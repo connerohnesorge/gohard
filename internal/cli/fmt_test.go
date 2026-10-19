@@ -82,7 +82,7 @@ type recordFS struct {
 func (r *recordFS) log(s string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.calls = append(r.calls, s)
+	r.calls = append(r.calls, filepath.ToSlash(s))
 }
 
 func (r *recordFS) WriteFile(name string, data []byte,
