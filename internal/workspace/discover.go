@@ -196,11 +196,7 @@ func (w *walker) args() []target {
 	}
 	var ts []target
 	for _, p := range w.o.Paths {
-		name := filepath.FromSlash(p)
-		if !filepath.IsAbs(name) {
-			name = filepath.Join(w.o.Dir, name)
-		}
-		name = filepath.Clean(name)
+		name := env.Abs(w.o.Dir, filepath.FromSlash(p))
 		ts = append(ts, target{disp: w.display(name), name: name})
 	}
 	slices.SortFunc(ts, func(a, b target) int {

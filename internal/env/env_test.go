@@ -1,6 +1,8 @@
 package env
 
 import (
+	"path/filepath"
+	"runtime"
 	"slices"
 	"strconv"
 	"testing"
@@ -254,4 +256,26 @@ func TestSequentialPanicsAtLowestIndex(t *testing.T) {
 			panic(i)
 		}
 	})
+}
+
+func TestAbs(t *testing.T) {
+	cases := []struct{ dir, name, want string }{
+		{"/work", "a/b.vhd", filepath.FromSlash("/work/a/b.vhd")},
+		{"/work", "/x/../y", filepath.FromSlash("/y")},
+		{"/work", "../z", filepath.FromSlash("/z")},
+	}
+	if runtime.GOOS == "windows" {
+		cases = append(cases,
+			struct{ dir, name, want string }{`C:\cwd`, `\x`, `C:\x`},
+			struct{ dir, name, want string }{`C:\cwd`, `/x/y`, `C:\x\y`},
+			struct{ dir, name, want string }{`C:\cwd`, `D:\x`, `D:\x`},
+			struct{ dir, name, want string }{`\work`, `\x`, `\x`},
+		)
+	}
+	for _, c := range cases {
+		if got := Abs(c.dir, c.name); got != c.want {
+			t.Errorf("Abs(%q, %q) = %q, want %q", c.dir, c.name, got,
+				c.want)
+		}
+	}
 }

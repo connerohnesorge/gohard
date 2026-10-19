@@ -1,7 +1,27 @@
 package env
 
+import "path/filepath"
+
 // Pure helpers shared by realenv, simenv and their callers. None of them
 // touches the world.
+
+// Abs resolves name against dir, an absolute directory, the way the OS
+// resolves a name against the current directory, and cleans the result
+// lexically. An absolute name is kept. On Windows a rooted name without
+// a volume (\x or /x, which filepath.IsAbs rejects) takes the volume of
+// dir instead of being joined below it, so /work stays /work in simenv
+// and \x is C:\x under C:\cwd, not C:\cwd\x. Any other name is joined to
+// dir.
+func Abs(dir, name string) string {
+	if filepath.IsAbs(name) {
+		return filepath.Clean(name)
+	}
+	if filepath.VolumeName(name) == "" && name != "" &&
+		(name[0] == '/' || name[0] == filepath.Separator) {
+		return filepath.Join(filepath.VolumeName(dir), name)
+	}
+	return filepath.Join(dir, name)
+}
 
 // SplitMix64 is a tiny, fast, seedable generator (Steele, Lea and
 // Flood). It implements Rand. Its whole state is one uint64, so a copy

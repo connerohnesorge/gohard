@@ -114,7 +114,7 @@ func Load(fsys env.FS, start string) Loaded {
 					diag.ConfigUnreadable, ".", reason(err))},
 			}
 		}
-		start = filepath.Join(wd, start)
+		start = env.Abs(wd, start)
 	}
 	root, found := FindRoot(fsys, start)
 	l := Loaded{Root: root, Found: found, Config: Defaults()}
@@ -196,10 +196,7 @@ func CheckFolders(fsys env.FS, root string, c *Config) []diag.Diagnostic {
 	var out []diag.Diagnostic
 	for _, lib := range c.Libraries {
 		for _, f := range lib.Folders {
-			p := filepath.FromSlash(f.Path)
-			if !filepath.IsAbs(p) {
-				p = filepath.Join(root, p)
-			}
+			p := env.Abs(root, filepath.FromSlash(f.Path))
 			if _, err := fsys.ReadDir(p); err != nil {
 				out = append(out, diag.New(diag.LibraryFolderMissing,
 					lib.Name, f.Path).At(FileName, f.Line, f.Col))

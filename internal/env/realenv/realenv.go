@@ -147,10 +147,7 @@ type osFS struct {
 // whether the name is absolute or relative, exactly as simenv resolves
 // it; the OS would otherwise apply ".." after following lnk.
 func (f osFS) abs(name string) string {
-	if filepath.IsAbs(name) {
-		return filepath.Clean(name)
-	}
-	return filepath.Join(f.dir, name)
+	return env.Abs(f.dir, name)
 }
 
 func (f osFS) Getwd() (string, error) {

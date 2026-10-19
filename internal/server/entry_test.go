@@ -169,6 +169,13 @@ func TestRejectedAndConfigLines(t *testing.T) {
 		`{"$gohard":"config","path":"x.yaml"}`,
 		`{"$gohard":"config","path":"/gohard.yaml"}`,
 		`{"$gohard":"config","path":"a/../gohard.yaml"}`,
+		`{"$gohard":"config","path":"C:/gohard.yaml"}`,
+		`{"$gohard":"config","path":"a\\gohard.yaml"}`,
+		`{"$gohard":"file","path":"/a.vhd","data":""}`,
+		`{"$gohard":"file","path":"../a.vhd","data":""}`,
+		`{"$gohard":"file","path":"c:/a.vhd","data":""}`,
+		`{"$gohard":"file","path":"rtl\\a.vhd","data":""}`,
+		`{"$gohard":"file","path":"./a.vhd","data":""}`,
 		`{"$gohard":"config"}`,
 		`{"$gohard":"config","path":"gohard.yaml","missing":true}`,
 	} {

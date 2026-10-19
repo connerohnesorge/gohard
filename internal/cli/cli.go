@@ -176,15 +176,25 @@ func outputFailed(w *bytes.Buffer, target string, err error) {
 	fmt.Fprintf(w, "gohard: %s[%s]: %s\n", d.Severity, d.Code, d.Message)
 }
 
-// errReason strips the operation and file names from err.
+// errReason strips the operation and file names from err. An error
+// that means a missing file or a refused permission reads the same on
+// every OS (Windows words a missing directory as "The system
+// cannot find the path specified."), so the same failure gives the
+// same bytes everywhere (P1).
 func errReason(err error) string {
 	var pe *fs.PathError
 	var le *os.LinkError
 	switch {
 	case errors.As(err, &pe):
-		return pe.Err.Error()
+		err = pe.Err
 	case errors.As(err, &le):
-		return le.Err.Error()
+		err = le.Err
+	}
+	switch {
+	case errors.Is(err, fs.ErrNotExist):
+		return "no such file or directory"
+	case errors.Is(err, fs.ErrPermission):
+		return "permission denied"
 	}
 	return err.Error()
 }

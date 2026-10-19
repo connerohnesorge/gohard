@@ -236,10 +236,7 @@ func lspAction(inv *Invocation) Result {
 	if err != nil {
 		return inv.Fail(diag.New(diag.CLIMissingPath, "."))
 	}
-	path := file
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(wd, path)
-	}
+	path := env.Abs(wd, file)
 	text, err := fsys.ReadFile(path)
 	if err != nil {
 		return inv.Fail(diag.New(diag.CLIMissingPath,

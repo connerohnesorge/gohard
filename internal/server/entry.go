@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
@@ -182,6 +183,21 @@ func isEntry(line []byte) bool {
 	return ok
 }
 
+// cleanRel reports whether p is a clean relative slash path naming a
+// file, with leading ../ segments only when up is set. The rule is the
+// same on every OS (a session recorded on one replays on all): no
+// leading '/', no backslash, no drive letter, no "." or ".." elsewhere.
+func cleanRel(p string, up bool) bool {
+	rest := p
+	for up && strings.HasPrefix(rest, "../") {
+		rest = rest[len("../"):]
+	}
+	return rest != "" && rest != "." && rest != ".." &&
+		!strings.HasPrefix(rest, "../") && path.Clean(p) == p &&
+		!path.IsAbs(p) && !strings.Contains(p, `\`) &&
+		!(len(rest) >= 2 && rest[1] == ':')
+}
+
 // input is one client input of a session.
 type input struct {
 	body   []byte // nil: the end of the input (unless reject is set)
@@ -237,8 +253,7 @@ func parseLines(lines []json.RawMessage) ([]input, project, error) {
 			c := ConfigRead{Path: e.Path, Data: e.Data,
 				Missing: e.Missing}
 			if c.Missing != (c.Path == "") || (!c.Missing &&
-				(filepath.IsAbs(filepath.FromSlash(c.Path)) ||
-					path.Clean(c.Path) != c.Path ||
+				(!cleanRel(c.Path, true) ||
 					path.Base(c.Path) != config.FileName)) {
 				return nil, p, fmt.Errorf("message %d: config "+
 					"entry path %s is not a clean relative path to "+
@@ -247,9 +262,7 @@ func parseLines(lines []json.RawMessage) ([]input, project, error) {
 			p.configs = append(p.configs, c)
 			continue
 		case entryFile:
-			if !filepath.IsLocal(filepath.FromSlash(e.Path)) ||
-				filepath.ToSlash(filepath.Clean(
-					filepath.FromSlash(e.Path))) != e.Path {
+			if !cleanRel(e.Path, false) {
 				return nil, p, fmt.Errorf("message %d: file path %s "+
 					"is not a clean relative path", i+1,
 					strconv.Quote(e.Path))
