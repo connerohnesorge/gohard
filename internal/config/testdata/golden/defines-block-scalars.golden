@@ -1,0 +1,3 @@
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set defines = {BAR@5:3: "folded\n", BAZ@7:3: "12", FOO@2:3: "multi\nline\n", QUX@8:3: ""}

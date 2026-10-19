@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "status": "clean",
+  "exit": 0,
+  "summary": {
+    "errors": 0,
+    "warnings": 0,
+    "hints": 0,
+    "files": 1
+  },
+  "diagnostics": [],
+  "incomplete": []
+}

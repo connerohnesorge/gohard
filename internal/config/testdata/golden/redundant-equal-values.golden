@@ -1,0 +1,6 @@
+exit 0
+gohard.yaml:2:16: warning[config/redundant-default]: simulation.time_budget is set to its default value "1 ms"
+gohard.yaml:4:12: warning[config/redundant-default]: simulation.env.epoch is set to its default value "2000-01-01T00:00:00Z"
+summary: 0 errors, 2 warnings, 0 hints, 1 files
+set simulation.time_budget = 1 ms
+set simulation.env.epoch = 2000-01-01T00:00:00Z

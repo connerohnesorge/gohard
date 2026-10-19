@@ -1,0 +1,122 @@
+# Nightly evidence (#30). Linux only, never blocks pull requests. Fuzz
+# crashes open a pull request adding the minimized input under
+# testdata/fuzz/<Target>/; that pull request stays red until the fix
+# lands on its branch.
+#
+# Pull requests opened with the default GITHUB_TOKEN do not trigger
+# other workflows, so the crash PR would show no checks. Set the
+# repository secret FUZZ_PR_TOKEN (a fine-grained token with contents
+# and pull-requests write) to have the pr workflow run on it; without
+# the secret the PR is still opened with GITHUB_TOKEN.
+name: nightly
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+    inputs:
+      fuzztime:
+        description: Fuzz time per target (go test -fuzztime)
+        required: false
+        default: 10m
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+env:
+  GOTOOLCHAIN: local
+  GOFLAGS: -mod=readonly
+
+jobs:
+  targets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.list.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - id: list
+        shell: bash
+        run: |
+          echo "matrix=$(bash scripts/ci/fuzz-targets.sh --json)" \
+            >>"$GITHUB_OUTPUT"
+
+  fuzz:
+    name: fuzz (${{ matrix.target }})
+    needs: targets
+    if: needs.targets.outputs.matrix != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.targets.outputs.matrix) }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.FUZZ_PR_TOKEN || github.token }}
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27.x'
+          cache: true
+
+      - name: Fuzz ${{ matrix.target }}
+        env:
+          GH_TOKEN: ${{ secrets.FUZZ_PR_TOKEN || github.token }}
+          FUZZTIME: ${{ inputs.fuzztime || '10m' }}
+          TARGET: ${{ matrix.target }}
+          PACKAGE: ${{ matrix.package }}
+          CORPUS: ${{ matrix.corpus }}
+        run: bash scripts/ci/fuzz.sh "$TARGET" "$PACKAGE" "$CORPUS"
+
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27.x'
+          cache: true
+
+      - name: Corpus at 64 seeds
+        run: bash scripts/ci/corpus-seeds.sh
+
+      - name: Parser-regression set (nightly)
+        run: bash scripts/ci/regression.sh nightly
+
+      - name: Replay testdata/seeds LSP sessions
+        run: bash scripts/ci/lsp-seeds.sh
+
+      - name: Benchmarks (recorded, never failing)
+        env:
+          BENCH_OUT: ${{ runner.temp }}/bench.txt
+        run: bash scripts/ci/bench.sh
+
+      - name: Upload benchmark numbers
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: bench-${{ github.sha }}
+          path: ${{ runner.temp }}/bench.txt
+          if-no-files-found: warn

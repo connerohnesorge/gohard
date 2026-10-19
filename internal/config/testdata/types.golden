@@ -1,0 +1,1485 @@
+== standard: {a: 1}
+| standard: {a: 1}
+exit 2
+gohard.yaml:1:11: error[config/type]: standard must be a string, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== standard: [1, 2]
+| standard: [1, 2]
+exit 2
+gohard.yaml:1:11: error[config/type]: standard must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== standard: ~
+| standard: ~
+exit 2
+gohard.yaml:1:11: error[config/type]: standard must be a string, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== standard: *x
+| x: &x 1
+| standard: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:2:11: error[config/type]: standard must be a string, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== standard: !!int 5
+| standard: !!int 5
+exit 2
+gohard.yaml:1:11: error[config/type]: standard must be a string, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== standard: nope
+| standard: nope
+exit 2
+gohard.yaml:1:11: error[config/enum]: standard must be one of "1993", "2002", "2008" or "2019", not nope
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== standard: "NOPE"
+| standard: "NOPE"
+exit 2
+gohard.yaml:1:11: error[config/enum]: standard must be one of "1993", "2002", "2008" or "2019", not "NOPE"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== standard: 2008
+| standard: 2008
+exit 2
+gohard.yaml:1:11: error[config/unquoted-standard]: standard must be a quoted string: standard: "2008"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== standard: yes
+| standard: yes
+exit 2
+gohard.yaml:1:11: error[config/enum]: standard must be one of "1993", "2002", "2008" or "2019", not yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: {a: 1}
+| lenient: {a: 1}
+exit 2
+gohard.yaml:1:10: error[config/type]: lenient must be true or false, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: [1, 2]
+| lenient: [1, 2]
+exit 2
+gohard.yaml:1:10: error[config/type]: lenient must be true or false, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: ~
+| lenient: ~
+exit 2
+gohard.yaml:1:10: error[config/type]: lenient must be true or false, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: *x
+| x: &x 1
+| lenient: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:2:10: error[config/type]: lenient must be true or false, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: !!int 5
+| lenient: !!int 5
+exit 2
+gohard.yaml:1:10: error[config/type]: lenient must be true or false, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: maybe
+| lenient: maybe
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not maybe
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: {a: 1}
+| psl:
+|   comments: {a: 1}
+exit 2
+gohard.yaml:2:13: error[config/type]: psl.comments must be true or false, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: [1, 2]
+| psl:
+|   comments: [1, 2]
+exit 2
+gohard.yaml:2:13: error[config/type]: psl.comments must be true or false, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: ~
+| psl:
+|   comments: ~
+exit 2
+gohard.yaml:2:13: error[config/type]: psl.comments must be true or false, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: *x
+| x: &x 1
+| psl:
+|   comments: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:13: error[config/type]: psl.comments must be true or false, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: !!int 5
+| psl:
+|   comments: !!int 5
+exit 2
+gohard.yaml:2:13: error[config/type]: psl.comments must be true or false, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: maybe
+| psl:
+|   comments: maybe
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not maybe
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: {a: 1}
+| psl:
+|   strict_keywords: {a: 1}
+exit 2
+gohard.yaml:2:20: error[config/type]: psl.strict_keywords must be true or false, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: [1, 2]
+| psl:
+|   strict_keywords: [1, 2]
+exit 2
+gohard.yaml:2:20: error[config/type]: psl.strict_keywords must be true or false, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: ~
+| psl:
+|   strict_keywords: ~
+exit 2
+gohard.yaml:2:20: error[config/type]: psl.strict_keywords must be true or false, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: *x
+| x: &x 1
+| psl:
+|   strict_keywords: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:20: error[config/type]: psl.strict_keywords must be true or false, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: !!int 5
+| psl:
+|   strict_keywords: !!int 5
+exit 2
+gohard.yaml:2:20: error[config/type]: psl.strict_keywords must be true or false, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: maybe
+| psl:
+|   strict_keywords: maybe
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not maybe
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: {a: 1}
+| libraries: {a: 1}
+exit 2
+gohard.yaml:1:16: error[config/type]: libraries.a must be a list, not the number 1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: [1, 2]
+| libraries: [1, 2]
+exit 2
+gohard.yaml:1:12: error[config/type]: libraries must be a mapping, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: ~
+| libraries: ~
+exit 2
+gohard.yaml:1:12: error[config/type]: libraries must be a mapping, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: a
+| libraries: a
+exit 2
+gohard.yaml:1:12: error[config/type]: libraries must be a mapping, not the string a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: {a: [1]}
+| libraries: {a: [1]}
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set libraries = {a@1:13: ["1"@1:17]}
+
+== libraries: {a: {b: 1}}
+| libraries: {a: {b: 1}}
+exit 2
+gohard.yaml:1:16: error[config/type]: libraries.a must be a list, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: {a: ~}
+| libraries: {a: ~}
+exit 2
+gohard.yaml:1:16: error[config/type]: libraries.a must be a list, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: {"": x}
+| libraries: {"": x}
+exit 2
+gohard.yaml:1:13: error[config/type]: a key under libraries must be a VHDL identifier, not the string ""
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: {9a: x}
+| libraries: {9a: x}
+exit 2
+gohard.yaml:1:13: error[config/type]: a key under libraries must be a VHDL identifier, not the string 9a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: {[a]: x}
+| libraries: {[a]: x}
+exit 2
+gohard.yaml:1:13: error[config/type]: a key under libraries must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: {a: 1}
+| allow_opaque: {a: 1}
+exit 2
+gohard.yaml:1:15: error[config/type]: allow_opaque must be a list, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: [1, 2]
+| allow_opaque: [1, 2]
+exit 2
+gohard.yaml:1:16: error[config/type]: allow_opaque[0] must be a lib.unit name, not the number 1
+gohard.yaml:1:19: error[config/type]: allow_opaque[1] must be a lib.unit name, not the number 2
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: ~
+| allow_opaque: ~
+exit 2
+gohard.yaml:1:15: error[config/type]: allow_opaque must be a list, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: a
+| allow_opaque: a
+exit 2
+gohard.yaml:1:15: error[config/type]: allow_opaque must be a list, not the string a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: [[a]]
+| allow_opaque: [[a]]
+exit 2
+gohard.yaml:1:16: error[config/type]: allow_opaque[0] must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: [{a: 1}]
+| allow_opaque: [{a: 1}]
+exit 2
+gohard.yaml:1:16: error[config/type]: allow_opaque[0] must be a string, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: [~]
+| allow_opaque: [~]
+exit 2
+gohard.yaml:1:16: error[config/type]: allow_opaque[0] must be a string, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: [""]
+| allow_opaque: [""]
+exit 2
+gohard.yaml:1:16: error[config/type]: allow_opaque[0] must be a lib.unit name, not the string ""
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: [1]
+| allow_opaque: [1]
+exit 2
+gohard.yaml:1:16: error[config/type]: allow_opaque[0] must be a lib.unit name, not the number 1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: {a: 1}
+| defines: {a: 1}
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set defines = {a@1:11: "1"}
+
+== defines: [1, 2]
+| defines: [1, 2]
+exit 2
+gohard.yaml:1:10: error[config/type]: defines must be a mapping, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: ~
+| defines: ~
+exit 2
+gohard.yaml:1:10: error[config/type]: defines must be a mapping, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: a
+| defines: a
+exit 2
+gohard.yaml:1:10: error[config/type]: defines must be a mapping, not the string a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: {a: [1]}
+| defines: {a: [1]}
+exit 2
+gohard.yaml:1:14: error[config/type]: defines.a must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: {a: {b: 1}}
+| defines: {a: {b: 1}}
+exit 2
+gohard.yaml:1:14: error[config/type]: defines.a must be a string, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: {a: ~}
+| defines: {a: ~}
+exit 2
+gohard.yaml:1:14: error[config/type]: defines.a must be a string, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: {"": x}
+| defines: {"": x}
+exit 2
+gohard.yaml:1:11: error[config/type]: a key under defines must be a VHDL identifier, not the string ""
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: {9a: x}
+| defines: {9a: x}
+exit 2
+gohard.yaml:1:11: error[config/type]: a key under defines must be a VHDL identifier, not the string 9a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: {[a]: x}
+| defines: {[a]: x}
+exit 2
+gohard.yaml:1:11: error[config/type]: a key under defines must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: {a: 1}
+| format:
+|   indent: {a: 1}
+exit 2
+gohard.yaml:2:11: error[config/type]: format.indent must be a decimal integer, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: [1, 2]
+| format:
+|   indent: [1, 2]
+exit 2
+gohard.yaml:2:11: error[config/type]: format.indent must be a decimal integer, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: ~
+| format:
+|   indent: ~
+exit 2
+gohard.yaml:2:11: error[config/type]: format.indent must be a decimal integer, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: *x
+| x: &x 1
+| format:
+|   indent: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:11: error[config/type]: format.indent must be a decimal integer, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: !!int 5
+| format:
+|   indent: !!int 5
+exit 2
+gohard.yaml:2:11: error[config/type]: format.indent must be a decimal integer, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: "5"
+| format:
+|   indent: "5"
+exit 2
+gohard.yaml:2:11: error[config/type]: format.indent must be a decimal integer, not the string "5"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: 1.5
+| format:
+|   indent: 1.5
+exit 2
+gohard.yaml:2:11: error[config/type]: format.indent must be a decimal integer, not the number 1.5
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: 0x10
+| format:
+|   indent: 0x10
+exit 2
+gohard.yaml:2:11: error[config/type]: format.indent must be a decimal integer, not the number 0x10
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: 012
+| format:
+|   indent: 012
+exit 2
+gohard.yaml:2:11: error[config/type]: format.indent must be a decimal integer, not the number 012
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: abc
+| format:
+|   indent: abc
+exit 2
+gohard.yaml:2:11: error[config/type]: format.indent must be a decimal integer, not the string abc
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: 0
+| format:
+|   indent: 0
+exit 2
+gohard.yaml:2:11: error[config/range]: format.indent must be at least 1, not 0
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: -1
+| format:
+|   indent: -1
+exit 2
+gohard.yaml:2:11: error[config/range]: format.indent must be at least 1, not -1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.indent: 9223372036854775808
+| format:
+|   indent: 9223372036854775808
+exit 2
+gohard.yaml:2:11: error[config/range]: format.indent must be between 1 and 9223372036854775807, not 9223372036854775808
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.keyword_case: {a: 1}
+| format:
+|   keyword_case: {a: 1}
+exit 2
+gohard.yaml:2:17: error[config/type]: format.keyword_case must be a string, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.keyword_case: [1, 2]
+| format:
+|   keyword_case: [1, 2]
+exit 2
+gohard.yaml:2:17: error[config/type]: format.keyword_case must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.keyword_case: ~
+| format:
+|   keyword_case: ~
+exit 2
+gohard.yaml:2:17: error[config/type]: format.keyword_case must be a string, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.keyword_case: *x
+| x: &x 1
+| format:
+|   keyword_case: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:17: error[config/type]: format.keyword_case must be a string, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== format.keyword_case: !!int 5
+| format:
+|   keyword_case: !!int 5
+exit 2
+gohard.yaml:2:17: error[config/type]: format.keyword_case must be a string, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.keyword_case: nope
+| format:
+|   keyword_case: nope
+exit 2
+gohard.yaml:2:17: error[config/enum]: format.keyword_case must be one of "lower", "upper" or "preserve", not nope
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.keyword_case: "NOPE"
+| format:
+|   keyword_case: "NOPE"
+exit 2
+gohard.yaml:2:17: error[config/enum]: format.keyword_case must be one of "lower", "upper" or "preserve", not "NOPE"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.keyword_case: 2008
+| format:
+|   keyword_case: 2008
+exit 2
+gohard.yaml:2:17: error[config/enum]: format.keyword_case must be one of "lower", "upper" or "preserve", not 2008
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.keyword_case: yes
+| format:
+|   keyword_case: yes
+exit 2
+gohard.yaml:2:17: error[config/enum]: format.keyword_case must be one of "lower", "upper" or "preserve", not yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: {a: 1}
+| format:
+|   align_ports: {a: 1}
+exit 2
+gohard.yaml:2:16: error[config/type]: format.align_ports must be true or false, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: [1, 2]
+| format:
+|   align_ports: [1, 2]
+exit 2
+gohard.yaml:2:16: error[config/type]: format.align_ports must be true or false, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: ~
+| format:
+|   align_ports: ~
+exit 2
+gohard.yaml:2:16: error[config/type]: format.align_ports must be true or false, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: *x
+| x: &x 1
+| format:
+|   align_ports: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:16: error[config/type]: format.align_ports must be true or false, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: !!int 5
+| format:
+|   align_ports: !!int 5
+exit 2
+gohard.yaml:2:16: error[config/type]: format.align_ports must be true or false, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: maybe
+| format:
+|   align_ports: maybe
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not maybe
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: {a: 1}
+| format:
+|   max_line_length: {a: 1}
+exit 2
+gohard.yaml:2:20: error[config/type]: format.max_line_length must be a decimal integer, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: [1, 2]
+| format:
+|   max_line_length: [1, 2]
+exit 2
+gohard.yaml:2:20: error[config/type]: format.max_line_length must be a decimal integer, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: ~
+| format:
+|   max_line_length: ~
+exit 2
+gohard.yaml:2:20: error[config/type]: format.max_line_length must be a decimal integer, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: *x
+| x: &x 1
+| format:
+|   max_line_length: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:20: error[config/type]: format.max_line_length must be a decimal integer, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: !!int 5
+| format:
+|   max_line_length: !!int 5
+exit 2
+gohard.yaml:2:20: error[config/type]: format.max_line_length must be a decimal integer, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: "5"
+| format:
+|   max_line_length: "5"
+exit 2
+gohard.yaml:2:20: error[config/type]: format.max_line_length must be a decimal integer, not the string "5"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: 1.5
+| format:
+|   max_line_length: 1.5
+exit 2
+gohard.yaml:2:20: error[config/type]: format.max_line_length must be a decimal integer, not the number 1.5
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: 0x10
+| format:
+|   max_line_length: 0x10
+exit 2
+gohard.yaml:2:20: error[config/type]: format.max_line_length must be a decimal integer, not the number 0x10
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: 012
+| format:
+|   max_line_length: 012
+exit 2
+gohard.yaml:2:20: error[config/type]: format.max_line_length must be a decimal integer, not the number 012
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: abc
+| format:
+|   max_line_length: abc
+exit 2
+gohard.yaml:2:20: error[config/type]: format.max_line_length must be a decimal integer, not the string abc
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: 39
+| format:
+|   max_line_length: 39
+exit 2
+gohard.yaml:2:20: error[config/range]: format.max_line_length must be at least 40, not 39
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: -1
+| format:
+|   max_line_length: -1
+exit 2
+gohard.yaml:2:20: error[config/range]: format.max_line_length must be at least 40, not -1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.max_line_length: 9223372036854775808
+| format:
+|   max_line_length: 9223372036854775808
+exit 2
+gohard.yaml:2:20: error[config/range]: format.max_line_length must be between 40 and 9223372036854775807, not 9223372036854775808
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: {a: 1}
+| simulation:
+|   auto_run_on_save: {a: 1}
+exit 2
+gohard.yaml:2:21: error[config/type]: simulation.auto_run_on_save must be true or false, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: [1, 2]
+| simulation:
+|   auto_run_on_save: [1, 2]
+exit 2
+gohard.yaml:2:21: error[config/type]: simulation.auto_run_on_save must be true or false, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: ~
+| simulation:
+|   auto_run_on_save: ~
+exit 2
+gohard.yaml:2:21: error[config/type]: simulation.auto_run_on_save must be true or false, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: *x
+| x: &x 1
+| simulation:
+|   auto_run_on_save: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:21: error[config/type]: simulation.auto_run_on_save must be true or false, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: !!int 5
+| simulation:
+|   auto_run_on_save: !!int 5
+exit 2
+gohard.yaml:2:21: error[config/type]: simulation.auto_run_on_save must be true or false, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: maybe
+| simulation:
+|   auto_run_on_save: maybe
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not maybe
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: {a: 1}
+| simulation:
+|   testbenches: {a: 1}
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.testbenches must be a list, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: [1, 2]
+| simulation:
+|   testbenches: [1, 2]
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.testbenches[0] must be a VHDL identifier, not the number 1
+gohard.yaml:2:20: error[config/type]: simulation.testbenches[1] must be a VHDL identifier, not the number 2
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: ~
+| simulation:
+|   testbenches: ~
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.testbenches must be a list, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: a
+| simulation:
+|   testbenches: a
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.testbenches must be a list, not the string a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: [[a]]
+| simulation:
+|   testbenches: [[a]]
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.testbenches[0] must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: [{a: 1}]
+| simulation:
+|   testbenches: [{a: 1}]
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.testbenches[0] must be a string, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: [~]
+| simulation:
+|   testbenches: [~]
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.testbenches[0] must be a string, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: [""]
+| simulation:
+|   testbenches: [""]
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.testbenches[0] must be a VHDL identifier, not the string ""
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: [1]
+| simulation:
+|   testbenches: [1]
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.testbenches[0] must be a VHDL identifier, not the number 1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.seed: {a: 1}
+| simulation:
+|   seed: {a: 1}
+exit 2
+gohard.yaml:2:9: error[config/type]: simulation.seed must be a decimal integer, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.seed: [1, 2]
+| simulation:
+|   seed: [1, 2]
+exit 2
+gohard.yaml:2:9: error[config/type]: simulation.seed must be a decimal integer, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.seed: ~
+| simulation:
+|   seed: ~
+exit 2
+gohard.yaml:2:9: error[config/type]: simulation.seed must be a decimal integer, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.seed: *x
+| x: &x 1
+| simulation:
+|   seed: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:9: error[config/type]: simulation.seed must be a decimal integer, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.seed: !!int 5
+| simulation:
+|   seed: !!int 5
+exit 2
+gohard.yaml:2:9: error[config/type]: simulation.seed must be a decimal integer, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.seed: "5"
+| simulation:
+|   seed: "5"
+exit 2
+gohard.yaml:2:9: error[config/type]: simulation.seed must be a decimal integer, not the string "5"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.seed: 1e3
+| simulation:
+|   seed: 1e3
+exit 2
+gohard.yaml:2:9: error[config/type]: simulation.seed must be a decimal integer, not the number 1e3
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.seed: -1
+| simulation:
+|   seed: -1
+exit 2
+gohard.yaml:2:9: error[config/range]: simulation.seed must be between 0 and 18446744073709551615, not -1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.seed: 18446744073709551616
+| simulation:
+|   seed: 18446744073709551616
+exit 2
+gohard.yaml:2:9: error[config/range]: simulation.seed must be between 0 and 18446744073709551615, not 18446744073709551616
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: {a: 1}
+| simulation:
+|   time_budget: {a: 1}
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.time_budget must be a VHDL time string, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: [1, 2]
+| simulation:
+|   time_budget: [1, 2]
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.time_budget must be a VHDL time string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: ~
+| simulation:
+|   time_budget: ~
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.time_budget must be a VHDL time string, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: *x
+| x: &x 1
+| simulation:
+|   time_budget: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:16: error[config/type]: simulation.time_budget must be a VHDL time string, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: !!int 5
+| simulation:
+|   time_budget: !!int 5
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.time_budget must be a VHDL time string, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: 1ms
+| simulation:
+|   time_budget: 1ms
+exit 2
+gohard.yaml:2:16: error[config/bad-time]: simulation.time_budget: 1ms is not a VHDL time such as "1 ms"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: 1
+| simulation:
+|   time_budget: 1
+exit 2
+gohard.yaml:2:16: error[config/bad-time]: simulation.time_budget: 1 is not a VHDL time such as "1 ms"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: ms
+| simulation:
+|   time_budget: ms
+exit 2
+gohard.yaml:2:16: error[config/bad-time]: simulation.time_budget: ms is not a VHDL time such as "1 ms"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: 1 s
+| simulation:
+|   time_budget: 1 s
+exit 2
+gohard.yaml:2:16: error[config/bad-time]: simulation.time_budget: 1 s is not a VHDL time such as "1 ms"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: 1.5.2 ns
+| simulation:
+|   time_budget: 1.5.2 ns
+exit 2
+gohard.yaml:2:16: error[config/bad-time]: simulation.time_budget: 1.5.2 ns is not a VHDL time such as "1 ms"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: 1__0 ns
+| simulation:
+|   time_budget: 1__0 ns
+exit 2
+gohard.yaml:2:16: error[config/bad-time]: simulation.time_budget: 1__0 ns is not a VHDL time such as "1 ms"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: _1 ns
+| simulation:
+|   time_budget: _1 ns
+exit 2
+gohard.yaml:2:16: error[config/bad-time]: simulation.time_budget: _1 ns is not a VHDL time such as "1 ms"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: 1 ms 
+| simulation:
+|   time_budget: 1 ms 
+exit 0
+gohard.yaml:2:16: warning[config/redundant-default]: simulation.time_budget is set to its default value "1 ms"
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.time_budget = 1 ms
+
+== simulation.time_budget: 1e ns
+| simulation:
+|   time_budget: 1e ns
+exit 2
+gohard.yaml:2:16: error[config/bad-time]: simulation.time_budget: 1e ns is not a VHDL time such as "1 ms"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: 10000 hr
+| simulation:
+|   time_budget: 10000 hr
+exit 2
+gohard.yaml:2:16: error[config/range]: simulation.time_budget must be at most 9223372036854775807 fs, not 10000 hr
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.time_budget: 1e30 fs
+| simulation:
+|   time_budget: 1e30 fs
+exit 2
+gohard.yaml:2:16: error[config/range]: simulation.time_budget must be at most 9223372036854775807 fs, not 1e30 fs
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: {a: 1}
+| simulation:
+|   delta_budget: {a: 1}
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.delta_budget must be a decimal integer, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: [1, 2]
+| simulation:
+|   delta_budget: [1, 2]
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.delta_budget must be a decimal integer, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: ~
+| simulation:
+|   delta_budget: ~
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.delta_budget must be a decimal integer, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: *x
+| x: &x 1
+| simulation:
+|   delta_budget: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:17: error[config/type]: simulation.delta_budget must be a decimal integer, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: !!int 5
+| simulation:
+|   delta_budget: !!int 5
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.delta_budget must be a decimal integer, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: "5"
+| simulation:
+|   delta_budget: "5"
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.delta_budget must be a decimal integer, not the string "5"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: 1.5
+| simulation:
+|   delta_budget: 1.5
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.delta_budget must be a decimal integer, not the number 1.5
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: 0x10
+| simulation:
+|   delta_budget: 0x10
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.delta_budget must be a decimal integer, not the number 0x10
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: 012
+| simulation:
+|   delta_budget: 012
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.delta_budget must be a decimal integer, not the number 012
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: abc
+| simulation:
+|   delta_budget: abc
+exit 2
+gohard.yaml:2:17: error[config/type]: simulation.delta_budget must be a decimal integer, not the string abc
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: 0
+| simulation:
+|   delta_budget: 0
+exit 2
+gohard.yaml:2:17: error[config/range]: simulation.delta_budget must be at least 1, not 0
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: -1
+| simulation:
+|   delta_budget: -1
+exit 2
+gohard.yaml:2:17: error[config/range]: simulation.delta_budget must be at least 1, not -1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.delta_budget: 9223372036854775808
+| simulation:
+|   delta_budget: 9223372036854775808
+exit 2
+gohard.yaml:2:17: error[config/range]: simulation.delta_budget must be between 1 and 9223372036854775807, not 9223372036854775808
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: {a: 1}
+| simulation:
+|   step_budget: {a: 1}
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.step_budget must be a decimal integer, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: [1, 2]
+| simulation:
+|   step_budget: [1, 2]
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.step_budget must be a decimal integer, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: ~
+| simulation:
+|   step_budget: ~
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.step_budget must be a decimal integer, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: *x
+| x: &x 1
+| simulation:
+|   step_budget: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:16: error[config/type]: simulation.step_budget must be a decimal integer, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: !!int 5
+| simulation:
+|   step_budget: !!int 5
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.step_budget must be a decimal integer, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: "5"
+| simulation:
+|   step_budget: "5"
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.step_budget must be a decimal integer, not the string "5"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: 1.5
+| simulation:
+|   step_budget: 1.5
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.step_budget must be a decimal integer, not the number 1.5
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: 0x10
+| simulation:
+|   step_budget: 0x10
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.step_budget must be a decimal integer, not the number 0x10
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: 012
+| simulation:
+|   step_budget: 012
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.step_budget must be a decimal integer, not the number 012
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: abc
+| simulation:
+|   step_budget: abc
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.step_budget must be a decimal integer, not the string abc
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: 0
+| simulation:
+|   step_budget: 0
+exit 2
+gohard.yaml:2:16: error[config/range]: simulation.step_budget must be at least 1, not 0
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: -1
+| simulation:
+|   step_budget: -1
+exit 2
+gohard.yaml:2:16: error[config/range]: simulation.step_budget must be at least 1, not -1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.step_budget: 9223372036854775808
+| simulation:
+|   step_budget: 9223372036854775808
+exit 2
+gohard.yaml:2:16: error[config/range]: simulation.step_budget must be between 1 and 9223372036854775807, not 9223372036854775808
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.stop_level: {a: 1}
+| simulation:
+|   stop_level: {a: 1}
+exit 2
+gohard.yaml:2:15: error[config/type]: simulation.stop_level must be a string, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.stop_level: [1, 2]
+| simulation:
+|   stop_level: [1, 2]
+exit 2
+gohard.yaml:2:15: error[config/type]: simulation.stop_level must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.stop_level: ~
+| simulation:
+|   stop_level: ~
+exit 2
+gohard.yaml:2:15: error[config/type]: simulation.stop_level must be a string, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.stop_level: *x
+| x: &x 1
+| simulation:
+|   stop_level: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:15: error[config/type]: simulation.stop_level must be a string, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.stop_level: !!int 5
+| simulation:
+|   stop_level: !!int 5
+exit 2
+gohard.yaml:2:15: error[config/type]: simulation.stop_level must be a string, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.stop_level: nope
+| simulation:
+|   stop_level: nope
+exit 2
+gohard.yaml:2:15: error[config/enum]: simulation.stop_level must be one of "note", "warning", "error" or "failure", not nope
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.stop_level: "NOPE"
+| simulation:
+|   stop_level: "NOPE"
+exit 2
+gohard.yaml:2:15: error[config/enum]: simulation.stop_level must be one of "note", "warning", "error" or "failure", not "NOPE"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.stop_level: 2008
+| simulation:
+|   stop_level: 2008
+exit 2
+gohard.yaml:2:15: error[config/enum]: simulation.stop_level must be one of "note", "warning", "error" or "failure", not 2008
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.stop_level: yes
+| simulation:
+|   stop_level: yes
+exit 2
+gohard.yaml:2:15: error[config/enum]: simulation.stop_level must be one of "note", "warning", "error" or "failure", not yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.dump_scope: {a: 1}
+| simulation:
+|   dump_scope: {a: 1}
+exit 2
+gohard.yaml:2:15: error[config/type]: simulation.dump_scope must be a list, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.dump_scope: [1, 2]
+| simulation:
+|   dump_scope: [1, 2]
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set simulation.dump_scope = ["1", "2"]
+
+== simulation.dump_scope: ~
+| simulation:
+|   dump_scope: ~
+exit 2
+gohard.yaml:2:15: error[config/type]: simulation.dump_scope must be a list, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.dump_scope: a
+| simulation:
+|   dump_scope: a
+exit 2
+gohard.yaml:2:15: error[config/type]: simulation.dump_scope must be a list, not the string a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.dump_scope: [[a]]
+| simulation:
+|   dump_scope: [[a]]
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.dump_scope[0] must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.dump_scope: [{a: 1}]
+| simulation:
+|   dump_scope: [{a: 1}]
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.dump_scope[0] must be a string, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.dump_scope: [~]
+| simulation:
+|   dump_scope: [~]
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.dump_scope[0] must be a string, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.dump_scope: [""]
+| simulation:
+|   dump_scope: [""]
+exit 2
+gohard.yaml:2:16: error[config/type]: simulation.dump_scope[0] must be a non-empty string, not the string ""
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.dump_scope: [1]
+| simulation:
+|   dump_scope: [1]
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set simulation.dump_scope = ["1"]
+
+== simulation.models: {a: 1}
+| simulation:
+|   models: {a: 1}
+exit 2
+gohard.yaml:2:12: error[config/type]: a key under simulation.models must be a lib.unit name, not the string a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: [1, 2]
+| simulation:
+|   models: [1, 2]
+exit 2
+gohard.yaml:2:11: error[config/type]: simulation.models must be a mapping, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: ~
+| simulation:
+|   models: ~
+exit 2
+gohard.yaml:2:11: error[config/type]: simulation.models must be a mapping, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: a
+| simulation:
+|   models: a
+exit 2
+gohard.yaml:2:11: error[config/type]: simulation.models must be a mapping, not the string a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: {a: [1]}
+| simulation:
+|   models: {a: [1]}
+exit 2
+gohard.yaml:2:12: error[config/type]: a key under simulation.models must be a lib.unit name, not the string a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: {a: {b: 1}}
+| simulation:
+|   models: {a: {b: 1}}
+exit 2
+gohard.yaml:2:12: error[config/type]: a key under simulation.models must be a lib.unit name, not the string a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: {a: ~}
+| simulation:
+|   models: {a: ~}
+exit 2
+gohard.yaml:2:12: error[config/type]: a key under simulation.models must be a lib.unit name, not the string a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: {"": x}
+| simulation:
+|   models: {"": x}
+exit 2
+gohard.yaml:2:12: error[config/type]: a key under simulation.models must be a lib.unit name, not the string ""
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: {9a: x}
+| simulation:
+|   models: {9a: x}
+exit 2
+gohard.yaml:2:12: error[config/type]: a key under simulation.models must be a lib.unit name, not the string 9a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: {[a]: x}
+| simulation:
+|   models: {[a]: x}
+exit 2
+gohard.yaml:2:12: error[config/type]: a key under simulation.models must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.epoch: {a: 1}
+| simulation:
+|   env:
+|     epoch: {a: 1}
+exit 2
+gohard.yaml:3:12: error[config/type]: simulation.env.epoch must be an RFC 3339 UTC time, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.epoch: [1, 2]
+| simulation:
+|   env:
+|     epoch: [1, 2]
+exit 2
+gohard.yaml:3:12: error[config/type]: simulation.env.epoch must be an RFC 3339 UTC time, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.epoch: ~
+| simulation:
+|   env:
+|     epoch: ~
+exit 2
+gohard.yaml:3:12: error[config/type]: simulation.env.epoch must be an RFC 3339 UTC time, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.epoch: *x
+| x: &x 1
+| simulation:
+|   env:
+|     epoch: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:4:12: error[config/type]: simulation.env.epoch must be an RFC 3339 UTC time, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.epoch: !!int 5
+| simulation:
+|   env:
+|     epoch: !!int 5
+exit 2
+gohard.yaml:3:12: error[config/type]: simulation.env.epoch must be an RFC 3339 UTC time, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.epoch: 2000-01-01
+| simulation:
+|   env:
+|     epoch: 2000-01-01
+exit 2
+gohard.yaml:3:12: error[config/bad-timestamp]: simulation.env.epoch: 2000-01-01 is not an RFC 3339 UTC time such as "2000-01-01T00:00:00Z"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.epoch: 2000-01-01T00:00:00
+| simulation:
+|   env:
+|     epoch: 2000-01-01T00:00:00
+exit 2
+gohard.yaml:3:12: error[config/bad-timestamp]: simulation.env.epoch: 2000-01-01T00:00:00 is not an RFC 3339 UTC time such as "2000-01-01T00:00:00Z"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.epoch: 2000-01-01T00:00:00+01:00
+| simulation:
+|   env:
+|     epoch: 2000-01-01T00:00:00+01:00
+exit 2
+gohard.yaml:3:12: error[config/bad-timestamp]: simulation.env.epoch: 2000-01-01T00:00:00+01:00 is not an RFC 3339 UTC time such as "2000-01-01T00:00:00Z"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.epoch: 2000-13-01T00:00:00Z
+| simulation:
+|   env:
+|     epoch: 2000-13-01T00:00:00Z
+exit 2
+gohard.yaml:3:12: error[config/bad-timestamp]: simulation.env.epoch: 2000-13-01T00:00:00Z is not an RFC 3339 UTC time such as "2000-01-01T00:00:00Z"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.epoch: yesterday
+| simulation:
+|   env:
+|     epoch: yesterday
+exit 2
+gohard.yaml:3:12: error[config/bad-timestamp]: simulation.env.epoch: yesterday is not an RFC 3339 UTC time such as "2000-01-01T00:00:00Z"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.vars: {a: 1}
+| simulation:
+|   env:
+|     vars: {a: 1}
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set simulation.env.vars = {a: "1"}
+
+== simulation.env.vars: [1, 2]
+| simulation:
+|   env:
+|     vars: [1, 2]
+exit 2
+gohard.yaml:3:11: error[config/type]: simulation.env.vars must be a mapping, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.vars: ~
+| simulation:
+|   env:
+|     vars: ~
+exit 2
+gohard.yaml:3:11: error[config/type]: simulation.env.vars must be a mapping, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.vars: a
+| simulation:
+|   env:
+|     vars: a
+exit 2
+gohard.yaml:3:11: error[config/type]: simulation.env.vars must be a mapping, not the string a
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.vars: {a: [1]}
+| simulation:
+|   env:
+|     vars: {a: [1]}
+exit 2
+gohard.yaml:3:15: error[config/type]: simulation.env.vars.a must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.vars: {a: {b: 1}}
+| simulation:
+|   env:
+|     vars: {a: {b: 1}}
+exit 2
+gohard.yaml:3:15: error[config/type]: simulation.env.vars.a must be a string, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.vars: {a: ~}
+| simulation:
+|   env:
+|     vars: {a: ~}
+exit 2
+gohard.yaml:3:15: error[config/type]: simulation.env.vars.a must be a string, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.vars: {"": x}
+| simulation:
+|   env:
+|     vars: {"": x}
+exit 2
+gohard.yaml:3:12: error[config/type]: a key under simulation.env.vars must be a variable name without '=', not the string ""
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.vars: {9a: x}
+| simulation:
+|   env:
+|     vars: {9a: x}
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set simulation.env.vars = {9a: "x"}
+
+== simulation.env.vars: {[a]: x}
+| simulation:
+|   env:
+|     vars: {[a]: x}
+exit 2
+gohard.yaml:3:12: error[config/type]: a key under simulation.env.vars must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files

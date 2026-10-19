@@ -1,0 +1,9 @@
+# Project config for the standin_model corpus design (#28, #35).
+# crypt_core.vhd carries an IEEE 1735 protected architecture, so
+# work.crypt_core is opaque encrypted IP; allow_opaque downgrades it
+# (#20) and simulation.models supplies the plain VHDL stand-in.
+allow_opaque:
+  - work.crypt_core
+simulation:
+  models:
+    work.crypt_core: models/crypt_core_model.vhd

@@ -1,0 +1,2 @@
+gohard.yaml:1:1: error[config/unreadable]: cannot read gohard.yaml: it is a directory
+summary: 1 errors, 0 warnings, 0 hints, 1 files

@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "status": "interrupted",
+  "exit": 143,
+  "summary": {
+    "errors": 1,
+    "warnings": 0,
+    "hints": 0,
+    "files": 1
+  },
+  "diagnostics": [
+    {
+      "path": "",
+      "line": 0,
+      "col": 0,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "cli/interrupted",
+      "message": "interrupted by SIGTERM",
+      "related": []
+    }
+  ],
+  "incomplete": []
+}

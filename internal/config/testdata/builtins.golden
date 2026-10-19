@@ -1,0 +1,95 @@
+== TOOL_EDITION
+| defines:
+|   TOOL_EDITION: "x"
+|   USER: "1"
+exit 2
+gohard.yaml:2:3: error[config/builtin-define]: TOOL_EDITION is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== tool_edition
+| defines:
+|   tool_edition: "x"
+|   USER: "1"
+exit 2
+gohard.yaml:2:3: error[config/builtin-define]: tool_edition is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== TOOL_NAME
+| defines:
+|   TOOL_NAME: "x"
+|   USER: "1"
+exit 2
+gohard.yaml:2:3: error[config/builtin-define]: TOOL_NAME is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== tool_name
+| defines:
+|   tool_name: "x"
+|   USER: "1"
+exit 2
+gohard.yaml:2:3: error[config/builtin-define]: tool_name is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== TOOL_TYPE
+| defines:
+|   TOOL_TYPE: "x"
+|   USER: "1"
+exit 2
+gohard.yaml:2:3: error[config/builtin-define]: TOOL_TYPE is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== tool_type
+| defines:
+|   tool_type: "x"
+|   USER: "1"
+exit 2
+gohard.yaml:2:3: error[config/builtin-define]: tool_type is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== TOOL_VENDOR
+| defines:
+|   TOOL_VENDOR: "x"
+|   USER: "1"
+exit 2
+gohard.yaml:2:3: error[config/builtin-define]: TOOL_VENDOR is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== tool_vendor
+| defines:
+|   tool_vendor: "x"
+|   USER: "1"
+exit 2
+gohard.yaml:2:3: error[config/builtin-define]: tool_vendor is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== TOOL_VERSION
+| defines:
+|   TOOL_VERSION: "x"
+|   USER: "1"
+exit 2
+gohard.yaml:2:3: error[config/builtin-define]: TOOL_VERSION is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== tool_version
+| defines:
+|   tool_version: "x"
+|   USER: "1"
+exit 2
+gohard.yaml:2:3: error[config/builtin-define]: tool_version is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== VHDL_VERSION
+| defines:
+|   VHDL_VERSION: "x"
+|   USER: "1"
+exit 2
+gohard.yaml:2:3: error[config/builtin-define]: VHDL_VERSION is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== vhdl_version
+| defines:
+|   vhdl_version: "x"
+|   USER: "1"
+exit 2
+gohard.yaml:2:3: error[config/builtin-define]: vhdl_version is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files

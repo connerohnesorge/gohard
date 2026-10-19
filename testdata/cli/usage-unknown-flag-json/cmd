@@ -1,0 +1,1 @@
+gohard check --format json --bogus a.vhd

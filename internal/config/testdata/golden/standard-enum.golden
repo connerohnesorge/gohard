@@ -1,0 +1,3 @@
+exit 2
+gohard.yaml:1:11: error[config/enum]: standard must be one of "1993", "2002", "2008" or "2019", not "08"
+summary: 1 errors, 0 warnings, 0 hints, 1 files

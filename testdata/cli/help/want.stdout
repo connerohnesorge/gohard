@@ -1,0 +1,29 @@
+gohard is a VHDL language server with a built-in simulator.
+
+Usage:
+  gohard <command> [flags] [arguments]
+
+Commands:
+  check    parse and analyze VHDL; with --sim, run testbenches
+  config   check gohard.yaml or print its JSON schema
+  fmt      format VHDL files in place, or check formatting
+  help     show help for gohard or one command
+  libs     find vendor libraries and print gohard.yaml lines
+  lsp      run the language server, or one language-server action
+  parse    print the concrete syntax tree of a file
+  trace    export a simulation trace to VCD or FST
+  version  print the gohard version
+
+Global flags:
+  -h, --help         show help
+  -p, --jobs N       run at most N parallel jobs (output never depends on N)
+      --output FILE  write standard output to FILE (a temp file, then rename)
+
+Exit codes:
+  0    clean (warnings and hints do not fail a run)
+  1    the design has problems (any warning with --strict)
+  2    tool or setup failure, or an opaque unit; wins over 1
+  130  interrupted (Ctrl-C)
+  143  terminated (SIGTERM)
+
+Run 'gohard help <command>' for the flags of one command.

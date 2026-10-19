@@ -1,0 +1,2 @@
+libraries:
+  mylib: [src/a.vhd]

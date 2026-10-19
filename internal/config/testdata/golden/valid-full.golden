@@ -1,0 +1,24 @@
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set standard = "2019"
+set lenient = true
+set psl.comments = true
+set psl.strict_keywords = true
+set libraries = {Mylib@9:3: ["rtl"@10:7], vendor_lib@8:3: ["vendor/src"@8:16, "vendor/extra"@8:28]}
+set allow_opaque = ["vendor_lib.secret_core"]
+set defines = {empty@15:3: "", USE_FAST_ADDER@13:3: "true", WIDTH@14:3: "32"}
+set format.indent = 4
+set format.keyword_case = "upper"
+set format.align_ports = false
+set format.max_line_length = 120
+set simulation.auto_run_on_save = true
+set simulation.testbenches = ["tb_top", "TB_Other"]
+set simulation.seed = 18446744073709551615
+set simulation.time_budget = 1500 ns
+set simulation.delta_budget = 1
+set simulation.step_budget = 9223372036854775807
+set simulation.stop_level = "failure"
+set simulation.dump_scope = ["tb.dut", "tb.u0"]
+set simulation.models = {vendor_lib.secret_core@31:5: "models/secret_core.vhd"}
+set simulation.env.epoch = 2024-02-29T12:30:00.5Z
+set simulation.env.vars = {HOME: "/home/user", lower: "x"}

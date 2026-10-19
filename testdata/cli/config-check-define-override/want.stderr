@@ -1,0 +1,2 @@
+gohard: --define FOO=1 overrides defines.FOO: "0" (gohard.yaml:2:3)
+gohard: --define foo=2 overrides --define FOO=1

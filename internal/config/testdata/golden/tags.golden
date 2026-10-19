@@ -1,0 +1,6 @@
+exit 2
+gohard.yaml:1:10: error[config/type]: lenient must be true or false, not a value tagged !!bool
+gohard.yaml:2:11: warning[config/redundant-default]: standard is set to its default value "2008"
+gohard.yaml:4:17: error[config/type]: format.keyword_case must be a string, not a value tagged !custom
+summary: 2 errors, 1 warnings, 0 hints, 1 files
+set standard = "2008"

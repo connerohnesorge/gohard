@@ -1,0 +1,2 @@
+gohard: error[cli/usage]: --define "FOO" must be NAME=VALUE; run 'gohard help' for usage
+summary: 1 errors, 0 warnings, 0 hints, 0 files

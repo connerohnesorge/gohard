@@ -1,0 +1,6 @@
+# Project config for the mode_views corpus design (#28, #31).
+# MV_PROFILE is the user conditional-analysis identifier. #31 takes user
+# identifiers only from `defines:` here (or --define), so without this
+# file analysis stops with syntax/undefined-condition. Values are strings.
+defines:
+  MV_PROFILE: "wide"

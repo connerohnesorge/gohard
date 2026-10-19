@@ -1,0 +1,2 @@
+gohard: error[cli/no-files]: no VHDL files found under docs; pass --allow-empty to accept an empty project
+summary: 1 errors, 0 warnings, 0 hints, 0 files

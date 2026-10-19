@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("libraries:\n  l:\n    - \"\"\n    - [x]\n  L: [y]\n")

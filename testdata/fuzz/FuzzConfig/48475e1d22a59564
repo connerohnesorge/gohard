@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("simulation:\n  seed: 99999999999999999999999999999999\n  env:\n    epoch: 9999-12-31T23:59:59.999999999Z\n")

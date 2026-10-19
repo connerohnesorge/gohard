@@ -1,0 +1,4 @@
+exit 2
+gohard.yaml:3:11: error[config/range]: format.indent must be at least 1, not 0
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set lenient = true

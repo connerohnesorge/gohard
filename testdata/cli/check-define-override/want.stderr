@@ -1,0 +1,1 @@
+gohard: --define WIDTH=16 overrides defines.WIDTH: "8" (gohard.yaml:2:3)

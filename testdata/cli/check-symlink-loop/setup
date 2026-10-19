@@ -1,0 +1,2 @@
+symlink rtl/up ..
+symlink self self

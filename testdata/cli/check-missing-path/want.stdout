@@ -1,0 +1,3 @@
+gohard: error[cli/missing-path]: gone does not exist
+gohard: error[cli/missing-path]: missing.vhd does not exist
+summary: 2 errors, 0 warnings, 0 hints, 1 files

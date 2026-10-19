@@ -1,0 +1,6 @@
+libraries:
+  lib: [src]
+  LIB: [other]
+defines:
+  Foo: "1"
+  FOO: "2"

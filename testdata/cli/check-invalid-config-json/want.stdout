@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "status": "tool_error",
+  "exit": 2,
+  "summary": {
+    "errors": 1,
+    "warnings": 0,
+    "hints": 0,
+    "files": 0
+  },
+  "diagnostics": [
+    {
+      "path": "gohard.yaml",
+      "line": 1,
+      "col": 10,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/bad-bool",
+      "message": "lenient must be true or false, not yes",
+      "related": []
+    }
+  ],
+  "incomplete": [],
+  "error": {
+    "code": "config/bad-bool",
+    "message": "lenient must be true or false, not yes"
+  }
+}

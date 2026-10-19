@@ -1,0 +1,281 @@
+== unknown key at top level
+| bogus: 1
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key bogus
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== unknown key at psl
+| psl:
+|   bogus: 1
+exit 2
+gohard.yaml:2:3: error[config/unknown-key]: unknown key psl.bogus
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== unknown key at format
+| format:
+|   bogus: 1
+exit 2
+gohard.yaml:2:3: error[config/unknown-key]: unknown key format.bogus
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== unknown key at simulation
+| simulation:
+|   bogus: 1
+exit 2
+gohard.yaml:2:3: error[config/unknown-key]: unknown key simulation.bogus
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== unknown key at simulation.env
+| simulation:
+|   env:
+|     bogus: 1
+exit 2
+gohard.yaml:3:5: error[config/unknown-key]: unknown key simulation.env.bogus
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== unknown group
+| formats:
+|   x: 1
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key formats
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== duplicate standard
+| standard: "2019"
+| standard: "2019"
+exit 2
+gohard.yaml:2:1: error[config/duplicate-key]: duplicate key standard (first set on line 1)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set standard = "2019"
+
+== duplicate lenient
+| lenient: true
+| lenient: true
+exit 2
+gohard.yaml:2:1: error[config/duplicate-key]: duplicate key lenient (first set on line 1)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set lenient = true
+
+== duplicate psl.comments
+| psl:
+|   comments: true
+|   comments: true
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key psl.comments (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set psl.comments = true
+
+== duplicate psl.strict_keywords
+| psl:
+|   strict_keywords: true
+|   strict_keywords: true
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key psl.strict_keywords (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set psl.strict_keywords = true
+
+== duplicate libraries
+| libraries: {}
+| libraries: {}
+exit 2
+gohard.yaml:1:12: warning[config/redundant-default]: libraries is set to its default value {}
+gohard.yaml:2:1: error[config/duplicate-key]: duplicate key libraries (first set on line 1)
+summary: 1 errors, 1 warnings, 0 hints, 1 files
+set libraries = {}
+
+== duplicate allow_opaque
+| allow_opaque: []
+| allow_opaque: []
+exit 2
+gohard.yaml:1:15: warning[config/redundant-default]: allow_opaque is set to its default value []
+gohard.yaml:2:1: error[config/duplicate-key]: duplicate key allow_opaque (first set on line 1)
+summary: 1 errors, 1 warnings, 0 hints, 1 files
+set allow_opaque = []
+
+== duplicate defines
+| defines: {}
+| defines: {}
+exit 2
+gohard.yaml:1:10: warning[config/redundant-default]: defines is set to its default value {}
+gohard.yaml:2:1: error[config/duplicate-key]: duplicate key defines (first set on line 1)
+summary: 1 errors, 1 warnings, 0 hints, 1 files
+set defines = {}
+
+== duplicate format.indent
+| format:
+|   indent: 50
+|   indent: 50
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key format.indent (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set format.indent = 50
+
+== duplicate format.keyword_case
+| format:
+|   keyword_case: "preserve"
+|   keyword_case: "preserve"
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key format.keyword_case (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set format.keyword_case = "preserve"
+
+== duplicate format.align_ports
+| format:
+|   align_ports: true
+|   align_ports: true
+exit 2
+gohard.yaml:2:16: warning[config/redundant-default]: format.align_ports is set to its default value true
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key format.align_ports (first set on line 2)
+summary: 1 errors, 1 warnings, 0 hints, 1 files
+set format.align_ports = true
+
+== duplicate format.max_line_length
+| format:
+|   max_line_length: 50
+|   max_line_length: 50
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key format.max_line_length (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set format.max_line_length = 50
+
+== duplicate simulation.auto_run_on_save
+| simulation:
+|   auto_run_on_save: true
+|   auto_run_on_save: true
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key simulation.auto_run_on_save (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set simulation.auto_run_on_save = true
+
+== duplicate simulation.testbenches
+| simulation:
+|   testbenches: []
+|   testbenches: []
+exit 2
+gohard.yaml:2:16: warning[config/redundant-default]: simulation.testbenches is set to its default value []
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key simulation.testbenches (first set on line 2)
+summary: 1 errors, 1 warnings, 0 hints, 1 files
+set simulation.testbenches = []
+
+== duplicate simulation.seed
+| simulation:
+|   seed: 50
+|   seed: 50
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key simulation.seed (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set simulation.seed = 50
+
+== duplicate simulation.time_budget
+| simulation:
+|   time_budget: "2 ms"
+|   time_budget: "2 ms"
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key simulation.time_budget (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set simulation.time_budget = 2 ms
+
+== duplicate simulation.delta_budget
+| simulation:
+|   delta_budget: 50
+|   delta_budget: 50
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key simulation.delta_budget (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set simulation.delta_budget = 50
+
+== duplicate simulation.step_budget
+| simulation:
+|   step_budget: 50
+|   step_budget: 50
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key simulation.step_budget (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set simulation.step_budget = 50
+
+== duplicate simulation.stop_level
+| simulation:
+|   stop_level: "failure"
+|   stop_level: "failure"
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key simulation.stop_level (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set simulation.stop_level = "failure"
+
+== duplicate simulation.dump_scope
+| simulation:
+|   dump_scope: []
+|   dump_scope: []
+exit 2
+gohard.yaml:2:15: warning[config/redundant-default]: simulation.dump_scope is set to its default value []
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key simulation.dump_scope (first set on line 2)
+summary: 1 errors, 1 warnings, 0 hints, 1 files
+set simulation.dump_scope = []
+
+== duplicate simulation.models
+| simulation:
+|   models: {}
+|   models: {}
+exit 2
+gohard.yaml:2:11: warning[config/redundant-default]: simulation.models is set to its default value {}
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key simulation.models (first set on line 2)
+summary: 1 errors, 1 warnings, 0 hints, 1 files
+set simulation.models = {}
+
+== duplicate simulation.env.epoch
+| simulation:
+|   env:
+|     epoch: "2001-01-01T00:00:00Z"
+|     epoch: "2001-01-01T00:00:00Z"
+exit 2
+gohard.yaml:4:5: error[config/duplicate-key]: duplicate key simulation.env.epoch (first set on line 3)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set simulation.env.epoch = 2001-01-01T00:00:00Z
+
+== duplicate simulation.env.vars
+| simulation:
+|   env:
+|     vars: {}
+|     vars: {}
+exit 2
+gohard.yaml:3:11: warning[config/redundant-default]: simulation.env.vars is set to its default value {}
+gohard.yaml:4:5: error[config/duplicate-key]: duplicate key simulation.env.vars (first set on line 3)
+summary: 1 errors, 1 warnings, 0 hints, 1 files
+set simulation.env.vars = {}
+
+== duplicate entry in libraries
+| libraries:
+|   lib: [a]
+|   LIB: [b]
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key libraries.LIB (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== duplicate entry in defines
+| defines:
+|   FOO: "1"
+|   foo: "2"
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key defines.foo (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== duplicate entry in simulation.models
+| simulation:
+|   models:
+|     l.u: a.vhd
+|     L.U: b.vhd
+exit 2
+gohard.yaml:4:5: error[config/duplicate-key]: duplicate key simulation.models.L.U (first set on line 3)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== duplicate entry in simulation.env.vars (case-sensitive)
+| simulation:
+|   env:
+|     vars:
+|       A: x
+|       a: y
+|       A: z
+exit 2
+gohard.yaml:5:10: error[config/unquoted-bool]: simulation.env.vars.a: y reads as a YAML 1.1 boolean; quote it: "y"
+gohard.yaml:6:7: error[config/duplicate-key]: duplicate key simulation.env.vars.A (first set on line 4)
+summary: 2 errors, 0 warnings, 0 hints, 1 files

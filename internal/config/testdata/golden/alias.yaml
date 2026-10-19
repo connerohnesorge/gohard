@@ -1,0 +1,4 @@
+a: &anchor {b: 1}
+format: *anchor
+simulation:
+  seed: *anchor

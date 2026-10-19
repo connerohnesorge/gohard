@@ -1,0 +1,3 @@
+exit 2
+gohard.yaml:1:1: error[config/type]: gohard.yaml must be a mapping, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files

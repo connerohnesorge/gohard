@@ -1,0 +1,6 @@
+format:
+  indent: 99999999999999999999
+  max_line_length: 9223372036854775808
+simulation:
+  delta_budget: 99999999999999999999999
+  step_budget: 0

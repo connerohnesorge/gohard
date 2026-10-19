@@ -1,0 +1,2 @@
+big.vhd:1:1: warning[workspace/file-too-large]: file not parsed: size 10000001 bytes exceeds the limit of 10000000 bytes (10 MB)
+summary: 0 errors, 1 warnings, 0 hints, 1 files

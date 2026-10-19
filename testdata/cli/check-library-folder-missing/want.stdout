@@ -1,0 +1,2 @@
+gohard.yaml:2:11: error[library/folder-missing]: library mylib: folder nothere is missing or unreadable
+summary: 1 errors, 0 warnings, 0 hints, 0 files

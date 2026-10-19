@@ -1,0 +1,172 @@
+== standard
+| standard: "2008"
+exit 0
+gohard.yaml:1:11: warning[config/redundant-default]: standard is set to its default value "2008"
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set standard = "2008"
+
+== lenient
+| lenient: false
+exit 0
+gohard.yaml:1:10: warning[config/redundant-default]: lenient is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set lenient = false
+
+== psl.comments
+| psl:
+|   comments: false
+exit 0
+gohard.yaml:2:13: warning[config/redundant-default]: psl.comments is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set psl.comments = false
+
+== psl.strict_keywords
+| psl:
+|   strict_keywords: false
+exit 0
+gohard.yaml:2:20: warning[config/redundant-default]: psl.strict_keywords is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set psl.strict_keywords = false
+
+== libraries
+| libraries: {}
+exit 0
+gohard.yaml:1:12: warning[config/redundant-default]: libraries is set to its default value {}
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set libraries = {}
+
+== allow_opaque
+| allow_opaque: []
+exit 0
+gohard.yaml:1:15: warning[config/redundant-default]: allow_opaque is set to its default value []
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set allow_opaque = []
+
+== defines
+| defines: {}
+exit 0
+gohard.yaml:1:10: warning[config/redundant-default]: defines is set to its default value {}
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set defines = {}
+
+== format.indent
+| format:
+|   indent: 2
+exit 0
+gohard.yaml:2:11: warning[config/redundant-default]: format.indent is set to its default value 2
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set format.indent = 2
+
+== format.keyword_case
+| format:
+|   keyword_case: lower
+exit 0
+gohard.yaml:2:17: warning[config/redundant-default]: format.keyword_case is set to its default value lower
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set format.keyword_case = "lower"
+
+== format.align_ports
+| format:
+|   align_ports: true
+exit 0
+gohard.yaml:2:16: warning[config/redundant-default]: format.align_ports is set to its default value true
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set format.align_ports = true
+
+== format.max_line_length
+| format:
+|   max_line_length: 80
+exit 0
+gohard.yaml:2:20: warning[config/redundant-default]: format.max_line_length is set to its default value 80
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set format.max_line_length = 80
+
+== simulation.auto_run_on_save
+| simulation:
+|   auto_run_on_save: false
+exit 0
+gohard.yaml:2:21: warning[config/redundant-default]: simulation.auto_run_on_save is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.auto_run_on_save = false
+
+== simulation.testbenches
+| simulation:
+|   testbenches: []
+exit 0
+gohard.yaml:2:16: warning[config/redundant-default]: simulation.testbenches is set to its default value []
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.testbenches = []
+
+== simulation.seed
+| simulation:
+|   seed: 0
+exit 0
+gohard.yaml:2:9: warning[config/redundant-default]: simulation.seed is set to its default value 0
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.seed = 0
+
+== simulation.time_budget
+| simulation:
+|   time_budget: "1 ms"
+exit 0
+gohard.yaml:2:16: warning[config/redundant-default]: simulation.time_budget is set to its default value "1 ms"
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.time_budget = 1 ms
+
+== simulation.delta_budget
+| simulation:
+|   delta_budget: 10000
+exit 0
+gohard.yaml:2:17: warning[config/redundant-default]: simulation.delta_budget is set to its default value 10000
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.delta_budget = 10000
+
+== simulation.step_budget
+| simulation:
+|   step_budget: 50000000
+exit 0
+gohard.yaml:2:16: warning[config/redundant-default]: simulation.step_budget is set to its default value 50000000
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.step_budget = 50000000
+
+== simulation.stop_level
+| simulation:
+|   stop_level: error
+exit 0
+gohard.yaml:2:15: warning[config/redundant-default]: simulation.stop_level is set to its default value error
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.stop_level = "error"
+
+== simulation.dump_scope
+| simulation:
+|   dump_scope: []
+exit 0
+gohard.yaml:2:15: warning[config/redundant-default]: simulation.dump_scope is set to its default value []
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.dump_scope = []
+
+== simulation.models
+| simulation:
+|   models: {}
+exit 0
+gohard.yaml:2:11: warning[config/redundant-default]: simulation.models is set to its default value {}
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.models = {}
+
+== simulation.env.epoch
+| simulation:
+|   env:
+|     epoch: "2000-01-01T00:00:00Z"
+exit 0
+gohard.yaml:3:12: warning[config/redundant-default]: simulation.env.epoch is set to its default value "2000-01-01T00:00:00Z"
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.env.epoch = 2000-01-01T00:00:00Z
+
+== simulation.env.vars
+| simulation:
+|   env:
+|     vars: {}
+exit 0
+gohard.yaml:3:11: warning[config/redundant-default]: simulation.env.vars is set to its default value {}
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.env.vars = {}

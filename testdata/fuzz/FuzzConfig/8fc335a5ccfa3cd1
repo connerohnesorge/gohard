@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("simulation:\n  time_budget: 1e9999999 fs\n")

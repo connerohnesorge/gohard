@@ -1,0 +1,150 @@
+{
+  "schema": 1,
+  "status": "tool_error",
+  "exit": 2,
+  "summary": {
+    "errors": 12,
+    "warnings": 0,
+    "hints": 0,
+    "files": 1
+  },
+  "diagnostics": [
+    {
+      "path": "gohard.yaml",
+      "line": 1,
+      "col": 11,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/unquoted-standard",
+      "message": "standard must be a quoted string: standard: \"2008\"",
+      "related": []
+    },
+    {
+      "path": "gohard.yaml",
+      "line": 2,
+      "col": 10,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/bad-bool",
+      "message": "lenient must be true or false, not yes",
+      "related": []
+    },
+    {
+      "path": "gohard.yaml",
+      "line": 4,
+      "col": 13,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/bad-bool",
+      "message": "psl.comments must be true or false, not on",
+      "related": []
+    },
+    {
+      "path": "gohard.yaml",
+      "line": 5,
+      "col": 3,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/unknown-key",
+      "message": "unknown key psl.strict",
+      "related": []
+    },
+    {
+      "path": "gohard.yaml",
+      "line": 7,
+      "col": 8,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/unquoted-bool",
+      "message": "defines.FOO: yes reads as a YAML 1.1 boolean; quote it: \"yes\"",
+      "related": []
+    },
+    {
+      "path": "gohard.yaml",
+      "line": 8,
+      "col": 3,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/builtin-define",
+      "message": "VHDL_VERSION is a built-in conditional-analysis identifier and cannot be defined",
+      "related": []
+    },
+    {
+      "path": "gohard.yaml",
+      "line": 10,
+      "col": 11,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/range",
+      "message": "format.indent must be at least 1, not 0",
+      "related": []
+    },
+    {
+      "path": "gohard.yaml",
+      "line": 11,
+      "col": 3,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/duplicate-key",
+      "message": "duplicate key format.indent (first set on line 10)",
+      "related": []
+    },
+    {
+      "path": "gohard.yaml",
+      "line": 12,
+      "col": 17,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/enum",
+      "message": "format.keyword_case must be one of \"lower\", \"upper\" or \"preserve\", not Upper",
+      "related": []
+    },
+    {
+      "path": "gohard.yaml",
+      "line": 14,
+      "col": 16,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/bad-time",
+      "message": "simulation.time_budget: 1ms is not a VHDL time such as \"1 ms\"",
+      "related": []
+    },
+    {
+      "path": "gohard.yaml",
+      "line": 15,
+      "col": 9,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/range",
+      "message": "simulation.seed must be between 0 and 18446744073709551615, not -1",
+      "related": []
+    },
+    {
+      "path": "gohard.yaml",
+      "line": 17,
+      "col": 12,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "config/bad-timestamp",
+      "message": "simulation.env.epoch: 2000-01-01 is not an RFC 3339 UTC time such as \"2000-01-01T00:00:00Z\"",
+      "related": []
+    }
+  ],
+  "incomplete": [],
+  "error": {
+    "code": "config/unquoted-standard",
+    "message": "standard must be a quoted string: standard: \"2008\""
+  }
+}

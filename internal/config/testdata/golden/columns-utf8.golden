@@ -1,0 +1,6 @@
+exit 2
+gohard.yaml:1:2: error[config/unknown-key]: unknown key é
+gohard.yaml:1:18: error[config/bad-bool]: lenient must be true or false, not yes
+gohard.yaml:1:23: error[config/unknown-key]: unknown key ü
+gohard.yaml:1:42: error[config/unquoted-standard]: standard must be a quoted string: standard: "2008"
+summary: 4 errors, 0 warnings, 0 hints, 1 files

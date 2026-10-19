@@ -1,0 +1,1504 @@
+# GoHard oracle corpus manifest (issue #8).
+#
+# Schema and field meanings: testdata/corpus/README.md.
+# The builder fragments (<name>/entry.yaml, regression.entry.yaml) were
+# merged here in S2a and removed; this file is the only source of truth.
+#
+# `trace_sha256` and `oracle_sha256` are written by
+# `go run ./tools/oracle --update`, which rewrites only changed hashes.
+# Until tools/oracle and the #36 canonical trace format exist they hold
+# the literal value `pending`.
+
+schema: 1
+
+# Fixed vocabularies. A design's `features` and `invariants` may only use
+# the ids listed here. The feature list is exactly the semantics list in
+# the "Done when" section of #8; every id must appear in the `features` of
+# at least one design.
+vocabulary:
+  features:
+    - id: delta_ordering
+      semantic: delta ordering
+    - id: multi_driver_resolution
+      semantic: multi-driver std_logic resolution
+    - id: postponed_processes
+      semantic: postponed processes
+    - id: wait_forms
+      semantic: every wait form
+    - id: delay_mechanisms
+      semantic: inertial/transport/reject delays
+    - id: signal_attributes
+      semantic: signal attributes ('event, 'last_value, 'delayed)
+    - id: process_all
+      semantic: process(all)
+    - id: force_release
+      semantic: force/release
+    - id: external_names
+      semantic: external names
+    - id: std_env
+      semantic: std.env
+    - id: textio
+      semantic: textio
+    - id: mode_views_converse
+      semantic: mode views and 'converse
+    - id: cond_analysis_builtin_id
+      semantic: conditional analysis, built-in identifier (in mode_views)
+    - id: cond_analysis_user_define
+      semantic: >-
+        conditional analysis, user identifier from defines: (in mode_views)
+    - id: cond_analysis_inactive_branch
+      semantic: conditional analysis, inactive branch (in mode_views)
+    - id: protected_type_ports
+      semantic: protected-type ports
+    - id: psl_assert_cover
+      semantic: PSL assert and cover
+    - id: generate_hierarchy
+      semantic: generate hierarchy
+    - id: overload_resolution
+      semantic: overload resolution
+    - id: standin_models
+      semantic: stand-in models
+  invariants:
+    - id: seed_independent
+      meaning: byte-identical trace at seeds 0-3 (PR) and 64 seeds (nightly)
+    - id: variant_stable
+      meaning: outcome unchanged under layout, case, rename and
+        independent-statement reordering variants
+    - id: self_stopping
+      meaning: stops on its own (std.env.stop/finish or end of events)
+    - id: fails_by_design
+      meaning: fails on purpose with the recorded messages (assert_fail)
+    - id: hits_budget
+      meaning: never terminates; ends in sim/budget-exceeded (budget_hang)
+    - id: standard_gated
+      meaning: valid only under its tagged standard; analysis under a
+        later standard is expected to fail (vhdl93_only)
+    - id: modeled_drivers_marked
+      meaning: every value driven by a simulation.models stand-in is
+        marked modeled in the trace
+    - id: unsupported_before_milestone
+      meaning: before its milestone, exits 2 with unsupported/construct
+        "planned for v1.1" naming each construct used
+
+designs:
+  - name: assert_fail
+    standard: "2008"
+    milestone: v1.0
+    files:
+      - path: assert_fail.vhd
+        standard: "2008"
+      - path: assert_fail_tb.vhd
+        standard: "2008"
+    top: assert_fail
+    testbench: assert_fail_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 1
+      status: problems
+      stop_time: 30 ns
+      messages:
+        - severity: hint
+          text: "assert_fail: starting checks"
+          time: 10 ns
+        - severity: warning
+          text: "assert_fail: sum wrapped to 2"
+          time: 20 ns
+        - severity: error
+          text: "assert_fail: expected 12, got 11"
+          time: 30 ns
+    features: []
+    invariants: [seed_independent, variant_stable, fails_by_design]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 assert_fail.vhd assert_fail_tb.vhd;
+        ghdl --elab-run --std=08 assert_fail_tb --assert-level=error
+      result: fail
+      exit: 1
+      stop_time: 30 ns
+      messages:
+        - "assert_fail_tb.vhd:32:5:@10ns:(report note): assert_fail: starting checks"
+        - "assert_fail_tb.vhd:37:5:@20ns:(assertion warning): assert_fail: sum wrapped to 2"
+        - "assert_fail_tb.vhd:43:5:@30ns:(assertion error): assert_fail: expected 12, got 11"
+        - "ghdl:error: assertion failed"
+        - "ghdl:error: simulation failed"
+      notes: >-
+        --assert-level=error is needed to stop and fail on the error
+        assertion; without it GHDL prints the same three lines, reaches the
+        end of events at 30 ns and exits 0 (its default assert level is
+        failure). Severities map per #20/#35: report note -> hint, assertion
+        warning -> warning, assertion error -> error and exit 1. The halt at
+        30 ns comes from the default simulation.stop_level (error); nothing
+        is scheduled after 30 ns, so the stop time is the same either way.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a assert_fail.vhd assert_fail_tb.vhd
+        -e assert_fail_tb -r
+      result: fail
+      exit: 1
+      stop_time: 30 ns
+      messages:
+        - "** Note: 10ns+0: assert_fail: starting checks"
+        - "** Warning: 20ns+0: assert_fail: sum wrapped to 2"
+        - "** Error: 30ns+0: assert_fail: expected 12, got 11"
+      notes: >-
+        NVC's default --exit-severity is error, so it stops and exits 1 at
+        the error assertion with no extra option.
+        The warning and error texts are built from the observed sum
+        (integer'image(to_integer(s))), so "wrapped to 2" and "got 11" pin
+        the DUT's a + b; mutating the DUT to a - b or a or b gives "got 15"
+        or "got 7" under both tools.
+    disagreements:
+      - topic: >-
+          default halt severity and exit code for a severity-error
+          assertion
+        ghdl: continues and exits 0 unless --assert-level=error is given
+        nvc: stops at the error assertion and exits 1 by default
+        follows: nvc
+        lrm: "10.3"
+        notes: >-
+          The LRM leaves halting on an assertion implementation defined.
+          GoHard's default simulation.stop_level (error) and #20's exit 1 for
+          severity error match NVC's default; the recorded GHDL command adds
+          --assert-level=error so both tools give the same outcome.
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: budget_hang
+    standard: "2008"
+    milestone: v1.0
+    files:
+      - path: budget_hang.vhd
+        standard: "2008"
+      - path: budget_hang_tb.vhd
+        standard: "2008"
+    top: budget_hang
+    testbench: budget_hang_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 1
+      status: problems
+      stop_time: 1 ms
+      messages:
+        - severity: error
+          code: sim/budget-exceeded
+          text: time_budget
+          time: 1 ms
+    features: []
+    invariants: [seed_independent, variant_stable, hits_budget]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 budget_hang.vhd budget_hang_tb.vhd;
+        ghdl --elab-run --std=08 budget_hang_tb --stop-time=1ms
+      result: bounded
+      exit: 0
+      stop_time: 1 ms
+      messages:
+        - "ghdl:info: simulation stopped by --stop-time @1ms"
+      notes: >-
+        Still running when --stop-time ends it; also checked with
+        --stop-time=10ms (stopped by --stop-time @10ms, exit 0). The clock
+        toggles every 5 ns forever and nothing calls std.env.stop/finish.
+        GoHard ends the run with the default simulation.time_budget (1 ms),
+        reported as sim/budget-exceeded (error under check --sim, exit 1,
+        #20/#35). Expected message text is provisional until #20's table
+        fixes the wording; it must name the exhausted budget.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a budget_hang.vhd budget_hang_tb.vhd
+        -e budget_hang_tb -r --stop-time=1ms
+      result: bounded
+      exit: 0
+      stop_time: 1 ms
+      messages: []
+      notes: >-
+        Stops silently at --stop-time with exit 0; also checked with
+        --stop-time=10ms (exit 0, about 0.4 s of run time).
+    disagreements: []
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: force_ext
+    standard: "2008"
+    milestone: v1.0
+    files:
+      - path: force_ext.vhd
+        standard: "2008"
+      - path: force_ext_tb.vhd
+        standard: "2008"
+    top: force_ext
+    testbench: force_ext_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 9 ns
+      messages: []
+    features: [process_all, force_release, external_names]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 force_ext.vhd force_ext_tb.vhd;
+        ghdl --elab-run --std=08 force_ext_tb
+      result: pass
+      exit: 0
+      stop_time: 9 ns
+      messages:
+        - "simulation finished @9ns"
+      notes: >-
+        Finished via std.env.finish at 9 ns with no assertion output.
+        process(all): comb reacts to a, b and op; pick reacts to sel and to
+        mid (replacing pick's (all) with (mid) fails the sel check).
+        External names: absolute <<signal .force_ext_tb.dut.mid>>,
+        upward-relative <<signal ^.dut.mid>> from a process in block chk,
+        relative <<signal dut.mid>> from the testbench architecture
+        (checked against the expected mid at 1 .. 8 ns; mid has no
+        testbench counterpart, so aliasing a and b instead is reported),
+        and
+        <<constant .force_ext_tb.dut.C_MAGIC>> = 42; all aliases sit in
+        process declarative parts after the dut instance so the objects are
+        elaborated first. force: mid <= force "0110" (default mode for a
+        non-port signal) overrides comb and holds while the inputs change;
+        release returns mid to its current driving value without a new
+        transaction. Dropping the force or the release is reported.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a force_ext.vhd force_ext_tb.vhd
+        -e force_ext_tb -r
+      result: pass
+      exit: 0
+      stop_time: 9 ns
+      messages:
+        - "** Note: 9ns+0: FINISH called"
+      notes: >-
+        Same outcome as GHDL. NVC prints a note for FINISH; it is not a
+        design message.
+    disagreements: []
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: hier_generate
+    standard: "2008"
+    milestone: v1.0
+    files:
+      - path: hier_generate_lane.vhd
+        standard: "2008"
+      - path: hier_generate.vhd
+        standard: "2008"
+      - path: hier_generate_tb.vhd
+        standard: "2008"
+    top: hier_generate
+    testbench: hier_generate_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 50 ns
+      messages: []
+    features: [generate_hierarchy, std_env]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 hier_generate_lane.vhd hier_generate.vhd
+        hier_generate_tb.vhd;
+        ghdl --elab-run --std=08 hier_generate_tb
+      result: pass
+      exit: 0
+      stop_time: 50 ns
+      messages:
+        - "simulation finished @50ns"
+      notes: >-
+        N = 4, BASE = 2: lanes(0..3).u have W = 2, 3, 4, 5 on a 14-bit
+        bus; odd lanes take polarity.inv, even lanes polarity.pass; the
+        outer tap if-generate takes multi. --disp-tree=inst shows
+        dut/rtl/lanes(0)..lanes(3) [for-generate] each with u [instance]
+        -> hier_generate_lane/rtl/polarity [if-generate true], then
+        tap [if-generate true]. GHDL's tree prints the if-generate but not
+        the alternative label (inv/pass, multi); GoHard's hierarchy names
+        the alternative. Five stimuli, the last with odd parity, so the
+        multi branch (xor din = '1') differs from single ('0'): forcing
+        the single branch (multi : N > 100) is reported at 50 ns as
+        "parity mismatch". Finished via std.env.finish at 50 ns.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a hier_generate_lane.vhd hier_generate.vhd
+        hier_generate_tb.vhd -e hier_generate_tb -r
+      result: pass
+      exit: 0
+      stop_time: 50 ns
+      messages:
+        - "** Note: 50ns+0: FINISH called"
+      notes: same outcome as GHDL
+    disagreements: []
+    variants:
+      - name: width_err
+        standard: "2008"
+        files:
+          - path: hier_generate_lane.vhd
+            standard: "2008"
+          - path: hier_generate_width_err.vhd
+            standard: "2008"
+          - path: hier_generate_tb.vhd
+            standard: "2008"
+        expected:
+          exit: 1
+          status: problems
+          stop_time: none
+          messages:
+            - severity: error
+              text: hier_generate_tb.dut.lanes(2).u
+            - severity: error
+              text: hier_generate_tb.dut.lanes(2).u
+        ghdl:
+          version: 6.0.0
+          command: >-
+            ghdl -a --std=08 hier_generate_lane.vhd
+            hier_generate_width_err.vhd hier_generate_tb.vhd;
+            ghdl --elab-run --std=08 hier_generate_tb
+          result: elab-error
+          exit: 1
+          stop_time: none
+          messages:
+            - "hier_generate_width_err.vhd:31:22:error: mismatching vector length; got 3, expect 4"
+            - "hier_generate_width_err.vhd:31:47:error: mismatching vector length; got 3, expect 4"
+          notes: >-
+            Analysis passes (exit 0); elaboration reports both port
+            associations (a and y) of the one bad instance, by source
+            position only, without the instance path.
+        nvc:
+          version: 1.23.0
+          command: >-
+            nvc --std=2008 -a hier_generate_lane.vhd
+            hier_generate_width_err.vhd hier_generate_tb.vhd;
+            nvc --std=2008 -e hier_generate_tb -r
+          result: elab-error
+          exit: 2
+          stop_time: none
+          messages:
+            - "** Fatal: (init): actual length 3 does not match formal length 4"
+          notes: >-
+            Analysis passes (exit 0). Elaboration reports the first
+            association (a) at line 31 "while elaborating instance U", then
+            crashes with SIGSEGV in jit_interp (an NVC 1.23.0 bug), hence
+            exit 2. Only the first error is reported.
+        disagreements:
+          - topic: errors reported for the bad instance
+            ghdl: both associations (a at 31:22, y at 31:47), exit 1
+            nvc: first association only, then a crash, exit 2
+            follows: ghdl
+            lrm: "14.3.5"
+            notes: >-
+              Each association whose actual length differs from the formal
+              is an error (LRM 14.3.5 port map elaboration, 6.5.7.3
+              matching elements). GoHard reports both, each naming the
+              elaborated instance path hier_generate_tb.dut.lanes(2).u
+              (#35), and never reports lanes 0, 1 or 3.
+        notes: >-
+          hier_generate_width_err.vhd is analyzed in place of
+          hier_generate.vhd. It is identical except that lane 2 is wired
+          through a slice one bit narrower than its W = 4 port, so exactly
+          one generate instance is wrong. Message text is provisional until
+          #20's table fixes the wording; it must name the instance path.
+          Both messages point at hier_generate_width_err.vhd:31 (columns 22
+          and 47).
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: md_resolve
+    standard: "2008"
+    milestone: v1.0
+    files:
+      - path: md_resolve.vhd
+        standard: "2008"
+      - path: md_resolve_tb.vhd
+        standard: "2008"
+    top: md_resolve
+    testbench: md_resolve_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 99 ns
+      messages: []
+    features: [delta_ordering, multi_driver_resolution]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 md_resolve.vhd md_resolve_tb.vhd;
+        ghdl --elab-run --std=08 md_resolve_tb
+      result: pass
+      exit: 0
+      stop_time: 99 ns
+      messages:
+        - "simulation finished @99ns"
+      notes: >-
+        Finished via std.env.finish at 99 ns with no assertion output. The
+        testbench checks all 81 pairs of the 9 std_ulogic values
+        (U X 0 1 Z W L H -) on two DUT drivers of the inout port bus_io
+        against an independent copy of the IEEE 1164 table, then three
+        drivers across the port
+        boundary (L,H,Z=W; L,H,1=1; 0,H,1=X), all-Z, element-wise vector
+        resolution ("01HZ" with "1L0Z" = "X10Z"), the chain d0->d3 settling
+        one delta per stage (d3 changes at 97 ns delta 4; ports add no
+        delta), and a two-signal swap in one delta. A mutated check (d3 at
+        delta 3, a wrong swap result, a wrong X row in the expected table)
+        is reported by both tools. Caution for
+        tools/oracle: GHDL exits 0 after severity-error assertions when the
+        run ends in std.env.finish, so a pass is judged by the absence of
+        assertion messages, not by the exit code.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a md_resolve.vhd md_resolve_tb.vhd
+        -e md_resolve_tb -r
+      result: pass
+      exit: 0
+      stop_time: 99 ns
+      messages:
+        - "** Note: 99ns+0: FINISH called"
+      notes: >-
+        Same outcome as GHDL. NVC prints a note for FINISH; it is not a
+        design message. Unlike GHDL, NVC exits 1 when a severity-error
+        assertion fired earlier in the run.
+    disagreements: []
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: mode_views
+    standard: "2019"
+    milestone: v1.0
+    files:
+      - path: mode_views_pkg.vhd
+        standard: "2019"
+      - path: mode_views.vhd
+        standard: "2019"
+      - path: mode_views_tb.vhd
+        standard: "2019"
+    top: mode_views
+    testbench: mode_views_tb
+    # MV_PROFILE reaches GoHard through the design-local gohard.yaml
+    # `defines:` (#31); this field mirrors it and must stay equal.
+    config: gohard.yaml
+    defines:
+      MV_PROFILE: wide
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 165 ns
+      messages: []
+    features:
+      - mode_views_converse
+      - cond_analysis_builtin_id
+      - cond_analysis_user_define
+      - cond_analysis_inactive_branch
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: nvc
+    # GHDL 6.0.0 cannot elaborate this 2019 design, so there is no
+    # --disp-tree recording: the hierarchy and generic values are a
+    # hand-written golden/hierarchy.txt, reviewed once (#8).
+    hierarchy_oracle: "none, hand-checked"
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=19 mode_views_pkg.vhd mode_views.vhd mode_views_tb.vhd
+      result: unsupported
+      exit: 1
+      stop_time: none
+      messages:
+        - 'mode_views_pkg.vhd:26:5:error: unknown tool directive "if" ignored'
+      notes: >-
+        GHDL 6.0.0 has no conditional analysis: every `if/`elsif/`else/`end
+        and `error directive is "unknown tool directive ... ignored" (an
+        error), and it has no option to define a user identifier (no -D).
+        With the directives stripped by hand to their active branches (in a
+        /tmp copy, not committed) GHDL analyzes the mode view, the
+        'converse alias and both view-typed ports and runs to "simulation
+        finished @165ns", exit 0, so GHDL agrees with NVC on everything but
+        conditional analysis. Because GHDL cannot elaborate the real files,
+        there is no --disp-tree recording: the expected hierarchy
+        (mode_views_tb, dut, dut.u_prod, dut.u_cons) is hand-written in S5.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2019 -a -D MV_PROFILE=wide mode_views_pkg.vhd mode_views.vhd
+        mode_views_tb.vhd -e mode_views_tb -r
+      result: pass
+      exit: 0
+      stop_time: 165 ns
+      messages:
+        - '** Note: 165ns+1: FINISH called'
+      notes: >-
+        Full pass: four handshakes through the view port and its converse,
+        sum 10, finish at 165 ns + 1 delta. Checked the directives are live:
+        with -D MV_PROFILE=narrow the run fails at 0 ms with "MV_PROFILE
+        branch not taken" (exit 1); with no -D, analysis fails with
+        "undefined conditional analysis identifier MV_PROFILE" and the
+        `error text "MV_PROFILE must be wide or narrow"; under --std=2008
+        `view` is rejected ("VIEW is a reserved word in VHDL-2019").
+    disagreements:
+      - topic: conditional analysis tool directives
+        ghdl: rejects `if/`elsif/`else/`end as unknown tool directives
+        nvc: implements them, with -D NAME=VALUE for user identifiers
+        follows: nvc
+        lrm: "24.2"
+        notes: >-
+          IEEE 1076-2019 conditional analysis tool directives (section
+          number not verified against the LRM text). GHDL 6.0.0 lacks the
+          feature, so it is not a semantic disagreement about the design.
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: overload_ops
+    standard: "2008"
+    milestone: v1.0
+    files:
+      - path: overload_ops_pkg.vhd
+        standard: "2008"
+      - path: overload_ops.vhd
+        standard: "2008"
+      - path: overload_ops_tb.vhd
+        standard: "2008"
+    top: overload_ops
+    testbench: overload_ops_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 1 ns
+      messages: []
+    features: [overload_resolution]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 overload_ops_pkg.vhd overload_ops.vhd
+        overload_ops_tb.vhd; ghdl --elab-run --std=08 overload_ops_tb
+      result: pass
+      exit: 0
+      stop_time: 1 ns
+      messages:
+        - simulation finished @1ns
+      notes: every src tag and value matches (S, I, W, N, integer -200)
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a overload_ops_pkg.vhd overload_ops.vhd
+        overload_ops_tb.vhd -e overload_ops_tb -r
+      result: pass
+      exit: 0
+      stop_time: 1 ns
+      messages:
+        - '** Note: 1ns+0: FINISH called'
+      notes: >-
+        Same result as GHDL. Checked the wrong use clause is caught: a /tmp
+        copy of overload_ops.vhd with `use work.ow_wrap.all` fails with
+        "a + b did not run ow_sat word+word" (exit 1). Overloads are told
+        apart by parameter type (word+word vs word+integer), by expanded
+        name (work.ow_wrap."+") and by result type ("-" returning word_t vs
+        integer, chosen by the assignment target).
+    disagreements: []
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: postponed_attrs
+    standard: "2008"
+    milestone: v1.0
+    files:
+      - path: postponed_attrs.vhd
+        standard: "2008"
+      - path: postponed_attrs_tb.vhd
+        standard: "2008"
+    top: postponed_attrs
+    testbench: postponed_attrs_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 98 ns
+      messages: []
+    features: [postponed_processes, signal_attributes]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 postponed_attrs.vhd postponed_attrs_tb.vhd;
+        ghdl --elab-run --std=08 postponed_attrs_tb
+      result: pass
+      exit: 0
+      stop_time: 98 ns
+      messages:
+        - "simulation finished @98ns"
+      notes: >-
+        Finished via std.env.finish at 98 ns with no assertion output.
+        Postponed: at 70 ns d glitches through three deltas; the ordinary
+        process(d) runs 3 times, the postponed process once, seeing only
+        the settled '1' (runs counted with the initial run: 2 at 71 ns,
+        3 at 81 ns); a postponed concurrent assertion never sees the delta
+        glitch of g at 20 ns, which an ordinary process does see. Removing
+        "postponed" makes both checks fail. Attributes checked: 'event,
+        'active, 'last_value, 'last_event (TIME'HIGH when no event yet),
+        'last_active, 'delayed (one delta), 'delayed(t), 'stable,
+        'stable(t), 'quiet, 'quiet(t), 'transaction (3 transactions, one
+        without an event), 'driving and 'driving_value (driver changes one
+        delta after the assignment), and an edge count using 'event with
+        'last_value = '0' (X->1 is not counted). The DUT's
+        q_dly <= d'delayed(5 ns) is pinned to exactly 5 ns: '0' at 74 ns,
+        '1' at 76 ns with q_dly'last_event = 1 ns, and the same for the
+        fall at 85 ns. 'delayed is a transport delay (LRM 16.2.3): a 2 ns
+        pulse on d at 90 ns reappears on q_dly at 95-97 ns, and the three
+        delta transactions of d at 70 ns all mature at 75 ns where each
+        preempts the last, so q_dly has exactly one event at 75 ns (both
+        tools agree). Mutated checks are reported by both tools, including
+        the DUT delay changed to 0, 1, 3, 4, 4.5, 5.5 and 6 ns and the
+        inertial `d after 5 ns` (drops the pulse, reported at 96 ns).
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a postponed_attrs.vhd postponed_attrs_tb.vhd
+        -e postponed_attrs_tb -r
+      result: pass
+      exit: 0
+      stop_time: 98 ns
+      messages:
+        - "** Note: 98ns+0: FINISH called"
+      notes: >-
+        Same outcome as GHDL, including S'STABLE being false and S'DELAYED
+        still old in the delta of the event. NVC prints a note for FINISH;
+        it is not a design message.
+    disagreements: []
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: prot_cond
+    standard: "2019"
+    milestone: v1.1
+    files:
+      - path: prot_cond_pkg.vhd
+        standard: "2019"
+      - path: prot_cond.vhd
+        standard: "2019"
+      - path: prot_cond_tb.vhd
+        standard: "2019"
+    top: prot_cond
+    testbench: prot_cond_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 1 ns
+      # The one deliberate non-halting assertion that makes the assert
+      # counter observable; a warning does not fail the run without --strict.
+      messages:
+        - severity: warning
+          text: "prot_cond: counter probe"
+          time: 1 ns
+    expected_v1_0:
+      exit: 2
+      status: tool_error
+      stop_time: none
+      # One per v1.1 construct (#18), at its first use, in #20 sorted
+      # (path, line) order. Paths sort bytewise, so prot_cond.vhd comes
+      # before prot_cond_pkg.vhd ('.' < '_').
+      messages:
+        - severity: error
+          code: unsupported/construct
+          path: prot_cond.vhd
+          line: 7
+          text: >-
+            shared-variable ports of protected type is not supported yet
+            (planned for v1.1)
+        - severity: error
+          code: unsupported/construct
+          path: prot_cond_pkg.vhd
+          line: 48
+          text: >-
+            conditional return ... when is not supported yet (planned for
+            v1.1)
+        - severity: error
+          code: unsupported/construct
+          path: prot_cond_tb.vhd
+          line: 6
+          text: std.reflection is not supported yet (planned for v1.1)
+        - severity: error
+          code: unsupported/construct
+          path: prot_cond_tb.vhd
+          line: 31
+          text: inferred constraints is not supported yet (planned for v1.1)
+        - severity: error
+          code: unsupported/construct
+          path: prot_cond_tb.vhd
+          line: 33
+          text: 64-bit integers is not supported yet (planned for v1.1)
+        - severity: error
+          code: unsupported/construct
+          path: prot_cond_tb.vhd
+          line: 67
+          text: >-
+            std.env VHDL_VERSION and TOOL_* functions is not supported yet
+            (planned for v1.1)
+        - severity: error
+          code: unsupported/construct
+          path: prot_cond_tb.vhd
+          line: 71
+          text: std.env GETENV is not supported yet (planned for v1.1)
+        - severity: error
+          code: unsupported/construct
+          path: prot_cond_tb.vhd
+          line: 73
+          text: >-
+            std.env FILE_NAME/FILE_PATH/FILE_LINE is not supported yet
+            (planned for v1.1)
+        - severity: error
+          code: unsupported/construct
+          path: prot_cond_tb.vhd
+          line: 84
+          text: >-
+            generic maps on subprogram calls is not supported yet (planned for
+            v1.1)
+        - severity: error
+          code: unsupported/construct
+          path: prot_cond_tb.vhd
+          line: 91
+          text: >-
+            'IMAGE for composite types is not supported yet (planned for v1.1)
+        - severity: error
+          code: unsupported/construct
+          path: prot_cond_tb.vhd
+          line: 98
+          text: >-
+            std.env assert/PSL counter-and-format API is not supported yet
+            (planned for v1.1)
+    features: [protected_type_ports, std_env]
+    invariants:
+      - seed_independent
+      - variant_stable
+      - self_stopping
+      - unsupported_before_milestone
+    oracle: nvc
+    # GHDL 6.0.0 cannot elaborate this 2019 design, so there is no
+    # --disp-tree recording: the hierarchy and generic values are a
+    # hand-written golden/hierarchy.txt, reviewed once (#8).
+    hierarchy_oracle: "none, hand-checked"
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=19 prot_cond_pkg.vhd prot_cond.vhd prot_cond_tb.vhd
+      result: unsupported
+      exit: 1
+      stop_time: none
+      messages:
+        - 'prot_cond_pkg.vhd:20:5:error: unknown tool directive "if" ignored'
+        - 'prot_cond_pkg.vhd:48:13:error: missing ";" at end of statement'
+      notes: >-
+        GHDL 6.0.0 has no conditional analysis, no conditional return
+        (return 0 when x < 0), and no std.reflection package (unit
+        "reflection" not found in library "std"). It cannot be an oracle for
+        this design.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2019 -a prot_cond_pkg.vhd prot_cond.vhd prot_cond_tb.vhd
+        -e prot_cond_tb -r
+      result: pass
+      exit: 0
+      stop_time: 1 ns
+      messages:
+        - '** Warning: 1ns+0: prot_cond: counter probe'
+        - '** Note: 1ns+0: FINISH called'
+      notes: >-
+        Every check passes: the protected port counter reads 3, all five
+        reflection classes, VHDL_VERSION = "2019", TOOL_NAME = "nvc" equals
+        the conditional-analysis branch, GETENV of an unset name is "",
+        FILE_LINE > 0, 2**40 and integer'high = 2**63-1, conditional return,
+        generic map on a call, inferred length 5, record 'IMAGE "(7,'1')"
+        and array 'IMAGE """1010""", GetVhdlAssertCount = 0 before and = 1
+        (also GetVhdlAssertCount(WARNING) = 1) after one deliberate
+        severity-warning probe. A mutated copy (count = 4) fails with
+        "protected port: count /= 3", and deleting the probe fails with
+        "assert counter after probe", so the checks are live.
+        Protected-type port syntax is
+        `variable c : inout counter_t` (`shared` is rejected). NVC 1.23.0
+        returns a wrong value from access_value_mirror.get
+        (vm.to_access.get.to_integer.value gave a pointer value, not 9), so
+        the access check uses is_null instead. The design checks only
+        seed- and environment-independent values (no EPOCH/LOCALTIME, no
+        FILE_NAME/FILE_PATH, no exact FILE_LINE) so it is variant-stable.
+        The TOOL_NAME branch has a "gohard" arm; any other tool gets
+        "unknown" and fails the TOOL_NAME check.
+    disagreements: []
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: psl_simple
+    standard: "2008"
+    milestone: v1.0
+    files:
+      - path: psl_simple.vhd
+        standard: "2008"
+      - path: psl_simple_tb.vhd
+        standard: "2008"
+    top: psl_simple
+    testbench: psl_simple_tb
+    defines: {}
+    models: {}
+    # simulation.stop_level: failure, so the error-severity PSL assert at
+    # 55 ns does not halt the run; it ends at the 100 ns std.env.finish.
+    config: gohard.yaml
+    expected:
+      exit: 1
+      status: problems
+      stop_time: 100 ns
+      # Diagnostics in sorted (source) order, #20.
+      messages:
+        - severity: error
+          text: a and b high in the same cycle
+          time: 55 ns
+        - severity: hint
+          text: a then b
+          time: 35 ns
+        - severity: warning
+          text: b twice in a row
+    features: [psl_assert_cover]
+    invariants:
+      - seed_independent
+      - variant_stable
+      - self_stopping
+      - fails_by_design
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 psl_simple.vhd psl_simple_tb.vhd; ghdl --elab-run
+        --std=08 psl_simple_tb --psl-report=<tmp>/psl.json
+      result: fail
+      exit: 0
+      stop_time: 100 ns
+      messages:
+        - 'psl_simple.vhd:41:3:@35ns:(psl cover note): a then b'
+        - >-
+          psl_simple.vhd:38:3:@55ns:(psl assertion error): a and b high in
+          the same cycle
+        - simulation finished @100ns
+      notes: >-
+        Same events as NVC, but GHDL exits 0 after a PSL assertion error.
+        --psl-report lists never_both "failed" (finished-count 1), a_then_b
+        "covered" (1) and b_twice "not covered" (0). Nothing is printed for
+        the cover miss during the run. GHDL also accepts `default clock` in
+        the statement part; the design puts it in the architecture
+        declarative part, where NVC requires it.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a psl_simple.vhd psl_simple_tb.vhd -e psl_simple_tb
+        -r
+      result: fail
+      exit: 1
+      stop_time: 100 ns
+      messages:
+        - '** Note: 35ns+0: a then b'
+        - '** Error: 55ns+0: a and b high in the same cycle'
+        - '** Note: 100ns+0: FINISH called'
+      notes: >-
+        Native 2008 PSL needs no flag. Do not pass -a --psl: it also parses
+        comments starting with "-- psl". NVC prints nothing for the cover
+        miss; GoHard reports it as a warning (#35). NVC does not halt on
+        the error-severity PSL assert (it does halt on an error-severity
+        VHDL assert, see assert_fail), and GHDL halts only at failure, so
+        both tools run to the 100 ns finish. GoHard treats PSL and VHDL
+        asserts alike and halts at simulation.stop_level (default error,
+        #35); this design's gohard.yaml sets stop_level: failure so GoHard
+        also runs to 100 ns and matches both tools event for event. Without
+        it GoHard would halt at 55 ns.
+    disagreements:
+      - topic: process exit status after a PSL assertion error
+        ghdl: exit 0
+        nvc: exit 1
+        follows: nvc
+        lrm: n/a
+        notes: >-
+          Tool exit status is outside the LRM; GoHard's rule (#20, #35) is
+          that an error-severity PSL assert under --sim exits 1. Reported
+          events and times agree.
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: standin_model
+    standard: "2008"
+    milestone: v1.0
+    files:
+      - path: crypt_core.vhd
+        standard: "2008"
+      - path: standin_model.vhd
+        standard: "2008"
+      - path: standin_model_tb.vhd
+        standard: "2008"
+    top: standin_model
+    testbench: standin_model_tb
+    defines: {}
+    # The design directory also holds the gohard.yaml this needs:
+    #   allow_opaque: [work.crypt_core]
+    #   simulation.models: {work.crypt_core: models/crypt_core_model.vhd}
+    # The stand-in is not in `files`: it is analyzed only through the model
+    # mapping (listing it would duplicate entity crypt_core).
+    models:
+      work.crypt_core: models/crypt_core_model.vhd
+    config: gohard.yaml
+    # Provisional (open spec question, see LIMITS.md): this assumes that
+    # allow_opaque plus a simulation.models stand-in lifts the #20 rule that
+    # a run with units depending on an opaque unit never exits 0, and that
+    # the allow_opaque downgrade emits no diagnostic. If #20/#35 decide
+    # otherwise, add the downgraded diagnostic here and change exit/status.
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 80 ns
+      messages: []
+    features: [standin_models]
+    invariants:
+      - seed_independent
+      - variant_stable
+      - self_stopping
+      - modeled_drivers_marked
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 models/crypt_core_model.vhd standin_model.vhd
+        standin_model_tb.vhd; ghdl --elab-run --std=08 standin_model_tb
+      result: pass
+      exit: 0
+      stop_time: 80 ns
+      messages:
+        - simulation finished @80ns
+      notes: >-
+        Run with the stand-in in place of crypt_core.vhd, which is what
+        simulation.models does. The testbench checks the reset outputs
+        (dout = x00, valid = '0' at 20 ns and still one clock after reset
+        release), a new din every clock reaching dout exactly two clocks
+        later, and that dout/valid only move on the rising edge. Mutations
+        reported by both tools: reset valid '1', reset dout xFF, the
+        register following every clk event, xor x5B. crypt_core.vhd
+        itself does not analyze:
+        "crypt_core.vhd:29:1:error: missing entity, architecture, package or
+        configuration" (GHDL skips `protect lines and then hits the base64
+        key block).
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a models/crypt_core_model.vhd standin_model.vhd
+        standin_model_tb.vhd -e standin_model_tb -r
+      result: pass
+      exit: 0
+      stop_time: 80 ns
+      messages:
+        - '** Note: 80ns+0: FINISH called'
+      notes: >-
+        Run with the stand-in, as for GHDL. On crypt_core.vhd itself NVC
+        reports "`protect directives are not supported" at line 20 and
+        cites IEEE 1076-2008 24.1 "Protect tool directives", the same opaque
+        treatment GoHard gives it (#20). The recorded trace contains no
+        modeled marking; GoHard adds it to u_core's dout/valid drivers.
+    disagreements: []
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: textio_env
+    standard: "2008"
+    milestone: v1.0
+    files:
+      - path: textio_env.vhd
+        standard: "2008"
+      - path: textio_env_tb.vhd
+        standard: "2008"
+    top: textio_env
+    testbench: textio_env_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 40 ns
+      messages: []
+    features: [std_env, textio]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 textio_env.vhd textio_env_tb.vhd;
+        ghdl --elab-run --std=08 textio_env_tb
+      result: pass
+      exit: 0
+      stop_time: 40 ns
+      messages:
+        - "textio_env: rows=4"
+        - "simulation finished @40ns"
+      notes: >-
+        Finished via std.env.finish at 40 ns. The log file textio_env.log is
+        created in the current directory (write_mode), closed, reopened
+        (read_mode) and checked field by field (integer, string, hread,
+        std_logic_vector read, time). Its contents were
+        "0 vec 00 11111111 10 ns" .. "3 vec FF 00000000 40 ns". The only
+        stdout line from the design is the writeline(output) line
+        "textio_env: rows=4"; it is textio output, not a diagnostic.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a textio_env.vhd textio_env_tb.vhd
+        -e textio_env_tb -r
+      result: pass
+      exit: 0
+      stop_time: 40 ns
+      messages:
+        - "textio_env: rows=4"
+        - "** Note: 40ns+0: FINISH called"
+      notes: >-
+        Same writeline(output) line and byte-identical textio_env.log as
+        GHDL. NVC prints a note for FINISH; GHDL prints "simulation
+        finished". Neither is a design message.
+    disagreements: []
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: vhdl93_only
+    standard: "1993"
+    milestone: v1.0
+    files:
+      - path: vhdl93_only.vhd
+        standard: "1993"
+      - path: vhdl93_only_tb.vhd
+        standard: "1993"
+    top: vhdl93_only
+    testbench: vhdl93_only_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 50 ns
+      messages: []
+    features: []
+    invariants:
+      - seed_independent
+      - variant_stable
+      - self_stopping
+      - standard_gated
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=93 vhdl93_only.vhd vhdl93_only_tb.vhd;
+        ghdl --elab-run --std=93 vhdl93_only_tb
+      result: pass
+      exit: 0
+      stop_time: 50 ns
+      messages: []
+      notes: >-
+        Accepted silently under --std=93 and runs to the end of events at
+        50 ns (last wait for 10 ns, then a bare wait; std.env does not exist
+        in 1993). Rejected under later standards (see variants): --std=02
+        exit 1, first error vhdl93_only.vhd:19:10 "an identifier is expected
+        instead of 'protected'"; --std=08 and --std=19 exit 1, first error
+        vhdl93_only.vhd:12:5 "interface declaration expected" (port force).
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=1993 -a vhdl93_only.vhd vhdl93_only_tb.vhd
+        -e vhdl93_only_tb -r
+      result: pass
+      exit: 0
+      stop_time: 50 ns
+      messages:
+        - "** Warning: FORCE is a reserved word in VHDL-2008"
+        - "** Warning: RELEASE is a reserved word in VHDL-2008"
+        - "** Warning: CONTEXT is a reserved word in VHDL-2008"
+        - "** Warning: PROTECTED is a reserved word in VHDL-2000"
+      notes: >-
+        Analysis warnings only (lines 12, 13, 14, 19 of vhdl93_only.vhd),
+        then a clean run. Under --std=2002 exit 1 with 4 errors, the first
+        "unexpected protected while parsing signal declaration" at line 19;
+        under --std=2008 and --std=2019 exit 1 with 5 errors, the first
+        "unexpected force while parsing interface declaration" at line 12.
+    disagreements:
+      - topic: later-standard reserved words used as identifiers under 1993
+        ghdl: accepts silently
+        nvc: accepts with one warning per identifier
+        follows: ghdl
+        lrm: "15.10"
+        notes: >-
+          Both are legal VHDL-1993 identifiers, so GoHard reports nothing
+          under 1993 (expected messages are empty). Both tools reject the
+          file under 2002 (protected) and 2008/2019 (force, release,
+          context).
+    variants:
+      - name: std_2002
+        standard: "2002"
+        files:
+          - path: vhdl93_only.vhd
+            standard: "2002"
+        expected:
+          exit: 1
+          status: problems
+          stop_time: none
+          messages:
+            - severity: error
+              text: protected
+        ghdl:
+          version: 6.0.0
+          command: ghdl -a --std=02 vhdl93_only.vhd
+          result: analysis-error
+          exit: 1
+          stop_time: none
+          notes: first error vhdl93_only.vhd:19:10
+        nvc:
+          version: 1.23.0
+          command: nvc --std=2002 -a vhdl93_only.vhd
+          result: analysis-error
+          exit: 1
+          stop_time: none
+          notes: first error vhdl93_only.vhd:19
+        notes: >-
+          expected.messages lists the first error, which must be on line 19
+          (signal protected); parser recovery may add more errors.
+      - name: std_2008
+        standard: "2008"
+        files:
+          - path: vhdl93_only.vhd
+            standard: "2008"
+        expected:
+          exit: 1
+          status: problems
+          stop_time: none
+          messages:
+            - severity: error
+              text: force
+        ghdl:
+          version: 6.0.0
+          command: ghdl -a --std=08 vhdl93_only.vhd
+          result: analysis-error
+          exit: 1
+          stop_time: none
+          notes: first error vhdl93_only.vhd:12:5; --std=19 is the same
+        nvc:
+          version: 1.23.0
+          command: nvc --std=2008 -a vhdl93_only.vhd
+          result: analysis-error
+          exit: 1
+          stop_time: none
+          notes: first error vhdl93_only.vhd:12; --std=2019 is the same
+        notes: >-
+          expected.messages lists the first error, which must be on line 12
+          (port force); parser recovery may add more errors. 2019 behaves
+          the same.
+    trace_sha256: pending
+    oracle_sha256: pending
+  - name: wait_forms
+    standard: "2008"
+    milestone: v1.0
+    files:
+      - path: wait_forms.vhd
+        standard: "2008"
+      - path: wait_forms_tb.vhd
+        standard: "2008"
+    top: wait_forms
+    testbench: wait_forms_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 500 ns
+      messages: []
+    features: [wait_forms, delay_mechanisms]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 wait_forms.vhd wait_forms_tb.vhd;
+        ghdl --elab-run --std=08 wait_forms_tb
+      result: pass
+      exit: 0
+      stop_time: 500 ns
+      messages:
+        - "simulation stopped @500ns"
+      notes: >-
+        Stopped via std.env.stop at 500 ns with no assertion output. Wait
+        forms, each asserting the exact time of every resumption: wait;
+        wait on a; wait on a, b; wait until c = '1' (an already true
+        condition still needs a new event); wait on a until b; wait on c
+        for t (timeout, then event); wait until b for t (timeout, then
+        condition); wait on a until c for t (condition, then timeout); wait
+        for t and wait for 0 ns; wait until true for 3 ns (empty
+        sensitivity set, timeout only); a sensitivity list; wait until
+        rising_edge(a). Delays on x (pulses of 2, 5 and 20 ns): inertial
+        10 ns passes only the 20 ns pulse, transport passes all three,
+        reject 3 ns inertial 10 ns passes 5 ns and 20 ns; each output also
+        leaves 'U' at 10 ns. Transport preemption deletes the 220 ns
+        transaction (events 2 at 215 ns, 3 at 236 ns); inertial preemption
+        leaves 2 at 310 ns only, and the marking rule keeps 7 at 406 ns.
+        wait for 0 ns is pinned to exactly one delta: a signal assigned
+        just before it has its new value and 'event after it, at the same
+        now. Mutating the reject limit to 6 ns or the 401 ns value,
+        deleting the wait for 0 ns, or doubling it is reported by both
+        tools.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a wait_forms.vhd wait_forms_tb.vhd
+        -e wait_forms_tb -r
+      result: pass
+      exit: 0
+      stop_time: 500 ns
+      messages:
+        - "** Note: 500ns+0: STOP called"
+      notes: >-
+        Same outcome as GHDL. NVC prints a note for STOP; GHDL prints
+        "simulation stopped". Neither is a design message, and both exit 0
+        for std.env.stop.
+    disagreements: []
+    trace_sha256: pending
+    oracle_sha256: pending
+
+# Parser-regression submodules (#8), sorted by name.
+regression:
+  #
+  # All are git submodules with `shallow = true` in .gitmodules, cloned at
+  # depth 1 at the release tag named in each entry comment. Only *.vhd and
+  # *.vhdl files are parsed. Nested submodules (VUnit, OSVVM-in-PoC, Open
+  # Logic 3rdParty) are not initialised and are not needed: OSVVM is pinned
+  # separately under testdata/libs/osvvm.
+  #
+  # Size on disk (apparent bytes, measured 2026-10-18):
+  #   name        worktree   .git/modules   VHDL files  VHDL bytes
+  #   ghdl         54.7 MB      12.1 MB        9668*    20.7 MB*
+  #   grlib       192.9 MB      33.2 MB        1168     23.4 MB
+  #   neorv32       4.7 MB       2.3 MB          68      1.2 MB
+  #   nvc          14.3 MB       3.5 MB        2116*     2.9 MB*
+  #   open-logic   24.7 MB      16.2 MB         255      3.1 MB
+  #   osvvm         3.6 MB       0.4 MB          76      3.5 MB
+  #   poc           5.8 MB       1.8 MB         430      3.2 MB
+  #   surf         34.7 MB       7.5 MB        1245     14.8 MB
+  #   uvvm        110.8 MB      22.6 MB         302      7.9 MB
+  #   vunit        10.8 MB       7.4 MB         292      2.2 MB
+  #   total       456.9 MB     107.0 MB       15620     83.0 MB
+  #   (* counted inside the PR subfolder only: ghdl/testsuite is 25.7 MB,
+  #    nvc/test is 5.2 MB; PR checkout total about 31 MB.)
+  #   `du -sh` (block usage) of worktrees plus .git/modules is about 620 MB.
+  #
+  # ---------------------------------------------------------------------------
+  # Expected-failure extraction. `expected_failures` lists every upstream
+  # file (paths or globs, relative to the submodule) that carries the
+  # project's own expectations; the rule for reading each kind is below and
+  # must be implemented by the PR parser-regression test:
+  #
+  # GHDL (testdata/ghdl, subfolder testsuite):
+  #   A file is EXPECTED TO FAIL ANALYSIS iff it is named by one of:
+  #   1. `analyze_failure` calls in testsuite/<suite>/<dir>/testsuite.sh for
+  #      suite in {gna, sanity} (628 call lines in v6.0.0; the helper lives
+  #      in testsuite/testenv.sh and runs `ghdl -a --expect-failure`).
+  #      Extraction: for each line matching ^\s*analyze_failure\b (ignore
+  #      commented lines and `if analyze_failure` re-checks of files already
+  #      listed), the file operands are the words that do not start with
+  #      `-` and end in .vhd/.vhdl, relative to that script's directory.
+  #      Strip trailing redirections (`2> x.err`). Seven scripts loop over
+  #      a variable and must be expanded from the loop list in the same
+  #      script: gna/bug090 (`for i in *.vhdl`: every .vhdl in the dir),
+  #      gna/bug0144 (badloc underscore1 quote1 +.vhdl), gna/issue2686
+  #      (tst_rec tst_arr +.vhdl), gna/issue2110 (conf1 psl1 psl2 retid
+  #      .vhdl), gna/issue2070, gna/issue2076, gna/issue2116 (the `files="..."`
+  #      list above the loop).
+  #      Standard: the last `export GHDL_STD_FLAGS=--std=NN` before the call
+  #      in that script, an inline `--std=NN` operand, else GHDL's default
+  #      93c. Flags such as -frelaxed, --force-analysis, -fpsl, -Werror=...
+  #      are recorded but do not change the "may fail" status.
+  #   2. VESTS: `run_non_compliant_test <file>` lines in
+  #      testsuite/vests/vhdl-93/ashenden/non_compliant/non_compliant.exp
+  #      (4 files, --std=93c) and
+  #      testsuite/vests/vhdl-93/billowitch/non_compliant/analyzer_failure/
+  #      non_compliant.exp (1518 files, --std=93). Files are relative to the
+  #      .exp file's directory. NOT expected to fail analysis:
+  #      billowitch/non_compliant/simulator_failure/ (run_err mode: analysis
+  #      must succeed, only simulation fails).
+  #   Every other file analysed by `analyze`, `elab_simulate`, `synth*`,
+  #   `build_compliant_test` or `run_compliant_test` must parse. Files that
+  #   no script references (and testsuite/vests/vhdl-ams/,
+  #   testsuite/vests/vhdl-93/billowitch/disputed/, which testsuite.sh does
+  #   not run) have no upstream expectation: parse them, report results,
+  #   but do not gate on them.
+  #   `synth_failure` / `elab_failure` / `simulate_failure` /
+  #   `run_err_non_compliant_test` do NOT mark an analysis failure.
+  #
+  # NVC (testdata/nvc, subfolder test):
+  #   test/regress/testlist.txt (1479 lines, `<name> <opt>,<opt>...`): NO
+  #   entry is an analysis failure. run_regr.c runs `nvc -a <name>.vhd -e
+  #   <name>` and requires success for every test; the `fail` option
+  #   (129 tests) only means the *run* step must fail. So every
+  #   test/regress/<name>.vhd listed there must parse, under the standard
+  #   from its options (`2000`, `2002`, `2008`, `2019`; default --std=1993,
+  #   see push_std in run_regr.c; `relaxed` adds --relaxed; tests flagged
+  #   `verilog` have no .vhd and are skipped; `mixed` also has a .v/.sv).
+  #   Expected diagnostics live in the C unit tests test/test_*.c (parse,
+  #   sem, bounds, simp, elab, lower, psl, ...): within each
+  #   START_TEST(...) ... END_TEST block, `input_from_file(TESTDIR
+  #   "/<dir>/<file>")` names the input and the preceding
+  #   `const error_t expect[] = { { LINE, "snippet" }, ..., { -1, NULL } };
+  #   expect_errors(expect);` lists every diagnostic NVC emits on that file,
+  #   in order, with its 1-based line and a message substring. Entries with
+  #   LINE == 0 are hints attached to the previous diagnostic, not separate
+  #   diagnostics. A block with no expect[] (or only {-1, NULL}) and
+  #   `fail_if_errors()` means the file is clean. `set_standard(STD_xx)` and
+  #   `opt_set_int(OPT_RELAXED, 1)` in the block give the standard and mode
+  #   (default 1993 for unit tests). Five blocks read more than one file;
+  #   the expect[] in force at each input_from_file applies to it. These
+  #   diagnostics include warnings and semantic errors, so for the parser
+  #   gate a listed file is "may fail"; line numbers feed the sema oracle.
+  #
+  # All other entries: the projects keep no expected-failure list; every
+  # VHDL file is expected to parse (`expected_failures: []`). Semantic
+  # checks need the project's own compile order (open-logic compile_order.txt, OSVVM
+  # osvvm.pro, PoC PoC.pro, UVVM <lib>/script/compile_order.txt,
+  # VUnit vunit/vhdl/*, NEORV32 rtl/file_list_*.f, SURF ruckus.tcl,
+  # GRLIB lib/libs.txt + per-library dirs.txt/vhdlsyn.txt).
+  # ---------------------------------------------------------------------------
+
+  # GHDL v6.0.0 (matches the oracle GHDL 6.0.0). Licence file COPYING.md
+  # (GPL-2.0, source headers "version 2 ... or any later"). VESTS is
+  # testsuite/vests/LICENSE + COPYING: GPL-2.0 (University of Cincinnati).
+  - name: ghdl
+    path: testdata/ghdl
+    url: https://github.com/ghdl/ghdl.git
+    commit: e589c698c351369ac5bcfe7abe1f1152ac5d4727
+    license: GPL-2.0-or-later
+    tag: pr
+    subfolder: testsuite
+    expected_failures:
+      - testsuite/gna/*/testsuite.sh
+      - testsuite/sanity/*/testsuite.sh
+      - testsuite/vests/vhdl-93/ashenden/non_compliant/non_compliant.exp
+      - >-
+        testsuite/vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.exp
+  # GRLIB GPL grlib-gpl-2026.2-b4300. Frontgrade Gaisler publishes GRLIB
+  # only as release tarballs (no official git); this is the automated
+  # mirror of those tarballs. No licence file in the tree. Of the 698
+  # lib/**/*.vhd, 541 carry "GNU General Public License ... version 2"
+  # (only); 143 have no GPL v2 header at all (`grep -rLi 'version 2' lib
+  # --include='*.vhd'`), among them Altera megafunction output under the
+  # Altera Program License Subscription Agreement (lib/techmap/stratixiii,
+  # cycloneiii) and vendor memory models with only a vendor copyright
+  # (lib/micron, lib/cypress, lib/gsi). Those are LicenseRef-GRLIB-
+  # third-party: parsed in the nightly run from the pinned upstream
+  # checkout only, never copied into this repo or shipped. Owner sign-off
+  # on the mirror is still open (LIMITS.md).
+  - name: grlib
+    path: testdata/grlib
+    url: https://github.com/TUT-ASI/leon3-grlib-gpl-mirror.git
+    commit: 2d4ae1f15bd942172e6aa0f9282bfeed73293f68
+    license: GPL-2.0-only AND LicenseRef-GRLIB-third-party
+    tag: nightly
+    subfolder: lib
+    expected_failures: []
+  # NEORV32 v1.13.6. Licence file LICENSE.
+  - name: neorv32
+    path: testdata/neorv32
+    url: https://github.com/stnolting/neorv32.git
+    commit: e25059f2d7fa948342516c0722bbf2b19039ab3c
+    license: BSD-3-Clause
+    tag: nightly
+    subfolder: .
+    expected_failures: []
+  # NVC r1.23.0 (matches the oracle NVC 1.23.0). Licence file COPYING.
+  - name: nvc
+    path: testdata/nvc
+    url: https://github.com/nickg/nvc.git
+    commit: cba10a2e0e37ae1c1ece982b6cbe5c65423800d3
+    license: GPL-3.0-or-later
+    tag: pr
+    subfolder: test
+    expected_failures:
+      - test/regress/testlist.txt
+      - test/test_*.c
+  # Open Logic 4.7.0. Licence file License.txt: "PSI HDL Library License
+  # 1.0" = GNU Library GPL v2 or later (LGPL2_1.txt shipped) plus a binary/
+  # bitstream exception; no SPDX id exists, hence LicenseRef.
+  - name: open-logic
+    path: testdata/open-logic
+    url: https://github.com/open-logic/open-logic.git
+    commit: d9f123aae1c6022288782668067311f9794da0a2
+    license: LicenseRef-PSI-HDL-Library-1.0
+    tag: nightly
+    subfolder: .
+    expected_failures: []
+  # OSVVM utility library 2026.09. Licence file LICENSE.md.
+  - name: osvvm
+    path: testdata/libs/osvvm
+    url: https://github.com/OSVVM/OSVVM.git
+    commit: 716d751566b4fb6479f69c38cc01790744c911b7
+    license: Apache-2.0
+    tag: nightly
+    subfolder: .
+    expected_failures: []
+  # PoC v3.0.0. VLSI-EDA/PoC is archived and points to VHDL/PoC. Licence
+  # file LICENSE.md.
+  - name: poc
+    path: testdata/poc
+    url: https://github.com/VHDL/PoC.git
+    commit: b90402732980e3fdbc4d2339c0b7d16dbc0b3d79
+    license: Apache-2.0
+    tag: nightly
+    subfolder: .
+    expected_failures: []
+  # SURF v2.76.0. Licence file LICENSE.txt: SLAC 3-clause BSD with the
+  # "Enhancements" grant, i.e. the SPDX BSD-3-Clause-LBNL text.
+  - name: surf
+    path: testdata/surf
+    url: https://github.com/slaclab/surf.git
+    commit: f0b5e3a7b5ab191be1cb5f4453e418299181c9d8
+    license: BSD-3-Clause-LBNL
+    tag: nightly
+    subfolder: .
+    expected_failures: []
+  # UVVM 2026.03.20. Licence file LICENSE.
+  - name: uvvm
+    path: testdata/libs/uvvm
+    url: https://github.com/UVVM/UVVM.git
+    commit: 4f1e13bf96dca5571597ca7416b9340e9de94efd
+    license: Apache-2.0
+    tag: nightly
+    subfolder: .
+    expected_failures: []
+  # VUnit v4.7.0 (latest stable; v5 is still -dev). Licence file
+  # LICENSE.rst. Its OSVVM and JSON-for-VHDL nested submodules are not
+  # initialised.
+  - name: vunit
+    path: testdata/libs/vunit
+    url: https://github.com/VUnit/vunit.git
+    commit: 62c904db092f64ac8c334af48c35eb8b8c96edb4
+    license: MPL-2.0
+    tag: nightly
+    subfolder: .
+    expected_failures: []

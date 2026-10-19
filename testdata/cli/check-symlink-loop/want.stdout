@@ -1,0 +1,3 @@
+rtl/up:1:1: error[workspace/symlink-loop]: symbolic link loop at rtl/up
+self:1:1: error[workspace/symlink-loop]: symbolic link loop at self
+summary: 2 errors, 0 warnings, 0 hints, 1 files

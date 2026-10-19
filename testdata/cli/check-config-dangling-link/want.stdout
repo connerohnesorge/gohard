@@ -1,0 +1,2 @@
+gohard.yaml:1:1: error[config/unreadable]: cannot read gohard.yaml: it is a symbolic link to a missing file
+summary: 1 errors, 0 warnings, 0 hints, 0 files

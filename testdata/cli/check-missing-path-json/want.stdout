@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "status": "tool_error",
+  "exit": 2,
+  "summary": {
+    "errors": 1,
+    "warnings": 0,
+    "hints": 0,
+    "files": 1
+  },
+  "diagnostics": [
+    {
+      "path": "",
+      "line": 0,
+      "col": 0,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "cli/missing-path",
+      "message": "missing.vhd does not exist",
+      "related": []
+    }
+  ],
+  "incomplete": [],
+  "error": {
+    "code": "cli/missing-path",
+    "message": "missing.vhd does not exist"
+  }
+}

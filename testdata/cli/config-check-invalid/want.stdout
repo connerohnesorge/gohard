@@ -1,0 +1,13 @@
+gohard.yaml:1:11: error[config/unquoted-standard]: standard must be a quoted string: standard: "2008"
+gohard.yaml:2:10: error[config/bad-bool]: lenient must be true or false, not yes
+gohard.yaml:4:13: error[config/bad-bool]: psl.comments must be true or false, not on
+gohard.yaml:5:3: error[config/unknown-key]: unknown key psl.strict
+gohard.yaml:7:8: error[config/unquoted-bool]: defines.FOO: yes reads as a YAML 1.1 boolean; quote it: "yes"
+gohard.yaml:8:3: error[config/builtin-define]: VHDL_VERSION is a built-in conditional-analysis identifier and cannot be defined
+gohard.yaml:10:11: error[config/range]: format.indent must be at least 1, not 0
+gohard.yaml:11:3: error[config/duplicate-key]: duplicate key format.indent (first set on line 10)
+gohard.yaml:12:17: error[config/enum]: format.keyword_case must be one of "lower", "upper" or "preserve", not Upper
+gohard.yaml:14:16: error[config/bad-time]: simulation.time_budget: 1ms is not a VHDL time such as "1 ms"
+gohard.yaml:15:9: error[config/range]: simulation.seed must be between 0 and 18446744073709551615, not -1
+gohard.yaml:17:12: error[config/bad-timestamp]: simulation.env.epoch: 2000-01-01 is not an RFC 3339 UTC time such as "2000-01-01T00:00:00Z"
+summary: 12 errors, 0 warnings, 0 hints, 1 files

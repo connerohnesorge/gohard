@@ -1,0 +1,6 @@
+exit 2
+gohard.yaml:2:11: error[config/range]: format.indent must be between 1 and 9223372036854775807, not 99999999999999999999
+gohard.yaml:3:20: error[config/range]: format.max_line_length must be between 40 and 9223372036854775807, not 9223372036854775808
+gohard.yaml:5:17: error[config/range]: simulation.delta_budget must be between 1 and 9223372036854775807, not 99999999999999999999999
+gohard.yaml:6:16: error[config/range]: simulation.step_budget must be at least 1, not 0
+summary: 4 errors, 0 warnings, 0 hints, 1 files

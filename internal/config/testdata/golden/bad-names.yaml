@@ -1,0 +1,14 @@
+libraries:
+  9lib: [src]
+  ok_lib: src
+  other: [src, ""]
+allow_opaque: [lib, lib.unit, "a.b.c", .x]
+simulation:
+  testbenches: [tb-1, tb_ok]
+  models:
+    nolib: m.vhd
+    lib.u: ""
+  env:
+    vars:
+      "A=B": x
+      "": y

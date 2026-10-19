@@ -1,0 +1,1 @@
+gohard config check --define VHDL_VERSION=2019

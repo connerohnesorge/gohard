@@ -1,0 +1,2 @@
+symlink alias.vhd rtl/a.vhd
+symlink rtl-link rtl

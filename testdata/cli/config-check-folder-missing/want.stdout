@@ -1,0 +1,2 @@
+gohard.yaml:2:14: error[library/folder-missing]: library lib: folder missing is missing or unreadable
+summary: 1 errors, 0 warnings, 0 hints, 1 files

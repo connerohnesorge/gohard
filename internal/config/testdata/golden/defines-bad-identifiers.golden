@@ -1,0 +1,6 @@
+exit 2
+gohard.yaml:2:3: error[config/type]: a key under defines must be a VHDL identifier, not the string 9X
+gohard.yaml:3:3: error[config/type]: a key under defines must be a VHDL identifier, not the string A__B
+gohard.yaml:4:3: error[config/type]: a key under defines must be a VHDL identifier, not the string _A
+gohard.yaml:5:3: error[config/type]: a key under defines must be a VHDL identifier, not the string "with space"
+summary: 4 errors, 0 warnings, 0 hints, 1 files

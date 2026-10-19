@@ -1,0 +1,40 @@
+[submodule "testdata/ghdl"]
+	path = testdata/ghdl
+	url = https://github.com/ghdl/ghdl.git
+	shallow = true
+[submodule "testdata/grlib"]
+	path = testdata/grlib
+	url = https://github.com/TUT-ASI/leon3-grlib-gpl-mirror.git
+	shallow = true
+[submodule "testdata/libs/osvvm"]
+	path = testdata/libs/osvvm
+	url = https://github.com/OSVVM/OSVVM.git
+	shallow = true
+[submodule "testdata/libs/uvvm"]
+	path = testdata/libs/uvvm
+	url = https://github.com/UVVM/UVVM.git
+	shallow = true
+[submodule "testdata/libs/vunit"]
+	path = testdata/libs/vunit
+	url = https://github.com/VUnit/vunit.git
+	shallow = true
+[submodule "testdata/neorv32"]
+	path = testdata/neorv32
+	url = https://github.com/stnolting/neorv32.git
+	shallow = true
+[submodule "testdata/nvc"]
+	path = testdata/nvc
+	url = https://github.com/nickg/nvc.git
+	shallow = true
+[submodule "testdata/open-logic"]
+	path = testdata/open-logic
+	url = https://github.com/open-logic/open-logic.git
+	shallow = true
+[submodule "testdata/poc"]
+	path = testdata/poc
+	url = https://github.com/VHDL/PoC.git
+	shallow = true
+[submodule "testdata/surf"]
+	path = testdata/surf
+	url = https://github.com/slaclab/surf.git
+	shallow = true

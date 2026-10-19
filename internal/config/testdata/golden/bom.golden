@@ -1,0 +1,4 @@
+exit 2
+gohard.yaml:1:13: error[config/bad-bool]: lenient must be true or false, not yes
+gohard.yaml:2:11: error[config/unquoted-standard]: standard must be a quoted string: standard: "2019"
+summary: 2 errors, 0 warnings, 0 hints, 1 files

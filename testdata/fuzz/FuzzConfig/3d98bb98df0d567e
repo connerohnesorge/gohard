@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("defines: {A: yes, a: no, VHDL_VERSION: on, \"\": y}\n")

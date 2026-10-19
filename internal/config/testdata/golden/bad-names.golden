@@ -1,0 +1,13 @@
+exit 2
+gohard.yaml:2:3: error[config/type]: a key under libraries must be a VHDL identifier, not the string 9lib
+gohard.yaml:3:11: error[config/type]: libraries.ok_lib must be a list, not the string src
+gohard.yaml:4:16: error[config/type]: libraries.other[1] must be a non-empty string, not the string ""
+gohard.yaml:5:16: error[config/type]: allow_opaque[0] must be a lib.unit name, not the string lib
+gohard.yaml:5:31: error[config/type]: allow_opaque[2] must be a lib.unit name, not the string "a.b.c"
+gohard.yaml:5:40: error[config/type]: allow_opaque[3] must be a lib.unit name, not the string .x
+gohard.yaml:7:17: error[config/type]: simulation.testbenches[0] must be a VHDL identifier, not the string tb-1
+gohard.yaml:9:5: error[config/type]: a key under simulation.models must be a lib.unit name, not the string nolib
+gohard.yaml:10:12: error[config/type]: simulation.models.lib.u must be a non-empty string, not the string ""
+gohard.yaml:13:7: error[config/type]: a key under simulation.env.vars must be a variable name without '=', not the string "A=B"
+gohard.yaml:14:7: error[config/type]: a key under simulation.env.vars must be a variable name without '=', not the string ""
+summary: 11 errors, 0 warnings, 0 hints, 1 files

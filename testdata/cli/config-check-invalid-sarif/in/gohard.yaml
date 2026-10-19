@@ -1,0 +1,17 @@
+standard: 2008
+lenient: yes
+psl:
+  comments: on
+  strict: true
+defines:
+  FOO: yes
+  VHDL_VERSION: "2008"
+format:
+  indent: 0
+  indent: 2
+  keyword_case: Upper
+simulation:
+  time_budget: 1ms
+  seed: -1
+  env:
+    epoch: 2000-01-01

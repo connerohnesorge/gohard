@@ -1,0 +1,4 @@
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key libraries.LIB (first set on line 2)
+gohard.yaml:6:3: error[config/duplicate-key]: duplicate key defines.FOO (first set on line 5)
+summary: 2 errors, 0 warnings, 0 hints, 1 files

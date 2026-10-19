@@ -1,0 +1,2 @@
+gohard: error[cli/usage]: --seed must be an unsigned integer or random, not "-3"; run 'gohard help' for usage
+summary: 1 errors, 0 warnings, 0 hints, 0 files

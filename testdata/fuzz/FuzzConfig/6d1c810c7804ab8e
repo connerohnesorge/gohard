@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("\u00e9\u00e9: {\u00fc: 1}\nstandard: 2008\n")

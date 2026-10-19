@@ -1,0 +1,5 @@
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key a
+gohard.yaml:2:9: error[config/type]: format must be a mapping, not an alias (*anchor)
+gohard.yaml:4:9: error[config/type]: simulation.seed must be a decimal integer, not an alias (*anchor)
+summary: 3 errors, 0 warnings, 0 hints, 1 files

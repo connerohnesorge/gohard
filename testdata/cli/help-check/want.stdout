@@ -1,0 +1,19 @@
+Usage:
+  gohard check [flags] [PATH...]
+
+Parse and analyze VHDL; with --sim, run testbenches.
+
+Flags:
+      --allow-empty        exit 0 when no VHDL files are found
+      --define NAME=VALUE  define a conditional-analysis identifier (overrides defines:); repeatable
+      --format FORMAT      diagnostic output format: text, json or sarif (default text)
+      --repro FILE         rerun the simulation recorded in a repro file
+      --seed N|random      simulation seed; 0 keeps declaration order
+      --sim                also elaborate and simulate testbenches
+      --strict             exit 1 on any warning (hints never fail a run)
+      --tb NAME            run only the testbench NAME
+
+Global flags:
+  -h, --help         show help
+  -p, --jobs N       run at most N parallel jobs (output never depends on N)
+      --output FILE  write standard output to FILE (a temp file, then rename)

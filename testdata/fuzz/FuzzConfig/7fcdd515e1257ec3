@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("x: &x [1,2]\ny: &y [*x,*x,*x,*x]\nz: [*y,*y,*y,*y]\nformat: *x\n")

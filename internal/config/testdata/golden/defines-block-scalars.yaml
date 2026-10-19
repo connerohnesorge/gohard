@@ -1,0 +1,8 @@
+defines:
+  FOO: |
+    multi
+    line
+  BAR: >
+    folded
+  BAZ: 12
+  QUX: ""

@@ -1,0 +1,2 @@
+gohard: error[cli/interrupted]: interrupted by SIGINT
+summary: 1 errors, 0 warnings, 0 hints, 1 files

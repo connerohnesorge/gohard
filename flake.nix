@@ -30,7 +30,7 @@
         ];
 
         shellHook = ''
-          export GOPATH="$PWD/.go"
+          export GOPATH="''${XDG_CACHE_HOME:-$HOME/.cache}/gohard-go"
           export PATH="$GOPATH/bin:$PATH"
           echo "Go $(go version | awk '{print $3}') devshell"
         '';

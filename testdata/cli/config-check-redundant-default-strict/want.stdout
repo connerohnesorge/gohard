@@ -1,0 +1,3 @@
+gohard.yaml:1:11: warning[config/redundant-default]: standard is set to its default value "2008"
+gohard.yaml:3:11: warning[config/redundant-default]: format.indent is set to its default value 2
+summary: 0 errors, 2 warnings, 0 hints, 1 files

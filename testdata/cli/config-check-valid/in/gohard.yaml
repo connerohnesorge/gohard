@@ -1,0 +1,13 @@
+standard: "2019"
+libraries:
+  work_lib: [rtl]
+  tb_lib: [tb]
+defines:
+  USE_FAST_ADDER: "true"
+format:
+  indent: 4
+  keyword_case: upper
+simulation:
+  testbenches: [tb_top]
+  seed: 42
+  time_budget: 10 us

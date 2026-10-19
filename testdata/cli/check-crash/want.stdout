@@ -1,0 +1,2 @@
+gohard: error[internal/crash]: internal error: fixture: injected panic reading a.vhd; crash report written to .gohard/crash/cdff24777306bec8.txt
+summary: 1 errors, 0 warnings, 0 hints, 0 files

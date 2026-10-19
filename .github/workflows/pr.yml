@@ -1,0 +1,87 @@
+# Pull-request gates (#30). Runs on Linux, macOS and Windows. Every step
+# calls a script in scripts/ci/ so the same check runs locally with
+# `nix develop -c bash scripts/ci/<name>.sh`. See scripts/ci/README.md
+# for which #30 checks are wired now and which later stages add.
+name: pr
+
+on:
+  pull_request:
+  push:
+    branches: [main, v1]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GOTOOLCHAIN: local
+  GOFLAGS: -mod=readonly
+
+jobs:
+  check:
+    name: check (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      # Byte-exact fixtures and gofmt need LF files on Windows too.
+      - name: Disable line-ending conversion
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27.x'
+          check-latest: false
+          cache: true
+
+      - name: Build, vet, test (replays testdata/fuzz)
+        run: bash scripts/ci/build.sh
+
+      - name: gofmt and golines -m 80
+        run: bash scripts/ci/format.sh
+
+      - name: Generated-file sync
+        run: bash scripts/ci/gen-check.sh
+
+      - name: detlint
+        run: bash scripts/ci/detlint.sh
+
+      - name: Parser-regression set (pr)
+        run: bash scripts/ci/regression.sh pr
+
+  race:
+    name: race (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27.x'
+          cache: true
+
+      - name: go test -race
+        run: bash scripts/ci/race.sh

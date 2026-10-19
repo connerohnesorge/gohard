@@ -1,0 +1,820 @@
+== lenient: y
+| lenient: y
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: Y
+| lenient: Y
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not Y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: yes
+| lenient: yes
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: Yes
+| lenient: Yes
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not Yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: YES
+| lenient: YES
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not YES
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: n
+| lenient: n
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not n
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: N
+| lenient: N
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not N
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: no
+| lenient: no
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not no
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: No
+| lenient: No
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not No
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: NO
+| lenient: NO
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not NO
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: true
+| lenient: true
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set lenient = true
+
+== lenient: True
+| lenient: True
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not True
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: TRUE
+| lenient: TRUE
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not TRUE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: false
+| lenient: false
+exit 0
+gohard.yaml:1:10: warning[config/redundant-default]: lenient is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set lenient = false
+
+== lenient: False
+| lenient: False
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not False
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: FALSE
+| lenient: FALSE
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not FALSE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: on
+| lenient: on
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not on
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: On
+| lenient: On
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not On
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: ON
+| lenient: ON
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not ON
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: off
+| lenient: off
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: Off
+| lenient: Off
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not Off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: OFF
+| lenient: OFF
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not OFF
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: quoted
+| lenient: "true"
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not "true"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lenient: number
+| lenient: 1
+exit 2
+gohard.yaml:1:10: error[config/bad-bool]: lenient must be true or false, not 1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: y
+| psl:
+|   comments: y
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: Y
+| psl:
+|   comments: Y
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not Y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: yes
+| psl:
+|   comments: yes
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: Yes
+| psl:
+|   comments: Yes
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not Yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: YES
+| psl:
+|   comments: YES
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not YES
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: n
+| psl:
+|   comments: n
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not n
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: N
+| psl:
+|   comments: N
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not N
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: no
+| psl:
+|   comments: no
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not no
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: No
+| psl:
+|   comments: No
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not No
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: NO
+| psl:
+|   comments: NO
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not NO
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: true
+| psl:
+|   comments: true
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set psl.comments = true
+
+== psl.comments: True
+| psl:
+|   comments: True
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not True
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: TRUE
+| psl:
+|   comments: TRUE
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not TRUE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: false
+| psl:
+|   comments: false
+exit 0
+gohard.yaml:2:13: warning[config/redundant-default]: psl.comments is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set psl.comments = false
+
+== psl.comments: False
+| psl:
+|   comments: False
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not False
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: FALSE
+| psl:
+|   comments: FALSE
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not FALSE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: on
+| psl:
+|   comments: on
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not on
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: On
+| psl:
+|   comments: On
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not On
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: ON
+| psl:
+|   comments: ON
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not ON
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: off
+| psl:
+|   comments: off
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: Off
+| psl:
+|   comments: Off
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not Off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: OFF
+| psl:
+|   comments: OFF
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not OFF
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: quoted
+| psl:
+|   comments: "true"
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not "true"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.comments: number
+| psl:
+|   comments: 1
+exit 2
+gohard.yaml:2:13: error[config/bad-bool]: psl.comments must be true or false, not 1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: y
+| psl:
+|   strict_keywords: y
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: Y
+| psl:
+|   strict_keywords: Y
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not Y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: yes
+| psl:
+|   strict_keywords: yes
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: Yes
+| psl:
+|   strict_keywords: Yes
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not Yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: YES
+| psl:
+|   strict_keywords: YES
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not YES
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: n
+| psl:
+|   strict_keywords: n
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not n
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: N
+| psl:
+|   strict_keywords: N
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not N
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: no
+| psl:
+|   strict_keywords: no
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not no
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: No
+| psl:
+|   strict_keywords: No
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not No
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: NO
+| psl:
+|   strict_keywords: NO
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not NO
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: true
+| psl:
+|   strict_keywords: true
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set psl.strict_keywords = true
+
+== psl.strict_keywords: True
+| psl:
+|   strict_keywords: True
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not True
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: TRUE
+| psl:
+|   strict_keywords: TRUE
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not TRUE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: false
+| psl:
+|   strict_keywords: false
+exit 0
+gohard.yaml:2:20: warning[config/redundant-default]: psl.strict_keywords is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set psl.strict_keywords = false
+
+== psl.strict_keywords: False
+| psl:
+|   strict_keywords: False
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not False
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: FALSE
+| psl:
+|   strict_keywords: FALSE
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not FALSE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: on
+| psl:
+|   strict_keywords: on
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not on
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: On
+| psl:
+|   strict_keywords: On
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not On
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: ON
+| psl:
+|   strict_keywords: ON
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not ON
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: off
+| psl:
+|   strict_keywords: off
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: Off
+| psl:
+|   strict_keywords: Off
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not Off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: OFF
+| psl:
+|   strict_keywords: OFF
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not OFF
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: quoted
+| psl:
+|   strict_keywords: "true"
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not "true"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== psl.strict_keywords: number
+| psl:
+|   strict_keywords: 1
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: psl.strict_keywords must be true or false, not 1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: y
+| format:
+|   align_ports: y
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: Y
+| format:
+|   align_ports: Y
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not Y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: yes
+| format:
+|   align_ports: yes
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: Yes
+| format:
+|   align_ports: Yes
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not Yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: YES
+| format:
+|   align_ports: YES
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not YES
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: n
+| format:
+|   align_ports: n
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not n
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: N
+| format:
+|   align_ports: N
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not N
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: no
+| format:
+|   align_ports: no
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not no
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: No
+| format:
+|   align_ports: No
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not No
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: NO
+| format:
+|   align_ports: NO
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not NO
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: true
+| format:
+|   align_ports: true
+exit 0
+gohard.yaml:2:16: warning[config/redundant-default]: format.align_ports is set to its default value true
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set format.align_ports = true
+
+== format.align_ports: True
+| format:
+|   align_ports: True
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not True
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: TRUE
+| format:
+|   align_ports: TRUE
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not TRUE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: false
+| format:
+|   align_ports: false
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set format.align_ports = false
+
+== format.align_ports: False
+| format:
+|   align_ports: False
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not False
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: FALSE
+| format:
+|   align_ports: FALSE
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not FALSE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: on
+| format:
+|   align_ports: on
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not on
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: On
+| format:
+|   align_ports: On
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not On
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: ON
+| format:
+|   align_ports: ON
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not ON
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: off
+| format:
+|   align_ports: off
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: Off
+| format:
+|   align_ports: Off
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not Off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: OFF
+| format:
+|   align_ports: OFF
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not OFF
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: quoted
+| format:
+|   align_ports: "true"
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not "true"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== format.align_ports: number
+| format:
+|   align_ports: 1
+exit 2
+gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not 1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: y
+| simulation:
+|   auto_run_on_save: y
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: Y
+| simulation:
+|   auto_run_on_save: Y
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not Y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: yes
+| simulation:
+|   auto_run_on_save: yes
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: Yes
+| simulation:
+|   auto_run_on_save: Yes
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not Yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: YES
+| simulation:
+|   auto_run_on_save: YES
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not YES
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: n
+| simulation:
+|   auto_run_on_save: n
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not n
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: N
+| simulation:
+|   auto_run_on_save: N
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not N
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: no
+| simulation:
+|   auto_run_on_save: no
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not no
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: No
+| simulation:
+|   auto_run_on_save: No
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not No
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: NO
+| simulation:
+|   auto_run_on_save: NO
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not NO
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: true
+| simulation:
+|   auto_run_on_save: true
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set simulation.auto_run_on_save = true
+
+== simulation.auto_run_on_save: True
+| simulation:
+|   auto_run_on_save: True
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not True
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: TRUE
+| simulation:
+|   auto_run_on_save: TRUE
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not TRUE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: false
+| simulation:
+|   auto_run_on_save: false
+exit 0
+gohard.yaml:2:21: warning[config/redundant-default]: simulation.auto_run_on_save is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set simulation.auto_run_on_save = false
+
+== simulation.auto_run_on_save: False
+| simulation:
+|   auto_run_on_save: False
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not False
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: FALSE
+| simulation:
+|   auto_run_on_save: FALSE
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not FALSE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: on
+| simulation:
+|   auto_run_on_save: on
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not on
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: On
+| simulation:
+|   auto_run_on_save: On
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not On
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: ON
+| simulation:
+|   auto_run_on_save: ON
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not ON
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: off
+| simulation:
+|   auto_run_on_save: off
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: Off
+| simulation:
+|   auto_run_on_save: Off
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not Off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: OFF
+| simulation:
+|   auto_run_on_save: OFF
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not OFF
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: quoted
+| simulation:
+|   auto_run_on_save: "true"
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not "true"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.auto_run_on_save: number
+| simulation:
+|   auto_run_on_save: 1
+exit 2
+gohard.yaml:2:21: error[config/bad-bool]: simulation.auto_run_on_save must be true or false, not 1
+summary: 1 errors, 0 warnings, 0 hints, 1 files

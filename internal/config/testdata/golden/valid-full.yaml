@@ -1,0 +1,36 @@
+# Every key set to a valid value that is not its default.
+standard: "2019"
+lenient: true
+psl:
+  comments: true
+  strict_keywords: true
+libraries:
+  vendor_lib: [vendor/src, vendor/extra]
+  Mylib:
+    - rtl
+allow_opaque: [vendor_lib.secret_core]
+defines:
+  USE_FAST_ADDER: "true"
+  WIDTH: '32'
+  empty: ""
+format:
+  indent: 4
+  keyword_case: upper
+  align_ports: false
+  max_line_length: 120
+simulation:
+  auto_run_on_save: true
+  testbenches: [tb_top, TB_Other]
+  seed: 18446744073709551615
+  time_budget: 1.5 us
+  delta_budget: 1
+  step_budget: 9223372036854775807
+  stop_level: failure
+  dump_scope: [tb.dut, "tb.u0"]
+  models:
+    vendor_lib.secret_core: models/secret_core.vhd
+  env:
+    epoch: 2024-02-29T12:30:00.5Z
+    vars:
+      HOME: /home/user
+      lower: "x"

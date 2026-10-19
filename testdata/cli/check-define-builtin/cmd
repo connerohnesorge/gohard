@@ -1,0 +1,1 @@
+gohard check --define VHDL_VERSION=2019

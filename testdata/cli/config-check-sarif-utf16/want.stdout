@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "gohard",
+          "version": "0.0.0-dev",
+          "informationUri": "https://github.com/connerohnesorge/gohard",
+          "rules": [
+            {
+              "id": "config/bad-bool",
+              "shortDescription": {
+                "text": "a bool key holds something other than true or false"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "config/unknown-key",
+              "shortDescription": {
+                "text": "a key that gohard.yaml does not define"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            }
+          ]
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": false,
+          "exitCode": 2,
+          "toolExecutionNotifications": [
+            {
+              "level": "error",
+              "message": {
+                "text": "unknown key éé"
+              },
+              "descriptor": {
+                "id": "config/unknown-key"
+              },
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "gohard.yaml"
+                    },
+                    "region": {
+                      "startLine": 1,
+                      "startColumn": 2
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "level": "error",
+              "message": {
+                "text": "lenient must be true or false, not yes"
+              },
+              "descriptor": {
+                "id": "config/bad-bool"
+              },
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "gohard.yaml"
+                    },
+                    "region": {
+                      "startLine": 1,
+                      "startColumn": 22
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "config/unknown-key",
+          "level": "error",
+          "message": {
+            "text": "unknown key éé"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gohard.yaml"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 2
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "config/bad-bool",
+          "level": "error",
+          "message": {
+            "text": "lenient must be true or false, not yes"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gohard.yaml"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 22
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    }
+  ]
+}

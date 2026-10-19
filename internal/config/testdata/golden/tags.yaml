@@ -1,0 +1,4 @@
+lenient: !!bool true
+standard: !!str 2008
+format:
+  keyword_case: !custom lower

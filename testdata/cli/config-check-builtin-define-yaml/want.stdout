@@ -1,0 +1,2 @@
+gohard.yaml:2:3: error[config/builtin-define]: tool_vendor is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 1 files

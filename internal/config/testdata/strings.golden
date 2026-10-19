@@ -1,0 +1,274 @@
+== defines: yes
+| defines:
+|   FOO: yes
+exit 2
+gohard.yaml:2:8: error[config/unquoted-bool]: defines.FOO: yes reads as a YAML 1.1 boolean; quote it: "yes"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: off
+| defines:
+|   FOO: off
+exit 2
+gohard.yaml:2:8: error[config/unquoted-bool]: defines.FOO: off reads as a YAML 1.1 boolean; quote it: "off"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: N
+| defines:
+|   FOO: N
+exit 2
+gohard.yaml:2:8: error[config/unquoted-bool]: defines.FOO: N reads as a YAML 1.1 boolean; quote it: "N"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: TRUE
+| defines:
+|   FOO: TRUE
+exit 2
+gohard.yaml:2:8: error[config/unquoted-bool]: defines.FOO: TRUE reads as a YAML 1.1 boolean; quote it: "TRUE"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== defines: quoted
+| defines:
+|   FOO: "yes"
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set defines = {FOO@2:3: "yes"}
+
+== simulation.env.vars: yes
+| simulation:
+|   env:
+|     vars:
+|       HOME: yes
+exit 2
+gohard.yaml:4:13: error[config/unquoted-bool]: simulation.env.vars.HOME: yes reads as a YAML 1.1 boolean; quote it: "yes"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.vars: off
+| simulation:
+|   env:
+|     vars:
+|       HOME: off
+exit 2
+gohard.yaml:4:13: error[config/unquoted-bool]: simulation.env.vars.HOME: off reads as a YAML 1.1 boolean; quote it: "off"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.vars: N
+| simulation:
+|   env:
+|     vars:
+|       HOME: N
+exit 2
+gohard.yaml:4:13: error[config/unquoted-bool]: simulation.env.vars.HOME: N reads as a YAML 1.1 boolean; quote it: "N"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.vars: TRUE
+| simulation:
+|   env:
+|     vars:
+|       HOME: TRUE
+exit 2
+gohard.yaml:4:13: error[config/unquoted-bool]: simulation.env.vars.HOME: TRUE reads as a YAML 1.1 boolean; quote it: "TRUE"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.env.vars: quoted
+| simulation:
+|   env:
+|     vars:
+|       HOME: "yes"
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set simulation.env.vars = {HOME: "yes"}
+
+== libraries: yes
+| libraries:
+|   lib:
+|     - yes
+exit 2
+gohard.yaml:3:7: error[config/unquoted-bool]: libraries.lib[0]: yes reads as a YAML 1.1 boolean; quote it: "yes"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: off
+| libraries:
+|   lib:
+|     - off
+exit 2
+gohard.yaml:3:7: error[config/unquoted-bool]: libraries.lib[0]: off reads as a YAML 1.1 boolean; quote it: "off"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: N
+| libraries:
+|   lib:
+|     - N
+exit 2
+gohard.yaml:3:7: error[config/unquoted-bool]: libraries.lib[0]: N reads as a YAML 1.1 boolean; quote it: "N"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: TRUE
+| libraries:
+|   lib:
+|     - TRUE
+exit 2
+gohard.yaml:3:7: error[config/unquoted-bool]: libraries.lib[0]: TRUE reads as a YAML 1.1 boolean; quote it: "TRUE"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== libraries: quoted
+| libraries:
+|   lib:
+|     - "yes"
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set libraries = {lib@2:3: ["yes"@3:7]}
+
+== simulation.models: yes
+| simulation:
+|   models:
+|     lib.unit: yes
+exit 2
+gohard.yaml:3:15: error[config/unquoted-bool]: simulation.models.lib.unit: yes reads as a YAML 1.1 boolean; quote it: "yes"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: off
+| simulation:
+|   models:
+|     lib.unit: off
+exit 2
+gohard.yaml:3:15: error[config/unquoted-bool]: simulation.models.lib.unit: off reads as a YAML 1.1 boolean; quote it: "off"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: N
+| simulation:
+|   models:
+|     lib.unit: N
+exit 2
+gohard.yaml:3:15: error[config/unquoted-bool]: simulation.models.lib.unit: N reads as a YAML 1.1 boolean; quote it: "N"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: TRUE
+| simulation:
+|   models:
+|     lib.unit: TRUE
+exit 2
+gohard.yaml:3:15: error[config/unquoted-bool]: simulation.models.lib.unit: TRUE reads as a YAML 1.1 boolean; quote it: "TRUE"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.models: quoted
+| simulation:
+|   models:
+|     lib.unit: "yes"
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set simulation.models = {lib.unit@3:5: "yes"}
+
+== simulation.dump_scope: yes
+| simulation:
+|   dump_scope:
+|     - yes
+exit 2
+gohard.yaml:3:7: error[config/unquoted-bool]: simulation.dump_scope[0]: yes reads as a YAML 1.1 boolean; quote it: "yes"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.dump_scope: off
+| simulation:
+|   dump_scope:
+|     - off
+exit 2
+gohard.yaml:3:7: error[config/unquoted-bool]: simulation.dump_scope[0]: off reads as a YAML 1.1 boolean; quote it: "off"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.dump_scope: N
+| simulation:
+|   dump_scope:
+|     - N
+exit 2
+gohard.yaml:3:7: error[config/unquoted-bool]: simulation.dump_scope[0]: N reads as a YAML 1.1 boolean; quote it: "N"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.dump_scope: TRUE
+| simulation:
+|   dump_scope:
+|     - TRUE
+exit 2
+gohard.yaml:3:7: error[config/unquoted-bool]: simulation.dump_scope[0]: TRUE reads as a YAML 1.1 boolean; quote it: "TRUE"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.dump_scope: quoted
+| simulation:
+|   dump_scope:
+|     - "yes"
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set simulation.dump_scope = ["yes"]
+
+== simulation.testbenches: yes
+| simulation:
+|   testbenches:
+|     - yes
+exit 2
+gohard.yaml:3:7: error[config/unquoted-bool]: simulation.testbenches[0]: yes reads as a YAML 1.1 boolean; quote it: "yes"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: off
+| simulation:
+|   testbenches:
+|     - off
+exit 2
+gohard.yaml:3:7: error[config/unquoted-bool]: simulation.testbenches[0]: off reads as a YAML 1.1 boolean; quote it: "off"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: N
+| simulation:
+|   testbenches:
+|     - N
+exit 2
+gohard.yaml:3:7: error[config/unquoted-bool]: simulation.testbenches[0]: N reads as a YAML 1.1 boolean; quote it: "N"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: TRUE
+| simulation:
+|   testbenches:
+|     - TRUE
+exit 2
+gohard.yaml:3:7: error[config/unquoted-bool]: simulation.testbenches[0]: TRUE reads as a YAML 1.1 boolean; quote it: "TRUE"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== simulation.testbenches: quoted
+| simulation:
+|   testbenches:
+|     - "yes"
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set simulation.testbenches = ["yes"]
+
+== allow_opaque: yes
+| allow_opaque:
+|   - yes
+exit 2
+gohard.yaml:2:5: error[config/unquoted-bool]: allow_opaque[0]: yes reads as a YAML 1.1 boolean; quote it: "yes"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: off
+| allow_opaque:
+|   - off
+exit 2
+gohard.yaml:2:5: error[config/unquoted-bool]: allow_opaque[0]: off reads as a YAML 1.1 boolean; quote it: "off"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: N
+| allow_opaque:
+|   - N
+exit 2
+gohard.yaml:2:5: error[config/unquoted-bool]: allow_opaque[0]: N reads as a YAML 1.1 boolean; quote it: "N"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: TRUE
+| allow_opaque:
+|   - TRUE
+exit 2
+gohard.yaml:2:5: error[config/unquoted-bool]: allow_opaque[0]: TRUE reads as a YAML 1.1 boolean; quote it: "TRUE"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== allow_opaque: quoted
+| allow_opaque:
+|   - "yes"
+exit 2
+gohard.yaml:2:5: error[config/type]: allow_opaque[0] must be a lib.unit name, not the string "yes"
+summary: 1 errors, 0 warnings, 0 hints, 1 files

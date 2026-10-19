@@ -1,0 +1,1 @@
+interrupt SIGTERM on-read a.vhd

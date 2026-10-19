@@ -1,0 +1,3 @@
+symlink inner/gohard.yaml nowhere.yaml
+mkdir .git
+cwd inner/deep

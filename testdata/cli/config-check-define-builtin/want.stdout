@@ -1,0 +1,2 @@
+gohard: error[config/builtin-define]: VHDL_VERSION is a built-in conditional-analysis identifier and cannot be defined
+summary: 1 errors, 0 warnings, 0 hints, 0 files

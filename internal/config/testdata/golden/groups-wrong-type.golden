@@ -1,0 +1,4 @@
+exit 2
+gohard.yaml:1:9: error[config/type]: format must be a mapping, not the number 2
+gohard.yaml:2:6: error[config/type]: psl must be a mapping, not a list
+summary: 2 errors, 0 warnings, 0 hints, 1 files

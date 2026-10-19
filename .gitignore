@@ -2,3 +2,4 @@
 result
 .go/
 .gohard/
+*.test
