@@ -1,5 +1,5 @@
 .direnv
 result
-.go/
-.gohard/
+/.go/
+/.gohard/
 *.test
