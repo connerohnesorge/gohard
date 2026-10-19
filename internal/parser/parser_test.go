@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"bytes"
 	"os"
 	"path/filepath"
 	"slices"
@@ -488,48 +487,5 @@ func TestEditReplay(t *testing.T) {
 			}
 			checkInvariants(t, f, src, Options{Standard: token.Std2019})
 		}
-	}
-}
-
-// BenchmarkParse measures full reparse (#22 reports time per 1k lines)
-// on the corpus files and on the largest NEORV32 file.
-func BenchmarkParse(b *testing.B) {
-	type set struct {
-		name string
-		srcs [][]byte
-	}
-	var corpus [][]byte
-	var each []set
-	for _, f := range corpusFiles(b) {
-		src, _ := os.ReadFile(f)
-		corpus = append(corpus, src)
-		each = append(each, set{"file/" + filepath.Base(filepath.Dir(f)) +
-			"/" + filepath.Base(f), [][]byte{src}})
-	}
-	// #22 measures every corpus file and the largest NEORV32 file.
-	sets := append([]set{{"corpus", corpus}}, each...)
-	if src, err := os.ReadFile("../../testdata/neorv32/rtl/core/" +
-		"neorv32_cpu_alu_fpu.vhd"); err == nil {
-		sets = append(sets, struct {
-			name string
-			srcs [][]byte
-		}{"neorv32_cpu_alu_fpu", [][]byte{src}})
-	}
-	for _, set := range sets {
-		b.Run(set.name, func(b *testing.B) {
-			lines, n := 0, 0
-			for _, src := range set.srcs {
-				lines += bytes.Count(src, []byte("\n"))
-				n += len(src)
-			}
-			b.SetBytes(int64(n))
-			for b.Loop() {
-				for _, src := range set.srcs {
-					Parse(src, Options{Standard: token.Std2019})
-				}
-			}
-			b.ReportMetric(float64(b.Elapsed().Nanoseconds())/
-				float64(b.N)/float64(lines)*1000/1e6, "ms/1klines")
-		})
 	}
 }
