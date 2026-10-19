@@ -1,0 +1,4 @@
+invalid.vhd:5:3: error[syntax/error]: expected a declaration, found reserved word view
+invalid.vhd:7:6: error[syntax/error]: expected ';', found reserved word view
+invalid.vhd:7:7: error[syntax/error]: expected a design unit (entity, architecture, package, configuration, context or a PSL verification unit), found reserved word view
+summary: 3 errors, 0 warnings, 0 hints, 1 files

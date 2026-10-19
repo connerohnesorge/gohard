@@ -1,0 +1,43 @@
+DesignFile 0..58
+  DesignUnit 0..57
+    ContextClause 0..0
+    PSLVunit 0..57
+      KwVunit 0..5 "vunit"
+        trail Whitespace " "
+      Identifier 6..7 "v"
+        trail Whitespace " "
+      PSLHierarchicalName 8..12
+        LParen 8..9 "("
+        SimpleName 9..10
+          Identifier 9..10 "e"
+        RParen 10..11 ")"
+          trail Whitespace " "
+      LBrace 12..13 "{"
+      PSLInheritSpec 13..36
+          lead Newline "\n"
+          lead Whitespace "  "
+        Identifier 16..23 "inherit"
+          trail Whitespace " "
+        SimpleName 24..28
+          Identifier 24..28 "base"
+        Comma 28..29 ","
+          trail Whitespace " "
+        SimpleName 30..35
+          Identifier 30..35 "other"
+        Semicolon 35..36 ";"
+      PSLAssert 36..55
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwAssert 39..45 "assert"
+          trail Whitespace " "
+        PSLAlways 46..54
+          KwAlways 46..52 "always"
+            trail Whitespace " "
+          PSLBoolean 53..54
+            SimpleName 53..54
+              Identifier 53..54 "a"
+        Semicolon 54..55 ";"
+        lead Newline "\n"
+      RBrace 56..57 "}"
+    lead Newline "\n"
+  EOF 58..58 ""

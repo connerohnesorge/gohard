@@ -10,7 +10,7 @@ macOS and Windows. Pull requests never fuzz; they only replay.
 testdata/fuzz/
   FuzzParse/<id>       any bytes                          (owner #31)
   FuzzFormat/<id>      any input that parses              (owner #32)
-  FuzzLSPReplay/<id>   edit series on one open document   (owner #25)
+  FuzzLSPReplay/<id>   client messages, one JSON per line (owner #25)
   FuzzConfig/<id>      any bytes as gohard.yaml           (owner #28)
 ```
 
@@ -31,7 +31,7 @@ testdata/fuzz/
 | --- | --- |
 | `FuzzParse` | Never panics or hangs, round-trips byte for byte, every reported error points at a real position in the input. |
 | `FuzzFormat` | Formatting twice equals formatting once; only whitespace and keyword case change; literals and extended identifiers are byte-identical; the output parses to the same tree (same node types and token text ignoring spacing, keywords compared case-insensitively, same comment text in the same order). |
-| `FuzzLSPReplay` | After a random series of edits and a save, once the server settles, its diagnostics equal `gohard check` on the final text. |
+| `FuzzLSPReplay` | The server never panics, two replays of the session give the same bytes, and the session invariants of `testdata/lsp/README.md` hold. When analysis lands (#34): after a random series of edits and a save, once the server settles, its diagnostics equal `gohard check` on the final text. |
 | `FuzzConfig` | Config loading never panics and is deterministic. |
 
 Elaboration and simulation are not fuzz targets until the corpus passes.

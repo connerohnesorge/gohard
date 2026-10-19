@@ -1,0 +1,101 @@
+gohard-trace 1
+testbench tb
+end 40000000
+type bit enum '0' '1'
+type boolean enum false true
+type count_array array natural
+type integer integer -2147483648 2147483647
+type natural integer 0 2147483647
+type real real
+type state_array array state_t
+type state_t enum idle run done
+type std_logic logic
+type std_logic_vector array std_logic
+type time physical -9223372036854775808 9223372036854775807 fs 1 ps 1000 ns 1000000 us 1000000000
+scope tb instance tb_counter(sim)
+scope tb.dut instance counter(rtl)
+scope tb.dut.bus record bus_t
+scope tb.gen(0) for-generate
+scope tb.mem instance mem_model(model)
+scope top2 instance other(rtl)
+signal tb.clk std_logic signal
+signal tb.dut.bus.addr std_logic_vector signal 3 downto 0
+signal tb.dut.bus.valid boolean signal
+signal tb.dut.clk std_logic in
+signal tb.dut.count_q std_logic_vector out 7 downto 0
+signal tb.dut.delay time signal
+signal tb.dut.flag bit signal
+signal tb.dut.hist count_array signal 0 to 2
+signal tb.dut.n natural signal
+signal tb.dut.ratio real signal
+signal tb.dut.state state_t signal
+signal tb.gen(0).mode state_array signal 1 to 2
+signal tb.mem.dout std_logic_vector out 3 downto 0
+signal tb.rst std_logic signal
+signal top2.x integer signal
+process 1 tb.clkgen
+process 2 tb.dut.p_count
+process 3 tb.mem.p_rd modeled
+process 4 tb.stim
+0 0 tb.clk U -
+0 0 tb.dut.bus.addr XXXX -
+0 0 tb.dut.bus.valid false -
+0 0 tb.dut.clk U -
+0 0 tb.dut.count_q UUUUUUUU -
+0 0 tb.dut.delay 0 -
+0 0 tb.dut.flag '0' -
+0 0 tb.dut.hist [ 0 0 0 ] -
+0 0 tb.dut.n 0 -
+0 0 tb.dut.ratio 0.5 -
+0 0 tb.dut.state idle -
+0 0 tb.gen(0).mode [ idle done ] -
+0 0 tb.mem.dout UUUU -
+0 0 tb.rst U -
+0 0 top2.x -5 -
+0 0 ! report note tb.vhd:30 p4 "start"
+0 1 tb.clk 0 p1
+0 1 tb.dut.delay 10000000 p4
+0 1 tb.mem.dout ZZZZ p3 modeled
+0 1 tb.rst 1 p4
+0 2 tb.dut.bus.valid true p4
+0 2 tb.dut.clk 0 -
+0 2 tb.dut.count_q 00000000 p2
+0 3 tb.dut.bus.valid false p4
+10000000 0 tb.clk 1 p1
+10000000 1 tb.dut.bus.addr 01LH p4
+10000000 1 tb.dut.clk 1 -
+10000000 1 tb.dut.flag '1' p4
+10000000 1 tb.gen(0).mode [ run done ] p4
+10000000 1 tb.rst 0 p4
+10000000 2 tb.dut.count_q 00000001 p2
+10000000 2 tb.dut.hist [ 1 0 1 ] p2
+10000000 2 tb.dut.n 1 p2
+10000000 2 tb.dut.ratio 0.3333333333333333 p2
+10000000 2 tb.dut.state run p2
+10000000 2 tb.mem.dout 0001 p3 modeled
+15000000 0 tb.clk 0 p1
+15000000 1 tb.dut.clk 0 -
+20000000 0 tb.clk 1 p1
+20000000 1 tb.dut.bus.addr WZ-X p4
+20000000 1 tb.dut.clk 1 -
+20000000 2 tb.dut.count_q 00000010 p2
+20000000 2 tb.dut.hist [ 2 0 4 ] p2
+20000000 2 tb.dut.n 2 p2
+20000000 2 tb.dut.ratio 0.6666666666666666 p2
+20000000 2 tb.mem.dout 0010 p3 modeled
+20000000 2 ! assert error rtl/counter.vhd:18 p2 "count_q /= \"00000010\" after reset"
+20000000 2 ! cover-hit - tb.vhd:51 p4 "count reached 2"
+20000000 2 ! report warning tb.vhd:52 p4 "second edge"
+25000000 0 tb.clk 0 p1
+25000000 1 tb.dut.clk 0 -
+30000000 0 tb.clk 1 p1
+30000000 1 tb.dut.clk 1 -
+30000000 2 tb.dut.count_q 00000011 p2
+30000000 2 tb.dut.hist [ 3 0 9 ] p2
+30000000 2 tb.dut.n 3 p2
+30000000 2 tb.dut.ratio 1 p2
+30000000 2 tb.mem.dout 0011 p3 modeled
+30000000 3 tb.dut.state done p2
+35000000 0 tb.clk 0 p1
+35000000 1 tb.dut.clk 0 -
+40000000 0 ! cover-miss - tb.vhd:60 - "overflow never seen"

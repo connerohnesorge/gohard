@@ -1,0 +1,47 @@
+DesignFile 0..74
+  DesignUnit 0..73
+    ContextClause 0..0
+    ArchitectureBody 0..73
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..62
+        AttributeSpec 22..62
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAttribute 25..34 "attribute"
+            trail Whitespace " "
+          Identifier 35..39 "keep"
+            trail Whitespace " "
+          KwOf 40..42 "of"
+            trail Whitespace " "
+          EntitySpecification 43..54
+            EntityNameList 43..45
+              EntityDesignator 43..45
+                Identifier 43..44 "s"
+                  trail Whitespace " "
+            Colon 45..46 ":"
+              trail Whitespace " "
+            KwSignal 47..53 "signal"
+              trail Whitespace " "
+          KwIs 54..56 "is"
+            trail Whitespace " "
+          SimpleName 57..61
+            Identifier 57..61 "true"
+          Semicolon 61..62 ";"
+        lead Newline "\n"
+      KwBegin 63..68 "begin"
+      StatementPart 68..68
+      EndClause 68..73
+          lead Newline "\n"
+        KwEnd 69..72 "end"
+        Semicolon 72..73 ";"
+    lead Newline "\n"
+  EOF 74..74 ""

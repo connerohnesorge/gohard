@@ -1,0 +1,118 @@
+DesignFile 0..186
+  DesignUnit 0..185
+    ContextClause 0..0
+    EntityDecl 0..185
+      KwEntity 0..6 "entity"
+        trail Whitespace " "
+      Identifier 7..8 "e"
+        trail Whitespace " "
+      KwIs 9..11 "is"
+      GenericClause 11..180
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwGeneric 14..21 "generic"
+          trail Whitespace " "
+        InterfaceList 22..179
+          LParen 22..23 "("
+          InterfacePackageDecl 23..70
+              lead Newline "\n"
+              lead Whitespace "    "
+            KwPackage 28..35 "package"
+              trail Whitespace " "
+            Identifier 36..38 "p1"
+              trail Whitespace " "
+            KwIs 39..41 "is"
+              trail Whitespace " "
+            KwNew 42..45 "new"
+              trail Whitespace " "
+            SelectedName 46..54
+              SimpleName 46..50
+                Identifier 46..50 "work"
+              Dot 50..51 "."
+              Identifier 51..53 "gp"
+                trail Whitespace " "
+            GenericMapAspect 54..70
+              KwGeneric 54..61 "generic"
+                trail Whitespace " "
+              KwMap 62..65 "map"
+                trail Whitespace " "
+              AssociationList 66..70
+                LParen 66..67 "("
+                AssociationElement 67..69
+                  BoxExpr 67..69
+                    Box 67..69 "<>"
+                RParen 69..70 ")"
+          Semicolon 70..71 ";"
+          InterfacePackageDecl 71..123
+              lead Newline "\n"
+              lead Whitespace "    "
+            KwPackage 76..83 "package"
+              trail Whitespace " "
+            Identifier 84..86 "p2"
+              trail Whitespace " "
+            KwIs 87..89 "is"
+              trail Whitespace " "
+            KwNew 90..93 "new"
+              trail Whitespace " "
+            SelectedName 94..102
+              SimpleName 94..98
+                Identifier 94..98 "work"
+              Dot 98..99 "."
+              Identifier 99..101 "gp"
+                trail Whitespace " "
+            GenericMapAspect 102..123
+              KwGeneric 102..109 "generic"
+                trail Whitespace " "
+              KwMap 110..113 "map"
+                trail Whitespace " "
+              AssociationList 114..123
+                LParen 114..115 "("
+                AssociationElement 115..122
+                  BoxExpr 115..122
+                    KwDefault 115..122 "default"
+                RParen 122..123 ")"
+          Semicolon 123..124 ";"
+          InterfacePackageDecl 124..175
+              lead Newline "\n"
+              lead Whitespace "    "
+            KwPackage 129..136 "package"
+              trail Whitespace " "
+            Identifier 137..139 "p3"
+              trail Whitespace " "
+            KwIs 140..142 "is"
+              trail Whitespace " "
+            KwNew 143..146 "new"
+              trail Whitespace " "
+            SelectedName 147..155
+              SimpleName 147..151
+                Identifier 147..151 "work"
+              Dot 151..152 "."
+              Identifier 152..154 "gp"
+                trail Whitespace " "
+            GenericMapAspect 155..175
+              KwGeneric 155..162 "generic"
+                trail Whitespace " "
+              KwMap 163..166 "map"
+                trail Whitespace " "
+              AssociationList 167..175
+                LParen 167..168 "("
+                AssociationElement 168..174
+                  SimpleName 168..170
+                    Identifier 168..169 "n"
+                      trail Whitespace " "
+                  Arrow 170..172 "=>"
+                    trail Whitespace " "
+                  LiteralExpr 173..174
+                    IntegerLiteral 173..174 "4"
+                RParen 174..175 ")"
+            lead Newline "\n"
+            lead Whitespace "  "
+          RParen 178..179 ")"
+        Semicolon 179..180 ";"
+      DeclarativePart 180..180
+      EndClause 180..185
+          lead Newline "\n"
+        KwEnd 181..184 "end"
+        Semicolon 184..185 ";"
+    lead Newline "\n"
+  EOF 186..186 ""

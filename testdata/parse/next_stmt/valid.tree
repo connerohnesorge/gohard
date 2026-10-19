@@ -1,0 +1,144 @@
+DesignFile 0..212
+  DesignUnit 0..211
+    ContextClause 0..0
+    ArchitectureBody 0..211
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..206
+        ProcessStmt 28..206
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..191
+            LoopStmt 49..123
+              ForScheme 49..70
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwFor 54..57 "for"
+                  trail Whitespace " "
+                ParameterSpecification 58..70
+                  Identifier 58..59 "i"
+                    trail Whitespace " "
+                  KwIn 60..62 "in"
+                    trail Whitespace " "
+                  RangeExpr 63..70
+                    LiteralExpr 63..65
+                      IntegerLiteral 63..64 "0"
+                        trail Whitespace " "
+                    KwTo 65..67 "to"
+                      trail Whitespace " "
+                    LiteralExpr 68..70
+                      IntegerLiteral 68..69 "3"
+                        trail Whitespace " "
+              KwLoop 70..74 "loop"
+              SequenceOfStatements 74..109
+                NextStmt 74..86
+                    lead Newline "\n"
+                    lead Whitespace "      "
+                  KwNext 81..85 "next"
+                  Semicolon 85..86 ";"
+                NextStmt 86..109
+                    lead Newline "\n"
+                    lead Whitespace "      "
+                  KwNext 93..97 "next"
+                    trail Whitespace " "
+                  KwWhen 98..102 "when"
+                    trail Whitespace " "
+                  BinaryExpr 103..108
+                    SimpleName 103..105
+                      Identifier 103..104 "i"
+                        trail Whitespace " "
+                    Eq 105..106 "="
+                      trail Whitespace " "
+                    LiteralExpr 107..108
+                      IntegerLiteral 107..108 "1"
+                  Semicolon 108..109 ";"
+              EndClause 109..123
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwEnd 114..117 "end"
+                  trail Whitespace " "
+                KwLoop 118..122 "loop"
+                Semicolon 122..123 ";"
+            LoopStmt 123..191
+              Label 123..132
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 128..129 "o"
+                  trail Whitespace " "
+                Colon 130..131 ":"
+                  trail Whitespace " "
+              ForScheme 132..148
+                KwFor 132..135 "for"
+                  trail Whitespace " "
+                ParameterSpecification 136..148
+                  Identifier 136..137 "i"
+                    trail Whitespace " "
+                  KwIn 138..140 "in"
+                    trail Whitespace " "
+                  RangeExpr 141..148
+                    LiteralExpr 141..143
+                      IntegerLiteral 141..142 "0"
+                        trail Whitespace " "
+                    KwTo 143..145 "to"
+                      trail Whitespace " "
+                    LiteralExpr 146..148
+                      IntegerLiteral 146..147 "3"
+                        trail Whitespace " "
+              KwLoop 148..152 "loop"
+              SequenceOfStatements 152..177
+                NextStmt 152..177
+                    lead Newline "\n"
+                    lead Whitespace "      "
+                  KwNext 159..163 "next"
+                    trail Whitespace " "
+                  Identifier 164..165 "o"
+                    trail Whitespace " "
+                  KwWhen 166..170 "when"
+                    trail Whitespace " "
+                  BinaryExpr 171..176
+                    SimpleName 171..173
+                      Identifier 171..172 "i"
+                        trail Whitespace " "
+                    Eq 173..174 "="
+                      trail Whitespace " "
+                    LiteralExpr 175..176
+                      IntegerLiteral 175..176 "2"
+                  Semicolon 176..177 ";"
+              EndClause 177..191
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwEnd 182..185 "end"
+                  trail Whitespace " "
+                KwLoop 186..190 "loop"
+                Semicolon 190..191 ";"
+          EndClause 191..206
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 194..197 "end"
+              trail Whitespace " "
+            KwProcess 198..205 "process"
+            Semicolon 205..206 ";"
+      EndClause 206..211
+          lead Newline "\n"
+        KwEnd 207..210 "end"
+        Semicolon 210..211 ";"
+    lead Newline "\n"
+  EOF 212..212 ""

@@ -1,0 +1,188 @@
+DesignFile 0..215
+  DesignUnit 0..214
+    ContextClause 0..0
+    PackageDecl 0..214
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..209
+        ConstantDecl 12..70
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "c"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..36
+            SimpleName 28..36
+              Identifier 28..35 "integer"
+                trail Whitespace " "
+          VarAssign 36..38 ":="
+            trail Whitespace " "
+          BinaryExpr 39..69
+            BinaryExpr 39..54
+              SimpleName 39..41
+                Identifier 39..40 "a"
+                  trail Whitespace " "
+              Plus 41..42 "+"
+                trail Whitespace " "
+              BinaryExpr 43..54
+                SimpleName 43..45
+                  Identifier 43..44 "b"
+                    trail Whitespace " "
+                Star 45..46 "*"
+                  trail Whitespace " "
+                BinaryExpr 47..54
+                  SimpleName 47..49
+                    Identifier 47..48 "c"
+                      trail Whitespace " "
+                  DoubleStar 49..51 "**"
+                    trail Whitespace " "
+                  LiteralExpr 52..54
+                    IntegerLiteral 52..53 "2"
+                      trail Whitespace " "
+            Minus 54..55 "-"
+              trail Whitespace " "
+            BinaryExpr 56..69
+              BinaryExpr 56..64
+                SimpleName 56..58
+                  Identifier 56..57 "d"
+                    trail Whitespace " "
+                KwMod 58..61 "mod"
+                  trail Whitespace " "
+                LiteralExpr 62..64
+                  IntegerLiteral 62..63 "3"
+                    trail Whitespace " "
+              KwRem 64..67 "rem"
+                trail Whitespace " "
+              LiteralExpr 68..69
+                IntegerLiteral 68..69 "2"
+          Semicolon 69..70 ";"
+        ConstantDecl 70..133
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 73..81 "constant"
+            trail Whitespace " "
+          IdentifierList 82..84
+            Identifier 82..83 "d"
+              trail Whitespace " "
+          Colon 84..85 ":"
+            trail Whitespace " "
+          SubtypeIndication 86..94
+            SimpleName 86..94
+              Identifier 86..93 "boolean"
+                trail Whitespace " "
+          VarAssign 94..96 ":="
+            trail Whitespace " "
+          BinaryExpr 97..132
+            ParenExpr 97..120
+              LParen 97..98 "("
+              BinaryExpr 98..118
+                ParenExpr 98..106
+                  LParen 98..99 "("
+                  BinaryExpr 99..104
+                    SimpleName 99..101
+                      Identifier 99..100 "a"
+                        trail Whitespace " "
+                    Eq 101..102 "="
+                      trail Whitespace " "
+                    SimpleName 103..104
+                      Identifier 103..104 "b"
+                  RParen 104..105 ")"
+                    trail Whitespace " "
+                KwAnd 106..109 "and"
+                  trail Whitespace " "
+                ParenExpr 110..118
+                  LParen 110..111 "("
+                  BinaryExpr 111..117
+                    SimpleName 111..113
+                      Identifier 111..112 "c"
+                        trail Whitespace " "
+                    Ne 113..115 "/="
+                      trail Whitespace " "
+                    SimpleName 116..117
+                      Identifier 116..117 "d"
+                  RParen 117..118 ")"
+              RParen 118..119 ")"
+                trail Whitespace " "
+            KwOr 120..122 "or"
+              trail Whitespace " "
+            ParenExpr 123..132
+              LParen 123..124 "("
+              BinaryExpr 124..131
+                SimpleName 124..126
+                  Identifier 124..125 "e"
+                    trail Whitespace " "
+                KwXor 126..129 "xor"
+                  trail Whitespace " "
+                SimpleName 130..131
+                  Identifier 130..131 "f"
+              RParen 131..132 ")"
+          Semicolon 132..133 ";"
+        ConstantDecl 133..175
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 136..144 "constant"
+            trail Whitespace " "
+          IdentifierList 145..147
+            Identifier 145..146 "e"
+              trail Whitespace " "
+          Colon 147..148 ":"
+            trail Whitespace " "
+          SubtypeIndication 149..160
+            SimpleName 149..160
+              Identifier 149..159 "bit_vector"
+                trail Whitespace " "
+          VarAssign 160..162 ":="
+            trail Whitespace " "
+          BinaryExpr 163..174
+            SimpleName 163..165
+              Identifier 163..164 "v"
+                trail Whitespace " "
+            KwSll 165..168 "sll"
+              trail Whitespace " "
+            BinaryExpr 169..174
+              LiteralExpr 169..171
+                IntegerLiteral 169..170 "2"
+                  trail Whitespace " "
+              Ampersand 171..172 "&"
+                trail Whitespace " "
+              SimpleName 173..174
+                Identifier 173..174 "w"
+          Semicolon 174..175 ";"
+        ConstantDecl 175..209
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 178..186 "constant"
+            trail Whitespace " "
+          IdentifierList 187..189
+            Identifier 187..188 "f"
+              trail Whitespace " "
+          Colon 189..190 ":"
+            trail Whitespace " "
+          SubtypeIndication 191..199
+            SimpleName 191..199
+              Identifier 191..198 "boolean"
+                trail Whitespace " "
+          VarAssign 199..201 ":="
+            trail Whitespace " "
+          BinaryExpr 202..208
+            SimpleName 202..204
+              Identifier 202..203 "a"
+                trail Whitespace " "
+            MatchEq 204..206 "?="
+              trail Whitespace " "
+            SimpleName 207..208
+              Identifier 207..208 "b"
+          Semicolon 208..209 ";"
+      EndClause 209..214
+          lead Newline "\n"
+        KwEnd 210..213 "end"
+        Semicolon 213..214 ";"
+    lead Newline "\n"
+  EOF 215..215 ""

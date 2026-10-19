@@ -1,0 +1,56 @@
+DesignFile 0..89
+  DesignUnit 0..88
+    ContextClause 0..0
+    ArchitectureBody 0..88
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..83
+        ProcessStmt 28..83
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..68
+            WaitStmt 49..68
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwWait 54..58 "wait"
+                trail Whitespace " "
+              TimeoutClause 59..67
+                KwFor 59..62 "for"
+                  trail Whitespace " "
+                PhysicalLiteral 63..67
+                  IntegerLiteral 63..64 "5"
+                    trail Whitespace " "
+                  SimpleName 65..67
+                    Identifier 65..67 "ns"
+              Semicolon 67..68 ";"
+          EndClause 68..83
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 71..74 "end"
+              trail Whitespace " "
+            KwProcess 75..82 "process"
+            Semicolon 82..83 ";"
+      EndClause 83..88
+          lead Newline "\n"
+        KwEnd 84..87 "end"
+        Semicolon 87..88 ";"
+    lead Newline "\n"
+  EOF 89..89 ""

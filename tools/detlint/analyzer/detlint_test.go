@@ -25,6 +25,7 @@ func TestTestdata(t *testing.T) {
 		mod+"/cmd/tool",
 		mod+"/internal/env/realenv/...",
 		mod+"/tools/gen",
+		mod+"/internal/jsonrpc2",
 		"outside",
 	)
 }
@@ -51,6 +52,14 @@ func TestRules(t *testing.T) {
 		{mod + "/internal/tools", false, analyzer.All},
 		{mod, false, analyzer.All},
 		{"example.com/cmd/x", false, analyzer.All},
+		{mod + "/internal/jsonrpc2", false,
+			analyzer.All &^ analyzer.Go &^ analyzer.Select},
+		{mod + "/internal/jsonrpc2_test", true,
+			analyzer.All &^ analyzer.TestAllowed &^ analyzer.Go &^
+				analyzer.Select},
+		{mod + "/internal/jsonrpc2/sub", false, analyzer.All},
+		{mod + "/internal/jsonrpc2x", false, analyzer.All},
+		{mod + "/internal/server", false, analyzer.All},
 		{mod + "/internal/cli", true,
 			analyzer.Clock | analyzer.Rand | analyzer.Net |
 				analyzer.Process | analyzer.Go | analyzer.Select |
@@ -69,7 +78,7 @@ func TestRules(t *testing.T) {
 // the exempt trees get none, and tools only get maporder.
 func TestRulesLaws(t *testing.T) {
 	segs := []string{"cmd", "internal", "env", "realenv", "tools", "x",
-		"cmdx", "realenv_test", "gohard"}
+		"cmdx", "realenv_test", "gohard", "jsonrpc2"}
 	roots := []string{mod, "example.com/m", "outside"}
 	n := 0
 	for _, root := range roots {
@@ -119,6 +128,8 @@ func checkLaws(t *testing.T, path string) {
 		want = 0
 	case in("tools"):
 		want = analyzer.MapOrder
+	case base == analyzer.StdioPackage:
+		want = analyzer.All &^ analyzer.StdioAllowed
 	}
 	if pkg != want {
 		t.Errorf("Rules(%q) = %v, want %v", path, pkg, want)

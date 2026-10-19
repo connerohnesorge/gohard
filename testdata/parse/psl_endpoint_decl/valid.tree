@@ -1,0 +1,54 @@
+DesignFile 0..64
+  DesignUnit 0..63
+    ContextClause 0..0
+    PSLVunit 0..63
+      KwVunit 0..5 "vunit"
+        trail Whitespace " "
+      Identifier 6..7 "v"
+        trail Whitespace " "
+      PSLHierarchicalName 8..12
+        LParen 8..9 "("
+        SimpleName 9..10
+          Identifier 9..10 "e"
+        RParen 10..11 ")"
+          trail Whitespace " "
+      LBrace 12..13 "{"
+      PSLEndpointDecl 13..61
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwEndpoint 16..24 "endpoint"
+          trail Whitespace " "
+        Identifier 25..27 "ep"
+          trail Whitespace " "
+        KwIs 28..30 "is"
+          trail Whitespace " "
+        PSLClockedProp 31..60
+          PSLBracedSere 31..42
+            LBrace 31..32 "{"
+            PSLSereConcat 32..40
+              PSLBoolean 32..35
+                SimpleName 32..35
+                  Identifier 32..35 "req"
+              Semicolon 35..36 ";"
+                trail Whitespace " "
+              PSLBoolean 37..40
+                SimpleName 37..40
+                  Identifier 37..40 "ack"
+            RBrace 40..41 "}"
+              trail Whitespace " "
+          At 42..43 "@"
+            trail Whitespace " "
+          CallOrIndexName 44..60
+            SimpleName 44..55
+              Identifier 44..55 "rising_edge"
+            AssociationList 55..60
+              LParen 55..56 "("
+              AssociationElement 56..59
+                SimpleName 56..59
+                  Identifier 56..59 "clk"
+              RParen 59..60 ")"
+        Semicolon 60..61 ";"
+        lead Newline "\n"
+      RBrace 62..63 "}"
+    lead Newline "\n"
+  EOF 64..64 ""

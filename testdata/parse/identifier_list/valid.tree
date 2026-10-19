@@ -1,0 +1,41 @@
+DesignFile 0..53
+  DesignUnit 0..52
+    ContextClause 0..0
+    PackageDecl 0..52
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..47
+        ConstantDecl 12..47
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..32
+            Identifier 24..25 "a"
+            Comma 25..26 ","
+              trail Whitespace " "
+            Identifier 27..28 "b"
+            Comma 28..29 ","
+              trail Whitespace " "
+            Identifier 30..31 "c"
+              trail Whitespace " "
+          Colon 32..33 ":"
+            trail Whitespace " "
+          SubtypeIndication 34..42
+            SimpleName 34..42
+              Identifier 34..41 "integer"
+                trail Whitespace " "
+          VarAssign 42..44 ":="
+            trail Whitespace " "
+          LiteralExpr 45..46
+            IntegerLiteral 45..46 "0"
+          Semicolon 46..47 ";"
+      EndClause 47..52
+          lead Newline "\n"
+        KwEnd 48..51 "end"
+        Semicolon 51..52 ";"
+    lead Newline "\n"
+  EOF 53..53 ""

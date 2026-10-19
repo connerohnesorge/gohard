@@ -1,0 +1,4 @@
+invalid.vhd:3:12: error[syntax/error]: expected '(', found identifier depth
+invalid.vhd:3:12: error[syntax/error]: expected ';', found identifier depth
+invalid.vhd:3:13: error[syntax/error]: expected a declaration, found identifier depth
+summary: 3 errors, 0 warnings, 0 hints, 1 files

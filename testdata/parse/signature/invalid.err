@@ -1,0 +1,2 @@
+invalid.vhd:2:26: error[syntax/error]: expected a type mark, found reserved word return
+summary: 1 errors, 0 warnings, 0 hints, 1 files

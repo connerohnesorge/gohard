@@ -143,6 +143,12 @@
 //
 //   - cmd/... and internal/env/realenv/... of the GoHard module: no
 //     rules. They are where the real world is wired in (#29, #30).
+//   - internal/jsonrpc2 of the GoHard module (that package only, not
+//     its subpackages): every rule except go and select, in its _test.go
+//     files too. It owns the stdio reader and writer goroutines, the
+//     only goroutines in GoHard (#4 P8, #25); the single-threaded
+//     server waits on input and timers through it, so no other package
+//     needs a select.
 //   - tools/... of the GoHard module: only maporder. Tools are dev-time
 //     programs (generators, the GHDL/NVC oracle) that may touch the
 //     world, but their output is committed and checked by the

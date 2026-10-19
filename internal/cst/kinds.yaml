@@ -1,0 +1,1508 @@
+# Every token and CST node kind (#10, #31). `go generate ./internal/cst`
+# (tools/genkinds) turns this file and internal/token/keywords.yaml into:
+#
+#   internal/token/kind_gen.go       token.Kind: these tokens, then Kw<Word>
+#   internal/token/keywords_gen.go   the keyword lookup table
+#   internal/lexer/keywords_gen_test.go  edge-value inputs for every keyword
+#   internal/cst/kind_gen.go         cst.Kind, names, standards, groups
+#   internal/cst/wrap_gen.go         typed wrappers and field accessors
+#   internal/parser/edits_gen_test.go    edit-replay token texts
+#
+# Kind numbers are positions in these lists (tokens from 1, keywords from
+# 256, nodes from 1). They are ONLY APPENDED: never reorder, rename or
+# delete an entry (scripts/ci/gen-check.d/10-kind-numbers.sh). The
+# generator never writes parsing code.
+#
+# Token fields: name, text (the fixed spelling, if any), trivia (true for
+# trivia kinds), psl (scanned only in PSL lexer modes), std (first
+# standard, default "1993"), doc.
+#
+# Node fields: name, std (the standard that introduces the construct,
+# default "1993"), doc, fields. A field is
+#   {name, token: Kind | tokens: [Kinds], nth: N}   the Nth direct child
+#                                                    token of those kinds
+#   {name, node: Kind|Group, nth: N}                 the Nth direct child
+#                                                    node it accepts
+#   {name, node: Kind|Group, list: true}             every such child
+# Groups name unions of node kinds; each has a typed wrapper too.
+schema: 1
+
+tokens:
+  # Special tokens.
+  - {name: EOF, doc: "end of file; carries the trailing trivia of the file"}
+  - {name: Error, doc: "a byte sequence that starts no token"}
+  - {name: Unparsed, doc: "a whole file that was not parsed (too large)"}
+  # Trivia.
+  - {name: Whitespace, trivia: true, doc: "spaces, tabs, VT, FF, NBSP"}
+  - {name: Newline, trivia: true, doc: "LF, CR LF or CR"}
+  - {name: LineComment, trivia: true, doc: "-- to end of line"}
+  - name: BlockComment
+    trivia: true
+    std: "2008"
+    doc: "/* ... */ delimited comment"
+  - name: Directive
+    trivia: true
+    std: "2008"
+    doc: "a tool directive line: `protect, `if, `else, `warning, ..."
+  - name: ProtectedData
+    trivia: true
+    std: "2008"
+    doc: "encrypted lines between `protect data_block and end_protected"
+  - name: PSLCommentMarker
+    trivia: true
+    doc: "the `-- psl` prefix or `--` continuation of a PSL comment line"
+  # Identifiers and literals.
+  - {name: Identifier, doc: "basic identifier"}
+  - {name: ExtendedIdentifier, doc: "\\extended identifier\\"}
+  - {name: IntegerLiteral, doc: "decimal or based integer literal"}
+  - {name: RealLiteral, doc: "decimal or based literal with a point"}
+  - {name: CharacterLiteral, doc: "'c'"}
+  - {name: StringLiteral, doc: "\"...\""}
+  - {name: BitStringLiteral, doc: "[size] base \"...\""}
+  # Delimiters.
+  - {name: Ampersand, text: "&"}
+  - {name: Tick, text: "'"}
+  - {name: LParen, text: "("}
+  - {name: RParen, text: ")"}
+  - {name: Star, text: "*"}
+  - {name: Plus, text: "+"}
+  - {name: Comma, text: ","}
+  - {name: Minus, text: "-"}
+  - {name: Dot, text: "."}
+  - {name: Slash, text: "/"}
+  - {name: Colon, text: ":"}
+  - {name: Semicolon, text: ";"}
+  - {name: Lt, text: "<"}
+  - {name: Eq, text: "="}
+  - {name: Gt, text: ">"}
+  - {name: Bar, text: "|"}
+  - {name: LBracket, text: "["}
+  - {name: RBracket, text: "]"}
+  - {name: Question, text: "?", std: "2008"}
+  - {name: Arrow, text: "=>"}
+  - {name: DoubleStar, text: "**"}
+  - {name: VarAssign, text: ":="}
+  - {name: Ne, text: "/="}
+  - {name: Ge, text: ">="}
+  - {name: Le, text: "<="}
+  - {name: Box, text: "<>"}
+  - {name: Condition, text: "??", std: "2008"}
+  - {name: MatchEq, text: "?=", std: "2008"}
+  - {name: MatchNe, text: "?/=", std: "2008"}
+  - {name: MatchLt, text: "?<", std: "2008"}
+  - {name: MatchLe, text: "?<=", std: "2008"}
+  - {name: MatchGt, text: "?>", std: "2008"}
+  - {name: MatchGe, text: "?>=", std: "2008"}
+  - {name: LtLt, text: "<<", std: "2008"}
+  - {name: GtGt, text: ">>", std: "2008"}
+  - name: At
+    text: "@"
+    std: "2008"
+    doc: "PSL clock operator; package pathname in external names"
+  - {name: Caret, text: "^", std: "2008"}
+  - {name: LBrace, text: "{", doc: "PSL SERE and vunit braces"}
+  - {name: RBrace, text: "}"}
+  # PSL-only tokens (scanned only in PSL lexer modes).
+  - {name: PSLImplies, text: "->", psl: true, std: "2008"}
+  - {name: PSLIff, text: "<->", psl: true, std: "2008"}
+  - {name: PSLOverlapImplies, text: "|->", psl: true, std: "2008"}
+  - {name: PSLNextImplies, text: "|=>", psl: true, std: "2008"}
+  - {name: PSLRepStar, text: "[*", psl: true, std: "2008"}
+  - {name: PSLRepPlus, text: "[+]", psl: true, std: "2008"}
+  - {name: PSLRepEq, text: "[=", psl: true, std: "2008"}
+  - {name: PSLRepGoto, text: "[->", psl: true, std: "2008"}
+  - {name: PSLAndAnd, text: "&&", psl: true, std: "2008"}
+  - {name: PSLOrOr, text: "||", psl: true, std: "2008"}
+  - {name: PSLBang, text: "!", psl: true, std: "2008"}
+  - name: PSLBangSuffix
+    text: "!"
+    psl: true
+    std: "2008"
+    doc: "strong suffix directly after eventually, next*, before, until"
+  - name: PSLUnderscoreSuffix
+    text: "_"
+    psl: true
+    std: "2008"
+    doc: "inclusive suffix directly after before[!] and until[!]"
+
+nodes:
+  # ---------------------------------------------------------------- file
+  - name: DesignFile
+    doc: "the root: design units, then the EOF token"
+    fields:
+      - {name: units, node: DesignUnit, list: true}
+      - {name: eof, token: EOF}
+  - name: DesignUnit
+    doc: "context clause plus one library unit"
+    fields:
+      - {name: context, node: ContextClause}
+      - {name: unit, node: LibraryUnit}
+  - name: ErrorNode
+    doc: "tokens skipped by error recovery"
+  - name: InactiveBranch
+    std: "2019"
+    doc: "an inactive conditional-analysis branch; parsed with recovery"
+  - name: EndClause
+    doc: "end [keywords] [designator] ;"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier, StringLiteral, CharacterLiteral]}
+  - name: Label
+    doc: "identifier : before a statement"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+  # ------------------------------------------------------------- context
+  - name: ContextClause
+    fields:
+      - {name: items, node: ContextItem, list: true}
+  - name: LibraryClause
+    fields:
+      - {name: names, node: SimpleName, list: true}
+  - name: UseClause
+    fields:
+      - {name: names, node: Name, list: true}
+  - name: ContextReference
+    std: "2008"
+    fields:
+      - {name: names, node: Name, list: true}
+  # --------------------------------------------------------------- units
+  - name: EntityDecl
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: generics, node: GenericClause}
+      - {name: ports, node: PortClause}
+      - {name: decls, node: DeclarativePart}
+      - {name: stmts, node: StatementPart}
+      - {name: end, node: EndClause}
+  - name: ArchitectureBody
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: entity, node: Name}
+      - {name: decls, node: DeclarativePart}
+      - {name: stmts, node: StatementPart}
+      - {name: end, node: EndClause}
+  - name: PackageDecl
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: generics, node: GenericClause}
+      - {name: generic_map, node: GenericMapAspect}
+      - {name: decls, node: DeclarativePart}
+      - {name: end, node: EndClause}
+  - name: PackageBody
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: decls, node: DeclarativePart}
+      - {name: end, node: EndClause}
+  - name: PackageInstantiation
+    std: "2008"
+    doc: "package p is new q [generic map (...)];"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: package, node: Name}
+      - {name: generic_map, node: GenericMapAspect}
+  - name: ConfigurationDecl
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: entity, node: Name}
+      - {name: decls, node: DeclarativePart}
+      - {name: vunits, node: VerificationUnitBinding, list: true}
+      - {name: block, node: BlockConfiguration}
+      - {name: end, node: EndClause}
+  - name: ContextDecl
+    std: "2008"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: clause, node: ContextClause}
+      - {name: end, node: EndClause}
+  - name: PSLVunit
+    std: "2008"
+    doc: "vunit name [(binding)] { items }"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: binding, node: PSLHierarchicalName}
+      - {name: items, node: PSLUnitItem, list: true}
+  - name: PSLVmode
+    std: "2008"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: binding, node: PSLHierarchicalName}
+      - {name: items, node: PSLUnitItem, list: true}
+  - name: PSLVprop
+    std: "2008"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: binding, node: PSLHierarchicalName}
+      - {name: items, node: PSLUnitItem, list: true}
+  - name: PSLHierarchicalName
+    std: "2008"
+    doc: "( entity [ ( architecture ) ] ) of a verification unit"
+    fields:
+      - {name: names, node: Name, list: true}
+  - name: PSLInheritSpec
+    std: "2008"
+    doc: "inherit name {, name};"
+    fields:
+      - {name: names, node: Name, list: true}
+  # ----------------------------------------------------- lists, regions
+  - name: DeclarativePart
+    fields:
+      - {name: items, node: Decl, list: true}
+  - name: StatementPart
+    doc: "concurrent statements"
+    fields:
+      - {name: items, node: ConcStmt, list: true}
+  - name: SequenceOfStatements
+    fields:
+      - {name: items, node: SeqStmt, list: true}
+  # ------------------------------------------------------- configuration
+  - name: BlockConfiguration
+    doc: "for block_spec {use_clause} {configuration_item} end for;"
+    fields:
+      - {name: spec, node: Name}
+      - {name: uses, node: UseClause, list: true}
+      - {name: items, node: ConfigItem, list: true}
+      - {name: end, node: EndClause}
+  - name: ComponentConfiguration
+    fields:
+      - {name: spec, node: ComponentSpecification}
+      - {name: binding, node: BindingIndication}
+      - {name: vunits, node: VerificationUnitBinding, list: true}
+      - {name: block, node: BlockConfiguration}
+      - {name: end, node: EndClause}
+  - name: ComponentSpecification
+    doc: "instantiation_list : component_name"
+    fields:
+      - {name: instances, node: InstantiationList}
+      - {name: component, node: Name}
+  - name: InstantiationList
+    doc: "labels, others or all"
+    fields:
+      - {name: labels, token: Identifier, list: true}
+  - name: BindingIndication
+    fields:
+      - {name: entity, node: EntityAspect}
+      - {name: generic_map, node: GenericMapAspect}
+      - {name: port_map, node: PortMapAspect}
+  - name: EntityAspect
+    doc: "entity name [(arch)] | configuration name | open"
+    fields:
+      - {name: unit, node: Name}
+  - name: VerificationUnitBinding
+    std: "2008"
+    doc: "use vunit name {, name};"
+    fields:
+      - {name: names, node: Name, list: true}
+  - name: ConfigurationSpec
+    doc: "for component_spec binding_indication; [end for;]"
+    fields:
+      - {name: spec, node: ComponentSpecification}
+      - {name: binding, node: BindingIndication}
+  # -------------------------------------------------------- declarations
+  - name: TypeDecl
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: def, node: TypeDef}
+  - name: IncompleteTypeDecl
+    doc: "type t;"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+  - name: SubtypeDecl
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: subtype, node: SubtypeIndication}
+  - name: ConstantDecl
+    fields:
+      - {name: names, node: IdentifierList}
+      - {name: subtype, node: SubtypeIndication}
+      - {name: value, node: Expr}
+  - name: SignalDecl
+    fields:
+      - {name: names, node: IdentifierList}
+      - {name: subtype, node: SubtypeIndication}
+      - {name: signal_kind, tokens: [KwRegister, KwBus]}
+      - {name: value, node: Expr}
+  - name: VariableDecl
+    doc: "[shared] variable names : subtype [:= expr];"
+    fields:
+      - {name: shared, token: KwShared}
+      - {name: names, node: IdentifierList}
+      - {name: subtype, node: SubtypeIndication}
+      - {name: value, node: Expr}
+  - name: PrivateVariableDecl
+    std: "2019"
+    doc: "private variable declaration in a protected type"
+    fields:
+      - {name: decl, node: VariableDecl}
+  - name: FileDecl
+    fields:
+      - {name: names, node: IdentifierList}
+      - {name: subtype, node: SubtypeIndication}
+      - {name: open_info, node: FileOpenInformation}
+  - name: FileOpenInformation
+    doc: "[open kind_expr] is file_name"
+    fields:
+      - {name: open_kind, node: Expr, nth: 0}
+      - {name: logical_name, node: Expr, nth: 1}
+  - name: IdentifierList
+    fields:
+      - {name: names, tokens: [Identifier, ExtendedIdentifier], list: true}
+  - name: AliasDecl
+    fields:
+      - {name: designator, tokens: [Identifier, ExtendedIdentifier, CharacterLiteral, StringLiteral]}
+      - {name: subtype, node: SubtypeIndication}
+      - {name: target, node: Name}
+      - {name: signature, node: Signature}
+  - name: AttributeDecl
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: type_mark, node: Name}
+  - name: AttributeSpec
+    fields:
+      - {name: designator, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: entities, node: EntitySpecification}
+      - {name: value, node: Expr}
+  - name: EntitySpecification
+    doc: "entity_name_list : entity_class"
+    fields:
+      - {name: names, node: EntityNameList}
+  - name: EntityNameList
+    doc: "designators, others or all"
+    fields:
+      - {name: designators, node: EntityDesignator, list: true}
+  - name: EntityDesignator
+    fields:
+      - {name: tag, tokens: [Identifier, ExtendedIdentifier, CharacterLiteral, StringLiteral]}
+      - {name: signature, node: Signature}
+  - name: ComponentDecl
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: generics, node: GenericClause}
+      - {name: ports, node: PortClause}
+      - {name: end, node: EndClause}
+  - name: DisconnectionSpec
+    fields:
+      - {name: signals, node: Name, list: true}
+      - {name: after, node: Expr}
+  - name: GroupTemplateDecl
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: classes, node: EntityClassEntry, list: true}
+  - name: EntityClassEntry
+    doc: "entity_class [<>]"
+  - name: GroupDecl
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: template, node: Name}
+      - {name: constituents, node: Name, list: true}
+  - name: SubprogramDecl
+    doc: "subprogram_specification ;"
+    fields:
+      - {name: spec, node: SubprogramSpec}
+  - name: SubprogramBody
+    fields:
+      - {name: spec, node: SubprogramSpec}
+      - {name: decls, node: DeclarativePart}
+      - {name: stmts, node: SequenceOfStatements}
+      - {name: end, node: EndClause}
+  - name: FunctionSpec
+    doc: "[pure|impure] function designator [header] [params] return ..."
+    fields:
+      - {name: designator, tokens: [Identifier, ExtendedIdentifier, StringLiteral]}
+      - {name: header, node: SubprogramHeader}
+      - {name: params, node: ParameterList}
+      - {name: return_type, node: ReturnSpec}
+  - name: ProcedureSpec
+    fields:
+      - {name: designator, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: header, node: SubprogramHeader}
+      - {name: params, node: ParameterList}
+  - name: ReturnSpec
+    doc: "return [identifier of] type_mark (2019 adds the identifier)"
+    fields:
+      - {name: type_mark, node: Name}
+  - name: SubprogramHeader
+    std: "2008"
+    doc: "generic (...) [generic map (...)] on a subprogram"
+    fields:
+      - {name: generics, node: GenericClause}
+      - {name: generic_map, node: GenericMapAspect}
+  - name: ParameterList
+    doc: "[parameter] ( interface_list )"
+    fields:
+      - {name: list, node: InterfaceList}
+  - name: SubprogramInstantiation
+    std: "2008"
+    doc: "function f is new g [signature] [generic map];"
+    fields:
+      - {name: designator, tokens: [Identifier, ExtendedIdentifier, StringLiteral]}
+      - {name: subprogram, node: Name}
+      - {name: signature, node: Signature}
+      - {name: generic_map, node: GenericMapAspect}
+  - name: ModeViewDecl
+    std: "2019"
+    doc: "view name of subtype is elements end view [name];"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: subtype, node: SubtypeIndication}
+      - {name: element_defs, node: ModeViewElementDef, list: true}
+      - {name: end, node: EndClause}
+  - name: ModeViewElementDef
+    std: "2019"
+    doc: "record element names : element_mode_indication ;"
+    fields:
+      - {name: names, node: IdentifierList}
+      - {name: mode, node: ElementModeIndication}
+  - name: ElementModeIndication
+    std: "2019"
+    doc: "a mode (in, out, ...) or view name / view (name)"
+    fields:
+      - {name: view, node: Name}
+  - name: PSLPropertyDecl
+    std: "2008"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: params, node: PSLFormalParameterList}
+      - {name: property, node: PSLProp}
+  - name: PSLSequenceDecl
+    std: "2008"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: params, node: PSLFormalParameterList}
+      - {name: sequence, node: PSLSere}
+  - name: PSLEndpointDecl
+    std: "2008"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: params, node: PSLFormalParameterList}
+      - {name: sequence, node: PSLSere}
+  - name: PSLFormalParameterList
+    std: "2008"
+    fields:
+      - {name: params, node: PSLFormalParameter, list: true}
+  - name: PSLFormalParameter
+    std: "2008"
+    doc: "[const|mutable] param_type name {, name}"
+    fields:
+      - {name: names, tokens: [Identifier, ExtendedIdentifier], list: true}
+  - name: PSLDefaultClock
+    std: "2008"
+    doc: "default clock is expr;"
+    fields:
+      - {name: clock, node: Expr}
+  # ----------------------------------------------------------- type defs
+  - name: EnumerationTypeDef
+    fields:
+      - {name: literals, tokens: [Identifier, ExtendedIdentifier, CharacterLiteral], list: true}
+  - name: RangeTypeDef
+    doc: "range constraint: integer and floating types"
+    fields:
+      - {name: range, node: RangeConstraint}
+  - name: PhysicalTypeDef
+    fields:
+      - {name: range, node: RangeConstraint}
+      - {name: primary, node: PrimaryUnitDecl}
+      - {name: secondary, node: SecondaryUnitDecl, list: true}
+      - {name: end, node: EndClause}
+  - name: PrimaryUnitDecl
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+  - name: SecondaryUnitDecl
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: value, node: Expr}
+  - name: UnboundedArrayDef
+    doc: "array (index_subtype_definition {, ...}) of element_subtype"
+    fields:
+      - {name: indexes, node: IndexSubtypeDef, list: true}
+      - {name: element_subtype, node: SubtypeIndication}
+  - name: ConstrainedArrayDef
+    doc: "array index_constraint of element_subtype"
+    fields:
+      - {name: constraint, node: ArrayConstraint}
+      - {name: element_subtype, node: SubtypeIndication}
+  - name: IndexSubtypeDef
+    doc: "type_mark range <>"
+    fields:
+      - {name: type_mark, node: Name}
+  - name: RecordTypeDef
+    fields:
+      - {name: element_decls, node: ElementDecl, list: true}
+      - {name: end, node: EndClause}
+  - name: ElementDecl
+    fields:
+      - {name: names, node: IdentifierList}
+      - {name: subtype, node: SubtypeIndication}
+  - name: AccessTypeDef
+    fields:
+      - {name: subtype, node: SubtypeIndication}
+  - name: FileTypeDef
+    fields:
+      - {name: type_mark, node: Name}
+  - name: ProtectedTypeDef
+    std: "2002"
+    doc: "protected [header] decls end protected [name]"
+    fields:
+      - {name: header, node: ProtectedTypeHeader}
+      - {name: decls, node: DeclarativePart}
+      - {name: end, node: EndClause}
+  - name: ProtectedTypeBody
+    std: "2002"
+    fields:
+      - {name: decls, node: DeclarativePart}
+      - {name: end, node: EndClause}
+  - name: ProtectedTypeHeader
+    std: "2019"
+    doc: "generic clause [generic map] of a protected type"
+    fields:
+      - {name: generics, node: GenericClause}
+      - {name: generic_map, node: GenericMapAspect}
+  - name: ProtectedTypeInstantiationDef
+    std: "2019"
+    doc: "new protected_type_name [generic map (...)]"
+    fields:
+      - {name: type_mark, node: Name}
+      - {name: generic_map, node: GenericMapAspect}
+  - {name: PrivateIncompleteTypeDef, std: "2019", doc: "private"}
+  - {name: ScalarIncompleteTypeDef, std: "2019", doc: "<>"}
+  - {name: DiscreteIncompleteTypeDef, std: "2019", doc: "(<>)"}
+  - {name: IntegerIncompleteTypeDef, std: "2019", doc: "range <>"}
+  - {name: PhysicalIncompleteTypeDef, std: "2019", doc: "units <>"}
+  - {name: FloatingIncompleteTypeDef, std: "2019", doc: "range <>.<>"}
+  - name: ArrayIncompleteTypeDef
+    std: "2019"
+    doc: "array (index_subtype_def {, ...}) of incomplete subtype"
+    fields:
+      - {name: element_subtype, node: SubtypeIndication}
+  - name: AccessIncompleteTypeDef
+    std: "2019"
+    fields:
+      - {name: subtype, node: SubtypeIndication}
+  - name: FileIncompleteTypeDef
+    std: "2019"
+    fields:
+      - {name: type_mark, node: Name}
+  # ------------------------------------------- subtypes and constraints
+  - name: SubtypeIndication
+    doc: "[resolution_indication] type_mark [constraint]"
+    fields:
+      - {name: resolution, node: Resolution}
+      - {name: type_mark, node: Name}
+      - {name: constraint, node: Constraint}
+  - name: ResolutionFunction
+    doc: "a resolution function name before the type mark"
+    fields:
+      - {name: function, node: Name}
+  - name: ElementResolution
+    std: "2008"
+    doc: "( resolution_indication ) for array elements"
+    fields:
+      - {name: resolution, node: Resolution}
+  - name: RecordResolution
+    std: "2008"
+    fields:
+      - {name: element_resolutions, node: RecordElementResolution, list: true}
+  - name: RecordElementResolution
+    std: "2008"
+    fields:
+      - {name: element_name, token: Identifier}
+      - {name: resolution, node: Resolution}
+  - name: RangeConstraint
+    fields:
+      - {name: range, node: DiscreteRange}
+  - name: ArrayConstraint
+    doc: "( discrete_range {, ...} | open ) [element_constraint]"
+    fields:
+      - {name: ranges, node: DiscreteRange, list: true}
+      - {name: element_constraint, node: Constraint}
+  - name: RecordConstraint
+    std: "2008"
+    fields:
+      - {name: element_constraints, node: RecordElementConstraint, list: true}
+  - name: RecordElementConstraint
+    std: "2008"
+    fields:
+      - {name: element_name, token: Identifier}
+      - {name: constraint, node: Constraint}
+  - name: RangeExpr
+    doc: "simple_expression to|downto simple_expression"
+    fields:
+      - {name: low, node: Expr, nth: 0}
+      - {name: direction, tokens: [KwTo, KwDownto]}
+      - {name: high, node: Expr, nth: 1}
+  - name: AnonymousTypeIndication
+    std: "2019"
+    doc: "type is incomplete_type_definition (interface subtype)"
+    fields:
+      - {name: def, node: TypeDef}
+  # ---------------------------------------------------------- interfaces
+  - name: GenericClause
+    fields:
+      - {name: list, node: InterfaceList}
+  - name: PortClause
+    fields:
+      - {name: list, node: InterfaceList}
+  - name: InterfaceList
+    doc: "( element {; element} [;] ) - trailing ; is 2019"
+    fields:
+      - {name: items, node: InterfaceDecl, list: true}
+  - name: InterfaceObjectDecl
+    doc: "[class] names : [mode] subtype [bus] [:= default]"
+    fields:
+      - {name: class, tokens: [KwConstant, KwSignal, KwVariable, KwFile]}
+      - {name: names, node: IdentifierList}
+      - {name: mode, node: ModeIndication}
+      - {name: subtype, node: SubtypeIndication}
+      - {name: default, node: Expr}
+  - name: InterfaceTypeDecl
+    std: "2008"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: def, node: TypeDef}
+  - name: InterfaceSubprogramDecl
+    std: "2008"
+    fields:
+      - {name: spec, node: SubprogramSpec}
+      - {name: default, node: InterfaceSubprogramDefault}
+  - name: InterfaceSubprogramDefault
+    std: "2008"
+    doc: "is name | is <>"
+    fields:
+      - {name: name, node: Name}
+  - name: InterfacePackageDecl
+    std: "2008"
+    doc: "package p is new q generic map (<> | default | ...)"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: package, node: Name}
+      - {name: generic_map, node: GenericMapAspect}
+  - name: SimpleModeIndication
+    doc: "[in|out|inout|buffer|linkage]"
+    fields:
+      - {name: mode, tokens: [KwIn, KwOut, KwInout, KwBuffer, KwLinkage]}
+  - name: ModeViewIndication
+    std: "2019"
+    doc: "view name [of subtype]"
+    fields:
+      - {name: view, node: Name}
+      - {name: subtype, node: SubtypeIndication}
+  - name: ArrayModeViewIndication
+    std: "2019"
+    doc: "view (name) of subtype"
+    fields:
+      - {name: view, node: Name}
+      - {name: subtype, node: SubtypeIndication}
+  - name: GenericMapAspect
+    fields:
+      - {name: list, node: AssociationList}
+  - name: PortMapAspect
+    fields:
+      - {name: list, node: AssociationList}
+  - name: ParameterMapAspect
+    std: "2019"
+    fields:
+      - {name: list, node: AssociationList}
+  - name: CallGenericMap
+    std: "2019"
+    doc: "generic map (...) on a subprogram call"
+    fields:
+      - {name: list, node: AssociationList}
+  - name: AssociationList
+    fields:
+      - {name: items, node: AssociationElement, list: true}
+  - name: AssociationElement
+    doc: "[formal =>] actual"
+    fields:
+      - {name: formal, node: Expr, with: Arrow}
+      - {name: arrow, token: Arrow}
+      - {name: actual, node: Expr, last: true}
+  - name: InertialActual
+    std: "2008"
+    doc: "inertial expression as a port actual"
+    fields:
+      - {name: value, node: Expr}
+  # ------------------------------------------------ sequential statements
+  - name: WaitStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: sensitivity, node: SensitivityClause}
+      - {name: condition, node: ConditionClause}
+      - {name: timeout, node: TimeoutClause}
+  - name: SensitivityClause
+    fields:
+      - {name: list, node: SensitivityList}
+  - name: SensitivityList
+    fields:
+      - {name: names, node: Name, list: true}
+  - name: ConditionClause
+    fields:
+      - {name: condition, node: Expr}
+  - name: TimeoutClause
+    fields:
+      - {name: timeout, node: Expr}
+  - name: AssertStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: condition, node: Expr, nth: 0}
+      - {name: report, node: Expr, nth: 1}
+      - {name: severity, node: Expr, nth: 2}
+  - name: ReportStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: report, node: Expr, nth: 0}
+      - {name: severity, node: Expr, nth: 1}
+  - name: SignalAssignStmt
+    doc: "target <= [delay] waveform;"
+    fields:
+      - {name: label, node: Label}
+      - {name: target, node: Target}
+      - {name: delay, node: DelayMechanism}
+      - {name: waveform, node: Waveform}
+  - name: ConditionalSignalAssignStmt
+    std: "2008"
+    fields:
+      - {name: label, node: Label}
+      - {name: target, node: Target}
+      - {name: delay, node: DelayMechanism}
+      - {name: waveforms, node: ConditionalWaveforms}
+  - name: SelectedSignalAssignStmt
+    std: "2008"
+    fields:
+      - {name: label, node: Label}
+      - {name: selector, node: Expr}
+      - {name: target, node: Target}
+      - {name: delay, node: DelayMechanism}
+      - {name: waveforms, node: SelectedWaveforms}
+  - name: ForceAssignStmt
+    std: "2008"
+    doc: "target <= force [in|out] expr;"
+    fields:
+      - {name: label, node: Label}
+      - {name: target, node: Target}
+      - {name: mode, tokens: [KwIn, KwOut]}
+      - {name: value, node: Expr}
+  - name: ReleaseAssignStmt
+    std: "2008"
+    fields:
+      - {name: label, node: Label}
+      - {name: target, node: Target}
+      - {name: mode, tokens: [KwIn, KwOut]}
+  - name: VariableAssignStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: target, node: Target}
+      - {name: value, node: Expr}
+  - name: ConditionalVariableAssignStmt
+    std: "2008"
+    fields:
+      - {name: label, node: Label}
+      - {name: target, node: Target}
+      - {name: values, node: ConditionalExpressions}
+  - name: SelectedVariableAssignStmt
+    std: "2008"
+    fields:
+      - {name: label, node: Label}
+      - {name: selector, node: Expr}
+      - {name: target, node: Target}
+      - {name: values, node: SelectedExpressions}
+  - name: ProcedureCallStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: call, node: Name}
+  - name: IfStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: condition, node: Expr}
+      - {name: then, node: SequenceOfStatements}
+      - {name: elsifs, node: ElsifBranch, list: true}
+      - {name: else, node: ElseBranch}
+      - {name: end, node: EndClause}
+  - name: ElsifBranch
+    fields:
+      - {name: condition, node: Expr}
+      - {name: stmts, node: SequenceOfStatements}
+  - name: ElseBranch
+    fields:
+      - {name: stmts, node: SequenceOfStatements}
+  - name: CaseStmt
+    doc: "case[?] expr is alternatives end case[?] [label];"
+    fields:
+      - {name: label, node: Label}
+      - {name: matching, token: Question}
+      - {name: selector, node: Expr}
+      - {name: alternatives, node: CaseAlternative, list: true}
+      - {name: end, node: EndClause}
+  - name: CaseAlternative
+    fields:
+      - {name: choices, node: Choices}
+      - {name: stmts, node: SequenceOfStatements}
+  - name: Choices
+    doc: "choice {| choice}"
+    fields:
+      - {name: items, node: Expr, list: true}
+  - name: LoopStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: scheme, node: IterationScheme}
+      - {name: stmts, node: SequenceOfStatements}
+      - {name: end, node: EndClause}
+  - name: WhileScheme
+    fields:
+      - {name: condition, node: Expr}
+  - name: ForScheme
+    fields:
+      - {name: param, node: ParameterSpecification}
+  - name: ParameterSpecification
+    doc: "identifier in discrete_range"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: range, node: DiscreteRange}
+  - name: NextStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: loop, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: condition, node: Expr}
+  - name: ExitStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: loop, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: condition, node: Expr}
+  - name: ReturnStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: value, node: Expr}
+  - name: ConditionalReturnStmt
+    std: "2019"
+    doc: "return [expr] when condition [else ...];"
+    fields:
+      - {name: label, node: Label}
+      - {name: values, node: ConditionalExpressions}
+  - name: NullStmt
+    fields:
+      - {name: label, node: Label}
+  - name: SequentialBlockStmt
+    std: "2019"
+    doc: "block [is] decls begin stmts end block [label]; in a process"
+    fields:
+      - {name: label, node: Label}
+      - {name: decls, node: DeclarativePart}
+      - {name: stmts, node: SequenceOfStatements}
+      - {name: end, node: EndClause}
+  - name: Waveform
+    doc: "element {, element} | unaffected"
+    fields:
+      - {name: waveform_elements, node: WaveformElement, list: true}
+  - name: WaveformElement
+    doc: "value [after time] | null [after time]"
+    fields:
+      - {name: value, node: Expr, nth: 0}
+      - {name: after, node: Expr, nth: 1}
+  - name: DelayMechanism
+    doc: "transport | [reject time] inertial"
+    fields:
+      - {name: reject, node: Expr}
+  - name: ConditionalWaveforms
+    fields:
+      - {name: branches, node: WhenBranch, list: true}
+  - name: SelectedWaveforms
+    fields:
+      - {name: branches, node: SelectBranch, list: true}
+  - name: ConditionalExpressions
+    std: "2008"
+    fields:
+      - {name: branches, node: WhenBranch, list: true}
+  - name: SelectedExpressions
+    std: "2008"
+    fields:
+      - {name: branches, node: SelectBranch, list: true}
+  - name: WhenBranch
+    doc: "value [when condition] (one arm of a when/else chain)"
+    fields:
+      - {name: value, node: WhenValue}
+      - {name: condition, node: Expr}
+  - name: SelectBranch
+    doc: "value when choices"
+    fields:
+      - {name: value, node: WhenValue}
+      - {name: choices, node: Choices}
+  - name: Target
+    doc: "a name or aggregate assigned to"
+    fields:
+      - {name: target, node: Expr}
+  # ------------------------------------------------ concurrent statements
+  - name: BlockStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: guard, node: Expr}
+      - {name: header, node: BlockHeader}
+      - {name: decls, node: DeclarativePart}
+      - {name: stmts, node: StatementPart}
+      - {name: end, node: EndClause}
+  - name: BlockHeader
+    fields:
+      - {name: generics, node: GenericClause}
+      - {name: generic_map, node: GenericMapAspect}
+      - {name: ports, node: PortClause}
+      - {name: port_map, node: PortMapAspect}
+  - name: ProcessStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: postponed, token: KwPostponed}
+      - {name: sensitivity, node: ProcessSensitivityList}
+      - {name: decls, node: DeclarativePart}
+      - {name: stmts, node: SequenceOfStatements}
+      - {name: end, node: EndClause}
+  - name: ProcessSensitivityList
+    doc: "( all | name {, name} ) - all is 2008"
+    fields:
+      - {name: all, token: KwAll}
+      - {name: names, node: Name, list: true}
+  - name: ConcurrentProcedureCallStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: postponed, token: KwPostponed}
+      - {name: call, node: Name}
+  - name: ConcurrentAssertionStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: postponed, token: KwPostponed}
+      - {name: condition, node: Expr, nth: 0}
+      - {name: report, node: Expr, nth: 1}
+      - {name: severity, node: Expr, nth: 2}
+  - name: ConcurrentSimpleSignalAssign
+    doc: "target <= [guarded] [delay] waveform; (2008 grammar name)"
+    fields:
+      - {name: label, node: Label}
+      - {name: target, node: Target}
+      - {name: delay, node: DelayMechanism}
+      - {name: waveform, node: Waveform}
+  - name: ConcurrentConditionalSignalAssign
+    fields:
+      - {name: label, node: Label}
+      - {name: postponed, token: KwPostponed}
+      - {name: target, node: Target}
+      - {name: guarded, token: KwGuarded}
+      - {name: delay, node: DelayMechanism}
+      - {name: waveforms, node: ConditionalWaveforms}
+  - name: ConcurrentSelectedSignalAssign
+    fields:
+      - {name: label, node: Label}
+      - {name: postponed, token: KwPostponed}
+      - {name: selector, node: Expr}
+      - {name: matching, token: Question}
+      - {name: target, node: Target}
+      - {name: guarded, token: KwGuarded}
+      - {name: delay, node: DelayMechanism}
+      - {name: waveforms, node: SelectedWaveforms}
+  - name: ComponentInstantiationStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: unit, node: InstantiatedUnit}
+      - {name: generic_map, node: GenericMapAspect}
+      - {name: port_map, node: PortMapAspect}
+  - name: InstantiatedUnit
+    doc: "[component] name | entity name [(arch)] | configuration name"
+    fields:
+      - {name: name, node: Name}
+      - {name: architecture, tokens: [Identifier, ExtendedIdentifier]}
+  - name: ForGenerateStmt
+    fields:
+      - {name: label, node: Label}
+      - {name: param, node: ParameterSpecification}
+      - {name: body, node: GenerateBody}
+      - {name: end, node: EndClause}
+  - name: IfGenerateStmt
+    doc: "if [alt:] cond generate body {elsif ...} [else ...] end generate"
+    fields:
+      - {name: label, node: Label}
+      - {name: branches, node: GenerateBranch, list: true}
+      - {name: end, node: EndClause}
+  - name: GenerateBranch
+    doc: "one if / elsif / else arm of an if generate"
+    fields:
+      - {name: alt_label, node: Label}
+      - {name: condition, node: Expr}
+      - {name: body, node: GenerateBody}
+  - name: CaseGenerateStmt
+    std: "2008"
+    fields:
+      - {name: label, node: Label}
+      - {name: selector, node: Expr}
+      - {name: alternatives, node: CaseGenerateAlternative, list: true}
+      - {name: end, node: EndClause}
+  - name: CaseGenerateAlternative
+    std: "2008"
+    fields:
+      - {name: alt_label, node: Label}
+      - {name: choices, node: Choices}
+      - {name: body, node: GenerateBody}
+  - name: GenerateBody
+    doc: "[decls begin] stmts [end [alt_label];]"
+    fields:
+      - {name: decls, node: DeclarativePart}
+      - {name: stmts, node: StatementPart}
+      - {name: end, node: EndClause}
+  # ------------------------------------------------- names, expressions
+  - name: SimpleName
+    fields:
+      - {name: ident, tokens: [Identifier, ExtendedIdentifier]}
+  - name: OperatorSymbol
+    doc: "a string literal used as a name (\"+\")"
+    fields:
+      - {name: symbol, token: StringLiteral}
+  - name: CharacterName
+    doc: "a character literal used as a name or enumeration literal"
+    fields:
+      - {name: literal, token: CharacterLiteral}
+  - name: SelectedName
+    doc: "prefix . suffix"
+    fields:
+      - {name: prefix, node: Name}
+      - {name: suffix, tokens: [Identifier, ExtendedIdentifier, CharacterLiteral, StringLiteral, KwAll]}
+  - name: CallOrIndexName
+    doc: "prefix ( association_list ): call, index, conversion or slice"
+    fields:
+      - {name: prefix, node: Name}
+      - {name: generic_map, node: CallGenericMap}
+      - {name: parameter_map, node: ParameterMapAspect}
+      - {name: args, node: AssociationList}
+  - name: SliceName
+    doc: "prefix ( discrete_range )"
+    fields:
+      - {name: prefix, node: Name}
+      - {name: range, node: DiscreteRange}
+  - name: AttributeName
+    doc: "prefix [signature] ' designator [( expr )]"
+    fields:
+      - {name: prefix, node: Name}
+      - {name: signature, node: Signature}
+      - {name: designator, tokens: [Identifier, KwRange, KwSubtype, KwRecord]}
+      - {name: arg, node: Expr}
+  - name: Signature
+    doc: "[ type_mark {, type_mark} [return type_mark] ]"
+    fields:
+      - {name: types, node: Name, list: true}
+  - name: ExternalName
+    std: "2008"
+    doc: "<< constant|signal|variable path : subtype >>"
+    fields:
+      - {name: class, tokens: [KwConstant, KwSignal, KwVariable]}
+      - {name: path, node: ExternalPathname}
+      - {name: subtype, node: SubtypeIndication}
+  - name: PackagePathname
+    std: "2008"
+    doc: "@ library . package . { package . } object"
+  - name: AbsolutePathname
+    std: "2008"
+    doc: ". partial_pathname"
+  - name: RelativePathname
+    std: "2008"
+    doc: "{^ .} partial_pathname"
+  - name: PathnameElement
+    std: "2008"
+    doc: "label [( static_expression )] ."
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: generate_index, node: Expr}
+  - name: LiteralExpr
+    doc: "numeric, character, string, bit-string or null literal"
+    fields:
+      - {name: literal, tokens: [IntegerLiteral, RealLiteral, CharacterLiteral, StringLiteral, BitStringLiteral, KwNull]}
+  - name: PhysicalLiteral
+    doc: "[abstract_literal] unit_name"
+    fields:
+      - {name: value, tokens: [IntegerLiteral, RealLiteral]}
+      - {name: unit, node: Name}
+  - name: ParenExpr
+    fields:
+      - {name: inner, node: Expr}
+  - name: Aggregate
+    fields:
+      - {name: associations, node: ElementAssociation, list: true}
+  - name: ElementAssociation
+    doc: "[choices =>] expression"
+    fields:
+      - {name: choices, node: Choices}
+      - {name: value, node: Expr}
+  - name: BinaryExpr
+    fields:
+      - {name: lhs, node: Expr, nth: 0}
+      - {name: op, tokens: [KwAnd, KwOr, KwNand, KwNor, KwXor, KwXnor, Eq, Ne, Lt, Le, Gt, Ge, MatchEq, MatchNe, MatchLt, MatchLe, MatchGt, MatchGe, KwSll, KwSrl, KwSla, KwSra, KwRol, KwRor, Plus, Minus, Ampersand, Star, Slash, KwMod, KwRem, DoubleStar]}
+      - {name: rhs, node: Expr, nth: 1}
+  - name: UnaryExpr
+    doc: "sign, not, abs, ?? or a 2008 unary reduction operator"
+    fields:
+      - {name: op, tokens: [Plus, Minus, KwNot, KwAbs, Condition, KwAnd, KwOr, KwNand, KwNor, KwXor, KwXnor]}
+      - {name: operand, node: Expr}
+  - name: QualifiedExpr
+    doc: "type_mark ' ( expression ) | type_mark ' aggregate"
+    fields:
+      - {name: type_mark, node: Name}
+      - {name: operand, node: Expr}
+  - name: Allocator
+    doc: "new subtype_indication | new qualified_expression"
+    fields:
+      - {name: operand, node: Expr}
+      - {name: subtype, node: SubtypeIndication}
+  - name: ConditionalExpr
+    std: "2019"
+    doc: "expr when cond {else expr when cond} [else expr]"
+    fields:
+      - {name: branches, node: WhenBranch, list: true}
+  - name: BoxExpr
+    doc: "<> as an expression (actual or default)"
+  - name: OpenExpr
+    doc: "open as an actual"
+  - name: OthersChoice
+    doc: "others as a choice"
+  - name: UnaffectedExpr
+    doc: "unaffected as a waveform or value"
+  # ------------------------------------------------------- PSL directives
+  - name: PSLAssert
+    std: "2008"
+    doc: "[label:] assert property [report expr] [severity expr];"
+    fields:
+      - {name: label, node: Label}
+      - {name: property, node: PSLProp}
+      - {name: report, node: PSLReport}
+  - name: PSLAssume
+    std: "2008"
+    fields:
+      - {name: label, node: Label}
+      - {name: property, node: PSLProp}
+  - name: PSLAssumeGuarantee
+    std: "2008"
+    fields:
+      - {name: label, node: Label}
+      - {name: property, node: PSLProp}
+      - {name: report, node: PSLReport}
+  - name: PSLRestrict
+    std: "2008"
+    fields:
+      - {name: label, node: Label}
+      - {name: sequence, node: PSLSere}
+  - name: PSLRestrictGuarantee
+    std: "2008"
+    fields:
+      - {name: label, node: Label}
+      - {name: sequence, node: PSLSere}
+      - {name: report, node: PSLReport}
+  - name: PSLCover
+    std: "2008"
+    fields:
+      - {name: label, node: Label}
+      - {name: sequence, node: PSLSere}
+      - {name: report, node: PSLReport}
+  - name: PSLFairness
+    std: "2008"
+    doc: "fairness b; | strong fairness a, b;"
+    fields:
+      - {name: label, node: Label}
+      - {name: strong, token: KwStrong}
+      - {name: operands, node: Expr, list: true}
+  - name: PSLReport
+    std: "2008"
+    doc: "report expr [severity expr]"
+    fields:
+      - {name: report, node: Expr, nth: 0}
+      - {name: severity, node: Expr, nth: 1}
+  # ------------------------------------------------------- PSL properties
+  - name: PSLParenProp
+    std: "2008"
+    fields:
+      - {name: inner, node: PSLProp}
+  - name: PSLClockedProp
+    std: "2008"
+    doc: "property @ clock_expression"
+    fields:
+      - {name: property, node: PSLProp}
+      - {name: clock, node: Expr}
+  - name: PSLAlways
+    std: "2008"
+    fields:
+      - {name: operand, node: PSLProp}
+  - name: PSLNever
+    std: "2008"
+    fields:
+      - {name: operand, node: PSLProp}
+  - name: PSLEventually
+    std: "2008"
+    doc: "eventually! operand"
+    fields:
+      - {name: operand, node: PSLProp}
+  - name: PSLNext
+    std: "2008"
+    doc: "next[!] [[count]] operand"
+    fields:
+      - {name: count, node: PSLCount}
+      - {name: operand, node: PSLProp}
+  - name: PSLNextA
+    std: "2008"
+    doc: "next_a[!] [range] operand"
+    fields:
+      - {name: range, node: PSLCount}
+      - {name: operand, node: PSLProp}
+  - name: PSLNextE
+    std: "2008"
+    fields:
+      - {name: range, node: PSLCount}
+      - {name: operand, node: PSLProp}
+  - name: PSLNextEvent
+    std: "2008"
+    doc: "next_event[!] (bool) [[count]] (property)"
+    fields:
+      - {name: event, node: Expr}
+      - {name: count, node: PSLCount}
+      - {name: operand, node: PSLProp}
+  - name: PSLNextEventA
+    std: "2008"
+    fields:
+      - {name: event, node: Expr}
+      - {name: range, node: PSLCount}
+      - {name: operand, node: PSLProp}
+  - name: PSLNextEventE
+    std: "2008"
+    fields:
+      - {name: event, node: Expr}
+      - {name: range, node: PSLCount}
+      - {name: operand, node: PSLProp}
+  - name: PSLUntil
+    std: "2008"
+    doc: "lhs until[!][_] rhs"
+    fields:
+      - {name: lhs, node: PSLProp, nth: 0}
+      - {name: rhs, node: PSLProp, nth: 1}
+  - name: PSLBefore
+    std: "2008"
+    doc: "lhs before[!][_] rhs"
+    fields:
+      - {name: lhs, node: PSLProp, nth: 0}
+      - {name: rhs, node: PSLProp, nth: 1}
+  - name: PSLAbort
+    std: "2008"
+    doc: "property abort|async_abort|sync_abort boolean"
+    fields:
+      - {name: property, node: PSLProp}
+      - {name: abort, tokens: [KwAbort, KwAsyncAbort, KwSyncAbort]}
+      - {name: condition, node: Expr}
+  - name: PSLImplication
+    std: "2008"
+    doc: "lhs -> rhs or lhs <-> rhs"
+    fields:
+      - {name: lhs, node: PSLProp, nth: 0}
+      - {name: op, tokens: [PSLImplies, PSLIff]}
+      - {name: rhs, node: PSLProp, nth: 1}
+  - name: PSLSuffixImplication
+    std: "2008"
+    doc: "sere |-> property or sere |=> property"
+    fields:
+      - {name: sequence, node: PSLSere}
+      - {name: op, tokens: [PSLOverlapImplies, PSLNextImplies]}
+      - {name: property, node: PSLProp}
+  - name: PSLLogicalProp
+    std: "2008"
+    doc: "property and|or property, or not property"
+    fields:
+      - {name: lhs, node: PSLProp, nth: 0}
+      - {name: op, tokens: [KwAnd, KwOr, KwNot, PSLBang]}
+      - {name: rhs, node: PSLProp, nth: 1}
+  - name: PSLForall
+    std: "2008"
+    doc: "forall name [index_range] in value_set : property"
+    fields:
+      - {name: name, tokens: [Identifier, ExtendedIdentifier]}
+      - {name: values, node: PSLValueSet}
+      - {name: property, node: PSLProp}
+  - name: PSLValueSet
+    std: "2008"
+    doc: "{ value_range {, value_range} } or boolean"
+  - name: PSLPropertyInstance
+    std: "2008"
+    fields:
+      - {name: name, node: Name}
+  - name: PSLOBEUnary
+    std: "2008"
+    doc: "AX, AG, AF, EX, EG or EF operand (branching time)"
+    fields:
+      - {name: op, tokens: [KwAx, KwAg, KwAf, KwEx, KwEg, KwEf]}
+      - {name: operand, node: PSLProp}
+  - name: PSLOBEUntil
+    std: "2008"
+    doc: "A [p U q] or E [p U q] (branching time)"
+    fields:
+      - {name: quantifier, tokens: [KwA, KwE]}
+      - {name: lhs, node: PSLProp, nth: 0}
+      - {name: rhs, node: PSLProp, nth: 1}
+  - name: PSLCount
+    std: "2008"
+    doc: "[ count ] or [ low to high ] / [ low : high ] in PSL brackets"
+    fields:
+      - {name: low, node: Expr, nth: 0}
+      - {name: high, node: Expr, nth: 1}
+  # ---------------------------------------------------- PSL sequences
+  - name: PSLBracedSere
+    std: "2008"
+    doc: "{ sere }"
+    fields:
+      - {name: inner, node: PSLSere}
+  - name: PSLSereConcat
+    std: "2008"
+    doc: "lhs ; rhs"
+    fields:
+      - {name: lhs, node: PSLSere, nth: 0}
+      - {name: rhs, node: PSLSere, nth: 1}
+  - name: PSLSereFusion
+    std: "2008"
+    doc: "lhs : rhs"
+    fields:
+      - {name: lhs, node: PSLSere, nth: 0}
+      - {name: rhs, node: PSLSere, nth: 1}
+  - name: PSLSereOr
+    std: "2008"
+    doc: "lhs | rhs"
+    fields:
+      - {name: lhs, node: PSLSere, nth: 0}
+      - {name: rhs, node: PSLSere, nth: 1}
+  - name: PSLSereAnd
+    std: "2008"
+    doc: "lhs & rhs (non-length-matching) or lhs && rhs"
+    fields:
+      - {name: lhs, node: PSLSere, nth: 0}
+      - {name: op, tokens: [Ampersand, PSLAndAnd]}
+      - {name: rhs, node: PSLSere, nth: 1}
+  - name: PSLSereWithin
+    std: "2008"
+    fields:
+      - {name: lhs, node: PSLSere, nth: 0}
+      - {name: rhs, node: PSLSere, nth: 1}
+  - name: PSLRepetition
+    std: "2008"
+    doc: "operand [* count] | [+] | [= count] | [-> count]"
+    fields:
+      - {name: operand, node: PSLSere}
+      - {name: op, tokens: [PSLRepStar, PSLRepPlus, PSLRepEq, PSLRepGoto]}
+      - {name: count, node: PSLCount}
+  - name: PSLSequenceInstance
+    std: "2008"
+    fields:
+      - {name: name, node: Name}
+  - name: PSLBuiltinCall
+    std: "2008"
+    doc: "prev, rose, fell, stable, onehot, onehot0, ended, nondet, ..."
+    fields:
+      - {name: function, tokens: [KwPrev, KwRose, KwFell, KwStable, KwOnehot, KwOnehot0, KwEnded, KwNondet, KwNondetVector]}
+      - {name: args, node: Expr, list: true}
+  - name: PSLUnion
+    std: "2008"
+    fields:
+      - {name: lhs, node: Expr, nth: 0}
+      - {name: rhs, node: Expr, nth: 1}
+  - name: PSLBoolean
+    std: "2008"
+    doc: "an HDL (VHDL) expression used as a PSL boolean or sequence"
+    fields:
+      - {name: expr, node: Expr}
+
+groups:
+  - name: LibraryUnit
+    kinds: [EntityDecl, ArchitectureBody, PackageDecl, PackageBody,
+      PackageInstantiation, ConfigurationDecl, ContextDecl, PSLVunit,
+      PSLVmode, PSLVprop]
+  - name: ContextItem
+    kinds: [LibraryClause, UseClause, ContextReference]
+  - name: Decl
+    kinds: [TypeDecl, IncompleteTypeDecl, SubtypeDecl, ConstantDecl,
+      SignalDecl, VariableDecl, PrivateVariableDecl, FileDecl, AliasDecl,
+      AttributeDecl, AttributeSpec, ComponentDecl, ConfigurationSpec,
+      DisconnectionSpec, GroupTemplateDecl, GroupDecl, SubprogramDecl,
+      SubprogramBody, SubprogramInstantiation, PackageDecl, PackageBody,
+      PackageInstantiation, UseClause, ModeViewDecl, PSLPropertyDecl,
+      PSLSequenceDecl, PSLEndpointDecl, PSLDefaultClock, ErrorNode,
+      InactiveBranch]
+  - name: ConcStmt
+    kinds: [BlockStmt, ProcessStmt, ConcurrentProcedureCallStmt,
+      ConcurrentAssertionStmt, ConcurrentSimpleSignalAssign,
+      ConcurrentConditionalSignalAssign, ConcurrentSelectedSignalAssign,
+      ComponentInstantiationStmt, ForGenerateStmt, IfGenerateStmt,
+      CaseGenerateStmt, PSLAssert, PSLAssume, PSLAssumeGuarantee,
+      PSLRestrict, PSLRestrictGuarantee, PSLCover, PSLFairness,
+      PSLPropertyDecl, PSLSequenceDecl, PSLDefaultClock, ErrorNode,
+      InactiveBranch]
+  - name: SeqStmt
+    kinds: [WaitStmt, AssertStmt, ReportStmt, SignalAssignStmt,
+      ConditionalSignalAssignStmt, SelectedSignalAssignStmt,
+      ForceAssignStmt, ReleaseAssignStmt, VariableAssignStmt,
+      ConditionalVariableAssignStmt, SelectedVariableAssignStmt,
+      ProcedureCallStmt, IfStmt, CaseStmt, LoopStmt, NextStmt, ExitStmt,
+      ReturnStmt, ConditionalReturnStmt, NullStmt, SequentialBlockStmt,
+      ErrorNode, InactiveBranch]
+  - name: Name
+    kinds: [SimpleName, OperatorSymbol, CharacterName, SelectedName,
+      CallOrIndexName, SliceName, AttributeName, ExternalName]
+  - name: Expr
+    kinds: [SimpleName, OperatorSymbol, CharacterName, SelectedName,
+      CallOrIndexName, SliceName, AttributeName, ExternalName, LiteralExpr,
+      PhysicalLiteral, ParenExpr, Aggregate, BinaryExpr, UnaryExpr,
+      QualifiedExpr, Allocator, ConditionalExpr, RangeExpr, BoxExpr,
+      OpenExpr, OthersChoice, UnaffectedExpr, InertialActual,
+      SubtypeIndication, PSLUnion, PSLValueSet, ErrorNode]
+  - name: WhenValue
+    kinds: [Waveform, SimpleName, OperatorSymbol, CharacterName,
+      SelectedName, CallOrIndexName, SliceName, AttributeName,
+      ExternalName, LiteralExpr, PhysicalLiteral, ParenExpr, Aggregate,
+      BinaryExpr, UnaryExpr, QualifiedExpr, Allocator, ConditionalExpr,
+      UnaffectedExpr, ErrorNode]
+  - name: DiscreteRange
+    kinds: [RangeExpr, SubtypeIndication, SimpleName, SelectedName,
+      AttributeName, CallOrIndexName, OpenExpr, ErrorNode]
+  - name: TypeDef
+    kinds: [EnumerationTypeDef, RangeTypeDef, PhysicalTypeDef,
+      UnboundedArrayDef, ConstrainedArrayDef, RecordTypeDef, AccessTypeDef,
+      FileTypeDef, ProtectedTypeDef, ProtectedTypeBody,
+      ProtectedTypeInstantiationDef, PrivateIncompleteTypeDef,
+      ScalarIncompleteTypeDef, DiscreteIncompleteTypeDef,
+      IntegerIncompleteTypeDef, PhysicalIncompleteTypeDef,
+      FloatingIncompleteTypeDef, ArrayIncompleteTypeDef,
+      AccessIncompleteTypeDef, FileIncompleteTypeDef, ErrorNode]
+  - name: Constraint
+    kinds: [RangeConstraint, ArrayConstraint, RecordConstraint]
+  - name: Resolution
+    kinds: [ResolutionFunction, ElementResolution, RecordResolution]
+  - name: InterfaceDecl
+    kinds: [InterfaceObjectDecl, InterfaceTypeDecl, InterfaceSubprogramDecl,
+      InterfacePackageDecl, ErrorNode, InactiveBranch]
+  - name: ModeIndication
+    kinds: [SimpleModeIndication, ModeViewIndication,
+      ArrayModeViewIndication, AnonymousTypeIndication]
+  - name: SubprogramSpec
+    kinds: [FunctionSpec, ProcedureSpec]
+  - name: ConfigItem
+    kinds: [BlockConfiguration, ComponentConfiguration, ErrorNode,
+      InactiveBranch]
+  - name: IterationScheme
+    kinds: [WhileScheme, ForScheme]
+  - name: ExternalPathname
+    kinds: [PackagePathname, AbsolutePathname, RelativePathname]
+  - name: PSLUnitItem
+    kinds: [PSLInheritSpec, PSLAssert, PSLAssume, PSLAssumeGuarantee,
+      PSLRestrict, PSLRestrictGuarantee, PSLCover, PSLFairness,
+      PSLPropertyDecl, PSLSequenceDecl, PSLEndpointDecl, PSLDefaultClock,
+      TypeDecl, SubtypeDecl, ConstantDecl, SignalDecl, VariableDecl,
+      AliasDecl, AttributeDecl, AttributeSpec, ComponentDecl,
+      SubprogramDecl, SubprogramBody, UseClause, BlockStmt, ProcessStmt,
+      ConcurrentProcedureCallStmt, ConcurrentAssertionStmt,
+      ConcurrentSimpleSignalAssign, ConcurrentConditionalSignalAssign,
+      ConcurrentSelectedSignalAssign, ComponentInstantiationStmt,
+      ForGenerateStmt, IfGenerateStmt, CaseGenerateStmt, ErrorNode,
+      InactiveBranch]
+  - name: PSLProp
+    kinds: [PSLParenProp, PSLClockedProp, PSLAlways, PSLNever,
+      PSLEventually, PSLNext, PSLNextA, PSLNextE, PSLNextEvent,
+      PSLNextEventA, PSLNextEventE, PSLUntil, PSLBefore, PSLAbort,
+      PSLImplication, PSLSuffixImplication, PSLLogicalProp, PSLForall,
+      PSLPropertyInstance, PSLOBEUnary, PSLOBEUntil, PSLBracedSere,
+      PSLSereConcat, PSLSereFusion, PSLSereOr, PSLSereAnd, PSLSereWithin,
+      PSLRepetition, PSLSequenceInstance, PSLBuiltinCall, PSLUnion,
+      PSLBoolean, ErrorNode]
+  - name: PSLSere
+    kinds: [PSLBracedSere, PSLSereConcat, PSLSereFusion, PSLSereOr,
+      PSLSereAnd, PSLSereWithin, PSLRepetition, PSLSequenceInstance,
+      PSLBuiltinCall, PSLUnion, PSLBoolean, PSLClockedProp, ErrorNode]

@@ -1,0 +1,118 @@
+DesignFile 0..195
+  DesignUnit 0..194
+    ContextClause 0..0
+    PackageDecl 0..194
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..189
+        TypeDecl 12..81
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..25 "bus_t"
+            trail Whitespace " "
+          KwIs 26..28 "is"
+            trail Whitespace " "
+          RecordTypeDef 29..81
+            KwRecord 29..35 "record"
+            ElementDecl 35..51
+              IdentifierList 35..45
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 40..43 "req"
+                  trail Whitespace "  "
+              Colon 45..46 ":"
+                trail Whitespace " "
+              SubtypeIndication 47..50
+                SimpleName 47..50
+                  Identifier 47..50 "bit"
+              Semicolon 50..51 ";"
+            ElementDecl 51..67
+              IdentifierList 51..61
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 56..59 "ack"
+                  trail Whitespace "  "
+              Colon 61..62 ":"
+                trail Whitespace " "
+              SubtypeIndication 63..66
+                SimpleName 63..66
+                  Identifier 63..66 "bit"
+              Semicolon 66..67 ";"
+            EndClause 67..81
+                lead Newline "\n"
+                lead Whitespace "  "
+              KwEnd 70..73 "end"
+                trail Whitespace " "
+              KwRecord 74..80 "record"
+              Semicolon 80..81 ";"
+        ModeViewDecl 81..155
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwView 84..88 "view"
+            trail Whitespace " "
+          Identifier 89..95 "master"
+            trail Whitespace " "
+          KwOf 96..98 "of"
+            trail Whitespace " "
+          SubtypeIndication 99..105
+            SimpleName 99..105
+              Identifier 99..104 "bus_t"
+                trail Whitespace " "
+          KwIs 105..107 "is"
+          ModeViewElementDef 107..122
+            IdentifierList 107..116
+                lead Newline "\n"
+                lead Whitespace "    "
+              Identifier 112..115 "req"
+                trail Whitespace " "
+            Colon 116..117 ":"
+              trail Whitespace " "
+            ElementModeIndication 118..121
+              KwOut 118..121 "out"
+            Semicolon 121..122 ";"
+          ModeViewElementDef 122..136
+            IdentifierList 122..131
+                lead Newline "\n"
+                lead Whitespace "    "
+              Identifier 127..130 "ack"
+                trail Whitespace " "
+            Colon 131..132 ":"
+              trail Whitespace " "
+            ElementModeIndication 133..135
+              KwIn 133..135 "in"
+            Semicolon 135..136 ";"
+          EndClause 136..155
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 139..142 "end"
+              trail Whitespace " "
+            KwView 143..147 "view"
+              trail Whitespace " "
+            Identifier 148..154 "master"
+            Semicolon 154..155 ";"
+        AliasDecl 155..189
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 158..163 "alias"
+            trail Whitespace " "
+          Identifier 164..169 "slave"
+            trail Whitespace " "
+          KwIs 170..172 "is"
+            trail Whitespace " "
+          AttributeName 173..188
+            SimpleName 173..179
+              Identifier 173..179 "master"
+            Tick 179..180 "'"
+            Identifier 180..188 "converse"
+          Semicolon 188..189 ";"
+      EndClause 189..194
+          lead Newline "\n"
+        KwEnd 190..193 "end"
+        Semicolon 193..194 ";"
+    lead Newline "\n"
+  EOF 195..195 ""

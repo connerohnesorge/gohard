@@ -1,0 +1,14 @@
+gohard-trace 1
+testbench "\\T B\\"
+end 0
+type character enum "' '" '"' nul
+type std_logic logic
+type std_logic_vector array std_logic
+type str array character
+signal tb.\a.b\ str signal 1 to 2
+signal "tb.\\my sig\\" character signal
+signal tb.null std_logic_vector signal 0 to -1
+0 0 tb.\a.b\ [ '"' nul ] -
+0 0 "tb.\\my sig\\" "' '" -
+0 0 tb.null "" -
+0 0 ! report failure "my tb.vhd:3" - "tab\there é"

@@ -1,0 +1,1 @@
+gohard trace export --format=fst .gohard/traces/tb-7.trace -o tb-7.fst

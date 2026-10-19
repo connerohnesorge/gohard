@@ -1,0 +1,113 @@
+DesignFile 0..154
+  DesignUnit 0..153
+    ContextClause 0..0
+    EntityDecl 0..153
+      KwEntity 0..6 "entity"
+        trail Whitespace " "
+      Identifier 7..8 "e"
+        trail Whitespace " "
+      KwIs 9..11 "is"
+      GenericClause 11..148
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwGeneric 14..21 "generic"
+          trail Whitespace " "
+        InterfaceList 22..147
+          LParen 22..23 "("
+          InterfaceTypeDecl 23..34
+              lead Newline "\n"
+              lead Whitespace "    "
+            KwType 28..32 "type"
+              trail Whitespace " "
+            Identifier 33..34 "t"
+          Semicolon 34..35 ";"
+          InterfaceSubprogramDecl 35..83
+            FunctionSpec 35..78
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwFunction 40..48 "function"
+                trail Whitespace " "
+              Identifier 49..51 "eq"
+                trail Whitespace " "
+              ParameterList 52..63
+                InterfaceList 52..63
+                  LParen 52..53 "("
+                  InterfaceObjectDecl 53..61
+                    IdentifierList 53..58
+                      Identifier 53..54 "a"
+                      Comma 54..55 ","
+                        trail Whitespace " "
+                      Identifier 56..57 "b"
+                        trail Whitespace " "
+                    Colon 58..59 ":"
+                      trail Whitespace " "
+                    SubtypeIndication 60..61
+                      SimpleName 60..61
+                        Identifier 60..61 "t"
+                  RParen 61..62 ")"
+                    trail Whitespace " "
+              ReturnSpec 63..78
+                KwReturn 63..69 "return"
+                  trail Whitespace " "
+                SimpleName 70..78
+                  Identifier 70..77 "boolean"
+                    trail Whitespace " "
+            InterfaceSubprogramDefault 78..83
+              KwIs 78..80 "is"
+                trail Whitespace " "
+              Box 81..83 "<>"
+          Semicolon 83..84 ";"
+          InterfacePackageDecl 84..143
+              lead Newline "\n"
+              lead Whitespace "    "
+            KwPackage 89..96 "package"
+              trail Whitespace " "
+            Identifier 97..98 "g"
+              trail Whitespace " "
+            KwIs 99..101 "is"
+              trail Whitespace " "
+            KwNew 102..105 "new"
+              trail Whitespace " "
+            SelectedName 106..114
+              SimpleName 106..110
+                Identifier 106..110 "work"
+              Dot 110..111 "."
+              Identifier 111..113 "gp"
+                trail Whitespace " "
+            GenericMapAspect 114..143
+              KwGeneric 114..121 "generic"
+                trail Whitespace " "
+              KwMap 122..125 "map"
+                trail Whitespace " "
+              AssociationList 126..143
+                LParen 126..127 "("
+                AssociationElement 127..134
+                  SimpleName 127..129
+                    Identifier 127..128 "n"
+                      trail Whitespace " "
+                  Arrow 129..131 "=>"
+                    trail Whitespace " "
+                  BoxExpr 132..134
+                    Box 132..134 "<>"
+                Comma 134..135 ","
+                  trail Whitespace " "
+                AssociationElement 136..142
+                  SimpleName 136..138
+                    Identifier 136..137 "m"
+                      trail Whitespace " "
+                  Arrow 138..140 "=>"
+                    trail Whitespace " "
+                  LiteralExpr 141..142
+                    IntegerLiteral 141..142 "1"
+                RParen 142..143 ")"
+            lead Newline "\n"
+            lead Whitespace "  "
+          RParen 146..147 ")"
+        Semicolon 147..148 ";"
+      DeclarativePart 148..148
+      EndClause 148..153
+          lead Newline "\n"
+        KwEnd 149..152 "end"
+        Semicolon 152..153 ";"
+    lead Newline "\n"
+  EOF 154..154 ""

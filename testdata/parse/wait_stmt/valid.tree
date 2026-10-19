@@ -1,0 +1,84 @@
+DesignFile 0..122
+  DesignUnit 0..121
+    ContextClause 0..0
+    ArchitectureBody 0..121
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..116
+        ProcessStmt 28..116
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..101
+            WaitStmt 49..91
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwWait 54..58 "wait"
+                trail Whitespace " "
+              SensitivityClause 59..67
+                KwOn 59..61 "on"
+                  trail Whitespace " "
+                SensitivityList 62..67
+                  SimpleName 62..63
+                    Identifier 62..63 "a"
+                  Comma 63..64 ","
+                    trail Whitespace " "
+                  SimpleName 65..67
+                    Identifier 65..66 "b"
+                      trail Whitespace " "
+              ConditionClause 67..81
+                KwUntil 67..72 "until"
+                  trail Whitespace " "
+                BinaryExpr 73..81
+                  SimpleName 73..75
+                    Identifier 73..74 "c"
+                      trail Whitespace " "
+                  Eq 75..76 "="
+                    trail Whitespace " "
+                  LiteralExpr 77..81
+                    CharacterLiteral 77..80 "'1'"
+                      trail Whitespace " "
+              TimeoutClause 81..90
+                KwFor 81..84 "for"
+                  trail Whitespace " "
+                PhysicalLiteral 85..90
+                  IntegerLiteral 85..87 "10"
+                    trail Whitespace " "
+                  SimpleName 88..90
+                    Identifier 88..90 "ns"
+              Semicolon 90..91 ";"
+            WaitStmt 91..101
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwWait 96..100 "wait"
+              Semicolon 100..101 ";"
+          EndClause 101..116
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 104..107 "end"
+              trail Whitespace " "
+            KwProcess 108..115 "process"
+            Semicolon 115..116 ";"
+      EndClause 116..121
+          lead Newline "\n"
+        KwEnd 117..120 "end"
+        Semicolon 120..121 ";"
+    lead Newline "\n"
+  EOF 122..122 ""

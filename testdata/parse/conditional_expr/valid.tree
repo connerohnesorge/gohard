@@ -1,0 +1,91 @@
+DesignFile 0..120
+  DesignUnit 0..119
+    ContextClause 0..0
+    PackageDecl 0..119
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..114
+        ConstantDecl 12..57
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "c"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..36
+            SimpleName 28..36
+              Identifier 28..35 "integer"
+                trail Whitespace " "
+          VarAssign 36..38 ":="
+            trail Whitespace " "
+          ConditionalExpr 39..56
+            WhenBranch 39..50
+              LiteralExpr 39..41
+                IntegerLiteral 39..40 "1"
+                  trail Whitespace " "
+              KwWhen 41..45 "when"
+                trail Whitespace " "
+              SimpleName 46..50
+                Identifier 46..49 "sel"
+                  trail Whitespace " "
+            KwElse 50..54 "else"
+              trail Whitespace " "
+            WhenBranch 55..56
+              LiteralExpr 55..56
+                IntegerLiteral 55..56 "2"
+          Semicolon 56..57 ";"
+        ConstantDecl 57..114
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 60..68 "constant"
+            trail Whitespace " "
+          IdentifierList 69..71
+            Identifier 69..70 "d"
+              trail Whitespace " "
+          Colon 71..72 ":"
+            trail Whitespace " "
+          SubtypeIndication 73..81
+            SimpleName 73..81
+              Identifier 73..80 "integer"
+                trail Whitespace " "
+          VarAssign 81..83 ":="
+            trail Whitespace " "
+          ConditionalExpr 84..113
+            WhenBranch 84..93
+              LiteralExpr 84..86
+                IntegerLiteral 84..85 "1"
+                  trail Whitespace " "
+              KwWhen 86..90 "when"
+                trail Whitespace " "
+              SimpleName 91..93
+                Identifier 91..92 "a"
+                  trail Whitespace " "
+            KwElse 93..97 "else"
+              trail Whitespace " "
+            WhenBranch 98..107
+              LiteralExpr 98..100
+                IntegerLiteral 98..99 "2"
+                  trail Whitespace " "
+              KwWhen 100..104 "when"
+                trail Whitespace " "
+              SimpleName 105..107
+                Identifier 105..106 "b"
+                  trail Whitespace " "
+            KwElse 107..111 "else"
+              trail Whitespace " "
+            WhenBranch 112..113
+              LiteralExpr 112..113
+                IntegerLiteral 112..113 "3"
+          Semicolon 113..114 ";"
+      EndClause 114..119
+          lead Newline "\n"
+        KwEnd 115..118 "end"
+        Semicolon 118..119 ";"
+    lead Newline "\n"
+  EOF 120..120 ""

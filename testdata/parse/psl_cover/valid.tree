@@ -1,0 +1,53 @@
+DesignFile 0..73
+  DesignUnit 0..72
+    ContextClause 0..0
+    ArchitectureBody 0..72
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..67
+        PSLCover 28..67
+          Label 28..36
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 31..33 "c1"
+              trail Whitespace " "
+            Colon 34..35 ":"
+              trail Whitespace " "
+          KwCover 36..41 "cover"
+            trail Whitespace " "
+          PSLBracedSere 42..53
+            LBrace 42..43 "{"
+            PSLSereConcat 43..51
+              PSLBoolean 43..46
+                SimpleName 43..46
+                  Identifier 43..46 "req"
+              Semicolon 46..47 ";"
+                trail Whitespace " "
+              PSLBoolean 48..51
+                SimpleName 48..51
+                  Identifier 48..51 "ack"
+            RBrace 51..52 "}"
+              trail Whitespace " "
+          PSLReport 53..66
+            KwReport 53..59 "report"
+              trail Whitespace " "
+            LiteralExpr 60..66
+              StringLiteral 60..66 "\"seen\""
+          Semicolon 66..67 ";"
+      EndClause 67..72
+          lead Newline "\n"
+        KwEnd 68..71 "end"
+        Semicolon 71..72 ";"
+    lead Newline "\n"
+  EOF 73..73 ""

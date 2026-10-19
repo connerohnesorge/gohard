@@ -1,0 +1,49 @@
+DesignFile 0..81
+  DesignUnit 0..80
+    ContextClause 0..0
+    ArchitectureBody 0..80
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..69
+        FileDecl 22..69
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwFile 25..29 "file"
+            trail Whitespace " "
+          IdentifierList 30..33
+            Identifier 30..32 "f1"
+              trail Whitespace " "
+          Colon 33..34 ":"
+            trail Whitespace " "
+          SubtypeIndication 35..40
+            SimpleName 35..40
+              Identifier 35..39 "text"
+                trail Whitespace " "
+          FileOpenInformation 40..68
+            KwOpen 40..44 "open"
+              trail Whitespace " "
+            SimpleName 45..56
+              Identifier 45..55 "write_mode"
+                trail Whitespace " "
+            KwIs 56..58 "is"
+              trail Whitespace " "
+            LiteralExpr 59..68
+              StringLiteral 59..68 "\"out.txt\""
+          Semicolon 68..69 ";"
+        lead Newline "\n"
+      KwBegin 70..75 "begin"
+      StatementPart 75..75
+      EndClause 75..80
+          lead Newline "\n"
+        KwEnd 76..79 "end"
+        Semicolon 79..80 ";"
+    lead Newline "\n"
+  EOF 81..81 ""

@@ -1,0 +1,47 @@
+DesignFile 0..86
+  DesignUnit 0..85
+    ContextClause 0..0
+    ArchitectureBody 0..85
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..80
+        PSLAssert 28..80
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 31..37 "assert"
+            trail Whitespace " "
+          PSLAlways 38..47
+            KwAlways 38..44 "always"
+              trail Whitespace " "
+            PSLBoolean 45..47
+              SimpleName 45..47
+                Identifier 45..46 "a"
+                  trail Whitespace " "
+          PSLReport 47..79
+            KwReport 47..53 "report"
+              trail Whitespace " "
+            LiteralExpr 54..63
+              StringLiteral 54..62 "\"a fell\""
+                trail Whitespace " "
+            KwSeverity 63..71 "severity"
+              trail Whitespace " "
+            SimpleName 72..79
+              Identifier 72..79 "warning"
+          Semicolon 79..80 ";"
+      EndClause 80..85
+          lead Newline "\n"
+        KwEnd 81..84 "end"
+        Semicolon 84..85 ";"
+    lead Newline "\n"
+  EOF 86..86 ""

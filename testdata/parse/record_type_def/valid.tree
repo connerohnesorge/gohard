@@ -1,0 +1,63 @@
+DesignFile 0..92
+  DesignUnit 0..91
+    ContextClause 0..0
+    PackageDecl 0..91
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..86
+        TypeDecl 12..86
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..24 "pair"
+            trail Whitespace " "
+          KwIs 25..27 "is"
+            trail Whitespace " "
+          RecordTypeDef 28..86
+            KwRecord 28..34 "record"
+            ElementDecl 34..51
+              IdentifierList 34..41
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 39..40 "a"
+                  trail Whitespace " "
+              Colon 41..42 ":"
+                trail Whitespace " "
+              SubtypeIndication 43..50
+                SimpleName 43..50
+                  Identifier 43..50 "integer"
+              Semicolon 50..51 ";"
+            ElementDecl 51..67
+              IdentifierList 51..61
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 56..57 "b"
+                Comma 57..58 ","
+                  trail Whitespace " "
+                Identifier 59..60 "c"
+                  trail Whitespace " "
+              Colon 61..62 ":"
+                trail Whitespace " "
+              SubtypeIndication 63..66
+                SimpleName 63..66
+                  Identifier 63..66 "bit"
+              Semicolon 66..67 ";"
+            EndClause 67..86
+                lead Newline "\n"
+                lead Whitespace "  "
+              KwEnd 70..73 "end"
+                trail Whitespace " "
+              KwRecord 74..80 "record"
+                trail Whitespace " "
+              Identifier 81..85 "pair"
+              Semicolon 85..86 ";"
+      EndClause 86..91
+          lead Newline "\n"
+        KwEnd 87..90 "end"
+        Semicolon 90..91 ";"
+    lead Newline "\n"
+  EOF 92..92 ""

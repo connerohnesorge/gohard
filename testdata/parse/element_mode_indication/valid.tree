@@ -1,0 +1,78 @@
+DesignFile 0..125
+  DesignUnit 0..124
+    ContextClause 0..0
+    PackageDecl 0..124
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..119
+        ModeViewDecl 12..119
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwView 15..19 "view"
+            trail Whitespace " "
+          Identifier 20..25 "outer"
+            trail Whitespace " "
+          KwOf 26..28 "of"
+            trail Whitespace " "
+          SubtypeIndication 29..37
+            SimpleName 29..37
+              Identifier 29..36 "outer_t"
+                trail Whitespace " "
+          KwIs 37..39 "is"
+          ModeViewElementDef 39..58
+            IdentifierList 39..50
+                lead Newline "\n"
+                lead Whitespace "    "
+              Identifier 44..49 "plain"
+                trail Whitespace " "
+            Colon 50..51 ":"
+              trail Whitespace " "
+            ElementModeIndication 52..57
+              KwInout 52..57 "inout"
+            Semicolon 57..58 ";"
+          ModeViewElementDef 58..83
+            IdentifierList 58..70
+                lead Newline "\n"
+                lead Whitespace "    "
+              Identifier 63..69 "nested"
+                trail Whitespace " "
+            Colon 70..71 ":"
+              trail Whitespace " "
+            ElementModeIndication 72..82
+              KwView 72..76 "view"
+                trail Whitespace " "
+              SimpleName 77..82
+                Identifier 77..82 "inner"
+            Semicolon 82..83 ";"
+          ModeViewElementDef 83..107
+            IdentifierList 83..92
+                lead Newline "\n"
+                lead Whitespace "    "
+              Identifier 88..91 "arr"
+                trail Whitespace " "
+            Colon 92..93 ":"
+              trail Whitespace " "
+            ElementModeIndication 94..106
+              KwView 94..98 "view"
+                trail Whitespace " "
+              LParen 99..100 "("
+              SimpleName 100..105
+                Identifier 100..105 "inner"
+              RParen 105..106 ")"
+            Semicolon 106..107 ";"
+          EndClause 107..119
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 110..113 "end"
+              trail Whitespace " "
+            KwView 114..118 "view"
+            Semicolon 118..119 ";"
+      EndClause 119..124
+          lead Newline "\n"
+        KwEnd 120..123 "end"
+        Semicolon 123..124 ";"
+    lead Newline "\n"
+  EOF 125..125 ""

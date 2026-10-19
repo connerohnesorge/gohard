@@ -1,0 +1,54 @@
+attr 7 "boolean 2 false true 0 1" 1
+attr 7 "state_t 3 idle run done 00 01 10" 2
+scope 12 tb tb_counter(sim)
+attr 2 "std_logic" 1030
+var 23 0 clk 1
+scope 12 dut counter(rtl)
+scope 15 bus bus_t
+attr 2 "std_logic_vector" 1031
+var 23 0 addr[3:0] 4
+attr 7 "" 1
+attr 2 "boolean" 1025
+var 28 0 valid 1
+upscope
+attr 2 "std_logic" 1030
+var 23 1 clk 1
+attr 2 "std_logic_vector" 1031
+var 23 2 count_q[7:0] 8
+attr 2 "time" 1038
+var 21 0 delay 0
+attr 2 "bit" 1026
+var 23 0 flag 1
+attr 2 "natural" 1036
+var 1 0 hist[0] 31
+attr 2 "natural" 1036
+var 1 0 hist[1] 31
+attr 2 "natural" 1036
+var 1 0 hist[2] 31
+attr 2 "natural" 1036
+var 1 0 n 31
+attr 2 "real" 1035
+var 3 0 ratio 8
+attr 7 "" 2
+attr 2 "state_t" 1024
+var 28 0 state 2
+upscope
+scope 18 gen(0) 
+attr 7 "" 2
+attr 2 "state_t" 1024
+var 28 0 mode[1] 2
+attr 7 "" 2
+attr 2 "state_t" 1024
+var 28 0 mode[2] 2
+upscope
+scope 12 mem mem_model(model)
+attr 2 "std_logic_vector" 1031
+var 23 2 dout[3:0] 4
+upscope
+attr 2 "std_logic" 1030
+var 23 0 rst 1
+upscope
+scope 12 top2 other(rtl)
+attr 2 "integer" 1034
+var 1 0 x 32
+upscope

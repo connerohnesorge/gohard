@@ -1,0 +1,2 @@
+{"jsonrpc":"2.0","id":1,"result":{"capabilities":{"positionEncoding":"utf-8","textDocumentSync":{"change":2,"openClose":true,"save":{"includeText":false}},"workspace":{"workspaceFolders":{"supported":true}}},"serverInfo":{"name":"gohard","version":"0.0.0-test"}}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":0,"id":1}}

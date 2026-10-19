@@ -1,0 +1,321 @@
+DesignFile 0..1179
+  DesignUnit 0..1178
+    ContextClause 0..178
+      LibraryClause 0..149
+          lead LineComment "-- mode_views: package with a record bus type, a mode view and its"
+          lead Newline "\n"
+          lead LineComment "-- converse alias, plus conditional-analysis directives (VHDL-2019)."
+          lead Newline "\n"
+        KwLibrary 136..143 "library"
+          trail Whitespace " "
+        SimpleName 144..148
+          Identifier 144..148 "ieee"
+        Semicolon 148..149 ";"
+      UseClause 149..178
+          lead Newline "\n"
+        KwUse 150..153 "use"
+          trail Whitespace " "
+        SelectedName 154..177
+          SelectedName 154..173
+            SimpleName 154..158
+              Identifier 154..158 "ieee"
+            Dot 158..159 "."
+            Identifier 159..173 "std_logic_1164"
+          Dot 173..174 "."
+          KwAll 174..177 "all"
+        Semicolon 177..178 ";"
+    PackageDecl 178..1178
+        lead Newline "\n"
+        lead Newline "\n"
+      KwPackage 180..187 "package"
+        trail Whitespace " "
+      Identifier 188..202 "mode_views_pkg"
+        trail Whitespace " "
+      KwIs 203..205 "is"
+      DeclarativePart 205..1090
+        TypeDecl 205..334
+            lead Newline "\n"
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 209..213 "type"
+            trail Whitespace " "
+          Identifier 214..219 "bus_t"
+            trail Whitespace " "
+          KwIs 220..222 "is"
+            trail Whitespace " "
+          RecordTypeDef 223..334
+            KwRecord 223..229 "record"
+            ElementDecl 229..251
+              IdentifierList 229..239
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 234..237 "req"
+                  trail Whitespace "  "
+              Colon 239..240 ":"
+                trail Whitespace " "
+              SubtypeIndication 241..250
+                SimpleName 241..250
+                  Identifier 241..250 "std_logic"
+              Semicolon 250..251 ";"
+            ElementDecl 251..292
+              IdentifierList 251..261
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 256..260 "data"
+                  trail Whitespace " "
+              Colon 261..262 ":"
+                trail Whitespace " "
+              SubtypeIndication 263..291
+                SimpleName 263..279
+                  Identifier 263..279 "std_logic_vector"
+                ArrayConstraint 279..291
+                  LParen 279..280 "("
+                  RangeExpr 280..290
+                    LiteralExpr 280..282
+                      IntegerLiteral 280..281 "7"
+                        trail Whitespace " "
+                    KwDownto 282..288 "downto"
+                      trail Whitespace " "
+                    LiteralExpr 289..290
+                      IntegerLiteral 289..290 "0"
+                  RParen 290..291 ")"
+              Semicolon 291..292 ";"
+            ElementDecl 292..314
+              IdentifierList 292..302
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 297..300 "ack"
+                  trail Whitespace "  "
+              Colon 302..303 ":"
+                trail Whitespace " "
+              SubtypeIndication 304..313
+                SimpleName 304..313
+                  Identifier 304..313 "std_logic"
+              Semicolon 313..314 ";"
+            EndClause 314..334
+                lead Newline "\n"
+                lead Whitespace "  "
+              KwEnd 317..320 "end"
+                trail Whitespace " "
+              KwRecord 321..327 "record"
+                trail Whitespace " "
+              Identifier 328..333 "bus_t"
+              Semicolon 333..334 ";"
+        ModeViewDecl 334..487
+            lead Newline "\n"
+            lead Newline "\n"
+            lead Whitespace "  "
+            lead LineComment "-- Producer side: drives req and data, reads ack."
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwView 390..394 "view"
+            trail Whitespace " "
+          Identifier 395..405 "producer_v"
+            trail Whitespace " "
+          KwOf 406..408 "of"
+            trail Whitespace " "
+          SubtypeIndication 409..415
+            SimpleName 409..415
+              Identifier 409..414 "bus_t"
+                trail Whitespace " "
+          KwIs 415..417 "is"
+          ModeViewElementDef 417..433
+            IdentifierList 417..427
+                lead Newline "\n"
+                lead Whitespace "    "
+              Identifier 422..425 "req"
+                trail Whitespace "  "
+            Colon 427..428 ":"
+              trail Whitespace " "
+            ElementModeIndication 429..432
+              KwOut 429..432 "out"
+            Semicolon 432..433 ";"
+          ModeViewElementDef 433..449
+            IdentifierList 433..443
+                lead Newline "\n"
+                lead Whitespace "    "
+              Identifier 438..442 "data"
+                trail Whitespace " "
+            Colon 443..444 ":"
+              trail Whitespace " "
+            ElementModeIndication 445..448
+              KwOut 445..448 "out"
+            Semicolon 448..449 ";"
+          ModeViewElementDef 449..464
+            IdentifierList 449..459
+                lead Newline "\n"
+                lead Whitespace "    "
+              Identifier 454..457 "ack"
+                trail Whitespace "  "
+            Colon 459..460 ":"
+              trail Whitespace " "
+            ElementModeIndication 461..463
+              KwIn 461..463 "in"
+            Semicolon 463..464 ";"
+          EndClause 464..487
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 467..470 "end"
+              trail Whitespace " "
+            KwView 471..475 "view"
+              trail Whitespace " "
+            Identifier 476..486 "producer_v"
+            Semicolon 486..487 ";"
+        AliasDecl 487..586
+            lead Newline "\n"
+            lead Newline "\n"
+            lead Whitespace "  "
+            lead LineComment "-- Consumer side: the converse of the producer view."
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 546..551 "alias"
+            trail Whitespace " "
+          Identifier 552..562 "consumer_v"
+            trail Whitespace " "
+          KwIs 563..565 "is"
+            trail Whitespace " "
+          AttributeName 566..585
+            SimpleName 566..576
+              Identifier 566..576 "producer_v"
+            Tick 576..577 "'"
+            Identifier 577..585 "converse"
+          Semicolon 585..586 ";"
+        ConstantDecl 586..790
+            lead Newline "\n"
+            lead Newline "\n"
+            lead Whitespace "  "
+            lead LineComment "-- Built-in identifier: active under 2019; the `else branch is the"
+            lead Newline "\n"
+            lead Whitespace "  "
+            lead LineComment "-- inactive branch (valid VHDL, so it adds no diagnostic)."
+            lead Newline "\n"
+            lead Directive "`if VHDL_VERSION >= \"2019\" then"
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 752..760 "constant"
+            trail Whitespace " "
+          IdentifierList 761..771
+            Identifier 761..770 "C_STD_TAG"
+              trail Whitespace " "
+          Colon 771..772 ":"
+            trail Whitespace " "
+          SubtypeIndication 773..780
+            SimpleName 773..780
+              Identifier 773..779 "string"
+                trail Whitespace " "
+          VarAssign 780..782 ":="
+            trail Whitespace " "
+          LiteralExpr 783..789
+            StringLiteral 783..789 "\"2019\""
+          Semicolon 789..790 ";"
+        InactiveBranch 790..836
+          ConstantDecl 790..836
+              lead Newline "\n"
+              lead Directive "`else"
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwConstant 799..807 "constant" inactive
+              trail Whitespace " "
+            IdentifierList 808..818
+              Identifier 808..817 "C_STD_TAG" inactive
+                trail Whitespace " "
+            Colon 818..819 ":" inactive
+              trail Whitespace " "
+            SubtypeIndication 820..827
+              SimpleName 820..827
+                Identifier 820..826 "string" inactive
+                  trail Whitespace " "
+            VarAssign 827..829 ":=" inactive
+              trail Whitespace " "
+            LiteralExpr 830..835
+              StringLiteral 830..835 "\"old\"" inactive
+            Semicolon 835..836 ";" inactive
+        ConstantDecl 836..994
+            lead Newline "\n"
+            lead Directive "`end if"
+            lead Newline "\n"
+            lead Newline "\n"
+            lead Whitespace "  "
+            lead LineComment "-- User identifier from defines: (MV_PROFILE = \"wide\")."
+            lead Newline "\n"
+            lead Directive "`if MV_PROFILE = \"wide\" then"
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 935..943 "constant"
+            trail Whitespace " "
+          IdentifierList 944..954
+            Identifier 944..953 "C_XOR_KEY"
+              trail Whitespace " "
+          Colon 954..955 ":"
+            trail Whitespace " "
+          SubtypeIndication 956..985
+            SimpleName 956..972
+              Identifier 956..972 "std_logic_vector"
+            ArrayConstraint 972..985
+              LParen 972..973 "("
+              RangeExpr 973..983
+                LiteralExpr 973..975
+                  IntegerLiteral 973..974 "7"
+                    trail Whitespace " "
+                KwDownto 975..981 "downto"
+                  trail Whitespace " "
+                LiteralExpr 982..983
+                  IntegerLiteral 982..983 "0"
+              RParen 983..984 ")"
+                trail Whitespace " "
+          VarAssign 985..987 ":="
+            trail Whitespace " "
+          LiteralExpr 988..993
+            BitStringLiteral 988..993 "x\"A5\""
+          Semicolon 993..994 ";"
+        InactiveBranch 994..1090
+          ConstantDecl 994..1090
+              lead Newline "\n"
+              lead Directive "`elsif MV_PROFILE = \"narrow\" then"
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwConstant 1031..1039 "constant" inactive
+              trail Whitespace " "
+            IdentifierList 1040..1050
+              Identifier 1040..1049 "C_XOR_KEY" inactive
+                trail Whitespace " "
+            Colon 1050..1051 ":" inactive
+              trail Whitespace " "
+            SubtypeIndication 1052..1081
+              SimpleName 1052..1068
+                Identifier 1052..1068 "std_logic_vector" inactive
+              ArrayConstraint 1068..1081
+                LParen 1068..1069 "(" inactive
+                RangeExpr 1069..1079
+                  LiteralExpr 1069..1071
+                    IntegerLiteral 1069..1070 "7" inactive
+                      trail Whitespace " "
+                  KwDownto 1071..1077 "downto" inactive
+                    trail Whitespace " "
+                  LiteralExpr 1078..1079
+                    IntegerLiteral 1078..1079 "0" inactive
+                RParen 1079..1080 ")" inactive
+                  trail Whitespace " "
+            VarAssign 1081..1083 ":=" inactive
+              trail Whitespace " "
+            LiteralExpr 1084..1089
+              BitStringLiteral 1084..1089 "x\"0F\"" inactive
+            Semicolon 1089..1090 ";" inactive
+      EndClause 1090..1178
+          lead Newline "\n"
+          lead Directive "`else"
+          lead Newline "\n"
+          lead Whitespace "  "
+          lead Directive "`error \"MV_PROFILE must be wide or narrow\""
+          lead Newline "\n"
+          lead Directive "`end if"
+          lead Newline "\n"
+          lead Newline "\n"
+        KwEnd 1151..1154 "end"
+          trail Whitespace " "
+        KwPackage 1155..1162 "package"
+          trail Whitespace " "
+        Identifier 1163..1177 "mode_views_pkg"
+        Semicolon 1177..1178 ";"
+    lead Newline "\n"
+  EOF 1179..1179 ""

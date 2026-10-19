@@ -1,0 +1,4 @@
+invalid.vhd:2:51: error[syntax/error]: expected '(', found identifier n
+invalid.vhd:2:51: error[syntax/error]: expected ';', found identifier n
+invalid.vhd:2:52: error[syntax/error]: expected a declaration, found identifier n
+summary: 3 errors, 0 warnings, 0 hints, 1 files

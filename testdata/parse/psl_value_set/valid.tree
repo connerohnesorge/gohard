@@ -1,0 +1,71 @@
+DesignFile 0..85
+  DesignUnit 0..84
+    ContextClause 0..0
+    ArchitectureBody 0..84
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..79
+        PSLAssert 28..79
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 31..37 "assert"
+            trail Whitespace " "
+          PSLForall 38..78
+            KwForall 38..44 "forall"
+              trail Whitespace " "
+            Identifier 45..46 "i"
+              trail Whitespace " "
+            KwIn 47..49 "in"
+              trail Whitespace " "
+            PSLValueSet 50..65
+              LBrace 50..51 "{"
+              LiteralExpr 51..52
+                IntegerLiteral 51..52 "0"
+              Comma 52..53 ","
+                trail Whitespace " "
+              LiteralExpr 54..55
+                IntegerLiteral 54..55 "2"
+              Comma 55..56 ","
+                trail Whitespace " "
+              LiteralExpr 57..59
+                IntegerLiteral 57..58 "4"
+                  trail Whitespace " "
+              KwTo 59..61 "to"
+                trail Whitespace " "
+              LiteralExpr 62..63
+                IntegerLiteral 62..63 "6"
+              RBrace 63..64 "}"
+                trail Whitespace " "
+            Colon 65..66 ":"
+              trail Whitespace " "
+            PSLAlways 67..78
+              KwAlways 67..73 "always"
+                trail Whitespace " "
+              PSLBoolean 74..78
+                CallOrIndexName 74..78
+                  SimpleName 74..75
+                    Identifier 74..75 "a"
+                  AssociationList 75..78
+                    LParen 75..76 "("
+                    AssociationElement 76..77
+                      SimpleName 76..77
+                        Identifier 76..77 "i"
+                    RParen 77..78 ")"
+          Semicolon 78..79 ";"
+      EndClause 79..84
+          lead Newline "\n"
+        KwEnd 80..83 "end"
+        Semicolon 83..84 ";"
+    lead Newline "\n"
+  EOF 85..85 ""

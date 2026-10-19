@@ -1,0 +1,62 @@
+DesignFile 0..77
+  DesignUnit 0..76
+    ContextClause 0..0
+    PackageDecl 0..76
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..71
+        ModeViewDecl 12..71
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwView 15..19 "view"
+            trail Whitespace " "
+          Identifier 20..21 "v"
+            trail Whitespace " "
+          KwOf 22..24 "of"
+            trail Whitespace " "
+          SubtypeIndication 25..29
+            SimpleName 25..29
+              Identifier 25..28 "rec"
+                trail Whitespace " "
+          KwIs 29..31 "is"
+          ModeViewElementDef 31..46
+            IdentifierList 31..41
+                lead Newline "\n"
+                lead Whitespace "    "
+              Identifier 36..37 "a"
+              Comma 37..38 ","
+                trail Whitespace " "
+              Identifier 39..40 "b"
+                trail Whitespace " "
+            Colon 41..42 ":"
+              trail Whitespace " "
+            ElementModeIndication 43..45
+              KwIn 43..45 "in"
+            Semicolon 45..46 ";"
+          ModeViewElementDef 46..59
+            IdentifierList 46..53
+                lead Newline "\n"
+                lead Whitespace "    "
+              Identifier 51..52 "c"
+                trail Whitespace " "
+            Colon 53..54 ":"
+              trail Whitespace " "
+            ElementModeIndication 55..58
+              KwOut 55..58 "out"
+            Semicolon 58..59 ";"
+          EndClause 59..71
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 62..65 "end"
+              trail Whitespace " "
+            KwView 66..70 "view"
+            Semicolon 70..71 ";"
+      EndClause 71..76
+          lead Newline "\n"
+        KwEnd 72..75 "end"
+        Semicolon 75..76 ";"
+    lead Newline "\n"
+  EOF 77..77 ""

@@ -1,0 +1,46 @@
+DesignFile 0..69
+  DesignUnit 0..68
+    ContextClause 0..0
+    PackageDecl 0..68
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..63
+        AliasDecl 12..63
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 15..20 "alias"
+            trail Whitespace " "
+          Identifier 21..22 "c"
+            trail Whitespace " "
+          KwIs 23..25 "is"
+            trail Whitespace " "
+          ExternalName 26..62
+            LtLt 26..28 "<<"
+              trail Whitespace " "
+            KwConstant 29..37 "constant"
+              trail Whitespace " "
+            PackagePathname 38..50
+              At 38..39 "@"
+              Identifier 39..43 "work"
+              Dot 43..44 "."
+              Identifier 44..47 "pkg"
+              Dot 47..48 "."
+              Identifier 48..49 "k"
+                trail Whitespace " "
+            Colon 50..51 ":"
+              trail Whitespace " "
+            SubtypeIndication 52..60
+              SimpleName 52..60
+                Identifier 52..59 "integer"
+                  trail Whitespace " "
+            GtGt 60..62 ">>"
+          Semicolon 62..63 ";"
+      EndClause 63..68
+          lead Newline "\n"
+        KwEnd 64..67 "end"
+        Semicolon 67..68 ";"
+    lead Newline "\n"
+  EOF 69..69 ""

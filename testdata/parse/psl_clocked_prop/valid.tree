@@ -1,0 +1,62 @@
+DesignFile 0..84
+  DesignUnit 0..83
+    ContextClause 0..0
+    ArchitectureBody 0..83
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..78
+        PSLAssert 28..78
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 31..37 "assert"
+            trail Whitespace " "
+          PSLClockedProp 38..77
+            PSLParenProp 38..59
+              LParen 38..39 "("
+              PSLAlways 39..57
+                KwAlways 39..45 "always"
+                  trail Whitespace " "
+                PSLImplication 46..57
+                  PSLBoolean 46..48
+                    SimpleName 46..48
+                      Identifier 46..47 "a"
+                        trail Whitespace " "
+                  PSLImplies 48..50 "->"
+                    trail Whitespace " "
+                  PSLNext 51..57
+                    KwNext 51..55 "next"
+                      trail Whitespace " "
+                    PSLBoolean 56..57
+                      SimpleName 56..57
+                        Identifier 56..57 "b"
+              RParen 57..58 ")"
+                trail Whitespace " "
+            At 59..60 "@"
+              trail Whitespace " "
+            CallOrIndexName 61..77
+              SimpleName 61..72
+                Identifier 61..72 "rising_edge"
+              AssociationList 72..77
+                LParen 72..73 "("
+                AssociationElement 73..76
+                  SimpleName 73..76
+                    Identifier 73..76 "clk"
+                RParen 76..77 ")"
+          Semicolon 77..78 ";"
+      EndClause 78..83
+          lead Newline "\n"
+        KwEnd 79..82 "end"
+        Semicolon 82..83 ";"
+    lead Newline "\n"
+  EOF 84..84 ""

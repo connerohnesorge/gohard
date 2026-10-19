@@ -1,0 +1,1 @@
+gohard: --define PROFILE=wide overrides defines.PROFILE: "narrow" (gohard.yaml:3:3)

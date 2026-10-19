@@ -1,0 +1,6 @@
+invalid.vhd:2:24: error[syntax/error]: expected reserved word of, found identifier real
+invalid.vhd:2:29: error[syntax/error]: expected ':', found ';'
+invalid.vhd:2:29: error[syntax/error]: expected an entity class, found ';'
+invalid.vhd:2:29: error[syntax/error]: expected an expression, found ';'
+invalid.vhd:2:29: error[syntax/error]: expected reserved word is, found ';'
+summary: 5 errors, 0 warnings, 0 hints, 1 files

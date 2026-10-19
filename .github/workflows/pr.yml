@@ -44,6 +44,9 @@ jobs:
         with:
           submodules: recursive
           persist-credentials: false
+          # The append-only kind-number check (gen-check.d) compares
+          # with the merge base of the PR's base branch.
+          fetch-depth: 0
 
       - uses: actions/setup-go@v7
         with:

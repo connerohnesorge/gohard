@@ -1,0 +1,65 @@
+DesignFile 0..105
+  DesignUnit 0..104
+    ContextClause 0..0
+    ArchitectureBody 0..104
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..99
+        PSLAssert 28..99
+          Label 28..36
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 31..33 "a1"
+              trail Whitespace " "
+            Colon 34..35 ":"
+              trail Whitespace " "
+          KwAssert 36..42 "assert"
+            trail Whitespace " "
+          PSLAlways 43..68
+            KwAlways 43..49 "always"
+              trail Whitespace " "
+            PSLParenProp 50..68
+              LParen 50..51 "("
+              PSLImplication 51..66
+                PSLBoolean 51..55
+                  SimpleName 51..55
+                    Identifier 51..54 "req"
+                      trail Whitespace " "
+                PSLImplies 55..57 "->"
+                  trail Whitespace " "
+                PSLNext 58..66
+                  KwNext 58..62 "next"
+                    trail Whitespace " "
+                  PSLBoolean 63..66
+                    SimpleName 63..66
+                      Identifier 63..66 "ack"
+              RParen 66..67 ")"
+                trail Whitespace " "
+          PSLReport 68..98
+            KwReport 68..74 "report"
+              trail Whitespace " "
+            LiteralExpr 75..84
+              StringLiteral 75..83 "\"no ack\""
+                trail Whitespace " "
+            KwSeverity 84..92 "severity"
+              trail Whitespace " "
+            SimpleName 93..98
+              Identifier 93..98 "error"
+          Semicolon 98..99 ";"
+      EndClause 99..104
+          lead Newline "\n"
+        KwEnd 100..103 "end"
+        Semicolon 103..104 ";"
+    lead Newline "\n"
+  EOF 105..105 ""

@@ -1,0 +1,29 @@
+DesignFile 0..40
+  DesignUnit 0..39
+    ContextClause 0..0
+    PSLVprop 0..39
+      KwVprop 0..5 "vprop"
+        trail Whitespace " "
+      Identifier 6..8 "pr"
+        trail Whitespace " "
+      LBrace 9..10 "{"
+      PSLPropertyDecl 10..37
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwProperty 13..21 "property"
+          trail Whitespace " "
+        Identifier 22..24 "p1"
+          trail Whitespace " "
+        KwIs 25..27 "is"
+          trail Whitespace " "
+        PSLAlways 28..36
+          KwAlways 28..34 "always"
+            trail Whitespace " "
+          PSLBoolean 35..36
+            SimpleName 35..36
+              Identifier 35..36 "a"
+        Semicolon 36..37 ";"
+        lead Newline "\n"
+      RBrace 38..39 "}"
+    lead Newline "\n"
+  EOF 40..40 ""

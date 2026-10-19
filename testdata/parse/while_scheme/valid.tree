@@ -1,0 +1,84 @@
+DesignFile 0..124
+  DesignUnit 0..123
+    ContextClause 0..0
+    ArchitectureBody 0..123
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..118
+        ProcessStmt 28..118
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..103
+            LoopStmt 49..103
+              WhileScheme 49..67
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwWhile 54..59 "while"
+                  trail Whitespace " "
+                BinaryExpr 60..67
+                  SimpleName 60..62
+                    Identifier 60..61 "i"
+                      trail Whitespace " "
+                  Lt 62..63 "<"
+                    trail Whitespace " "
+                  LiteralExpr 64..67
+                    IntegerLiteral 64..66 "10"
+                      trail Whitespace " "
+              KwLoop 67..71 "loop"
+              SequenceOfStatements 71..89
+                VariableAssignStmt 71..89
+                  Target 71..80
+                    SimpleName 71..80
+                        lead Newline "\n"
+                        lead Whitespace "      "
+                      Identifier 78..79 "i"
+                        trail Whitespace " "
+                  VarAssign 80..82 ":="
+                    trail Whitespace " "
+                  BinaryExpr 83..88
+                    SimpleName 83..85
+                      Identifier 83..84 "i"
+                        trail Whitespace " "
+                    Plus 85..86 "+"
+                      trail Whitespace " "
+                    LiteralExpr 87..88
+                      IntegerLiteral 87..88 "1"
+                  Semicolon 88..89 ";"
+              EndClause 89..103
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwEnd 94..97 "end"
+                  trail Whitespace " "
+                KwLoop 98..102 "loop"
+                Semicolon 102..103 ";"
+          EndClause 103..118
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 106..109 "end"
+              trail Whitespace " "
+            KwProcess 110..117 "process"
+            Semicolon 117..118 ";"
+      EndClause 118..123
+          lead Newline "\n"
+        KwEnd 119..122 "end"
+        Semicolon 122..123 ";"
+    lead Newline "\n"
+  EOF 124..124 ""

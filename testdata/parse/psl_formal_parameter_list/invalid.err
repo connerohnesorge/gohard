@@ -1,0 +1,4 @@
+invalid.vhd:2:28: error[syntax/error]: expected ')', found reserved word const
+invalid.vhd:2:28: error[syntax/error]: expected reserved word is, found reserved word const
+invalid.vhd:2:34: error[syntax/error]: expected ';', found reserved word numeric
+summary: 3 errors, 0 warnings, 0 hints, 1 files

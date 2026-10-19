@@ -1,0 +1,2 @@
+invalid.vhd:1:25: error[syntax/error]: expected an identifier, character literal, operator symbol or all, found ';'
+summary: 1 errors, 0 warnings, 0 hints, 1 files

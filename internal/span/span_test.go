@@ -3,6 +3,7 @@ package span
 import (
 	"fmt"
 	"testing"
+	"unicode/utf8"
 )
 
 // pieces are the alphabet of the generator: every kind of line
@@ -274,4 +275,34 @@ func FuzzIndex(f *testing.F) {
 			}
 		}
 	})
+}
+
+// TestUTF8PositionSnapsLikeForwardWalk: the O(1) UTF-8 column agrees,
+// at every byte offset (inside runes and on invalid UTF-8 too), with
+// counting bytes of whole runes decoded forward from the line start,
+// the definition the other encodings use.
+func TestUTF8PositionSnapsLikeForwardWalk(t *testing.T) {
+	for n, src := range inputs(3, 2000) {
+		b := []byte(src)
+		x := NewIndex(b)
+		for off := 0; off <= len(b); off++ {
+			line := x.Line(off)
+			start, end := x.LineStart(line), x.LineEnd(line)
+			o := max(start, min(off, end))
+			col := 0
+			for i := start; i < o; {
+				_, size := utf8.DecodeRune(b[i:end])
+				if i+size > o {
+					break
+				}
+				col += size
+				i += size
+			}
+			want := Position{Line: line, Col: col}
+			if got := x.Position(off, UTF8); got != want {
+				t.Fatalf("case %d %q off %d: %v, want %v", n, src, off,
+					got, want)
+			}
+		}
+	}
 }

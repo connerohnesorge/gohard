@@ -1,0 +1,31 @@
+DesignFile 0..42
+  DesignUnit 0..41
+    ContextClause 0..24
+      LibraryClause 0..24
+        KwLibrary 0..7 "library"
+          trail Whitespace " "
+        SimpleName 8..12
+          Identifier 8..12 "ieee"
+        Comma 12..13 ","
+          trail Whitespace " "
+        SimpleName 14..17
+          Identifier 14..17 "std"
+        Comma 17..18 ","
+          trail Whitespace " "
+        SimpleName 19..23
+          Identifier 19..23 "work"
+        Semicolon 23..24 ";"
+    EntityDecl 24..41
+        lead Newline "\n"
+      KwEntity 25..31 "entity"
+        trail Whitespace " "
+      Identifier 32..33 "e"
+        trail Whitespace " "
+      KwIs 34..36 "is"
+      DeclarativePart 36..36
+      EndClause 36..41
+          lead Newline "\n"
+        KwEnd 37..40 "end"
+        Semicolon 40..41 ";"
+    lead Newline "\n"
+  EOF 42..42 ""

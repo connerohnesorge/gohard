@@ -1,0 +1,94 @@
+DesignFile 0..144
+  DesignUnit 0..143
+    ContextClause 0..0
+    ArchitectureBody 0..143
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..132
+        PSLSequenceDecl 22..77
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSequence 25..33 "sequence"
+            trail Whitespace " "
+          Identifier 34..36 "s2"
+            trail Whitespace " "
+          PSLFormalParameterList 37..66
+            LParen 37..38 "("
+            PSLFormalParameter 38..53
+              KwConst 38..43 "const"
+                trail Whitespace " "
+              KwNumeric 44..51 "numeric"
+                trail Whitespace " "
+              Identifier 52..53 "n"
+            Semicolon 53..54 ";"
+              trail Whitespace " "
+            PSLFormalParameter 55..64
+              KwBoolean 55..62 "boolean"
+                trail Whitespace " "
+              Identifier 63..64 "b"
+            RParen 64..65 ")"
+              trail Whitespace " "
+          KwIs 66..68 "is"
+            trail Whitespace " "
+          PSLBracedSere 69..76
+            LBrace 69..70 "{"
+            PSLRepetition 70..75
+              PSLBoolean 70..71
+                SimpleName 70..71
+                  Identifier 70..71 "b"
+              PSLRepStar 71..73 "[*"
+              PSLCount 73..74
+                SimpleName 73..74
+                  Identifier 73..74 "n"
+              RBracket 74..75 "]"
+            RBrace 75..76 "}"
+          Semicolon 76..77 ";"
+        PSLPropertyDecl 77..132
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProperty 80..88 "property"
+            trail Whitespace " "
+          Identifier 89..91 "p3"
+            trail Whitespace " "
+          PSLFormalParameterList 92..120
+            LParen 92..93 "("
+            PSLFormalParameter 93..106
+              KwMutable 93..100 "mutable"
+                trail Whitespace " "
+              KwBit 101..104 "bit"
+                trail Whitespace " "
+              Identifier 105..106 "h"
+            Semicolon 106..107 ";"
+              trail Whitespace " "
+            PSLFormalParameter 108..118
+              KwProperty 108..116 "property"
+                trail Whitespace " "
+              Identifier 117..118 "q"
+            RParen 118..119 ")"
+              trail Whitespace " "
+          KwIs 120..122 "is"
+            trail Whitespace " "
+          PSLAlways 123..131
+            KwAlways 123..129 "always"
+              trail Whitespace " "
+            PSLBoolean 130..131
+              SimpleName 130..131
+                Identifier 130..131 "q"
+          Semicolon 131..132 ";"
+        lead Newline "\n"
+      KwBegin 133..138 "begin"
+      StatementPart 138..138
+      EndClause 138..143
+          lead Newline "\n"
+        KwEnd 139..142 "end"
+        Semicolon 142..143 ";"
+    lead Newline "\n"
+  EOF 144..144 ""

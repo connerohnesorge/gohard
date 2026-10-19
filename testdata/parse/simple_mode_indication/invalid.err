@@ -1,0 +1,3 @@
+invalid.vhd:2:15: error[syntax/error]: expected ';' or ')', found reserved word out
+invalid.vhd:2:15: error[syntax/error]: expected a subtype indication, found reserved word out
+summary: 2 errors, 0 warnings, 0 hints, 1 files

@@ -25,12 +25,12 @@ Triggers: `pull_request`, pushes to `main` and `v1`, manual dispatch.
 | Generated-file sync (`go generate ./...` then compare) | `gen-check.sh` | wired; no generators exist yet |
 | Kind renumbering | `gen-check.d/*.sh` hook | later: #31 adds `10-kind-numbers.sh` |
 | `detlint` | `detlint.sh` (`go run ./tools/detlint ./...`) | wired; needs `tools/detlint` (#30) |
-| `go test -race` on Linux | `race.sh` | wired for `internal/env/realenv`; later: #25 appends `internal/jsonrpc2` and `internal/server` |
+| `go test -race` on Linux | `race.sh` | wired for `internal/env/realenv`, `internal/jsonrpc2` and `internal/server` (real pipe transport) |
 | Parser-regression set (`pr` submodules, stdlib, corpus) | `regression.sh pr` | placeholder; later #31 with #8's `corpus.yaml` |
 | Corpus designs at seeds 0..3, `prot_cond` exit 2 | not yet | later: #35/#36 with #8 (a step in `pr.yml`) |
 | `testdata/cli` fixtures at `-p 1` and `-p 16` | `go test` (`internal/cli`) | wired |
-| `testdata/lsp` and `testdata/parse` fixtures | `go test` | later: #25, #31 add the harnesses |
-| Liveness workload (60 s virtual, 5 s no-progress rule) | `go test` | later: #25/#11 |
+| `testdata/lsp` and `testdata/parse` fixtures | `go test` | `testdata/lsp` wired (#25, see its README); `testdata/parse` later (#31) |
+| Liveness workload (60 s virtual, 5 s no-progress rule) | `go test` | wired: `TestLiveness` and `TestNoProgressRule` in `internal/server` |
 | `docs/libraries.md` examples, Neovim and Helix tests | new steps | later: #1, #38 |
 
 Formatting scope: every tracked or untracked, non-ignored `*.go` file,
@@ -56,11 +56,11 @@ Triggers: daily schedule and manual dispatch (input `fuzztime`, default
 
 | #30 item | Where | Status |
 | --- | --- | --- |
-| Fuzz each target for 10 minutes | `fuzz-targets.sh` (the one list) and `fuzz.sh` (one matrix job per target) | wired for `FuzzConfig` (#28) and `FuzzIndex`; later: #31 `FuzzParse`, #32 `FuzzFormat`, #25 `FuzzLSPReplay` append to the list |
+| Fuzz each target for 10 minutes | `fuzz-targets.sh` (the one list) and `fuzz.sh` (one matrix job per target) | wired for `FuzzConfig` (#28), `FuzzIndex` and `FuzzLSPReplay` (#25); later: #31 `FuzzParse`, #32 `FuzzFormat` append to the list |
 | Crash opens a PR adding the minimized input under `testdata/fuzz/<Target>/` | `fuzz.sh` | wired |
 | Every corpus design at 64 seeds | `corpus-seeds.sh` | placeholder; later #35/#36 with #8 |
 | Full parser-regression list (`pr` and `nightly` submodules) | `regression.sh nightly` | placeholder; later #31 |
-| Replay every LSP session in `testdata/seeds/` | `lsp-seeds.sh` | placeholder; later #25 |
+| Replay every LSP session in `testdata/seeds/` | `lsp-seeds.sh` | wired (`TestSeeds`, `TestLSPReplaySeeds`) |
 | Benchmarks (#19, #22), recorded, never failing | `bench.sh` | wired; runs every `Benchmark*` that exists, uploads `bench.txt` |
 
 Crash pull requests: `fuzz.sh` moves the input Go wrote to

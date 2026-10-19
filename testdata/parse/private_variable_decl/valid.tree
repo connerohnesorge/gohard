@@ -1,0 +1,62 @@
+DesignFile 0..118
+  DesignUnit 0..117
+    ContextClause 0..0
+    PackageDecl 0..117
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..112
+        TypeDecl 12..112
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..22 "pt"
+            trail Whitespace " "
+          KwIs 23..25 "is"
+            trail Whitespace " "
+          ProtectedTypeDef 26..112
+            KwProtected 26..35 "protected"
+            DeclarativePart 35..92
+              PrivateVariableDecl 35..73
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwPrivate 40..47 "private"
+                  trail Whitespace " "
+                VariableDecl 48..73
+                  KwVariable 48..56 "variable"
+                    trail Whitespace " "
+                  IdentifierList 57..63
+                    Identifier 57..62 "count"
+                      trail Whitespace " "
+                  Colon 63..64 ":"
+                    trail Whitespace " "
+                  SubtypeIndication 65..72
+                    SimpleName 65..72
+                      Identifier 65..72 "natural"
+                  Semicolon 72..73 ";"
+              SubprogramDecl 73..92
+                ProcedureSpec 73..91
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  KwProcedure 78..87 "procedure"
+                    trail Whitespace " "
+                  Identifier 88..91 "inc"
+                Semicolon 91..92 ";"
+            EndClause 92..112
+                lead Newline "\n"
+                lead Whitespace "  "
+              KwEnd 95..98 "end"
+                trail Whitespace " "
+              KwProtected 99..108 "protected"
+                trail Whitespace " "
+              Identifier 109..111 "pt"
+              Semicolon 111..112 ";"
+      EndClause 112..117
+          lead Newline "\n"
+        KwEnd 113..116 "end"
+        Semicolon 116..117 ";"
+    lead Newline "\n"
+  EOF 118..118 ""

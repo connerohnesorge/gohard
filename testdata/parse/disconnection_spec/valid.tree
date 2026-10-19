@@ -1,0 +1,65 @@
+DesignFile 0..102
+  DesignUnit 0..101
+    ContextClause 0..0
+    ArchitectureBody 0..101
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..90
+        DisconnectionSpec 22..55
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwDisconnect 25..35 "disconnect"
+            trail Whitespace " "
+          SimpleName 36..38
+            Identifier 36..37 "s"
+              trail Whitespace " "
+          Colon 38..39 ":"
+            trail Whitespace " "
+          SimpleName 40..44
+            Identifier 40..43 "bit"
+              trail Whitespace " "
+          KwAfter 44..49 "after"
+            trail Whitespace " "
+          PhysicalLiteral 50..54
+            IntegerLiteral 50..51 "1"
+              trail Whitespace " "
+            SimpleName 52..54
+              Identifier 52..54 "ns"
+          Semicolon 54..55 ";"
+        DisconnectionSpec 55..90
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwDisconnect 58..68 "disconnect"
+            trail Whitespace " "
+          KwAll 69..72 "all"
+            trail Whitespace " "
+          Colon 73..74 ":"
+            trail Whitespace " "
+          SimpleName 75..79
+            Identifier 75..78 "bit"
+              trail Whitespace " "
+          KwAfter 79..84 "after"
+            trail Whitespace " "
+          PhysicalLiteral 85..89
+            IntegerLiteral 85..86 "0"
+              trail Whitespace " "
+            SimpleName 87..89
+              Identifier 87..89 "ns"
+          Semicolon 89..90 ";"
+        lead Newline "\n"
+      KwBegin 91..96 "begin"
+      StatementPart 96..96
+      EndClause 96..101
+          lead Newline "\n"
+        KwEnd 97..100 "end"
+        Semicolon 100..101 ";"
+    lead Newline "\n"
+  EOF 102..102 ""

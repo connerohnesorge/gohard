@@ -1,0 +1,71 @@
+DesignFile 0..97
+  DesignUnit 0..96
+    ContextClause 0..0
+    PackageDecl 0..96
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..91
+        SubprogramDecl 12..55
+          FunctionSpec 12..54
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwFunction 15..23 "function"
+              trail Whitespace " "
+            Identifier 24..25 "f"
+              trail Whitespace " "
+            ParameterList 26..40
+              InterfaceList 26..40
+                LParen 26..27 "("
+                InterfaceObjectDecl 27..38
+                  IdentifierList 27..29
+                    Identifier 27..28 "x"
+                      trail Whitespace " "
+                  Colon 29..30 ":"
+                    trail Whitespace " "
+                  SubtypeIndication 31..38
+                    SimpleName 31..38
+                      Identifier 31..38 "integer"
+                RParen 38..39 ")"
+                  trail Whitespace " "
+            ReturnSpec 40..54
+              KwReturn 40..46 "return"
+                trail Whitespace " "
+              SimpleName 47..54
+                Identifier 47..54 "integer"
+          Semicolon 54..55 ";"
+        SubprogramDecl 55..91
+          ProcedureSpec 55..90
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwProcedure 58..67 "procedure"
+              trail Whitespace " "
+            Identifier 68..69 "q"
+              trail Whitespace " "
+            ParameterList 70..90
+              InterfaceList 70..90
+                LParen 70..71 "("
+                InterfaceObjectDecl 71..89
+                  KwSignal 71..77 "signal"
+                    trail Whitespace " "
+                  IdentifierList 78..80
+                    Identifier 78..79 "s"
+                      trail Whitespace " "
+                  Colon 80..81 ":"
+                    trail Whitespace " "
+                  SimpleModeIndication 82..86
+                    KwOut 82..85 "out"
+                      trail Whitespace " "
+                  SubtypeIndication 86..89
+                    SimpleName 86..89
+                      Identifier 86..89 "bit"
+                RParen 89..90 ")"
+          Semicolon 90..91 ";"
+      EndClause 91..96
+          lead Newline "\n"
+        KwEnd 92..95 "end"
+        Semicolon 95..96 ";"
+    lead Newline "\n"
+  EOF 97..97 ""

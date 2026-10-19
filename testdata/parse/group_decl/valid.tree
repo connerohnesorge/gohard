@@ -1,0 +1,45 @@
+DesignFile 0..62
+  DesignUnit 0..61
+    ContextClause 0..0
+    ArchitectureBody 0..61
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..50
+        GroupDecl 22..50
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwGroup 25..30 "group"
+            trail Whitespace " "
+          Identifier 31..33 "g1"
+            trail Whitespace " "
+          Colon 34..35 ":"
+            trail Whitespace " "
+          SimpleName 36..41
+            Identifier 36..40 "pair"
+              trail Whitespace " "
+          LParen 41..42 "("
+          SimpleName 42..44
+            Identifier 42..44 "s1"
+          Comma 44..45 ","
+            trail Whitespace " "
+          SimpleName 46..48
+            Identifier 46..48 "s2"
+          RParen 48..49 ")"
+          Semicolon 49..50 ";"
+        lead Newline "\n"
+      KwBegin 51..56 "begin"
+      StatementPart 56..56
+      EndClause 56..61
+          lead Newline "\n"
+        KwEnd 57..60 "end"
+        Semicolon 60..61 ";"
+    lead Newline "\n"
+  EOF 62..62 ""

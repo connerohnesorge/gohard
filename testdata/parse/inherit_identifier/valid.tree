@@ -1,0 +1,41 @@
+DesignFile 0..94
+  DesignUnit 0..93
+    ContextClause 0..0
+    PackageDecl 0..93
+        lead LineComment "-- test: kind=none"
+        lead Newline "\n"
+      KwPackage 19..26 "package"
+        trail Whitespace " "
+      Identifier 27..34 "inherit"
+        trail Whitespace " "
+      KwIs 35..37 "is"
+      DeclarativePart 37..72
+        ConstantDecl 37..72
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 40..48 "constant"
+            trail Whitespace " "
+          IdentifierList 49..57
+            Identifier 49..56 "inherit"
+              trail Whitespace " "
+          Colon 57..58 ":"
+            trail Whitespace " "
+          SubtypeIndication 59..67
+            SimpleName 59..67
+              Identifier 59..66 "integer"
+                trail Whitespace " "
+          VarAssign 67..69 ":="
+            trail Whitespace " "
+          LiteralExpr 70..71
+            IntegerLiteral 70..71 "1"
+          Semicolon 71..72 ";"
+      EndClause 72..93
+          lead Newline "\n"
+        KwEnd 73..76 "end"
+          trail Whitespace " "
+        KwPackage 77..84 "package"
+          trail Whitespace " "
+        Identifier 85..92 "inherit"
+        Semicolon 92..93 ";"
+    lead Newline "\n"
+  EOF 94..94 ""

@@ -1,0 +1,48 @@
+DesignFile 0..65
+  DesignUnit 0..64
+    ContextClause 0..0
+    ArchitectureBody 0..64
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..59
+        PSLAssume 28..59
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssume 31..37 "assume"
+            trail Whitespace " "
+          PSLAlways 38..58
+            KwAlways 38..44 "always"
+              trail Whitespace " "
+            PSLBoolean 45..58
+              UnaryExpr 45..58
+                KwNot 45..48 "not"
+                  trail Whitespace " "
+                ParenExpr 49..58
+                  LParen 49..50 "("
+                  BinaryExpr 50..57
+                    SimpleName 50..52
+                      Identifier 50..51 "a"
+                        trail Whitespace " "
+                    KwAnd 52..55 "and"
+                      trail Whitespace " "
+                    SimpleName 56..57
+                      Identifier 56..57 "b"
+                  RParen 57..58 ")"
+          Semicolon 58..59 ";"
+      EndClause 59..64
+          lead Newline "\n"
+        KwEnd 60..63 "end"
+        Semicolon 63..64 ";"
+    lead Newline "\n"
+  EOF 65..65 ""

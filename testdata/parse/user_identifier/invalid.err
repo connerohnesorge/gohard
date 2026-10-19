@@ -1,0 +1,2 @@
+invalid.vhd:2:5: error[syntax/undefined-condition]: PROFILE_TYPO is not a built-in conditional-analysis identifier and is not defined; define it under defines: in gohard.yaml or with --define PROFILE_TYPO=VALUE
+summary: 1 errors, 0 warnings, 0 hints, 1 files

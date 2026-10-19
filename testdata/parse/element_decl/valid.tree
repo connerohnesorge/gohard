@@ -1,0 +1,49 @@
+DesignFile 0..68
+  DesignUnit 0..67
+    ContextClause 0..0
+    PackageDecl 0..67
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..62
+        TypeDecl 12..62
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..21 "r"
+            trail Whitespace " "
+          KwIs 22..24 "is"
+            trail Whitespace " "
+          RecordTypeDef 25..62
+            KwRecord 25..31 "record"
+            ElementDecl 31..48
+              IdentifierList 31..41
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 36..37 "x"
+                Comma 37..38 ","
+                  trail Whitespace " "
+                Identifier 39..40 "y"
+                  trail Whitespace " "
+              Colon 41..42 ":"
+                trail Whitespace " "
+              SubtypeIndication 43..47
+                SimpleName 43..47
+                  Identifier 43..47 "real"
+              Semicolon 47..48 ";"
+            EndClause 48..62
+                lead Newline "\n"
+                lead Whitespace "  "
+              KwEnd 51..54 "end"
+                trail Whitespace " "
+              KwRecord 55..61 "record"
+              Semicolon 61..62 ";"
+      EndClause 62..67
+          lead Newline "\n"
+        KwEnd 63..66 "end"
+        Semicolon 66..67 ";"
+    lead Newline "\n"
+  EOF 68..68 ""

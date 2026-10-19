@@ -1,0 +1,61 @@
+DesignFile 0..86
+  DesignUnit 0..85
+    ContextClause 0..0
+    ArchitectureBody 0..85
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..80
+        ComponentInstantiationStmt 28..58
+          Label 28..36
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 31..33 "u1"
+              trail Whitespace " "
+            Colon 34..35 ":"
+              trail Whitespace " "
+          InstantiatedUnit 36..57
+            KwComponent 36..45 "component"
+              trail Whitespace " "
+            SelectedName 46..57
+              SelectedName 46..52
+                SimpleName 46..50
+                  Identifier 46..50 "work"
+                Dot 50..51 "."
+                Identifier 51..52 "p"
+              Dot 52..53 "."
+              Identifier 53..57 "comp"
+          Semicolon 57..58 ";"
+        ComponentInstantiationStmt 58..80
+          Label 58..66
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 61..63 "u2"
+              trail Whitespace " "
+            Colon 64..65 ":"
+              trail Whitespace " "
+          InstantiatedUnit 66..79
+            KwEntity 66..72 "entity"
+              trail Whitespace " "
+            SelectedName 73..79
+              SimpleName 73..77
+                Identifier 73..77 "work"
+              Dot 77..78 "."
+              Identifier 78..79 "f"
+          Semicolon 79..80 ";"
+      EndClause 80..85
+          lead Newline "\n"
+        KwEnd 81..84 "end"
+        Semicolon 84..85 ";"
+    lead Newline "\n"
+  EOF 86..86 ""

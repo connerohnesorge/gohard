@@ -1,0 +1,12 @@
+# A client that sends bodies which are not JSON-RPC objects: the live
+# server answers each with an error, and the recording keeps them
+# (a "$gohard":"raw" entry for the body that is not JSON), so the
+# replay prints the same bytes. A line starting with "!raw " is sent
+# verbatim, without the prefix.
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":null,"rootUri":"file:///work","capabilities":{}}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+!raw {not json
+[]
+{"$gohard":"end","step":0}
+{"jsonrpc":"2.0","id":2,"method":"shutdown"}
+{"jsonrpc":"2.0","method":"exit"}

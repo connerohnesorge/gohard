@@ -1,0 +1,76 @@
+DesignFile 0..98
+  DesignUnit 0..97
+    ContextClause 0..0
+    PackageDecl 0..97
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..92
+        AliasDecl 12..54
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 15..20 "alias"
+            trail Whitespace " "
+          Identifier 21..22 "s"
+            trail Whitespace " "
+          KwIs 23..25 "is"
+            trail Whitespace " "
+          ExternalName 26..53
+            LtLt 26..28 "<<"
+              trail Whitespace " "
+            KwSignal 29..35 "signal"
+              trail Whitespace " "
+            RelativePathname 36..45
+              Caret 36..37 "^"
+              Dot 37..38 "."
+              Caret 38..39 "^"
+              Dot 39..40 "."
+              PathnameElement 40..43
+                Identifier 40..42 "u1"
+                Dot 42..43 "."
+              Identifier 43..44 "s"
+                trail Whitespace " "
+            Colon 45..46 ":"
+              trail Whitespace " "
+            SubtypeIndication 47..51
+              SimpleName 47..51
+                Identifier 47..50 "bit"
+                  trail Whitespace " "
+            GtGt 51..53 ">>"
+          Semicolon 53..54 ";"
+        AliasDecl 54..92
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 57..62 "alias"
+            trail Whitespace " "
+          Identifier 63..64 "t"
+            trail Whitespace " "
+          KwIs 65..67 "is"
+            trail Whitespace " "
+          ExternalName 68..91
+            LtLt 68..70 "<<"
+              trail Whitespace " "
+            KwSignal 71..77 "signal"
+              trail Whitespace " "
+            RelativePathname 78..83
+              PathnameElement 78..81
+                Identifier 78..80 "u2"
+                Dot 80..81 "."
+              Identifier 81..82 "t"
+                trail Whitespace " "
+            Colon 83..84 ":"
+              trail Whitespace " "
+            SubtypeIndication 85..89
+              SimpleName 85..89
+                Identifier 85..88 "bit"
+                  trail Whitespace " "
+            GtGt 89..91 ">>"
+          Semicolon 91..92 ";"
+      EndClause 92..97
+          lead Newline "\n"
+        KwEnd 93..96 "end"
+        Semicolon 96..97 ";"
+    lead Newline "\n"
+  EOF 98..98 ""

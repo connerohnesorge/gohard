@@ -1,0 +1,69 @@
+DesignFile 0..117
+  DesignUnit 0..116
+    ContextClause 0..0
+    ArchitectureBody 0..116
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..111
+        ConcurrentAssertionStmt 28..78
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 31..37 "assert"
+            trail Whitespace " "
+          BinaryExpr 38..46
+            SimpleName 38..40
+              Identifier 38..39 "s"
+                trail Whitespace " "
+            Eq 40..41 "="
+              trail Whitespace " "
+            LiteralExpr 42..46
+              CharacterLiteral 42..45 "'1'"
+                trail Whitespace " "
+          KwReport 46..52 "report"
+            trail Whitespace " "
+          LiteralExpr 53..61
+            StringLiteral 53..60 "\"s low\""
+              trail Whitespace " "
+          KwSeverity 61..69 "severity"
+            trail Whitespace " "
+          SimpleName 70..77
+            Identifier 70..77 "warning"
+          Semicolon 77..78 ";"
+        ConcurrentAssertionStmt 78..111
+          Label 78..86
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 81..83 "c1"
+              trail Whitespace " "
+            Colon 84..85 ":"
+              trail Whitespace " "
+          KwPostponed 86..95 "postponed"
+            trail Whitespace " "
+          KwAssert 96..102 "assert"
+            trail Whitespace " "
+          BinaryExpr 103..110
+            SimpleName 103..105
+              Identifier 103..104 "t"
+                trail Whitespace " "
+            Eq 105..106 "="
+              trail Whitespace " "
+            LiteralExpr 107..110
+              CharacterLiteral 107..110 "'0'"
+          Semicolon 110..111 ";"
+      EndClause 111..116
+          lead Newline "\n"
+        KwEnd 112..115 "end"
+        Semicolon 115..116 ";"
+    lead Newline "\n"
+  EOF 117..117 ""

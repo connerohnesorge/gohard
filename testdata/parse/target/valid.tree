@@ -1,0 +1,103 @@
+DesignFile 0..131
+  DesignUnit 0..130
+    ContextClause 0..0
+    ArchitectureBody 0..130
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..125
+        ProcessStmt 28..125
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..110
+            SignalAssignStmt 49..69
+              Target 49..61
+                Aggregate 49..61
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  LParen 54..55 "("
+                  ElementAssociation 55..56
+                    SimpleName 55..56
+                      Identifier 55..56 "a"
+                  Comma 56..57 ","
+                    trail Whitespace " "
+                  ElementAssociation 58..59
+                    SimpleName 58..59
+                      Identifier 58..59 "b"
+                  RParen 59..60 ")"
+                    trail Whitespace " "
+              Le 61..63 "<="
+                trail Whitespace " "
+              Waveform 64..68
+                WaveformElement 64..68
+                  SimpleName 64..68
+                    Identifier 64..68 "pair"
+              Semicolon 68..69 ";"
+            VariableAssignStmt 69..96
+              Target 69..88
+                SliceName 69..88
+                  SimpleName 69..75
+                      lead Newline "\n"
+                      lead Whitespace "    "
+                    Identifier 74..75 "v"
+                  LParen 75..76 "("
+                  RangeExpr 76..86
+                    LiteralExpr 76..78
+                      IntegerLiteral 76..77 "1"
+                        trail Whitespace " "
+                    KwDownto 78..84 "downto"
+                      trail Whitespace " "
+                    LiteralExpr 85..86
+                      IntegerLiteral 85..86 "0"
+                  RParen 86..87 ")"
+                    trail Whitespace " "
+              VarAssign 88..90 ":="
+                trail Whitespace " "
+              LiteralExpr 91..95
+                StringLiteral 91..95 "\"10\""
+              Semicolon 95..96 ";"
+            VariableAssignStmt 96..110
+              Target 96..105
+                SelectedName 96..105
+                  SimpleName 96..102
+                      lead Newline "\n"
+                      lead Whitespace "    "
+                    Identifier 101..102 "r"
+                  Dot 102..103 "."
+                  Identifier 103..104 "f"
+                    trail Whitespace " "
+              VarAssign 105..107 ":="
+                trail Whitespace " "
+              LiteralExpr 108..109
+                IntegerLiteral 108..109 "1"
+              Semicolon 109..110 ";"
+          EndClause 110..125
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 113..116 "end"
+              trail Whitespace " "
+            KwProcess 117..124 "process"
+            Semicolon 124..125 ";"
+      EndClause 125..130
+          lead Newline "\n"
+        KwEnd 126..129 "end"
+        Semicolon 129..130 ";"
+    lead Newline "\n"
+  EOF 131..131 ""

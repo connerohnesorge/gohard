@@ -1,0 +1,130 @@
+DesignFile 0..221
+  DesignUnit 0..220
+    ContextClause 0..0
+    PackageDecl 0..220
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..215
+        ConstantDecl 12..46
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "i"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..36
+            SimpleName 28..36
+              Identifier 28..35 "integer"
+                trail Whitespace " "
+          VarAssign 36..38 ":="
+            trail Whitespace " "
+          LiteralExpr 39..45
+            IntegerLiteral 39..45 "16#FF#"
+          Semicolon 45..46 ";"
+        ConstantDecl 46..77
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 49..57 "constant"
+            trail Whitespace " "
+          IdentifierList 58..60
+            Identifier 58..59 "r"
+              trail Whitespace " "
+          Colon 60..61 ":"
+            trail Whitespace " "
+          SubtypeIndication 62..67
+            SimpleName 62..67
+              Identifier 62..66 "real"
+                trail Whitespace " "
+          VarAssign 67..69 ":="
+            trail Whitespace " "
+          LiteralExpr 70..76
+            RealLiteral 70..76 "1.5e-3"
+          Semicolon 76..77 ";"
+        ConstantDecl 77..110
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 80..88 "constant"
+            trail Whitespace " "
+          IdentifierList 89..91
+            Identifier 89..90 "s"
+              trail Whitespace " "
+          Colon 91..92 ":"
+            trail Whitespace " "
+          SubtypeIndication 93..100
+            SimpleName 93..100
+              Identifier 93..99 "string"
+                trail Whitespace " "
+          VarAssign 100..102 ":="
+            trail Whitespace " "
+          LiteralExpr 103..109
+            StringLiteral 103..109 "\"text\""
+          Semicolon 109..110 ";"
+        ConstantDecl 110..146
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 113..121 "constant"
+            trail Whitespace " "
+          IdentifierList 122..124
+            Identifier 122..123 "b"
+              trail Whitespace " "
+          Colon 124..125 ":"
+            trail Whitespace " "
+          SubtypeIndication 126..137
+            SimpleName 126..137
+              Identifier 126..136 "bit_vector"
+                trail Whitespace " "
+          VarAssign 137..139 ":="
+            trail Whitespace " "
+          LiteralExpr 140..145
+            BitStringLiteral 140..145 "x\"0F\""
+          Semicolon 145..146 ";"
+        ConstantDecl 146..185
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 149..157 "constant"
+            trail Whitespace " "
+          IdentifierList 158..160
+            Identifier 158..159 "q"
+              trail Whitespace " "
+          Colon 160..161 ":"
+            trail Whitespace " "
+          SubtypeIndication 162..173
+            SimpleName 162..173
+              Identifier 162..172 "bit_vector"
+                trail Whitespace " "
+          VarAssign 173..175 ":="
+            trail Whitespace " "
+          LiteralExpr 176..184
+            BitStringLiteral 176..184 "8ub\"101\""
+          Semicolon 184..185 ";"
+        ConstantDecl 185..215
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 188..196 "constant"
+            trail Whitespace " "
+          IdentifierList 197..199
+            Identifier 197..198 "p"
+              trail Whitespace " "
+          Colon 199..200 ":"
+            trail Whitespace " "
+          SubtypeIndication 201..207
+            SimpleName 201..207
+              Identifier 201..206 "ptr_t"
+                trail Whitespace " "
+          VarAssign 207..209 ":="
+            trail Whitespace " "
+          LiteralExpr 210..214
+            KwNull 210..214 "null"
+          Semicolon 214..215 ";"
+      EndClause 215..220
+          lead Newline "\n"
+        KwEnd 216..219 "end"
+        Semicolon 219..220 ";"
+    lead Newline "\n"
+  EOF 221..221 ""

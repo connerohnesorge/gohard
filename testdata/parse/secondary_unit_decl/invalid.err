@@ -1,0 +1,2 @@
+invalid.vhd:2:45: error[syntax/error]: expected '=', found literal 1000
+summary: 1 errors, 0 warnings, 0 hints, 1 files

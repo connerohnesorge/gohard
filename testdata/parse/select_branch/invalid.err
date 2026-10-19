@@ -1,0 +1,2 @@
+invalid.vhd:5:25: error[syntax/error]: expected reserved word when, found literal 0
+summary: 1 errors, 0 warnings, 0 hints, 1 files

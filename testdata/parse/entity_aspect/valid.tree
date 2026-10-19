@@ -1,0 +1,99 @@
+DesignFile 0..144
+  DesignUnit 0..143
+    ContextClause 0..0
+    ArchitectureBody 0..143
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..132
+        ConfigurationSpec 22..62
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwFor 25..28 "for"
+            trail Whitespace " "
+          ComponentSpecification 29..39
+            InstantiationList 29..32
+              Identifier 29..31 "u1"
+                trail Whitespace " "
+            Colon 32..33 ":"
+              trail Whitespace " "
+            SimpleName 34..39
+              Identifier 34..38 "comp"
+                trail Whitespace " "
+          BindingIndication 39..61
+            KwUse 39..42 "use"
+              trail Whitespace " "
+            EntityAspect 43..61
+              KwEntity 43..49 "entity"
+                trail Whitespace " "
+              SelectedName 50..56
+                SimpleName 50..54
+                  Identifier 50..54 "work"
+                Dot 54..55 "."
+                Identifier 55..56 "f"
+              LParen 56..57 "("
+              Identifier 57..60 "rtl"
+              RParen 60..61 ")"
+          Semicolon 61..62 ";"
+        ConfigurationSpec 62..106
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwFor 65..68 "for"
+            trail Whitespace " "
+          ComponentSpecification 69..79
+            InstantiationList 69..72
+              Identifier 69..71 "u2"
+                trail Whitespace " "
+            Colon 72..73 ":"
+              trail Whitespace " "
+            SimpleName 74..79
+              Identifier 74..78 "comp"
+                trail Whitespace " "
+          BindingIndication 79..105
+            KwUse 79..82 "use"
+              trail Whitespace " "
+            EntityAspect 83..105
+              KwConfiguration 83..96 "configuration"
+                trail Whitespace " "
+              SelectedName 97..105
+                SimpleName 97..101
+                  Identifier 97..101 "work"
+                Dot 101..102 "."
+                Identifier 102..105 "cfg"
+          Semicolon 105..106 ";"
+        ConfigurationSpec 106..132
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwFor 109..112 "for"
+            trail Whitespace " "
+          ComponentSpecification 113..123
+            InstantiationList 113..116
+              Identifier 113..115 "u3"
+                trail Whitespace " "
+            Colon 116..117 ":"
+              trail Whitespace " "
+            SimpleName 118..123
+              Identifier 118..122 "comp"
+                trail Whitespace " "
+          BindingIndication 123..131
+            KwUse 123..126 "use"
+              trail Whitespace " "
+            EntityAspect 127..131
+              KwOpen 127..131 "open"
+          Semicolon 131..132 ";"
+        lead Newline "\n"
+      KwBegin 133..138 "begin"
+      StatementPart 138..138
+      EndClause 138..143
+          lead Newline "\n"
+        KwEnd 139..142 "end"
+        Semicolon 142..143 ";"
+    lead Newline "\n"
+  EOF 144..144 ""

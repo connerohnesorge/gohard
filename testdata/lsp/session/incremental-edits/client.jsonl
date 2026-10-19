@@ -1,0 +1,23 @@
+# Incremental sync in utf-16. The echo analyzer publishes each open
+# document's version and text, so every edit is visible.
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":null,"rootUri":"file:///work","capabilities":{"general":{"positionEncodings":["utf-16"]}}}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///work/a.vhd","languageId":"vhdl","version":1,"text":"abc\n"}}}
+# insert an astral character (two UTF-16 units) after "a": a😀bc
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///work/a.vhd","version":2},"contentChanges":[{"range":{"start":{"line":0,"character":1},"end":{"line":0,"character":1}},"text":"😀"}]}}
+# replace b, which starts at unit 3: a😀Bc
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///work/a.vhd","version":3},"contentChanges":[{"range":{"start":{"line":0,"character":3},"end":{"line":0,"character":4}},"text":"B"}]}}
+# two changes in one message, applied in order: X😀Bc then a new line
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///work/a.vhd","version":4},"contentChanges":[{"range":{"start":{"line":0,"character":0},"end":{"line":0,"character":1}},"text":"X"},{"range":{"start":{"line":1,"character":0},"end":{"line":1,"character":0}},"text":"line2"}]}}
+# a range past the end of the text is clamped to the end
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///work/a.vhd","version":5},"contentChanges":[{"range":{"start":{"line":9,"character":0},"end":{"line":9,"character":0}},"text":"!"}]}}
+# a stale version is logged and ignored
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///work/a.vhd","version":5},"contentChanges":[{"text":"stale"}]}}
+# a change without a range replaces the whole text
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///work/a.vhd","version":6},"contentChanges":[{"text":"new\r\nfile"}]}}
+# a change to a document that is not open is logged and ignored
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///work/b.vhd","version":1},"contentChanges":[{"text":"x"}]}}
+# closing clears its diagnostics
+{"jsonrpc":"2.0","method":"textDocument/didClose","params":{"textDocument":{"uri":"file:///work/a.vhd"}}}
+{"jsonrpc":"2.0","id":99,"method":"shutdown"}
+{"jsonrpc":"2.0","method":"exit"}

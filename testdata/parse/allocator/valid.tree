@@ -1,0 +1,68 @@
+DesignFile 0..100
+  DesignUnit 0..99
+    ContextClause 0..0
+    PackageDecl 0..99
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..94
+        ConstantDecl 12..51
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "p"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..36
+            SimpleName 28..36
+              Identifier 28..35 "int_ptr"
+                trail Whitespace " "
+          VarAssign 36..38 ":="
+            trail Whitespace " "
+          Allocator 39..50
+            KwNew 39..42 "new"
+              trail Whitespace " "
+            SubtypeIndication 43..50
+              SimpleName 43..50
+                Identifier 43..50 "integer"
+          Semicolon 50..51 ";"
+        ConstantDecl 51..94
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 54..62 "constant"
+            trail Whitespace " "
+          IdentifierList 63..65
+            Identifier 63..64 "q"
+              trail Whitespace " "
+          Colon 65..66 ":"
+            trail Whitespace " "
+          SubtypeIndication 67..75
+            SimpleName 67..75
+              Identifier 67..74 "int_ptr"
+                trail Whitespace " "
+          VarAssign 75..77 ":="
+            trail Whitespace " "
+          Allocator 78..93
+            KwNew 78..81 "new"
+              trail Whitespace " "
+            QualifiedExpr 82..93
+              SimpleName 82..89
+                Identifier 82..89 "integer"
+              Tick 89..90 "'"
+              ParenExpr 90..93
+                LParen 90..91 "("
+                LiteralExpr 91..92
+                  IntegerLiteral 91..92 "5"
+                RParen 92..93 ")"
+          Semicolon 93..94 ";"
+      EndClause 94..99
+          lead Newline "\n"
+        KwEnd 95..98 "end"
+        Semicolon 98..99 ";"
+    lead Newline "\n"
+  EOF 100..100 ""

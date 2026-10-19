@@ -1,0 +1,86 @@
+DesignFile 0..119
+  DesignUnit 0..118
+    ContextClause 0..0
+    ArchitectureBody 0..118
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..113
+        ProcessStmt 28..113
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..98
+            SignalAssignStmt 49..72
+              Target 49..56
+                SimpleName 49..56
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 54..55 "s"
+                    trail Whitespace " "
+              Le 56..58 "<="
+                trail Whitespace " "
+              Waveform 59..71
+                WaveformElement 59..71
+                  SimpleName 59..61
+                    Identifier 59..60 "a"
+                      trail Whitespace " "
+                  KwAfter 61..66 "after"
+                    trail Whitespace " "
+                  PhysicalLiteral 67..71
+                    IntegerLiteral 67..68 "1"
+                      trail Whitespace " "
+                    SimpleName 69..71
+                      Identifier 69..71 "ns"
+              Semicolon 71..72 ";"
+            SignalAssignStmt 72..98
+              Target 72..79
+                SimpleName 72..79
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 77..78 "g"
+                    trail Whitespace " "
+              Le 79..81 "<="
+                trail Whitespace " "
+              Waveform 82..97
+                WaveformElement 82..97
+                  LiteralExpr 82..87
+                    KwNull 82..86 "null"
+                      trail Whitespace " "
+                  KwAfter 87..92 "after"
+                    trail Whitespace " "
+                  PhysicalLiteral 93..97
+                    IntegerLiteral 93..94 "2"
+                      trail Whitespace " "
+                    SimpleName 95..97
+                      Identifier 95..97 "ns"
+              Semicolon 97..98 ";"
+          EndClause 98..113
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 101..104 "end"
+              trail Whitespace " "
+            KwProcess 105..112 "process"
+            Semicolon 112..113 ";"
+      EndClause 113..118
+          lead Newline "\n"
+        KwEnd 114..117 "end"
+        Semicolon 117..118 ";"
+    lead Newline "\n"
+  EOF 119..119 ""

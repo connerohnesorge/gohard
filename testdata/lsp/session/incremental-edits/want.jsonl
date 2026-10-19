@@ -1,0 +1,20 @@
+{"jsonrpc":"2.0","id":1,"result":{"capabilities":{"definitionProvider":true,"hoverProvider":true,"positionEncoding":"utf-16","textDocumentSync":{"change":2,"openClose":true,"save":{"includeText":false}},"workspace":{"workspaceFolders":{"supported":true}}},"serverInfo":{"name":"gohard","version":"0.0.0-test"}}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":0,"id":1}}
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file:///work/a.vhd","version":1,"diagnostics":[{"range":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}},"severity":4,"code":"lsp/echo","source":"gohard","message":"v1 \"abc\\n\""}]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":2,"uri":"file:///work/a.vhd"}}
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file:///work/a.vhd","version":2,"diagnostics":[{"range":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}},"severity":4,"code":"lsp/echo","source":"gohard","message":"v2 \"a😀bc\\n\""}]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":3,"uri":"file:///work/a.vhd"}}
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file:///work/a.vhd","version":3,"diagnostics":[{"range":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}},"severity":4,"code":"lsp/echo","source":"gohard","message":"v3 \"a😀Bc\\n\""}]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":4,"uri":"file:///work/a.vhd"}}
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file:///work/a.vhd","version":4,"diagnostics":[{"range":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}},"severity":4,"code":"lsp/echo","source":"gohard","message":"v4 \"X😀Bc\\nline2\""}]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":5,"uri":"file:///work/a.vhd"}}
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file:///work/a.vhd","version":5,"diagnostics":[{"range":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}},"severity":4,"code":"lsp/echo","source":"gohard","message":"v5 \"X😀Bc\\nline2!\""}]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":6,"uri":"file:///work/a.vhd"}}
+{"jsonrpc":"2.0","method":"window/logMessage","params":{"type":2,"message":"didChange: stale version 5 of file:///work/a.vhd (have 5); change ignored"}}
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file:///work/a.vhd","version":6,"diagnostics":[{"range":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}},"severity":4,"code":"lsp/echo","source":"gohard","message":"v6 \"new\\r\\nfile\""}]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":7,"uri":"file:///work/a.vhd"}}
+{"jsonrpc":"2.0","method":"window/logMessage","params":{"type":2,"message":"didChange: file:///work/b.vhd is not open; change ignored"}}
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file:///work/a.vhd","diagnostics":[]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":8,"uri":"file:///work/a.vhd"}}
+{"jsonrpc":"2.0","id":99,"result":null}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":8,"id":99}}

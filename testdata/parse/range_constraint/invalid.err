@@ -1,0 +1,3 @@
+invalid.vhd:2:32: error[syntax/error]: expected ';', found literal 7
+invalid.vhd:2:33: error[syntax/error]: expected a declaration, found literal 7
+summary: 2 errors, 0 warnings, 0 hints, 1 files

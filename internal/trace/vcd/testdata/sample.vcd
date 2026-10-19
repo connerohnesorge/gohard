@@ -1,0 +1,105 @@
+$comment
+  gohard trace export: testbench tb
+$end
+$version
+  gohard
+$end
+$timescale
+  1 fs
+$end
+$scope module tb $end
+$var wire 1 ! clk $end
+$scope module dut $end
+$scope module bus $end
+$var wire 4 " addr [3:0] $end
+$var string 1 # valid $end
+$upscope $end
+$var wire 1 $ clk $end
+$var wire 8 % count_q [7:0] $end
+$var integer 64 & delay $end
+$var wire 1 ' flag $end
+$var integer 31 ( hist[0] $end
+$var integer 31 ) hist[1] $end
+$var integer 31 * hist[2] $end
+$var integer 31 + n $end
+$var real 64 , ratio $end
+$var string 1 - state $end
+$upscope $end
+$scope begin gen(0) $end
+$var string 1 . mode[1] $end
+$var string 1 / mode[2] $end
+$upscope $end
+$scope module mem $end
+$var wire 4 0 dout [3:0] $end
+$upscope $end
+$var wire 1 1 rst $end
+$upscope $end
+$scope module top2 $end
+$var integer 32 2 x $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+0!
+bxxxx "
+sfalse #
+0$
+b00000000 %
+b0000000000000000000000000000000000000000100110001001011010000000 &
+0'
+b0000000000000000000000000000000 (
+b0000000000000000000000000000000 )
+b0000000000000000000000000000000 *
+b0000000000000000000000000000000 +
+r0.5 ,
+sidle -
+sidle .
+sdone /
+bzzzz 0
+11
+b11111111111111111111111111111011 2
+$end
+#10000000
+1!
+b0101 "
+1$
+b00000001 %
+1'
+b0000000000000000000000000000001 (
+b0000000000000000000000000000001 *
+b0000000000000000000000000000001 +
+r0.3333333333333333 ,
+srun -
+srun .
+b0001 0
+01
+#15000000
+0!
+0$
+#20000000
+1!
+bxzxx "
+1$
+b00000010 %
+b0000000000000000000000000000010 (
+b0000000000000000000000000000100 *
+b0000000000000000000000000000010 +
+r0.6666666666666666 ,
+b0010 0
+#25000000
+0!
+0$
+#30000000
+1!
+1$
+b00000011 %
+b0000000000000000000000000000011 (
+b0000000000000000000000000001001 *
+b0000000000000000000000000000011 +
+r1 ,
+sdone -
+b0011 0
+#35000000
+0!
+0$
+#40000000

@@ -1,0 +1,78 @@
+DesignFile 0..105
+  DesignUnit 0..104
+    ContextClause 0..0
+    ArchitectureBody 0..104
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..99
+        ConcurrentSimpleSignalAssign 28..39
+          Target 28..34
+            SimpleName 28..34
+                lead Newline "\n"
+                lead Whitespace "  "
+              Identifier 31..33 "s1"
+                trail Whitespace " "
+          Le 34..36 "<="
+            trail Whitespace " "
+          Waveform 37..38
+            WaveformElement 37..38
+              SimpleName 37..38
+                Identifier 37..38 "a"
+          Semicolon 38..39 ";"
+        ProcessStmt 39..78
+          Label 39..46
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 42..43 "p"
+              trail Whitespace " "
+            Colon 44..45 ":"
+              trail Whitespace " "
+          KwProcess 46..53 "process"
+            trail Whitespace " "
+          DeclarativePart 54..54
+          KwBegin 54..59 "begin"
+            trail Whitespace " "
+          SequenceOfStatements 60..66
+            WaitStmt 60..66
+              KwWait 60..64 "wait"
+              Semicolon 64..65 ";"
+                trail Whitespace " "
+          EndClause 66..78
+            KwEnd 66..69 "end"
+              trail Whitespace " "
+            KwProcess 70..77 "process"
+            Semicolon 77..78 ";"
+        ComponentInstantiationStmt 78..99
+          Label 78..85
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 81..82 "u"
+              trail Whitespace " "
+            Colon 83..84 ":"
+              trail Whitespace " "
+          InstantiatedUnit 85..98
+            KwEntity 85..91 "entity"
+              trail Whitespace " "
+            SelectedName 92..98
+              SimpleName 92..96
+                Identifier 92..96 "work"
+              Dot 96..97 "."
+              Identifier 97..98 "f"
+          Semicolon 98..99 ";"
+      EndClause 99..104
+          lead Newline "\n"
+        KwEnd 100..103 "end"
+        Semicolon 103..104 ";"
+    lead Newline "\n"
+  EOF 105..105 ""

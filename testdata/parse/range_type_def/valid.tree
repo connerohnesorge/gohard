@@ -1,0 +1,101 @@
+DesignFile 0..151
+  DesignUnit 0..150
+    ContextClause 0..0
+    PackageDecl 0..150
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..145
+        TypeDecl 12..44
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..25 "small"
+            trail Whitespace " "
+          KwIs 26..28 "is"
+            trail Whitespace " "
+          RangeTypeDef 29..43
+            RangeConstraint 29..43
+              KwRange 29..34 "range"
+                trail Whitespace " "
+              RangeExpr 35..43
+                LiteralExpr 35..37
+                  IntegerLiteral 35..36 "0"
+                    trail Whitespace " "
+                KwTo 37..39 "to"
+                  trail Whitespace " "
+                LiteralExpr 40..43
+                  IntegerLiteral 40..43 "255"
+          Semicolon 43..44 ";"
+        TypeDecl 44..78
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 47..51 "type"
+            trail Whitespace " "
+          Identifier 52..56 "down"
+            trail Whitespace " "
+          KwIs 57..59 "is"
+            trail Whitespace " "
+          RangeTypeDef 60..77
+            RangeConstraint 60..77
+              KwRange 60..65 "range"
+                trail Whitespace " "
+              RangeExpr 66..77
+                LiteralExpr 66..69
+                  IntegerLiteral 66..68 "10"
+                    trail Whitespace " "
+                KwDownto 69..75 "downto"
+                  trail Whitespace " "
+                LiteralExpr 76..77
+                  IntegerLiteral 76..77 "0"
+          Semicolon 77..78 ";"
+        TypeDecl 78..111
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 81..85 "type"
+            trail Whitespace " "
+          Identifier 86..90 "prob"
+            trail Whitespace " "
+          KwIs 91..93 "is"
+            trail Whitespace " "
+          RangeTypeDef 94..110
+            RangeConstraint 94..110
+              KwRange 94..99 "range"
+                trail Whitespace " "
+              RangeExpr 100..110
+                LiteralExpr 100..104
+                  RealLiteral 100..103 "0.0"
+                    trail Whitespace " "
+                KwTo 104..106 "to"
+                  trail Whitespace " "
+                LiteralExpr 107..110
+                  RealLiteral 107..110 "1.0"
+          Semicolon 110..111 ";"
+        TypeDecl 111..145
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 114..118 "type"
+            trail Whitespace " "
+          Identifier 119..123 "same"
+            trail Whitespace " "
+          KwIs 124..126 "is"
+            trail Whitespace " "
+          RangeTypeDef 127..144
+            RangeConstraint 127..144
+              KwRange 127..132 "range"
+                trail Whitespace " "
+              AttributeName 133..144
+                SimpleName 133..138
+                  Identifier 133..138 "small"
+                Tick 138..139 "'"
+                KwRange 139..144 "range"
+          Semicolon 144..145 ";"
+      EndClause 145..150
+          lead Newline "\n"
+        KwEnd 146..149 "end"
+        Semicolon 149..150 ";"
+    lead Newline "\n"
+  EOF 151..151 ""

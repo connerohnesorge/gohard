@@ -1,0 +1,4 @@
+invalid.vhd:3:12: error[syntax/error]: expected reserved word body, found identifier p
+invalid.vhd:3:14: error[syntax/error]: expected ';', found reserved word body
+invalid.vhd:3:15: error[syntax/error]: expected a design unit (entity, architecture, package, configuration, context or a PSL verification unit), found reserved word body
+summary: 3 errors, 0 warnings, 0 hints, 1 files

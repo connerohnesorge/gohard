@@ -1,0 +1,33 @@
+DesignFile 0..43
+  DesignUnit 0..42
+    ContextClause 0..25
+      ContextReference 0..25
+        KwContext 0..7 "context"
+          trail Whitespace " "
+        SelectedName 8..15
+          SimpleName 8..12
+            Identifier 8..12 "work"
+          Dot 12..13 "."
+          Identifier 13..15 "c1"
+        Comma 15..16 ","
+          trail Whitespace " "
+        SelectedName 17..24
+          SimpleName 17..21
+            Identifier 17..21 "work"
+          Dot 21..22 "."
+          Identifier 22..24 "c2"
+        Semicolon 24..25 ";"
+    EntityDecl 25..42
+        lead Newline "\n"
+      KwEntity 26..32 "entity"
+        trail Whitespace " "
+      Identifier 33..34 "e"
+        trail Whitespace " "
+      KwIs 35..37 "is"
+      DeclarativePart 37..37
+      EndClause 37..42
+          lead Newline "\n"
+        KwEnd 38..41 "end"
+        Semicolon 41..42 ";"
+    lead Newline "\n"
+  EOF 43..43 ""

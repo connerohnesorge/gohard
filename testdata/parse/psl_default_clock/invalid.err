@@ -1,0 +1,2 @@
+invalid.vhd:2:16: error[syntax/error]: expected reserved word is, found identifier rising_edge
+summary: 1 errors, 0 warnings, 0 hints, 1 files

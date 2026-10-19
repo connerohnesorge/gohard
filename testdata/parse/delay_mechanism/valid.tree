@@ -1,0 +1,117 @@
+DesignFile 0..168
+  DesignUnit 0..167
+    ContextClause 0..0
+    ArchitectureBody 0..167
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..162
+        ProcessStmt 28..162
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..147
+            SignalAssignStmt 49..82
+              Target 49..56
+                SimpleName 49..56
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 54..55 "s"
+                    trail Whitespace " "
+              Le 56..58 "<="
+                trail Whitespace " "
+              DelayMechanism 59..69
+                KwTransport 59..68 "transport"
+                  trail Whitespace " "
+              Waveform 69..81
+                WaveformElement 69..81
+                  SimpleName 69..71
+                    Identifier 69..70 "a"
+                      trail Whitespace " "
+                  KwAfter 71..76 "after"
+                    trail Whitespace " "
+                  PhysicalLiteral 77..81
+                    IntegerLiteral 77..78 "1"
+                      trail Whitespace " "
+                    SimpleName 79..81
+                      Identifier 79..81 "ns"
+              Semicolon 81..82 ";"
+            SignalAssignStmt 82..126
+              Target 82..89
+                SimpleName 82..89
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 87..88 "t"
+                    trail Whitespace " "
+              Le 89..91 "<="
+                trail Whitespace " "
+              DelayMechanism 92..113
+                KwReject 92..98 "reject"
+                  trail Whitespace " "
+                PhysicalLiteral 99..104
+                  IntegerLiteral 99..100 "2"
+                    trail Whitespace " "
+                  SimpleName 101..104
+                    Identifier 101..103 "ns"
+                      trail Whitespace " "
+                KwInertial 104..112 "inertial"
+                  trail Whitespace " "
+              Waveform 113..125
+                WaveformElement 113..125
+                  SimpleName 113..115
+                    Identifier 113..114 "b"
+                      trail Whitespace " "
+                  KwAfter 115..120 "after"
+                    trail Whitespace " "
+                  PhysicalLiteral 121..125
+                    IntegerLiteral 121..122 "3"
+                      trail Whitespace " "
+                    SimpleName 123..125
+                      Identifier 123..125 "ns"
+              Semicolon 125..126 ";"
+            SignalAssignStmt 126..147
+              Target 126..133
+                SimpleName 126..133
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 131..132 "u"
+                    trail Whitespace " "
+              Le 133..135 "<="
+                trail Whitespace " "
+              DelayMechanism 136..145
+                KwInertial 136..144 "inertial"
+                  trail Whitespace " "
+              Waveform 145..146
+                WaveformElement 145..146
+                  SimpleName 145..146
+                    Identifier 145..146 "c"
+              Semicolon 146..147 ";"
+          EndClause 147..162
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 150..153 "end"
+              trail Whitespace " "
+            KwProcess 154..161 "process"
+            Semicolon 161..162 ";"
+      EndClause 162..167
+          lead Newline "\n"
+        KwEnd 163..166 "end"
+        Semicolon 166..167 ";"
+    lead Newline "\n"
+  EOF 168..168 ""

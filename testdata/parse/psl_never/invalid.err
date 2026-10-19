@@ -1,0 +1,4 @@
+invalid.vhd:3:22: error[syntax/error]: expected ';', found reserved word end
+invalid.vhd:3:22: error[syntax/error]: expected '}', found reserved word end
+invalid.vhd:3:22: error[syntax/error]: expected a PSL sequence, found reserved word end
+summary: 3 errors, 0 warnings, 0 hints, 1 files

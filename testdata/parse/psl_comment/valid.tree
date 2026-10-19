@@ -1,0 +1,104 @@
+DesignFile 0..211
+  DesignUnit 0..210
+    ContextClause 0..0
+    ArchitectureBody 0..210
+        lead LineComment "-- test: std=2008 psl.comments kind=PSLAssert"
+        lead Newline "\n"
+      KwArchitecture 46..58 "architecture"
+        trail Whitespace " "
+      Identifier 59..60 "a"
+        trail Whitespace " "
+      KwOf 61..63 "of"
+        trail Whitespace " "
+      SimpleName 64..66
+        Identifier 64..65 "e"
+          trail Whitespace " "
+      KwIs 66..68 "is"
+      DeclarativePart 68..68
+        lead Newline "\n"
+      KwBegin 69..74 "begin"
+      StatementPart 74..205
+        PSLDefaultClock 74..118
+            lead Newline "\n"
+            lead Whitespace "  "
+            lead PSLCommentMarker "-- psl"
+            lead Whitespace " "
+          KwDefault 84..91 "default" psl-comment
+            trail Whitespace " "
+          KwClock 92..97 "clock" psl-comment
+            trail Whitespace " "
+          KwIs 98..100 "is" psl-comment
+            trail Whitespace " "
+          CallOrIndexName 101..117
+            SimpleName 101..112
+              Identifier 101..112 "rising_edge" psl-comment
+            AssociationList 112..117
+              LParen 112..113 "(" psl-comment
+              AssociationElement 113..116
+                SimpleName 113..116
+                  Identifier 113..116 "clk" psl-comment
+              RParen 116..117 ")" psl-comment
+          Semicolon 117..118 ";" psl-comment
+        PSLAssert 118..160
+            lead Newline "\n"
+            lead Whitespace "  "
+            lead PSLCommentMarker "-- psl"
+            lead Whitespace " "
+          KwAssert 128..134 "assert" psl-comment
+            trail Whitespace " "
+          PSLAlways 135..159
+            KwAlways 135..141 "always" psl-comment
+              trail Whitespace " "
+            PSLParenProp 142..159
+              LParen 142..143 "(" psl-comment
+              PSLImplication 143..158
+                PSLBoolean 143..147
+                  SimpleName 143..147
+                    Identifier 143..146 "req" psl-comment
+                      trail Whitespace " "
+                PSLImplies 147..149 "->" psl-comment
+                  trail Whitespace " "
+                PSLNext 150..158
+                  KwNext 150..154 "next" psl-comment
+                    trail Whitespace " "
+                  PSLBoolean 155..158
+                    SimpleName 155..158
+                      Identifier 155..158 "ack" psl-comment
+              RParen 158..159 ")" psl-comment
+          Semicolon 159..160 ";" psl-comment
+        PSLAssert 160..205
+            lead Newline "\n"
+            lead Whitespace "  "
+            lead PSLCommentMarker "-- psl"
+            lead Whitespace " "
+          KwAssert 170..176 "assert" psl-comment
+            trail Whitespace " "
+          PSLAlways 177..204
+            KwAlways 177..183 "always" psl-comment
+              trail Whitespace " "
+            PSLParenProp 184..204
+              LParen 184..185 "(" psl-comment
+              PSLImplication 185..203
+                PSLBoolean 185..187
+                  SimpleName 185..187
+                    Identifier 185..186 "a" psl-comment
+                      trail Whitespace " "
+                PSLImplies 187..189 "->" psl-comment
+                PSLNext 189..203
+                    lead Newline "\n"
+                    lead Whitespace "  "
+                    lead PSLCommentMarker "--"
+                    lead Whitespace "   "
+                  KwNext 197..201 "next" psl-comment
+                    trail Whitespace " "
+                  PSLBoolean 202..203
+                    SimpleName 202..203
+                      Identifier 202..203 "b" psl-comment
+              RParen 203..204 ")" psl-comment
+          Semicolon 204..205 ";" psl-comment
+      EndClause 205..210
+          lead Newline "\n"
+        KwEnd 206..209 "end"
+        Semicolon 209..210 ";"
+    lead Newline "\n"
+  EOF 211..211 ""

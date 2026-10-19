@@ -1,0 +1,97 @@
+DesignFile 0..123
+  DesignUnit 0..122
+    ContextClause 0..0
+    ArchitectureBody 0..122
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..117
+        PSLAssert 28..57
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 31..37 "assert"
+            trail Whitespace " "
+          PSLOBEUnary 38..56
+            KwAg 38..40 "AG"
+              trail Whitespace " "
+            PSLParenProp 41..56
+              LParen 41..42 "("
+              PSLImplication 42..55
+                PSLBoolean 42..46
+                  SimpleName 42..46
+                    Identifier 42..45 "req"
+                      trail Whitespace " "
+                PSLImplies 46..48 "->"
+                  trail Whitespace " "
+                PSLOBEUnary 49..55
+                  KwAf 49..51 "AF"
+                    trail Whitespace " "
+                  PSLBoolean 52..55
+                    SimpleName 52..55
+                      Identifier 52..55 "ack"
+              RParen 55..56 ")"
+          Semicolon 56..57 ";"
+        PSLAssert 57..72
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 60..66 "assert"
+            trail Whitespace " "
+          PSLOBEUnary 67..71
+            KwEx 67..69 "EX"
+              trail Whitespace " "
+            PSLBoolean 70..71
+              SimpleName 70..71
+                Identifier 70..71 "a"
+          Semicolon 71..72 ";"
+        PSLAssert 72..87
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 75..81 "assert"
+            trail Whitespace " "
+          PSLOBEUnary 82..86
+            KwAx 82..84 "AX"
+              trail Whitespace " "
+            PSLBoolean 85..86
+              SimpleName 85..86
+                Identifier 85..86 "b"
+          Semicolon 86..87 ";"
+        PSLAssert 87..102
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 90..96 "assert"
+            trail Whitespace " "
+          PSLOBEUnary 97..101
+            KwEg 97..99 "EG"
+              trail Whitespace " "
+            PSLBoolean 100..101
+              SimpleName 100..101
+                Identifier 100..101 "c"
+          Semicolon 101..102 ";"
+        PSLAssert 102..117
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 105..111 "assert"
+            trail Whitespace " "
+          PSLOBEUnary 112..116
+            KwEf 112..114 "EF"
+              trail Whitespace " "
+            PSLBoolean 115..116
+              SimpleName 115..116
+                Identifier 115..116 "d"
+          Semicolon 116..117 ";"
+      EndClause 117..122
+          lead Newline "\n"
+        KwEnd 118..121 "end"
+        Semicolon 121..122 ";"
+    lead Newline "\n"
+  EOF 123..123 ""

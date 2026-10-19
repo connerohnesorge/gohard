@@ -1,0 +1,33 @@
+DesignFile 0..54
+  DesignUnit 0..53
+    ContextClause 0..0
+    PackageDecl 0..53
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..48
+        SubtypeDecl 12..48
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSubtype 15..22 "subtype"
+            trail Whitespace " "
+          Identifier 23..27 "rbit"
+            trail Whitespace " "
+          KwIs 28..30 "is"
+            trail Whitespace " "
+          SubtypeIndication 31..47
+            ResolutionFunction 31..44
+              SimpleName 31..44
+                Identifier 31..43 "resolve_bits"
+                  trail Whitespace " "
+            SimpleName 44..47
+              Identifier 44..47 "bit"
+          Semicolon 47..48 ";"
+      EndClause 48..53
+          lead Newline "\n"
+        KwEnd 49..52 "end"
+        Semicolon 52..53 ";"
+    lead Newline "\n"
+  EOF 54..54 ""

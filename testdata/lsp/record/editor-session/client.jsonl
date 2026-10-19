@@ -1,0 +1,10 @@
+# Recorded with gohard lsp --record DIR, then replayed with gohard lsp
+# replay DIR/1.jsonl: the replay must print the same bytes.
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":null,"rootUri":"file:///work","capabilities":{"general":{"positionEncodings":["utf-8"]}},"initializationOptions":{"format":{"indent":2,"align_ports":false}}}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///work/top.vhd","languageId":"vhdl","version":1,"text":"entity top is\nend entity;\n"}}}
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///work/top.vhd","version":2},"contentChanges":[{"range":{"start":{"line":0,"character":7},"end":{"line":0,"character":10}},"text":"tb"}]}}
+{"jsonrpc":"2.0","id":2,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///work/top.vhd"},"position":{"line":0,"character":7}}}
+{"jsonrpc":"2.0","method":"$/cancelRequest","params":{"id":2}}
+{"jsonrpc":"2.0","id":3,"method":"shutdown"}
+{"jsonrpc":"2.0","method":"exit"}

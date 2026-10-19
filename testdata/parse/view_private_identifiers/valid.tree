@@ -1,0 +1,35 @@
+DesignFile 0..76
+  DesignUnit 0..75
+    ContextClause 0..0
+    PackageDecl 0..75
+        lead LineComment "-- test: std=2008 kind=none"
+        lead Newline "\n"
+      KwPackage 28..35 "package"
+        trail Whitespace " "
+      Identifier 36..37 "p"
+        trail Whitespace " "
+      KwIs 38..40 "is"
+      DeclarativePart 40..70
+        SignalDecl 40..70
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSignal 43..49 "signal"
+            trail Whitespace " "
+          IdentifierList 50..64
+            Identifier 50..54 "view"
+            Comma 54..55 ","
+              trail Whitespace " "
+            Identifier 56..63 "private"
+              trail Whitespace " "
+          Colon 64..65 ":"
+            trail Whitespace " "
+          SubtypeIndication 66..69
+            SimpleName 66..69
+              Identifier 66..69 "bit"
+          Semicolon 69..70 ";"
+      EndClause 70..75
+          lead Newline "\n"
+        KwEnd 71..74 "end"
+        Semicolon 74..75 ";"
+    lead Newline "\n"
+  EOF 76..76 ""

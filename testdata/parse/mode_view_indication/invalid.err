@@ -1,0 +1,2 @@
+invalid.vhd:2:12: error[syntax/error]: expected a mode view indication, found reserved word view
+summary: 1 errors, 0 warnings, 0 hints, 1 files

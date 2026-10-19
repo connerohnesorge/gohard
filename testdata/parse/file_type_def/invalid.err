@@ -1,0 +1,2 @@
+invalid.vhd:2:24: error[syntax/error]: expected reserved word of, found identifier integer
+summary: 1 errors, 0 warnings, 0 hints, 1 files

@@ -1,0 +1,100 @@
+DesignFile 0..150
+  DesignUnit 0..149
+    ContextClause 0..0
+    ArchitectureBody 0..149
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..144
+        PSLAssert 28..71
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 31..37 "assert"
+            trail Whitespace " "
+          PSLAbort 38..70
+            PSLParenProp 38..61
+              LParen 38..39 "("
+              PSLAlways 39..59
+                KwAlways 39..45 "always"
+                  trail Whitespace " "
+                PSLParenProp 46..59
+                  LParen 46..47 "("
+                  PSLImplication 47..58
+                    PSLBoolean 47..49
+                      SimpleName 47..49
+                        Identifier 47..48 "a"
+                          trail Whitespace " "
+                    PSLImplies 49..51 "->"
+                      trail Whitespace " "
+                    PSLNext 52..58
+                      KwNext 52..56 "next"
+                        trail Whitespace " "
+                      PSLBoolean 57..58
+                        SimpleName 57..58
+                          Identifier 57..58 "b"
+                  RParen 58..59 ")"
+              RParen 59..60 ")"
+                trail Whitespace " "
+            KwAbort 61..66 "abort"
+              trail Whitespace " "
+            SimpleName 67..70
+              Identifier 67..70 "rst"
+          Semicolon 70..71 ";"
+        PSLAssert 71..108
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 74..80 "assert"
+            trail Whitespace " "
+          PSLAbort 81..107
+            PSLParenProp 81..92
+              LParen 81..82 "("
+              PSLAlways 82..90
+                KwAlways 82..88 "always"
+                  trail Whitespace " "
+                PSLBoolean 89..90
+                  SimpleName 89..90
+                    Identifier 89..90 "a"
+              RParen 90..91 ")"
+                trail Whitespace " "
+            KwAsyncAbort 92..103 "async_abort"
+              trail Whitespace " "
+            SimpleName 104..107
+              Identifier 104..107 "rst"
+          Semicolon 107..108 ";"
+        PSLAssert 108..144
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 111..117 "assert"
+            trail Whitespace " "
+          PSLAbort 118..143
+            PSLParenProp 118..129
+              LParen 118..119 "("
+              PSLAlways 119..127
+                KwAlways 119..125 "always"
+                  trail Whitespace " "
+                PSLBoolean 126..127
+                  SimpleName 126..127
+                    Identifier 126..127 "a"
+              RParen 127..128 ")"
+                trail Whitespace " "
+            KwSyncAbort 129..139 "sync_abort"
+              trail Whitespace " "
+            SimpleName 140..143
+              Identifier 140..143 "rst"
+          Semicolon 143..144 ";"
+      EndClause 144..149
+          lead Newline "\n"
+        KwEnd 145..148 "end"
+        Semicolon 148..149 ";"
+    lead Newline "\n"
+  EOF 150..150 ""

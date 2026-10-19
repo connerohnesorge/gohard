@@ -1,0 +1,2 @@
+invalid.vhd:2:10: error[syntax/error]: expected ':', found identifier text
+summary: 1 errors, 0 warnings, 0 hints, 1 files

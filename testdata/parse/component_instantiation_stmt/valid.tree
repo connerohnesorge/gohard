@@ -1,0 +1,150 @@
+DesignFile 0..198
+  DesignUnit 0..197
+    ContextClause 0..0
+    ArchitectureBody 0..197
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..192
+        ComponentInstantiationStmt 28..59
+          Label 28..36
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 31..33 "u1"
+              trail Whitespace " "
+            Colon 34..35 ":"
+              trail Whitespace " "
+          InstantiatedUnit 36..41
+            SimpleName 36..41
+              Identifier 36..40 "comp"
+                trail Whitespace " "
+          PortMapAspect 41..58
+            KwPort 41..45 "port"
+              trail Whitespace " "
+            KwMap 46..49 "map"
+              trail Whitespace " "
+            AssociationList 50..58
+              LParen 50..51 "("
+              AssociationElement 51..57
+                SimpleName 51..53
+                  Identifier 51..52 "a"
+                    trail Whitespace " "
+                Arrow 53..55 "=>"
+                  trail Whitespace " "
+                SimpleName 56..57
+                  Identifier 56..57 "s"
+              RParen 57..58 ")"
+          Semicolon 58..59 ";"
+        ComponentInstantiationStmt 59..116
+          Label 59..67
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 62..64 "u2"
+              trail Whitespace " "
+            Colon 65..66 ":"
+              trail Whitespace " "
+          InstantiatedUnit 67..82
+            KwComponent 67..76 "component"
+              trail Whitespace " "
+            SimpleName 77..82
+              Identifier 77..81 "comp"
+                trail Whitespace " "
+          GenericMapAspect 82..103
+            KwGeneric 82..89 "generic"
+              trail Whitespace " "
+            KwMap 90..93 "map"
+              trail Whitespace " "
+            AssociationList 94..103
+              LParen 94..95 "("
+              AssociationElement 95..101
+                SimpleName 95..97
+                  Identifier 95..96 "n"
+                    trail Whitespace " "
+                Arrow 97..99 "=>"
+                  trail Whitespace " "
+                LiteralExpr 100..101
+                  IntegerLiteral 100..101 "1"
+              RParen 101..102 ")"
+                trail Whitespace " "
+          PortMapAspect 103..115
+            KwPort 103..107 "port"
+              trail Whitespace " "
+            KwMap 108..111 "map"
+              trail Whitespace " "
+            AssociationList 112..115
+              LParen 112..113 "("
+              AssociationElement 113..114
+                SimpleName 113..114
+                  Identifier 113..114 "s"
+              RParen 114..115 ")"
+          Semicolon 115..116 ";"
+        ComponentInstantiationStmt 116..161
+          Label 116..124
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 119..121 "u3"
+              trail Whitespace " "
+            Colon 122..123 ":"
+              trail Whitespace " "
+          InstantiatedUnit 124..143
+            KwEntity 124..130 "entity"
+              trail Whitespace " "
+            SelectedName 131..137
+              SimpleName 131..135
+                Identifier 131..135 "work"
+              Dot 135..136 "."
+              Identifier 136..137 "f"
+            LParen 137..138 "("
+            Identifier 138..141 "rtl"
+            RParen 141..142 ")"
+              trail Whitespace " "
+          PortMapAspect 143..160
+            KwPort 143..147 "port"
+              trail Whitespace " "
+            KwMap 148..151 "map"
+              trail Whitespace " "
+            AssociationList 152..160
+              LParen 152..153 "("
+              AssociationElement 153..159
+                SimpleName 153..155
+                  Identifier 153..154 "a"
+                    trail Whitespace " "
+                Arrow 155..157 "=>"
+                  trail Whitespace " "
+                SimpleName 158..159
+                  Identifier 158..159 "s"
+              RParen 159..160 ")"
+          Semicolon 160..161 ";"
+        ComponentInstantiationStmt 161..192
+          Label 161..169
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 164..166 "u4"
+              trail Whitespace " "
+            Colon 167..168 ":"
+              trail Whitespace " "
+          InstantiatedUnit 169..191
+            KwConfiguration 169..182 "configuration"
+              trail Whitespace " "
+            SelectedName 183..191
+              SimpleName 183..187
+                Identifier 183..187 "work"
+              Dot 187..188 "."
+              Identifier 188..191 "cfg"
+          Semicolon 191..192 ";"
+      EndClause 192..197
+          lead Newline "\n"
+        KwEnd 193..196 "end"
+        Semicolon 196..197 ";"
+    lead Newline "\n"
+  EOF 198..198 ""

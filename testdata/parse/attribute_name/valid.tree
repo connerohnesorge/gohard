@@ -1,0 +1,122 @@
+DesignFile 0..187
+  DesignUnit 0..186
+    ContextClause 0..0
+    PackageDecl 0..186
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..181
+        ConstantDecl 12..48
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "c"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..36
+            SimpleName 28..36
+              Identifier 28..35 "integer"
+                trail Whitespace " "
+          VarAssign 36..38 ":="
+            trail Whitespace " "
+          AttributeName 39..47
+            SimpleName 39..40
+              Identifier 39..40 "v"
+            Tick 40..41 "'"
+            Identifier 41..47 "length"
+          Semicolon 47..48 ";"
+        ConstantDecl 48..84
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 51..59 "constant"
+            trail Whitespace " "
+          IdentifierList 60..62
+            Identifier 60..61 "d"
+              trail Whitespace " "
+          Colon 62..63 ":"
+            trail Whitespace " "
+          SubtypeIndication 64..72
+            SimpleName 64..72
+              Identifier 64..71 "integer"
+                trail Whitespace " "
+          VarAssign 72..74 ":="
+            trail Whitespace " "
+          AttributeName 75..83
+            SimpleName 75..76
+              Identifier 75..76 "t"
+            Tick 76..77 "'"
+            Identifier 77..80 "pos"
+            LParen 80..81 "("
+            SimpleName 81..82
+              Identifier 81..82 "x"
+            RParen 82..83 ")"
+          Semicolon 83..84 ";"
+        ConstantDecl 84..142
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 87..95 "constant"
+            trail Whitespace " "
+          IdentifierList 96..98
+            Identifier 96..97 "e"
+              trail Whitespace " "
+          Colon 98..99 ":"
+            trail Whitespace " "
+          SubtypeIndication 100..107
+            SimpleName 100..107
+              Identifier 100..106 "string"
+                trail Whitespace " "
+          VarAssign 107..109 ":="
+            trail Whitespace " "
+          AttributeName 110..141
+            SimpleName 110..111
+              Identifier 110..111 "f"
+            Signature 111..131
+              LBracket 111..112 "["
+              SimpleName 112..120
+                Identifier 112..119 "integer"
+                  trail Whitespace " "
+              KwReturn 120..126 "return"
+                trail Whitespace " "
+              SimpleName 127..130
+                Identifier 127..130 "bit"
+              RBracket 130..131 "]"
+            Tick 131..132 "'"
+            Identifier 132..141 "path_name"
+          Semicolon 141..142 ";"
+        ConstantDecl 142..181
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 145..153 "constant"
+            trail Whitespace " "
+          IdentifierList 154..156
+            Identifier 154..155 "g"
+              trail Whitespace " "
+          Colon 156..157 ":"
+            trail Whitespace " "
+          SubtypeIndication 158..166
+            SimpleName 158..166
+              Identifier 158..165 "integer"
+                trail Whitespace " "
+          VarAssign 166..168 ":="
+            trail Whitespace " "
+          AttributeName 169..180
+            SimpleName 169..170
+              Identifier 169..170 "v"
+            Tick 170..171 "'"
+            Identifier 171..177 "length"
+            LParen 177..178 "("
+            LiteralExpr 178..179
+              IntegerLiteral 178..179 "1"
+            RParen 179..180 ")"
+          Semicolon 180..181 ";"
+      EndClause 181..186
+          lead Newline "\n"
+        KwEnd 182..185 "end"
+        Semicolon 185..186 ";"
+    lead Newline "\n"
+  EOF 187..187 ""

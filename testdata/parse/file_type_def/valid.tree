@@ -1,0 +1,33 @@
+DesignFile 0..54
+  DesignUnit 0..53
+    ContextClause 0..0
+    PackageDecl 0..53
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..48
+        TypeDecl 12..48
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..28 "int_file"
+            trail Whitespace " "
+          KwIs 29..31 "is"
+            trail Whitespace " "
+          FileTypeDef 32..47
+            KwFile 32..36 "file"
+              trail Whitespace " "
+            KwOf 37..39 "of"
+              trail Whitespace " "
+            SimpleName 40..47
+              Identifier 40..47 "integer"
+          Semicolon 47..48 ";"
+      EndClause 48..53
+          lead Newline "\n"
+        KwEnd 49..52 "end"
+        Semicolon 52..53 ";"
+    lead Newline "\n"
+  EOF 54..54 ""

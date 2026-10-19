@@ -1,0 +1,4 @@
+invalid.vhd:1:16: error[syntax/error]: expected ';', found identifier work
+invalid.vhd:1:16: error[syntax/error]: expected a library unit, found identifier work
+invalid.vhd:1:17: error[syntax/error]: expected a design unit (entity, architecture, package, configuration, context or a PSL verification unit), found identifier work
+summary: 3 errors, 0 warnings, 0 hints, 1 files

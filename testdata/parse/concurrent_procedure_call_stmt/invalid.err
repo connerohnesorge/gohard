@@ -1,0 +1,2 @@
+invalid.vhd:3:11: error[syntax/error]: expected an expression, found ')'
+summary: 1 errors, 0 warnings, 0 hints, 1 files

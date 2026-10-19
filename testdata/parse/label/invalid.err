@@ -1,0 +1,5 @@
+invalid.vhd:3:7: error[syntax/error]: expected a concurrent statement, found ':'
+invalid.vhd:4:3: error[syntax/error]: expected a concurrent statement, found reserved word begin
+invalid.vhd:5:6: error[syntax/error]: expected ';', found reserved word process
+invalid.vhd:5:7: error[syntax/error]: expected a design unit (entity, architecture, package, configuration, context or a PSL verification unit), found reserved word process
+summary: 4 errors, 0 warnings, 0 hints, 1 files

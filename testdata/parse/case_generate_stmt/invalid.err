@@ -1,0 +1,4 @@
+invalid.vhd:6:4: error[syntax/error]: expected reserved word generate, found ';'
+invalid.vhd:6:5: error[syntax/error]: expected ';', found end of file
+invalid.vhd:6:5: error[syntax/error]: expected reserved word end, found end of file
+summary: 3 errors, 0 warnings, 0 hints, 1 files

@@ -1,0 +1,4 @@
+invalid.vhd:2:24: error[syntax/error]: expected ')', found '<'
+invalid.vhd:2:24: error[syntax/error]: expected ';', found '<'
+invalid.vhd:2:25: error[syntax/error]: expected a declaration, found '<'
+summary: 3 errors, 0 warnings, 0 hints, 1 files

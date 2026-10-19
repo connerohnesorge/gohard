@@ -1,0 +1,4 @@
+invalid.vhd:2:10: error[syntax/error]: expected '(', found identifier width
+invalid.vhd:2:10: error[syntax/error]: expected ';', found identifier width
+invalid.vhd:2:11: error[syntax/error]: expected a declaration, found identifier width
+summary: 3 errors, 0 warnings, 0 hints, 1 files

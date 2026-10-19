@@ -1,0 +1,62 @@
+DesignFile 0..72
+  DesignUnit 0..71
+    ContextClause 0..0
+    EntityDecl 0..71
+      KwEntity 0..6 "entity"
+        trail Whitespace " "
+      Identifier 7..8 "e"
+        trail Whitespace " "
+      KwIs 9..11 "is"
+      PortClause 11..66
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwPort 14..18 "port"
+          trail Whitespace " "
+        InterfaceList 19..65
+          LParen 19..20 "("
+          InterfaceObjectDecl 20..32
+            IdentifierList 20..24
+              Identifier 20..23 "clk"
+                trail Whitespace " "
+            Colon 24..25 ":"
+              trail Whitespace " "
+            SimpleModeIndication 26..29
+              KwIn 26..28 "in"
+                trail Whitespace " "
+            SubtypeIndication 29..32
+              SimpleName 29..32
+                Identifier 29..32 "bit"
+          Semicolon 32..33 ";"
+            trail Whitespace " "
+          InterfaceObjectDecl 34..64
+            IdentifierList 34..36
+              Identifier 34..35 "q"
+                trail Whitespace " "
+            Colon 36..37 ":"
+              trail Whitespace " "
+            SimpleModeIndication 38..42
+              KwOut 38..41 "out"
+                trail Whitespace " "
+            SubtypeIndication 42..64
+              SimpleName 42..52
+                Identifier 42..52 "bit_vector"
+              ArrayConstraint 52..64
+                LParen 52..53 "("
+                RangeExpr 53..63
+                  LiteralExpr 53..55
+                    IntegerLiteral 53..54 "3"
+                      trail Whitespace " "
+                  KwDownto 55..61 "downto"
+                    trail Whitespace " "
+                  LiteralExpr 62..63
+                    IntegerLiteral 62..63 "0"
+                RParen 63..64 ")"
+          RParen 64..65 ")"
+        Semicolon 65..66 ";"
+      DeclarativePart 66..66
+      EndClause 66..71
+          lead Newline "\n"
+        KwEnd 67..70 "end"
+        Semicolon 70..71 ";"
+    lead Newline "\n"
+  EOF 72..72 ""

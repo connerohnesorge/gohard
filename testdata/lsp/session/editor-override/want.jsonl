@@ -1,0 +1,7 @@
+{"jsonrpc":"2.0","id":1,"result":{"capabilities":{"positionEncoding":"utf-16","textDocumentSync":{"change":2,"openClose":true,"save":{"includeText":false}},"workspace":{"workspaceFolders":{"supported":true}}},"serverInfo":{"name":"gohard","version":"0.0.0-test"}}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":0,"id":1}}
+{"jsonrpc":"2.0","method":"window/logMessage","params":{"type":3,"message":"gohard.yaml sets format.indent; the editor setting format.indent is ignored"}}
+{"jsonrpc":"2.0","method":"window/logMessage","params":{"type":3,"message":"gohard.yaml sets format.indent; the editor setting format.indent is ignored"}}
+{"jsonrpc":"2.0","method":"window/logMessage","params":{"type":3,"message":"gohard.yaml sets simulation.seed; the editor setting simulation.seed is ignored"}}
+{"jsonrpc":"2.0","id":99,"result":null}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":2,"id":99}}

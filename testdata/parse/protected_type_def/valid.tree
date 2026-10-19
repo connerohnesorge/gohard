@@ -1,0 +1,61 @@
+DesignFile 0..130
+  DesignUnit 0..129
+    ContextClause 0..0
+    PackageDecl 0..129
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..124
+        TypeDecl 12..124
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..27 "counter"
+            trail Whitespace " "
+          KwIs 28..30 "is"
+            trail Whitespace " "
+          ProtectedTypeDef 31..124
+            KwProtected 31..40 "protected"
+            DeclarativePart 40..99
+              SubprogramDecl 40..59
+                ProcedureSpec 40..58
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  KwProcedure 45..54 "procedure"
+                    trail Whitespace " "
+                  Identifier 55..58 "inc"
+                Semicolon 58..59 ";"
+              SubprogramDecl 59..99
+                FunctionSpec 59..98
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  KwImpure 64..70 "impure"
+                    trail Whitespace " "
+                  KwFunction 71..79 "function"
+                    trail Whitespace " "
+                  Identifier 80..83 "get"
+                    trail Whitespace " "
+                  ReturnSpec 84..98
+                    KwReturn 84..90 "return"
+                      trail Whitespace " "
+                    SimpleName 91..98
+                      Identifier 91..98 "natural"
+                Semicolon 98..99 ";"
+            EndClause 99..124
+                lead Newline "\n"
+                lead Whitespace "  "
+              KwEnd 102..105 "end"
+                trail Whitespace " "
+              KwProtected 106..115 "protected"
+                trail Whitespace " "
+              Identifier 116..123 "counter"
+              Semicolon 123..124 ";"
+      EndClause 124..129
+          lead Newline "\n"
+        KwEnd 125..128 "end"
+        Semicolon 128..129 ";"
+    lead Newline "\n"
+  EOF 130..130 ""

@@ -1,0 +1,75 @@
+DesignFile 0..103
+  DesignUnit 0..102
+    ContextClause 0..0
+    PackageDecl 0..102
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..97
+        ConstantDecl 12..56
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "c"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..39
+            SimpleName 28..39
+              Identifier 28..38 "bit_vector"
+                trail Whitespace " "
+          VarAssign 39..41 ":="
+            trail Whitespace " "
+          SliceName 42..55
+            SimpleName 42..43
+              Identifier 42..43 "v"
+            LParen 43..44 "("
+            RangeExpr 44..54
+              LiteralExpr 44..46
+                IntegerLiteral 44..45 "7"
+                  trail Whitespace " "
+              KwDownto 46..52 "downto"
+                trail Whitespace " "
+              LiteralExpr 53..54
+                IntegerLiteral 53..54 "4"
+            RParen 54..55 ")"
+          Semicolon 55..56 ";"
+        ConstantDecl 56..97
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 59..67 "constant"
+            trail Whitespace " "
+          IdentifierList 68..70
+            Identifier 68..69 "d"
+              trail Whitespace " "
+          Colon 70..71 ":"
+            trail Whitespace " "
+          SubtypeIndication 72..83
+            SimpleName 72..83
+              Identifier 72..82 "bit_vector"
+                trail Whitespace " "
+          VarAssign 83..85 ":="
+            trail Whitespace " "
+          CallOrIndexName 86..96
+            SimpleName 86..87
+              Identifier 86..87 "v"
+            AssociationList 87..96
+              LParen 87..88 "("
+              AssociationElement 88..95
+                AttributeName 88..95
+                  SimpleName 88..89
+                    Identifier 88..89 "r"
+                  Tick 89..90 "'"
+                  KwRange 90..95 "range"
+              RParen 95..96 ")"
+          Semicolon 96..97 ";"
+      EndClause 97..102
+          lead Newline "\n"
+        KwEnd 98..101 "end"
+        Semicolon 101..102 ";"
+    lead Newline "\n"
+  EOF 103..103 ""

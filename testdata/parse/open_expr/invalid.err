@@ -1,0 +1,2 @@
+invalid.vhd:2:50: error[syntax/error]: expected ',' or ')', found reserved word open
+summary: 1 errors, 0 warnings, 0 hints, 1 files

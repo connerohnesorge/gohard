@@ -1,0 +1,37 @@
+DesignFile 0..43
+  DesignUnit 0..42
+    ContextClause 0..0
+    PSLVmode 0..42
+      KwVmode 0..5 "vmode"
+        trail Whitespace " "
+      Identifier 6..7 "m"
+        trail Whitespace " "
+      LBrace 8..9 "{"
+      PSLAssume 9..40
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwAssume 12..18 "assume"
+          trail Whitespace " "
+        PSLAlways 19..39
+          KwAlways 19..25 "always"
+            trail Whitespace " "
+          PSLBoolean 26..39
+            UnaryExpr 26..39
+              KwNot 26..29 "not"
+                trail Whitespace " "
+              ParenExpr 30..39
+                LParen 30..31 "("
+                BinaryExpr 31..38
+                  SimpleName 31..33
+                    Identifier 31..32 "a"
+                      trail Whitespace " "
+                  KwAnd 33..36 "and"
+                    trail Whitespace " "
+                  SimpleName 37..38
+                    Identifier 37..38 "b"
+                RParen 38..39 ")"
+        Semicolon 39..40 ";"
+        lead Newline "\n"
+      RBrace 41..42 "}"
+    lead Newline "\n"
+  EOF 43..43 ""

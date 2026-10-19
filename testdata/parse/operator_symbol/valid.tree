@@ -1,0 +1,74 @@
+DesignFile 0..101
+  DesignUnit 0..100
+    ContextClause 0..0
+    PackageDecl 0..100
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..95
+        ConstantDecl 12..49
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "c"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..36
+            SimpleName 28..36
+              Identifier 28..35 "integer"
+                trail Whitespace " "
+          VarAssign 36..38 ":="
+            trail Whitespace " "
+          CallOrIndexName 39..48
+            OperatorSymbol 39..42
+              StringLiteral 39..42 "\"+\""
+            AssociationList 42..48
+              LParen 42..43 "("
+              AssociationElement 43..44
+                LiteralExpr 43..44
+                  IntegerLiteral 43..44 "1"
+              Comma 44..45 ","
+                trail Whitespace " "
+              AssociationElement 46..47
+                LiteralExpr 46..47
+                  IntegerLiteral 46..47 "2"
+              RParen 47..48 ")"
+          Semicolon 48..49 ";"
+        AliasDecl 49..95
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 52..57 "alias"
+            trail Whitespace " "
+          Identifier 58..63 "andop"
+            trail Whitespace " "
+          KwIs 64..66 "is"
+            trail Whitespace " "
+          OperatorSymbol 67..73
+            StringLiteral 67..72 "\"and\""
+              trail Whitespace " "
+          Signature 73..94
+            LBracket 73..74 "["
+            SimpleName 74..77
+              Identifier 74..77 "bit"
+            Comma 77..78 ","
+              trail Whitespace " "
+            SimpleName 79..83
+              Identifier 79..82 "bit"
+                trail Whitespace " "
+            KwReturn 83..89 "return"
+              trail Whitespace " "
+            SimpleName 90..93
+              Identifier 90..93 "bit"
+            RBracket 93..94 "]"
+          Semicolon 94..95 ";"
+      EndClause 95..100
+          lead Newline "\n"
+        KwEnd 96..99 "end"
+        Semicolon 99..100 ";"
+    lead Newline "\n"
+  EOF 101..101 ""

@@ -1,0 +1,60 @@
+DesignFile 0..103
+  DesignUnit 0..102
+    ContextClause 0..0
+    ArchitectureBody 0..102
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..97
+        ProcessStmt 28..97
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..82
+            WaitStmt 49..82
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwWait 54..58 "wait"
+                trail Whitespace " "
+              ConditionClause 59..81
+                KwUntil 59..64 "until"
+                  trail Whitespace " "
+                CallOrIndexName 65..81
+                  SimpleName 65..76
+                    Identifier 65..76 "rising_edge"
+                  AssociationList 76..81
+                    LParen 76..77 "("
+                    AssociationElement 77..80
+                      SimpleName 77..80
+                        Identifier 77..80 "clk"
+                    RParen 80..81 ")"
+              Semicolon 81..82 ";"
+          EndClause 82..97
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 85..88 "end"
+              trail Whitespace " "
+            KwProcess 89..96 "process"
+            Semicolon 96..97 ";"
+      EndClause 97..102
+          lead Newline "\n"
+        KwEnd 98..101 "end"
+        Semicolon 101..102 ";"
+    lead Newline "\n"
+  EOF 103..103 ""

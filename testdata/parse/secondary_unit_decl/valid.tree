@@ -1,0 +1,73 @@
+DesignFile 0..100
+  DesignUnit 0..99
+    ContextClause 0..0
+    PackageDecl 0..99
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..94
+        TypeDecl 12..94
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..26 "weight"
+            trail Whitespace " "
+          KwIs 27..29 "is"
+            trail Whitespace " "
+          PhysicalTypeDef 30..94
+            RangeConstraint 30..49
+              KwRange 30..35 "range"
+                trail Whitespace " "
+              RangeExpr 36..49
+                LiteralExpr 36..38
+                  IntegerLiteral 36..37 "0"
+                    trail Whitespace " "
+                KwTo 38..40 "to"
+                  trail Whitespace " "
+                LiteralExpr 41..49
+                  IntegerLiteral 41..48 "1000000"
+                    trail Whitespace " "
+            KwUnits 49..54 "units"
+              trail Whitespace " "
+            PrimaryUnitDecl 55..58
+              Identifier 55..56 "g"
+              Semicolon 56..57 ";"
+                trail Whitespace " "
+            SecondaryUnitDecl 58..71
+              Identifier 58..60 "kg"
+                trail Whitespace " "
+              Eq 61..62 "="
+                trail Whitespace " "
+              PhysicalLiteral 63..69
+                IntegerLiteral 63..67 "1000"
+                  trail Whitespace " "
+                SimpleName 68..69
+                  Identifier 68..69 "g"
+              Semicolon 69..70 ";"
+                trail Whitespace " "
+            SecondaryUnitDecl 71..84
+              Identifier 71..72 "t"
+                trail Whitespace " "
+              Eq 73..74 "="
+                trail Whitespace " "
+              PhysicalLiteral 75..82
+                IntegerLiteral 75..79 "1000"
+                  trail Whitespace " "
+                SimpleName 80..82
+                  Identifier 80..82 "kg"
+              Semicolon 82..83 ";"
+                trail Whitespace " "
+            EndClause 84..94
+              KwEnd 84..87 "end"
+                trail Whitespace " "
+              KwUnits 88..93 "units"
+              Semicolon 93..94 ";"
+      EndClause 94..99
+          lead Newline "\n"
+        KwEnd 95..98 "end"
+        Semicolon 98..99 ";"
+    lead Newline "\n"
+  EOF 100..100 ""

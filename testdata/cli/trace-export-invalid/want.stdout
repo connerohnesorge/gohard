@@ -1,0 +1,2 @@
+gohard: error[trace/invalid]: invalid trace bad.trace: line 3: bad number x
+summary: 1 errors, 0 warnings, 0 hints, 0 files

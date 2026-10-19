@@ -1,0 +1,51 @@
+DesignFile 0..147
+  DesignUnit 0..81
+    ContextClause 0..0
+    EntityDecl 0..81
+        lead LineComment "-- A file with two design units and a trailing comment."
+        lead Newline "\n"
+      KwEntity 56..62 "entity"
+        trail Whitespace " "
+      Identifier 63..64 "e"
+        trail Whitespace " "
+      KwIs 65..67 "is"
+      DeclarativePart 67..67
+      EndClause 67..81
+          lead Newline "\n"
+        KwEnd 68..71 "end"
+          trail Whitespace " "
+        KwEntity 72..78 "entity"
+          trail Whitespace " "
+        Identifier 79..80 "e"
+        Semicolon 80..81 ";"
+  DesignUnit 81..131
+    ContextClause 81..81
+    ArchitectureBody 81..131
+        lead Newline "\n"
+        lead Newline "\n"
+      KwArchitecture 83..95 "architecture"
+        trail Whitespace " "
+      Identifier 96..97 "a"
+        trail Whitespace " "
+      KwOf 98..100 "of"
+        trail Whitespace " "
+      SimpleName 101..103
+        Identifier 101..102 "e"
+          trail Whitespace " "
+      KwIs 103..105 "is"
+      DeclarativePart 105..105
+        lead Newline "\n"
+      KwBegin 106..111 "begin"
+      StatementPart 111..111
+      EndClause 111..131
+          lead Newline "\n"
+        KwEnd 112..115 "end"
+          trail Whitespace " "
+        KwArchitecture 116..128 "architecture"
+          trail Whitespace " "
+        Identifier 129..130 "a"
+        Semicolon 130..131 ";"
+    lead Newline "\n"
+    lead LineComment "-- end of file"
+    lead Newline "\n"
+  EOF 147..147 ""

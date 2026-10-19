@@ -1,0 +1,44 @@
+DesignFile 0..63
+  DesignUnit 0..62
+    ContextClause 0..0
+    PackageDecl 0..62
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..57
+        TypeDecl 12..57
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..21 "v"
+            trail Whitespace " "
+          KwIs 22..24 "is"
+            trail Whitespace " "
+          UnboundedArrayDef 25..56
+            KwArray 25..30 "array"
+              trail Whitespace " "
+            LParen 31..32 "("
+            IndexSubtypeDef 32..48
+              SimpleName 32..40
+                Identifier 32..39 "integer"
+                  trail Whitespace " "
+              KwRange 40..45 "range"
+                trail Whitespace " "
+              Box 46..48 "<>"
+            RParen 48..49 ")"
+              trail Whitespace " "
+            KwOf 50..52 "of"
+              trail Whitespace " "
+            SubtypeIndication 53..56
+              SimpleName 53..56
+                Identifier 53..56 "bit"
+          Semicolon 56..57 ";"
+      EndClause 57..62
+          lead Newline "\n"
+        KwEnd 58..61 "end"
+        Semicolon 61..62 ";"
+    lead Newline "\n"
+  EOF 63..63 ""

@@ -1,0 +1,2 @@
+invalid.vhd:2:22: error[syntax/error]: expected ':', found reserved word signal
+summary: 1 errors, 0 warnings, 0 hints, 1 files

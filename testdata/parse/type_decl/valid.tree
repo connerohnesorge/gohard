@@ -1,0 +1,55 @@
+DesignFile 0..64
+  DesignUnit 0..63
+    ContextClause 0..0
+    PackageDecl 0..63
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..58
+        TypeDecl 12..32
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..21 "t"
+            trail Whitespace " "
+          KwIs 22..24 "is"
+            trail Whitespace " "
+          EnumerationTypeDef 25..31
+            LParen 25..26 "("
+            Identifier 26..27 "a"
+            Comma 27..28 ","
+              trail Whitespace " "
+            Identifier 29..30 "b"
+            RParen 30..31 ")"
+          Semicolon 31..32 ";"
+        TypeDecl 32..58
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 35..39 "type"
+            trail Whitespace " "
+          Identifier 40..41 "r"
+            trail Whitespace " "
+          KwIs 42..44 "is"
+            trail Whitespace " "
+          RangeTypeDef 45..57
+            RangeConstraint 45..57
+              KwRange 45..50 "range"
+                trail Whitespace " "
+              RangeExpr 51..57
+                LiteralExpr 51..53
+                  IntegerLiteral 51..52 "0"
+                    trail Whitespace " "
+                KwTo 53..55 "to"
+                  trail Whitespace " "
+                LiteralExpr 56..57
+                  IntegerLiteral 56..57 "7"
+          Semicolon 57..58 ";"
+      EndClause 58..63
+          lead Newline "\n"
+        KwEnd 59..62 "end"
+        Semicolon 62..63 ";"
+    lead Newline "\n"
+  EOF 64..64 ""

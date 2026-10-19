@@ -1,0 +1,104 @@
+DesignFile 0..116
+  DesignUnit 0..115
+    ContextClause 0..0
+    PackageDecl 0..115
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..110
+        ConstantDecl 12..47
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "c"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..36
+            SimpleName 28..36
+              Identifier 28..35 "integer"
+                trail Whitespace " "
+          VarAssign 36..38 ":="
+            trail Whitespace " "
+          CallOrIndexName 39..46
+            SimpleName 39..40
+              Identifier 39..40 "f"
+            AssociationList 40..46
+              LParen 40..41 "("
+              AssociationElement 41..42
+                LiteralExpr 41..42
+                  IntegerLiteral 41..42 "1"
+              Comma 42..43 ","
+                trail Whitespace " "
+              AssociationElement 44..45
+                LiteralExpr 44..45
+                  IntegerLiteral 44..45 "2"
+              RParen 45..46 ")"
+          Semicolon 46..47 ";"
+        ConstantDecl 47..75
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 50..58 "constant"
+            trail Whitespace " "
+          IdentifierList 59..61
+            Identifier 59..60 "d"
+              trail Whitespace " "
+          Colon 61..62 ":"
+            trail Whitespace " "
+          SubtypeIndication 63..67
+            SimpleName 63..67
+              Identifier 63..66 "bit"
+                trail Whitespace " "
+          VarAssign 67..69 ":="
+            trail Whitespace " "
+          CallOrIndexName 70..74
+            SimpleName 70..71
+              Identifier 70..71 "v"
+            AssociationList 71..74
+              LParen 71..72 "("
+              AssociationElement 72..73
+                LiteralExpr 72..73
+                  IntegerLiteral 72..73 "3"
+              RParen 73..74 ")"
+          Semicolon 74..75 ";"
+        ConstantDecl 75..110
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 78..86 "constant"
+            trail Whitespace " "
+          IdentifierList 87..89
+            Identifier 87..88 "e"
+              trail Whitespace " "
+          Colon 89..90 ":"
+            trail Whitespace " "
+          SubtypeIndication 91..99
+            SimpleName 91..99
+              Identifier 91..98 "integer"
+                trail Whitespace " "
+          VarAssign 99..101 ":="
+            trail Whitespace " "
+          CallOrIndexName 102..109
+            SimpleName 102..103
+              Identifier 102..103 "m"
+            AssociationList 103..109
+              LParen 103..104 "("
+              AssociationElement 104..105
+                LiteralExpr 104..105
+                  IntegerLiteral 104..105 "1"
+              Comma 105..106 ","
+                trail Whitespace " "
+              AssociationElement 107..108
+                LiteralExpr 107..108
+                  IntegerLiteral 107..108 "2"
+              RParen 108..109 ")"
+          Semicolon 109..110 ";"
+      EndClause 110..115
+          lead Newline "\n"
+        KwEnd 111..114 "end"
+        Semicolon 114..115 ";"
+    lead Newline "\n"
+  EOF 116..116 ""

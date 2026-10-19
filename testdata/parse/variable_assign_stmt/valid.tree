@@ -1,0 +1,79 @@
+DesignFile 0..101
+  DesignUnit 0..100
+    ContextClause 0..0
+    ArchitectureBody 0..100
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..95
+        ProcessStmt 28..95
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..80
+            VariableAssignStmt 49..61
+              Target 49..56
+                SimpleName 49..56
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 54..55 "v"
+                    trail Whitespace " "
+              VarAssign 56..58 ":="
+                trail Whitespace " "
+              LiteralExpr 59..60
+                IntegerLiteral 59..60 "1"
+              Semicolon 60..61 ";"
+            VariableAssignStmt 61..80
+              Target 61..71
+                CallOrIndexName 61..71
+                  SimpleName 61..67
+                      lead Newline "\n"
+                      lead Whitespace "    "
+                    Identifier 66..67 "w"
+                  AssociationList 67..71
+                    LParen 67..68 "("
+                    AssociationElement 68..69
+                      LiteralExpr 68..69
+                        IntegerLiteral 68..69 "3"
+                    RParen 69..70 ")"
+                      trail Whitespace " "
+              VarAssign 71..73 ":="
+                trail Whitespace " "
+              BinaryExpr 74..79
+                SimpleName 74..76
+                  Identifier 74..75 "v"
+                    trail Whitespace " "
+                Plus 76..77 "+"
+                  trail Whitespace " "
+                LiteralExpr 78..79
+                  IntegerLiteral 78..79 "2"
+              Semicolon 79..80 ";"
+          EndClause 80..95
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 83..86 "end"
+              trail Whitespace " "
+            KwProcess 87..94 "process"
+            Semicolon 94..95 ";"
+      EndClause 95..100
+          lead Newline "\n"
+        KwEnd 96..99 "end"
+        Semicolon 99..100 ";"
+    lead Newline "\n"
+  EOF 101..101 ""

@@ -1,0 +1,84 @@
+DesignFile 0..125
+  DesignUnit 0..124
+    ContextClause 0..0
+    ArchitectureBody 0..124
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..83
+        PSLPropertyDecl 22..83
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProperty 25..33 "property"
+            trail Whitespace " "
+          Identifier 34..43 "handshake"
+            trail Whitespace " "
+          PSLFormalParameterList 44..59
+            LParen 44..45 "("
+            PSLFormalParameter 45..57
+              KwBoolean 45..52 "boolean"
+                trail Whitespace " "
+              Identifier 53..54 "r"
+              Comma 54..55 ","
+                trail Whitespace " "
+              Identifier 56..57 "q"
+            RParen 57..58 ")"
+              trail Whitespace " "
+          KwIs 59..61 "is"
+            trail Whitespace " "
+          PSLAlways 62..82
+            KwAlways 62..68 "always"
+              trail Whitespace " "
+            PSLParenProp 69..82
+              LParen 69..70 "("
+              PSLImplication 70..81
+                PSLBoolean 70..72
+                  SimpleName 70..72
+                    Identifier 70..71 "r"
+                      trail Whitespace " "
+                PSLImplies 72..74 "->"
+                  trail Whitespace " "
+                PSLNext 75..81
+                  KwNext 75..79 "next"
+                    trail Whitespace " "
+                  PSLBoolean 80..81
+                    SimpleName 80..81
+                      Identifier 80..81 "q"
+              RParen 81..82 ")"
+          Semicolon 82..83 ";"
+        lead Newline "\n"
+      KwBegin 84..89 "begin"
+      StatementPart 89..119
+        PSLAssert 89..119
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 92..98 "assert"
+            trail Whitespace " "
+          PSLPropertyInstance 99..118
+            SimpleName 99..108
+              Identifier 99..108 "handshake"
+            AssociationList 108..118
+              LParen 108..109 "("
+              PSLBoolean 109..112
+                SimpleName 109..112
+                  Identifier 109..112 "req"
+              Comma 112..113 ","
+                trail Whitespace " "
+              PSLBoolean 114..117
+                SimpleName 114..117
+                  Identifier 114..117 "ack"
+              RParen 117..118 ")"
+          Semicolon 118..119 ";"
+      EndClause 119..124
+          lead Newline "\n"
+        KwEnd 120..123 "end"
+        Semicolon 123..124 ";"
+    lead Newline "\n"
+  EOF 125..125 ""

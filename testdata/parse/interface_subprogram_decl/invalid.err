@@ -1,0 +1,3 @@
+invalid.vhd:2:36: error[syntax/error]: expected ';' or ')', found identifier boolean
+invalid.vhd:2:36: error[syntax/error]: expected reserved word return, found identifier boolean
+summary: 2 errors, 0 warnings, 0 hints, 1 files

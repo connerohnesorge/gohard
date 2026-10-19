@@ -1,0 +1,83 @@
+DesignFile 0..128
+  DesignUnit 0..127
+    ContextClause 0..0
+    ArchitectureBody 0..127
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..116
+        FileDecl 22..67
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwFile 25..29 "file"
+            trail Whitespace " "
+          IdentifierList 30..33
+            Identifier 30..32 "f1"
+              trail Whitespace " "
+          Colon 33..34 ":"
+            trail Whitespace " "
+          SubtypeIndication 35..40
+            SimpleName 35..40
+              Identifier 35..39 "text"
+                trail Whitespace " "
+          FileOpenInformation 40..66
+            KwOpen 40..44 "open"
+              trail Whitespace " "
+            SimpleName 45..55
+              Identifier 45..54 "read_mode"
+                trail Whitespace " "
+            KwIs 55..57 "is"
+              trail Whitespace " "
+            LiteralExpr 58..66
+              StringLiteral 58..66 "\"in.txt\""
+          Semicolon 66..67 ";"
+        FileDecl 67..98
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwFile 70..74 "file"
+            trail Whitespace " "
+          IdentifierList 75..78
+            Identifier 75..77 "f2"
+              trail Whitespace " "
+          Colon 78..79 ":"
+            trail Whitespace " "
+          SubtypeIndication 80..85
+            SimpleName 80..85
+              Identifier 80..84 "text"
+                trail Whitespace " "
+          FileOpenInformation 85..97
+            KwIs 85..87 "is"
+              trail Whitespace " "
+            LiteralExpr 88..97
+              StringLiteral 88..97 "\"out.txt\""
+          Semicolon 97..98 ";"
+        FileDecl 98..116
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwFile 101..105 "file"
+            trail Whitespace " "
+          IdentifierList 106..109
+            Identifier 106..108 "f3"
+              trail Whitespace " "
+          Colon 109..110 ":"
+            trail Whitespace " "
+          SubtypeIndication 111..115
+            SimpleName 111..115
+              Identifier 111..115 "text"
+          Semicolon 115..116 ";"
+        lead Newline "\n"
+      KwBegin 117..122 "begin"
+      StatementPart 122..122
+      EndClause 122..127
+          lead Newline "\n"
+        KwEnd 123..126 "end"
+        Semicolon 126..127 ";"
+    lead Newline "\n"
+  EOF 128..128 ""

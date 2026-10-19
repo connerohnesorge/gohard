@@ -1,0 +1,3 @@
+invalid.vhd:5:5: error[syntax/error]: expected a declaration, found identifier t
+invalid.vhd:5:15: error[syntax/error]: expected reserved word begin, found reserved word end
+summary: 2 errors, 0 warnings, 0 hints, 1 files

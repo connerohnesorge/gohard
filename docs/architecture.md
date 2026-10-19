@@ -67,7 +67,7 @@ Env, maps SIGINT/SIGTERM to 130/143, and calls `cli.Run`.
 | 5 | `internal/resolve` | queries over sema results: definition, references, hover data | #34 |
 | 6 | `internal/elab` | lowers a resolved design to a compact model; instance paths like `tb.dut.u0` | #35 |
 | 6 | `internal/sim` | single-threaded discrete-event kernel ordered by (time, delta, process sequence) | #35 |
-| 6 | `internal/trace` | lossless native trace, canonical text form, VCD/FST export | #36 |
+| 6 | `internal/trace` | lossless native trace, `Writer`/`Recorder` fed by the kernel, canonical text form (grammar in `doc.go`), value lookup; exports in `trace/vcd` and `trace/fst` (pure Go, fixed bytes); `trace/waveform` is "Open waveform" | #36 |
 | 6 | `internal/repro` | repro files and session headers (`"schema":1`) | #29 |
 | 7 | `internal/ide` | LSP features as pure functions of a snapshot | #25 |
 | 7 | `internal/jsonrpc2` | hand-rolled JSON-RPC 2.0 framing; the only goroutines (stdio reader and writer) | #25 |
@@ -100,6 +100,11 @@ order as a pure function of (seed, delta step).
 `internal/env/realenv` and `cmd/`: `time.Now`, `time.Sleep`, timers,
 `math/rand`, `os.Getenv`, direct `os` file access, `net`, `os/exec`, `go`
 and `select` statements, and map iteration whose order reaches output.
+The one other exemption is `internal/jsonrpc2` (that package only, its
+tests included), which may use `go` and `select` and nothing else
+banned: its stdio reader and writer are the only goroutines in GoHard
+(#4 P8, #25). The single-threaded server waits for input, timers and
+cancellation through `jsonrpc2.Conn.Next`, so it needs no `select`.
 
 ## Diagnostics (#20)
 
@@ -170,6 +175,32 @@ not built yet exits 2 with `cli/not-implemented`.
   case-insensitive file system.
 * `.gohard/crash/<hash>.txt` on an internal crash (#20).
 * `DIR/<n>.jsonl` for `gohard lsp --record DIR` (#29).
+
+## Language server (#25, #26)
+
+`internal/server` is `Step(State, Event) -> (State, []Effect)` with a
+queue ordered by virtual time, priority and sequence; each Step costs
+one virtual millisecond, so the 5 s no-progress rule is a step bound.
+`server.Driver` is the shell: it runs queued events one at a time and
+performs effects through the env doors; before each step `Serve`
+queues every client message already read, so a cancel or an edit
+reaches running work at the next slice boundary. A `--record` session
+stores each input with the core step it arrived at (plain JSON-RPC
+lines for input that arrived while idle, `"$gohard"` entries
+otherwise, and for bodies that are not JSON), so the output is a
+function of the session file and the project files and `gohard lsp
+replay` reproduces it byte for byte. The session also holds every
+`gohard.yaml` read (a save reloads it) and every request the
+transport skipped unread (answered with InvalidRequest), and its
+folder is the one the first initialize request names, wherever that
+request is. Failing harness sessions embed
+their project files and test analyzer, so a seed replays on its own.
+Every response and publish is followed by the notification
+`$/gohard/snapshot` with the snapshot ID. Features come from a
+`server.Analyzer` (pure tasks over a whole-workspace `Snapshot`, byte
+offsets, cross-file locations), `server.Nop` until #32, #34 and #35
+implement it; `gohard lsp <action>` runs the action as an in-memory
+session on the same code path (`server.RunAction`).
 
 ## Test data
 

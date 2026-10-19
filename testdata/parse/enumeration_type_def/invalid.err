@@ -1,0 +1,2 @@
+invalid.vhd:2:23: error[syntax/error]: expected an enumeration literal, found ','
+summary: 1 errors, 0 warnings, 0 hints, 1 files

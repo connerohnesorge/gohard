@@ -1,0 +1,74 @@
+DesignFile 0..105
+  DesignUnit 0..104
+    ContextClause 0..0
+    PackageDecl 0..104
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..99
+        ConstantDecl 12..51
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "c"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..36
+            SimpleName 28..36
+              Identifier 28..35 "integer"
+                trail Whitespace " "
+          VarAssign 36..38 ":="
+            trail Whitespace " "
+          QualifiedExpr 39..50
+            SimpleName 39..46
+              Identifier 39..46 "integer"
+            Tick 46..47 "'"
+            ParenExpr 47..50
+              LParen 47..48 "("
+              LiteralExpr 48..49
+                IntegerLiteral 48..49 "5"
+              RParen 49..50 ")"
+          Semicolon 50..51 ";"
+        ConstantDecl 51..99
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 54..62 "constant"
+            trail Whitespace " "
+          IdentifierList 63..65
+            Identifier 63..64 "d"
+              trail Whitespace " "
+          Colon 65..66 ":"
+            trail Whitespace " "
+          SubtypeIndication 67..78
+            SimpleName 67..78
+              Identifier 67..77 "bit_vector"
+                trail Whitespace " "
+          VarAssign 78..80 ":="
+            trail Whitespace " "
+          QualifiedExpr 81..98
+            SimpleName 81..91
+              Identifier 81..91 "bit_vector"
+            Tick 91..92 "'"
+            Aggregate 92..98
+              LParen 92..93 "("
+              ElementAssociation 93..94
+                SimpleName 93..94
+                  Identifier 93..94 "x"
+              Comma 94..95 ","
+                trail Whitespace " "
+              ElementAssociation 96..97
+                SimpleName 96..97
+                  Identifier 96..97 "y"
+              RParen 97..98 ")"
+          Semicolon 98..99 ";"
+      EndClause 99..104
+          lead Newline "\n"
+        KwEnd 100..103 "end"
+        Semicolon 103..104 ";"
+    lead Newline "\n"
+  EOF 105..105 ""

@@ -1,0 +1,78 @@
+DesignFile 0..110
+  DesignUnit 0..109
+    ContextClause 0..0
+    ArchitectureBody 0..109
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..104
+        ProcessStmt 28..104
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..89
+            ConditionalVariableAssignStmt 49..89
+              Target 49..56
+                SimpleName 49..56
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 54..55 "v"
+                    trail Whitespace " "
+              VarAssign 56..58 ":="
+                trail Whitespace " "
+              ConditionalExpressions 59..88
+                WhenBranch 59..68
+                  SimpleName 59..61
+                    Identifier 59..60 "a"
+                      trail Whitespace " "
+                  KwWhen 61..65 "when"
+                    trail Whitespace " "
+                  SimpleName 66..68
+                    Identifier 66..67 "p"
+                      trail Whitespace " "
+                KwElse 68..72 "else"
+                  trail Whitespace " "
+                WhenBranch 73..82
+                  SimpleName 73..75
+                    Identifier 73..74 "b"
+                      trail Whitespace " "
+                  KwWhen 75..79 "when"
+                    trail Whitespace " "
+                  SimpleName 80..82
+                    Identifier 80..81 "q"
+                      trail Whitespace " "
+                KwElse 82..86 "else"
+                  trail Whitespace " "
+                WhenBranch 87..88
+                  SimpleName 87..88
+                    Identifier 87..88 "c"
+              Semicolon 88..89 ";"
+          EndClause 89..104
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 92..95 "end"
+              trail Whitespace " "
+            KwProcess 96..103 "process"
+            Semicolon 103..104 ";"
+      EndClause 104..109
+          lead Newline "\n"
+        KwEnd 105..108 "end"
+        Semicolon 108..109 ";"
+    lead Newline "\n"
+  EOF 110..110 ""

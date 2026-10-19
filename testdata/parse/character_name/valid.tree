@@ -1,0 +1,59 @@
+DesignFile 0..91
+  DesignUnit 0..90
+    ContextClause 0..0
+    PackageDecl 0..90
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..85
+        AliasDecl 12..45
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 15..20 "alias"
+            trail Whitespace " "
+          Identifier 21..24 "one"
+            trail Whitespace " "
+          KwIs 25..27 "is"
+            trail Whitespace " "
+          CharacterName 28..32
+            CharacterLiteral 28..31 "'1'"
+              trail Whitespace " "
+          Signature 32..44
+            LBracket 32..33 "["
+            KwReturn 33..39 "return"
+              trail Whitespace " "
+            SimpleName 40..43
+              Identifier 40..43 "bit"
+            RBracket 43..44 "]"
+          Semicolon 44..45 ";"
+        AttributeSpec 45..85
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAttribute 48..57 "attribute"
+            trail Whitespace " "
+          Identifier 58..62 "code"
+            trail Whitespace " "
+          KwOf 63..65 "of"
+            trail Whitespace " "
+          EntitySpecification 66..80
+            EntityNameList 66..70
+              EntityDesignator 66..70
+                CharacterLiteral 66..69 "'0'"
+                  trail Whitespace " "
+            Colon 70..71 ":"
+              trail Whitespace " "
+            KwLiteral 72..79 "literal"
+              trail Whitespace " "
+          KwIs 80..82 "is"
+            trail Whitespace " "
+          LiteralExpr 83..84
+            IntegerLiteral 83..84 "2"
+          Semicolon 84..85 ";"
+      EndClause 85..90
+          lead Newline "\n"
+        KwEnd 86..89 "end"
+        Semicolon 89..90 ";"
+    lead Newline "\n"
+  EOF 91..91 ""

@@ -1,0 +1,48 @@
+DesignFile 0..71
+  DesignUnit 0..70
+    ContextClause 0..0
+    PackageDecl 0..70
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..65
+        TypeDecl 12..65
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..26 "fifo16"
+            trail Whitespace " "
+          KwIs 27..29 "is"
+            trail Whitespace " "
+          ProtectedTypeInstantiationDef 30..64
+            KwNew 30..33 "new"
+              trail Whitespace " "
+            SimpleName 34..39
+              Identifier 34..38 "fifo"
+                trail Whitespace " "
+            GenericMapAspect 39..64
+              KwGeneric 39..46 "generic"
+                trail Whitespace " "
+              KwMap 47..50 "map"
+                trail Whitespace " "
+              AssociationList 51..64
+                LParen 51..52 "("
+                AssociationElement 52..63
+                  SimpleName 52..58
+                    Identifier 52..57 "depth"
+                      trail Whitespace " "
+                  Arrow 58..60 "=>"
+                    trail Whitespace " "
+                  LiteralExpr 61..63
+                    IntegerLiteral 61..63 "16"
+                RParen 63..64 ")"
+          Semicolon 64..65 ";"
+      EndClause 65..70
+          lead Newline "\n"
+        KwEnd 66..69 "end"
+        Semicolon 69..70 ";"
+    lead Newline "\n"
+  EOF 71..71 ""

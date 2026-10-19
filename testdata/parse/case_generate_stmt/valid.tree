@@ -1,0 +1,97 @@
+DesignFile 0..123
+  DesignUnit 0..122
+    ContextClause 0..0
+    ArchitectureBody 0..122
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..117
+        CaseGenerateStmt 28..117
+          Label 28..35
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 31..32 "g"
+              trail Whitespace " "
+            Colon 33..34 ":"
+              trail Whitespace " "
+          KwCase 35..39 "case"
+            trail Whitespace " "
+          SimpleName 40..42
+            Identifier 40..41 "n"
+              trail Whitespace " "
+          KwGenerate 42..50 "generate"
+          CaseGenerateAlternative 50..72
+              lead Newline "\n"
+              lead Whitespace "    "
+            KwWhen 55..59 "when"
+              trail Whitespace " "
+            Choices 60..62
+              LiteralExpr 60..62
+                IntegerLiteral 60..61 "0"
+                  trail Whitespace " "
+            Arrow 62..64 "=>"
+              trail Whitespace " "
+            GenerateBody 65..72
+              StatementPart 65..72
+                ConcurrentSimpleSignalAssign 65..72
+                  Target 65..67
+                    SimpleName 65..67
+                      Identifier 65..66 "s"
+                        trail Whitespace " "
+                  Le 67..69 "<="
+                    trail Whitespace " "
+                  Waveform 70..71
+                    WaveformElement 70..71
+                      SimpleName 70..71
+                        Identifier 70..71 "a"
+                  Semicolon 71..72 ";"
+          CaseGenerateAlternative 72..99
+              lead Newline "\n"
+              lead Whitespace "    "
+            KwWhen 77..81 "when"
+              trail Whitespace " "
+            Choices 82..89
+              OthersChoice 82..89
+                KwOthers 82..88 "others"
+                  trail Whitespace " "
+            Arrow 89..91 "=>"
+              trail Whitespace " "
+            GenerateBody 92..99
+              StatementPart 92..99
+                ConcurrentSimpleSignalAssign 92..99
+                  Target 92..94
+                    SimpleName 92..94
+                      Identifier 92..93 "s"
+                        trail Whitespace " "
+                  Le 94..96 "<="
+                    trail Whitespace " "
+                  Waveform 97..98
+                    WaveformElement 97..98
+                      SimpleName 97..98
+                        Identifier 97..98 "b"
+                  Semicolon 98..99 ";"
+          EndClause 99..117
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 102..105 "end"
+              trail Whitespace " "
+            KwGenerate 106..114 "generate"
+              trail Whitespace " "
+            Identifier 115..116 "g"
+            Semicolon 116..117 ";"
+      EndClause 117..122
+          lead Newline "\n"
+        KwEnd 118..121 "end"
+        Semicolon 121..122 ";"
+    lead Newline "\n"
+  EOF 123..123 ""

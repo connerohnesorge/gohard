@@ -1,0 +1,88 @@
+DesignFile 0..133
+  DesignUnit 0..132
+    ContextClause 0..0
+    ArchitectureBody 0..132
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..127
+        ProcessStmt 28..127
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..112
+            ForceAssignStmt 49..69
+              Target 49..56
+                SimpleName 49..56
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 54..55 "s"
+                    trail Whitespace " "
+              Le 56..58 "<="
+                trail Whitespace " "
+              KwForce 59..64 "force"
+                trail Whitespace " "
+              LiteralExpr 65..68
+                CharacterLiteral 65..68 "'1'"
+              Semicolon 68..69 ";"
+            ForceAssignStmt 69..90
+              Target 69..76
+                SimpleName 69..76
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 74..75 "t"
+                    trail Whitespace " "
+              Le 76..78 "<="
+                trail Whitespace " "
+              KwForce 79..84 "force"
+                trail Whitespace " "
+              KwIn 85..87 "in"
+                trail Whitespace " "
+              SimpleName 88..89
+                Identifier 88..89 "x"
+              Semicolon 89..90 ";"
+            ForceAssignStmt 90..112
+              Target 90..97
+                SimpleName 90..97
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 95..96 "u"
+                    trail Whitespace " "
+              Le 97..99 "<="
+                trail Whitespace " "
+              KwForce 100..105 "force"
+                trail Whitespace " "
+              KwOut 106..109 "out"
+                trail Whitespace " "
+              SimpleName 110..111
+                Identifier 110..111 "y"
+              Semicolon 111..112 ";"
+          EndClause 112..127
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 115..118 "end"
+              trail Whitespace " "
+            KwProcess 119..126 "process"
+            Semicolon 126..127 ";"
+      EndClause 127..132
+          lead Newline "\n"
+        KwEnd 128..131 "end"
+        Semicolon 131..132 ";"
+    lead Newline "\n"
+  EOF 133..133 ""

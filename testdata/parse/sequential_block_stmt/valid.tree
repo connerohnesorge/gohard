@@ -1,0 +1,93 @@
+DesignFile 0..158
+  DesignUnit 0..157
+    ContextClause 0..0
+    ArchitectureBody 0..157
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..152
+        ProcessStmt 28..152
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..137
+            SequentialBlockStmt 49..137
+              Label 49..60
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 54..57 "blk"
+                  trail Whitespace " "
+                Colon 58..59 ":"
+                  trail Whitespace " "
+              KwBlock 60..65 "block"
+                trail Whitespace " "
+              KwIs 66..68 "is"
+              DeclarativePart 68..92
+                VariableDecl 68..92
+                    lead Newline "\n"
+                    lead Whitespace "      "
+                  KwVariable 75..83 "variable"
+                    trail Whitespace " "
+                  IdentifierList 84..86
+                    Identifier 84..85 "t"
+                      trail Whitespace " "
+                  Colon 86..87 ":"
+                    trail Whitespace " "
+                  SubtypeIndication 88..91
+                    SimpleName 88..91
+                      Identifier 88..91 "bit"
+                  Semicolon 91..92 ";"
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwBegin 97..102 "begin"
+              SequenceOfStatements 102..118
+                VariableAssignStmt 102..118
+                  Target 102..111
+                    SimpleName 102..111
+                        lead Newline "\n"
+                        lead Whitespace "      "
+                      Identifier 109..110 "t"
+                        trail Whitespace " "
+                  VarAssign 111..113 ":="
+                    trail Whitespace " "
+                  LiteralExpr 114..117
+                    CharacterLiteral 114..117 "'1'"
+                  Semicolon 117..118 ";"
+              EndClause 118..137
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwEnd 123..126 "end"
+                  trail Whitespace " "
+                KwBlock 127..132 "block"
+                  trail Whitespace " "
+                Identifier 133..136 "blk"
+                Semicolon 136..137 ";"
+          EndClause 137..152
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 140..143 "end"
+              trail Whitespace " "
+            KwProcess 144..151 "process"
+            Semicolon 151..152 ";"
+      EndClause 152..157
+          lead Newline "\n"
+        KwEnd 153..156 "end"
+        Semicolon 156..157 ";"
+    lead Newline "\n"
+  EOF 158..158 ""

@@ -1,0 +1,104 @@
+DesignFile 0..140
+  DesignUnit 0..139
+    ContextClause 0..0
+    PackageDecl 0..139
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..134
+        SubtypeDecl 12..51
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSubtype 15..22 "subtype"
+            trail Whitespace " "
+          Identifier 23..24 "w"
+            trail Whitespace " "
+          KwIs 25..27 "is"
+            trail Whitespace " "
+          SubtypeIndication 28..50
+            SimpleName 28..38
+              Identifier 28..38 "bit_vector"
+            ArrayConstraint 38..50
+              LParen 38..39 "("
+              RangeExpr 39..49
+                LiteralExpr 39..41
+                  IntegerLiteral 39..40 "7"
+                    trail Whitespace " "
+                KwDownto 41..47 "downto"
+                  trail Whitespace " "
+                LiteralExpr 48..49
+                  IntegerLiteral 48..49 "0"
+              RParen 49..50 ")"
+          Semicolon 50..51 ";"
+        SubtypeDecl 51..93
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSubtype 54..61 "subtype"
+            trail Whitespace " "
+          Identifier 62..63 "m"
+            trail Whitespace " "
+          KwIs 64..66 "is"
+            trail Whitespace " "
+          SubtypeIndication 67..92
+            SimpleName 67..72
+              Identifier 67..72 "mem_t"
+            ArrayConstraint 72..92
+              LParen 72..73 "("
+              RangeExpr 73..79
+                LiteralExpr 73..75
+                  IntegerLiteral 73..74 "0"
+                    trail Whitespace " "
+                KwTo 75..77 "to"
+                  trail Whitespace " "
+                LiteralExpr 78..79
+                  IntegerLiteral 78..79 "3"
+              RParen 79..80 ")"
+              ArrayConstraint 80..92
+                LParen 80..81 "("
+                RangeExpr 81..91
+                  LiteralExpr 81..83
+                    IntegerLiteral 81..82 "7"
+                      trail Whitespace " "
+                  KwDownto 83..89 "downto"
+                    trail Whitespace " "
+                  LiteralExpr 90..91
+                    IntegerLiteral 90..91 "0"
+                RParen 91..92 ")"
+          Semicolon 92..93 ";"
+        SubtypeDecl 93..134
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSubtype 96..103 "subtype"
+            trail Whitespace " "
+          Identifier 104..105 "o"
+            trail Whitespace " "
+          KwIs 106..108 "is"
+            trail Whitespace " "
+          SubtypeIndication 109..133
+            SimpleName 109..114
+              Identifier 109..114 "mem_t"
+            ArrayConstraint 114..133
+              LParen 114..115 "("
+              OpenExpr 115..119
+                KwOpen 115..119 "open"
+              RParen 119..120 ")"
+              ArrayConstraint 120..133
+                LParen 120..121 "("
+                RangeExpr 121..132
+                  LiteralExpr 121..124
+                    IntegerLiteral 121..123 "15"
+                      trail Whitespace " "
+                  KwDownto 124..130 "downto"
+                    trail Whitespace " "
+                  LiteralExpr 131..132
+                    IntegerLiteral 131..132 "0"
+                RParen 132..133 ")"
+          Semicolon 133..134 ";"
+      EndClause 134..139
+          lead Newline "\n"
+        KwEnd 135..138 "end"
+        Semicolon 138..139 ";"
+    lead Newline "\n"
+  EOF 140..140 ""

@@ -1,0 +1,90 @@
+DesignFile 0..125
+  DesignUnit 0..124
+    ContextClause 0..0
+    ArchitectureBody 0..124
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..119
+        BlockStmt 28..119
+          Label 28..36
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 31..33 "b1"
+              trail Whitespace " "
+            Colon 34..35 ":"
+              trail Whitespace " "
+          KwBlock 36..41 "block"
+            trail Whitespace " "
+          LParen 42..43 "("
+          BinaryExpr 43..51
+            SimpleName 43..46
+              Identifier 43..45 "en"
+                trail Whitespace " "
+            Eq 46..47 "="
+              trail Whitespace " "
+            LiteralExpr 48..51
+              CharacterLiteral 48..51 "'1'"
+          RParen 51..52 ")"
+            trail Whitespace " "
+          KwIs 53..55 "is"
+          DeclarativePart 55..75
+            SignalDecl 55..75
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwSignal 60..66 "signal"
+                trail Whitespace " "
+              IdentifierList 67..69
+                Identifier 67..68 "t"
+                  trail Whitespace " "
+              Colon 69..70 ":"
+                trail Whitespace " "
+              SubtypeIndication 71..74
+                SimpleName 71..74
+                  Identifier 71..74 "bit"
+              Semicolon 74..75 ";"
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 78..83 "begin"
+          StatementPart 83..103
+            ConcurrentSimpleSignalAssign 83..103
+              Target 83..90
+                SimpleName 83..90
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 88..89 "t"
+                    trail Whitespace " "
+              Le 90..92 "<="
+                trail Whitespace " "
+              KwGuarded 93..100 "guarded"
+                trail Whitespace " "
+              Waveform 101..102
+                WaveformElement 101..102
+                  SimpleName 101..102
+                    Identifier 101..102 "d"
+              Semicolon 102..103 ";"
+          EndClause 103..119
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 106..109 "end"
+              trail Whitespace " "
+            KwBlock 110..115 "block"
+              trail Whitespace " "
+            Identifier 116..118 "b1"
+            Semicolon 118..119 ";"
+      EndClause 119..124
+          lead Newline "\n"
+        KwEnd 120..123 "end"
+        Semicolon 123..124 ";"
+    lead Newline "\n"
+  EOF 125..125 ""

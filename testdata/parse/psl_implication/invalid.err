@@ -1,0 +1,2 @@
+invalid.vhd:3:22: error[syntax/error]: expected a PSL property, found ')'
+summary: 1 errors, 0 warnings, 0 hints, 1 files

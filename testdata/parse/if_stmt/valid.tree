@@ -1,0 +1,110 @@
+DesignFile 0..164
+  DesignUnit 0..163
+    ContextClause 0..0
+    ArchitectureBody 0..163
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..158
+        ProcessStmt 28..158
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..143
+            IfStmt 49..143
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwIf 54..56 "if"
+                trail Whitespace " "
+              SimpleName 57..59
+                Identifier 57..58 "a"
+                  trail Whitespace " "
+              KwThen 59..63 "then"
+              SequenceOfStatements 63..77
+                VariableAssignStmt 63..77
+                  Target 63..72
+                    SimpleName 63..72
+                        lead Newline "\n"
+                        lead Whitespace "      "
+                      Identifier 70..71 "x"
+                        trail Whitespace " "
+                  VarAssign 72..74 ":="
+                    trail Whitespace " "
+                  LiteralExpr 75..76
+                    IntegerLiteral 75..76 "1"
+                  Semicolon 76..77 ";"
+              ElsifBranch 77..108
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwElsif 82..87 "elsif"
+                  trail Whitespace " "
+                SimpleName 88..90
+                  Identifier 88..89 "b"
+                    trail Whitespace " "
+                KwThen 90..94 "then"
+                SequenceOfStatements 94..108
+                  VariableAssignStmt 94..108
+                    Target 94..103
+                      SimpleName 94..103
+                          lead Newline "\n"
+                          lead Whitespace "      "
+                        Identifier 101..102 "x"
+                          trail Whitespace " "
+                    VarAssign 103..105 ":="
+                      trail Whitespace " "
+                    LiteralExpr 106..107
+                      IntegerLiteral 106..107 "2"
+                    Semicolon 107..108 ";"
+              ElseBranch 108..131
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwElse 113..117 "else"
+                SequenceOfStatements 117..131
+                  VariableAssignStmt 117..131
+                    Target 117..126
+                      SimpleName 117..126
+                          lead Newline "\n"
+                          lead Whitespace "      "
+                        Identifier 124..125 "x"
+                          trail Whitespace " "
+                    VarAssign 126..128 ":="
+                      trail Whitespace " "
+                    LiteralExpr 129..130
+                      IntegerLiteral 129..130 "3"
+                    Semicolon 130..131 ";"
+              EndClause 131..143
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwEnd 136..139 "end"
+                  trail Whitespace " "
+                KwIf 140..142 "if"
+                Semicolon 142..143 ";"
+          EndClause 143..158
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 146..149 "end"
+              trail Whitespace " "
+            KwProcess 150..157 "process"
+            Semicolon 157..158 ";"
+      EndClause 158..163
+          lead Newline "\n"
+        KwEnd 159..162 "end"
+        Semicolon 162..163 ";"
+    lead Newline "\n"
+  EOF 164..164 ""

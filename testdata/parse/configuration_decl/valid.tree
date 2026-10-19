@@ -1,0 +1,76 @@
+DesignFile 0..126
+  DesignUnit 0..125
+    ContextClause 0..0
+    ConfigurationDecl 0..125
+      KwConfiguration 0..13 "configuration"
+        trail Whitespace " "
+      Identifier 14..15 "c"
+        trail Whitespace " "
+      KwOf 16..18 "of"
+        trail Whitespace " "
+      SimpleName 19..21
+        Identifier 19..20 "e"
+          trail Whitespace " "
+      KwIs 21..23 "is"
+      DeclarativePart 23..83
+        UseClause 23..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwUse 26..29 "use"
+            trail Whitespace " "
+          SelectedName 30..40
+            SelectedName 30..36
+              SimpleName 30..34
+                Identifier 30..34 "work"
+              Dot 34..35 "."
+              Identifier 35..36 "p"
+            Dot 36..37 "."
+            KwAll 37..40 "all"
+          Semicolon 40..41 ";"
+        AttributeSpec 41..83
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAttribute 44..53 "attribute"
+            trail Whitespace " "
+          Identifier 54..55 "a"
+            trail Whitespace " "
+          KwOf 56..58 "of"
+            trail Whitespace " "
+          EntitySpecification 59..78
+            EntityNameList 59..63
+              EntityDesignator 59..63
+                Identifier 59..62 "rtl"
+                  trail Whitespace " "
+            Colon 63..64 ":"
+              trail Whitespace " "
+            KwArchitecture 65..77 "architecture"
+              trail Whitespace " "
+          KwIs 78..80 "is"
+            trail Whitespace " "
+          LiteralExpr 81..82
+            IntegerLiteral 81..82 "1"
+          Semicolon 82..83 ";"
+      BlockConfiguration 83..104
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwFor 86..89 "for"
+          trail Whitespace " "
+        SimpleName 90..93
+          Identifier 90..93 "rtl"
+        EndClause 93..104
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwEnd 96..99 "end"
+            trail Whitespace " "
+          KwFor 100..103 "for"
+          Semicolon 103..104 ";"
+      EndClause 104..125
+          lead Newline "\n"
+        KwEnd 105..108 "end"
+          trail Whitespace " "
+        KwConfiguration 109..122 "configuration"
+          trail Whitespace " "
+        Identifier 123..124 "c"
+        Semicolon 124..125 ";"
+    lead Newline "\n"
+  EOF 126..126 ""

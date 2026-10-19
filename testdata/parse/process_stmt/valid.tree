@@ -1,0 +1,85 @@
+DesignFile 0..142
+  DesignUnit 0..141
+    ContextClause 0..0
+    ArchitectureBody 0..141
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..136
+        ProcessStmt 28..136
+          Label 28..36
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 31..33 "p1"
+              trail Whitespace " "
+            Colon 34..35 ":"
+              trail Whitespace " "
+          KwPostponed 36..45 "postponed"
+            trail Whitespace " "
+          KwProcess 46..53 "process"
+            trail Whitespace " "
+          ProcessSensitivityList 54..60
+            LParen 54..55 "("
+            SimpleName 55..58
+              Identifier 55..58 "clk"
+            RParen 58..59 ")"
+              trail Whitespace " "
+          KwIs 60..62 "is"
+          DeclarativePart 62..88
+            VariableDecl 62..88
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwVariable 67..75 "variable"
+                trail Whitespace " "
+              IdentifierList 76..78
+                Identifier 76..77 "v"
+                  trail Whitespace " "
+              Colon 78..79 ":"
+                trail Whitespace " "
+              SubtypeIndication 80..87
+                SimpleName 80..87
+                  Identifier 80..87 "integer"
+              Semicolon 87..88 ";"
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 91..96 "begin"
+          SequenceOfStatements 96..108
+            VariableAssignStmt 96..108
+              Target 96..103
+                SimpleName 96..103
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 101..102 "v"
+                    trail Whitespace " "
+              VarAssign 103..105 ":="
+                trail Whitespace " "
+              LiteralExpr 106..107
+                IntegerLiteral 106..107 "0"
+              Semicolon 107..108 ";"
+          EndClause 108..136
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 111..114 "end"
+              trail Whitespace " "
+            KwPostponed 115..124 "postponed"
+              trail Whitespace " "
+            KwProcess 125..132 "process"
+              trail Whitespace " "
+            Identifier 133..135 "p1"
+            Semicolon 135..136 ";"
+      EndClause 136..141
+          lead Newline "\n"
+        KwEnd 137..140 "end"
+        Semicolon 140..141 ";"
+    lead Newline "\n"
+  EOF 142..142 ""

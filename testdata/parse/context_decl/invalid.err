@@ -1,0 +1,4 @@
+invalid.vhd:3:6: error[syntax/error]: expected ';', found reserved word context
+invalid.vhd:3:14: error[syntax/error]: expected an identifier, found ';'
+invalid.vhd:3:15: error[syntax/error]: expected a library unit, found end of file
+summary: 3 errors, 0 warnings, 0 hints, 1 files

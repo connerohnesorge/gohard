@@ -1,0 +1,101 @@
+DesignFile 0..185
+  DesignUnit 0..184
+    ContextClause 0..0
+    PackageBody 0..184
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      KwBody 8..12 "body"
+        trail Whitespace " "
+      Identifier 13..14 "p"
+        trail Whitespace " "
+      KwIs 15..17 "is"
+      DeclarativePart 17..179
+        TypeDecl 17..179
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 20..24 "type"
+            trail Whitespace " "
+          Identifier 25..32 "counter"
+            trail Whitespace " "
+          KwIs 33..35 "is"
+            trail Whitespace " "
+          ProtectedTypeBody 36..179
+            KwProtected 36..45 "protected"
+              trail Whitespace " "
+            KwBody 46..50 "body"
+            DeclarativePart 50..149
+              VariableDecl 50..81
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwVariable 55..63 "variable"
+                  trail Whitespace " "
+                IdentifierList 64..66
+                  Identifier 64..65 "n"
+                    trail Whitespace " "
+                Colon 66..67 ":"
+                  trail Whitespace " "
+                SubtypeIndication 68..76
+                  SimpleName 68..76
+                    Identifier 68..75 "natural"
+                      trail Whitespace " "
+                VarAssign 76..78 ":="
+                  trail Whitespace " "
+                LiteralExpr 79..80
+                  IntegerLiteral 79..80 "0"
+                Semicolon 80..81 ";"
+              SubprogramBody 81..149
+                ProcedureSpec 81..100
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  KwProcedure 86..95 "procedure"
+                    trail Whitespace " "
+                  Identifier 96..99 "inc"
+                    trail Whitespace " "
+                KwIs 100..102 "is"
+                DeclarativePart 102..102
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwBegin 107..112 "begin"
+                SequenceOfStatements 112..130
+                  VariableAssignStmt 112..130
+                    Target 112..121
+                      SimpleName 112..121
+                          lead Newline "\n"
+                          lead Whitespace "      "
+                        Identifier 119..120 "n"
+                          trail Whitespace " "
+                    VarAssign 121..123 ":="
+                      trail Whitespace " "
+                    BinaryExpr 124..129
+                      SimpleName 124..126
+                        Identifier 124..125 "n"
+                          trail Whitespace " "
+                      Plus 126..127 "+"
+                        trail Whitespace " "
+                      LiteralExpr 128..129
+                        IntegerLiteral 128..129 "1"
+                    Semicolon 129..130 ";"
+                EndClause 130..149
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  KwEnd 135..138 "end"
+                    trail Whitespace " "
+                  KwProcedure 139..148 "procedure"
+                  Semicolon 148..149 ";"
+            EndClause 149..179
+                lead Newline "\n"
+                lead Whitespace "  "
+              KwEnd 152..155 "end"
+                trail Whitespace " "
+              KwProtected 156..165 "protected"
+                trail Whitespace " "
+              KwBody 166..170 "body"
+                trail Whitespace " "
+              Identifier 171..178 "counter"
+              Semicolon 178..179 ";"
+      EndClause 179..184
+          lead Newline "\n"
+        KwEnd 180..183 "end"
+        Semicolon 183..184 ";"
+    lead Newline "\n"
+  EOF 185..185 ""

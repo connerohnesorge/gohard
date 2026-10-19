@@ -1,0 +1,43 @@
+DesignFile 0..116
+  DesignUnit 0..115
+    ContextClause 0..0
+    ArchitectureBody 0..115
+        lead LineComment "-- test: kind=none allow=syntax/psl-identifier"
+        lead Newline "\n"
+      KwArchitecture 47..59 "architecture"
+        trail Whitespace " "
+      Identifier 60..61 "a"
+        trail Whitespace " "
+      KwOf 62..64 "of"
+        trail Whitespace " "
+      SimpleName 65..67
+        Identifier 65..66 "e"
+          trail Whitespace " "
+      KwIs 67..69 "is"
+      DeclarativePart 69..104
+        SignalDecl 69..104
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSignal 72..78 "signal"
+            trail Whitespace " "
+          IdentifierList 79..98
+            Identifier 79..87 "sequence"
+            Comma 87..88 ","
+              trail Whitespace " "
+            Identifier 89..97 "property"
+              trail Whitespace " "
+          Colon 98..99 ":"
+            trail Whitespace " "
+          SubtypeIndication 100..103
+            SimpleName 100..103
+              Identifier 100..103 "bit"
+          Semicolon 103..104 ";"
+        lead Newline "\n"
+      KwBegin 105..110 "begin"
+      StatementPart 110..110
+      EndClause 110..115
+          lead Newline "\n"
+        KwEnd 111..114 "end"
+        Semicolon 114..115 ";"
+    lead Newline "\n"
+  EOF 116..116 ""

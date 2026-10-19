@@ -1,0 +1,44 @@
+DesignFile 0..92
+  DesignUnit 0..91
+    ContextClause 0..60
+      LibraryClause 0..31
+          lead LineComment "-- A doc comment."
+          lead Newline "\n"
+        KwLibrary 18..25 "library"
+          trail Whitespace " "
+        SimpleName 26..30
+          Identifier 26..30 "ieee"
+        Semicolon 30..31 ";"
+      UseClause 31..60
+          lead Newline "\n"
+        KwUse 32..35 "use"
+          trail Whitespace " "
+        SelectedName 36..59
+          SelectedName 36..55
+            SimpleName 36..40
+              Identifier 36..40 "ieee"
+            Dot 40..41 "."
+            Identifier 41..55 "std_logic_1164"
+          Dot 55..56 "."
+          KwAll 56..59 "all"
+        Semicolon 59..60 ";"
+    EntityDecl 60..91
+        lead Newline "\n"
+        lead Newline "\n"
+      KwEntity 62..68 "entity"
+        trail Whitespace " "
+      Identifier 69..72 "top"
+        trail Whitespace " "
+      KwIs 73..75 "is"
+      DeclarativePart 75..75
+      EndClause 75..91
+          lead Newline "\n"
+        KwEnd 76..79 "end"
+          trail Whitespace " "
+        KwEntity 80..86 "entity"
+          trail Whitespace " "
+        Identifier 87..90 "top"
+        Semicolon 90..91 ";"
+    lead Newline "\n"
+  EOF 92..92 ""
+summary: 0 errors, 0 warnings, 0 hints, 1 files

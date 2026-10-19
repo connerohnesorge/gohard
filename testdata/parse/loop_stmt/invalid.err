@@ -1,0 +1,2 @@
+invalid.vhd:7:8: error[syntax/error]: expected reserved word loop, found ';'
+summary: 1 errors, 0 warnings, 0 hints, 1 files

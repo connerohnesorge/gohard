@@ -1,0 +1,65 @@
+DesignFile 0..91
+  DesignUnit 0..90
+    ContextClause 0..0
+    PackageDecl 0..90
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..85
+        SubprogramDecl 12..70
+          ProcedureSpec 12..69
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwProcedure 15..24 "procedure"
+              trail Whitespace " "
+            Identifier 25..26 "q"
+              trail Whitespace " "
+            ParameterList 27..69
+              InterfaceList 27..69
+                LParen 27..28 "("
+                InterfaceObjectDecl 28..42
+                  IdentifierList 28..30
+                    Identifier 28..29 "a"
+                      trail Whitespace " "
+                  Colon 30..31 ":"
+                    trail Whitespace " "
+                  SimpleModeIndication 32..35
+                    KwIn 32..34 "in"
+                      trail Whitespace " "
+                  SubtypeIndication 35..42
+                    SimpleName 35..42
+                      Identifier 35..42 "integer"
+                Semicolon 42..43 ";"
+                  trail Whitespace " "
+                InterfaceObjectDecl 44..68
+                  KwVariable 44..52 "variable"
+                    trail Whitespace " "
+                  IdentifierList 53..55
+                    Identifier 53..54 "b"
+                      trail Whitespace " "
+                  Colon 55..56 ":"
+                    trail Whitespace " "
+                  SimpleModeIndication 57..61
+                    KwOut 57..60 "out"
+                      trail Whitespace " "
+                  SubtypeIndication 61..68
+                    SimpleName 61..68
+                      Identifier 61..68 "integer"
+                RParen 68..69 ")"
+          Semicolon 69..70 ";"
+        SubprogramDecl 70..85
+          ProcedureSpec 70..84
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwProcedure 73..82 "procedure"
+              trail Whitespace " "
+            Identifier 83..84 "r"
+          Semicolon 84..85 ";"
+      EndClause 85..90
+          lead Newline "\n"
+        KwEnd 86..89 "end"
+        Semicolon 89..90 ";"
+    lead Newline "\n"
+  EOF 91..91 ""

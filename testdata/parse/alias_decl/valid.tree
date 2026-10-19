@@ -1,0 +1,115 @@
+DesignFile 0..185
+  DesignUnit 0..184
+    ContextClause 0..0
+    PackageDecl 0..184
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..179
+        AliasDecl 12..73
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 15..20 "alias"
+            trail Whitespace " "
+          Identifier 21..25 "word"
+            trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..52
+            SimpleName 28..38
+              Identifier 28..38 "bit_vector"
+            ArrayConstraint 38..52
+              LParen 38..39 "("
+              RangeExpr 39..50
+                LiteralExpr 39..42
+                  IntegerLiteral 39..41 "15"
+                    trail Whitespace " "
+                KwDownto 42..48 "downto"
+                  trail Whitespace " "
+                LiteralExpr 49..50
+                  IntegerLiteral 49..50 "0"
+              RParen 50..51 ")"
+                trail Whitespace " "
+          KwIs 52..54 "is"
+            trail Whitespace " "
+          SliceName 55..72
+            SimpleName 55..58
+              Identifier 55..58 "mem"
+            LParen 58..59 "("
+            RangeExpr 59..71
+              LiteralExpr 59..62
+                IntegerLiteral 59..61 "31"
+                  trail Whitespace " "
+              KwDownto 62..68 "downto"
+                trail Whitespace " "
+              LiteralExpr 69..71
+                IntegerLiteral 69..71 "16"
+            RParen 71..72 ")"
+          Semicolon 72..73 ";"
+        AliasDecl 73..91
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 76..81 "alias"
+            trail Whitespace " "
+          Identifier 82..83 "s"
+            trail Whitespace " "
+          KwIs 84..86 "is"
+            trail Whitespace " "
+          SimpleName 87..90
+            Identifier 87..90 "sig"
+          Semicolon 90..91 ";"
+        AliasDecl 91..146
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 94..99 "alias"
+            trail Whitespace " "
+          Identifier 100..104 "plus"
+            trail Whitespace " "
+          KwIs 105..107 "is"
+            trail Whitespace " "
+          OperatorSymbol 108..112
+            StringLiteral 108..111 "\"+\""
+              trail Whitespace " "
+          Signature 112..145
+            LBracket 112..113 "["
+            SimpleName 113..120
+              Identifier 113..120 "integer"
+            Comma 120..121 ","
+              trail Whitespace " "
+            SimpleName 122..130
+              Identifier 122..129 "integer"
+                trail Whitespace " "
+            KwReturn 130..136 "return"
+              trail Whitespace " "
+            SimpleName 137..144
+              Identifier 137..144 "integer"
+            RBracket 144..145 "]"
+          Semicolon 145..146 ";"
+        AliasDecl 146..179
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 149..154 "alias"
+            trail Whitespace " "
+          Identifier 155..158 "lit"
+            trail Whitespace " "
+          KwIs 159..161 "is"
+            trail Whitespace " "
+          CharacterName 162..166
+            CharacterLiteral 162..165 "'0'"
+              trail Whitespace " "
+          Signature 166..178
+            LBracket 166..167 "["
+            KwReturn 167..173 "return"
+              trail Whitespace " "
+            SimpleName 174..177
+              Identifier 174..177 "bit"
+            RBracket 177..178 "]"
+          Semicolon 178..179 ";"
+      EndClause 179..184
+          lead Newline "\n"
+        KwEnd 180..183 "end"
+        Semicolon 183..184 ";"
+    lead Newline "\n"
+  EOF 185..185 ""

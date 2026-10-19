@@ -1,0 +1,102 @@
+DesignFile 0..131
+  DesignUnit 0..130
+    ContextClause 0..0
+    ArchitectureBody 0..130
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..125
+        ForGenerateStmt 28..125
+          Label 28..35
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 31..32 "g"
+              trail Whitespace " "
+            Colon 33..34 ":"
+              trail Whitespace " "
+          KwFor 35..38 "for"
+            trail Whitespace " "
+          ParameterSpecification 39..51
+            Identifier 39..40 "i"
+              trail Whitespace " "
+            KwIn 41..43 "in"
+              trail Whitespace " "
+            RangeExpr 44..51
+              LiteralExpr 44..46
+                IntegerLiteral 44..45 "0"
+                  trail Whitespace " "
+              KwTo 46..48 "to"
+                trail Whitespace " "
+              LiteralExpr 49..51
+                IntegerLiteral 49..50 "1"
+                  trail Whitespace " "
+          KwGenerate 51..59 "generate"
+          GenerateBody 59..109
+            DeclarativePart 59..79
+              SignalDecl 59..79
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwSignal 64..70 "signal"
+                  trail Whitespace " "
+                IdentifierList 71..73
+                  Identifier 71..72 "t"
+                    trail Whitespace " "
+                Colon 73..74 ":"
+                  trail Whitespace " "
+                SubtypeIndication 75..78
+                  SimpleName 75..78
+                    Identifier 75..78 "bit"
+                Semicolon 78..79 ";"
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwBegin 82..87 "begin"
+            StatementPart 87..102
+              ConcurrentSimpleSignalAssign 87..102
+                Target 87..94
+                  SimpleName 87..94
+                      lead Newline "\n"
+                      lead Whitespace "    "
+                    Identifier 92..93 "t"
+                      trail Whitespace " "
+                Le 94..96 "<="
+                  trail Whitespace " "
+                Waveform 97..101
+                  WaveformElement 97..101
+                    CallOrIndexName 97..101
+                      SimpleName 97..98
+                        Identifier 97..98 "a"
+                      AssociationList 98..101
+                        LParen 98..99 "("
+                        AssociationElement 99..100
+                          SimpleName 99..100
+                            Identifier 99..100 "i"
+                        RParen 100..101 ")"
+                Semicolon 101..102 ";"
+            EndClause 102..109
+                lead Newline "\n"
+                lead Whitespace "  "
+              KwEnd 105..108 "end"
+              Semicolon 108..109 ";"
+          EndClause 109..125
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 112..115 "end"
+              trail Whitespace " "
+            KwGenerate 116..124 "generate"
+            Semicolon 124..125 ";"
+      EndClause 125..130
+          lead Newline "\n"
+        KwEnd 126..129 "end"
+        Semicolon 129..130 ";"
+    lead Newline "\n"
+  EOF 131..131 ""

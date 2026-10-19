@@ -1,0 +1,3 @@
+invalid.vhd:3:39: error[syntax/error]: expected '(' and a property, found ';'
+invalid.vhd:3:39: error[syntax/error]: expected ')', found ';'
+summary: 2 errors, 0 warnings, 0 hints, 1 files

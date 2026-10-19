@@ -1,0 +1,44 @@
+DesignFile 0..61
+  DesignUnit 0..60
+    ContextClause 0..0
+    EntityDecl 0..60
+      KwEntity 0..6 "entity"
+        trail Whitespace " "
+      Identifier 7..8 "e"
+        trail Whitespace " "
+      KwIs 9..11 "is"
+      PortClause 11..55
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwPort 14..18 "port"
+          trail Whitespace " "
+        InterfaceList 19..54
+          LParen 19..20 "("
+          InterfaceObjectDecl 20..53
+            IdentifierList 20..23
+              Identifier 20..22 "ms"
+                trail Whitespace " "
+            Colon 23..24 ":"
+              trail Whitespace " "
+            ArrayModeViewIndication 25..53
+              KwView 25..29 "view"
+                trail Whitespace " "
+              LParen 30..31 "("
+              SimpleName 31..37
+                Identifier 31..37 "master"
+              RParen 37..38 ")"
+                trail Whitespace " "
+              KwOf 39..41 "of"
+                trail Whitespace " "
+              SubtypeIndication 42..53
+                SimpleName 42..53
+                  Identifier 42..53 "bus_array_t"
+          RParen 53..54 ")"
+        Semicolon 54..55 ";"
+      DeclarativePart 55..55
+      EndClause 55..60
+          lead Newline "\n"
+        KwEnd 56..59 "end"
+        Semicolon 59..60 ";"
+    lead Newline "\n"
+  EOF 61..61 ""

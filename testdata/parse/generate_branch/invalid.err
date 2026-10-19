@@ -1,0 +1,2 @@
+invalid.vhd:5:7: error[syntax/error]: expected reserved word generate, found identifier s
+summary: 1 errors, 0 warnings, 0 hints, 1 files

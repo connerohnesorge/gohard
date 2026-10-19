@@ -1,0 +1,68 @@
+DesignFile 0..96
+  DesignUnit 0..95
+    ContextClause 0..0
+    PackageDecl 0..95
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..90
+        SubtypeDecl 12..50
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSubtype 15..22 "subtype"
+            trail Whitespace " "
+          Identifier 23..25 "s1"
+            trail Whitespace " "
+          KwIs 26..28 "is"
+            trail Whitespace " "
+          SubtypeIndication 29..49
+            SimpleName 29..37
+              Identifier 29..36 "integer"
+                trail Whitespace " "
+            RangeConstraint 37..49
+              KwRange 37..42 "range"
+                trail Whitespace " "
+              RangeExpr 43..49
+                LiteralExpr 43..45
+                  IntegerLiteral 43..44 "0"
+                    trail Whitespace " "
+                KwTo 45..47 "to"
+                  trail Whitespace " "
+                LiteralExpr 48..49
+                  IntegerLiteral 48..49 "7"
+          Semicolon 49..50 ";"
+        SubtypeDecl 50..90
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSubtype 53..60 "subtype"
+            trail Whitespace " "
+          Identifier 61..63 "s2"
+            trail Whitespace " "
+          KwIs 64..66 "is"
+            trail Whitespace " "
+          SubtypeIndication 67..89
+            SimpleName 67..72
+              Identifier 67..71 "real"
+                trail Whitespace " "
+            RangeConstraint 72..89
+              KwRange 72..77 "range"
+                trail Whitespace " "
+              RangeExpr 78..89
+                UnaryExpr 78..83
+                  Minus 78..79 "-"
+                  LiteralExpr 79..83
+                    RealLiteral 79..82 "1.0"
+                      trail Whitespace " "
+                KwTo 83..85 "to"
+                  trail Whitespace " "
+                LiteralExpr 86..89
+                  RealLiteral 86..89 "1.0"
+          Semicolon 89..90 ";"
+      EndClause 90..95
+          lead Newline "\n"
+        KwEnd 91..94 "end"
+        Semicolon 94..95 ";"
+    lead Newline "\n"
+  EOF 96..96 ""

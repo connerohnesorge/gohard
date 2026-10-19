@@ -1,0 +1,55 @@
+DesignFile 0..84
+  DesignUnit 0..83
+    ContextClause 0..0
+    EntityDecl 0..83
+      KwEntity 0..6 "entity"
+        trail Whitespace " "
+      Identifier 7..8 "e"
+        trail Whitespace " "
+      KwIs 9..11 "is"
+      GenericClause 11..78
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwGeneric 14..21 "generic"
+          trail Whitespace " "
+        InterfaceList 22..77
+          LParen 22..23 "("
+          InterfaceTypeDecl 23..46
+              lead Newline "\n"
+              lead Whitespace "    "
+            KwType 28..32 "type"
+              trail Whitespace " "
+            Identifier 33..35 "el"
+              trail Whitespace " "
+            KwIs 36..38 "is"
+              trail Whitespace " "
+            PrivateIncompleteTypeDef 39..46
+              KwPrivate 39..46 "private"
+          Semicolon 46..47 ";"
+          InterfaceTypeDecl 47..73
+              lead Newline "\n"
+              lead Whitespace "    "
+            KwType 52..56 "type"
+              trail Whitespace " "
+            Identifier 57..59 "fl"
+              trail Whitespace " "
+            KwIs 60..62 "is"
+              trail Whitespace " "
+            FileIncompleteTypeDef 63..73
+              KwFile 63..67 "file"
+                trail Whitespace " "
+              KwOf 68..70 "of"
+                trail Whitespace " "
+              SimpleName 71..73
+                Identifier 71..73 "el"
+            lead Newline "\n"
+            lead Whitespace "  "
+          RParen 76..77 ")"
+        Semicolon 77..78 ";"
+      DeclarativePart 78..78
+      EndClause 78..83
+          lead Newline "\n"
+        KwEnd 79..82 "end"
+        Semicolon 82..83 ";"
+    lead Newline "\n"
+  EOF 84..84 ""

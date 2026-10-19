@@ -1,0 +1,3 @@
+invalid.vhd:6:42: error[syntax/error]: expected ')', found ';'
+invalid.vhd:6:42: error[syntax/error]: expected ',' or ')', found ';'
+summary: 2 errors, 0 warnings, 0 hints, 1 files

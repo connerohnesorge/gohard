@@ -1,0 +1,2 @@
+gohard: error[cli/output-failed]: cannot write missing/dir/x.vcd: no such file or directory
+summary: 1 errors, 0 warnings, 0 hints, 0 files

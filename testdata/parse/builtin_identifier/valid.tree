@@ -1,0 +1,22 @@
+DesignFile 0..188
+  DesignUnit 0..179
+    ContextClause 0..0
+    PackageDecl 0..179
+        lead LineComment "-- test: kind=none"
+        lead Newline "\n"
+        lead Directive "`if VHDL_VERSION = \"2019\" and TOOL_TYPE = \"SIMULATION\" and TOOL_VENDOR = \"gohard\" and TOOL_NAME = \"gohard\" and TOOL_EDITION = \"community\" then"
+        lead Newline "\n"
+      KwPackage 162..169 "package"
+        trail Whitespace " "
+      Identifier 170..171 "p"
+        trail Whitespace " "
+      KwIs 172..174 "is"
+      DeclarativePart 174..174
+      EndClause 174..179
+          lead Newline "\n"
+        KwEnd 175..178 "end"
+        Semicolon 178..179 ";"
+    lead Newline "\n"
+    lead Directive "`end if"
+    lead Newline "\n"
+  EOF 188..188 ""

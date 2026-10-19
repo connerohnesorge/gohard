@@ -1,0 +1,88 @@
+DesignFile 0..101
+  DesignUnit 0..100
+    ContextClause 0..0
+    ArchitectureBody 0..100
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..95
+        ForGenerateStmt 28..95
+          Label 28..35
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 31..32 "g"
+              trail Whitespace " "
+            Colon 33..34 ":"
+              trail Whitespace " "
+          KwFor 35..38 "for"
+            trail Whitespace " "
+          ParameterSpecification 39..51
+            Identifier 39..40 "i"
+              trail Whitespace " "
+            KwIn 41..43 "in"
+              trail Whitespace " "
+            RangeExpr 44..51
+              LiteralExpr 44..46
+                IntegerLiteral 44..45 "0"
+                  trail Whitespace " "
+              KwTo 46..48 "to"
+                trail Whitespace " "
+              LiteralExpr 49..51
+                IntegerLiteral 49..50 "3"
+                  trail Whitespace " "
+          KwGenerate 51..59 "generate"
+          GenerateBody 59..77
+            StatementPart 59..77
+              ConcurrentSimpleSignalAssign 59..77
+                Target 59..69
+                  CallOrIndexName 59..69
+                    SimpleName 59..65
+                        lead Newline "\n"
+                        lead Whitespace "    "
+                      Identifier 64..65 "s"
+                    AssociationList 65..69
+                      LParen 65..66 "("
+                      AssociationElement 66..67
+                        SimpleName 66..67
+                          Identifier 66..67 "i"
+                      RParen 67..68 ")"
+                        trail Whitespace " "
+                Le 69..71 "<="
+                  trail Whitespace " "
+                Waveform 72..76
+                  WaveformElement 72..76
+                    CallOrIndexName 72..76
+                      SimpleName 72..73
+                        Identifier 72..73 "a"
+                      AssociationList 73..76
+                        LParen 73..74 "("
+                        AssociationElement 74..75
+                          SimpleName 74..75
+                            Identifier 74..75 "i"
+                        RParen 75..76 ")"
+                Semicolon 76..77 ";"
+          EndClause 77..95
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 80..83 "end"
+              trail Whitespace " "
+            KwGenerate 84..92 "generate"
+              trail Whitespace " "
+            Identifier 93..94 "g"
+            Semicolon 94..95 ";"
+      EndClause 95..100
+          lead Newline "\n"
+        KwEnd 96..99 "end"
+        Semicolon 99..100 ";"
+    lead Newline "\n"
+  EOF 101..101 ""

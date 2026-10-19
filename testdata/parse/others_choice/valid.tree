@@ -1,0 +1,56 @@
+DesignFile 0..76
+  DesignUnit 0..75
+    ContextClause 0..0
+    PackageDecl 0..75
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..70
+        ConstantDecl 12..70
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "v"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..51
+            SimpleName 28..38
+              Identifier 28..38 "bit_vector"
+            ArrayConstraint 38..51
+              LParen 38..39 "("
+              RangeExpr 39..49
+                LiteralExpr 39..41
+                  IntegerLiteral 39..40 "3"
+                    trail Whitespace " "
+                KwDownto 41..47 "downto"
+                  trail Whitespace " "
+                LiteralExpr 48..49
+                  IntegerLiteral 48..49 "0"
+              RParen 49..50 ")"
+                trail Whitespace " "
+          VarAssign 51..53 ":="
+            trail Whitespace " "
+          Aggregate 54..69
+            LParen 54..55 "("
+            ElementAssociation 55..68
+              Choices 55..62
+                OthersChoice 55..62
+                  KwOthers 55..61 "others"
+                    trail Whitespace " "
+              Arrow 62..64 "=>"
+                trail Whitespace " "
+              LiteralExpr 65..68
+                CharacterLiteral 65..68 "'1'"
+            RParen 68..69 ")"
+          Semicolon 69..70 ";"
+      EndClause 70..75
+          lead Newline "\n"
+        KwEnd 71..74 "end"
+        Semicolon 74..75 ";"
+    lead Newline "\n"
+  EOF 76..76 ""

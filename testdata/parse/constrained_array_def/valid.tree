@@ -1,0 +1,80 @@
+DesignFile 0..106
+  DesignUnit 0..105
+    ContextClause 0..0
+    PackageDecl 0..105
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..100
+        TypeDecl 12..51
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..24 "word"
+            trail Whitespace " "
+          KwIs 25..27 "is"
+            trail Whitespace " "
+          ConstrainedArrayDef 28..50
+            KwArray 28..33 "array"
+              trail Whitespace " "
+            ArrayConstraint 34..44
+              LParen 34..35 "("
+              RangeExpr 35..42
+                LiteralExpr 35..37
+                  IntegerLiteral 35..36 "0"
+                    trail Whitespace " "
+                KwTo 37..39 "to"
+                  trail Whitespace " "
+                LiteralExpr 40..42
+                  IntegerLiteral 40..42 "15"
+              RParen 42..43 ")"
+                trail Whitespace " "
+            KwOf 44..46 "of"
+              trail Whitespace " "
+            SubtypeIndication 47..50
+              SimpleName 47..50
+                Identifier 47..50 "bit"
+          Semicolon 50..51 ";"
+        TypeDecl 51..100
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 54..58 "type"
+            trail Whitespace " "
+          Identifier 59..63 "grid"
+            trail Whitespace " "
+          KwIs 64..66 "is"
+            trail Whitespace " "
+          ConstrainedArrayDef 67..99
+            KwArray 67..72 "array"
+              trail Whitespace " "
+            ArrayConstraint 73..89
+              LParen 73..74 "("
+              SimpleName 74..79
+                Identifier 74..79 "state"
+              Comma 79..80 ","
+                trail Whitespace " "
+              RangeExpr 81..87
+                LiteralExpr 81..83
+                  IntegerLiteral 81..82 "1"
+                    trail Whitespace " "
+                KwTo 83..85 "to"
+                  trail Whitespace " "
+                LiteralExpr 86..87
+                  IntegerLiteral 86..87 "3"
+              RParen 87..88 ")"
+                trail Whitespace " "
+            KwOf 89..91 "of"
+              trail Whitespace " "
+            SubtypeIndication 92..99
+              SimpleName 92..99
+                Identifier 92..99 "integer"
+          Semicolon 99..100 ";"
+      EndClause 100..105
+          lead Newline "\n"
+        KwEnd 101..104 "end"
+        Semicolon 104..105 ";"
+    lead Newline "\n"
+  EOF 106..106 ""

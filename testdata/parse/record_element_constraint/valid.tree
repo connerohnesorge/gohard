@@ -1,0 +1,45 @@
+DesignFile 0..55
+  DesignUnit 0..54
+    ContextClause 0..0
+    PackageDecl 0..54
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..49
+        SubtypeDecl 12..49
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSubtype 15..22 "subtype"
+            trail Whitespace " "
+          Identifier 23..25 "rc"
+            trail Whitespace " "
+          KwIs 26..28 "is"
+            trail Whitespace " "
+          SubtypeIndication 29..48
+            SimpleName 29..34
+              Identifier 29..34 "rec_t"
+            RecordConstraint 34..48
+              LParen 34..35 "("
+              RecordElementConstraint 35..47
+                Identifier 35..39 "data"
+                ArrayConstraint 39..47
+                  LParen 39..40 "("
+                  RangeExpr 40..46
+                    LiteralExpr 40..42
+                      IntegerLiteral 40..41 "0"
+                        trail Whitespace " "
+                    KwTo 42..44 "to"
+                      trail Whitespace " "
+                    LiteralExpr 45..46
+                      IntegerLiteral 45..46 "3"
+                  RParen 46..47 ")"
+              RParen 47..48 ")"
+          Semicolon 48..49 ";"
+      EndClause 49..54
+          lead Newline "\n"
+        KwEnd 50..53 "end"
+        Semicolon 53..54 ";"
+    lead Newline "\n"
+  EOF 55..55 ""

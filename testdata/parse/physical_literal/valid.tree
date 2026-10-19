@@ -1,0 +1,79 @@
+DesignFile 0..109
+  DesignUnit 0..108
+    ContextClause 0..0
+    PackageDecl 0..108
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..103
+        ConstantDecl 12..43
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..27
+            Identifier 24..26 "t1"
+              trail Whitespace " "
+          Colon 27..28 ":"
+            trail Whitespace " "
+          SubtypeIndication 29..34
+            SimpleName 29..34
+              Identifier 29..33 "time"
+                trail Whitespace " "
+          VarAssign 34..36 ":="
+            trail Whitespace " "
+          PhysicalLiteral 37..42
+            IntegerLiteral 37..39 "10"
+              trail Whitespace " "
+            SimpleName 40..42
+              Identifier 40..42 "ns"
+          Semicolon 42..43 ";"
+        ConstantDecl 43..71
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 46..54 "constant"
+            trail Whitespace " "
+          IdentifierList 55..58
+            Identifier 55..57 "t2"
+              trail Whitespace " "
+          Colon 58..59 ":"
+            trail Whitespace " "
+          SubtypeIndication 60..65
+            SimpleName 60..65
+              Identifier 60..64 "time"
+                trail Whitespace " "
+          VarAssign 65..67 ":="
+            trail Whitespace " "
+          SimpleName 68..70
+            Identifier 68..70 "ns"
+          Semicolon 70..71 ";"
+        ConstantDecl 71..103
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 74..82 "constant"
+            trail Whitespace " "
+          IdentifierList 83..86
+            Identifier 83..85 "t3"
+              trail Whitespace " "
+          Colon 86..87 ":"
+            trail Whitespace " "
+          SubtypeIndication 88..93
+            SimpleName 88..93
+              Identifier 88..92 "time"
+                trail Whitespace " "
+          VarAssign 93..95 ":="
+            trail Whitespace " "
+          PhysicalLiteral 96..102
+            RealLiteral 96..99 "2.5"
+              trail Whitespace " "
+            SimpleName 100..102
+              Identifier 100..102 "us"
+          Semicolon 102..103 ";"
+      EndClause 103..108
+          lead Newline "\n"
+        KwEnd 104..107 "end"
+        Semicolon 107..108 ";"
+    lead Newline "\n"
+  EOF 109..109 ""

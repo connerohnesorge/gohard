@@ -1,0 +1,77 @@
+DesignFile 0..129
+  DesignUnit 0..128
+    ContextClause 0..0
+    ArchitectureBody 0..128
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..117
+        AttributeSpec 22..71
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAttribute 25..34 "attribute"
+            trail Whitespace " "
+          Identifier 35..39 "keep"
+            trail Whitespace " "
+          KwOf 40..42 "of"
+            trail Whitespace " "
+          EntitySpecification 43..63
+            EntityNameList 43..54
+              EntityDesignator 43..45
+                Identifier 43..45 "s1"
+              Comma 45..46 ","
+                trail Whitespace " "
+              EntityDesignator 47..49
+                Identifier 47..49 "s2"
+              Comma 49..50 ","
+                trail Whitespace " "
+              EntityDesignator 51..54
+                Identifier 51..53 "s3"
+                  trail Whitespace " "
+            Colon 54..55 ":"
+              trail Whitespace " "
+            KwSignal 56..62 "signal"
+              trail Whitespace " "
+          KwIs 63..65 "is"
+            trail Whitespace " "
+          SimpleName 66..70
+            Identifier 66..70 "true"
+          Semicolon 70..71 ";"
+        AttributeSpec 71..117
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAttribute 74..83 "attribute"
+            trail Whitespace " "
+          Identifier 84..88 "keep"
+            trail Whitespace " "
+          KwOf 89..91 "of"
+            trail Whitespace " "
+          EntitySpecification 92..108
+            EntityNameList 92..99
+              KwOthers 92..98 "others"
+                trail Whitespace " "
+            Colon 99..100 ":"
+              trail Whitespace " "
+            KwSignal 101..107 "signal"
+              trail Whitespace " "
+          KwIs 108..110 "is"
+            trail Whitespace " "
+          SimpleName 111..116
+            Identifier 111..116 "false"
+          Semicolon 116..117 ";"
+        lead Newline "\n"
+      KwBegin 118..123 "begin"
+      StatementPart 123..123
+      EndClause 123..128
+          lead Newline "\n"
+        KwEnd 124..127 "end"
+        Semicolon 127..128 ";"
+    lead Newline "\n"
+  EOF 129..129 ""

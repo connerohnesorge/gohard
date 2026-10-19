@@ -1,0 +1,38 @@
+DesignFile 0..54
+  DesignUnit 0..25
+    ContextClause 0..0
+    EntityDecl 0..25
+      KwEntity 0..6 "entity"
+        trail Whitespace " "
+      Identifier 7..8 "e"
+        trail Whitespace " "
+      KwIs 9..11 "is"
+      DeclarativePart 11..11
+      EndClause 11..25
+          lead Newline "\n"
+        KwEnd 12..15 "end"
+          trail Whitespace " "
+        KwEntity 16..22 "entity"
+          trail Whitespace " "
+        Identifier 23..24 "e"
+        Semicolon 24..25 ";"
+  DesignUnit 25..53
+    ContextClause 25..25
+    PackageDecl 25..53
+        lead Newline "\n"
+      KwPackage 26..33 "package"
+        trail Whitespace " "
+      Identifier 34..35 "p"
+        trail Whitespace " "
+      KwIs 36..38 "is"
+      DeclarativePart 38..38
+      EndClause 38..53
+          lead Newline "\n"
+        KwEnd 39..42 "end"
+          trail Whitespace " "
+        KwPackage 43..50 "package"
+          trail Whitespace " "
+        Identifier 51..52 "p"
+        Semicolon 52..53 ";"
+    lead Newline "\n"
+  EOF 54..54 ""

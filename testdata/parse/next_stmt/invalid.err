@@ -1,0 +1,2 @@
+invalid.vhd:6:16: error[syntax/error]: expected a condition, found ';'
+summary: 1 errors, 0 warnings, 0 hints, 1 files

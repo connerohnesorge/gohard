@@ -1,0 +1,51 @@
+id,construct,first,lrm,snippet,diagnostic,gate,source,lrm_verified
+prot_type,protected type decl/body,2002,2002 §3.5,type t is protected ... end protected;,protected types require VHDL-2002,parser,1076-2000 addition (keyword gating not seen in NVC: parse.c L6692 has no require_std),false
+shared_nonprot,shared variable of non-protected type,ERROR>=2002,2008 §6.4.2.4,shared variable v : integer;,shared variable must be of a protected type (VHDL-2002+),sema,reverse gate; NVC parse.c L7357,false
+block_comment,/* */ delimited comment,2008,2008 §15.9,/* x */,delimited comments require VHDL-2008,lexer,⚠ NVC lexer.l not inspected,false
+context_decl,context declaration/reference,2008,2008 §13.3/§13.4,context c is library ieee; end context;,context declarations require VHDL-2008,lexer(keyword),parse.c L2866 (gated via keyword table),false
+generic_type,interface type decl,2008,2008 §6.5.3,generic (type T),interface type declarations require VHDL-2008,parser,parse.c L5576,false
+generic_subp,interface subprogram decl,2008,2008 §6.5.4,generic (function f return T),interface subprogram declarations require VHDL-2008,parser,parse.c L5736,true
+generic_pkg,interface package decl,2008,2008 §6.5.5,generic (package p is new q generic map (<>)),interface package declarations require VHDL-2008,parser,parse.c L5836,true
+generic_on_subp,generic clause on subprogram,2008,2008 §4.2.1,function f generic (...),generic subprograms require VHDL-2008,parser,parse.c L7161,false
+pkg_inst,package instantiation,2008,2008 §4.9,package p is new q generic map (...);,package instantiation declarations require VHDL-2008,parser,parse.c L7971,true
+subp_inst,subprogram instantiation,2008,2008 §4.4,function g is new f generic map (...);,subprogram instantiation declarations require VHDL-2008,parser,parse.c L7301,true
+nested_pkg,package nested in declarative part,2008,2008 §4.7,process ... package p is,nested package declarations require VHDL-2008,parser,parse.c L8235,true
+process_all,process (all),2008,2008 §11.3,process (all),process(all) requires VHDL-2008,parser,parse.c L8552 (switch at L8584),true
+cond_seq_sig,conditional signal assignment in process,2008,2008 §10.5.3,s <= a when c else b;  -- in process,conditional signal assignment statements require VHDL-2008,parser,parse.c L9988,true
+sel_var,selected variable assignment,2008,2008 §10.6.4,with s select v := ...,selected variable assignment requires VHDL-2008,parser,parse.c L9755,true
+case_match,case? statement,2008,2008 §10.9,case? x is,matching case statements require VHDL-2008,parser,parse.c L10507,true
+select_match,select? statement,2008,2008 §11.6,with x select? ,matching select statements require VHDL-2008,parser,parse.c L10964,false
+match_ops,?= ?/= ?< ?<= ?> ?>=,2008,2008 §9.2.3,a ?= b,matching relational operators require VHDL-2008,parser,"parse.c L4991 STD(08,...)",false
+cond_conv,?? and implicit condition conversion,2008,2008 §9.2.9,if s then,condition conversion requires VHDL-2008,parser+sema,parse.c L5014,false
+unary_logic,unary and/or/xor reduction,2008,2008 §9.2.2,and v,unary logical operators require VHDL-2008,parser,parse.c L4773,false
+force,force assignment,2008,2008 §10.5.2,s <= force '1';,simple force assignments require VHDL-2008,parser,parse.c L9897,true
+release,release assignment,2008,2008 §10.5.2,s <= release;,simple release assignments require VHDL-2008,parser,parse.c L9932,true
+ext_name,external names,2008,2008 §8.7,<< signal .tb.dut.x : bit >>,external names require VHDL-2008,parser,parse.c L3764,true
+record_constraint,record/unconstrained element constraint,2008,2008 §5.3.2/§5.3.3,subtype t is r(f(7 downto 0)),record element constraints require VHDL-2008,parser,parse.c L4160-4170,true
+elem_resolution,element resolution indication,2008,2008 §6.3,subtype t is (resolved) slv,element resolution requires VHDL-2008,parser,parse.c L4200-4210,true
+bitstr_len,sized/decimal bit string,2008,2008 §15.8,"8x""FF"" / d""12""",bit string literals with length specifier require VHDL-2008,lexer/parser,parse.c L517 L555,true
+gen_elsif_else_case,"if-generate elsif/else, case generate, alt labels",2008,2008 §11.8,g: if a: c generate ... elsif,"if-generate elsif/else, case generate and alternative labels require VHDL-2008",parser,parse.c L11282 L11308 L11336 L11414,true
+inertial_actual,inertial in port actual,2008,2008 §6.5.6.3,p => inertial a and b,inertial in actual designator requires VHDL-2008,parser,parse.c L3187,false
+subtype_attr,'subtype attribute,2008,2008 §16.2,x'subtype,subtype attribute requires VHDL-2008,parser,parse.c L3491,false
+pkg_body_attr_decl,attribute decl in package body,2008,2008 §4.8,attribute a : t; -- pkg body,package body may not contain attribute declarations,parser,parse.c L13456,true
+condanal,`if/`elsif/`else/`end/`error/`warning,2019,2019 §24.2,"`if VHDL_VERSION >= ""2019"" then",conditional analysis requires VHDL-2019,prepass,scan.c processed_yylex,false
+mode_view,mode view decl and port mode view,2019,2019 §6.5.2,view v of r is ... ; p : view v,mode view indication requires VHDL-2019,lexer(keyword)+parser,parse.c L5227 L8240,true
+private_var,private variable in protected type,2019,2019 §5.6.2,private variable v : t;,private variable declarations require VHDL-2019,parser,parse.c L6625,false
+incomplete_generic,incomplete/private generic types,2019,2019 §6.5.3,generic (type T is private),incomplete type definition requires VHDL-2019,parser,parse.c L5345 L5547,false
+cond_expr,when/else expressions anywhere,2019,2019 §9.2?,c := a when x else b;,conditional expressions require VHDL-2019,parser,parse.c L6926 L6964,false
+cond_return,return x when c,2019,2019 §10.13,return 0 when c;,conditional return statement requires VHDL-2019,parser,parse.c L10300,false
+seq_block,sequential block statement,2019,2019 §10.?,block begin ... end block;  -- in process,sequential block statements require VHDL-2019,parser,parse.c L10566,false
+empty_record,empty record,2019,2019 §5.3.3,type r is record end record;,empty record requires VHDL-2019,parser,parse.c L6496,false
+trailing_semi,trailing ; in interface list,2019,2019 §6.5.6,port (a : bit;),optional trailing semicolons require VHDL-2019,parser,parse.c L5955,true
+end_component,optional 'component' after end,2019,2019 §6.8,end;,optional end component requires VHDL-2019,parser,parse.c L8759,false
+record_attr,'element/'record attributes,2019,2019 §16.2,x'record,record attribute requires VHDL-2019,parser,parse.c L3497,false
+anon_type,anonymous type indication,2019,2019 §6.5.3,p : type is (<>),anonymous type indication requires VHDL-2019,parser,parse.c L5065,false
+subp_generic_map_call,generic map on call,2019,2019 §9.3.4,f generic map (...) (x),generic map on function call requires VHDL-2019,parser,parse.c L3435 L10442,false
+param_map,parameter map aspect,2019,2019 §9.3.4,f parameter map (...),parameter map aspect requires VHDL-2019,parser,parse.c L3384,false
+prot_port,protected-type ports/generics,2019,2019 §6.5.2,port (p : inout pt),protected-type interface objects require VHDL-2019,sema,⚠ unverified in NVC,false
+std_env_2008,std.env (stop/finish/resolution_limit),2008,2008 §16.5,use std.env.all;,std.env requires VHDL-2008,sema(library),"⚠ library selection, not syntax",false
+std_reflection,std.reflection + 2019 std.env additions,2019,2019 §16.?,use std.reflection.all;,std.reflection requires VHDL-2019,sema(library),⚠ unverified,false
+seq_selected_sig,selected signal assignment in process,2008,2008 §10.5.4,"with s select t <= a when '0', b when others;",selected signal assignments in sequential code require VHDL-2008,parser,added by #31 (statement builder; not in #7),false
+cond_var,conditional variable assignment,2008,2008 §10.6.3,v := a when c else b;,conditional variable assignments require VHDL-2008,parser,added by #31 (statement builder; not in #7),false
+prot_generics,generic clause on a protected type,2019,2019 §5.6.2,type t is protected generic (n : natural); end protected;,generics on protected types require VHDL-2019,parser,added by #31 (2019 builder; not in #7),false
+prot_inst,protected type instantiation,2019,2019 §5.6.2,type t2 is new t generic map (n => 1);,protected type instantiations require VHDL-2019,parser,added by #31 (2019 builder; not in #7),false

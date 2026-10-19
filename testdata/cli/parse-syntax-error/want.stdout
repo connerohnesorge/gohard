@@ -1,0 +1,5 @@
+a.vhd:2:7: error[syntax/error]: expected ';', found end of file
+a.vhd:2:7: error[syntax/error]: expected an identifier, found end of file
+a.vhd:2:7: error[syntax/error]: expected reserved word end, found end of file
+a.vhd:2:7: error[syntax/error]: expected reserved word is, found end of file
+summary: 4 errors, 0 warnings, 0 hints, 1 files

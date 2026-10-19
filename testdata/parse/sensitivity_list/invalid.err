@@ -1,0 +1,3 @@
+invalid.vhd:5:15: error[syntax/error]: expected ';', found ','
+invalid.vhd:5:15: error[syntax/error]: expected a signal name, found ','
+summary: 2 errors, 0 warnings, 0 hints, 1 files

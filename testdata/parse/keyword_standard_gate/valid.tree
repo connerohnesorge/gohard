@@ -1,0 +1,22 @@
+DesignFile 0..54
+  DesignUnit 0..53
+    ContextClause 0..0
+    ContextDecl 0..53
+        lead LineComment "-- test: kind=ContextDecl"
+        lead Newline "\n"
+      KwContext 26..33 "context"
+        trail Whitespace " "
+      Identifier 34..35 "c"
+        trail Whitespace " "
+      KwIs 36..38 "is"
+      ContextClause 38..38
+      EndClause 38..53
+          lead Newline "\n"
+        KwEnd 39..42 "end"
+          trail Whitespace " "
+        KwContext 43..50 "context"
+          trail Whitespace " "
+        Identifier 51..52 "c"
+        Semicolon 52..53 ";"
+    lead Newline "\n"
+  EOF 54..54 ""

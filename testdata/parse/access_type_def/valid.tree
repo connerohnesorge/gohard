@@ -1,0 +1,59 @@
+DesignFile 0..97
+  DesignUnit 0..96
+    ContextClause 0..0
+    PackageDecl 0..96
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..91
+        TypeDecl 12..46
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..27 "int_ptr"
+            trail Whitespace " "
+          KwIs 28..30 "is"
+            trail Whitespace " "
+          AccessTypeDef 31..45
+            KwAccess 31..37 "access"
+              trail Whitespace " "
+            SubtypeIndication 38..45
+              SimpleName 38..45
+                Identifier 38..45 "integer"
+          Semicolon 45..46 ";"
+        TypeDecl 46..91
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 49..53 "type"
+            trail Whitespace " "
+          Identifier 54..61 "vec_ptr"
+            trail Whitespace " "
+          KwIs 62..64 "is"
+            trail Whitespace " "
+          AccessTypeDef 65..90
+            KwAccess 65..71 "access"
+              trail Whitespace " "
+            SubtypeIndication 72..90
+              SimpleName 72..82
+                Identifier 72..82 "bit_vector"
+              ArrayConstraint 82..90
+                LParen 82..83 "("
+                RangeExpr 83..89
+                  LiteralExpr 83..85
+                    IntegerLiteral 83..84 "0"
+                      trail Whitespace " "
+                  KwTo 85..87 "to"
+                    trail Whitespace " "
+                  LiteralExpr 88..89
+                    IntegerLiteral 88..89 "7"
+                RParen 89..90 ")"
+          Semicolon 90..91 ";"
+      EndClause 91..96
+          lead Newline "\n"
+        KwEnd 92..95 "end"
+        Semicolon 95..96 ";"
+    lead Newline "\n"
+  EOF 97..97 ""

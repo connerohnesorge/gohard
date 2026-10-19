@@ -147,7 +147,13 @@ var commands = []Command{
 		Flags: []Flag{
 			{
 				Name: "format", Kind: String, Value: "vcd|fst",
-				Usage: "export format",
+				Usage: "export format (required)",
+			},
+			{
+				Name: "out", Short: "o", Kind: String,
+				Value: "FILE",
+				Usage: "write the export to FILE (a temp file, " +
+					"then rename) instead of standard output",
 			},
 		},
 	},

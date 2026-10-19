@@ -1,0 +1,3 @@
+invalid.vhd:2:49: error[syntax/error]: expected ',' or ')', found literal '1'
+invalid.vhd:2:49: error[syntax/error]: expected '=>', found literal '1'
+summary: 2 errors, 0 warnings, 0 hints, 1 files

@@ -1,0 +1,81 @@
+DesignFile 0..109
+  DesignUnit 0..108
+    ContextClause 0..0
+    ArchitectureBody 0..108
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..103
+        PSLAssert 28..63
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 31..37 "assert"
+            trail Whitespace " "
+          PSLLogicalProp 38..62
+            PSLParenProp 38..49
+              LParen 38..39 "("
+              PSLAlways 39..47
+                KwAlways 39..45 "always"
+                  trail Whitespace " "
+                PSLBoolean 46..47
+                  SimpleName 46..47
+                    Identifier 46..47 "a"
+              RParen 47..48 ")"
+                trail Whitespace " "
+            KwAnd 49..52 "and"
+              trail Whitespace " "
+            PSLParenProp 53..62
+              LParen 53..54 "("
+              PSLNever 54..61
+                KwNever 54..59 "never"
+                  trail Whitespace " "
+                PSLBoolean 60..61
+                  SimpleName 60..61
+                    Identifier 60..61 "b"
+              RParen 61..62 ")"
+          Semicolon 62..63 ";"
+        PSLAssert 63..103
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 66..72 "assert"
+            trail Whitespace " "
+          PSLLogicalProp 73..102
+            PSLParenProp 73..89
+              LParen 73..74 "("
+              PSLEventually 74..87
+                KwEventually 74..84 "eventually"
+                PSLBangSuffix 84..85 "!"
+                  trail Whitespace " "
+                PSLBoolean 86..87
+                  SimpleName 86..87
+                    Identifier 86..87 "a"
+              RParen 87..88 ")"
+                trail Whitespace " "
+            KwOr 89..91 "or"
+              trail Whitespace " "
+            PSLParenProp 92..102
+              LParen 92..93 "("
+              PSLAlways 93..101
+                KwAlways 93..99 "always"
+                  trail Whitespace " "
+                PSLBoolean 100..101
+                  SimpleName 100..101
+                    Identifier 100..101 "b"
+              RParen 101..102 ")"
+          Semicolon 102..103 ";"
+      EndClause 103..108
+          lead Newline "\n"
+        KwEnd 104..107 "end"
+        Semicolon 107..108 ";"
+    lead Newline "\n"
+  EOF 109..109 ""

@@ -1,0 +1,49 @@
+DesignFile 0..71
+  DesignUnit 0..70
+    ContextClause 0..0
+    PackageDecl 0..70
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..65
+        TypeDecl 12..65
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..26 "weight"
+            trail Whitespace " "
+          KwIs 27..29 "is"
+            trail Whitespace " "
+          PhysicalTypeDef 30..65
+            RangeConstraint 30..46
+              KwRange 30..35 "range"
+                trail Whitespace " "
+              RangeExpr 36..46
+                LiteralExpr 36..38
+                  IntegerLiteral 36..37 "0"
+                    trail Whitespace " "
+                KwTo 38..40 "to"
+                  trail Whitespace " "
+                LiteralExpr 41..46
+                  IntegerLiteral 41..45 "1000"
+                    trail Whitespace " "
+            KwUnits 46..51 "units"
+              trail Whitespace " "
+            PrimaryUnitDecl 52..55
+              Identifier 52..53 "g"
+              Semicolon 53..54 ";"
+                trail Whitespace " "
+            EndClause 55..65
+              KwEnd 55..58 "end"
+                trail Whitespace " "
+              KwUnits 59..64 "units"
+              Semicolon 64..65 ";"
+      EndClause 65..70
+          lead Newline "\n"
+        KwEnd 66..69 "end"
+        Semicolon 69..70 ";"
+    lead Newline "\n"
+  EOF 71..71 ""

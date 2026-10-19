@@ -1,0 +1,36 @@
+DesignFile 0..66
+  DesignUnit 0..65
+    ContextClause 0..0
+    PackageDecl 0..65
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..60
+        SubtypeDecl 12..60
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSubtype 15..22 "subtype"
+            trail Whitespace " "
+          Identifier 23..27 "rvec"
+            trail Whitespace " "
+          KwIs 28..30 "is"
+            trail Whitespace " "
+          SubtypeIndication 31..59
+            ElementResolution 31..42
+              LParen 31..32 "("
+              ResolutionFunction 32..40
+                SimpleName 32..40
+                  Identifier 32..40 "resolved"
+              RParen 40..41 ")"
+                trail Whitespace " "
+            SimpleName 42..59
+              Identifier 42..59 "std_ulogic_vector"
+          Semicolon 59..60 ";"
+      EndClause 60..65
+          lead Newline "\n"
+        KwEnd 61..64 "end"
+        Semicolon 64..65 ";"
+    lead Newline "\n"
+  EOF 66..66 ""

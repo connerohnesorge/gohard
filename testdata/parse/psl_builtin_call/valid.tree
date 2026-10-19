@@ -1,0 +1,131 @@
+DesignFile 0..166
+  DesignUnit 0..165
+    ContextClause 0..0
+    ArchitectureBody 0..165
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..160
+        PSLAssert 28..71
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 31..37 "assert"
+            trail Whitespace " "
+          PSLAlways 38..70
+            KwAlways 38..44 "always"
+              trail Whitespace " "
+            PSLParenProp 45..70
+              LParen 45..46 "("
+              PSLImplication 46..69
+                PSLBuiltinCall 46..54
+                  KwRose 46..50 "rose"
+                  LParen 50..51 "("
+                  SimpleName 51..52
+                    Identifier 51..52 "a"
+                  RParen 52..53 ")"
+                    trail Whitespace " "
+                PSLImplies 54..56 "->"
+                  trail Whitespace " "
+                PSLNext 57..69
+                  KwNext 57..61 "next"
+                    trail Whitespace " "
+                  PSLBuiltinCall 62..69
+                    KwFell 62..66 "fell"
+                    LParen 66..67 "("
+                    SimpleName 67..68
+                      Identifier 67..68 "b"
+                    RParen 68..69 ")"
+              RParen 69..70 ")"
+          Semicolon 70..71 ";"
+        PSLAssert 71..129
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 74..80 "assert"
+            trail Whitespace " "
+          PSLAlways 81..128
+            KwAlways 81..87 "always"
+              trail Whitespace " "
+            PSLBoolean 88..128
+              ParenExpr 88..128
+                LParen 88..89 "("
+                BinaryExpr 89..127
+                  BinaryExpr 89..113
+                    CallOrIndexName 89..99
+                      SimpleName 89..95
+                        Identifier 89..95 "stable"
+                      AssociationList 95..99
+                        LParen 95..96 "("
+                        AssociationElement 96..97
+                          SimpleName 96..97
+                            Identifier 96..97 "c"
+                        RParen 97..98 ")"
+                          trail Whitespace " "
+                    KwAnd 99..102 "and"
+                      trail Whitespace " "
+                    CallOrIndexName 103..113
+                      SimpleName 103..109
+                        Identifier 103..109 "onehot"
+                      AssociationList 109..113
+                        LParen 109..110 "("
+                        AssociationElement 110..111
+                          SimpleName 110..111
+                            Identifier 110..111 "v"
+                        RParen 111..112 ")"
+                          trail Whitespace " "
+                  KwAnd 113..116 "and"
+                    trail Whitespace " "
+                  CallOrIndexName 117..127
+                    SimpleName 117..124
+                      Identifier 117..124 "onehot0"
+                    AssociationList 124..127
+                      LParen 124..125 "("
+                      AssociationElement 125..126
+                        SimpleName 125..126
+                          Identifier 125..126 "w"
+                      RParen 126..127 ")"
+                RParen 127..128 ")"
+          Semicolon 128..129 ";"
+        PSLAssert 129..160
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 132..138 "assert"
+            trail Whitespace " "
+          PSLAlways 139..159
+            KwAlways 139..145 "always"
+              trail Whitespace " "
+            PSLBoolean 146..159
+              ParenExpr 146..159
+                LParen 146..147 "("
+                BinaryExpr 147..158
+                  CallOrIndexName 147..155
+                    SimpleName 147..151
+                      Identifier 147..151 "prev"
+                    AssociationList 151..155
+                      LParen 151..152 "("
+                      AssociationElement 152..153
+                        SimpleName 152..153
+                          Identifier 152..153 "a"
+                      RParen 153..154 ")"
+                        trail Whitespace " "
+                  Eq 155..156 "="
+                    trail Whitespace " "
+                  SimpleName 157..158
+                    Identifier 157..158 "b"
+                RParen 158..159 ")"
+          Semicolon 159..160 ";"
+      EndClause 160..165
+          lead Newline "\n"
+        KwEnd 161..164 "end"
+        Semicolon 164..165 ";"
+    lead Newline "\n"
+  EOF 166..166 ""

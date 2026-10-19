@@ -1,0 +1,50 @@
+DesignFile 0..70
+  DesignUnit 0..69
+    ContextClause 0..0
+    EntityDecl 0..69
+      KwEntity 0..6 "entity"
+        trail Whitespace " "
+      Identifier 7..8 "e"
+        trail Whitespace " "
+      KwIs 9..11 "is"
+      GenericClause 11..64
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwGeneric 14..21 "generic"
+          trail Whitespace " "
+        InterfaceList 22..63
+          LParen 22..23 "("
+          InterfaceObjectDecl 23..44
+            IdentifierList 23..29
+              Identifier 23..28 "width"
+                trail Whitespace " "
+            Colon 29..30 ":"
+              trail Whitespace " "
+            SubtypeIndication 31..40
+              SimpleName 31..40
+                Identifier 31..39 "positive"
+                  trail Whitespace " "
+            VarAssign 40..42 ":="
+              trail Whitespace " "
+            LiteralExpr 43..44
+              IntegerLiteral 43..44 "8"
+          Semicolon 44..45 ";"
+            trail Whitespace " "
+          InterfaceObjectDecl 46..62
+            IdentifierList 46..52
+              Identifier 46..51 "depth"
+                trail Whitespace " "
+            Colon 52..53 ":"
+              trail Whitespace " "
+            SubtypeIndication 54..62
+              SimpleName 54..62
+                Identifier 54..62 "positive"
+          RParen 62..63 ")"
+        Semicolon 63..64 ";"
+      DeclarativePart 64..64
+      EndClause 64..69
+          lead Newline "\n"
+        KwEnd 65..68 "end"
+        Semicolon 68..69 ";"
+    lead Newline "\n"
+  EOF 70..70 ""

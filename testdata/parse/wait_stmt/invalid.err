@@ -1,0 +1,2 @@
+invalid.vhd:5:23: error[syntax/error]: expected a condition, found reserved word for
+summary: 1 errors, 0 warnings, 0 hints, 1 files

@@ -1,0 +1,99 @@
+DesignFile 0..111
+  DesignUnit 0..110
+    ContextClause 0..0
+    ArchitectureBody 0..110
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..105
+        ConcurrentConditionalSignalAssign 28..105
+          Target 28..33
+            SimpleName 28..33
+                lead Newline "\n"
+                lead Whitespace "  "
+              Identifier 31..32 "s"
+                trail Whitespace " "
+          Le 33..35 "<="
+            trail Whitespace " "
+          ConditionalWaveforms 36..104
+            WhenBranch 36..62
+              Waveform 36..49
+                WaveformElement 36..49
+                  SimpleName 36..38
+                    Identifier 36..37 "a"
+                      trail Whitespace " "
+                  KwAfter 38..43 "after"
+                    trail Whitespace " "
+                  PhysicalLiteral 44..49
+                    IntegerLiteral 44..45 "1"
+                      trail Whitespace " "
+                    SimpleName 46..49
+                      Identifier 46..48 "ns"
+                        trail Whitespace " "
+              KwWhen 49..53 "when"
+                trail Whitespace " "
+              BinaryExpr 54..62
+                SimpleName 54..56
+                  Identifier 54..55 "c"
+                    trail Whitespace " "
+                Eq 56..57 "="
+                  trail Whitespace " "
+                LiteralExpr 58..62
+                  CharacterLiteral 58..61 "'1'"
+                    trail Whitespace " "
+            KwElse 62..66 "else"
+              trail Whitespace " "
+            WhenBranch 67..96
+              Waveform 67..83
+                WaveformElement 67..68
+                  SimpleName 67..68
+                    Identifier 67..68 "b"
+                Comma 68..69 ","
+                  trail Whitespace " "
+                WaveformElement 70..83
+                  SimpleName 70..72
+                    Identifier 70..71 "d"
+                      trail Whitespace " "
+                  KwAfter 72..77 "after"
+                    trail Whitespace " "
+                  PhysicalLiteral 78..83
+                    IntegerLiteral 78..79 "2"
+                      trail Whitespace " "
+                    SimpleName 80..83
+                      Identifier 80..82 "ns"
+                        trail Whitespace " "
+              KwWhen 83..87 "when"
+                trail Whitespace " "
+              BinaryExpr 88..96
+                SimpleName 88..90
+                  Identifier 88..89 "e"
+                    trail Whitespace " "
+                Eq 90..91 "="
+                  trail Whitespace " "
+                LiteralExpr 92..96
+                  CharacterLiteral 92..95 "'1'"
+                    trail Whitespace " "
+            KwElse 96..100 "else"
+              trail Whitespace " "
+            WhenBranch 101..104
+              Waveform 101..104
+                WaveformElement 101..104
+                  LiteralExpr 101..104
+                    CharacterLiteral 101..104 "'0'"
+          Semicolon 104..105 ";"
+      EndClause 105..110
+          lead Newline "\n"
+        KwEnd 106..109 "end"
+        Semicolon 109..110 ";"
+    lead Newline "\n"
+  EOF 111..111 ""

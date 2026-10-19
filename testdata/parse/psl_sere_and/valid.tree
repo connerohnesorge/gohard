@@ -1,0 +1,86 @@
+DesignFile 0..83
+  DesignUnit 0..82
+    ContextClause 0..0
+    ArchitectureBody 0..82
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..77
+        PSLCover 28..49
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwCover 31..36 "cover"
+            trail Whitespace " "
+          PSLBracedSere 37..48
+            LBrace 37..38 "{"
+            PSLSereAnd 38..47
+              PSLBracedSere 38..42
+                LBrace 38..39 "{"
+                PSLBoolean 39..40
+                  SimpleName 39..40
+                    Identifier 39..40 "a"
+                RBrace 40..41 "}"
+                  trail Whitespace " "
+              Ampersand 42..43 "&"
+                trail Whitespace " "
+              PSLBracedSere 44..47
+                LBrace 44..45 "{"
+                PSLBoolean 45..46
+                  SimpleName 45..46
+                    Identifier 45..46 "b"
+                RBrace 46..47 "}"
+            RBrace 47..48 "}"
+          Semicolon 48..49 ";"
+        PSLCover 49..77
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwCover 52..57 "cover"
+            trail Whitespace " "
+          PSLBracedSere 58..76
+            LBrace 58..59 "{"
+            PSLSereAnd 59..75
+              PSLBracedSere 59..66
+                LBrace 59..60 "{"
+                PSLSereConcat 60..64
+                  PSLBoolean 60..61
+                    SimpleName 60..61
+                      Identifier 60..61 "a"
+                  Semicolon 61..62 ";"
+                    trail Whitespace " "
+                  PSLBoolean 63..64
+                    SimpleName 63..64
+                      Identifier 63..64 "b"
+                RBrace 64..65 "}"
+                  trail Whitespace " "
+              PSLAndAnd 66..68 "&&"
+                trail Whitespace " "
+              PSLBracedSere 69..75
+                LBrace 69..70 "{"
+                PSLSereConcat 70..74
+                  PSLBoolean 70..71
+                    SimpleName 70..71
+                      Identifier 70..71 "c"
+                  Semicolon 71..72 ";"
+                    trail Whitespace " "
+                  PSLBoolean 73..74
+                    SimpleName 73..74
+                      Identifier 73..74 "d"
+                RBrace 74..75 "}"
+            RBrace 75..76 "}"
+          Semicolon 76..77 ";"
+      EndClause 77..82
+          lead Newline "\n"
+        KwEnd 78..81 "end"
+        Semicolon 81..82 ";"
+    lead Newline "\n"
+  EOF 83..83 ""

@@ -1,0 +1,42 @@
+DesignFile 0..58
+  DesignUnit 0..57
+    ContextClause 0..0
+    PackageDecl 0..57
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..52
+        SubtypeDecl 12..52
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSubtype 15..22 "subtype"
+            trail Whitespace " "
+          Identifier 23..27 "rrec"
+            trail Whitespace " "
+          KwIs 28..30 "is"
+            trail Whitespace " "
+          SubtypeIndication 31..51
+            RecordResolution 31..46
+              LParen 31..32 "("
+              RecordElementResolution 32..44
+                Identifier 32..33 "a"
+                  trail Whitespace " "
+                ElementResolution 34..44
+                  LParen 34..35 "("
+                  ResolutionFunction 35..43
+                    SimpleName 35..43
+                      Identifier 35..43 "resolved"
+                  RParen 43..44 ")"
+              RParen 44..45 ")"
+                trail Whitespace " "
+            SimpleName 46..51
+              Identifier 46..51 "rec_t"
+          Semicolon 51..52 ";"
+      EndClause 52..57
+          lead Newline "\n"
+        KwEnd 53..56 "end"
+        Semicolon 56..57 ";"
+    lead Newline "\n"
+  EOF 58..58 ""

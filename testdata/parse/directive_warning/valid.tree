@@ -1,0 +1,28 @@
+DesignFile 0..188
+  DesignUnit 0..187
+    ContextClause 0..0
+    PackageDecl 0..187
+        lead LineComment "-- test: kind=none allow=syntax/directive-warning"
+        lead Newline "\n"
+        lead Directive "`if VHDL_VERSION < \"2019\" then"
+        lead Newline "\n"
+        lead Directive "`warning \"this design needs VHDL-2019\""
+        lead Newline "\n"
+        lead Directive "`else"
+        lead Newline "\n"
+        lead Directive "`warning \"analysing with VHDL-2019\""
+        lead Newline "\n"
+        lead Directive "`end if"
+        lead Newline "\n"
+      KwPackage 170..177 "package"
+        trail Whitespace " "
+      Identifier 178..179 "p"
+        trail Whitespace " "
+      KwIs 180..182 "is"
+      DeclarativePart 182..182
+      EndClause 182..187
+          lead Newline "\n"
+        KwEnd 183..186 "end"
+        Semicolon 186..187 ";"
+    lead Newline "\n"
+  EOF 188..188 ""

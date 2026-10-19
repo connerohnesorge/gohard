@@ -1,0 +1,125 @@
+DesignFile 0..170
+  DesignUnit 0..169
+    ContextClause 0..0
+    ArchitectureBody 0..169
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..164
+        BlockStmt 28..164
+          Label 28..36
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 31..33 "b2"
+              trail Whitespace " "
+            Colon 34..35 ":"
+              trail Whitespace " "
+          KwBlock 36..41 "block"
+            trail Whitespace " "
+          KwIs 42..44 "is"
+          BlockHeader 44..143
+            GenericClause 44..71
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwGeneric 49..56 "generic"
+                trail Whitespace " "
+              InterfaceList 57..70
+                LParen 57..58 "("
+                InterfaceObjectDecl 58..69
+                  IdentifierList 58..60
+                    Identifier 58..59 "n"
+                      trail Whitespace " "
+                  Colon 60..61 ":"
+                    trail Whitespace " "
+                  SubtypeIndication 62..69
+                    SimpleName 62..69
+                      Identifier 62..69 "natural"
+                RParen 69..70 ")"
+              Semicolon 70..71 ";"
+            GenericMapAspect 71..96
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwGeneric 76..83 "generic"
+                trail Whitespace " "
+              KwMap 84..87 "map"
+                trail Whitespace " "
+              AssociationList 88..96
+                LParen 88..89 "("
+                AssociationElement 89..95
+                  SimpleName 89..91
+                    Identifier 89..90 "n"
+                      trail Whitespace " "
+                  Arrow 91..93 "=>"
+                    trail Whitespace " "
+                  LiteralExpr 94..95
+                    IntegerLiteral 94..95 "4"
+                RParen 95..96 ")"
+            Semicolon 96..97 ";"
+            PortClause 97..120
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwPort 102..106 "port"
+                trail Whitespace " "
+              InterfaceList 107..119
+                LParen 107..108 "("
+                InterfaceObjectDecl 108..118
+                  IdentifierList 108..110
+                    Identifier 108..109 "a"
+                      trail Whitespace " "
+                  Colon 110..111 ":"
+                    trail Whitespace " "
+                  SimpleModeIndication 112..115
+                    KwIn 112..114 "in"
+                      trail Whitespace " "
+                  SubtypeIndication 115..118
+                    SimpleName 115..118
+                      Identifier 115..118 "bit"
+                RParen 118..119 ")"
+              Semicolon 119..120 ";"
+            PortMapAspect 120..142
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwPort 125..129 "port"
+                trail Whitespace " "
+              KwMap 130..133 "map"
+                trail Whitespace " "
+              AssociationList 134..142
+                LParen 134..135 "("
+                AssociationElement 135..141
+                  SimpleName 135..137
+                    Identifier 135..136 "a"
+                      trail Whitespace " "
+                  Arrow 137..139 "=>"
+                    trail Whitespace " "
+                  SimpleName 140..141
+                    Identifier 140..141 "s"
+                RParen 141..142 ")"
+            Semicolon 142..143 ";"
+          DeclarativePart 143..143
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 146..151 "begin"
+          StatementPart 151..151
+          EndClause 151..164
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 154..157 "end"
+              trail Whitespace " "
+            KwBlock 158..163 "block"
+            Semicolon 163..164 ";"
+      EndClause 164..169
+          lead Newline "\n"
+        KwEnd 165..168 "end"
+        Semicolon 168..169 ";"
+    lead Newline "\n"
+  EOF 170..170 ""

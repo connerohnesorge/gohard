@@ -1,0 +1,40 @@
+DesignFile 0..128
+  DesignUnit 0..66
+    ContextClause 0..0
+    PackageDecl 0..66
+        lead LineComment "-- test: kind=none"
+        lead Newline "\n"
+        lead Directive "`if TOOL_NAME = \"gohard\" then"
+        lead Newline "\n"
+      KwPackage 49..56 "package"
+        trail Whitespace " "
+      Identifier 57..58 "p"
+        trail Whitespace " "
+      KwIs 59..61 "is"
+      DeclarativePart 61..61
+      EndClause 61..66
+          lead Newline "\n"
+        KwEnd 62..65 "end"
+        Semicolon 65..66 ";"
+  DesignUnit 66..122
+    ContextClause 66..66
+    PackageDecl 66..122
+        lead Newline "\n"
+        lead Directive "`end if"
+        lead Newline "\n"
+        lead Directive "`if TOOL_NAME /= \"other\" then"
+        lead Newline "\n"
+      KwPackage 105..112 "package"
+        trail Whitespace " "
+      Identifier 113..114 "q"
+        trail Whitespace " "
+      KwIs 115..117 "is"
+      DeclarativePart 117..117
+      EndClause 117..122
+          lead Newline "\n"
+        KwEnd 118..121 "end"
+        Semicolon 121..122 ";"
+    lead Newline "\n"
+    lead Directive "`end"
+    lead Newline "\n"
+  EOF 128..128 ""

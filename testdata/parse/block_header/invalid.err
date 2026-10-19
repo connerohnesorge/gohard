@@ -1,0 +1,2 @@
+invalid.vhd:4:26: error[syntax/error]: expected ';', found reserved word generic
+summary: 1 errors, 0 warnings, 0 hints, 1 files

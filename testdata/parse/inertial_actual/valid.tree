@@ -1,0 +1,67 @@
+DesignFile 0..88
+  DesignUnit 0..87
+    ContextClause 0..0
+    ArchitectureBody 0..87
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..82
+        ComponentInstantiationStmt 28..82
+          Label 28..35
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 31..32 "u"
+              trail Whitespace " "
+            Colon 33..34 ":"
+              trail Whitespace " "
+          InstantiatedUnit 35..49
+            KwEntity 35..41 "entity"
+              trail Whitespace " "
+            SelectedName 42..49
+              SimpleName 42..46
+                Identifier 42..46 "work"
+              Dot 46..47 "."
+              Identifier 47..48 "f"
+                trail Whitespace " "
+          PortMapAspect 49..81
+            KwPort 49..53 "port"
+              trail Whitespace " "
+            KwMap 54..57 "map"
+              trail Whitespace " "
+            AssociationList 58..81
+              LParen 58..59 "("
+              AssociationElement 59..80
+                SimpleName 59..61
+                  Identifier 59..60 "a"
+                    trail Whitespace " "
+                Arrow 61..63 "=>"
+                  trail Whitespace " "
+                InertialActual 64..80
+                  KwInertial 64..72 "inertial"
+                    trail Whitespace " "
+                  BinaryExpr 73..80
+                    SimpleName 73..75
+                      Identifier 73..74 "s"
+                        trail Whitespace " "
+                    KwAnd 75..78 "and"
+                      trail Whitespace " "
+                    SimpleName 79..80
+                      Identifier 79..80 "t"
+              RParen 80..81 ")"
+          Semicolon 81..82 ";"
+      EndClause 82..87
+          lead Newline "\n"
+        KwEnd 83..86 "end"
+        Semicolon 86..87 ";"
+    lead Newline "\n"
+  EOF 88..88 ""

@@ -1,0 +1,78 @@
+DesignFile 0..87
+  DesignUnit 0..86
+    ContextClause 0..0
+    PackageDecl 0..86
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..81
+        ConstantDecl 12..81
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "v"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..39
+            SimpleName 28..39
+              Identifier 28..38 "int_vector"
+                trail Whitespace " "
+          VarAssign 39..41 ":="
+            trail Whitespace " "
+          Aggregate 42..80
+            LParen 42..43 "("
+            ElementAssociation 43..53
+              Choices 43..49
+                LiteralExpr 43..45
+                  IntegerLiteral 43..44 "0"
+                    trail Whitespace " "
+                Bar 45..46 "|"
+                  trail Whitespace " "
+                LiteralExpr 47..49
+                  IntegerLiteral 47..48 "2"
+                    trail Whitespace " "
+              Arrow 49..51 "=>"
+                trail Whitespace " "
+              LiteralExpr 52..53
+                IntegerLiteral 52..53 "1"
+            Comma 53..54 ","
+              trail Whitespace " "
+            ElementAssociation 55..66
+              Choices 55..62
+                RangeExpr 55..62
+                  LiteralExpr 55..57
+                    IntegerLiteral 55..56 "1"
+                      trail Whitespace " "
+                  KwTo 57..59 "to"
+                    trail Whitespace " "
+                  LiteralExpr 60..62
+                    IntegerLiteral 60..61 "3"
+                      trail Whitespace " "
+              Arrow 62..64 "=>"
+                trail Whitespace " "
+              LiteralExpr 65..66
+                IntegerLiteral 65..66 "0"
+            Comma 66..67 ","
+              trail Whitespace " "
+            ElementAssociation 68..79
+              Choices 68..75
+                OthersChoice 68..75
+                  KwOthers 68..74 "others"
+                    trail Whitespace " "
+              Arrow 75..77 "=>"
+                trail Whitespace " "
+              LiteralExpr 78..79
+                IntegerLiteral 78..79 "9"
+            RParen 79..80 ")"
+          Semicolon 80..81 ";"
+      EndClause 81..86
+          lead Newline "\n"
+        KwEnd 82..85 "end"
+        Semicolon 85..86 ";"
+    lead Newline "\n"
+  EOF 87..87 ""

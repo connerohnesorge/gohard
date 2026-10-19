@@ -1,0 +1,3 @@
+invalid.vhd:2:1: error[syntax/standard]: the reserved word context requires VHDL-2008 or later (standard is 2002)
+invalid.vhd:3:5: error[syntax/standard]: the reserved word context requires VHDL-2008 or later (standard is 2002)
+summary: 2 errors, 0 warnings, 0 hints, 1 files

@@ -1,0 +1,90 @@
+DesignFile 0..121
+  DesignUnit 0..120
+    ContextClause 0..0
+    ArchitectureBody 0..120
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..115
+        ProcessStmt 28..115
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..100
+            ProcedureCallStmt 49..59
+              SimpleName 49..58
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 54..58 "proc"
+              Semicolon 58..59 ";"
+            ProcedureCallStmt 59..80
+              CallOrIndexName 59..79
+                SimpleName 59..68
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 64..68 "proc"
+                AssociationList 68..79
+                  LParen 68..69 "("
+                  AssociationElement 69..70
+                    LiteralExpr 69..70
+                      IntegerLiteral 69..70 "1"
+                  Comma 70..71 ","
+                    trail Whitespace " "
+                  AssociationElement 72..78
+                    SimpleName 72..74
+                      Identifier 72..73 "b"
+                        trail Whitespace " "
+                    Arrow 74..76 "=>"
+                      trail Whitespace " "
+                    LiteralExpr 77..78
+                      IntegerLiteral 77..78 "2"
+                  RParen 78..79 ")"
+              Semicolon 79..80 ";"
+            ProcedureCallStmt 80..100
+              CallOrIndexName 80..99
+                SelectedName 80..96
+                  SelectedName 80..91
+                    SimpleName 80..89
+                        lead Newline "\n"
+                        lead Whitespace "    "
+                      Identifier 85..89 "work"
+                    Dot 89..90 "."
+                    Identifier 90..91 "p"
+                  Dot 91..92 "."
+                  Identifier 92..96 "proc"
+                AssociationList 96..99
+                  LParen 96..97 "("
+                  AssociationElement 97..98
+                    SimpleName 97..98
+                      Identifier 97..98 "x"
+                  RParen 98..99 ")"
+              Semicolon 99..100 ";"
+          EndClause 100..115
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 103..106 "end"
+              trail Whitespace " "
+            KwProcess 107..114 "process"
+            Semicolon 114..115 ";"
+      EndClause 115..120
+          lead Newline "\n"
+        KwEnd 116..119 "end"
+        Semicolon 119..120 ";"
+    lead Newline "\n"
+  EOF 121..121 ""

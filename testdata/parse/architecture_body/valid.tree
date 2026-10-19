@@ -1,0 +1,59 @@
+DesignFile 0..88
+  DesignUnit 0..87
+    ContextClause 0..0
+    ArchitectureBody 0..87
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..16 "rtl"
+        trail Whitespace " "
+      KwOf 17..19 "of"
+        trail Whitespace " "
+      SelectedName 20..27
+        SimpleName 20..24
+          Identifier 20..24 "work"
+        Dot 24..25 "."
+        Identifier 25..26 "e"
+          trail Whitespace " "
+      KwIs 27..29 "is"
+      DeclarativePart 29..47
+        SignalDecl 29..47
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSignal 32..38 "signal"
+            trail Whitespace " "
+          IdentifierList 39..41
+            Identifier 39..40 "s"
+              trail Whitespace " "
+          Colon 41..42 ":"
+            trail Whitespace " "
+          SubtypeIndication 43..46
+            SimpleName 43..46
+              Identifier 43..46 "bit"
+          Semicolon 46..47 ";"
+        lead Newline "\n"
+      KwBegin 48..53 "begin"
+      StatementPart 53..65
+        ConcurrentSimpleSignalAssign 53..65
+          Target 53..58
+            SimpleName 53..58
+                lead Newline "\n"
+                lead Whitespace "  "
+              Identifier 56..57 "s"
+                trail Whitespace " "
+          Le 58..60 "<="
+            trail Whitespace " "
+          Waveform 61..64
+            WaveformElement 61..64
+              LiteralExpr 61..64
+                CharacterLiteral 61..64 "'1'"
+          Semicolon 64..65 ";"
+      EndClause 65..87
+          lead Newline "\n"
+        KwEnd 66..69 "end"
+          trail Whitespace " "
+        KwArchitecture 70..82 "architecture"
+          trail Whitespace " "
+        Identifier 83..86 "rtl"
+        Semicolon 86..87 ";"
+    lead Newline "\n"
+  EOF 88..88 ""

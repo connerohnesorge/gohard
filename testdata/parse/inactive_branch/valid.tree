@@ -1,0 +1,56 @@
+DesignFile 0..116
+  InactiveBranch 0..89
+    DesignUnit 0..89
+      ContextClause 0..0
+      PackageDecl 0..89
+          lead LineComment "-- test: define=A=1"
+          lead Newline "\n"
+          lead Directive "`if A = \"2\" then"
+          lead Newline "\n"
+        KwPackage 37..44 "package" inactive
+          trail Whitespace " "
+        Identifier 45..52 "never_p" inactive
+          trail Whitespace " "
+        KwIs 53..55 "is" inactive
+        DeclarativePart 55..84
+          ConstantDecl 55..84
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwConstant 58..66 "constant" inactive
+              trail Whitespace " "
+            IdentifierList 67..69
+              Identifier 67..68 "c" inactive
+                trail Whitespace " "
+            Colon 69..70 ":" inactive
+              trail Whitespace " "
+            SubtypeIndication 71..79
+              SimpleName 71..79
+                Identifier 71..78 "integer" inactive
+                  trail Whitespace " "
+            VarAssign 79..81 ":=" inactive
+              trail Whitespace " "
+            LiteralExpr 82..83
+              IntegerLiteral 82..83 "2" inactive
+            Semicolon 83..84 ";" inactive
+        EndClause 84..89
+            lead Newline "\n"
+          KwEnd 85..88 "end" inactive
+          Semicolon 88..89 ";" inactive
+  DesignUnit 89..115
+    ContextClause 89..89
+    PackageDecl 89..115
+        lead Newline "\n"
+        lead Directive "`end if"
+        lead Newline "\n"
+      KwPackage 98..105 "package"
+        trail Whitespace " "
+      Identifier 106..107 "p"
+        trail Whitespace " "
+      KwIs 108..110 "is"
+      DeclarativePart 110..110
+      EndClause 110..115
+          lead Newline "\n"
+        KwEnd 111..114 "end"
+        Semicolon 114..115 ";"
+    lead Newline "\n"
+  EOF 116..116 ""

@@ -1,0 +1,73 @@
+DesignFile 0..123
+  DesignUnit 0..122
+    ContextClause 0..0
+    ArchitectureBody 0..122
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..117
+        ProcessStmt 28..117
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..102
+            LoopStmt 49..102
+              Label 49..58
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 54..55 "l"
+                  trail Whitespace " "
+                Colon 56..57 ":"
+                  trail Whitespace " "
+              KwLoop 58..62 "loop"
+              SequenceOfStatements 62..86
+                ExitStmt 62..86
+                    lead Newline "\n"
+                    lead Whitespace "      "
+                  KwExit 69..73 "exit"
+                    trail Whitespace " "
+                  Identifier 74..75 "l"
+                    trail Whitespace " "
+                  KwWhen 76..80 "when"
+                    trail Whitespace " "
+                  SimpleName 81..85
+                    Identifier 81..85 "done"
+                  Semicolon 85..86 ";"
+              EndClause 86..102
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwEnd 91..94 "end"
+                  trail Whitespace " "
+                KwLoop 95..99 "loop"
+                  trail Whitespace " "
+                Identifier 100..101 "l"
+                Semicolon 101..102 ";"
+          EndClause 102..117
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 105..108 "end"
+              trail Whitespace " "
+            KwProcess 109..116 "process"
+            Semicolon 116..117 ";"
+      EndClause 117..122
+          lead Newline "\n"
+        KwEnd 118..121 "end"
+        Semicolon 121..122 ";"
+    lead Newline "\n"
+  EOF 123..123 ""

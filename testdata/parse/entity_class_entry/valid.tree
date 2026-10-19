@@ -1,0 +1,32 @@
+DesignFile 0..47
+  DesignUnit 0..46
+    ContextClause 0..0
+    PackageDecl 0..46
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..41
+        GroupTemplateDecl 12..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwGroup 15..20 "group"
+            trail Whitespace " "
+          Identifier 21..25 "sigs"
+            trail Whitespace " "
+          KwIs 26..28 "is"
+            trail Whitespace " "
+          LParen 29..30 "("
+          EntityClassEntry 30..39
+            KwSignal 30..36 "signal"
+              trail Whitespace " "
+            Box 37..39 "<>"
+          RParen 39..40 ")"
+          Semicolon 40..41 ";"
+      EndClause 41..46
+          lead Newline "\n"
+        KwEnd 42..45 "end"
+        Semicolon 45..46 ";"
+    lead Newline "\n"
+  EOF 47..47 ""

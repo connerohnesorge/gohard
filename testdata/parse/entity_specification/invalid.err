@@ -1,0 +1,2 @@
+invalid.vhd:2:29: error[syntax/error]: expected an entity class, found reserved word is
+summary: 1 errors, 0 warnings, 0 hints, 1 files

@@ -1,0 +1,68 @@
+DesignFile 0..87
+  DesignUnit 0..86
+    ContextClause 0..0
+    ArchitectureBody 0..86
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..81
+        PSLAssert 28..54
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 31..37 "assert"
+            trail Whitespace " "
+          PSLAlways 38..53
+            KwAlways 38..44 "always"
+              trail Whitespace " "
+            PSLParenProp 45..53
+              LParen 45..46 "("
+              PSLImplication 46..52
+                PSLBoolean 46..48
+                  SimpleName 46..48
+                    Identifier 46..47 "a"
+                      trail Whitespace " "
+                PSLImplies 48..50 "->"
+                  trail Whitespace " "
+                PSLBoolean 51..52
+                  SimpleName 51..52
+                    Identifier 51..52 "b"
+              RParen 52..53 ")"
+          Semicolon 53..54 ";"
+        PSLAssert 54..81
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 57..63 "assert"
+            trail Whitespace " "
+          PSLAlways 64..80
+            KwAlways 64..70 "always"
+              trail Whitespace " "
+            PSLParenProp 71..80
+              LParen 71..72 "("
+              PSLImplication 72..79
+                PSLBoolean 72..74
+                  SimpleName 72..74
+                    Identifier 72..73 "a"
+                      trail Whitespace " "
+                PSLIff 74..77 "<->"
+                  trail Whitespace " "
+                PSLBoolean 78..79
+                  SimpleName 78..79
+                    Identifier 78..79 "b"
+              RParen 79..80 ")"
+          Semicolon 80..81 ";"
+      EndClause 81..86
+          lead Newline "\n"
+        KwEnd 82..85 "end"
+        Semicolon 85..86 ";"
+    lead Newline "\n"
+  EOF 87..87 ""

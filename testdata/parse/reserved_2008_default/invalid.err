@@ -1,0 +1,6 @@
+invalid.vhd:3:9: error[syntax/error]: expected ':', found reserved word default
+invalid.vhd:3:9: error[syntax/error]: expected ';', found reserved word default
+invalid.vhd:3:9: error[syntax/error]: expected a subtype indication, found reserved word default
+invalid.vhd:3:9: error[syntax/error]: expected an identifier, found reserved word default
+invalid.vhd:3:10: error[syntax/error]: expected a declaration, found reserved word default
+summary: 5 errors, 0 warnings, 0 hints, 1 files

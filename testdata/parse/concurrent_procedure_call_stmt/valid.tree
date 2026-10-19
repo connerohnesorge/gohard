@@ -1,0 +1,73 @@
+DesignFile 0..88
+  DesignUnit 0..87
+    ContextClause 0..0
+    ArchitectureBody 0..87
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..82
+        ConcurrentProcedureCallStmt 28..40
+          CallOrIndexName 28..39
+            SimpleName 28..36
+                lead Newline "\n"
+                lead Whitespace "  "
+              Identifier 31..36 "check"
+            AssociationList 36..39
+              LParen 36..37 "("
+              AssociationElement 37..38
+                SimpleName 37..38
+                  Identifier 37..38 "s"
+              RParen 38..39 ")"
+          Semicolon 39..40 ";"
+        ConcurrentProcedureCallStmt 40..82
+          Label 40..48
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 43..45 "c2"
+              trail Whitespace " "
+            Colon 46..47 ":"
+              trail Whitespace " "
+          KwPostponed 48..57 "postponed"
+            trail Whitespace " "
+          CallOrIndexName 58..81
+            SelectedName 58..70
+              SelectedName 58..64
+                SimpleName 58..62
+                  Identifier 58..62 "work"
+                Dot 62..63 "."
+                Identifier 63..64 "p"
+              Dot 64..65 "."
+              Identifier 65..70 "check"
+            AssociationList 70..81
+              LParen 70..71 "("
+              AssociationElement 71..72
+                SimpleName 71..72
+                  Identifier 71..72 "t"
+              Comma 72..73 ","
+                trail Whitespace " "
+              AssociationElement 74..80
+                SimpleName 74..76
+                  Identifier 74..75 "n"
+                    trail Whitespace " "
+                Arrow 76..78 "=>"
+                  trail Whitespace " "
+                LiteralExpr 79..80
+                  IntegerLiteral 79..80 "2"
+              RParen 80..81 ")"
+          Semicolon 81..82 ";"
+      EndClause 82..87
+          lead Newline "\n"
+        KwEnd 83..86 "end"
+        Semicolon 86..87 ";"
+    lead Newline "\n"
+  EOF 88..88 ""

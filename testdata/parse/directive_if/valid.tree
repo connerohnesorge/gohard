@@ -1,0 +1,22 @@
+DesignFile 0..76
+  DesignUnit 0..67
+    ContextClause 0..0
+    EntityDecl 0..67
+        lead LineComment "-- test: kind=none"
+        lead Newline "\n"
+        lead Directive "`if VHDL_VERSION >= \"2019\" then"
+        lead Newline "\n"
+      KwEntity 51..57 "entity"
+        trail Whitespace " "
+      Identifier 58..59 "e"
+        trail Whitespace " "
+      KwIs 60..62 "is"
+      DeclarativePart 62..62
+      EndClause 62..67
+          lead Newline "\n"
+        KwEnd 63..66 "end"
+        Semicolon 66..67 ";"
+    lead Newline "\n"
+    lead Directive "`end if"
+    lead Newline "\n"
+  EOF 76..76 ""

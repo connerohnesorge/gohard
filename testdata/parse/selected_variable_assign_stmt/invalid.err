@@ -1,0 +1,2 @@
+invalid.vhd:5:36: error[syntax/error]: expected ';', found literal 2
+summary: 1 errors, 0 warnings, 0 hints, 1 files

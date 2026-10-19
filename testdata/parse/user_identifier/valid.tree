@@ -1,0 +1,39 @@
+DesignFile 0..189
+  DesignUnit 0..97
+    ContextClause 0..0
+    PackageDecl 0..97
+        lead LineComment "-- test: define=PROFILE=wide kind=InactiveBranch"
+        lead Newline "\n"
+        lead Directive "`if PROFILE = \"wide\" then"
+        lead Newline "\n"
+      KwPackage 75..82 "package"
+        trail Whitespace " "
+      Identifier 83..89 "wide_p"
+        trail Whitespace " "
+      KwIs 90..92 "is"
+      DeclarativePart 92..92
+      EndClause 92..97
+          lead Newline "\n"
+        KwEnd 93..96 "end"
+        Semicolon 96..97 ";"
+  InactiveBranch 97..180
+    DesignUnit 97..180
+      ContextClause 97..97
+      PackageDecl 97..180
+          lead Newline "\n"
+          lead Directive "`elsif PROFILE = \"narrow\" or not (PROFILE /= \"tiny\") then"
+          lead Newline "\n"
+        KwPackage 156..163 "package" inactive
+          trail Whitespace " "
+        Identifier 164..172 "narrow_p" inactive
+          trail Whitespace " "
+        KwIs 173..175 "is" inactive
+        DeclarativePart 175..175
+        EndClause 175..180
+            lead Newline "\n"
+          KwEnd 176..179 "end" inactive
+          Semicolon 179..180 ";" inactive
+    lead Newline "\n"
+    lead Directive "`end if"
+    lead Newline "\n"
+  EOF 189..189 ""

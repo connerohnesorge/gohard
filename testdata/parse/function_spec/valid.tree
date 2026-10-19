@@ -1,0 +1,93 @@
+DesignFile 0..128
+  DesignUnit 0..127
+    ContextClause 0..0
+    PackageDecl 0..127
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..122
+        SubprogramDecl 12..43
+          FunctionSpec 12..42
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwPure 15..19 "pure"
+              trail Whitespace " "
+            KwFunction 20..28 "function"
+              trail Whitespace " "
+            Identifier 29..31 "f1"
+              trail Whitespace " "
+            ReturnSpec 32..42
+              KwReturn 32..38 "return"
+                trail Whitespace " "
+              SimpleName 39..42
+                Identifier 39..42 "bit"
+          Semicolon 42..43 ";"
+        SubprogramDecl 43..86
+          FunctionSpec 43..85
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwImpure 46..52 "impure"
+              trail Whitespace " "
+            KwFunction 53..61 "function"
+              trail Whitespace " "
+            Identifier 62..64 "f2"
+              trail Whitespace " "
+            ParameterList 65..75
+              InterfaceList 65..75
+                LParen 65..66 "("
+                InterfaceObjectDecl 66..73
+                  IdentifierList 66..68
+                    Identifier 66..67 "a"
+                      trail Whitespace " "
+                  Colon 68..69 ":"
+                    trail Whitespace " "
+                  SubtypeIndication 70..73
+                    SimpleName 70..73
+                      Identifier 70..73 "bit"
+                RParen 73..74 ")"
+                  trail Whitespace " "
+            ReturnSpec 75..85
+              KwReturn 75..81 "return"
+                trail Whitespace " "
+              SimpleName 82..85
+                Identifier 82..85 "bit"
+          Semicolon 85..86 ";"
+        SubprogramDecl 86..122
+          FunctionSpec 86..121
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwFunction 89..97 "function"
+              trail Whitespace " "
+            StringLiteral 98..101 "\"+\""
+              trail Whitespace " "
+            ParameterList 102..113
+              InterfaceList 102..113
+                LParen 102..103 "("
+                InterfaceObjectDecl 103..111
+                  IdentifierList 103..108
+                    Identifier 103..104 "a"
+                    Comma 104..105 ","
+                      trail Whitespace " "
+                    Identifier 106..107 "b"
+                      trail Whitespace " "
+                  Colon 108..109 ":"
+                    trail Whitespace " "
+                  SubtypeIndication 110..111
+                    SimpleName 110..111
+                      Identifier 110..111 "t"
+                RParen 111..112 ")"
+                  trail Whitespace " "
+            ReturnSpec 113..121
+              KwReturn 113..119 "return"
+                trail Whitespace " "
+              SimpleName 120..121
+                Identifier 120..121 "t"
+          Semicolon 121..122 ";"
+      EndClause 122..127
+          lead Newline "\n"
+        KwEnd 123..126 "end"
+        Semicolon 126..127 ";"
+    lead Newline "\n"
+  EOF 128..128 ""

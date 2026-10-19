@@ -1,0 +1,63 @@
+DesignFile 0..83
+  DesignUnit 0..82
+    ContextClause 0..0
+    ArchitectureBody 0..82
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..77
+        ComponentInstantiationStmt 28..77
+          Label 28..35
+              lead Newline "\n"
+              lead Whitespace "  "
+            Identifier 31..32 "u"
+              trail Whitespace " "
+            Colon 33..34 ":"
+              trail Whitespace " "
+          InstantiatedUnit 35..49
+            KwEntity 35..41 "entity"
+              trail Whitespace " "
+            SelectedName 42..49
+              SimpleName 42..46
+                Identifier 42..46 "work"
+              Dot 46..47 "."
+              Identifier 47..48 "f"
+                trail Whitespace " "
+          GenericMapAspect 49..76
+            KwGeneric 49..56 "generic"
+              trail Whitespace " "
+            KwMap 57..60 "map"
+              trail Whitespace " "
+            AssociationList 61..76
+              LParen 61..62 "("
+              AssociationElement 62..63
+                LiteralExpr 62..63
+                  IntegerLiteral 62..63 "8"
+              Comma 63..64 ","
+                trail Whitespace " "
+              AssociationElement 65..75
+                SimpleName 65..71
+                  Identifier 65..70 "depth"
+                    trail Whitespace " "
+                Arrow 71..73 "=>"
+                  trail Whitespace " "
+                LiteralExpr 74..75
+                  IntegerLiteral 74..75 "4"
+              RParen 75..76 ")"
+          Semicolon 76..77 ";"
+      EndClause 77..82
+          lead Newline "\n"
+        KwEnd 78..81 "end"
+        Semicolon 81..82 ";"
+    lead Newline "\n"
+  EOF 83..83 ""

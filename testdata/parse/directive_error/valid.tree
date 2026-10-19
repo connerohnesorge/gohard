@@ -1,0 +1,24 @@
+DesignFile 0..136
+  DesignUnit 0..135
+    ContextClause 0..0
+    PackageDecl 0..135
+        lead LineComment "-- test: kind=none allow=syntax/directive-error"
+        lead Newline "\n"
+        lead Directive "`if TOOL_TYPE = \"SIMULATION\" then"
+        lead Newline "\n"
+        lead Directive "`error \"not for simulation\""
+        lead Newline "\n"
+        lead Directive "`end if"
+        lead Newline "\n"
+      KwPackage 118..125 "package"
+        trail Whitespace " "
+      Identifier 126..127 "p"
+        trail Whitespace " "
+      KwIs 128..130 "is"
+      DeclarativePart 130..130
+      EndClause 130..135
+          lead Newline "\n"
+        KwEnd 131..134 "end"
+        Semicolon 134..135 ";"
+    lead Newline "\n"
+  EOF 136..136 ""

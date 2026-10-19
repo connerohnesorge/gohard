@@ -1,0 +1,9 @@
+# gohard.yaml sets format.indent and simulation.seed. The editor sends
+# format.indent and lenient: gohard.yaml wins for format.indent, which
+# is reported in a window/logMessage; lenient comes from the editor.
+# A later didChangeConfiguration is merged and reported the same way.
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":null,"rootUri":"file:///work","capabilities":{},"initializationOptions":{"gohard":{"format":{"indent":8},"lenient":true}}}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+{"jsonrpc":"2.0","method":"workspace/didChangeConfiguration","params":{"settings":{"gohard":{"format":{"indent":3},"simulation":{"seed":1}}}}}
+{"jsonrpc":"2.0","id":99,"method":"shutdown"}
+{"jsonrpc":"2.0","method":"exit"}

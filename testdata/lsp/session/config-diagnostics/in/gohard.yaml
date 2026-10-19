@@ -1,0 +1,4 @@
+standard: 2008
+bogus: 1
+format:
+  indent: yes

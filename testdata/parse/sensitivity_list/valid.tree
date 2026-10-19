@@ -1,0 +1,72 @@
+DesignFile 0..96
+  DesignUnit 0..95
+    ContextClause 0..0
+    ArchitectureBody 0..95
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..90
+        ProcessStmt 28..90
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..75
+            WaitStmt 49..75
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwWait 54..58 "wait"
+                trail Whitespace " "
+              SensitivityClause 59..74
+                KwOn 59..61 "on"
+                  trail Whitespace " "
+                SensitivityList 62..74
+                  SimpleName 62..63
+                    Identifier 62..63 "a"
+                  Comma 63..64 ","
+                    trail Whitespace " "
+                  CallOrIndexName 65..69
+                    SimpleName 65..66
+                      Identifier 65..66 "b"
+                    AssociationList 66..69
+                      LParen 66..67 "("
+                      AssociationElement 67..68
+                        LiteralExpr 67..68
+                          IntegerLiteral 67..68 "0"
+                      RParen 68..69 ")"
+                  Comma 69..70 ","
+                    trail Whitespace " "
+                  SelectedName 71..74
+                    SimpleName 71..72
+                      Identifier 71..72 "c"
+                    Dot 72..73 "."
+                    Identifier 73..74 "d"
+              Semicolon 74..75 ";"
+          EndClause 75..90
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 78..81 "end"
+              trail Whitespace " "
+            KwProcess 82..89 "process"
+            Semicolon 89..90 ";"
+      EndClause 90..95
+          lead Newline "\n"
+        KwEnd 91..94 "end"
+        Semicolon 94..95 ";"
+    lead Newline "\n"
+  EOF 96..96 ""

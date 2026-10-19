@@ -1,0 +1,8 @@
+{"jsonrpc":"2.0","id":1,"result":{"capabilities":{"definitionProvider":true,"hoverProvider":true,"positionEncoding":"utf-8","textDocumentSync":{"change":2,"openClose":true,"save":{"includeText":false}},"workspace":{"workspaceFolders":{"supported":true}}},"serverInfo":{"name":"gohard","version":"0.0.0-test"}}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":0,"id":1}}
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file:///work/top.vhd","version":1,"diagnostics":[{"range":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}},"severity":4,"code":"lsp/echo","source":"gohard","message":"v1 \"-- é😀 x\\nentity top is end;\\n\""}]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":2,"uri":"file:///work/top.vhd"}}
+{"jsonrpc":"2.0","id":2,"result":{"contents":{"kind":"markdown","value":"\"x\" at byte 10"},"range":{"start":{"line":0,"character":10},"end":{"line":0,"character":11}}}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":2,"id":2}}
+{"jsonrpc":"2.0","id":99,"result":null}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":2,"id":99}}

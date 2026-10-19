@@ -1,0 +1,164 @@
+DesignFile 0..248
+  DesignUnit 0..247
+    ContextClause 0..0
+    ArchitectureBody 0..247
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..242
+        ProcessStmt 28..242
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..227
+            CaseStmt 49..135
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwCase 54..58 "case"
+                trail Whitespace " "
+              SimpleName 59..63
+                Identifier 59..62 "sel"
+                  trail Whitespace " "
+              KwIs 63..65 "is"
+              CaseAlternative 65..92
+                  lead Newline "\n"
+                  lead Whitespace "      "
+                KwWhen 72..76 "when"
+                  trail Whitespace " "
+                Choices 77..82
+                  LiteralExpr 77..82
+                    StringLiteral 77..81 "\"00\""
+                      trail Whitespace " "
+                Arrow 82..84 "=>"
+                  trail Whitespace " "
+                SequenceOfStatements 85..92
+                  VariableAssignStmt 85..92
+                    Target 85..87
+                      SimpleName 85..87
+                        Identifier 85..86 "x"
+                          trail Whitespace " "
+                    VarAssign 87..89 ":="
+                      trail Whitespace " "
+                    LiteralExpr 90..91
+                      IntegerLiteral 90..91 "0"
+                    Semicolon 91..92 ";"
+              CaseAlternative 92..121
+                  lead Newline "\n"
+                  lead Whitespace "      "
+                KwWhen 99..103 "when"
+                  trail Whitespace " "
+                Choices 104..111
+                  OthersChoice 104..111
+                    KwOthers 104..110 "others"
+                      trail Whitespace " "
+                Arrow 111..113 "=>"
+                  trail Whitespace " "
+                SequenceOfStatements 114..121
+                  VariableAssignStmt 114..121
+                    Target 114..116
+                      SimpleName 114..116
+                        Identifier 114..115 "x"
+                          trail Whitespace " "
+                    VarAssign 116..118 ":="
+                      trail Whitespace " "
+                    LiteralExpr 119..120
+                      IntegerLiteral 119..120 "1"
+                    Semicolon 120..121 ";"
+              EndClause 121..135
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwEnd 126..129 "end"
+                  trail Whitespace " "
+                KwCase 130..134 "case"
+                Semicolon 134..135 ";"
+            CaseStmt 135..227
+              Label 135..144
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 140..141 "m"
+                  trail Whitespace " "
+                Colon 142..143 ":"
+                  trail Whitespace " "
+              KwCase 144..148 "case"
+              Question 148..149 "?"
+                trail Whitespace " "
+              SimpleName 150..154
+                Identifier 150..153 "sel"
+                  trail Whitespace " "
+              KwIs 154..156 "is"
+              CaseAlternative 156..183
+                  lead Newline "\n"
+                  lead Whitespace "      "
+                KwWhen 163..167 "when"
+                  trail Whitespace " "
+                Choices 168..173
+                  LiteralExpr 168..173
+                    StringLiteral 168..172 "\"1-\""
+                      trail Whitespace " "
+                Arrow 173..175 "=>"
+                  trail Whitespace " "
+                SequenceOfStatements 176..183
+                  VariableAssignStmt 176..183
+                    Target 176..178
+                      SimpleName 176..178
+                        Identifier 176..177 "x"
+                          trail Whitespace " "
+                    VarAssign 178..180 ":="
+                      trail Whitespace " "
+                    LiteralExpr 181..182
+                      IntegerLiteral 181..182 "2"
+                    Semicolon 182..183 ";"
+              CaseAlternative 183..210
+                  lead Newline "\n"
+                  lead Whitespace "      "
+                KwWhen 190..194 "when"
+                  trail Whitespace " "
+                Choices 195..202
+                  OthersChoice 195..202
+                    KwOthers 195..201 "others"
+                      trail Whitespace " "
+                Arrow 202..204 "=>"
+                  trail Whitespace " "
+                SequenceOfStatements 205..210
+                  NullStmt 205..210
+                    KwNull 205..209 "null"
+                    Semicolon 209..210 ";"
+              EndClause 210..227
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwEnd 215..218 "end"
+                  trail Whitespace " "
+                KwCase 219..223 "case"
+                Question 223..224 "?"
+                  trail Whitespace " "
+                Identifier 225..226 "m"
+                Semicolon 226..227 ";"
+          EndClause 227..242
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 230..233 "end"
+              trail Whitespace " "
+            KwProcess 234..241 "process"
+            Semicolon 241..242 ";"
+      EndClause 242..247
+          lead Newline "\n"
+        KwEnd 243..246 "end"
+        Semicolon 246..247 ";"
+    lead Newline "\n"
+  EOF 248..248 ""

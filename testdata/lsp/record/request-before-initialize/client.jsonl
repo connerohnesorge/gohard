@@ -1,0 +1,14 @@
+# The first inputs come before initialize: a request (answered with
+# ServerNotInitialized), a notification and a body that is not JSON.
+# The session folder is still the one initialize names, not the
+# directory gohard lsp runs in (TestLSPRecordReplay runs every case
+# from /elsewhere), so the header hashes /work and the replay
+# publishes the same gohard.yaml diagnostics as the live server.
+{"jsonrpc":"2.0","id":0,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///work/top.vhd"},"position":{"line":0,"character":0}}}
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{}}
+!raw {not json
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":null,"rootUri":"file:///work","capabilities":{}}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+{"jsonrpc":"2.0","method":"textDocument/didSave","params":{"textDocument":{"uri":"file:///work/gohard.yaml"}}}
+{"jsonrpc":"2.0","id":2,"method":"shutdown"}
+{"jsonrpc":"2.0","method":"exit"}

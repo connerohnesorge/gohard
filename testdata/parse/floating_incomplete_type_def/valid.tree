@@ -1,0 +1,38 @@
+DesignFile 0..52
+  DesignUnit 0..51
+    ContextClause 0..0
+    EntityDecl 0..51
+      KwEntity 0..6 "entity"
+        trail Whitespace " "
+      Identifier 7..8 "e"
+        trail Whitespace " "
+      KwIs 9..11 "is"
+      GenericClause 11..46
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwGeneric 14..21 "generic"
+          trail Whitespace " "
+        InterfaceList 22..45
+          LParen 22..23 "("
+          InterfaceTypeDecl 23..44
+            KwType 23..27 "type"
+              trail Whitespace " "
+            Identifier 28..29 "t"
+              trail Whitespace " "
+            KwIs 30..32 "is"
+              trail Whitespace " "
+            FloatingIncompleteTypeDef 33..44
+              KwRange 33..38 "range"
+                trail Whitespace " "
+              Box 39..41 "<>"
+              Dot 41..42 "."
+              Box 42..44 "<>"
+          RParen 44..45 ")"
+        Semicolon 45..46 ";"
+      DeclarativePart 46..46
+      EndClause 46..51
+          lead Newline "\n"
+        KwEnd 47..50 "end"
+        Semicolon 50..51 ";"
+    lead Newline "\n"
+  EOF 52..52 ""

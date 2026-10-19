@@ -1,0 +1,94 @@
+DesignFile 0..166
+  DesignUnit 0..165
+    ContextClause 0..0
+    ArchitectureBody 0..165
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..160
+        ProcessStmt 28..160
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..145
+            IfStmt 49..145
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwIf 54..56 "if"
+                trail Whitespace " "
+              SimpleName 57..59
+                Identifier 57..58 "a"
+                  trail Whitespace " "
+              KwThen 59..63 "then"
+              SequenceOfStatements 63..75
+                NullStmt 63..75
+                    lead Newline "\n"
+                    lead Whitespace "      "
+                  KwNull 70..74 "null"
+                  Semicolon 74..75 ";"
+              ElsifBranch 75..104
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwElsif 80..85 "elsif"
+                  trail Whitespace " "
+                SimpleName 86..88
+                  Identifier 86..87 "b"
+                    trail Whitespace " "
+                KwThen 88..92 "then"
+                SequenceOfStatements 92..104
+                  NullStmt 92..104
+                      lead Newline "\n"
+                      lead Whitespace "      "
+                    KwNull 99..103 "null"
+                    Semicolon 103..104 ";"
+              ElsifBranch 104..133
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwElsif 109..114 "elsif"
+                  trail Whitespace " "
+                SimpleName 115..117
+                  Identifier 115..116 "c"
+                    trail Whitespace " "
+                KwThen 117..121 "then"
+                SequenceOfStatements 121..133
+                  NullStmt 121..133
+                      lead Newline "\n"
+                      lead Whitespace "      "
+                    KwNull 128..132 "null"
+                    Semicolon 132..133 ";"
+              EndClause 133..145
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwEnd 138..141 "end"
+                  trail Whitespace " "
+                KwIf 142..144 "if"
+                Semicolon 144..145 ";"
+          EndClause 145..160
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 148..151 "end"
+              trail Whitespace " "
+            KwProcess 152..159 "process"
+            Semicolon 159..160 ";"
+      EndClause 160..165
+          lead Newline "\n"
+        KwEnd 161..164 "end"
+        Semicolon 164..165 ";"
+    lead Newline "\n"
+  EOF 166..166 ""

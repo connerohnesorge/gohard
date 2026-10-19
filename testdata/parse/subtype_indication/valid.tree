@@ -1,0 +1,86 @@
+DesignFile 0..127
+  DesignUnit 0..126
+    ContextClause 0..0
+    PackageDecl 0..126
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..121
+        ConstantDecl 12..86
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "c"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..67
+            ResolutionFunction 28..37
+              SimpleName 28..37
+                Identifier 28..36 "resolved"
+                  trail Whitespace " "
+            SimpleName 37..54
+              Identifier 37..54 "std_ulogic_vector"
+            ArrayConstraint 54..67
+              LParen 54..55 "("
+              RangeExpr 55..65
+                LiteralExpr 55..57
+                  IntegerLiteral 55..56 "7"
+                    trail Whitespace " "
+                KwDownto 57..63 "downto"
+                  trail Whitespace " "
+                LiteralExpr 64..65
+                  IntegerLiteral 64..65 "0"
+              RParen 65..66 ")"
+                trail Whitespace " "
+          VarAssign 67..69 ":="
+            trail Whitespace " "
+          Aggregate 70..85
+            LParen 70..71 "("
+            ElementAssociation 71..84
+              Choices 71..78
+                OthersChoice 71..78
+                  KwOthers 71..77 "others"
+                    trail Whitespace " "
+              Arrow 78..80 "=>"
+                trail Whitespace " "
+              LiteralExpr 81..84
+                CharacterLiteral 81..84 "'0'"
+            RParen 84..85 ")"
+          Semicolon 85..86 ";"
+        SignalDecl 86..121
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSignal 89..95 "signal"
+            trail Whitespace " "
+          IdentifierList 96..98
+            Identifier 96..97 "s"
+              trail Whitespace " "
+          Colon 98..99 ":"
+            trail Whitespace " "
+          SubtypeIndication 100..120
+            SimpleName 100..108
+              Identifier 100..107 "integer"
+                trail Whitespace " "
+            RangeConstraint 108..120
+              KwRange 108..113 "range"
+                trail Whitespace " "
+              RangeExpr 114..120
+                LiteralExpr 114..116
+                  IntegerLiteral 114..115 "0"
+                    trail Whitespace " "
+                KwTo 116..118 "to"
+                  trail Whitespace " "
+                LiteralExpr 119..120
+                  IntegerLiteral 119..120 "3"
+          Semicolon 120..121 ";"
+      EndClause 121..126
+          lead Newline "\n"
+        KwEnd 122..125 "end"
+        Semicolon 125..126 ";"
+    lead Newline "\n"
+  EOF 127..127 ""

@@ -1,0 +1,49 @@
+DesignFile 0..68
+  DesignUnit 0..67
+    ContextClause 0..50
+      UseClause 0..50
+        KwUse 0..3 "use"
+          trail Whitespace " "
+        SelectedName 4..27
+          SelectedName 4..23
+            SimpleName 4..8
+              Identifier 4..8 "ieee"
+            Dot 8..9 "."
+            Identifier 9..23 "std_logic_1164"
+          Dot 23..24 "."
+          KwAll 24..27 "all"
+        Comma 27..28 ","
+          trail Whitespace " "
+        SelectedName 29..39
+          SelectedName 29..35
+            SimpleName 29..33
+              Identifier 29..33 "work"
+            Dot 33..34 "."
+            Identifier 34..35 "p"
+          Dot 35..36 "."
+          StringLiteral 36..39 "\"+\""
+        Comma 39..40 ","
+          trail Whitespace " "
+        SelectedName 41..49
+          SelectedName 41..47
+            SimpleName 41..45
+              Identifier 41..45 "work"
+            Dot 45..46 "."
+            Identifier 46..47 "q"
+          Dot 47..48 "."
+          Identifier 48..49 "c"
+        Semicolon 49..50 ";"
+    EntityDecl 50..67
+        lead Newline "\n"
+      KwEntity 51..57 "entity"
+        trail Whitespace " "
+      Identifier 58..59 "e"
+        trail Whitespace " "
+      KwIs 60..62 "is"
+      DeclarativePart 62..62
+      EndClause 62..67
+          lead Newline "\n"
+        KwEnd 63..66 "end"
+        Semicolon 66..67 ";"
+    lead Newline "\n"
+  EOF 68..68 ""

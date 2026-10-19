@@ -1,0 +1,44 @@
+DesignFile 0..133
+  DesignUnit 0..42
+    ContextClause 0..0
+    EntityDecl 0..42
+        lead Directive "`if PROFILE = \"wide\" then"
+        lead Newline "\n"
+      KwEntity 26..32 "entity"
+        trail Whitespace " "
+      Identifier 33..34 "a"
+        trail Whitespace " "
+      KwIs 35..37 "is"
+        trail Whitespace " "
+      DeclarativePart 38..38
+      EndClause 38..42
+        KwEnd 38..41 "end"
+        Semicolon 41..42 ";"
+  InactiveBranch 42..65
+    DesignUnit 42..65
+      ContextClause 42..42
+      EntityDecl 42..65
+          lead Newline "\n"
+          lead Directive "`else"
+          lead Newline "\n"
+        KwEntity 49..55 "entity" inactive
+          trail Whitespace " "
+        Identifier 56..57 "b" inactive
+          trail Whitespace " "
+        KwIs 58..60 "is" inactive
+          trail Whitespace " "
+        DeclarativePart 61..61
+        EndClause 61..65
+          KwEnd 61..64 "end" inactive
+          Semicolon 64..65 ";" inactive
+    lead Newline "\n"
+    lead Directive "`end if"
+    lead Newline "\n"
+    lead Directive "`if VHDL_VERSION < \"2019\" then"
+    lead Newline "\n"
+    lead Directive "`error \"needs 2019\""
+    lead Newline "\n"
+    lead Directive "`end if"
+    lead Newline "\n"
+  EOF 133..133 ""
+summary: 0 errors, 0 warnings, 0 hints, 1 files

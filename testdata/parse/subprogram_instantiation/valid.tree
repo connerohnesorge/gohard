@@ -1,0 +1,88 @@
+DesignFile 0..142
+  DesignUnit 0..141
+    ContextClause 0..0
+    PackageDecl 0..141
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..136
+        SubprogramInstantiation 12..68
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwFunction 15..23 "function"
+            trail Whitespace " "
+          Identifier 24..30 "int_id"
+            trail Whitespace " "
+          KwIs 31..33 "is"
+            trail Whitespace " "
+          KwNew 34..37 "new"
+            trail Whitespace " "
+          SimpleName 38..41
+            Identifier 38..40 "id"
+              trail Whitespace " "
+          GenericMapAspect 41..67
+            KwGeneric 41..48 "generic"
+              trail Whitespace " "
+            KwMap 49..52 "map"
+              trail Whitespace " "
+            AssociationList 53..67
+              LParen 53..54 "("
+              AssociationElement 54..66
+                SimpleName 54..56
+                  Identifier 54..55 "t"
+                    trail Whitespace " "
+                Arrow 56..58 "=>"
+                  trail Whitespace " "
+                SimpleName 59..66
+                  Identifier 59..66 "integer"
+              RParen 66..67 ")"
+          Semicolon 67..68 ";"
+        SubprogramInstantiation 68..136
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcedure 71..80 "procedure"
+            trail Whitespace " "
+          Identifier 81..89 "bit_swap"
+            trail Whitespace " "
+          KwIs 90..92 "is"
+            trail Whitespace " "
+          KwNew 93..96 "new"
+            trail Whitespace " "
+          SimpleName 97..102
+            Identifier 97..101 "swap"
+              trail Whitespace " "
+          Signature 102..113
+            LBracket 102..103 "["
+            SimpleName 103..106
+              Identifier 103..106 "bit"
+            Comma 106..107 ","
+              trail Whitespace " "
+            SimpleName 108..111
+              Identifier 108..111 "bit"
+            RBracket 111..112 "]"
+              trail Whitespace " "
+          GenericMapAspect 113..135
+            KwGeneric 113..120 "generic"
+              trail Whitespace " "
+            KwMap 121..124 "map"
+              trail Whitespace " "
+            AssociationList 125..135
+              LParen 125..126 "("
+              AssociationElement 126..134
+                SimpleName 126..128
+                  Identifier 126..127 "t"
+                    trail Whitespace " "
+                Arrow 128..130 "=>"
+                  trail Whitespace " "
+                SimpleName 131..134
+                  Identifier 131..134 "bit"
+              RParen 134..135 ")"
+          Semicolon 135..136 ";"
+      EndClause 136..141
+          lead Newline "\n"
+        KwEnd 137..140 "end"
+        Semicolon 140..141 ";"
+    lead Newline "\n"
+  EOF 142..142 ""

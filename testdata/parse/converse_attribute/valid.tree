@@ -1,0 +1,54 @@
+DesignFile 0..116
+  DesignUnit 0..115
+    ContextClause 0..0
+    EntityDecl 0..115
+        lead LineComment "-- test: kind=AttributeName,ModeViewIndication"
+        lead Newline "\n"
+      KwEntity 47..53 "entity"
+        trail Whitespace " "
+      Identifier 54..55 "e"
+        trail Whitespace " "
+      KwIs 56..58 "is"
+      PortClause 58..110
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwPort 61..65 "port"
+          trail Whitespace " "
+        InterfaceList 66..109
+          LParen 66..67 "("
+          InterfaceObjectDecl 67..82
+            IdentifierList 67..69
+              Identifier 67..68 "m"
+                trail Whitespace " "
+            Colon 69..70 ":"
+              trail Whitespace " "
+            ModeViewIndication 71..82
+              KwView 71..75 "view"
+                trail Whitespace " "
+              SimpleName 76..82
+                Identifier 76..82 "master"
+          Semicolon 82..83 ";"
+            trail Whitespace " "
+          InterfaceObjectDecl 84..108
+            IdentifierList 84..86
+              Identifier 84..85 "s"
+                trail Whitespace " "
+            Colon 86..87 ":"
+              trail Whitespace " "
+            ModeViewIndication 88..108
+              KwView 88..92 "view"
+                trail Whitespace " "
+              AttributeName 93..108
+                SimpleName 93..99
+                  Identifier 93..99 "master"
+                Tick 99..100 "'"
+                Identifier 100..108 "converse"
+          RParen 108..109 ")"
+        Semicolon 109..110 ";"
+      DeclarativePart 110..110
+      EndClause 110..115
+          lead Newline "\n"
+        KwEnd 111..114 "end"
+        Semicolon 114..115 ";"
+    lead Newline "\n"
+  EOF 116..116 ""

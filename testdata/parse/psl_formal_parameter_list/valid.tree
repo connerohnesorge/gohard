@@ -1,0 +1,74 @@
+DesignFile 0..106
+  DesignUnit 0..105
+    ContextClause 0..0
+    ArchitectureBody 0..105
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..94
+        PSLPropertyDecl 22..94
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProperty 25..33 "property"
+            trail Whitespace " "
+          Identifier 34..36 "p2"
+            trail Whitespace " "
+          PSLFormalParameterList 37..69
+            LParen 37..38 "("
+            PSLFormalParameter 38..50
+              KwBoolean 38..45 "boolean"
+                trail Whitespace " "
+              Identifier 46..47 "x"
+              Comma 47..48 ","
+                trail Whitespace " "
+              Identifier 49..50 "y"
+            Semicolon 50..51 ";"
+              trail Whitespace " "
+            PSLFormalParameter 52..67
+              KwConst 52..57 "const"
+                trail Whitespace " "
+              KwNumeric 58..65 "numeric"
+                trail Whitespace " "
+              Identifier 66..67 "n"
+            RParen 67..68 ")"
+              trail Whitespace " "
+          KwIs 69..71 "is"
+            trail Whitespace " "
+          PSLAlways 72..93
+            KwAlways 72..78 "always"
+              trail Whitespace " "
+            PSLImplication 79..93
+              PSLBoolean 79..81
+                SimpleName 79..81
+                  Identifier 79..80 "x"
+                    trail Whitespace " "
+              PSLImplies 81..83 "->"
+                trail Whitespace " "
+              PSLNext 84..93
+                KwNext 84..88 "next"
+                PSLCount 88..92
+                  LBracket 88..89 "["
+                  SimpleName 89..90
+                    Identifier 89..90 "n"
+                  RBracket 90..91 "]"
+                    trail Whitespace " "
+                PSLBoolean 92..93
+                  SimpleName 92..93
+                    Identifier 92..93 "y"
+          Semicolon 93..94 ";"
+        lead Newline "\n"
+      KwBegin 95..100 "begin"
+      StatementPart 100..100
+      EndClause 100..105
+          lead Newline "\n"
+        KwEnd 101..104 "end"
+        Semicolon 104..105 ";"
+    lead Newline "\n"
+  EOF 106..106 ""

@@ -1,0 +1,8 @@
+invalid.vhd:2:22: error[syntax/error]: expected '(', found reserved word type
+invalid.vhd:2:22: error[syntax/error]: expected ';', found reserved word type
+invalid.vhd:2:22: error[syntax/error]: expected reserved word return, found reserved word type
+invalid.vhd:2:29: error[syntax/error]: expected reserved word is, found '('
+invalid.vhd:2:32: error[syntax/error]: expected ')', found ':'
+invalid.vhd:2:32: error[syntax/error]: expected ';', found ':'
+invalid.vhd:2:33: error[syntax/error]: expected a declaration, found ':'
+summary: 7 errors, 0 warnings, 0 hints, 1 files

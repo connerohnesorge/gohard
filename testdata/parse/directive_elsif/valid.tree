@@ -1,0 +1,39 @@
+DesignFile 0..144
+  InactiveBranch 0..91
+    DesignUnit 0..91
+      ContextClause 0..0
+      PackageDecl 0..91
+          lead LineComment "-- test: define=MODE=fast kind=InactiveBranch"
+          lead Newline "\n"
+          lead Directive "`if MODE = \"slow\" then"
+          lead Newline "\n"
+        KwPackage 69..76 "package" inactive
+          trail Whitespace " "
+        Identifier 77..83 "slow_p" inactive
+          trail Whitespace " "
+        KwIs 84..86 "is" inactive
+        DeclarativePart 86..86
+        EndClause 86..91
+            lead Newline "\n"
+          KwEnd 87..90 "end" inactive
+          Semicolon 90..91 ";" inactive
+  DesignUnit 91..135
+    ContextClause 91..91
+    PackageDecl 91..135
+        lead Newline "\n"
+        lead Directive "`elsif MODE = \"fast\" then"
+        lead Newline "\n"
+      KwPackage 118..125 "package"
+        trail Whitespace " "
+      Identifier 126..127 "p"
+        trail Whitespace " "
+      KwIs 128..130 "is"
+      DeclarativePart 130..130
+      EndClause 130..135
+          lead Newline "\n"
+        KwEnd 131..134 "end"
+        Semicolon 134..135 ";"
+    lead Newline "\n"
+    lead Directive "`end if"
+    lead Newline "\n"
+  EOF 144..144 ""

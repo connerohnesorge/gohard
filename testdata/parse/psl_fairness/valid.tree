@@ -1,0 +1,46 @@
+DesignFile 0..80
+  DesignUnit 0..79
+    ContextClause 0..0
+    ArchitectureBody 0..79
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..74
+        PSLFairness 28..46
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwFairness 31..39 "fairness"
+            trail Whitespace " "
+          SimpleName 40..45
+            Identifier 40..45 "ready"
+          Semicolon 45..46 ";"
+        PSLFairness 46..74
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwStrong 49..55 "strong"
+            trail Whitespace " "
+          KwFairness 56..64 "fairness"
+            trail Whitespace " "
+          SimpleName 65..68
+            Identifier 65..68 "req"
+          Comma 68..69 ","
+            trail Whitespace " "
+          SimpleName 70..73
+            Identifier 70..73 "ack"
+          Semicolon 73..74 ";"
+      EndClause 74..79
+          lead Newline "\n"
+        KwEnd 75..78 "end"
+        Semicolon 78..79 ";"
+    lead Newline "\n"
+  EOF 80..80 ""

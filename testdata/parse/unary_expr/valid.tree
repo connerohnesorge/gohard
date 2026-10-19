@@ -1,0 +1,112 @@
+DesignFile 0..146
+  DesignUnit 0..145
+    ContextClause 0..0
+    PackageDecl 0..145
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..140
+        ConstantDecl 12..50
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 15..23 "constant"
+            trail Whitespace " "
+          IdentifierList 24..26
+            Identifier 24..25 "c"
+              trail Whitespace " "
+          Colon 26..27 ":"
+            trail Whitespace " "
+          SubtypeIndication 28..36
+            SimpleName 28..36
+              Identifier 28..35 "integer"
+                trail Whitespace " "
+          VarAssign 36..38 ":="
+            trail Whitespace " "
+          BinaryExpr 39..49
+            UnaryExpr 39..42
+              Minus 39..40 "-"
+              SimpleName 40..42
+                Identifier 40..41 "a"
+                  trail Whitespace " "
+            Plus 42..43 "+"
+              trail Whitespace " "
+            UnaryExpr 44..49
+              KwAbs 44..47 "abs"
+                trail Whitespace " "
+              SimpleName 48..49
+                Identifier 48..49 "b"
+          Semicolon 49..50 ";"
+        ConstantDecl 50..79
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 53..61 "constant"
+            trail Whitespace " "
+          IdentifierList 62..64
+            Identifier 62..63 "d"
+              trail Whitespace " "
+          Colon 64..65 ":"
+            trail Whitespace " "
+          SubtypeIndication 66..70
+            SimpleName 66..70
+              Identifier 66..69 "bit"
+                trail Whitespace " "
+          VarAssign 70..72 ":="
+            trail Whitespace " "
+          UnaryExpr 73..78
+            KwNot 73..76 "not"
+              trail Whitespace " "
+            SimpleName 77..78
+              Identifier 77..78 "x"
+          Semicolon 78..79 ";"
+        ConstantDecl 79..108
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 82..90 "constant"
+            trail Whitespace " "
+          IdentifierList 91..93
+            Identifier 91..92 "e"
+              trail Whitespace " "
+          Colon 93..94 ":"
+            trail Whitespace " "
+          SubtypeIndication 95..99
+            SimpleName 95..99
+              Identifier 95..98 "bit"
+                trail Whitespace " "
+          VarAssign 99..101 ":="
+            trail Whitespace " "
+          UnaryExpr 102..107
+            KwAnd 102..105 "and"
+              trail Whitespace " "
+            SimpleName 106..107
+              Identifier 106..107 "v"
+          Semicolon 107..108 ";"
+        ConstantDecl 108..140
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 111..119 "constant"
+            trail Whitespace " "
+          IdentifierList 120..122
+            Identifier 120..121 "f"
+              trail Whitespace " "
+          Colon 122..123 ":"
+            trail Whitespace " "
+          SubtypeIndication 124..132
+            SimpleName 124..132
+              Identifier 124..131 "boolean"
+                trail Whitespace " "
+          VarAssign 132..134 ":="
+            trail Whitespace " "
+          UnaryExpr 135..139
+            Condition 135..137 "??"
+              trail Whitespace " "
+            SimpleName 138..139
+              Identifier 138..139 "s"
+          Semicolon 139..140 ";"
+      EndClause 140..145
+          lead Newline "\n"
+        KwEnd 141..144 "end"
+        Semicolon 144..145 ";"
+    lead Newline "\n"
+  EOF 146..146 ""

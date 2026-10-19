@@ -1,0 +1,203 @@
+# The reserved-word table (#31, data from #5 and #6): the single source of
+# keywords for every standard. `go generate ./internal/cst` (tools/genkinds)
+# turns it into the token kinds Kw<Word> (numbered from 256 in file order,
+# append only), the lexer lookup in internal/token/keywords_gen.go and the
+# lexer's edge-value test inputs.
+#
+# Fields:
+#   word      the reserved word (lower case)
+#   class     vhdl      reserved from `first` on (until `removed`), in VHDL
+#                       and PSL code alike
+#             psl2008   one of the eleven PSL-only 2008 words: reserved
+#                       inside PSL; outside PSL an identifier with a
+#                       portability hint (NVC), or reserved everywhere with
+#                       psl.strict_keywords: true (GHDL), #11 entry 3
+#             psl       PSL-context-only: reserved inside PSL, a plain
+#                       identifier outside
+#             never     never a keyword in any standard (`inherit`)
+#   first     the first standard that reserves the word (VHDL classes) or
+#             whose PSL defines it; older standards lex it as an identifier
+#   removed   the first standard that no longer reserves it ("" = never)
+#   psl       the word has a PSL meaning; a vhdl-class word with psl: true
+#             is reserved inside PSL code under every standard, which is
+#             how `-- psl` comments work under VHDL-1993
+#   suffixes  PSL suffix forms scanned as separate suffix tokens ("!",
+#             "_", "!_"); `eventually` requires "!"
+#   context   where the word is used (documentation)
+#   lcs       the 2019 language change specification (documentation)
+#
+# Order: 1993 < 2002 < 2008 < 2019; there is no 2000 mode. Each standard
+# inherits the previous one; nothing is ever removed.
+schema: 1
+standards:
+  - {name: "1993", inherits: "", add: 97}
+  - {name: "2002", inherits: "1993", add: 1}
+  - {name: "2008", inherits: "2002", add: 17}
+  - {name: "2019", inherits: "2008", add: 2, verified_against_lrm: false}
+words:
+  - {word: "abs", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "access", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "after", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "alias", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "all", class: vhdl, first: "1993", psl: false, context: "use clause suffix, sensitivity list, instantiation list"}
+  - {word: "and", class: vhdl, first: "1993", psl: true, context: "reserved word"}
+  - {word: "architecture", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "array", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "assert", class: vhdl, first: "1993", psl: true, context: "reserved word"}
+  - {word: "attribute", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "begin", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "block", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "body", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "buffer", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "bus", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "case", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "component", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "configuration", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "constant", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "disconnect", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "downto", class: vhdl, first: "1993", psl: true, context: "reserved word"}
+  - {word: "else", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "elsif", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "end", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "entity", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "exit", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "file", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "for", class: vhdl, first: "1993", psl: true, context: "reserved word"}
+  - {word: "function", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "generate", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "generic", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "group", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "guarded", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "if", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "impure", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "in", class: vhdl, first: "1993", psl: true, context: "reserved word"}
+  - {word: "inertial", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "inout", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "is", class: vhdl, first: "1993", psl: true, context: "reserved word"}
+  - {word: "label", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "library", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "linkage", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "literal", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "loop", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "map", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "mod", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "nand", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "new", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "next", class: vhdl, first: "1993", psl: true, suffixes: ["!"], context: "reserved word"}
+  - {word: "nor", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "not", class: vhdl, first: "1993", psl: true, context: "reserved word"}
+  - {word: "null", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "of", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "on", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "open", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "or", class: vhdl, first: "1993", psl: true, context: "reserved word"}
+  - {word: "others", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "out", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "package", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "port", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "postponed", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "procedure", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "process", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "pure", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "range", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "record", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "register", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "reject", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "rem", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "report", class: vhdl, first: "1993", psl: true, context: "reserved word"}
+  - {word: "return", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "rol", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "ror", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "select", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "severity", class: vhdl, first: "1993", psl: true, context: "reserved word"}
+  - {word: "signal", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "shared", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "sla", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "sll", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "sra", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "srl", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "subtype", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "then", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "to", class: vhdl, first: "1993", psl: true, context: "reserved word"}
+  - {word: "transport", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "type", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "unaffected", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "units", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "until", class: vhdl, first: "1993", psl: true, suffixes: ["!", "_", "!_"], context: "reserved word"}
+  - {word: "use", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "variable", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "wait", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "when", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "while", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "with", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "xnor", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "xor", class: vhdl, first: "1993", psl: false, context: "reserved word"}
+  - {word: "protected", class: vhdl, first: "2002", psl: false, context: "protected type declaration and body"}
+  - {word: "context", class: vhdl, first: "2008", psl: false, context: "context declaration and context reference"}
+  - {word: "default", class: vhdl, first: "2008", psl: true, context: "default clock (PSL); generic map default"}
+  - {word: "force", class: vhdl, first: "2008", psl: false, context: "force assignment"}
+  - {word: "parameter", class: vhdl, first: "2008", psl: false, context: "parameter list and parameter map aspect"}
+  - {word: "release", class: vhdl, first: "2008", psl: false, context: "release assignment"}
+  - {word: "cover", class: vhdl, first: "2008", psl: true, context: "PSL cover directive"}
+  - {word: "assume", class: psl2008, first: "2008", psl: true, context: "PSL; identifier outside PSL unless psl.strict_keywords"}
+  - {word: "assume_guarantee", class: psl2008, first: "2008", psl: true, context: "PSL; identifier outside PSL unless psl.strict_keywords"}
+  - {word: "fairness", class: psl2008, first: "2008", psl: true, context: "PSL; identifier outside PSL unless psl.strict_keywords"}
+  - {word: "property", class: psl2008, first: "2008", psl: true, context: "PSL; identifier outside PSL unless psl.strict_keywords"}
+  - {word: "restrict", class: psl2008, first: "2008", psl: true, context: "PSL; identifier outside PSL unless psl.strict_keywords"}
+  - {word: "restrict_guarantee", class: psl2008, first: "2008", psl: true, context: "PSL; identifier outside PSL unless psl.strict_keywords"}
+  - {word: "sequence", class: psl2008, first: "2008", psl: true, context: "PSL; identifier outside PSL unless psl.strict_keywords"}
+  - {word: "strong", class: psl2008, first: "2008", psl: true, context: "PSL; identifier outside PSL unless psl.strict_keywords"}
+  - {word: "vmode", class: psl2008, first: "2008", psl: true, context: "PSL; identifier outside PSL unless psl.strict_keywords"}
+  - {word: "vprop", class: psl2008, first: "2008", psl: true, context: "PSL; identifier outside PSL unless psl.strict_keywords"}
+  - {word: "vunit", class: psl2008, first: "2008", psl: true, context: "PSL; identifier outside PSL unless psl.strict_keywords"}
+  - {word: "private", class: vhdl, first: "2019", psl: false, context: "protected type declarative item (private variable)", lcs: LCS-2016-033}
+  - {word: "view", class: vhdl, first: "2019", psl: false, context: "mode view declaration and interface mode", lcs: LCS-2016-045a}
+  - {word: "always", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "never", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "eventually", class: psl, first: "2008", psl: true, suffixes: ["!"], context: "PSL only; plain identifier outside PSL"}
+  - {word: "next_a", class: psl, first: "2008", psl: true, suffixes: ["!"], context: "PSL only; plain identifier outside PSL"}
+  - {word: "next_e", class: psl, first: "2008", psl: true, suffixes: ["!"], context: "PSL only; plain identifier outside PSL"}
+  - {word: "next_event", class: psl, first: "2008", psl: true, suffixes: ["!"], context: "PSL only; plain identifier outside PSL"}
+  - {word: "next_event_a", class: psl, first: "2008", psl: true, suffixes: ["!"], context: "PSL only; plain identifier outside PSL"}
+  - {word: "next_event_e", class: psl, first: "2008", psl: true, suffixes: ["!"], context: "PSL only; plain identifier outside PSL"}
+  - {word: "before", class: psl, first: "2008", psl: true, suffixes: ["!", "_", "!_"], context: "PSL only; plain identifier outside PSL"}
+  - {word: "within", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "abort", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "async_abort", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "sync_abort", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "clock", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "const", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "boolean", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "endpoint", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "inf", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "prev", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "stable", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "rose", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "fell", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "onehot", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "onehot0", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "ended", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "nondet", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "nondet_vector", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "union", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "forall", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "mutable", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "hdltype", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "bit", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "bitvector", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "numeric", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "string", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "a", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "af", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "ag", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "ax", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "e", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "ef", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "eg", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "ex", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "g", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "f", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "x", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "u", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "w", class: psl, first: "2008", psl: true, context: "PSL only; plain identifier outside PSL"}
+  - {word: "inherit", class: never, first: "2008", psl: true, context: "never a keyword (vunit inherit is matched by spelling)"}

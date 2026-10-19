@@ -1,0 +1,3 @@
+invalid.vhd:5:22: error[syntax/error]: expected '(', found identifier x
+invalid.vhd:5:22: error[syntax/error]: expected '<=', ':=' or ';', found identifier x
+summary: 2 errors, 0 warnings, 0 hints, 1 files

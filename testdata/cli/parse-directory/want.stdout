@@ -1,0 +1,2 @@
+gohard: error[cli/usage]: gohard parse takes a FILE, not the directory rtl; run 'gohard help' for usage
+summary: 1 errors, 0 warnings, 0 hints, 0 files

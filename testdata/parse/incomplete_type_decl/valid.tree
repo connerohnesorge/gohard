@@ -1,0 +1,69 @@
+DesignFile 0..125
+  DesignUnit 0..124
+    ContextClause 0..0
+    PackageDecl 0..124
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..119
+        IncompleteTypeDecl 12..25
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..24 "node"
+          Semicolon 24..25 ";"
+        TypeDecl 25..57
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 28..32 "type"
+            trail Whitespace " "
+          Identifier 33..41 "node_ptr"
+            trail Whitespace " "
+          KwIs 42..44 "is"
+            trail Whitespace " "
+          AccessTypeDef 45..56
+            KwAccess 45..51 "access"
+              trail Whitespace " "
+            SubtypeIndication 52..56
+              SimpleName 52..56
+                Identifier 52..56 "node"
+          Semicolon 56..57 ";"
+        TypeDecl 57..119
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 60..64 "type"
+            trail Whitespace " "
+          Identifier 65..69 "node"
+            trail Whitespace " "
+          KwIs 70..72 "is"
+            trail Whitespace " "
+          RecordTypeDef 73..119
+            KwRecord 73..79 "record"
+            ElementDecl 79..105
+              IdentifierList 79..94
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 84..93 "next_node"
+                  trail Whitespace " "
+              Colon 94..95 ":"
+                trail Whitespace " "
+              SubtypeIndication 96..104
+                SimpleName 96..104
+                  Identifier 96..104 "node_ptr"
+              Semicolon 104..105 ";"
+            EndClause 105..119
+                lead Newline "\n"
+                lead Whitespace "  "
+              KwEnd 108..111 "end"
+                trail Whitespace " "
+              KwRecord 112..118 "record"
+              Semicolon 118..119 ";"
+      EndClause 119..124
+          lead Newline "\n"
+        KwEnd 120..123 "end"
+        Semicolon 123..124 ";"
+    lead Newline "\n"
+  EOF 125..125 ""

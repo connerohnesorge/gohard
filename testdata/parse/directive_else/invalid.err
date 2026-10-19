@@ -1,0 +1,2 @@
+invalid.vhd:4:1: error[syntax/error]: `else without `if
+summary: 1 errors, 0 warnings, 0 hints, 1 files

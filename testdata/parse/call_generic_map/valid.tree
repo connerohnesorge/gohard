@@ -1,0 +1,98 @@
+DesignFile 0..150
+  DesignUnit 0..149
+    ContextClause 0..0
+    ArchitectureBody 0..149
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..144
+        ProcessStmt 28..144
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..67
+            VariableDecl 41..67
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwVariable 46..54 "variable"
+                trail Whitespace " "
+              IdentifierList 55..57
+                Identifier 55..56 "v"
+                  trail Whitespace " "
+              Colon 57..58 ":"
+                trail Whitespace " "
+              SubtypeIndication 59..66
+                SimpleName 59..66
+                  Identifier 59..66 "integer"
+              Semicolon 66..67 ";"
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 70..75 "begin"
+          SequenceOfStatements 75..129
+            VariableAssignStmt 75..119
+              Target 75..82
+                SimpleName 75..82
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 80..81 "v"
+                    trail Whitespace " "
+              VarAssign 82..84 ":="
+                trail Whitespace " "
+              CallOrIndexName 85..118
+                SimpleName 85..88
+                  Identifier 85..87 "id"
+                    trail Whitespace " "
+                CallGenericMap 88..115
+                  KwGeneric 88..95 "generic"
+                    trail Whitespace " "
+                  KwMap 96..99 "map"
+                    trail Whitespace " "
+                  AssociationList 100..115
+                    LParen 100..101 "("
+                    AssociationElement 101..113
+                      SimpleName 101..103
+                        Identifier 101..102 "t"
+                          trail Whitespace " "
+                      Arrow 103..105 "=>"
+                        trail Whitespace " "
+                      SimpleName 106..113
+                        Identifier 106..113 "integer"
+                    RParen 113..114 ")"
+                      trail Whitespace " "
+                AssociationList 115..118
+                  LParen 115..116 "("
+                  AssociationElement 116..117
+                    LiteralExpr 116..117
+                      IntegerLiteral 116..117 "4"
+                  RParen 117..118 ")"
+              Semicolon 118..119 ";"
+            WaitStmt 119..129
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwWait 124..128 "wait"
+              Semicolon 128..129 ";"
+          EndClause 129..144
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 132..135 "end"
+              trail Whitespace " "
+            KwProcess 136..143 "process"
+            Semicolon 143..144 ";"
+      EndClause 144..149
+          lead Newline "\n"
+        KwEnd 145..148 "end"
+        Semicolon 148..149 ";"
+    lead Newline "\n"
+  EOF 150..150 ""

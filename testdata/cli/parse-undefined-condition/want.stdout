@@ -1,0 +1,2 @@
+a.vhd:1:5: error[syntax/undefined-condition]: PROFILE is not a built-in conditional-analysis identifier and is not defined; define it under defines: in gohard.yaml or with --define PROFILE=VALUE
+summary: 1 errors, 0 warnings, 0 hints, 1 files

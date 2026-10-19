@@ -1,0 +1,43 @@
+DesignFile 0..71
+  DesignUnit 0..70
+    ContextClause 0..0
+    ArchitectureBody 0..70
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..59
+        PSLDefaultClock 22..59
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwDefault 25..32 "default"
+            trail Whitespace " "
+          KwClock 33..38 "clock"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+            trail Whitespace " "
+          CallOrIndexName 42..58
+            SimpleName 42..53
+              Identifier 42..53 "rising_edge"
+            AssociationList 53..58
+              LParen 53..54 "("
+              AssociationElement 54..57
+                SimpleName 54..57
+                  Identifier 54..57 "clk"
+              RParen 57..58 ")"
+          Semicolon 58..59 ";"
+        lead Newline "\n"
+      KwBegin 60..65 "begin"
+      StatementPart 65..65
+      EndClause 65..70
+          lead Newline "\n"
+        KwEnd 66..69 "end"
+        Semicolon 69..70 ";"
+    lead Newline "\n"
+  EOF 71..71 ""

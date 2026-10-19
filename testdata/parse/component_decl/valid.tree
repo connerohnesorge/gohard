@@ -1,0 +1,99 @@
+DesignFile 0..144
+  DesignUnit 0..143
+    ContextClause 0..0
+    ArchitectureBody 0..143
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..132
+        ComponentDecl 22..132
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwComponent 25..34 "component"
+            trail Whitespace " "
+          Identifier 35..39 "comp"
+            trail Whitespace " "
+          KwIs 40..42 "is"
+          GenericClause 42..74
+              lead Newline "\n"
+              lead Whitespace "    "
+            KwGeneric 47..54 "generic"
+              trail Whitespace " "
+            InterfaceList 55..73
+              LParen 55..56 "("
+              InterfaceObjectDecl 56..72
+                IdentifierList 56..58
+                  Identifier 56..57 "n"
+                    trail Whitespace " "
+                Colon 58..59 ":"
+                  trail Whitespace " "
+                SubtypeIndication 60..68
+                  SimpleName 60..68
+                    Identifier 60..67 "natural"
+                      trail Whitespace " "
+                VarAssign 68..70 ":="
+                  trail Whitespace " "
+                LiteralExpr 71..72
+                  IntegerLiteral 71..72 "1"
+              RParen 72..73 ")"
+            Semicolon 73..74 ";"
+          PortClause 74..110
+              lead Newline "\n"
+              lead Whitespace "    "
+            KwPort 79..83 "port"
+              trail Whitespace " "
+            InterfaceList 84..109
+              LParen 84..85 "("
+              InterfaceObjectDecl 85..95
+                IdentifierList 85..87
+                  Identifier 85..86 "a"
+                    trail Whitespace " "
+                Colon 87..88 ":"
+                  trail Whitespace " "
+                SimpleModeIndication 89..92
+                  KwIn 89..91 "in"
+                    trail Whitespace " "
+                SubtypeIndication 92..95
+                  SimpleName 92..95
+                    Identifier 92..95 "bit"
+              Semicolon 95..96 ";"
+                trail Whitespace " "
+              InterfaceObjectDecl 97..108
+                IdentifierList 97..99
+                  Identifier 97..98 "b"
+                    trail Whitespace " "
+                Colon 99..100 ":"
+                  trail Whitespace " "
+                SimpleModeIndication 101..105
+                  KwOut 101..104 "out"
+                    trail Whitespace " "
+                SubtypeIndication 105..108
+                  SimpleName 105..108
+                    Identifier 105..108 "bit"
+              RParen 108..109 ")"
+            Semicolon 109..110 ";"
+          EndClause 110..132
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 113..116 "end"
+              trail Whitespace " "
+            KwComponent 117..126 "component"
+              trail Whitespace " "
+            Identifier 127..131 "comp"
+            Semicolon 131..132 ";"
+        lead Newline "\n"
+      KwBegin 133..138 "begin"
+      StatementPart 138..138
+      EndClause 138..143
+          lead Newline "\n"
+        KwEnd 139..142 "end"
+        Semicolon 142..143 ";"
+    lead Newline "\n"
+  EOF 144..144 ""

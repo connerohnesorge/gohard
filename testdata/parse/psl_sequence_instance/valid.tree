@@ -1,0 +1,86 @@
+DesignFile 0..107
+  DesignUnit 0..106
+    ContextClause 0..0
+    ArchitectureBody 0..106
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..67
+        PSLSequenceDecl 22..67
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwSequence 25..33 "sequence"
+            trail Whitespace " "
+          Identifier 34..41 "req_ack"
+            trail Whitespace " "
+          PSLFormalParameterList 42..57
+            LParen 42..43 "("
+            PSLFormalParameter 43..55
+              KwBoolean 43..50 "boolean"
+                trail Whitespace " "
+              Identifier 51..52 "r"
+              Comma 52..53 ","
+                trail Whitespace " "
+              Identifier 54..55 "q"
+            RParen 55..56 ")"
+              trail Whitespace " "
+          KwIs 57..59 "is"
+            trail Whitespace " "
+          PSLBracedSere 60..66
+            LBrace 60..61 "{"
+            PSLSereConcat 61..65
+              PSLBoolean 61..62
+                SimpleName 61..62
+                  Identifier 61..62 "r"
+              Semicolon 62..63 ";"
+                trail Whitespace " "
+              PSLBoolean 64..65
+                SimpleName 64..65
+                  Identifier 64..65 "q"
+            RBrace 65..66 "}"
+          Semicolon 66..67 ";"
+        lead Newline "\n"
+      KwBegin 68..73 "begin"
+      StatementPart 73..101
+        PSLCover 73..101
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwCover 76..81 "cover"
+            trail Whitespace " "
+          PSLBracedSere 82..100
+            LBrace 82..83 "{"
+            PSLSereConcat 83..99
+              PSLSequenceInstance 83..96
+                SimpleName 83..90
+                  Identifier 83..90 "req_ack"
+                AssociationList 90..96
+                  LParen 90..91 "("
+                  PSLBoolean 91..92
+                    SimpleName 91..92
+                      Identifier 91..92 "a"
+                  Comma 92..93 ","
+                    trail Whitespace " "
+                  PSLBoolean 94..95
+                    SimpleName 94..95
+                      Identifier 94..95 "b"
+                  RParen 95..96 ")"
+              Semicolon 96..97 ";"
+                trail Whitespace " "
+              PSLBoolean 98..99
+                SimpleName 98..99
+                  Identifier 98..99 "c"
+            RBrace 99..100 "}"
+          Semicolon 100..101 ";"
+      EndClause 101..106
+          lead Newline "\n"
+        KwEnd 102..105 "end"
+        Semicolon 105..106 ";"
+    lead Newline "\n"
+  EOF 107..107 ""

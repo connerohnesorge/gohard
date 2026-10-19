@@ -1,0 +1,59 @@
+DesignFile 0..85
+  DesignUnit 0..84
+    ContextClause 0..0
+    PackageDecl 0..84
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..79
+        AliasDecl 12..59
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 15..20 "alias"
+            trail Whitespace " "
+          Identifier 21..23 "f2"
+            trail Whitespace " "
+          KwIs 24..26 "is"
+            trail Whitespace " "
+          SimpleName 27..29
+            Identifier 27..28 "f"
+              trail Whitespace " "
+          Signature 29..58
+            LBracket 29..30 "["
+            SimpleName 30..37
+              Identifier 30..37 "integer"
+            Comma 37..38 ","
+              trail Whitespace " "
+            SimpleName 39..43
+              Identifier 39..42 "bit"
+                trail Whitespace " "
+            KwReturn 43..49 "return"
+              trail Whitespace " "
+            SimpleName 50..57
+              Identifier 50..57 "boolean"
+            RBracket 57..58 "]"
+          Semicolon 58..59 ";"
+        AliasDecl 59..79
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 62..67 "alias"
+            trail Whitespace " "
+          Identifier 68..70 "p2"
+            trail Whitespace " "
+          KwIs 71..73 "is"
+            trail Whitespace " "
+          SimpleName 74..76
+            Identifier 74..75 "p"
+              trail Whitespace " "
+          Signature 76..78
+            LBracket 76..77 "["
+            RBracket 77..78 "]"
+          Semicolon 78..79 ";"
+      EndClause 79..84
+          lead Newline "\n"
+        KwEnd 80..83 "end"
+        Semicolon 83..84 ";"
+    lead Newline "\n"
+  EOF 85..85 ""

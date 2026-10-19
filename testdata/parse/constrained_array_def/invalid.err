@@ -1,0 +1,6 @@
+invalid.vhd:2:21: error[syntax/error]: expected '(', found literal 0
+invalid.vhd:2:21: error[syntax/error]: expected ';', found literal 0
+invalid.vhd:2:21: error[syntax/error]: expected a subtype indication, found literal 0
+invalid.vhd:2:21: error[syntax/error]: expected reserved word of, found literal 0
+invalid.vhd:2:22: error[syntax/error]: expected a declaration, found literal 0
+summary: 5 errors, 0 warnings, 0 hints, 1 files

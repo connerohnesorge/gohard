@@ -1,0 +1,67 @@
+DesignFile 0..96
+  DesignUnit 0..95
+    ContextClause 0..0
+    ArchitectureBody 0..95
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..90
+        ProcessStmt 28..90
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..75
+            ConditionalVariableAssignStmt 49..75
+              Target 49..56
+                SimpleName 49..56
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 54..55 "v"
+                    trail Whitespace " "
+              VarAssign 56..58 ":="
+                trail Whitespace " "
+              ConditionalExpressions 59..74
+                WhenBranch 59..68
+                  SimpleName 59..61
+                    Identifier 59..60 "x"
+                      trail Whitespace " "
+                  KwWhen 61..65 "when"
+                    trail Whitespace " "
+                  SimpleName 66..68
+                    Identifier 66..67 "c"
+                      trail Whitespace " "
+                KwElse 68..72 "else"
+                  trail Whitespace " "
+                WhenBranch 73..74
+                  SimpleName 73..74
+                    Identifier 73..74 "y"
+              Semicolon 74..75 ";"
+          EndClause 75..90
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 78..81 "end"
+              trail Whitespace " "
+            KwProcess 82..89 "process"
+            Semicolon 89..90 ";"
+      EndClause 90..95
+          lead Newline "\n"
+        KwEnd 91..94 "end"
+        Semicolon 94..95 ";"
+    lead Newline "\n"
+  EOF 96..96 ""

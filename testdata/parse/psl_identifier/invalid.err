@@ -1,0 +1,2 @@
+invalid.vhd:3:10: error[syntax/psl-keyword]: sequence is reserved (psl.strict_keywords: true)
+summary: 1 errors, 0 warnings, 0 hints, 1 files

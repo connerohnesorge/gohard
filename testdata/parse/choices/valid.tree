@@ -1,0 +1,112 @@
+DesignFile 0..172
+  DesignUnit 0..171
+    ContextClause 0..0
+    ArchitectureBody 0..171
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..166
+        ProcessStmt 28..166
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..151
+            CaseStmt 49..151
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwCase 54..58 "case"
+                trail Whitespace " "
+              SimpleName 59..61
+                Identifier 59..60 "n"
+                  trail Whitespace " "
+              KwIs 61..63 "is"
+              CaseAlternative 63..110
+                  lead Newline "\n"
+                  lead Whitespace "      "
+                KwWhen 70..74 "when"
+                  trail Whitespace " "
+                Choices 75..102
+                  LiteralExpr 75..77
+                    IntegerLiteral 75..76 "0"
+                      trail Whitespace " "
+                  Bar 77..78 "|"
+                    trail Whitespace " "
+                  LiteralExpr 79..81
+                    IntegerLiteral 79..80 "2"
+                      trail Whitespace " "
+                  Bar 81..82 "|"
+                    trail Whitespace " "
+                  RangeExpr 83..90
+                    LiteralExpr 83..85
+                      IntegerLiteral 83..84 "4"
+                        trail Whitespace " "
+                    KwTo 85..87 "to"
+                      trail Whitespace " "
+                    LiteralExpr 88..90
+                      IntegerLiteral 88..89 "6"
+                        trail Whitespace " "
+                  Bar 90..91 "|"
+                    trail Whitespace " "
+                  AttributeName 92..102
+                    SimpleName 92..97
+                      Identifier 92..97 "state"
+                    Tick 97..98 "'"
+                    Identifier 98..101 "low"
+                      trail Whitespace " "
+                Arrow 102..104 "=>"
+                  trail Whitespace " "
+                SequenceOfStatements 105..110
+                  NullStmt 105..110
+                    KwNull 105..109 "null"
+                    Semicolon 109..110 ";"
+              CaseAlternative 110..137
+                  lead Newline "\n"
+                  lead Whitespace "      "
+                KwWhen 117..121 "when"
+                  trail Whitespace " "
+                Choices 122..129
+                  OthersChoice 122..129
+                    KwOthers 122..128 "others"
+                      trail Whitespace " "
+                Arrow 129..131 "=>"
+                  trail Whitespace " "
+                SequenceOfStatements 132..137
+                  NullStmt 132..137
+                    KwNull 132..136 "null"
+                    Semicolon 136..137 ";"
+              EndClause 137..151
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwEnd 142..145 "end"
+                  trail Whitespace " "
+                KwCase 146..150 "case"
+                Semicolon 150..151 ";"
+          EndClause 151..166
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 154..157 "end"
+              trail Whitespace " "
+            KwProcess 158..165 "process"
+            Semicolon 165..166 ";"
+      EndClause 166..171
+          lead Newline "\n"
+        KwEnd 167..170 "end"
+        Semicolon 170..171 ";"
+    lead Newline "\n"
+  EOF 172..172 ""

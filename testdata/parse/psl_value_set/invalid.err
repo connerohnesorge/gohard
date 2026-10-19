@@ -1,0 +1,7 @@
+invalid.vhd:3:25: error[syntax/error]: expected ':', found ','
+invalid.vhd:3:25: error[syntax/error]: expected ';', found ','
+invalid.vhd:3:25: error[syntax/error]: expected '}', found ','
+invalid.vhd:3:25: error[syntax/error]: expected a PSL property, found ','
+invalid.vhd:3:25: error[syntax/error]: expected a value, found ','
+invalid.vhd:3:29: error[syntax/error]: expected a concurrent statement, found '}'
+summary: 6 errors, 0 warnings, 0 hints, 1 files

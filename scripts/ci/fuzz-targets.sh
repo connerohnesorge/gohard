@@ -7,9 +7,7 @@
 # "local" is <package>/testdata/fuzz/<Target>/, which Go replays
 # automatically, for helper targets that do not read the root corpus.
 # Later stages append (root):
-#   FuzzParse     ./internal/parser     (#31)
 #   FuzzFormat    ./internal/format     (#32)
-#   FuzzLSPReplay ./internal/server     (#25)
 # Elaboration and simulation are not fuzz targets until the corpus
 # passes.
 #
@@ -20,6 +18,8 @@
 TARGETS=(
 	"FuzzConfig ./internal/config root"
 	"FuzzIndex ./internal/span local"
+	"FuzzLSPReplay ./internal/server root"
+	"FuzzParse ./internal/parser root"
 )
 
 if [ "${1:-}" = "--json" ]; then

@@ -1,0 +1,94 @@
+DesignFile 0..141
+  DesignUnit 0..140
+    ContextClause 0..0
+    ArchitectureBody 0..140
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..135
+        ConcurrentConditionalSignalAssign 28..68
+          Target 28..33
+            SimpleName 28..33
+                lead Newline "\n"
+                lead Whitespace "  "
+              Identifier 31..32 "s"
+                trail Whitespace " "
+          Le 33..35 "<="
+            trail Whitespace " "
+          ConditionalWaveforms 36..67
+            WhenBranch 36..61
+              Waveform 36..47
+                UnaffectedExpr 36..47
+                  KwUnaffected 36..46 "unaffected"
+                    trail Whitespace " "
+              KwWhen 47..51 "when"
+                trail Whitespace " "
+              BinaryExpr 52..61
+                SimpleName 52..55
+                  Identifier 52..54 "en"
+                    trail Whitespace " "
+                Eq 55..56 "="
+                  trail Whitespace " "
+                LiteralExpr 57..61
+                  CharacterLiteral 57..60 "'0'"
+                    trail Whitespace " "
+            KwElse 61..65 "else"
+              trail Whitespace " "
+            WhenBranch 66..67
+              Waveform 66..67
+                WaveformElement 66..67
+                  SimpleName 66..67
+                    Identifier 66..67 "d"
+          Semicolon 67..68 ";"
+        ProcessStmt 68..135
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 71..78 "process"
+            trail Whitespace " "
+          KwIs 79..81 "is"
+          DeclarativePart 81..81
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 84..89 "begin"
+          SequenceOfStatements 89..120
+            SignalAssignStmt 89..110
+              Target 89..96
+                SimpleName 89..96
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  Identifier 94..95 "t"
+                    trail Whitespace " "
+              Le 96..98 "<="
+                trail Whitespace " "
+              Waveform 99..109
+                UnaffectedExpr 99..109
+                  KwUnaffected 99..109 "unaffected"
+              Semicolon 109..110 ";"
+            WaitStmt 110..120
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwWait 115..119 "wait"
+              Semicolon 119..120 ";"
+          EndClause 120..135
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 123..126 "end"
+              trail Whitespace " "
+            KwProcess 127..134 "process"
+            Semicolon 134..135 ";"
+      EndClause 135..140
+          lead Newline "\n"
+        KwEnd 136..139 "end"
+        Semicolon 139..140 ";"
+    lead Newline "\n"
+  EOF 141..141 ""

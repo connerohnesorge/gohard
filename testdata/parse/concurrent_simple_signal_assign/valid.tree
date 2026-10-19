@@ -1,0 +1,71 @@
+DesignFile 0..89
+  DesignUnit 0..88
+    ContextClause 0..0
+    ArchitectureBody 0..88
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..83
+        ConcurrentSimpleSignalAssign 28..44
+          Target 28..33
+            SimpleName 28..33
+                lead Newline "\n"
+                lead Whitespace "  "
+              Identifier 31..32 "s"
+                trail Whitespace " "
+          Le 33..35 "<="
+            trail Whitespace " "
+          Waveform 36..43
+            WaveformElement 36..43
+              BinaryExpr 36..43
+                SimpleName 36..38
+                  Identifier 36..37 "a"
+                    trail Whitespace " "
+                KwAnd 38..41 "and"
+                  trail Whitespace " "
+                SimpleName 42..43
+                  Identifier 42..43 "b"
+          Semicolon 43..44 ";"
+        ConcurrentSimpleSignalAssign 44..83
+          Target 44..49
+            SimpleName 44..49
+                lead Newline "\n"
+                lead Whitespace "  "
+              Identifier 47..48 "t"
+                trail Whitespace " "
+          Le 49..51 "<="
+            trail Whitespace " "
+          KwGuarded 52..59 "guarded"
+            trail Whitespace " "
+          DelayMechanism 60..70
+            KwTransport 60..69 "transport"
+              trail Whitespace " "
+          Waveform 70..82
+            WaveformElement 70..82
+              SimpleName 70..72
+                Identifier 70..71 "c"
+                  trail Whitespace " "
+              KwAfter 72..77 "after"
+                trail Whitespace " "
+              PhysicalLiteral 78..82
+                IntegerLiteral 78..79 "1"
+                  trail Whitespace " "
+                SimpleName 80..82
+                  Identifier 80..82 "ns"
+          Semicolon 82..83 ";"
+      EndClause 83..88
+          lead Newline "\n"
+        KwEnd 84..87 "end"
+        Semicolon 87..88 ";"
+    lead Newline "\n"
+  EOF 89..89 ""

@@ -1,0 +1,124 @@
+DesignFile 0..169
+  DesignUnit 0..168
+    ContextClause 0..0
+    EntityDecl 0..168
+      KwEntity 0..6 "entity"
+        trail Whitespace " "
+      Identifier 7..8 "e"
+        trail Whitespace " "
+      KwIs 9..11 "is"
+      GenericClause 11..41
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwGeneric 14..21 "generic"
+          trail Whitespace " "
+        InterfaceList 22..40
+          LParen 22..23 "("
+          InterfaceObjectDecl 23..39
+            IdentifierList 23..25
+              Identifier 23..24 "n"
+                trail Whitespace " "
+            Colon 25..26 ":"
+              trail Whitespace " "
+            SubtypeIndication 27..35
+              SimpleName 27..35
+                Identifier 27..34 "natural"
+                  trail Whitespace " "
+            VarAssign 35..37 ":="
+              trail Whitespace " "
+            LiteralExpr 38..39
+              IntegerLiteral 38..39 "4"
+          RParen 39..40 ")"
+        Semicolon 40..41 ";"
+      PortClause 41..75
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwPort 44..48 "port"
+          trail Whitespace " "
+        InterfaceList 49..74
+          LParen 49..50 "("
+          InterfaceObjectDecl 50..60
+            IdentifierList 50..52
+              Identifier 50..51 "a"
+                trail Whitespace " "
+            Colon 52..53 ":"
+              trail Whitespace " "
+            SimpleModeIndication 54..57
+              KwIn 54..56 "in"
+                trail Whitespace " "
+            SubtypeIndication 57..60
+              SimpleName 57..60
+                Identifier 57..60 "bit"
+          Semicolon 60..61 ";"
+            trail Whitespace " "
+          InterfaceObjectDecl 62..73
+            IdentifierList 62..64
+              Identifier 62..63 "b"
+                trail Whitespace " "
+            Colon 64..65 ":"
+              trail Whitespace " "
+            SimpleModeIndication 66..70
+              KwOut 66..69 "out"
+                trail Whitespace " "
+            SubtypeIndication 70..73
+              SimpleName 70..73
+                Identifier 70..73 "bit"
+          RParen 73..74 ")"
+        Semicolon 74..75 ";"
+      DeclarativePart 75..104
+        ConstantDecl 75..104
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 78..86 "constant"
+            trail Whitespace " "
+          IdentifierList 87..89
+            Identifier 87..88 "k"
+              trail Whitespace " "
+          Colon 89..90 ":"
+            trail Whitespace " "
+          SubtypeIndication 91..99
+            SimpleName 91..99
+              Identifier 91..98 "natural"
+                trail Whitespace " "
+          VarAssign 99..101 ":="
+            trail Whitespace " "
+          SimpleName 102..103
+            Identifier 102..103 "n"
+          Semicolon 103..104 ";"
+        lead Newline "\n"
+      KwBegin 105..110 "begin"
+      StatementPart 110..154
+        ConcurrentAssertionStmt 110..154
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 113..119 "assert"
+            trail Whitespace " "
+          BinaryExpr 120..126
+            SimpleName 120..122
+              Identifier 120..121 "n"
+                trail Whitespace " "
+            Gt 122..123 ">"
+              trail Whitespace " "
+            LiteralExpr 124..126
+              IntegerLiteral 124..125 "0"
+                trail Whitespace " "
+          KwReport 126..132 "report"
+            trail Whitespace " "
+          LiteralExpr 133..137
+            StringLiteral 133..136 "\"n\""
+              trail Whitespace " "
+          KwSeverity 137..145 "severity"
+            trail Whitespace " "
+          SimpleName 146..153
+            Identifier 146..153 "failure"
+          Semicolon 153..154 ";"
+      EndClause 154..168
+          lead Newline "\n"
+        KwEnd 155..158 "end"
+          trail Whitespace " "
+        KwEntity 159..165 "entity"
+          trail Whitespace " "
+        Identifier 166..167 "e"
+        Semicolon 167..168 ";"
+    lead Newline "\n"
+  EOF 169..169 ""

@@ -1,0 +1,2 @@
+invalid.vhd:4:16: error[syntax/error]: expected reserved word body, found identifier counter
+summary: 1 errors, 0 warnings, 0 hints, 1 files

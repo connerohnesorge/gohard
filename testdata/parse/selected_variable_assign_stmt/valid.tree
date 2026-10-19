@@ -1,0 +1,80 @@
+DesignFile 0..122
+  DesignUnit 0..121
+    ContextClause 0..0
+    ArchitectureBody 0..121
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..116
+        ProcessStmt 28..116
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..101
+            SelectedVariableAssignStmt 49..101
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwWith 54..58 "with"
+                trail Whitespace " "
+              SimpleName 59..63
+                Identifier 59..62 "sel"
+                  trail Whitespace " "
+              KwSelect 63..69 "select"
+                trail Whitespace " "
+              Target 70..72
+                SimpleName 70..72
+                  Identifier 70..71 "v"
+                    trail Whitespace " "
+              VarAssign 72..74 ":="
+                trail Whitespace " "
+              SelectedExpressions 75..100
+                SelectBranch 75..85
+                  LiteralExpr 75..77
+                    IntegerLiteral 75..76 "1"
+                      trail Whitespace " "
+                  KwWhen 77..81 "when"
+                    trail Whitespace " "
+                  Choices 82..85
+                    LiteralExpr 82..85
+                      CharacterLiteral 82..85 "'0'"
+                Comma 85..86 ","
+                  trail Whitespace " "
+                SelectBranch 87..100
+                  LiteralExpr 87..89
+                    IntegerLiteral 87..88 "2"
+                      trail Whitespace " "
+                  KwWhen 89..93 "when"
+                    trail Whitespace " "
+                  Choices 94..100
+                    OthersChoice 94..100
+                      KwOthers 94..100 "others"
+              Semicolon 100..101 ";"
+          EndClause 101..116
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 104..107 "end"
+              trail Whitespace " "
+            KwProcess 108..115 "process"
+            Semicolon 115..116 ";"
+      EndClause 116..121
+          lead Newline "\n"
+        KwEnd 117..120 "end"
+        Semicolon 120..121 ";"
+    lead Newline "\n"
+  EOF 122..122 ""

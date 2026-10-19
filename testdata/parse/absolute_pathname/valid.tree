@@ -1,0 +1,48 @@
+DesignFile 0..61
+  DesignUnit 0..60
+    ContextClause 0..0
+    PackageDecl 0..60
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..55
+        AliasDecl 12..55
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAlias 15..20 "alias"
+            trail Whitespace " "
+          Identifier 21..22 "s"
+            trail Whitespace " "
+          KwIs 23..25 "is"
+            trail Whitespace " "
+          ExternalName 26..54
+            LtLt 26..28 "<<"
+              trail Whitespace " "
+            KwSignal 29..35 "signal"
+              trail Whitespace " "
+            AbsolutePathname 36..46
+              Dot 36..37 "."
+              PathnameElement 37..41
+                Identifier 37..40 "top"
+                Dot 40..41 "."
+              PathnameElement 41..44
+                Identifier 41..43 "u1"
+                Dot 43..44 "."
+              Identifier 44..45 "s"
+                trail Whitespace " "
+            Colon 46..47 ":"
+              trail Whitespace " "
+            SubtypeIndication 48..52
+              SimpleName 48..52
+                Identifier 48..51 "bit"
+                  trail Whitespace " "
+            GtGt 52..54 ">>"
+          Semicolon 54..55 ";"
+      EndClause 55..60
+          lead Newline "\n"
+        KwEnd 56..59 "end"
+        Semicolon 59..60 ";"
+    lead Newline "\n"
+  EOF 61..61 ""

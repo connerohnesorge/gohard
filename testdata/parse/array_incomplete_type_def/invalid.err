@@ -1,0 +1,2 @@
+invalid.vhd:4:41: error[syntax/error]: expected reserved word of, found identifier el
+summary: 1 errors, 0 warnings, 0 hints, 1 files

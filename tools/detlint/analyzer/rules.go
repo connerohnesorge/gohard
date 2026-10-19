@@ -39,6 +39,15 @@ const All = World | MapOrder
 // packages.
 const TestAllowed = Getenv | FS | Stdio | RealEnv | MapOrder
 
+// Stdio goroutines: internal/jsonrpc2 (the package itself, not its
+// subpackages) runs the stdio reader and writer, the only goroutines
+// in GoHard (#4 P8, #25), so only it is exempt from the go and select
+// rules. Every other rule still applies there.
+const (
+	StdioPackage = Module + "/internal/jsonrpc2"
+	StdioAllowed = Go | Select
+)
+
 var ruleNames = [...]string{
 	"clock", "rand", "getenv", "fs", "stdio", "net", "process", "go",
 	"select", "realenv", "maporder", "linkname", "address",
@@ -99,6 +108,10 @@ func within(path, dir string) bool {
 func Rules(pkgPath string, test bool) Rule {
 	pkgPath = strings.TrimSuffix(pkgPath, "_test")
 	switch {
+	case pkgPath == StdioPackage && test:
+		return All &^ TestAllowed &^ StdioAllowed
+	case pkgPath == StdioPackage:
+		return All &^ StdioAllowed
 	case within(pkgPath, "cmd"), within(pkgPath, "internal/env/realenv"):
 		return 0
 	case within(pkgPath, "tools"):

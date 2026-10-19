@@ -1,0 +1,3 @@
+invalid.vhd:2:32: error[syntax/error]: expected a type mark, found ')'
+invalid.vhd:2:32: error[syntax/error]: expected an identifier, found ')'
+summary: 2 errors, 0 warnings, 0 hints, 1 files

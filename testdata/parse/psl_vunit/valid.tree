@@ -1,0 +1,63 @@
+DesignFile 0..87
+  DesignUnit 0..86
+    ContextClause 0..0
+    PSLVunit 0..86
+      KwVunit 0..5 "vunit"
+        trail Whitespace " "
+      Identifier 6..7 "v"
+        trail Whitespace " "
+      PSLHierarchicalName 8..17
+        LParen 8..9 "("
+        SimpleName 9..10
+          Identifier 9..10 "e"
+        LParen 10..11 "("
+        Identifier 11..14 "rtl"
+        RParen 14..15 ")"
+        RParen 15..16 ")"
+          trail Whitespace " "
+      LBrace 17..18 "{"
+      PSLDefaultClock 18..55
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwDefault 21..28 "default"
+          trail Whitespace " "
+        KwClock 29..34 "clock"
+          trail Whitespace " "
+        KwIs 35..37 "is"
+          trail Whitespace " "
+        CallOrIndexName 38..54
+          SimpleName 38..49
+            Identifier 38..49 "rising_edge"
+          AssociationList 49..54
+            LParen 49..50 "("
+            AssociationElement 50..53
+              SimpleName 50..53
+                Identifier 50..53 "clk"
+            RParen 53..54 ")"
+        Semicolon 54..55 ";"
+      PSLAssert 55..84
+          lead Newline "\n"
+          lead Whitespace "  "
+        KwAssert 58..64 "assert"
+          trail Whitespace " "
+        PSLAlways 65..83
+          KwAlways 65..71 "always"
+            trail Whitespace " "
+          PSLImplication 72..83
+            PSLBoolean 72..74
+              SimpleName 72..74
+                Identifier 72..73 "a"
+                  trail Whitespace " "
+            PSLImplies 74..76 "->"
+              trail Whitespace " "
+            PSLNext 77..83
+              KwNext 77..81 "next"
+                trail Whitespace " "
+              PSLBoolean 82..83
+                SimpleName 82..83
+                  Identifier 82..83 "b"
+        Semicolon 83..84 ";"
+        lead Newline "\n"
+      RBrace 85..86 "}"
+    lead Newline "\n"
+  EOF 87..87 ""

@@ -1,0 +1,140 @@
+DesignFile 0..190
+  DesignUnit 0..189
+    ContextClause 0..0
+    ArchitectureBody 0..189
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..184
+        ProcessStmt 28..184
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..169
+            SelectedSignalAssignStmt 49..115
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwWith 54..58 "with"
+                trail Whitespace " "
+              SimpleName 59..63
+                Identifier 59..62 "sel"
+                  trail Whitespace " "
+              KwSelect 63..69 "select"
+                trail Whitespace " "
+              Target 70..72
+                SimpleName 70..72
+                  Identifier 70..71 "s"
+                    trail Whitespace " "
+              Le 72..74 "<="
+                trail Whitespace " "
+              SelectedWaveforms 75..114
+                SelectBranch 75..86
+                  Waveform 75..77
+                    WaveformElement 75..77
+                      SimpleName 75..77
+                        Identifier 75..76 "a"
+                          trail Whitespace " "
+                  KwWhen 77..81 "when"
+                    trail Whitespace " "
+                  Choices 82..86
+                    LiteralExpr 82..86
+                      StringLiteral 82..86 "\"00\""
+                Comma 86..87 ","
+                  trail Whitespace " "
+                SelectBranch 88..99
+                  Waveform 88..90
+                    WaveformElement 88..90
+                      SimpleName 88..90
+                        Identifier 88..89 "b"
+                          trail Whitespace " "
+                  KwWhen 90..94 "when"
+                    trail Whitespace " "
+                  Choices 95..99
+                    LiteralExpr 95..99
+                      StringLiteral 95..99 "\"01\""
+                Comma 99..100 ","
+                  trail Whitespace " "
+                SelectBranch 101..114
+                  Waveform 101..103
+                    WaveformElement 101..103
+                      SimpleName 101..103
+                        Identifier 101..102 "c"
+                          trail Whitespace " "
+                  KwWhen 103..107 "when"
+                    trail Whitespace " "
+                  Choices 108..114
+                    OthersChoice 108..114
+                      KwOthers 108..114 "others"
+              Semicolon 114..115 ";"
+            SelectedSignalAssignStmt 115..169
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwWith 120..124 "with"
+                trail Whitespace " "
+              SimpleName 125..129
+                Identifier 125..128 "sel"
+                  trail Whitespace " "
+              KwSelect 129..135 "select"
+              Question 135..136 "?"
+                trail Whitespace " "
+              Target 137..139
+                SimpleName 137..139
+                  Identifier 137..138 "s"
+                    trail Whitespace " "
+              Le 139..141 "<="
+                trail Whitespace " "
+              SelectedWaveforms 142..168
+                SelectBranch 142..153
+                  Waveform 142..144
+                    WaveformElement 142..144
+                      SimpleName 142..144
+                        Identifier 142..143 "a"
+                          trail Whitespace " "
+                  KwWhen 144..148 "when"
+                    trail Whitespace " "
+                  Choices 149..153
+                    LiteralExpr 149..153
+                      StringLiteral 149..153 "\"1-\""
+                Comma 153..154 ","
+                  trail Whitespace " "
+                SelectBranch 155..168
+                  Waveform 155..157
+                    WaveformElement 155..157
+                      SimpleName 155..157
+                        Identifier 155..156 "b"
+                          trail Whitespace " "
+                  KwWhen 157..161 "when"
+                    trail Whitespace " "
+                  Choices 162..168
+                    OthersChoice 162..168
+                      KwOthers 162..168 "others"
+              Semicolon 168..169 ";"
+          EndClause 169..184
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 172..175 "end"
+              trail Whitespace " "
+            KwProcess 176..183 "process"
+            Semicolon 183..184 ";"
+      EndClause 184..189
+          lead Newline "\n"
+        KwEnd 185..188 "end"
+        Semicolon 188..189 ";"
+    lead Newline "\n"
+  EOF 190..190 ""

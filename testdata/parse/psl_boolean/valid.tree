@@ -1,0 +1,64 @@
+DesignFile 0..76
+  DesignUnit 0..75
+    ContextClause 0..0
+    ArchitectureBody 0..75
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..70
+        PSLAssert 28..70
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwAssert 31..37 "assert"
+            trail Whitespace " "
+          PSLAlways 38..69
+            KwAlways 38..44 "always"
+              trail Whitespace " "
+            PSLBoolean 45..69
+              ParenExpr 45..69
+                LParen 45..46 "("
+                BinaryExpr 46..68
+                  BinaryExpr 46..54
+                    SimpleName 46..48
+                      Identifier 46..47 "s"
+                        trail Whitespace " "
+                    Eq 48..49 "="
+                      trail Whitespace " "
+                    LiteralExpr 50..54
+                      CharacterLiteral 50..53 "'1'"
+                        trail Whitespace " "
+                  KwAnd 54..57 "and"
+                    trail Whitespace " "
+                  BinaryExpr 58..68
+                    CallOrIndexName 58..63
+                      SimpleName 58..59
+                        Identifier 58..59 "v"
+                      AssociationList 59..63
+                        LParen 59..60 "("
+                        AssociationElement 60..61
+                          LiteralExpr 60..61
+                            IntegerLiteral 60..61 "0"
+                        RParen 61..62 ")"
+                          trail Whitespace " "
+                    Eq 63..64 "="
+                      trail Whitespace " "
+                    LiteralExpr 65..68
+                      CharacterLiteral 65..68 "'0'"
+                RParen 68..69 ")"
+          Semicolon 69..70 ";"
+      EndClause 70..75
+          lead Newline "\n"
+        KwEnd 71..74 "end"
+        Semicolon 74..75 ";"
+    lead Newline "\n"
+  EOF 76..76 ""

@@ -204,6 +204,20 @@ func (x *Index) Position(off int, enc Encoding) Position {
 	line := x.Line(off)
 	start, end := x.lines[line], x.LineEnd(line)
 	off = max(start, min(off, end))
+	if enc == UTF8 {
+		// Bytes: O(1). Snap back when off is inside a valid multi-byte
+		// rune; such a rune starts at most 3 bytes back, and its lead
+		// byte cannot be inside an earlier rune, so this agrees with
+		// the forward decoding below.
+		for j := off - 1; j >= max(start, off-3); j-- {
+			if _, size := utf8.DecodeRune(x.src[j:end]); size > 1 &&
+				j+size > off {
+				off = j
+				break
+			}
+		}
+		return Position{Line: line, Col: off - start}
+	}
 	col := 0
 	for i := start; i < off; {
 		r, size := utf8.DecodeRune(x.src[i:end])

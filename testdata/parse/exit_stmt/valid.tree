@@ -1,0 +1,88 @@
+DesignFile 0..156
+  DesignUnit 0..155
+    ContextClause 0..0
+    ArchitectureBody 0..155
+      KwArchitecture 0..12 "architecture"
+        trail Whitespace " "
+      Identifier 13..14 "a"
+        trail Whitespace " "
+      KwOf 15..17 "of"
+        trail Whitespace " "
+      SimpleName 18..20
+        Identifier 18..19 "e"
+          trail Whitespace " "
+      KwIs 20..22 "is"
+      DeclarativePart 22..22
+        lead Newline "\n"
+      KwBegin 23..28 "begin"
+      StatementPart 28..150
+        ProcessStmt 28..150
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwProcess 31..38 "process"
+            trail Whitespace " "
+          KwIs 39..41 "is"
+          DeclarativePart 41..41
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwBegin 44..49 "begin"
+          SequenceOfStatements 49..135
+            LoopStmt 49..84
+                lead Newline "\n"
+                lead Whitespace "    "
+              KwLoop 54..58 "loop"
+              SequenceOfStatements 58..70
+                ExitStmt 58..70
+                    lead Newline "\n"
+                    lead Whitespace "      "
+                  KwExit 65..69 "exit"
+                  Semicolon 69..70 ";"
+              EndClause 70..84
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwEnd 75..78 "end"
+                  trail Whitespace " "
+                KwLoop 79..83 "loop"
+                Semicolon 83..84 ";"
+            LoopStmt 84..135
+              Label 84..93
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                Identifier 89..90 "o"
+                  trail Whitespace " "
+                Colon 91..92 ":"
+                  trail Whitespace " "
+              KwLoop 93..97 "loop"
+              SequenceOfStatements 97..121
+                ExitStmt 97..121
+                    lead Newline "\n"
+                    lead Whitespace "      "
+                  KwExit 104..108 "exit"
+                    trail Whitespace " "
+                  Identifier 109..110 "o"
+                    trail Whitespace " "
+                  KwWhen 111..115 "when"
+                    trail Whitespace " "
+                  SimpleName 116..120
+                    Identifier 116..120 "done"
+                  Semicolon 120..121 ";"
+              EndClause 121..135
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwEnd 126..129 "end"
+                  trail Whitespace " "
+                KwLoop 130..134 "loop"
+                Semicolon 134..135 ";"
+          EndClause 135..150
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwEnd 138..141 "end"
+              trail Whitespace " "
+            KwProcess 142..149 "process"
+            Semicolon 149..150 ";"
+      EndClause 150..155
+          lead Newline "\n"
+        KwEnd 151..154 "end"
+        Semicolon 154..155 ";"
+    lead Newline "\n"
+  EOF 156..156 ""

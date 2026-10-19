@@ -1,0 +1,2 @@
+invalid.vhd:5:16: error[syntax/error]: expected a time expression, found reserved word inertial
+summary: 1 errors, 0 warnings, 0 hints, 1 files

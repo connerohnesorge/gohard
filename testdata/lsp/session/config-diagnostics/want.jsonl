@@ -1,0 +1,6 @@
+{"jsonrpc":"2.0","id":1,"result":{"capabilities":{"positionEncoding":"utf-16","textDocumentSync":{"change":2,"openClose":true,"save":{"includeText":false}},"workspace":{"workspaceFolders":{"supported":true}}},"serverInfo":{"name":"gohard","version":"0.0.0-test"}}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":0,"id":1}}
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file:///work/gohard.yaml","diagnostics":[{"range":{"start":{"line":0,"character":10},"end":{"line":0,"character":10}},"severity":1,"code":"config/unquoted-standard","source":"gohard","message":"standard must be a quoted string: standard: \"2008\""},{"range":{"start":{"line":1,"character":0},"end":{"line":1,"character":0}},"severity":1,"code":"config/unknown-key","source":"gohard","message":"unknown key bogus"},{"range":{"start":{"line":3,"character":10},"end":{"line":3,"character":10}},"severity":1,"code":"config/type","source":"gohard","message":"format.indent must be a decimal integer, not the string yes"}]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":0,"uri":"file:///work/gohard.yaml"}}
+{"jsonrpc":"2.0","id":99,"result":null}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":1,"id":99}}

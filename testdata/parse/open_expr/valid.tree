@@ -1,0 +1,50 @@
+DesignFile 0..70
+  DesignUnit 0..69
+    ContextClause 0..0
+    PackageDecl 0..69
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..64
+        PackageInstantiation 12..64
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwPackage 15..22 "package"
+            trail Whitespace " "
+          Identifier 23..24 "q"
+            trail Whitespace " "
+          KwIs 25..27 "is"
+            trail Whitespace " "
+          KwNew 28..31 "new"
+            trail Whitespace " "
+          SelectedName 32..40
+            SimpleName 32..36
+              Identifier 32..36 "work"
+            Dot 36..37 "."
+            Identifier 37..39 "gp"
+              trail Whitespace " "
+          GenericMapAspect 40..63
+            KwGeneric 40..47 "generic"
+              trail Whitespace " "
+            KwMap 48..51 "map"
+              trail Whitespace " "
+            AssociationList 52..63
+              LParen 52..53 "("
+              AssociationElement 53..62
+                SimpleName 53..55
+                  Identifier 53..54 "n"
+                    trail Whitespace " "
+                Arrow 55..57 "=>"
+                  trail Whitespace " "
+                OpenExpr 58..62
+                  KwOpen 58..62 "open"
+              RParen 62..63 ")"
+          Semicolon 63..64 ";"
+      EndClause 64..69
+          lead Newline "\n"
+        KwEnd 65..68 "end"
+        Semicolon 68..69 ";"
+    lead Newline "\n"
+  EOF 70..70 ""

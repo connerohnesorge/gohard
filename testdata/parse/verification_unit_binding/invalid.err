@@ -1,0 +1,6 @@
+invalid.vhd:4:19: error[syntax/error]: expected ';', found identifier v2
+invalid.vhd:4:19: error[syntax/error]: expected reserved word end, found identifier v2
+invalid.vhd:4:19: error[syntax/error]: expected reserved word for, found identifier v2
+invalid.vhd:6:6: error[syntax/error]: expected ';', found reserved word for
+invalid.vhd:6:7: error[syntax/error]: expected a design unit (entity, architecture, package, configuration, context or a PSL verification unit), found reserved word for
+summary: 5 errors, 0 warnings, 0 hints, 1 files

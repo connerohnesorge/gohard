@@ -1,0 +1,39 @@
+DesignFile 0..58
+  DesignUnit 0..57
+    ContextClause 0..0
+    PackageDecl 0..57
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..52
+        TypeDecl 12..52
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..25 "state"
+            trail Whitespace " "
+          KwIs 26..28 "is"
+            trail Whitespace " "
+          EnumerationTypeDef 29..51
+            LParen 29..30 "("
+            Identifier 30..34 "idle"
+            Comma 34..35 ","
+              trail Whitespace " "
+            Identifier 36..39 "run"
+            Comma 39..40 ","
+              trail Whitespace " "
+            CharacterLiteral 41..44 "'x'"
+            Comma 44..45 ","
+              trail Whitespace " "
+            Identifier 46..50 "done"
+            RParen 50..51 ")"
+          Semicolon 51..52 ";"
+      EndClause 52..57
+          lead Newline "\n"
+        KwEnd 53..56 "end"
+        Semicolon 56..57 ";"
+    lead Newline "\n"
+  EOF 58..58 ""

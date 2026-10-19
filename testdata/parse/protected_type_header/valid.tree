@@ -1,0 +1,83 @@
+DesignFile 0..135
+  DesignUnit 0..134
+    ContextClause 0..0
+    PackageDecl 0..134
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..129
+        TypeDecl 12..129
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwType 15..19 "type"
+            trail Whitespace " "
+          Identifier 20..24 "fifo"
+            trail Whitespace " "
+          KwIs 25..27 "is"
+            trail Whitespace " "
+          ProtectedTypeDef 28..129
+            KwProtected 28..37 "protected"
+            ProtectedTypeHeader 37..73
+              GenericClause 37..73
+                  lead Newline "\n"
+                  lead Whitespace "    "
+                KwGeneric 42..49 "generic"
+                  trail Whitespace " "
+                InterfaceList 50..72
+                  LParen 50..51 "("
+                  InterfaceObjectDecl 51..71
+                    IdentifierList 51..57
+                      Identifier 51..56 "depth"
+                        trail Whitespace " "
+                    Colon 57..58 ":"
+                      trail Whitespace " "
+                    SubtypeIndication 59..67
+                      SimpleName 59..67
+                        Identifier 59..66 "natural"
+                          trail Whitespace " "
+                    VarAssign 67..69 ":="
+                      trail Whitespace " "
+                    LiteralExpr 70..71
+                      IntegerLiteral 70..71 "8"
+                  RParen 71..72 ")"
+                Semicolon 72..73 ";"
+            DeclarativePart 73..107
+              SubprogramDecl 73..107
+                ProcedureSpec 73..106
+                    lead Newline "\n"
+                    lead Whitespace "    "
+                  KwProcedure 78..87 "procedure"
+                    trail Whitespace " "
+                  Identifier 88..92 "push"
+                    trail Whitespace " "
+                  ParameterList 93..106
+                    InterfaceList 93..106
+                      LParen 93..94 "("
+                      InterfaceObjectDecl 94..105
+                        IdentifierList 94..96
+                          Identifier 94..95 "x"
+                            trail Whitespace " "
+                        Colon 96..97 ":"
+                          trail Whitespace " "
+                        SubtypeIndication 98..105
+                          SimpleName 98..105
+                            Identifier 98..105 "integer"
+                      RParen 105..106 ")"
+                Semicolon 106..107 ";"
+            EndClause 107..129
+                lead Newline "\n"
+                lead Whitespace "  "
+              KwEnd 110..113 "end"
+                trail Whitespace " "
+              KwProtected 114..123 "protected"
+                trail Whitespace " "
+              Identifier 124..128 "fifo"
+              Semicolon 128..129 ";"
+      EndClause 129..134
+          lead Newline "\n"
+        KwEnd 130..133 "end"
+        Semicolon 133..134 ";"
+    lead Newline "\n"
+  EOF 135..135 ""

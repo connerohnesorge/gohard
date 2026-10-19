@@ -1,0 +1,73 @@
+DesignFile 0..95
+  DesignUnit 0..94
+    ContextClause 0..0
+    PackageDecl 0..94
+      KwPackage 0..7 "package"
+        trail Whitespace " "
+      Identifier 8..9 "p"
+        trail Whitespace " "
+      KwIs 10..12 "is"
+      DeclarativePart 12..89
+        SubprogramDecl 12..51
+          ProcedureSpec 12..50
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwProcedure 15..24 "procedure"
+              trail Whitespace " "
+            Identifier 25..26 "q"
+              trail Whitespace " "
+            ParameterList 27..50
+              KwParameter 27..36 "parameter"
+                trail Whitespace " "
+              InterfaceList 37..50
+                LParen 37..38 "("
+                InterfaceObjectDecl 38..49
+                  IdentifierList 38..40
+                    Identifier 38..39 "a"
+                      trail Whitespace " "
+                  Colon 40..41 ":"
+                    trail Whitespace " "
+                  SubtypeIndication 42..49
+                    SimpleName 42..49
+                      Identifier 42..49 "integer"
+                RParen 49..50 ")"
+          Semicolon 50..51 ";"
+        SubprogramDecl 51..89
+          ProcedureSpec 51..88
+              lead Newline "\n"
+              lead Whitespace "  "
+            KwProcedure 54..63 "procedure"
+              trail Whitespace " "
+            Identifier 64..65 "r"
+              trail Whitespace " "
+            ParameterList 66..88
+              InterfaceList 66..88
+                LParen 66..67 "("
+                InterfaceObjectDecl 67..78
+                  IdentifierList 67..69
+                    Identifier 67..68 "a"
+                      trail Whitespace " "
+                  Colon 69..70 ":"
+                    trail Whitespace " "
+                  SubtypeIndication 71..78
+                    SimpleName 71..78
+                      Identifier 71..78 "integer"
+                Semicolon 78..79 ";"
+                  trail Whitespace " "
+                InterfaceObjectDecl 80..87
+                  IdentifierList 80..82
+                    Identifier 80..81 "b"
+                      trail Whitespace " "
+                  Colon 82..83 ":"
+                    trail Whitespace " "
+                  SubtypeIndication 84..87
+                    SimpleName 84..87
+                      Identifier 84..87 "bit"
+                RParen 87..88 ")"
+          Semicolon 88..89 ";"
+      EndClause 89..94
+          lead Newline "\n"
+        KwEnd 90..93 "end"
+        Semicolon 93..94 ";"
+    lead Newline "\n"
+  EOF 95..95 ""
