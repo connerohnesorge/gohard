@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -18,7 +17,9 @@ import (
 // specialFS reports chosen names as a FIFO, a character device (what a
 // link to /dev/zero stats as) or a file over the size limit, and fails
 // the test if anything reads them: a real read would block forever or
-// never end.
+// never end. kinds is keyed by slash paths; env.FS names are OS paths
+// (Verify joins with filepath.Join, so they hold `\` on Windows), and
+// lookups normalize them the way simenv does.
 type specialFS struct {
 	env.FS
 	t     *testing.T
@@ -31,14 +32,14 @@ type specialInfo struct {
 }
 
 func (s specialFS) Stat(name string) (fs.FileInfo, error) {
-	if k, ok := s.kinds[name]; ok {
+	if k, ok := s.kinds[filepath.ToSlash(name)]; ok {
 		return k.info(name), nil
 	}
 	return s.FS.Stat(name)
 }
 
 func (s specialFS) ReadFile(name string) ([]byte, error) {
-	if _, ok := s.kinds[name]; ok {
+	if _, ok := s.kinds[filepath.ToSlash(name)]; ok {
 		s.t.Fatalf("ReadFile(%s): a special or oversize file was read",
 			name)
 	}
@@ -46,7 +47,7 @@ func (s specialFS) ReadFile(name string) ([]byte, error) {
 }
 
 func (k specialInfo) info(name string) fs.FileInfo {
-	return fakeInfo{name: path.Base(name), mode: k.mode, size: k.size}
+	return fakeInfo{name: filepath.Base(name), mode: k.mode, size: k.size}
 }
 
 type fakeInfo struct {

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"slices"
@@ -555,7 +556,8 @@ func TestNextSession(t *testing.T) {
 	if err != nil || n != 11 {
 		t.Fatalf("NextSession = %d %v", n, err)
 	}
-	if SessionName("rec", n) != "rec/11.jsonl" {
+	// SessionName is an env.FS name, an OS path.
+	if SessionName("rec", n) != filepath.FromSlash("rec/11.jsonl") {
 		t.Fatal(SessionName("rec", n))
 	}
 }
