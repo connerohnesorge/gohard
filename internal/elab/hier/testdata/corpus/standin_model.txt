@@ -1,0 +1,3 @@
+standin_model_tb entity work.standin_model_tb(sim)
+  standin_model_tb.dut entity work.standin_model(rtl)
+    standin_model_tb.dut.u_core entity work.crypt_core

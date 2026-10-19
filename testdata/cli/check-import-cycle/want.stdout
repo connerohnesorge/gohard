@@ -1,0 +1,2 @@
+pa.vhd:2:9: error[library/import-cycle]: import cycle: work.pa -> work.pb -> work.pc -> work.pa
+summary: 1 errors, 0 warnings, 0 hints, 3 files

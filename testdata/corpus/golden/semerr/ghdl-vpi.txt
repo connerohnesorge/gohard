@@ -1,0 +1,44 @@
+# GoHard semantic-error oracle (#34, R12): ghdl-vpi.txt.
+# Written by go run ./tools/oracle --update semerr; do not edit.
+# Each "run" is one analysis group of the project's own driver (a
+# testsuite.sh between cleans, a VESTS list, an NVC regression test or
+# unit-test block, a corpus design run, or a file no driver names,
+# alone under 2008): its files are analyzed in order, one command per
+# file, in a fresh work directory per tool ("dir" is the working
+# directory; the run's GHDL --std and the sha256 prefix of its sources
+# follow). Each file line is the argument, the library when not work,
+# the GHDL options, then per tool the exit code and the lines of that
+# file it reports errors on; "~" marks a line whose only errors are
+# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
+# reports an error on every line both tools report one on
+# (semerr_check.go).
+tool ghdl 6.0.0
+tool nvc 1.23.0
+run vpi/issue2856#1 dir=testdata/ghdl/testsuite/vpi/issue2856 std=93c sha=ef1895b53cbb593e
+ mwe.vhdl ghdl=0 nvc=0
+run vpi/issue2874#1 dir=testdata/ghdl/testsuite/vpi/issue2874 std=93c sha=58a06dc96c7e160d
+ mwe.vhdl ghdl=0 nvc=0
+run vpi/issue3149#1 dir=testdata/ghdl/testsuite/vpi/issue3149 std=93c sha=7210abbd37318f9f
+ mydesign.vhdl ghdl=0 nvc=0
+run vpi/vpi001#1 dir=testdata/ghdl/testsuite/vpi/vpi001 std=93c sha=a4dfc25b8e485c6d
+ mydesign.vhdl ghdl=0 nvc=0
+run vpi/vpi002#1 dir=testdata/ghdl/testsuite/vpi/vpi002 std=93c sha=aa727ccca672de0f
+ mydesign.vhdl ghdl=0 nvc=0
+run vpi/vpi003#1 dir=testdata/ghdl/testsuite/vpi/vpi003 std=93c sha=925e57d4ab10ea2e
+ mydesign.vhdl ghdl=0 nvc=0
+run vpi/vpi004#1 dir=testdata/ghdl/testsuite/vpi/vpi004 std=93c sha=5f6d146d6c52fd0d
+ mydesign.vhdl ghdl=0 nvc=0
+run vpi/vpi005#1 dir=testdata/ghdl/testsuite/vpi/vpi005 std=93c sha=1b888e24dd969d2c
+ mydesign.vhdl ghdl=0 nvc=0
+run vpi/vpi006#1 dir=testdata/ghdl/testsuite/vpi/vpi006 std=93c sha=d79e1f2a9151df07
+ mydesign.vhdl ghdl=0 nvc=0
+run vpi/vpi007#1 dir=testdata/ghdl/testsuite/vpi/vpi007 std=93c sha=a84897f7801f4385
+ mydesign.vhdl ghdl=0 nvc=0
+run vpi/vpi008#1 dir=testdata/ghdl/testsuite/vpi/vpi008 std=93c sha=28b1bf22e531a7ac
+ mydesign.vhdl ghdl=0 nvc=0
+run vpi/vpi009#1 dir=testdata/ghdl/testsuite/vpi/vpi009 std=93c sha=a1066563a44db4e9
+ repro1.vhdl ghdl=0 nvc=0
+run vpi/vpi010#1 dir=testdata/ghdl/testsuite/vpi/vpi010 std=93c sha=2f80b07e29b0acb1
+ repro1.vhdl ghdl=0 nvc=0
+run vpi/vpi011#1 dir=testdata/ghdl/testsuite/vpi/vpi011 std=93c sha=41fb97c23c488cc2
+ dut.vhdl ghdl=0 nvc=0

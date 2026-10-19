@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- prot_cond: entity with a shared-variable port of protected type.\n-- It increments the counter three times in one loop, in the same delta.\nuse work.prot_cond_pkg.all;\n\nentity prot_cond is\n  port (\n    variable c : inout counter_t\n  );\nend entity prot_cond;\n\narchitecture rtl of prot_cond is\nbegin\n  process\n  begin\n    for i in 1 to 3 loop\n      c.inc;\n    end loop;\n    wait;\n  end process;\nend architecture rtl;\n")

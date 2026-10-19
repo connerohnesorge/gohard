@@ -1,0 +1,10 @@
+top.vhd:9:32: error[sema/ambiguous-overload]: ambiguous =: "=" [length, length return BOOLEAN] from units_si; "=" [length, length return BOOLEAN] from units_us
+  units.vhd:4:8: note: candidate "=" [length, length return BOOLEAN] from units_si, predefined for the type declared here
+  units.vhd:10:8: note: candidate "=" [length, length return BOOLEAN] from units_us, predefined for the type declared here
+top.vhd:11:29: error[sema/ambiguous-overload]: ambiguous scale: scale [INTEGER return INTEGER] from units_si; scale [INTEGER return INTEGER] from units_us
+  units.vhd:5:12: note: candidate scale [INTEGER return INTEGER] from units_si
+  units.vhd:11:12: note: candidate scale [INTEGER return INTEGER] from units_us
+top.vhd:17:5: error[sema/ambiguous-overload]: ambiguous log: log [INTEGER] from units_si; log [INTEGER] from units_us
+  units.vhd:6:13: note: candidate log [INTEGER] from units_si
+  units.vhd:12:13: note: candidate log [INTEGER] from units_us
+summary: 3 errors, 0 warnings, 0 hints, 2 files

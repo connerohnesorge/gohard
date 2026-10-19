@@ -1,0 +1,2 @@
+overload_ops_tb entity work.overload_ops_tb(sim)
+  overload_ops_tb.dut entity work.overload_ops(rtl)

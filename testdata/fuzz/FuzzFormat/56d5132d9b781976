@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  process is\n  begin\n    case sel is\n      when \"00\" => x := 0;\n      when others => x := 1;\n    end case;\n    m : case? sel is\n      when \"1-\" => x := 2;\n      when others => null;\n    end case? m;\n  end process;\nend;\n")

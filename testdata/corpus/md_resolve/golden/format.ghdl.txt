@@ -1,0 +1,17 @@
+# GoHard formatter oracle (#32): md_resolve, ghdl.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool ghdl 6.0.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file md_resolve.vhd std=2008 sha256=8eef33745c66ffbe1e0e33553cf9e773baea13430f6deb62edbe7dd44c0a6e80 formatted=17f84dfb48d44a47e67831f9a9d131b67ac0c3896f2b26d7509c702ce4cae49c changed
+  exit original=0 formatted=0
+file md_resolve_tb.vhd std=2008 sha256=5c3404a2f31ee540680b6ee0e644eee23f1a6c30b5a17270406f4f9240f63e39 formatted=cae056dd0f66fd630e8d04cd8bcef7fc80786eaf554bd47754d8656e4382f8d4 changed
+  exit original=0 formatted=0
+result new=0

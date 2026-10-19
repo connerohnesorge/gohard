@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  u : entity work.f port map (a => inertial s and t);\nend;\n")

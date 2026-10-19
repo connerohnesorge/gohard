@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type node;\n  type node_ptr is access node;\n  type node is record\n    next_node : node_ptr;\n  end record;\nend;\n")

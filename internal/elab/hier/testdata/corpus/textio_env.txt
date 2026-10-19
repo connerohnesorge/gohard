@@ -1,0 +1,2 @@
+textio_env_tb entity work.textio_env_tb(sim)
+  textio_env_tb.dut entity work.textio_env(rtl)

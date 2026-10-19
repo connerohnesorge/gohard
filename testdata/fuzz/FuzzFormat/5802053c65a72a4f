@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  b1 : block (en = '1') is\n    signal t : bit;\n  begin\n    t <= guarded d;\n  end block b1;\nend;\n")

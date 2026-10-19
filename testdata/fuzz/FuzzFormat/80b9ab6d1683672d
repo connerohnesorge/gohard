@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type bus_t is record\n    req  : bit;\n    ack  : bit;\n  end record;\n  view master of bus_t is\n    req : out;\n    ack : in;\n  end view master;\n  alias slave is master'converse;\nend;\n")

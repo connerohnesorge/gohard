@@ -189,6 +189,10 @@ func (f osFS) Rename(oldname, newname string) error {
 	return os.Rename(f.abs(oldname), f.abs(newname))
 }
 
+func (f osFS) Chmod(name string, perm fs.FileMode) error {
+	return os.Chmod(f.abs(name), perm)
+}
+
 func (f osFS) Remove(name string) error { return os.Remove(f.abs(name)) }
 
 func (f osFS) MkdirAll(name string, perm fs.FileMode) error {

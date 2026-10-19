@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\n  property handshake (boolean r, q) is always (r -> next q);\nbegin\n  assert handshake(req, ack);\nend;\n")

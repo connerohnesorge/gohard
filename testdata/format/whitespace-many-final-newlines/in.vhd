@@ -1,0 +1,5 @@
+entity ws is
+end;
+
+
+

@@ -1,0 +1,15 @@
+hier_generate_tb entity work.hier_generate_tb(sim)
+  hier_generate_tb.dut entity work.hier_generate(rtl) n=4 base=2
+    hier_generate_tb.dut.lanes(0) for-generate
+      hier_generate_tb.dut.lanes(0).u entity work.hier_generate_lane(rtl) w=2 invert=false
+        hier_generate_tb.dut.lanes(0).u.polarity.pass if-generate
+    hier_generate_tb.dut.lanes(1) for-generate
+      hier_generate_tb.dut.lanes(1).u entity work.hier_generate_lane(rtl) w=3 invert=true
+        hier_generate_tb.dut.lanes(1).u.polarity.inv if-generate
+    hier_generate_tb.dut.lanes(2) for-generate
+      hier_generate_tb.dut.lanes(2).u entity work.hier_generate_lane(rtl) w=4 invert=false
+        hier_generate_tb.dut.lanes(2).u.polarity.pass if-generate
+    hier_generate_tb.dut.lanes(3) for-generate
+      hier_generate_tb.dut.lanes(3).u entity work.hier_generate_lane(rtl) w=5 invert=true
+        hier_generate_tb.dut.lanes(3).u.polarity.inv if-generate
+    hier_generate_tb.dut.tap.multi if-generate

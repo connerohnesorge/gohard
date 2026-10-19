@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package q is new work.p generic map (n => 8);\n")

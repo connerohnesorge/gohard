@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  alias one is '1' [return bit];\n  attribute code of '0' : literal is 2;\nend;\n")

@@ -1,0 +1,17 @@
+# GoHard formatter oracle (#32): psl_simple, ghdl.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool ghdl 6.0.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file psl_simple.vhd std=2008 sha256=4d85720ea51aa07205a8bec1b9c1fb6665e50b85d73b00d0f7d7d610a3fe3736 formatted=704ae18b35fdc0696929f2d617b50f41292120b4fb90a19b54ddc35951f91eac changed
+  exit original=0 formatted=0
+file psl_simple_tb.vhd std=2008 sha256=b08043ce71d13c03f691ec4a25ac7d3a745d85c2f94df6c7ee62679cdfed93ae formatted=739126add1a86d2f87a059f49c82fdac8b123383498471c664aaf2f8e5416d43 changed
+  exit original=0 formatted=0
+result new=0

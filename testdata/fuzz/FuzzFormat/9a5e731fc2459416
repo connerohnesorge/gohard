@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("entity e is\n  generic (\n    type t;\n    function eq (a, b : t) return boolean is <>;\n    function hash (a : t) return natural is default_hash\n  );\nend;\n")

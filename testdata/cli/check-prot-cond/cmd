@@ -1,0 +1,4 @@
+# The corpus design prot_cond (#8, milestone v1.1) under v1.0: exactly
+# the unsupported/construct diagnostics corpus.yaml records in
+# expected_v1_0, one per v1.1 construct, exit 2.
+gohard check

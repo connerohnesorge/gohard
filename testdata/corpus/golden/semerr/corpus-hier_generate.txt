@@ -1,0 +1,24 @@
+# GoHard semantic-error oracle (#34, R12): corpus-hier_generate.txt.
+# Written by go run ./tools/oracle --update semerr; do not edit.
+# Each "run" is one analysis group of the project's own driver (a
+# testsuite.sh between cleans, a VESTS list, an NVC regression test or
+# unit-test block, a corpus design run, or a file no driver names,
+# alone under 2008): its files are analyzed in order, one command per
+# file, in a fresh work directory per tool ("dir" is the working
+# directory; the run's GHDL --std and the sha256 prefix of its sources
+# follow). Each file line is the argument, the library when not work,
+# the GHDL options, then per tool the exit code and the lines of that
+# file it reports errors on; "~" marks a line whose only errors are
+# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
+# reports an error on every line both tools report one on
+# (semerr_check.go).
+tool ghdl 6.0.0
+tool nvc 1.23.0
+run corpus:hier_generate:main dir=testdata/corpus/hier_generate std=08 sha=db1f15226d59d1c5
+ hier_generate_lane.vhd ghdl=0 nvc=0
+ hier_generate.vhd ghdl=0 nvc=0
+ hier_generate_tb.vhd ghdl=0 nvc=0
+run corpus:hier_generate:width_err dir=testdata/corpus/hier_generate std=08 sha=8ce36adf8f61a33a
+ hier_generate_lane.vhd ghdl=0 nvc=0
+ hier_generate_width_err.vhd ghdl=0 nvc=0
+ hier_generate_tb.vhd ghdl=0 nvc=0

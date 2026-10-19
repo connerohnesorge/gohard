@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("configuration c of e is\n  for rtl\n    for u1 : comp\n      use entity work.f(a);\n      for a\n      end for;\n    end for;\n  end for;\nend;\n")

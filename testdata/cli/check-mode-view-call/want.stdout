@@ -1,0 +1,3 @@
+bus.vhd:30:11: error[sema/error]: the actual for out signal parameter o cannot be b.ack: it has mode in in view producer_v of port b
+bus.vhd:31:12: error[sema/error]: the actual for inout signal parameter o cannot be b.ack: it has mode in in view producer_v of port b
+summary: 2 errors, 0 warnings, 0 hints, 1 files

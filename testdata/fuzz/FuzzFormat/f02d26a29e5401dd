@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("entity e is\n  generic (\n    type el is private;\n    type ptr is access el\n  );\nend;\n")

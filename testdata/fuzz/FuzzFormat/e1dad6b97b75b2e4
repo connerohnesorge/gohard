@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  s <= a when sel = '1' else b;\n  t <= guarded c when en = '1' else unaffected;\nend;\n")

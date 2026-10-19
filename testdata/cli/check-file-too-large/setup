@@ -1,2 +1,4 @@
 size big.vhd 10000001
+# edge.vhd ends in a comment, so the NUL bytes the size directive
+# appends are comment text: the file is parsed and analyzed cleanly.
 size edge.vhd 10000000

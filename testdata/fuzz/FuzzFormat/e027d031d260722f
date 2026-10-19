@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("vprop pr {\n  property p1 is always a;\n}\n")

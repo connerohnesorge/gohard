@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  u1 : comp port map (a => s);\n  u2 : component comp generic map (n => 1) port map (s);\n  u3 : entity work.f(rtl) port map (a => s);\n  u4 : configuration work.cfg;\nend;\n")

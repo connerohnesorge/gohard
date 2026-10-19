@@ -1,0 +1,3 @@
+big.vhd:1:1: error[format/not-parsed]: file does not parse; it was not formatted
+big.vhd:1:1: warning[workspace/file-too-large]: file not parsed: size 10000001 bytes exceeds the limit of 10000000 bytes (10 MB)
+summary: 1 errors, 1 warnings, 0 hints, 2 files

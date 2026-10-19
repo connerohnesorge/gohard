@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("configuration c of e is\n  use work.p.all;\n  attribute a of rtl : architecture is 1;\n  for rtl\n  end for;\nend configuration c;\n")

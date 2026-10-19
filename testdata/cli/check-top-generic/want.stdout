@@ -1,0 +1,2 @@
+top.vhd:2:32: error[sema/static-error]: generic depth: value 0 is out of range 1 to 2147483647 in top
+summary: 1 errors, 0 warnings, 0 hints, 1 files

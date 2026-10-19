@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type word is array (0 to 15) of bit;\n  type grid is array (state, 1 to 3) of integer;\nend;\n")

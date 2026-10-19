@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- test: kind=none\n`if VHDL_VERSION = \"2019\" and TOOL_TYPE = \"SIMULATION\" and TOOL_VENDOR = \"gohard\" and TOOL_NAME = \"gohard\" and TOOL_EDITION = \"community\" then\npackage p is\nend;\n`end if\n")

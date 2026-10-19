@@ -1,0 +1,26 @@
+# GoHard formatter oracle (#32): hier_generate, nvc.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool nvc 1.23.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file hier_generate_lane.vhd std=2008 sha256=293ad36c616f9e53e653a124c695b93ac1cc6ee392331ab87fb10aa2db69a6b1 formatted=57b9eae92f8fec3daf4cf050934d2ae8e6a586ef11a6aa0444828246b11d38a4 changed
+  exit original=0 formatted=0
+file hier_generate.vhd std=2008 sha256=7debe2100be9df6ab158205e9520341c7a190f81d2f9cc3f359a8c84e28d9239 formatted=e81cb7129096573e4aca51fb0d9c5271cb02e7b4a2af21d937d656472acea326 changed
+  exit original=0 formatted=0
+file hier_generate_tb.vhd std=2008 sha256=1ec70448f93089db175343773f1b299bb3b8a13c1755fa48710251891c3dce02 formatted=48364181271ffb75d296ee79f7a123db992df81ca272f1ae99d426c3769f6685 changed
+  exit original=0 formatted=0
+run width_err std=2008
+file hier_generate_lane.vhd std=2008 sha256=293ad36c616f9e53e653a124c695b93ac1cc6ee392331ab87fb10aa2db69a6b1 formatted=57b9eae92f8fec3daf4cf050934d2ae8e6a586ef11a6aa0444828246b11d38a4 changed
+  exit original=0 formatted=0
+file hier_generate_width_err.vhd std=2008 sha256=3180ecfe818e3995afca98e407543e084bab8dc872abb5d2dd590d8389e8db43 formatted=20cb44723f58d811df247af5961176df0f053db72a571d873cdfc4a49c801621 changed
+  exit original=0 formatted=0
+file hier_generate_tb.vhd std=2008 sha256=1ec70448f93089db175343773f1b299bb3b8a13c1755fa48710251891c3dce02 formatted=48364181271ffb75d296ee79f7a123db992df81ca272f1ae99d426c3769f6685 changed
+  exit original=0 formatted=0
+result new=0

@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  s <= unaffected when en = '0' else d;\n  process is\n  begin\n    t <= unaffected;\n    wait;\n  end process;\nend;\n")

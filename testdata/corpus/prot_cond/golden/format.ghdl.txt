@@ -1,0 +1,26 @@
+# GoHard formatter oracle (#32): prot_cond, ghdl.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool ghdl 6.0.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2019
+file prot_cond_pkg.vhd std=2019 sha256=7862cd18908748ce8820dc2224a00f6620d9df0fa45fe9be38114b227d1f32c4 formatted=4d14991f0a39d1cd98f86673b57017eb3af96bfcb3af33a0de33522a845d3f63 changed
+  exit original=1 formatted=1
+  error 20: unknown tool directive "if" ignored
+  error 22: unknown tool directive "elsif" ignored
+  error 24: unknown tool directive "else" ignored
+  error 26: unknown tool directive "end" ignored
+  error 48: missing ";" at end of statement
+file prot_cond.vhd std=2019 sha256=377f602255f89397889fc802e16bc15af3ffdebacdd7ab470df02176953cbee4 formatted=377f602255f89397889fc802e16bc15af3ffdebacdd7ab470df02176953cbee4 unchanged
+  exit original=1 formatted=1
+  error 7: variable interface not allowed in generic or port clause
+file prot_cond_tb.vhd std=2019 sha256=5590de68c29b81a833f7f3891f5e403133b2b8b9ffb2b8183ce978776abfae30 formatted=a92d627a0a09328713512db076c2c89e10b39caad73686c5be542bf1c2db0c3a changed
+  exit original=1 formatted=1
+  error 84: missing ";" at end of statement
+result new=0

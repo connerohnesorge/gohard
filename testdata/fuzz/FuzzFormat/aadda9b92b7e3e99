@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  process is\n    variable v : integer;\n  begin\n    v := id generic map (t => integer) (4);\n    wait;\n  end process;\nend;\n")

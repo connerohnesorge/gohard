@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\n  sequence s1 is {req; ack};\nbegin\nend;\n")

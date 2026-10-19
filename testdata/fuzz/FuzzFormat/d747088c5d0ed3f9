@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("vmode m {\n  assume always not (a and b);\n}\n")

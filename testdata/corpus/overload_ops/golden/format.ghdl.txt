@@ -1,0 +1,19 @@
+# GoHard formatter oracle (#32): overload_ops, ghdl.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool ghdl 6.0.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file overload_ops_pkg.vhd std=2008 sha256=ae6e93efbbeae9eae61eea020171141e8543e066aa51b7db3e46984b8b308d59 formatted=44df65622d42c410da0cb17c7a96f197b55d5d1a808911fb017d0aef809ce387 changed
+  exit original=0 formatted=0
+file overload_ops.vhd std=2008 sha256=0cf19af9d079f7eeac98b677d6c8e73e1fb59d84f8590a374cdc92ba2e4a779f formatted=263d3c3b591aed1551dcb4b17eaade229fc9d7625990181145405fe19999bc64 changed
+  exit original=0 formatted=0
+file overload_ops_tb.vhd std=2008 sha256=f423cb5e1201085824eb4d2ec37a8426b9f052db596cd29f3bd20b3d5a6c2ced formatted=eb35dbeadaa8996a249dd28913d985c7afbfc10430fa0703a36d36538639d72c changed
+  exit original=0 formatted=0
+result new=0

@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- assert_fail: design under test for the assert_fail corpus design (#8).\n-- A 4-bit adder that is correct; the testbench expects a wrong sum on\n-- purpose so the run fails with known messages.\nlibrary ieee;\nuse ieee.std_logic_1164.all;\nuse ieee.numeric_std.all;\n\nentity assert_fail is\n  port (\n    a : in  unsigned(3 downto 0);\n    b : in  unsigned(3 downto 0);\n    s : out unsigned(3 downto 0)\n  );\nend entity assert_fail;\n\narchitecture rtl of assert_fail is\nbegin\n  s <= a + b;\nend architecture rtl;\n")

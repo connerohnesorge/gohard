@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\n  for u1 : comp use entity work.f;\n  for u2 : comp use entity work.f; end for;\nbegin\nend;\n")

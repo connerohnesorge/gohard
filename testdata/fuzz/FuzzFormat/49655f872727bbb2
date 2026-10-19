@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("context c is\n  library ieee;\n  use ieee.std_logic_1164.all;\n  context work.d;\nend context c;\n")

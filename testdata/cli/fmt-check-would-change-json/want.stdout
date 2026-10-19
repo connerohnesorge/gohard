@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "status": "problems",
+  "exit": 1,
+  "summary": {
+    "errors": 1,
+    "warnings": 0,
+    "hints": 0,
+    "files": 2
+  },
+  "diagnostics": [
+    {
+      "path": "a.vhd",
+      "line": 1,
+      "col": 1,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "format/would-change",
+      "message": "file is not formatted; run gohard fmt",
+      "related": []
+    }
+  ],
+  "incomplete": []
+}

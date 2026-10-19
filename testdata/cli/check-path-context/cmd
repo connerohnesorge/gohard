@@ -1,0 +1,4 @@
+# Only rtl/top.vhd is checked, but its names resolve against the whole
+# project: work.defs in pkg/defs.vhd is found, and the error in that
+# file is not reported.
+gohard check rtl/top.vhd

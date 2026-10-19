@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  function int_id is new id generic map (t => integer);\n  procedure bit_swap is new swap [bit, bit] generic map (t => bit);\nend;\n")

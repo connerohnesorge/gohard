@@ -1,0 +1,2 @@
+budget_hang_tb entity work.budget_hang_tb(sim)
+  budget_hang_tb.dut entity work.budget_hang(rtl)

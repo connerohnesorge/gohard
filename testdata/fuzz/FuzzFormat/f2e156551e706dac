@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  group pair is (signal, signal);\n  group many is (label <>);\nend;\n")

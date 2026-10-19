@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("entity e is\n  generic (constant n : integer := 1);\n  port (signal a, b : in bit := '0'; c : inout bit bus; l : linkage bit);\nend;\n")

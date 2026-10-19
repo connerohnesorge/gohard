@@ -1,0 +1,3 @@
+simulation:
+  models:
+    work.core: models/core_model.vhd

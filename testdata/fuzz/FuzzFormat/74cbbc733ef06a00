@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  restrict {rst; not rst[*]};\nend;\n")

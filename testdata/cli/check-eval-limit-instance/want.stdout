@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "status": "clean",
+  "exit": 0,
+  "summary": {
+    "errors": 0,
+    "warnings": 1,
+    "hints": 0,
+    "files": 1
+  },
+  "diagnostics": [
+    {
+      "path": "design.vhd",
+      "line": 27,
+      "col": 31,
+      "end_line": 27,
+      "end_col": 39,
+      "severity": "warning",
+      "code": "sema/eval-limit",
+      "message": "constant TOTAL of top.u_big could not be computed within 1,000,000 evaluation steps",
+      "related": []
+    }
+  ],
+  "incomplete": [
+    "top.u_big"
+  ]
+}

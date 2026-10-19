@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("configuration c of e is\n  for rtl\n    use work.p.all;\n    for gen(1)\n    end for;\n  end for;\nend;\n")

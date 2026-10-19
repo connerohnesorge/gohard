@@ -1,0 +1,3349 @@
+# GoHard semantic-error oracle (#34, R12): ghdl-synth.txt.
+# Written by go run ./tools/oracle --update semerr; do not edit.
+# Each "run" is one analysis group of the project's own driver (a
+# testsuite.sh between cleans, a VESTS list, an NVC regression test or
+# unit-test block, a corpus design run, or a file no driver names,
+# alone under 2008): its files are analyzed in order, one command per
+# file, in a fresh work directory per tool ("dir" is the working
+# directory; the run's GHDL --std and the sha256 prefix of its sources
+# follow). Each file line is the argument, the library when not work,
+# the GHDL options, then per tool the exit code and the lines of that
+# file it reports errors on; "~" marks a line whose only errors are
+# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
+# reports an error on every line both tools report one on
+# (semerr_check.go).
+tool ghdl 6.0.0
+tool nvc 1.23.0
+run synth/aggr01#1 dir=testdata/ghdl/testsuite/synth/aggr01 std=93c sha=3820d13ca9533835
+ aggr01.vhdl ghdl=0 nvc=0
+ tb_aggr01.vhdl ghdl=0 nvc=0
+run synth/aggr01#2 dir=testdata/ghdl/testsuite/synth/aggr01 std=93c sha=055c5d909a3b300c
+ aggr02.vhdl ghdl=0 nvc=0
+ tb_aggr02.vhdl ghdl=0 nvc=0
+run synth/aggr01#3 dir=testdata/ghdl/testsuite/synth/aggr01 std=93c sha=461e05daf5d2da96
+ aggr03.vhdl ghdl=0 nvc=0
+ tb_aggr03.vhdl ghdl=0 nvc=0
+run synth/aggr02#1 dir=testdata/ghdl/testsuite/synth/aggr02 std=93c sha=a611292d49ca0752
+ targ01.vhdl ghdl=0 nvc=0
+ tb_targ01.vhdl ghdl=0 nvc=0
+run synth/aggr02#2 dir=testdata/ghdl/testsuite/synth/aggr02 std=93c sha=7595f8eb22b0a73c
+ targ02.vhdl ghdl=0 nvc=0
+ tb_targ02.vhdl ghdl=0 nvc=0
+run synth/aggr02#3 dir=testdata/ghdl/testsuite/synth/aggr02 std=93c sha=ef18f01d89e20ec0
+ targ03.vhdl ghdl=0 nvc=0
+ tb_targ03.vhdl ghdl=0 nvc=0
+run synth/aggr02#4 dir=testdata/ghdl/testsuite/synth/aggr02 std=93c sha=91a8ae7e74f12d1a
+ targ04.vhdl ghdl=0 nvc=0
+run synth/aggr03#1 dir=testdata/ghdl/testsuite/synth/aggr03 std=08 sha=2ffdfd6c485ff7e5
+ conv01.vhdl ghdl=0 nvc=0
+ tb_conv01.vhdl ghdl=0 nvc=0
+run synth/anon01#1 dir=testdata/ghdl/testsuite/synth/anon01 std=08 sha=772d87ff04e68fd6
+ anon01.vhdl ghdl=0 nvc=0
+ tb_anon01.vhdl ghdl=0 nvc=0
+run synth/anon01#2 dir=testdata/ghdl/testsuite/synth/anon01 std=08 sha=f4f01e3faa10f1b3
+ anon02.vhdl ghdl=0 nvc=0
+run synth/arr01#1 dir=testdata/ghdl/testsuite/synth/arr01 std=93c sha=00799b92aacb4a34
+ arr01.vhdl ghdl=0 nvc=0
+ tb_arr01.vhdl ghdl=0 nvc=0
+run synth/arr01#2 dir=testdata/ghdl/testsuite/synth/arr01 std=93c sha=6c5c3f5a2d8bd57f
+ arr02.vhdl ghdl=0 nvc=0
+ tb_arr02.vhdl ghdl=0 nvc=0
+run synth/arr01#3 dir=testdata/ghdl/testsuite/synth/arr01 std=93c sha=b0c0cea0908842fb
+ arr04.vhdl ghdl=0 nvc=0
+ tb_arr04.vhdl ghdl=0 nvc=0
+run synth/arr01#4 dir=testdata/ghdl/testsuite/synth/arr01 std=93c sha=7b0ff6c8697757f3
+ arr05.vhdl ghdl=0 nvc=0
+ tb_arr05.vhdl ghdl=0 nvc=0
+run synth/arr01#5 dir=testdata/ghdl/testsuite/synth/arr01 std=93c sha=9032233b3c8a962f
+ arr06.vhdl ghdl=0 nvc=0
+ tb_arr06.vhdl ghdl=0 nvc=0
+run synth/arr01#6 dir=testdata/ghdl/testsuite/synth/arr01 std=93c sha=45209e22eadf7945
+ arr07.vhdl ghdl=0 nvc=0
+ tb_arr07.vhdl ghdl=0 nvc=0
+run synth/arr01#7 dir=testdata/ghdl/testsuite/synth/arr01 std=93c sha=23ed6f3027fcacd9
+ arr09.vhdl ghdl=0 nvc=0
+ tb_arr09.vhdl ghdl=0 nvc=0
+run synth/arr01#8 dir=testdata/ghdl/testsuite/synth/arr01 std=93c sha=48e6c9524979db44
+ arr10.vhdl ghdl=0 nvc=0
+ arr11.vhdl ghdl=0 nvc=0
+run synth/arr02#1 dir=testdata/ghdl/testsuite/synth/arr02 std=93c sha=e93b296e38aa8f48
+ arr01.vhdl ghdl=0 nvc=0
+ tb_arr01.vhdl ghdl=0 nvc=0
+run synth/arr02#2 dir=testdata/ghdl/testsuite/synth/arr02 std=93c sha=96ce4f2e29a6696c
+ arr02.vhdl ghdl=0 nvc=0
+ tb_arr02.vhdl ghdl=0 nvc=0
+run synth/arr02#3 dir=testdata/ghdl/testsuite/synth/arr02 std=93c sha=8a9c889c337e7fa8
+ arr03.vhdl ghdl=0 nvc=0
+ tb_arr03.vhdl ghdl=0 nvc=0
+run synth/arr03#1 dir=testdata/ghdl/testsuite/synth/arr03 std=93c sha=08469cf636e525ee
+ mdim01.vhdl ghdl=0 nvc=0
+ tb_mdim01.vhdl ghdl=0 nvc=0
+run synth/asgn01#1 dir=testdata/ghdl/testsuite/synth/asgn01 std=93c sha=61e97e2a3f0c45eb
+ asgn01.vhdl ghdl=0 nvc=0
+ tb_asgn01.vhdl ghdl=0 nvc=0
+run synth/asgn01#2 dir=testdata/ghdl/testsuite/synth/asgn01 std=93c sha=eff3f07c6a27bc40
+ asgn02.vhdl ghdl=0 nvc=0
+ tb_asgn02.vhdl ghdl=0 nvc=0
+run synth/asgn01#3 dir=testdata/ghdl/testsuite/synth/asgn01 std=93c sha=0236d34caa7d5de1
+ asgn03.vhdl ghdl=0 nvc=0
+ tb_asgn03.vhdl ghdl=0 nvc=0
+run synth/asgn01#4 dir=testdata/ghdl/testsuite/synth/asgn01 std=93c sha=3837d71b1b23dfd0
+ asgn04.vhdl ghdl=0 nvc=0
+ tb_asgn04.vhdl ghdl=0 nvc=0
+run synth/asgn01#5 dir=testdata/ghdl/testsuite/synth/asgn01 std=93c sha=f04f0d1cb61ffc3c
+ asgn05.vhdl ghdl=0 nvc=0
+ tb_asgn05.vhdl ghdl=0 nvc=0
+run synth/asgn01#6 dir=testdata/ghdl/testsuite/synth/asgn01 std=93c sha=c98ce2a237e941a3
+ asgn06.vhdl ghdl=0 nvc=0
+ tb_asgn06.vhdl ghdl=0 nvc=0
+run synth/asgn01#7 dir=testdata/ghdl/testsuite/synth/asgn01 std=93c sha=7c265cbe799ce261
+ asgn07.vhdl ghdl=0 nvc=0
+ tb_asgn07.vhdl ghdl=0 nvc=0
+run synth/asgn01#8 dir=testdata/ghdl/testsuite/synth/asgn01 std=93c sha=ea3f05de7b2c67d7
+ asgn08.vhdl ghdl=0 nvc=0
+ tb_asgn08.vhdl ghdl=0 nvc=0
+run synth/asgn01#9 dir=testdata/ghdl/testsuite/synth/asgn01 std=93c sha=b8e849fbb5a113b7
+ arr04.vhdl ghdl=0 nvc=0
+ tb_arr04.vhdl ghdl=0 nvc=0
+run synth/asgn01#10 dir=testdata/ghdl/testsuite/synth/asgn01 std=93c sha=7c78d28c5a715aaa
+ asgn09.vhdl ghdl=0 nvc=0
+ tb_asgn09.vhdl ghdl=0 nvc=0
+run synth/asgn01#11 dir=testdata/ghdl/testsuite/synth/asgn01 std=93c sha=0d7996905d3e1eb0
+ asgn10.vhdl ghdl=0 nvc=0
+ tb_asgn10.vhdl ghdl=0 nvc=0
+run synth/assertassumes0#1 dir=testdata/ghdl/testsuite/synth/assertassumes0 std=08 sha=f1ac2a26c6fee643
+ assert0.vhdl ghdl=0 nvc=1@17,19
+ assert0.vhdl ghdl=0 nvc=1@17,19
+run synth/assumeasserts0#1 dir=testdata/ghdl/testsuite/synth/assumeasserts0 std=08 sha=abdb8469cd65459a
+ assume0.vhdl ghdl=0 nvc=1@17
+ assume0.vhdl ghdl=0 nvc=1@17
+run synth/attr01#1 dir=testdata/ghdl/testsuite/synth/attr01 std=08 sha=c4615b3a778b585a
+ attr01.vhdl ghdl=0 nvc=0
+run synth/attr01#2 dir=testdata/ghdl/testsuite/synth/attr01 std=08 sha=623ce78028fc118e
+ attr02.vhdl ghdl=0 nvc=0
+run synth/attr01#3 dir=testdata/ghdl/testsuite/synth/attr01 std=08 sha=eb62da1658eeb8cb
+ attr04.vhdl ghdl=0 nvc=0
+run synth/attr01#4 dir=testdata/ghdl/testsuite/synth/attr01 std=93c sha=b2e216b404fbe6d8
+ attr03.vhdl -frelaxed ghdl=0 nvc=0
+ tb_attr03.vhdl -frelaxed ghdl=0 nvc=0
+run synth/attr02#1 dir=testdata/ghdl/testsuite/synth/attr02 std=93c sha=0d44461f081f859e
+ succ01.vhdl ghdl=0 nvc=0
+ tb_succ01.vhdl ghdl=0 nvc=0
+run synth/attr02#2 dir=testdata/ghdl/testsuite/synth/attr02 std=93c sha=b4f0c9d98b5c237f
+ pred01.vhdl ghdl=0 nvc=0
+ tb_pred01.vhdl ghdl=0 nvc=0
+run synth/attr02#3 dir=testdata/ghdl/testsuite/synth/attr02 std=93c sha=de12525b782f7916
+ leftof01.vhdl ghdl=0 nvc=0
+ tb_leftof01.vhdl ghdl=0 nvc=0
+run synth/attr02#4 dir=testdata/ghdl/testsuite/synth/attr02 std=93c sha=b82581f8b4340b10
+ rightof01.vhdl ghdl=0 nvc=0
+ tb_rightof01.vhdl ghdl=0 nvc=0
+run synth/attr02#5 dir=testdata/ghdl/testsuite/synth/attr02 std=93c sha=87009dab9f433d25
+ left01.vhdl ghdl=0 nvc=0
+ tb_left01.vhdl ghdl=0 nvc=0
+run synth/attr02#6 dir=testdata/ghdl/testsuite/synth/attr02 std=93c sha=ceaaa3ecb2ea16c9
+ err_last_val.vhdl ghdl=0 nvc=0
+ err_last_active.vhdl ghdl=0 nvc=0
+ err_last_event.vhdl ghdl=0 nvc=0
+ err_driving_value.vhdl ghdl=0 nvc=0
+ err_driving.vhdl ghdl=0 nvc=0
+ leftof02.vhdl ghdl=0 nvc=0
+ leftof02.vhdl ghdl=0 nvc=0
+run synth/attr02#7 dir=testdata/ghdl/testsuite/synth/attr02 std=93c sha=104688d65870c442
+ rightof02.vhdl ghdl=0 nvc=0
+ rightof02.vhdl ghdl=0 nvc=0
+run synth/attr02#8 dir=testdata/ghdl/testsuite/synth/attr02 std=93c sha=d3836294147fe5d4
+ name01.vhdl ghdl=0 nvc=0
+ name02.vhdl ghdl=0 nvc=0
+ leftof03.vhdl ghdl=0 nvc=0
+run synth/attr02#9 dir=testdata/ghdl/testsuite/synth/attr02 std=08 sha=fb199fe72590c973
+ right01.vhdl ghdl=0 nvc=0
+ tb_right01.vhdl ghdl=0 nvc=0
+run synth/bit01#1 dir=testdata/ghdl/testsuite/synth/bit01 std=93c sha=f6dc9a32790e65cb
+ not01.vhdl ghdl=0 nvc=0
+run synth/blackbox01#1 dir=testdata/ghdl/testsuite/synth/blackbox01 std=93c sha=a9beb0bc3a02e73e
+ blackbox1_adder.vhdl ghdl=0 nvc=0
+ blackbox1.vhdl ghdl=0 nvc=0
+ tb_blackbox1.vhdl ghdl=0 nvc=0
+run synth/blackbox01#2 dir=testdata/ghdl/testsuite/synth/blackbox01 std=93c sha=329c8684ab445d20
+ blackbox1.vhdl ghdl=0 nvc=0
+ blackbox1_adder.vhdl ghdl=0 nvc=0
+ tb_blackbox1.vhdl ghdl=0 nvc=0
+run synth/blackbox01#3 dir=testdata/ghdl/testsuite/synth/blackbox01 std=93c sha=2458554c667de064
+ blackbox1_adder_bb.vhdl ghdl=0 nvc=0
+ blackbox1.vhdl ghdl=0 nvc=0
+ blackbox1_adder.vhdl ghdl=0 nvc=0
+ tb_blackbox1.vhdl ghdl=0 nvc=0
+run synth/blackbox01#4 dir=testdata/ghdl/testsuite/synth/blackbox01 std=93c sha=4680c5aaa07d2d63
+ blackbox1_adder_err01.vhdl ghdl=0 nvc=0
+ blackbox1.vhdl ghdl=0 nvc=0
+ blackbox1_adder_err02.vhdl ghdl=0 nvc=0
+ blackbox1.vhdl ghdl=0 nvc=0
+ blackbox2.vhdl ghdl=0 nvc=0
+ blackbox2.vhdl ghdl=0 nvc=0
+run synth/block01#1 dir=testdata/ghdl/testsuite/synth/block01 std=93c sha=9d8417804f89a03b
+ block01.vhdl ghdl=0 nvc=0
+ tb_block01.vhdl ghdl=0 nvc=0
+run synth/block01#2 dir=testdata/ghdl/testsuite/synth/block01 std=93c sha=ccc70017eda554ef
+ block02.vhdl ghdl=0 nvc=0
+ tb_block02.vhdl ghdl=0 nvc=0
+run synth/bug01#1 dir=testdata/ghdl/testsuite/synth/bug01 std=93c sha=c06cc28fb076cfb4
+ display.vhdl ghdl=0 nvc=0
+run synth/bug02#1 dir=testdata/ghdl/testsuite/synth/bug02 std=93c sha=701bdf0e7d4cf871
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run synth/bug04#1 dir=testdata/ghdl/testsuite/synth/bug04 std=93 sha=e0f6646e08701737
+ io_pin.vhdl ghdl=0 nvc=0
+run synth/bug05#1 dir=testdata/ghdl/testsuite/synth/bug05 std=93c sha=7965a91f62163c3a
+ bug.vhdl ghdl=0 nvc=0
+run synth/case01#1 dir=testdata/ghdl/testsuite/synth/case01 std=93c sha=55468b971ecff28f
+ case01.vhdl ghdl=0 nvc=0
+ tb_case01.vhdl ghdl=0 nvc=0
+run synth/case01#2 dir=testdata/ghdl/testsuite/synth/case01 std=93c sha=c8fd895fb0e2ec53
+ case02.vhdl ghdl=0 nvc=0
+ tb_case02.vhdl ghdl=0 nvc=0
+run synth/case01#3 dir=testdata/ghdl/testsuite/synth/case01 std=93c sha=9c88149889a7ca9f
+ case03.vhdl ghdl=0 nvc=0
+ tb_case03.vhdl ghdl=0 nvc=0
+run synth/case01#4 dir=testdata/ghdl/testsuite/synth/case01 std=93c sha=ac51cb3d8f725184
+ case04.vhdl ghdl=0 nvc=0
+ tb_case04.vhdl ghdl=0 nvc=0
+run synth/case01#5 dir=testdata/ghdl/testsuite/synth/case01 std=93c sha=c435b5db73f80c59
+ tb_case01.vhdl ghdl=1@12 nvc=1@12
+ case05.vhdl ghdl=0 nvc=0
+ case06.vhdl ghdl=0 nvc=0
+ case07.vhdl ghdl=0 nvc=1
+run synth/case02#1 dir=testdata/ghdl/testsuite/synth/case02 std=93c sha=e09f24c19d3b8978
+ case01.vhdl ghdl=0 nvc=0
+ tb_case01.vhdl ghdl=0 nvc=0
+run synth/case02#2 dir=testdata/ghdl/testsuite/synth/case02 std=93c sha=6f5e12fc705e3528
+ case02.vhdl ghdl=0 nvc=0
+ tb_case02.vhdl ghdl=0 nvc=0
+run synth/case02#3 dir=testdata/ghdl/testsuite/synth/case02 std=93c sha=2d78225800ec7dc5
+ case03.vhdl ghdl=0 nvc=0
+ tb_case03.vhdl ghdl=0 nvc=0
+run synth/case02#4 dir=testdata/ghdl/testsuite/synth/case02 std=93c sha=a222e5abded39264
+ case04.vhdl ghdl=0 nvc=0
+ tb_case04.vhdl ghdl=0 nvc=0
+run synth/case02#5 dir=testdata/ghdl/testsuite/synth/case02 std=93c sha=851d9fdb7b1a8b6a
+ case05.vhdl ghdl=0 nvc=0
+ tb_case05.vhdl ghdl=0 nvc=0
+run synth/cli01#1 dir=testdata/ghdl/testsuite/synth/cli01 std=93c sha=9a7d85cd78110321
+ dpram1.vhdl ghdl=0 nvc=0
+ dpram1.vhdl ghdl=0 nvc=0
+ dpram1.vhdl ghdl=0 nvc=0
+run synth/cnt01#1 dir=testdata/ghdl/testsuite/synth/cnt01 std=93c sha=5e04a92d72797e2b
+ cnt01.vhdl ghdl=0 nvc=0
+ tb_cnt01.vhdl ghdl=0 nvc=0
+run synth/cnt01#2 dir=testdata/ghdl/testsuite/synth/cnt01 std=93c sha=8ae6e93f276d6017
+ cnt02.vhdl ghdl=0 nvc=0
+ tb_cnt02.vhdl ghdl=0 nvc=0
+run synth/cnt01#3 dir=testdata/ghdl/testsuite/synth/cnt01 std=93c sha=6ce57c539b8816a9
+ cnt04.vhdl ghdl=0 nvc=0
+ tb_cnt04.vhdl ghdl=0 nvc=0
+run synth/comp01#1 dir=testdata/ghdl/testsuite/synth/comp01 std=93c sha=f1be6c01997b573b
+ and3.vhdl ghdl=0 nvc=0
+ and6.vhdl ghdl=0 nvc=0
+ tb_and6.vhdl ghdl=0 nvc=0
+run synth/comp01#2 dir=testdata/ghdl/testsuite/synth/comp01 std=93c sha=f1be6c01997b573b
+ and3.vhdl ghdl=0 nvc=0
+ and6.vhdl ghdl=0 nvc=0
+ tb_and6.vhdl ghdl=0 nvc=0
+run synth/comp01#3 dir=testdata/ghdl/testsuite/synth/comp01 std=93c sha=f68d2402a635854e
+ and3.vhdl ghdl=0 nvc=0
+ and6comp.vhdl ghdl=0 nvc=0
+ tb_and6.vhdl ghdl=0 nvc=0
+run synth/comp01#4 dir=testdata/ghdl/testsuite/synth/comp01 std=93c sha=f68d2402a635854e
+ and3.vhdl ghdl=0 nvc=0
+ and6comp.vhdl ghdl=0 nvc=0
+ tb_and6.vhdl ghdl=0 nvc=0
+run synth/comp01#5 dir=testdata/ghdl/testsuite/synth/comp01 std=93c sha=310bd653483ae468
+ and3.vhdl ghdl=0 nvc=0
+ and6conf.vhdl ghdl=0 nvc=0
+ tb_and6.vhdl ghdl=0 nvc=0
+run synth/comp01#6 dir=testdata/ghdl/testsuite/synth/comp01 std=93c sha=62e747378fb2458d
+ and6comp.vhdl ghdl=0 nvc=0
+run synth/comp02#1 dir=testdata/ghdl/testsuite/synth/comp02 std=93c sha=85fa818b01b69004
+ pkg.vhdl ghdl=0 nvc=0
+ cmask.vhdl ghdl=0 nvc=0
+ mixer.vhdl ghdl=0 nvc=0
+ tb_mixer.vhdl ghdl=0 nvc=0
+run synth/comp02#2 dir=testdata/ghdl/testsuite/synth/comp02 std=93c sha=85fa818b01b69004
+ pkg.vhdl ghdl=0 nvc=0
+ cmask.vhdl ghdl=0 nvc=0
+ mixer.vhdl ghdl=0 nvc=0
+ tb_mixer.vhdl ghdl=0 nvc=0
+run synth/comp03#1 dir=testdata/ghdl/testsuite/synth/comp03 std=93c sha=5582450ae1fd6ef7
+ sub1.vhdl ghdl=0 nvc=0
+ comp03.vhdl ghdl=1@12 nvc=1@12
+ sub2.vhdl ghdl=0 nvc=0
+ comp04.vhdl ghdl=0 nvc=0
+run synth/comp04#1 dir=testdata/ghdl/testsuite/synth/comp04 std=93c sha=648d40e4964e5665
+ comp04.vhdl ghdl=0 nvc=0
+ tb_comp04.vhdl ghdl=0 nvc=0
+run synth/comp04#2 dir=testdata/ghdl/testsuite/synth/comp04 std=93c sha=1ae1fe802cd4a2cb
+ comp05.vhdl ghdl=0 nvc=0
+ tb_comp05.vhdl ghdl=0 nvc=0
+run synth/comp04#3 dir=testdata/ghdl/testsuite/synth/comp04 std=93c sha=a935406574cc5c9a
+ comp06.vhdl ghdl=0 nvc=0
+ tb_comp06.vhdl ghdl=0 nvc=0
+run synth/comp04#4 dir=testdata/ghdl/testsuite/synth/comp04 std=93c sha=648d40e4964e5665
+ comp04.vhdl ghdl=0 nvc=0
+ tb_comp04.vhdl ghdl=0 nvc=0
+run synth/comp04#5 dir=testdata/ghdl/testsuite/synth/comp04 std=93c sha=1ae1fe802cd4a2cb
+ comp05.vhdl ghdl=0 nvc=0
+ tb_comp05.vhdl ghdl=0 nvc=0
+run synth/comp04#6 dir=testdata/ghdl/testsuite/synth/comp04 std=93c sha=a935406574cc5c9a
+ comp06.vhdl ghdl=0 nvc=0
+ tb_comp06.vhdl ghdl=0 nvc=0
+run synth/comp05#1 dir=testdata/ghdl/testsuite/synth/comp05 std=93c sha=c8fc81f13b2b4209
+ inter01.vhdl ghdl=0 nvc=0
+run synth/comp05#2 dir=testdata/ghdl/testsuite/synth/comp05 std=08 sha=3c7f2d47e4f82786
+ inter02.vhdl ghdl=0 nvc=0
+ inter03.vhdl ghdl=0 nvc=0
+run synth/concat01#1 dir=testdata/ghdl/testsuite/synth/concat01 std=93c sha=93d5064a2c7121d0
+ concat01.vhdl ghdl=0 nvc=0
+ tb_concat01.vhdl ghdl=0 nvc=0
+run synth/const01#1 dir=testdata/ghdl/testsuite/synth/const01 std=93c sha=003a65b22f373616
+ const01.vhdl ghdl=0 nvc=0
+ tb_const01.vhdl ghdl=0 nvc=0
+run synth/const01#2 dir=testdata/ghdl/testsuite/synth/const01 std=93c sha=ea92fcb00848e9b8
+ const03.vhdl ghdl=0 nvc=0
+run synth/conv01#1 dir=testdata/ghdl/testsuite/synth/conv01 std=93c sha=b07e46009737241b
+ conv01.vhdl ghdl=0 nvc=0
+run synth/conv01#2 dir=testdata/ghdl/testsuite/synth/conv01 std=93c sha=2b9d12d5fc247594
+ pos01.vhdl ghdl=0 nvc=0
+run synth/conv01#3 dir=testdata/ghdl/testsuite/synth/conv01 std=93c sha=ec510c39fc9b9844
+ pos02.vhdl ghdl=0 nvc=0
+ convacc01.vhdl ghdl=0 nvc=0
+ convarr01.vhdl ghdl=0 nvc=0
+ convflt01.vhdl ghdl=0 nvc=0
+ convflt02.vhdl ghdl=0 nvc=0
+ convflt03.vhdl ghdl=0 nvc=0
+run synth/conv01#4 dir=testdata/ghdl/testsuite/synth/conv01 std=08 sha=f137f36bfb39ec87
+ convrec01.vhdl ghdl=0 nvc=0
+ convarr02.vhdl ghdl=0 nvc=0
+ convarr03.vhdl ghdl=0 nvc=2
+ convarr04.vhdl ghdl=0 nvc=0
+ convarr05.vhdl ghdl=0 nvc=0
+ convrec02.vhdl ghdl=0 nvc=0
+run synth/dff01#1 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=bc56b6300a4f4fd2
+ dff01.vhdl ghdl=0 nvc=0
+ tb_dff01.vhdl ghdl=0 nvc=0
+run synth/dff01#2 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=5c21b73780e8a618
+ dff01b.vhdl ghdl=0 nvc=0
+ tb_dff01b.vhdl ghdl=0 nvc=0
+run synth/dff01#3 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=4479364688938252
+ dff02.vhdl ghdl=0 nvc=0
+ tb_dff02.vhdl ghdl=0 nvc=0
+run synth/dff01#4 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=0a1286bb19dc44a5
+ dff03.vhdl ghdl=0 nvc=0
+ tb_dff03.vhdl ghdl=0 nvc=0
+run synth/dff01#5 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=9970f5b346f4b6aa
+ dff04.vhdl ghdl=0 nvc=0
+ tb_dff04.vhdl ghdl=0 nvc=0
+run synth/dff01#6 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=8934d19bb696a14a
+ dff05.vhdl ghdl=0 nvc=0
+ tb_dff05.vhdl ghdl=0 nvc=0
+run synth/dff01#7 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=0dd075e7e198ad5a
+ dff06.vhdl ghdl=0 nvc=0
+ tb_dff06.vhdl ghdl=0 nvc=0
+run synth/dff01#8 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=4c6c3e9a9f8ae211
+ dff07.vhdl ghdl=0 nvc=0
+ tb_dff07.vhdl ghdl=0 nvc=0
+run synth/dff01#9 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=3dd3f78993067cb6
+ dff08.vhdl ghdl=0 nvc=0
+ tb_dff08.vhdl ghdl=0 nvc=0
+run synth/dff01#10 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=f8b3f37bed7c01c1
+ dff09.vhdl ghdl=0 nvc=0
+ tb_dff09.vhdl ghdl=0 nvc=0
+run synth/dff01#11 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=03c2aea41bf5ebe1
+ dff10.vhdl ghdl=0 nvc=0
+ tb_dff10.vhdl ghdl=0 nvc=0
+run synth/dff01#12 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=300e5b649a2afc57
+ dff11.vhdl ghdl=0 nvc=0
+ tb_dff11.vhdl ghdl=0 nvc=0
+run synth/dff01#13 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=d8851667c18ceca8
+ dff12.vhdl ghdl=0 nvc=0
+ tb_dff12.vhdl ghdl=0 nvc=0
+run synth/dff01#14 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=234e3f3860af930a
+ dff13.vhdl ghdl=0 nvc=0
+ tb_dff13.vhdl ghdl=0 nvc=0
+run synth/dff01#15 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=5e791da42e708cc1
+ dff14.vhdl ghdl=0 nvc=0
+ tb_dff14.vhdl ghdl=0 nvc=0
+run synth/dff01#16 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=d6bd84d34bd9ca11
+ dff15.vhdl ghdl=0 nvc=0
+ tb_dff15.vhdl ghdl=0 nvc=0
+run synth/dff01#17 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=a84df92b7960c825
+ dff22.vhdl ghdl=0 nvc=0
+ tb_dff22.vhdl ghdl=0 nvc=0
+run synth/dff01#18 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=e5730b1c56c8d47f
+ dff24.vhdl ghdl=0 nvc=0
+ tb_dff24.vhdl ghdl=0 nvc=0
+run synth/dff01#19 dir=testdata/ghdl/testsuite/synth/dff01 std=93c sha=88eb9e498be02c92
+ dff18.vhdl ghdl=0 nvc=0
+ dff19.vhdl ghdl=0 nvc=0
+ dff20.vhdl ghdl=0 nvc=0
+ dff21.vhdl ghdl=0 nvc=0
+ dff23.vhdl ghdl=0 nvc=0
+run synth/dff02#1 dir=testdata/ghdl/testsuite/synth/dff02 std=93c sha=a366762d49d5342e
+ dff05.vhdl ghdl=0 nvc=0
+ tb_dff05.vhdl ghdl=0 nvc=0
+run synth/dff02#2 dir=testdata/ghdl/testsuite/synth/dff02 std=93c sha=ef639e0c17c8c312
+ dff08.vhdl ghdl=0 nvc=0
+ tb_dff08.vhdl ghdl=0 nvc=0
+run synth/dff02#3 dir=testdata/ghdl/testsuite/synth/dff02 std=93c sha=62de48a7b92cdba7
+ dff08a.vhdl ghdl=0 nvc=0
+ tb_dff08a.vhdl ghdl=0 nvc=0
+run synth/dff02#4 dir=testdata/ghdl/testsuite/synth/dff02 std=93c sha=8906bd25f35485b8
+ dff08b.vhdl ghdl=0 nvc=0
+ tb_dff08b.vhdl ghdl=0 nvc=0
+run synth/dff02#5 dir=testdata/ghdl/testsuite/synth/dff02 std=93c sha=4c3a611a8371f279
+ dff08c.vhdl ghdl=0 nvc=0
+ tb_dff08c.vhdl ghdl=0 nvc=0
+run synth/dff02#6 dir=testdata/ghdl/testsuite/synth/dff02 std=93c sha=278141b89e09cdbe
+ dff08d.vhdl ghdl=0 nvc=0
+ tb_dff08d.vhdl ghdl=0 nvc=0
+run synth/dff02#7 dir=testdata/ghdl/testsuite/synth/dff02 std=93c sha=c12b6372d905cd3a
+ dff09.vhdl ghdl=0 nvc=0
+ tb_dff09.vhdl ghdl=0 nvc=0
+run synth/dff03#1 dir=testdata/ghdl/testsuite/synth/dff03 std=93c sha=fbd51bdbaf51d5fa
+ dff01.vhdl ghdl=0 nvc=0
+ tb_dff01.vhdl ghdl=0 nvc=0
+run synth/dff03#2 dir=testdata/ghdl/testsuite/synth/dff03 std=93c sha=bda9f0d577345a20
+ dff02.vhdl ghdl=0 nvc=0
+ tb_dff02.vhdl ghdl=0 nvc=0
+run synth/dff03#3 dir=testdata/ghdl/testsuite/synth/dff03 std=93c sha=e57f7d40cfb816dd
+ dff03.vhdl ghdl=0 nvc=0
+ tb_dff03.vhdl ghdl=0 nvc=0
+run synth/dff03#4 dir=testdata/ghdl/testsuite/synth/dff03 std=93c sha=53a15fcb4686d911
+ dff04.vhdl ghdl=0 nvc=0
+ tb_dff04.vhdl ghdl=0 nvc=0
+run synth/dff03#5 dir=testdata/ghdl/testsuite/synth/dff03 std=93c sha=008c3e88905a983e
+ dff05.vhdl ghdl=0 nvc=0
+ tb_dff05.vhdl ghdl=0 nvc=0
+run synth/dff03#6 dir=testdata/ghdl/testsuite/synth/dff03 std=93c sha=d2e0036b8db140a9
+ dff06.vhdl ghdl=0 nvc=0
+ tb_dff06.vhdl ghdl=0 nvc=0
+run synth/dff03#7 dir=testdata/ghdl/testsuite/synth/dff03 std=93c sha=c6b716bc3725c99f
+ dff07.vhdl ghdl=0 nvc=0
+ tb_dff07.vhdl ghdl=0 nvc=0
+run synth/dff05#1 dir=testdata/ghdl/testsuite/synth/dff05 std=93c sha=50d86f1ab46fb181
+ dff01.vhdl ghdl=0 nvc=0
+ tb_dff01.vhdl ghdl=0 nvc=0
+run synth/dff05#2 dir=testdata/ghdl/testsuite/synth/dff05 std=93c sha=f52a472833a253bd
+ dff02.vhdl ghdl=0 nvc=0
+ tb_dff02.vhdl ghdl=0 nvc=0
+run synth/dispin01#1 dir=testdata/ghdl/testsuite/synth/dispin01 std=93c sha=7f5259ef2d931972
+ pkg_rec01.vhdl ghdl=0 nvc=0
+ rec01.vhdl ghdl=0 nvc=0
+ tb_rec01.vhdl ghdl=0 nvc=0
+run synth/dispin01#2 dir=testdata/ghdl/testsuite/synth/dispin01 std=93c sha=72c0c738ee9332e5
+ pkg_rec01.vhdl ghdl=0 nvc=0
+ rec01.vhdl ghdl=0 nvc=0
+ pkg_rec01.vhdl ghdl=0 nvc=0
+ tb_rec01.vhdl ghdl=1@12 nvc=0
+run synth/dispin01#3 dir=testdata/ghdl/testsuite/synth/dispin01 std=93c sha=ac3b73657c86b615
+ pkg_rec02.vhdl ghdl=0 nvc=0
+ rec02.vhdl ghdl=0 nvc=0
+ tb_rec02.vhdl ghdl=0 nvc=0
+run synth/dispin01#4 dir=testdata/ghdl/testsuite/synth/dispin01 std=93c sha=adc5f8d44b1cd359
+ pkg_rec02.vhdl ghdl=0 nvc=0
+ rec02.vhdl ghdl=0 nvc=0
+ pkg_rec02.vhdl ghdl=0 nvc=0
+ tb_rec02.vhdl ghdl=1@12 nvc=0
+run synth/dispin01#5 dir=testdata/ghdl/testsuite/synth/dispin01 std=93c sha=4e7ddcc03a3258a8
+ pkg_rec03.vhdl ghdl=0 nvc=0
+ rec03.vhdl ghdl=0 nvc=0
+ tb_rec03.vhdl ghdl=0 nvc=0
+run synth/dispin01#6 dir=testdata/ghdl/testsuite/synth/dispin01 std=93c sha=faa12d5766d716be
+ pkg_rec03.vhdl ghdl=0 nvc=0
+ rec03.vhdl ghdl=0 nvc=0
+ pkg_rec03.vhdl ghdl=0 nvc=0
+ tb_rec03.vhdl ghdl=1@12 nvc=0
+run synth/dispin01#7 dir=testdata/ghdl/testsuite/synth/dispin01 std=93c sha=ed53f24cdb6588ec
+ pkg_rec04.vhdl ghdl=0 nvc=0
+ rec04.vhdl ghdl=0 nvc=0
+ tb_rec04.vhdl ghdl=0 nvc=0
+run synth/dispin01#8 dir=testdata/ghdl/testsuite/synth/dispin01 std=93c sha=35103b2b9054edd0
+ pkg_rec04.vhdl ghdl=0 nvc=0
+ rec04.vhdl ghdl=0 nvc=0
+ pkg_rec04.vhdl ghdl=0 nvc=0
+ tb_rec04.vhdl ghdl=1@12 nvc=0
+run synth/dispin01#9 dir=testdata/ghdl/testsuite/synth/dispin01 std=93c sha=fb03a0a1aa75816d
+ pkg_rec05.vhdl ghdl=0 nvc=0
+ rec05.vhdl ghdl=0 nvc=0
+ tb_rec05.vhdl ghdl=0 nvc=0
+run synth/dispin01#10 dir=testdata/ghdl/testsuite/synth/dispin01 std=93c sha=555070c081d3a5cf
+ pkg_rec05.vhdl ghdl=0 nvc=0
+ rec05.vhdl ghdl=0 nvc=0
+ pkg_rec05.vhdl ghdl=0 nvc=0
+ tb_rec05.vhdl ghdl=1@12 nvc=0
+run synth/dispin01#11 dir=testdata/ghdl/testsuite/synth/dispin01 std=93c sha=7824732d5ccaa463
+ pkg_rec06.vhdl ghdl=0 nvc=0
+ rec06.vhdl ghdl=0 nvc=0
+ tb_rec06.vhdl ghdl=0 nvc=0
+run synth/dispin01#12 dir=testdata/ghdl/testsuite/synth/dispin01 std=93c sha=0fd02b710b7c3da1
+ pkg_rec06.vhdl ghdl=0 nvc=0
+ rec06.vhdl ghdl=0 nvc=0
+ pkg_rec06.vhdl ghdl=0 nvc=0
+ tb_rec06.vhdl ghdl=1@12 nvc=0
+run synth/dispout01#1 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=f8acfacf7f0725fe
+ pkg_rec01.vhdl ghdl=0 nvc=0
+ rec01.vhdl ghdl=0 nvc=0
+ tb_rec01.vhdl ghdl=0 nvc=0
+run synth/dispout01#2 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=d0690ae2fac8fae3
+ pkg_rec01.vhdl ghdl=0 nvc=0
+ rec01.vhdl ghdl=0 nvc=0
+ pkg_rec01.vhdl ghdl=0 nvc=0
+ tb_rec01.vhdl ghdl=1@12 nvc=0
+run synth/dispout01#3 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=e514a04fcf1ac401
+ pkg_rec02.vhdl ghdl=0 nvc=0
+ rec02.vhdl ghdl=0 nvc=0
+ tb_rec02.vhdl ghdl=0 nvc=0
+run synth/dispout01#4 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=c860d5cfea9738a6
+ pkg_rec02.vhdl ghdl=0 nvc=0
+ rec02.vhdl ghdl=0 nvc=0
+ pkg_rec02.vhdl ghdl=0 nvc=0
+ tb_rec02.vhdl ghdl=1@12 nvc=0
+run synth/dispout01#5 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=751f297b192195ef
+ pkg_rec03.vhdl ghdl=0 nvc=0
+ rec03.vhdl ghdl=0 nvc=0
+ tb_rec03.vhdl ghdl=0 nvc=0
+run synth/dispout01#6 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=c70d9400cb40be86
+ pkg_rec03.vhdl ghdl=0 nvc=0
+ rec03.vhdl ghdl=0 nvc=0
+ pkg_rec03.vhdl ghdl=0 nvc=0
+ tb_rec03.vhdl ghdl=1@12 nvc=0
+run synth/dispout01#7 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=3d0f642ac2b7d17e
+ pkg_rec04.vhdl ghdl=0 nvc=0
+ rec04.vhdl ghdl=0 nvc=0
+ tb_rec04.vhdl ghdl=0 nvc=0
+run synth/dispout01#8 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=1c8b10105c7cccca
+ pkg_rec04.vhdl ghdl=0 nvc=0
+ rec04.vhdl ghdl=0 nvc=0
+ pkg_rec04.vhdl ghdl=0 nvc=0
+ tb_rec04.vhdl ghdl=1@12 nvc=0
+run synth/dispout01#9 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=81622b6685fe6f06
+ pkg_rec05.vhdl ghdl=0 nvc=0
+ rec05.vhdl ghdl=0 nvc=0
+ tb_rec05.vhdl ghdl=0 nvc=0
+run synth/dispout01#10 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=76a658f3708eef0e
+ pkg_rec05.vhdl ghdl=0 nvc=0
+ rec05.vhdl ghdl=0 nvc=0
+ pkg_rec05.vhdl ghdl=0 nvc=0
+ tb_rec05.vhdl ghdl=1@12 nvc=0
+run synth/dispout01#11 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=30dd8b1d1180f644
+ pkg_rec06.vhdl ghdl=0 nvc=0
+ rec06.vhdl ghdl=0 nvc=0
+ tb_rec06.vhdl ghdl=0 nvc=0
+run synth/dispout01#12 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=6e5216d3807c40e5
+ pkg_rec06.vhdl ghdl=0 nvc=0
+ rec06.vhdl ghdl=0 nvc=0
+ pkg_rec06.vhdl ghdl=0 nvc=0
+ tb_rec06.vhdl ghdl=1@12 nvc=0
+run synth/dispout01#13 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=9a9e1321abafaa7c
+ pkg_rec07.vhdl ghdl=0 nvc=0
+ rec07.vhdl ghdl=0 nvc=0
+ tb_rec07.vhdl ghdl=0 nvc=0
+run synth/dispout01#14 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=33c08fe7ef1c1d87
+ pkg_rec07.vhdl ghdl=0 nvc=0
+ rec07.vhdl ghdl=0 nvc=0
+ pkg_rec07.vhdl ghdl=0 nvc=0
+ tb_rec07.vhdl ghdl=1@12 nvc=0
+run synth/dispout01#15 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=65abac04989b55d2
+ pkg_rec08.vhdl ghdl=0 nvc=0
+ rec08.vhdl ghdl=0 nvc=0
+ tb_rec08.vhdl ghdl=0 nvc=0
+run synth/dispout01#16 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=73f249e5980426fe
+ pkg_rec08.vhdl ghdl=0 nvc=0
+ rec08.vhdl ghdl=0 nvc=0
+ pkg_rec08.vhdl ghdl=0 nvc=0
+ tb_rec08.vhdl ghdl=1@12 nvc=0
+run synth/dispout01#17 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=c5dd802d5b49bb84
+ pkg_rec09.vhdl ghdl=0 nvc=0
+ rec09.vhdl ghdl=0 nvc=0
+ tb_rec09.vhdl ghdl=0 nvc=0
+run synth/dispout01#18 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=e71c0dc68ab6d4e2
+ pkg_rec09.vhdl ghdl=0 nvc=0
+ rec09.vhdl ghdl=0 nvc=0
+ pkg_rec09.vhdl ghdl=0 nvc=0
+ tb_rec09.vhdl ghdl=1@12 nvc=0
+run synth/dispout01#19 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=8169bf10528be11d
+ pkg_rec10.vhdl ghdl=0 nvc=0
+ rec10.vhdl ghdl=0 nvc=0
+ tb_rec10.vhdl ghdl=0 nvc=0
+run synth/dispout01#20 dir=testdata/ghdl/testsuite/synth/dispout01 std=93c sha=a186e3d6769bb179
+ pkg_rec10.vhdl ghdl=0 nvc=0
+ rec10.vhdl ghdl=0 nvc=0
+ pkg_rec10.vhdl ghdl=0 nvc=0
+ tb_rec10.vhdl ghdl=1@12 nvc=0
+run synth/dispvhdl01#1 dir=testdata/ghdl/testsuite/synth/dispvhdl01 std=93c sha=5af361f5a777a4a4
+ pkg.vhdl ghdl=0 nvc=0
+ vhd01.vhdl ghdl=0 nvc=0
+ tb_vhd01.vhdl ghdl=0 nvc=0
+run synth/dispvhdl01#2 dir=testdata/ghdl/testsuite/synth/dispvhdl01 std=93c sha=8c3a559940160cf9
+ pkg.vhdl ghdl=0 nvc=0
+ vhd01.vhdl ghdl=0 nvc=0
+ pkg.vhdl ghdl=0 nvc=0
+ tb_vhd01.vhdl ghdl=1@11 nvc=0
+run synth/dispvhdl01#3 dir=testdata/ghdl/testsuite/synth/dispvhdl01 std=93c sha=6be3dbaecef4b0bc
+ pkg.vhdl ghdl=0 nvc=0
+ vhd02.vhdl ghdl=0 nvc=0
+ tb_vhd02.vhdl ghdl=0 nvc=0
+run synth/dispvhdl01#4 dir=testdata/ghdl/testsuite/synth/dispvhdl01 std=93c sha=f70ade9146d820ca
+ pkg.vhdl ghdl=0 nvc=0
+ vhd02.vhdl ghdl=0 nvc=0
+ pkg.vhdl ghdl=0 nvc=0
+ tb_vhd02.vhdl ghdl=1@11 nvc=0
+run synth/dump01#1 dir=testdata/ghdl/testsuite/synth/dump01 std=93c sha=e41e0a97158b9352
+ adder.vhdl ghdl=0 nvc=0
+ adder.vhdl ghdl=0 nvc=0
+run synth/enum01#1 dir=testdata/ghdl/testsuite/synth/enum01 std=93c sha=c549b4f097ba9ad2
+ test_pkg.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=0 nvc=0
+run synth/enum01#2 dir=testdata/ghdl/testsuite/synth/enum01 std=93c sha=307e49016ed8a868
+ test_pkg.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+ test_pkg.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=1@50 nvc=0
+run synth/enum01#3 dir=testdata/ghdl/testsuite/synth/enum01 std=93c sha=b210a99d55725b9e
+ test_pkg.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+run synth/err01#1 dir=testdata/ghdl/testsuite/synth/err01 std=93c sha=d8aca580f144cb9d
+ err01.vhdl ghdl=0 nvc=0
+ err02.vhdl ghdl=0 nvc=0
+ err_slv1.vhdl ghdl=0 nvc=0
+ err_vect1.vhdl ghdl=0 nvc=0
+ err_elab01.vhdl ghdl=0 nvc=0
+ err_elab01.vhdl -frelaxed ghdl=0 nvc=0
+ err_elab02.vhdl ghdl=0 nvc=0
+ err_elab02.vhdl -frelaxed ghdl=0 nvc=0
+ err_elab03.vhdl ghdl=0 nvc=0
+ err_elab03.vhdl -frelaxed ghdl=0 nvc=0
+ err_elab04.vhdl ghdl=0 nvc=0
+ err_elab04.vhdl -frelaxed ghdl=0 nvc=0
+ case01.vhdl ghdl=0 nvc=0
+ err_idx01.vhdl ghdl=0 nvc=0
+ err_idx02.vhdl ghdl=0 nvc=0
+ err_idx03.vhdl ghdl=0 nvc=0
+ err_idx04.vhdl ghdl=0 nvc=0
+ err_asgn01.vhdl ghdl=0 nvc=0
+ err_slice01.vhdl ghdl=0 nvc=0
+ err_acc01.vhdl ghdl=0 nvc=0
+ err_lit01.vhdl ghdl=0 nvc=0
+ err_conv01.vhdl ghdl=0 nvc=0
+ err_op02.vhdl ghdl=0 nvc=0
+ err_assert01.vhdl ghdl=0 nvc=0
+ err_assert02.vhdl ghdl=0 nvc=0
+ err_assert03.vhdl ghdl=0 nvc=0
+ err_resize01.vhdl ghdl=0 nvc=0
+ err_resize02.vhdl ghdl=0 nvc=0
+ err_flt01.vhdl ghdl=0 nvc=0
+ err_phy01.vhdl ghdl=0 nvc=0
+ err_process01.vhdl ghdl=0 nvc=0
+ err_process02.vhdl ghdl=0 nvc=0
+ err_process03.vhdl ghdl=0 nvc=0
+ err_process04.vhdl ghdl=0 nvc=0
+ err_process05.vhdl ghdl=0 nvc=0
+ foreign01.vhdl ghdl=0 nvc=0
+ foreign02.vhdl ghdl=0 nvc=0
+ err_var01.vhdl ghdl=0 nvc=0
+ err_image01.vhdl ghdl=0 nvc=0
+ err_value01.vhdl ghdl=0 nvc=0
+ err_value02.vhdl ghdl=0 nvc=0
+ err_value03.vhdl ghdl=0 nvc=0
+ err_value04.vhdl ghdl=0 nvc=0
+ err_value05.vhdl ghdl=0 nvc=0
+ err_value06.vhdl ghdl=0 nvc=0
+ err_value07.vhdl ghdl=0 nvc=0
+run synth/err01#2 dir=testdata/ghdl/testsuite/synth/err01 std=08 sha=51b12fc2095b0fdf
+ err_slv2.vhdl ghdl=0 nvc=0
+ err_concat01.vhdl ghdl=0 nvc=1@14
+ err_concat02.vhdl ghdl=0 nvc=0
+ err_concat03.vhdl ghdl=0 nvc=0
+ err_concat04.vhdl ghdl=0 nvc=1@14
+ err_concat05.vhdl ghdl=0 nvc=1@16
+ err_concat06.vhdl ghdl=0 nvc=0
+ err_concat07.vhdl ghdl=0 nvc=1@16
+ err_concat08.vhdl ghdl=0 nvc=0
+ err_tostr01.vhdl ghdl=0 nvc=0
+ eq01.vhdl ghdl=0 nvc=0
+ tb_eq01.vhdl ghdl=0 nvc=0
+run synth/err01#3 dir=testdata/ghdl/testsuite/synth/err01 std=08 sha=8d4780722ca4b113
+ err_prot01.vhdl ghdl=0 nvc=0
+run synth/exit01#1 dir=testdata/ghdl/testsuite/synth/exit01 std=93c sha=1f8bc535d322920e
+ exit01.vhdl ghdl=0 nvc=0
+ tb_exit01.vhdl ghdl=0 nvc=0
+run synth/exit01#2 dir=testdata/ghdl/testsuite/synth/exit01 std=93c sha=5c149f3b41f193db
+ exit02.vhdl ghdl=0 nvc=0
+ tb_exit02.vhdl ghdl=0 nvc=0
+run synth/external01#1 dir=testdata/ghdl/testsuite/synth/external01 std=08 sha=8b09989c475280e8
+ external01.vhdl ghdl=0 nvc=0
+ external02.vhdl ghdl=0 nvc=0
+ external03.vhdl ghdl=0 nvc=0
+ external04.vhdl ghdl=0 nvc=0
+ external02.vhdl ghdl=0 nvc=0
+ externalerr01.vhdl ghdl=0 nvc=1@58
+ externalerr03.vhdl ghdl=0 nvc=0
+ externalerr04.vhdl ghdl=0 nvc=0
+ externalerr05.vhdl ghdl=0 nvc=0
+ externalerr06.vhdl ghdl=0 nvc=0
+ externalerr07.vhdl ghdl=0 nvc=0
+ externalerr08.vhdl ghdl=0 nvc=0
+ externalerr09.vhdl ghdl=0 nvc=0
+ externalerr10.vhdl ghdl=0 nvc=0
+ externalerr11.vhdl ghdl=0 nvc=0
+ externalerr12.vhdl ghdl=0 nvc=0
+ externalerr13.vhdl ghdl=0 nvc=0
+ externalerr14.vhdl ghdl=1@59 nvc=1@59
+ externalerr15.vhdl ghdl=0 nvc=0
+run synth/file01#1 dir=testdata/ghdl/testsuite/synth/file01 std=08 sha=b74536cbbd24dbe4
+ file02.vhdl ghdl=0 nvc=0
+ gen_file_ints.vhdl ghdl=0 nvc=0
+ gen_file_vec.vhdl ghdl=0 nvc=0
+ file03.vhdl ghdl=0 nvc=0
+ file04.vhdl ghdl=0 nvc=0
+ file05.vhdl ghdl=0 nvc=0
+ file06.vhdl ghdl=0 nvc=0
+ file07.vhdl ghdl=0 nvc=0
+ file08.vhdl ghdl=0 nvc=0
+ file09.vhdl ghdl=0 nvc=0
+ file10.vhdl ghdl=0 nvc=0
+ file11.vhdl ghdl=0 nvc=0
+ file12.vhdl ghdl=0 nvc=0
+ file13.vhdl ghdl=0 nvc=0
+run synth/forgen01#1 dir=testdata/ghdl/testsuite/synth/forgen01 std=93c sha=465a00dd861139f2
+ forgen01.vhdl ghdl=0 nvc=0
+ tb_forgen01.vhdl ghdl=0 nvc=0
+run synth/forgen01#2 dir=testdata/ghdl/testsuite/synth/forgen01 std=93c sha=89350259daf5f66d
+ forgen02.vhdl ghdl=0 nvc=0
+ tb_forgen02.vhdl ghdl=0 nvc=0
+run synth/forgen01#3 dir=testdata/ghdl/testsuite/synth/forgen01 std=93c sha=a73e98172e3a24ce
+ forgen03.vhdl ghdl=0 nvc=0
+ tb_forgen03.vhdl ghdl=0 nvc=0
+run synth/fsm01#1 dir=testdata/ghdl/testsuite/synth/fsm01 std=93c sha=d81e142fbc696d5c
+ fsm_2s.vhdl ghdl=0 nvc=0
+ tb_fsm_2s.vhdl ghdl=0 nvc=0
+run synth/fsm01#2 dir=testdata/ghdl/testsuite/synth/fsm01 std=93c sha=f2826077ede037eb
+ fsm_3s.vhdl ghdl=0 nvc=0
+ tb_fsm_3s.vhdl ghdl=0 nvc=0
+run synth/fsm01#3 dir=testdata/ghdl/testsuite/synth/fsm01 std=93c sha=f8fd5e80374ce60f
+ fsm_4s.vhdl ghdl=0 nvc=0
+ tb_fsm_4s.vhdl ghdl=0 nvc=0
+run synth/fsm01#4 dir=testdata/ghdl/testsuite/synth/fsm01 std=93c sha=cbff552a202f4c7c
+ fsm_5s.vhdl ghdl=0 nvc=0
+ tb_fsm_5s.vhdl ghdl=0 nvc=0
+run synth/fsm01#5 dir=testdata/ghdl/testsuite/synth/fsm01 std=93c sha=69f4ffe145da4eba
+ fsm_6s.vhdl ghdl=0 nvc=0
+ tb_fsm_6s.vhdl ghdl=0 nvc=0
+run synth/fsm01#6 dir=testdata/ghdl/testsuite/synth/fsm01 std=93c sha=6833dd7721068b7c
+ fsm_7s.vhdl ghdl=0 nvc=0
+ tb_fsm_7s.vhdl ghdl=0 nvc=0
+run synth/fsm02#1 dir=testdata/ghdl/testsuite/synth/fsm02 std=93c sha=0e7f25d34e1bab5b
+ recv.vhdl -fpsl ghdl=0 nvc=0
+ tb_recv.vhdl -fpsl ghdl=0 nvc=0
+run synth/fsm02#2 dir=testdata/ghdl/testsuite/synth/fsm02 std=93c sha=0e7f25d34e1bab5b
+ recv.vhdl -fpsl ghdl=0 nvc=0
+ tb_recv.vhdl ghdl=0 nvc=0
+run synth/func01#1 dir=testdata/ghdl/testsuite/synth/func01 std=93c sha=bf7475ece2d66134
+ func01.vhdl ghdl=0 nvc=0
+ tb_func01.vhdl ghdl=0 nvc=0
+run synth/func01#2 dir=testdata/ghdl/testsuite/synth/func01 std=93c sha=5c49d44330336d26
+ func02.vhdl ghdl=0 nvc=0
+ tb_func02.vhdl ghdl=0 nvc=0
+run synth/func01#3 dir=testdata/ghdl/testsuite/synth/func01 std=93c sha=2ea70775cb6efaf4
+ func03.vhdl ghdl=0 nvc=0
+ tb_func03.vhdl ghdl=0 nvc=0
+run synth/func01#4 dir=testdata/ghdl/testsuite/synth/func01 std=93c sha=fc1c303c0813edb9
+ func04.vhdl ghdl=0 nvc=0
+ tb_func04.vhdl ghdl=0 nvc=0
+run synth/func01#5 dir=testdata/ghdl/testsuite/synth/func01 std=93c sha=1cd5e72815733b15
+ func05.vhdl ghdl=0 nvc=0
+ tb_func05.vhdl ghdl=0 nvc=0
+run synth/func01#6 dir=testdata/ghdl/testsuite/synth/func01 std=93c sha=20c985ed0f133f0d
+ func06.vhdl ghdl=0 nvc=0
+ tb_func06.vhdl ghdl=0 nvc=0
+run synth/func01#7 dir=testdata/ghdl/testsuite/synth/func01 std=93c sha=4c9e5dce675d7299
+ func07.vhdl ghdl=0 nvc=0
+ tb_func07.vhdl ghdl=0 nvc=0
+run synth/func01#8 dir=testdata/ghdl/testsuite/synth/func01 std=93c sha=0068b4b609a09f04
+ func08b.vhdl ghdl=0 nvc=0
+ tb_func08b.vhdl ghdl=0 nvc=0
+run synth/func01#9 dir=testdata/ghdl/testsuite/synth/func01 std=93c sha=e86c96810ae7e880
+ func08.vhdl ghdl=0 nvc=0
+ tb_func08.vhdl ghdl=0 nvc=0
+run synth/func02#1 dir=testdata/ghdl/testsuite/synth/func02 std=93c sha=704b9727f08ad376
+ func01.vhdl ghdl=0 nvc=0
+ tb_func01.vhdl ghdl=0 nvc=0
+run synth/func02#2 dir=testdata/ghdl/testsuite/synth/func02 std=93c sha=704b9727f08ad376
+ func01.vhdl ghdl=0 nvc=0
+ tb_func01.vhdl ghdl=0 nvc=0
+run synth/func03#1 dir=testdata/ghdl/testsuite/synth/func03 std=93c sha=f83f3b1c6b11dcb7
+ func01.vhdl ghdl=0 nvc=0
+ tb_func01.vhdl ghdl=0 nvc=0
+run synth/func03#2 dir=testdata/ghdl/testsuite/synth/func03 std=93c sha=90e55543a6c46941
+ func03.vhdl ghdl=0 nvc=0
+run synth/func03#3 dir=testdata/ghdl/testsuite/synth/func03 std=08 sha=12e8dba098bd4f9e
+ func04.vhdl ghdl=0 nvc=0
+ func06.vhdl ghdl=0 nvc=0
+ tb_func06.vhdl ghdl=0 nvc=0
+run synth/func03#4 dir=testdata/ghdl/testsuite/synth/func03 std=08 sha=98d9154eb8b87d5b
+ func07.vhdl ghdl=0 nvc=0
+run synth/gen01#1 dir=testdata/ghdl/testsuite/synth/gen01 std=08 sha=cb60f17637dc72da
+ dly1.vhdl ghdl=0 nvc=0
+ tb_dly1.vhdl ghdl=0 nvc=0
+run synth/gen01#2 dir=testdata/ghdl/testsuite/synth/gen01 std=08 sha=bb03fbed3598961b
+ dly1.vhdl ghdl=0 nvc=0
+ dly2.vhdl ghdl=0 nvc=0
+ dly3.vhdl ghdl=0 nvc=0
+ pkg01.vhdl ghdl=0 nvc=0
+ pkg02.vhdl ghdl=0 nvc=0
+ pkg03.vhdl ghdl=0 nvc=0
+ pkg04.vhdl ghdl=0 nvc=0
+run synth/iassoc01#1 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=94ada099993905d0
+ iassoc01.vhdl ghdl=1@1,4,8~,18~ nvc=1@1,8,20
+ tb_iassoc01.vhdl ghdl=1@12 nvc=1@12
+ pkg.vhdl ghdl=0 nvc=0
+run synth/iassoc01#2 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=c559d96fc6aeefe3
+ iassoc02.vhdl ghdl=1@1,5,8~,19~ nvc=1@1,8,21
+ tb_iassoc02.vhdl ghdl=1@12 nvc=1@12
+ pkg.vhdl ghdl=0 nvc=0
+run synth/iassoc01#3 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=d0657e7a6f6655ed
+ iassoc03.vhdl ghdl=1@1,4,8~,26~ nvc=1@1,8,28
+ tb_iassoc03.vhdl ghdl=1@12 nvc=1@12
+ pkg.vhdl ghdl=0 nvc=0
+run synth/iassoc01#4 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=1ab02ea708d0e593
+ iassoc04.vhdl ghdl=0 nvc=0
+ tb_iassoc04.vhdl ghdl=0 nvc=0
+ pkg.vhdl ghdl=0 nvc=0
+run synth/iassoc01#5 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=6e7f6182ef5abda2
+ iassoc11.vhdl ghdl=1@1,4,8~,18,20~ nvc=1@1,8,18
+ tb_iassoc11.vhdl ghdl=1@12 nvc=1@12
+ pkg.vhdl ghdl=0 nvc=0
+run synth/iassoc01#6 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=3e058cb99785685a
+ iassoc12.vhdl ghdl=1@1,5,8~,19,21~ nvc=1@1,8,19
+ tb_iassoc12.vhdl ghdl=1@12 nvc=1@12
+ pkg.vhdl ghdl=0 nvc=0
+run synth/if01#1 dir=testdata/ghdl/testsuite/synth/if01 std=93c sha=d29e52934594cdda
+ if01.vhdl ghdl=0 nvc=0
+ tb_if01.vhdl ghdl=0 nvc=0
+run synth/if01#2 dir=testdata/ghdl/testsuite/synth/if01 std=93c sha=615073e0263d5537
+ if02.vhdl ghdl=0 nvc=0
+ tb_if02.vhdl ghdl=0 nvc=0
+run synth/if02#1 dir=testdata/ghdl/testsuite/synth/if02 std=93c sha=254ff5456e330d79
+ if01.vhdl ghdl=0 nvc=0
+ if02.vhdl ghdl=0 nvc=0
+ if03.vhdl ghdl=0 nvc=0
+run synth/if03#1 dir=testdata/ghdl/testsuite/synth/if03 std=93c sha=261d442079b1c45b
+ if01.vhdl ghdl=0 nvc=0
+ tb_if01.vhdl ghdl=0 nvc=0
+run synth/img01#1 dir=testdata/ghdl/testsuite/synth/img01 std=93c sha=6fc83c03176cd873
+ img01.vhdl ghdl=0 nvc=0
+run synth/img01#2 dir=testdata/ghdl/testsuite/synth/img01 std=08 sha=a45c6ab627959d3c
+ img02.vhdl ghdl=0 nvc=0
+ img03.vhdl ghdl=0 nvc=0
+ img04.vhdl ghdl=0 nvc=0
+ img05.vhdl ghdl=0 nvc=0
+ img06.vhdl ghdl=0 nvc=0
+ img07.vhdl ghdl=0 nvc=0
+ img08.vhdl ghdl=0 nvc=0
+run synth/insert01#1 dir=testdata/ghdl/testsuite/synth/insert01 std=93c sha=497d77c3179f08de
+ insert01.vhdl ghdl=0 nvc=0
+ tb_insert01.vhdl ghdl=0 nvc=0
+run synth/insert01#2 dir=testdata/ghdl/testsuite/synth/insert01 std=93c sha=fcbc608ce1086415
+ insert02.vhdl ghdl=0 nvc=0
+ tb_insert02.vhdl ghdl=0 nvc=0
+run synth/int01#1 dir=testdata/ghdl/testsuite/synth/int01 std=93c sha=d58ea5049e511880
+ int_operators.vhdl ghdl=0 nvc=0
+run synth/int01#2 dir=testdata/ghdl/testsuite/synth/int01 std=93c sha=f76373e1a9f48e79
+ prio02.vhdl ghdl=0 nvc=0
+ tb_prio02.vhdl ghdl=0 nvc=0
+run synth/issue1002#1 dir=testdata/ghdl/testsuite/synth/issue1002 std=93c sha=ff1d15c76c55feda
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1004#1 dir=testdata/ghdl/testsuite/synth/issue1004 std=08 sha=e15b4dfb47709f92
+ test.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+ tb_test2.vhdl ghdl=0 nvc=0
+run synth/issue1005#1 dir=testdata/ghdl/testsuite/synth/issue1005 std=08 sha=67aa0ebef15f8fba
+ test.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+run synth/issue1006#1 dir=testdata/ghdl/testsuite/synth/issue1006 std=93c sha=439f2b65a8544052
+ test_package.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+ test_package.vhdl ghdl=0 nvc=0
+run synth/issue1007#1 dir=testdata/ghdl/testsuite/synth/issue1007 std=93c sha=ec33fc5c1d5ebc33
+ test_entity.vhdl ghdl=0 nvc=0
+ test_wrapper.vhdl ghdl=0 nvc=0
+run synth/issue1008#1 dir=testdata/ghdl/testsuite/synth/issue1008 std=08 sha=14d49a3ae7440fb5
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1008#2 dir=testdata/ghdl/testsuite/synth/issue1008 std=08 sha=29787947130a2446
+ test_orig.vhdl ghdl=0 nvc=0
+run synth/issue1009#1 dir=testdata/ghdl/testsuite/synth/issue1009 std=93c sha=7cf4cef730cc217c
+ record_test.vhdl ghdl=0 nvc=0
+ array_test.vhdl ghdl=0 nvc=0
+run synth/issue1011#1 dir=testdata/ghdl/testsuite/synth/issue1011 std=93c sha=773a3a36eb249120
+ record_test.vhdl ghdl=0 nvc=0
+run synth/issue1014#1 dir=testdata/ghdl/testsuite/synth/issue1014 std=93c sha=35b28c2cb1fc65e2
+ record_test.vhdl ghdl=0 nvc=0
+ tb_record_test.vhdl ghdl=0 nvc=0
+run synth/issue1018#1 dir=testdata/ghdl/testsuite/synth/issue1018 std=93c sha=db80cd578494efe9
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1021#1 dir=testdata/ghdl/testsuite/synth/issue1021 std=08 sha=f97ce64c7a1e929a
+ test.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=0 nvc=0
+run synth/issue1023#1 dir=testdata/ghdl/testsuite/synth/issue1023 std=93c sha=7a3a40f60fe5b7f8
+ barrel_shifter.vhdl ghdl=0 nvc=0
+run synth/issue1025#1 dir=testdata/ghdl/testsuite/synth/issue1025 std=08 sha=a41acb94949d408d
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1032#1 dir=testdata/ghdl/testsuite/synth/issue1032 std=93c sha=3473a94b60801bb1
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1033#1 dir=testdata/ghdl/testsuite/synth/issue1033 std=93c sha=32a85eef8d3540ed
+ ent.vhdl ghdl=0 nvc=0
+ entcos.vhdl ghdl=0 nvc=0
+run synth/issue1034#1 dir=testdata/ghdl/testsuite/synth/issue1034 std=93c sha=1f6829c9f78b6536
+ ent.vhdl ghdl=1@1,8,12~ nvc=1@1,12
+ tb_ent.vhdl ghdl=1@10 nvc=1@10
+ p.vhdl ghdl=0 nvc=0
+run synth/issue1035#1 dir=testdata/ghdl/testsuite/synth/issue1035 std=08 sha=0f7a15210ec73aab
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1036#1 dir=testdata/ghdl/testsuite/synth/issue1036 std=08 sha=4f2cf3def343a3ae
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1039#1 dir=testdata/ghdl/testsuite/synth/issue1039 std=93c sha=f1fa4482adf89432
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1041#1 dir=testdata/ghdl/testsuite/synth/issue1041 std=08 sha=31a3fb05d9983bb3
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1042#1 dir=testdata/ghdl/testsuite/synth/issue1042 std=93c sha=62bd5ccf394de06c
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1043#1 dir=testdata/ghdl/testsuite/synth/issue1043 std=93c sha=beda608d2b82bc73
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1044#1 dir=testdata/ghdl/testsuite/synth/issue1044 std=93c sha=189efa6c6d0ec802
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1046#1 dir=testdata/ghdl/testsuite/synth/issue1046 std=93c sha=405795b0ac2bb8cb
+ concat01.vhdl ghdl=0 nvc=0
+ tb_concat01.vhdl ghdl=0 nvc=0
+run synth/issue1047#1 dir=testdata/ghdl/testsuite/synth/issue1047 std=93c sha=026051c23601fc57
+ top.vhdl ghdl=0 nvc=0
+run synth/issue1050#1 dir=testdata/ghdl/testsuite/synth/issue1050 std=93c sha=d1837bdcfda9f88d
+ top.vhdl ghdl=0 nvc=0
+run synth/issue1054#1 dir=testdata/ghdl/testsuite/synth/issue1054 std=93c sha=06956f7097752119
+ simple01.vhdl ghdl=0 nvc=0
+ tb_simple01.vhdl ghdl=0 nvc=0
+run synth/issue1058#1 dir=testdata/ghdl/testsuite/synth/issue1058 std=93c sha=e7ab3dbf1d0fa7b2
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1062#1 dir=testdata/ghdl/testsuite/synth/issue1062 std=93c sha=8c6d852652af2e18
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=1@10 nvc=1@10
+run synth/issue1064#1 dir=testdata/ghdl/testsuite/synth/issue1064 std=08 sha=866ef70c076e657a
+ test.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=0 nvc=0
+run synth/issue1064#2 dir=testdata/ghdl/testsuite/synth/issue1064 std=08 sha=b20ea11d2b52ef8d
+ testrec.vhdl ghdl=0 nvc=0
+ tb_testrec.vhdl ghdl=0 nvc=0
+run synth/issue1068#1 dir=testdata/ghdl/testsuite/synth/issue1068 std=93c sha=22bd477cf77043b8
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1069#1 dir=testdata/ghdl/testsuite/synth/issue1069 std=93c sha=240ad26ce13022d8
+ tdp_ram.vhdl ghdl=0 nvc=0
+ tb_tdp_ram.vhdl ghdl=0 nvc=0
+run synth/issue1069#2 dir=testdata/ghdl/testsuite/synth/issue1069 std=93c sha=76cf49ce979f57bf
+ tdp_ram2.vhdl ghdl=0 nvc=0
+ tb_tdp_ram2.vhdl ghdl=0 nvc=0
+run synth/issue1069#3 dir=testdata/ghdl/testsuite/synth/issue1069 std=93c sha=4f0fd8a5f92ea285
+ ram3.vhdl ghdl=0 nvc=0
+ tb_ram3.vhdl ghdl=0 nvc=0
+run synth/issue1069#4 dir=testdata/ghdl/testsuite/synth/issue1069 std=93c sha=0a3bc5fe67d309b6
+ ram4.vhdl ghdl=0 nvc=0
+ tb_ram4.vhdl ghdl=0 nvc=0
+run synth/issue1069#5 dir=testdata/ghdl/testsuite/synth/issue1069 std=93c sha=ac63da6c7998b380
+ ram5.vhdl ghdl=0 nvc=0
+ tb_ram5.vhdl ghdl=0 nvc=0
+run synth/issue1074#1 dir=testdata/ghdl/testsuite/synth/issue1074 std=93c sha=ae7c160252825c79
+ blinky.vhdl ghdl=0 nvc=0
+run synth/issue1075#1 dir=testdata/ghdl/testsuite/synth/issue1075 std=93c sha=3c98b8049fb54f85
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1076#1 dir=testdata/ghdl/testsuite/synth/issue1076 std=08 sha=95cb296e12682d2b
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1076#2 dir=testdata/ghdl/testsuite/synth/issue1076 std=08 sha=d2d5960adbe87411
+ ent2.vhdl ghdl=0 nvc=0
+ tb_ent2.vhdl ghdl=0 nvc=0
+run synth/issue1077#1 dir=testdata/ghdl/testsuite/synth/issue1077 std=08 sha=85e45d2a649e11da
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1078#1 dir=testdata/ghdl/testsuite/synth/issue1078 std=93c sha=46b0f9211a5277b2
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1079#1 dir=testdata/ghdl/testsuite/synth/issue1079 std=93c sha=00ba884a8e084a9b
+ test.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+ tb_test2.vhdl ghdl=0 nvc=0
+run synth/issue1079#2 dir=testdata/ghdl/testsuite/synth/issue1079 std=93c sha=9972e722d65624cf
+ test2n.vhdl ghdl=0 nvc=0
+ tb_test2n.vhdl ghdl=0 nvc=0
+run synth/issue1080#1 dir=testdata/ghdl/testsuite/synth/issue1080 std=93c sha=6938492b589221f6
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue1080#2 dir=testdata/ghdl/testsuite/synth/issue1080 std=93c sha=861219af9a2ff32d
+ repro2.vhdl ghdl=0 nvc=0
+run synth/issue1080#3 dir=testdata/ghdl/testsuite/synth/issue1080 std=93c sha=a482de865cef14ce
+ repro2_1.vhdl ghdl=0 nvc=0
+run synth/issue1080#4 dir=testdata/ghdl/testsuite/synth/issue1080 std=93c sha=15db410331692e7c
+ repro3.vhdl ghdl=0 nvc=0
+run synth/issue1080#5 dir=testdata/ghdl/testsuite/synth/issue1080 std=93c sha=31888bf7fd7fe9c3
+ repro4.vhdl ghdl=0 nvc=0
+run synth/issue1080#6 dir=testdata/ghdl/testsuite/synth/issue1080 std=93c sha=d8ca8b1f63172d46
+ repro3_1.vhdl ghdl=0 nvc=0
+ tb_repro3_1.vhdl ghdl=0 nvc=0
+run synth/issue1081#1 dir=testdata/ghdl/testsuite/synth/issue1081 std=93c sha=7c4defe5e159a60e
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1082#1 dir=testdata/ghdl/testsuite/synth/issue1082 std=08 sha=bf97ebf15571a4c7
+ test.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=0 nvc=0
+run synth/issue1083#1 dir=testdata/ghdl/testsuite/synth/issue1083 std=93c sha=f8cb3e9216c96c40
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1086#1 dir=testdata/ghdl/testsuite/synth/issue1086 std=08 sha=52f246fd7cb189ca
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1090#1 dir=testdata/ghdl/testsuite/synth/issue1090 std=93c sha=d04696cba56af28e
+ simple_ram.vhdl ghdl=0 nvc=0
+ tb_simple_ram.vhdl ghdl=0 nvc=0
+run synth/issue1090#2 dir=testdata/ghdl/testsuite/synth/issue1090 std=93c sha=8cff99b0bfa24ea7
+ ram2.vhdl ghdl=0 nvc=0
+ tb_ram2.vhdl ghdl=0 nvc=0
+run synth/issue1090#3 dir=testdata/ghdl/testsuite/synth/issue1090 std=93c sha=a127e40b8a0b1ed3
+ ram3.vhdl ghdl=0 nvc=0
+ tb_ram3.vhdl ghdl=0 nvc=0
+run synth/issue1090#4 dir=testdata/ghdl/testsuite/synth/issue1090 std=93c sha=7c08bc130751a4da
+ ram4.vhdl ghdl=0 nvc=0
+ tb_ram4.vhdl ghdl=0 nvc=0
+run synth/issue1095#1 dir=testdata/ghdl/testsuite/synth/issue1095 std=08 sha=2cf273913ef1f0fc
+ top.vhdl ghdl=0 nvc=0
+run synth/issue1096#1 dir=testdata/ghdl/testsuite/synth/issue1096 std=93c sha=a6c8cd63bbe33733
+ my_entity.vhdl ghdl=0 nvc=0
+ tb_my_entity.vhdl ghdl=0 nvc=0
+run synth/issue1099#1 dir=testdata/ghdl/testsuite/synth/issue1099 std=93c sha=4df6a248ac7eb320
+ top.vhdl ghdl=0 nvc=0
+run synth/issue1100#1 dir=testdata/ghdl/testsuite/synth/issue1100 std=08 sha=f8377769c745222b
+ repro.vhdl ghdl=0 nvc=0
+ tb_repro.vhdl ghdl=0 nvc=0
+run synth/issue1101#1 dir=testdata/ghdl/testsuite/synth/issue1101 std=08 sha=0fd403591a09ef46
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1107#1 dir=testdata/ghdl/testsuite/synth/issue1107 std=93c sha=5247187ee70de235
+ unconnected.vhdl ghdl=0 nvc=0
+run synth/issue1109#1 dir=testdata/ghdl/testsuite/synth/issue1109 std=08 sha=946c904e5e5bdd81
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1113#1 dir=testdata/ghdl/testsuite/synth/issue1113 std=93c sha=a6f301cbc6d54f9e
+ memory_depth_one.vhdl ghdl=0 nvc=0
+run synth/issue1114#1 dir=testdata/ghdl/testsuite/synth/issue1114 std=93c sha=386586e7fa61e5c6
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1116#1 dir=testdata/ghdl/testsuite/synth/issue1116 std=93c sha=b5263bd5bc7835f9
+ ent1.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+run synth/issue1117#1 dir=testdata/ghdl/testsuite/synth/issue1117 std=93c sha=043fd4ead5aa70bd
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1117#2 dir=testdata/ghdl/testsuite/synth/issue1117 std=93c sha=043fd4ead5aa70bd
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1122#1 dir=testdata/ghdl/testsuite/synth/issue1122 std=93c sha=ee482f60139e77c1
+ mult.vhd ghdl=1@4,10,11,14~ nvc=1@4,14
+ mult_pkg.vhd ghdl=0 nvc=0
+ mult_pkg.vhd ghdl=0 nvc=0
+run synth/issue1122#2 dir=testdata/ghdl/testsuite/synth/issue1122 std=93c sha=8c0f13996e63da41
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue1122#3 dir=testdata/ghdl/testsuite/synth/issue1122 std=93c sha=38ea69e20af4746f
+ repro2.vhdl ghdl=0 nvc=0
+run synth/issue1126#1 dir=testdata/ghdl/testsuite/synth/issue1126 std=93c sha=9a38d913782636f9
+ bch_128x64.vhdl ghdl=0 nvc=0
+run synth/issue1127#1 dir=testdata/ghdl/testsuite/synth/issue1127 std=93c sha=7ab8162cf4cded20
+ foo.vhdl ghdl=0 nvc=0
+run synth/issue1127#2 dir=testdata/ghdl/testsuite/synth/issue1127 std=93c sha=16f3d4bd13ee14ff
+ foo2.vhdl ghdl=0 nvc=0
+run synth/issue1130#1 dir=testdata/ghdl/testsuite/synth/issue1130 std=93c sha=dd6c0bd8c151fc09
+ foo.vhdl ghdl=0 nvc=0
+run synth/issue1132#1 dir=testdata/ghdl/testsuite/synth/issue1132 std=93c sha=bb7e045970abad16
+ bar.vhdl ghdl=0 nvc=0
+run synth/issue1133#1 dir=testdata/ghdl/testsuite/synth/issue1133 std=93c sha=c1a14e290af8b822
+ foo.vhdl ghdl=0 nvc=0
+run synth/issue1139#1 dir=testdata/ghdl/testsuite/synth/issue1139 std=08 sha=91090dcecaff42d1
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1139#2 dir=testdata/ghdl/testsuite/synth/issue1139 std=08 sha=91090dcecaff42d1
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1140#1 dir=testdata/ghdl/testsuite/synth/issue1140 std=08 sha=11fc45e2d273e82a
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1140#2 dir=testdata/ghdl/testsuite/synth/issue1140 std=08 sha=11fc45e2d273e82a
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1144#1 dir=testdata/ghdl/testsuite/synth/issue1144 std=93c sha=6a770fbbc4e1e994
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1146#1 dir=testdata/ghdl/testsuite/synth/issue1146 std=08 sha=1bcd449236612d39
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1148#1 dir=testdata/ghdl/testsuite/synth/issue1148 std=08 sha=c924d2d59bf4b36b
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1153#1 dir=testdata/ghdl/testsuite/synth/issue1153 std=93c sha=e1bc354d50458285
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1155#1 dir=testdata/ghdl/testsuite/synth/issue1155 std=93c sha=679019af2cf9b169
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1157#1 dir=testdata/ghdl/testsuite/synth/issue1157 std=93c sha=cefe493e9972bc9c
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1157#2 dir=testdata/ghdl/testsuite/synth/issue1157 std=93c sha=3aab6e20d67980dd
+ smod0.vhdl ghdl=0 nvc=0
+ srem0.vhdl ghdl=0 nvc=0
+ sdiv0.vhdl ghdl=0 nvc=0
+ urem0.vhdl ghdl=0 nvc=0
+ udiv0.vhdl ghdl=0 nvc=0
+run synth/issue1158#1 dir=testdata/ghdl/testsuite/synth/issue1158 std=08 sha=9949ea817e960c4e
+ max.vhdl ghdl=0 nvc=0
+run synth/issue1159#1 dir=testdata/ghdl/testsuite/synth/issue1159 std=08 sha=3958919d9cf0f83d
+ fixed_point_example.vhdl ghdl=0 nvc=0
+run synth/issue1160#1 dir=testdata/ghdl/testsuite/synth/issue1160 std=93c sha=48cea3f6d9cc985c
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1161#1 dir=testdata/ghdl/testsuite/synth/issue1161 std=08 sha=a2757a163bde3e81
+ issue1.vhdl ghdl=0 nvc=0
+ tb_issue1.vhdl ghdl=0 nvc=0
+run synth/issue1161#2 dir=testdata/ghdl/testsuite/synth/issue1161 std=08 sha=57e05dab4a2c4fde
+ issue2.vhdl ghdl=0 nvc=0
+ tb_issue2.vhdl ghdl=0 nvc=0
+run synth/issue1161#3 dir=testdata/ghdl/testsuite/synth/issue1161 std=08 sha=58415caf4a3415c5
+ issue3.vhdl ghdl=0 nvc=0
+run synth/issue1162#1 dir=testdata/ghdl/testsuite/synth/issue1162 std=93c sha=b6b0768fb6797e19
+ counter.vhdl ghdl=0 nvc=0
+run synth/issue1163#1 dir=testdata/ghdl/testsuite/synth/issue1163 std=93c sha=cc80754e916fd311
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue1163#2 dir=testdata/ghdl/testsuite/synth/issue1163 std=93c sha=0aadb9b39b9fb77a
+ bug2.vhdl ghdl=0 nvc=0
+run synth/issue1163#3 dir=testdata/ghdl/testsuite/synth/issue1163 std=93c sha=f53504f01243a697
+ bug3.vhdl ghdl=0 nvc=0
+run synth/issue1164#1 dir=testdata/ghdl/testsuite/synth/issue1164 std=93c sha=59c54d829b5303ba
+ bug.vhdl ghdl=0 nvc=0
+ comp.vhdl ghdl=0 nvc=0
+run synth/issue1165#1 dir=testdata/ghdl/testsuite/synth/issue1165 std=08 sha=9b4aa6fa9a0a10ef
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue1166#1 dir=testdata/ghdl/testsuite/synth/issue1166 std=08 sha=30219fe6a7fb12b1
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1167#1 dir=testdata/ghdl/testsuite/synth/issue1167 std=93c sha=84cc4a373c6cb2c6
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue1168#1 dir=testdata/ghdl/testsuite/synth/issue1168 std=08 sha=3964113d7fb055b2
+ bug.vhdl ghdl=0 nvc=0
+ bug2.vhdl ghdl=0 nvc=0
+run synth/issue1169#1 dir=testdata/ghdl/testsuite/synth/issue1169 std=93c sha=3a57887d4902869d
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue1170#1 dir=testdata/ghdl/testsuite/synth/issue1170 std=93c sha=e259e39c1d8fe3c0
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue1172#1 dir=testdata/ghdl/testsuite/synth/issue1172 std=93c sha=6376102d2c6f1b74
+ test_module.vhdl ghdl=0 nvc=0
+run synth/issue1175#1 dir=testdata/ghdl/testsuite/synth/issue1175 std=93c sha=5201eb1676cfcf46
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1175#2 dir=testdata/ghdl/testsuite/synth/issue1175 std=08 sha=564544dff06dac4b
+ issue.vhdl ghdl=0 nvc=0
+ issue2.vhdl ghdl=0 nvc=0
+ issue3.vhdl ghdl=0 nvc=0
+run synth/issue1176#1 dir=testdata/ghdl/testsuite/synth/issue1176 std=93c sha=e308c0ce83bd395f
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1177#1 dir=testdata/ghdl/testsuite/synth/issue1177 std=08 sha=520174114337df4a
+ issue1.vhdl ghdl=0 nvc=0
+ issue2.vhdl ghdl=0 nvc=0
+run synth/issue1178#1 dir=testdata/ghdl/testsuite/synth/issue1178 std=08 sha=0b25efc7162a94d0
+ issue1.vhdl ghdl=0 nvc=0
+run synth/issue1179#1 dir=testdata/ghdl/testsuite/synth/issue1179 std=93c sha=a29205ba24d2fc2d
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue1180#1 dir=testdata/ghdl/testsuite/synth/issue1180 std=93c sha=8a77682bf8560f8d
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue1181#1 dir=testdata/ghdl/testsuite/synth/issue1181 std=08 sha=f17473691c6b9fdf
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue1182#1 dir=testdata/ghdl/testsuite/synth/issue1182 std=93c sha=e8143691c6b761bb
+ issue.vhdl ghdl=1@12 nvc=1@12
+run synth/issue1186#1 dir=testdata/ghdl/testsuite/synth/issue1186 std=93c sha=743b5bc014f93b4c
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1190#1 dir=testdata/ghdl/testsuite/synth/issue1190 std=93c sha=84be82dab72142bd
+ hdl/ram.vhdl ghdl=0 nvc=0
+run synth/issue1193#1 dir=testdata/ghdl/testsuite/synth/issue1193 std=93c sha=9e43ad8fd4111583
+ counters_7.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1197#1 dir=testdata/ghdl/testsuite/synth/issue1197 std=93c sha=25cc44a77b72a8c8
+ generics_1.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1198#1 dir=testdata/ghdl/testsuite/synth/issue1198 std=93c sha=3d369dedfd349b3d
+ for_loop.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1199#1 dir=testdata/ghdl/testsuite/synth/issue1199 std=93c sha=40ffe8db91f6b685
+ issue1.vhdl ghdl=0 nvc=0
+ issue2.vhdl ghdl=0 nvc=1@13
+run synth/issue1207#1 dir=testdata/ghdl/testsuite/synth/issue1207 std=93c sha=f288eee3918ff58e
+ alphablender.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1208#1 dir=testdata/ghdl/testsuite/synth/issue1208 std=93c sha=49483c669929295b
+ adders_4.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1209#1 dir=testdata/ghdl/testsuite/synth/issue1209 std=93c sha=6dae9409bb2bd8ff
+ issue.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1210#1 dir=testdata/ghdl/testsuite/synth/issue1210 std=93c sha=6371bd6c77cccee9
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue1211#1 dir=testdata/ghdl/testsuite/synth/issue1211 std=93c sha=2238505918748232
+ repro1.vhdl ghdl=0 nvc=0
+ tb_repro1.vhdl ghdl=0 nvc=0
+run synth/issue1211#2 dir=testdata/ghdl/testsuite/synth/issue1211 std=93c sha=1c734a4dabeccf4e
+ delay_ul.vhdl ghdl=0 nvc=0
+ tb_delay_ul.vhdl ghdl=0 nvc=0
+run synth/issue1212#1 dir=testdata/ghdl/testsuite/synth/issue1212 std=93c sha=b4b6970e4446f6e3
+ fileissue.vhdl ghdl=0 nvc=0
+run synth/issue1217#1 dir=testdata/ghdl/testsuite/synth/issue1217 std=93c sha=d97701555f2e120c
+ top.vhdl ghdl=0 nvc=0
+ tb_top.vhdl ghdl=0 nvc=0
+run synth/issue1218#1 dir=testdata/ghdl/testsuite/synth/issue1218 std=93c sha=97fb10ad787ad1d8
+ top.vhdl ghdl=0 nvc=0
+run synth/issue1219#1 dir=testdata/ghdl/testsuite/synth/issue1219 std=93c sha=c3a3116ea2cd1e01
+ top.vhdl ghdl=0 nvc=0
+ tb_top.vhdl ghdl=0 nvc=0
+run synth/issue1220#1 dir=testdata/ghdl/testsuite/synth/issue1220 std=93c sha=b090bc0a8b7f7a56
+ top.vhdl ghdl=0 nvc=0
+ tb_top.vhdl ghdl=0 nvc=0
+run synth/issue1220#2 dir=testdata/ghdl/testsuite/synth/issue1220 std=93c sha=dabb363d1c23e45d
+ top.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run synth/issue1221#1 dir=testdata/ghdl/testsuite/synth/issue1221 std=93c sha=b636793d6319c97c
+ top.vhdl ghdl=0 nvc=0
+run synth/issue1225#1 dir=testdata/ghdl/testsuite/synth/issue1225 std=93c sha=c8242eb139d4475c
+ top.vhdl ghdl=0 nvc=0
+ tb_top.vhdl ghdl=0 nvc=0
+run synth/issue1230#1 dir=testdata/ghdl/testsuite/synth/issue1230 std=93c sha=6b98903ac54a8f1d
+ delayline.vhdl ghdl=0 nvc=0
+run synth/issue1231#1 dir=testdata/ghdl/testsuite/synth/issue1231 std=93c sha=a617bbe6e620535b
+ top.vhdl ghdl=0 nvc=0
+ top3.vhdl ghdl=0 nvc=0
+run synth/issue1234#1 dir=testdata/ghdl/testsuite/synth/issue1234 std=93c sha=89d15ab442244fd8
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1236#1 dir=testdata/ghdl/testsuite/synth/issue1236 std=08 sha=1bd894e9c7d552e5
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1237#1 dir=testdata/ghdl/testsuite/synth/issue1237 std=93c sha=192c37ef04dce842
+ mwe.vhdl ghdl=0 nvc=0
+run synth/issue1238#1 dir=testdata/ghdl/testsuite/synth/issue1238 std=93c sha=92290dccfce5528f
+ tri.vhdl ghdl=0 nvc=0
+ tb_tri.vhdl ghdl=0 nvc=0
+run synth/issue1238#2 dir=testdata/ghdl/testsuite/synth/issue1238 std=93c sha=a99e87b03ce15923
+ multiplexers_3.vhdl ghdl=0 nvc=0
+ tb_multiplexers_3.vhdl ghdl=0 nvc=0
+run synth/issue1239#1 dir=testdata/ghdl/testsuite/synth/issue1239 std=93c sha=451cce427155a5ee
+ repro.vhdl -fsynopsys ghdl=0 nvc=0
+ repro2.vhdl -fsynopsys ghdl=0 nvc=0
+ repro3.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1240#1 dir=testdata/ghdl/testsuite/synth/issue1240 std=93c sha=2f23e8bcf1973a79
+ issue1.vhdl ghdl=0 nvc=0
+ issue2.vhdl ghdl=0 nvc=0
+ issue3.vhdl ghdl=0 nvc=0
+ tb_issue3.vhdl ghdl=0 nvc=0
+run synth/issue1241#1 dir=testdata/ghdl/testsuite/synth/issue1241 std=93c sha=d9b43041a98f27f7
+ top.vhdl ghdl=0 nvc=0
+ tb_top.vhdl ghdl=0 nvc=0
+run synth/issue1242#1 dir=testdata/ghdl/testsuite/synth/issue1242 std=93c sha=35357860860c6a33
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1243#1 dir=testdata/ghdl/testsuite/synth/issue1243 std=08 sha=aa5c90c907e0bce4
+ DSPn.vhdl ghdl=0 nvc=0
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1244#1 dir=testdata/ghdl/testsuite/synth/issue1244 std=02 sha=a40036aa91dd0eeb
+ ram_protected_sharedvar.vhd -fsynopsys ghdl=0 nvc=0
+run synth/issue1250#1 dir=testdata/ghdl/testsuite/synth/issue1250 std=93c sha=8832d0596b33d8df
+ theunit.vhdl ghdl=0 nvc=0
+ tb_theunit.vhdl ghdl=0 nvc=0
+run synth/issue1251#1 dir=testdata/ghdl/testsuite/synth/issue1251 std=93c sha=cfccfdd4013e5eb5
+ theunit.vhdl ghdl=0 nvc=0
+run synth/issue1253#1 dir=testdata/ghdl/testsuite/synth/issue1253 std=93c sha=4baca8757d7f2df6
+ repro1.vhdl -fsynopsys ghdl=0 nvc=0
+ repro2.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1258#1 dir=testdata/ghdl/testsuite/synth/issue1258 std=93c sha=943886087bf79573
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1264#1 dir=testdata/ghdl/testsuite/synth/issue1264 std=93c sha=d18c5115d22fc124
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue1264#2 dir=testdata/ghdl/testsuite/synth/issue1264 std=93c sha=18cb49d2fec14456
+ issue.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+ issue2.vhdl ghdl=0 nvc=0
+run synth/issue1265#1 dir=testdata/ghdl/testsuite/synth/issue1265 std=93c sha=aa01ed0455e1079f
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1266#1 dir=testdata/ghdl/testsuite/synth/issue1266 std=93c sha=56eca5230ac57516
+ issue.vhdl ghdl=0 nvc=0
+ tb_issue.vhdl ghdl=0 nvc=0
+run synth/issue1267#1 dir=testdata/ghdl/testsuite/synth/issue1267 std=93c sha=5166050737eb2c08
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1271#1 dir=testdata/ghdl/testsuite/synth/issue1271 std=93 sha=7a5eafbe8b4d42a3
+ issue.vhdl ghdl=0 nvc=0
+ issue2.vhdl ghdl=0 nvc=0
+ issue3.vhdl ghdl=0 nvc=0
+run synth/issue1272#1 dir=testdata/ghdl/testsuite/synth/issue1272 std=08 sha=5ba8d6e3af4d507f
+ issue.vhdl -fpsl ghdl=0 nvc=0
+run synth/issue1273#1 dir=testdata/ghdl/testsuite/synth/issue1273 std=93c sha=db0273c60b3b2b57
+ issue.vhdl ghdl=0 nvc=0
+ assert2.vhdl ghdl=0 nvc=0
+ assert3.vhdl ghdl=0 nvc=0
+ assert4.vhdl ghdl=0 nvc=0
+ tb_assert4.vhdl ghdl=0 nvc=0
+run synth/issue1273#2 dir=testdata/ghdl/testsuite/synth/issue1273 std=93c sha=7013227941e04ba7
+ assert5.vhdl ghdl=0 nvc=0
+ tb_assert5.vhdl ghdl=0 nvc=0
+run synth/issue1273#3 dir=testdata/ghdl/testsuite/synth/issue1273 std=93c sha=ad98fae0d9dca085
+ assert6.vhdl ghdl=0 nvc=0
+ assert7.vhdl ghdl=0 nvc=0
+run synth/issue1277#1 dir=testdata/ghdl/testsuite/synth/issue1277 std=08 sha=f615d3745fcfae31
+ issue.vhdl ghdl=0 nvc=0
+ issue2.vhdl ghdl=0 nvc=0
+run synth/issue1280#1 dir=testdata/ghdl/testsuite/synth/issue1280 std=08 sha=b06311364513cf19
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1282#1 dir=testdata/ghdl/testsuite/synth/issue1282 std=08 sha=d7736ca27d842a37
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1283#1 dir=testdata/ghdl/testsuite/synth/issue1283 std=08 sha=2be5ae2b4a0cb0e8
+ issue1.vhdl ghdl=0 nvc=0
+ issue2.vhdl ghdl=0 nvc=0
+ issue3.vhdl ghdl=1@13 nvc=1@13
+ issue4.vhdl ghdl=0 nvc=0
+run synth/issue1288#1 dir=testdata/ghdl/testsuite/synth/issue1288 std=08 sha=f4a8484b2b710dc7
+ issue.vhdl ghdl=0 nvc=1@88,91
+run synth/issue1292#1 dir=testdata/ghdl/testsuite/synth/issue1292 std=08 sha=7ae71ae66854e717
+ issue.vhdl ghdl=0 nvc=1@88,91
+run synth/issue1294#1 dir=testdata/ghdl/testsuite/synth/issue1294 std=08 sha=37d636be78d35590
+ generic_array_range.vhdl ghdl=0 nvc=0
+run synth/issue1295#1 dir=testdata/ghdl/testsuite/synth/issue1295 std=08 sha=de89c9cff31b3402
+ issue.vhdl ghdl=0 nvc=1@88,91
+run synth/issue1298#1 dir=testdata/ghdl/testsuite/synth/issue1298 std=08 sha=ed18b8a77eb0bb1b
+ generics.vhdl -fsynopsys -fexplicit -frelaxed ghdl=0 nvc=0
+ generics.vhdl -fsynopsys -fexplicit -frelaxed ghdl=0 nvc=0
+ generics.vhdl -fsynopsys -fexplicit -frelaxed ghdl=0 nvc=0
+run synth/issue1302#1 dir=testdata/ghdl/testsuite/synth/issue1302 std=93c sha=ce2f987bead7fcf0
+ testcase3.vhdl ghdl=0 nvc=0
+run synth/issue1307#1 dir=testdata/ghdl/testsuite/synth/issue1307 std=93c sha=d7eb713f7e9c6c46
+ edge_enhance.vhd ghdl=0 nvc=0
+ hdmi_design.vhd ghdl=0 nvc=0
+ line_delay.vhd ghdl=0 nvc=0
+ pixel_processing.vhd ghdl=0 nvc=0
+run synth/issue1310#1 dir=testdata/ghdl/testsuite/synth/issue1310 std=93c sha=4822a0eeccb02ada
+ issue.vhdl ghdl=0 nvc=0
+ issue2.vhdl ghdl=0 nvc=0
+run synth/issue1311#1 dir=testdata/ghdl/testsuite/synth/issue1311 std=93c sha=cfe3b90e09828b74
+ issue.vhdl ghdl=0 nvc=0
+ tb_issue.vhdl ghdl=0 nvc=0
+run synth/issue1313#1 dir=testdata/ghdl/testsuite/synth/issue1313 std=93c sha=76bde3d9e6d41ffc
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1314#1 dir=testdata/ghdl/testsuite/synth/issue1314 std=08 sha=be25f640776635a9
+ issue.vhdl ghdl=0 nvc=1@155,158,159,168,171
+run synth/issue1316#1 dir=testdata/ghdl/testsuite/synth/issue1316 std=93c sha=aee9e471a3c7265f
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1317#1 dir=testdata/ghdl/testsuite/synth/issue1317 std=93c sha=97a9e78a6c008b90
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue1318#1 dir=testdata/ghdl/testsuite/synth/issue1318 std=93c sha=f14855ab1c0d4867
+ ram_blk.vhdl ghdl=0 nvc=0
+run synth/issue1319#1 dir=testdata/ghdl/testsuite/synth/issue1319 std=08 sha=188d32b6096727ec
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1321#1 dir=testdata/ghdl/testsuite/synth/issue1321 std=08 sha=4f68a58da53d72f9
+ issue.vhdl ghdl=0 nvc=1@87,93
+ issue.vhdl ghdl=0 nvc=1@87,93
+run synth/issue1322#1 dir=testdata/ghdl/testsuite/synth/issue1322 std=08 sha=79223399289ac5a3
+ issue.vhdl ghdl=0 nvc=1@87,93
+ issue.vhdl ghdl=0 nvc=1@87,93
+run synth/issue1324#1 dir=testdata/ghdl/testsuite/synth/issue1324 std=08 sha=984e5de22553c26d
+ pkg.vhdl ghdl=0 nvc=0
+ foo.vhdl ghdl=0 nvc=0
+ pkg.vhdl ghdl=0 nvc=0
+run synth/issue1325#1 dir=testdata/ghdl/testsuite/synth/issue1325 std=93c sha=a1e486e3d2be3eb4
+ rotate_testcase.vhdl ghdl=0 nvc=0
+ tb_rotate_testcase.vhdl ghdl=0 nvc=0
+run synth/issue1330#1 dir=testdata/ghdl/testsuite/synth/issue1330 std=93c sha=8442365404ae9c5a
+ test.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=0 nvc=0
+run synth/issue1330#2 dir=testdata/ghdl/testsuite/synth/issue1330 std=93c sha=a2c669cc4e696662
+ test2.vhdl ghdl=0 nvc=0
+ tb_test2.vhdl ghdl=0 nvc=0
+run synth/issue1330#3 dir=testdata/ghdl/testsuite/synth/issue1330 std=93c sha=a9247edcf1362413
+ test3.vhdl ghdl=0 nvc=0
+ tb_test3.vhdl ghdl=0 nvc=0
+run synth/issue1332#1 dir=testdata/ghdl/testsuite/synth/issue1332 std=93c sha=9ef8e3c791ecd96c
+ rom_constant.vhdl ghdl=0 nvc=0
+run synth/issue1333#1 dir=testdata/ghdl/testsuite/synth/issue1333 std=93c sha=24e6c3033b2c225b
+ ascending_attribute.vhdl ghdl=0 nvc=0
+run synth/issue1342#1 dir=testdata/ghdl/testsuite/synth/issue1342 std=08 sha=74d2bc6f3ef058df
+ test_unop.vhdl ghdl=0 nvc=0
+run synth/issue1345#1 dir=testdata/ghdl/testsuite/synth/issue1345 std=08 sha=eb7b6f5f349859fb
+ issue.vhdl ghdl=0 nvc=1@86,90
+run synth/issue1348#1 dir=testdata/ghdl/testsuite/synth/issue1348 std=93c sha=39a32b1b1ab1085a
+ sdp_simple.vhdl ghdl=0 nvc=0
+ tb_sdp_simple.vhdl ghdl=0 nvc=0
+run synth/issue1366#1 dir=testdata/ghdl/testsuite/synth/issue1366 std=08 sha=b4b850a619b0dea1
+ issue.vhdl ghdl=0 nvc=0
+ issue_psl.vhdl ghdl=0 nvc=1@1
+run synth/issue1367#1 dir=testdata/ghdl/testsuite/synth/issue1367 std=08 sha=afbd0cf918739b45
+ issue.vhdl ghdl=0 nvc=1@96,99,102,105,106
+run synth/issue1372#1 dir=testdata/ghdl/testsuite/synth/issue1372 std=08 sha=67bb82e886d40835
+ issue.vhdl ghdl=0 nvc=0
+ issue_psl.vhdl ghdl=0 nvc=1@1
+run synth/issue1387#1 dir=testdata/ghdl/testsuite/synth/issue1387 std=93c sha=a34cebeb472ea870
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run synth/issue1390#1 dir=testdata/ghdl/testsuite/synth/issue1390 std=08 sha=86d28c9a3a49a2f3
+ aes_pkg.vhdl ghdl=0 nvc=0
+ aes_enc.vhdl ghdl=0 nvc=1@137,143,145,148
+run synth/issue1406#1 dir=testdata/ghdl/testsuite/synth/issue1406 std=93c sha=dd791e6c48d8e544
+ half_adder.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue1407#1 dir=testdata/ghdl/testsuite/synth/issue1407 std=08 sha=6cb58ecd1c903c5d
+ repro.vhdl ghdl=0 nvc=0
+ fixed_point_example.vhdl ghdl=0 nvc=0
+run synth/issue1408#1 dir=testdata/ghdl/testsuite/synth/issue1408 std=08 sha=209f8871544c43d0
+ fixed_point_example.vhdl ghdl=0 nvc=0
+run synth/issue1413#1 dir=testdata/ghdl/testsuite/synth/issue1413 std=08 sha=043ed234a3635a11
+ repro1.vhdl ghdl=0 nvc=0
+ fixed_point_example.vhdl ghdl=0 nvc=0
+run synth/issue1414#1 dir=testdata/ghdl/testsuite/synth/issue1414 std=93c sha=d1bc46f3bab79077
+ cover_overlap_misparse.vhdl -fpsl ghdl=0 nvc=0
+ cover_overlap_misparse.vhdl -fpsl ghdl=0 nvc=0
+run synth/issue1417#1 dir=testdata/ghdl/testsuite/synth/issue1417 std=08 sha=731c67b81f66ad01
+ fixed_point_example.vhdl ghdl=0 nvc=0
+run synth/issue1421#1 dir=testdata/ghdl/testsuite/synth/issue1421 std=93c sha=49cc896c3445704f
+ repro3.vhdl ghdl=0 nvc=0
+run synth/issue1424#1 dir=testdata/ghdl/testsuite/synth/issue1424 std=08 sha=1fe6cb14db359288
+ bar.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1426#1 dir=testdata/ghdl/testsuite/synth/issue1426 std=93c sha=b804c31e480556d0
+ bar.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1428#1 dir=testdata/ghdl/testsuite/synth/issue1428 std=93c sha=d799a72581300bef
+ rec1.vhdl ghdl=0 nvc=0
+ rec2.vhdl ghdl=0 nvc=0
+ rec3.vhdl ghdl=0 nvc=0
+ rec4.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro4b.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+ repro5b.vhdl ghdl=0 nvc=0
+ repro5.vhdl ghdl=0 nvc=0
+ repro6.vhdl ghdl=0 nvc=0
+ arr01.vhdl ghdl=0 nvc=0
+ vec01.vhdl ghdl=0 nvc=0
+ bit01.vhdl ghdl=0 nvc=0
+run synth/issue1430#1 dir=testdata/ghdl/testsuite/synth/issue1430 std=93c sha=a456cccdad6b2db6
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue1442#1 dir=testdata/ghdl/testsuite/synth/issue1442 std=08 sha=7f46616801c38078
+ fixed_round_crash_correct.vhdl ghdl=0 nvc=0
+run synth/issue1454#1 dir=testdata/ghdl/testsuite/synth/issue1454 std=93c sha=133100f8eed80fa9
+ dummy_top.vhdl ghdl=0 nvc=0
+run synth/issue1460#1 dir=testdata/ghdl/testsuite/synth/issue1460 std=08 sha=0005c27e39eef883
+ leftmost01.vhdl ghdl=0 nvc=0
+ tb_leftmost01.vhdl ghdl=0 nvc=0
+run synth/issue1460#2 dir=testdata/ghdl/testsuite/synth/issue1460 std=08 sha=72cadb6395bdf1a2
+ leftmost02.vhdl ghdl=0 nvc=0
+ tb_leftmost02.vhdl ghdl=0 nvc=0
+run synth/issue1460#3 dir=testdata/ghdl/testsuite/synth/issue1460 std=08 sha=6d8f3c722e45f8d7
+ leftmost03.vhdl ghdl=0 nvc=0
+ tb_leftmost03.vhdl ghdl=0 nvc=0
+run synth/issue1460#4 dir=testdata/ghdl/testsuite/synth/issue1460 std=08 sha=4f1b6706cebe95e5
+ leftmost04.vhdl ghdl=0 nvc=0
+ tb_leftmost04.vhdl ghdl=0 nvc=0
+run synth/issue1460#5 dir=testdata/ghdl/testsuite/synth/issue1460 std=08 sha=41fb713183789d70
+ rightmost01.vhdl ghdl=0 nvc=0
+ tb_rightmost01.vhdl ghdl=0 nvc=0
+run synth/issue1460#6 dir=testdata/ghdl/testsuite/synth/issue1460 std=08 sha=24b5c2ed7f2dce7b
+ rightmost02.vhdl ghdl=0 nvc=0
+ tb_rightmost02.vhdl ghdl=0 nvc=0
+run synth/issue1460#7 dir=testdata/ghdl/testsuite/synth/issue1460 std=08 sha=a3e7d256e5a73c38
+ to01_float.vhdl ghdl=0 nvc=0
+ division_float.vhdl ghdl=0 nvc=0
+run synth/issue1475#1 dir=testdata/ghdl/testsuite/synth/issue1475 std=93c sha=07d0976624bb5f22
+ e2.vhdl ghdl=0 nvc=1@14
+ e1.vhdl ghdl=0 nvc=1@11
+ e.vhdl ghdl=0 nvc=1@10
+run synth/issue1481#1 dir=testdata/ghdl/testsuite/synth/issue1481 std=08 sha=8fbf03c98a146fb1
+ e.vhdl ghdl=0 nvc=0
+run synth/issue1503#1 dir=testdata/ghdl/testsuite/synth/issue1503 std=93c sha=614836efc972b2b9
+ theunit.vhdl ghdl=0 nvc=0
+run synth/issue1505#1 dir=testdata/ghdl/testsuite/synth/issue1505 std=93c sha=c0da4539db3bb8dd
+ test.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=0 nvc=0
+run synth/issue1509#1 dir=testdata/ghdl/testsuite/synth/issue1509 std=93c sha=16b53b208ad36fd3
+ pass01.vhdl ghdl=0 nvc=0
+ tb_pass01.vhdl ghdl=0 nvc=0
+run synth/issue1520#1 dir=testdata/ghdl/testsuite/synth/issue1520 std=08 sha=c83d1ddf5c9e7e88
+ test.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=0 nvc=0
+run synth/issue1531#1 dir=testdata/ghdl/testsuite/synth/issue1531 std=93c sha=6892d8b637b8d97d
+ uns.vhdl ghdl=0 nvc=0
+ tb_uns.vhdl ghdl=0 nvc=0
+run synth/issue1531#2 dir=testdata/ghdl/testsuite/synth/issue1531 std=93c sha=a8d89eb54cf0d0b4
+ sgn.vhdl ghdl=0 nvc=0
+ tb_sgn.vhdl ghdl=0 nvc=0
+run synth/issue1534#1 dir=testdata/ghdl/testsuite/synth/issue1534 std=93c sha=46e40bad149170ba
+ ent.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+ xor01.vhdl ghdl=0 nvc=0
+ xor02.vhdl ghdl=0 nvc=0
+run synth/issue1536#1 dir=testdata/ghdl/testsuite/synth/issue1536 std=93c sha=296d23089c84ff06
+ ent1.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+run synth/issue1537#1 dir=testdata/ghdl/testsuite/synth/issue1537 std=93c sha=886cac3bbb102f4d
+ ent1.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+run synth/issue1540#1 dir=testdata/ghdl/testsuite/synth/issue1540 std=93c sha=1348771b48ad3e08
+ ent1.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+run synth/issue1563#1 dir=testdata/ghdl/testsuite/synth/issue1563 std=93c sha=9630c886c27cf56a
+ bug.vhdl ghdl=0 nvc=0
+ tb_bug.vhdl ghdl=0 nvc=0
+run synth/issue1563#2 dir=testdata/ghdl/testsuite/synth/issue1563 std=93c sha=14c63fc67f471573
+ bug4.vhdl ghdl=0 nvc=0
+ tb_bug4.vhdl ghdl=0 nvc=0
+run synth/issue1563#3 dir=testdata/ghdl/testsuite/synth/issue1563 std=93c sha=2f791b61c76000ea
+ bug2.vhdl ghdl=0 nvc=0
+ tb_bug2.vhdl ghdl=0 nvc=0
+run synth/issue1572#1 dir=testdata/ghdl/testsuite/synth/issue1572 std=08 sha=52b2486825edc13e
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1591#1 dir=testdata/ghdl/testsuite/synth/issue1591 std=08 sha=2f57321613e9e032
+ issue.vhdl ghdl=0 nvc=1@29,32,55
+ repro1.vhdl ghdl=0 nvc=1@12,16
+ repro2.vhdl ghdl=0 nvc=1@14,18
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+run synth/issue1596#1 dir=testdata/ghdl/testsuite/synth/issue1596 std=93c sha=885728369a46f751
+ ent.vhdl ghdl=0 nvc=0
+ ent_working.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+ ent_bug.vhdl ghdl=0 nvc=0
+run synth/issue1609#1 dir=testdata/ghdl/testsuite/synth/issue1609 std=08 sha=579fdb623f0e898b
+ exp_psl.vhdl ghdl=0 nvc=1@12
+ exp_psl2.vhdl ghdl=0 nvc=1@13
+ exp_vhd.vhdl ghdl=0 nvc=1@20,23
+run synth/issue1628#1 dir=testdata/ghdl/testsuite/synth/issue1628 std=08 sha=ecc29b6ecbcf9bcf
+ test.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+run synth/issue1645#1 dir=testdata/ghdl/testsuite/synth/issue1645 std=93c sha=74ed84aaeb575225
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue1650#1 dir=testdata/ghdl/testsuite/synth/issue1650 std=93c sha=87529c25e3e377de
+ debounce.vhdl ghdl=0 nvc=0
+ debounce.vhdl ghdl=0 nvc=0
+run synth/issue1654#1 dir=testdata/ghdl/testsuite/synth/issue1654 std=08 sha=edb61c59a3eeff9d
+ checker.vhdl ghdl=0 nvc=1@15,18
+ tb_checker.vhdl ghdl=0 nvc=1@70
+run synth/issue1654#2 dir=testdata/ghdl/testsuite/synth/issue1654 std=08 sha=edb61c59a3eeff9d
+ checker.vhdl ghdl=0 nvc=1@15,18
+ tb_checker.vhdl ghdl=0 nvc=1@70
+run synth/issue1658#1 dir=testdata/ghdl/testsuite/synth/issue1658 std=08 sha=21dca42dad4f3259
+ issue_1658.vhdl ghdl=0 nvc=1@22,26,37,51
+run synth/issue1665#1 dir=testdata/ghdl/testsuite/synth/issue1665 std=08 sha=a3b62cebd67bae42
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1675#1 dir=testdata/ghdl/testsuite/synth/issue1675 std=93c sha=b387578308110578
+ accum.vhdl ghdl=1@5,10,14~ nvc=1@5,14
+ tb_accum.vhdl ghdl=1@7,11,14 nvc=1@7
+ pkg.vhdl ghdl=0 nvc=0
+run synth/issue1675#2 dir=testdata/ghdl/testsuite/synth/issue1675 std=93c sha=242f3c52f51f0f1d
+ accumwr.vhdl ghdl=1@5,15~ nvc=1@5,15
+ tb_accumwr.vhdl ghdl=1@7,15 nvc=1@7
+ pkg.vhdl ghdl=0 nvc=0
+ accum.vhdl ghdl=0 nvc=0
+run synth/issue1675#3 dir=testdata/ghdl/testsuite/synth/issue1675 std=93c sha=535969491740d6b7
+ patgen.vhdl ghdl=1@5,11,14~ nvc=1@5,14
+ tb_patgen.vhdl ghdl=1@7,12,14 nvc=1@7
+ pkg.vhdl ghdl=0 nvc=0
+run synth/issue1675#4 dir=testdata/ghdl/testsuite/synth/issue1675 std=93c sha=983cc4f099e3d6d9
+ patacc.vhdl ghdl=1@5,14~ nvc=1@5,14
+ tb_patacc.vhdl ghdl=1@7,14 nvc=1@7
+ pkg.vhdl ghdl=0 nvc=0
+ patgen.vhdl ghdl=0 nvc=0
+run synth/issue1679#1 dir=testdata/ghdl/testsuite/synth/issue1679 std=93c sha=619a7434fd1cedf5
+ test_fail.vhdl ghdl=0 nvc=0
+run synth/issue1680#1 dir=testdata/ghdl/testsuite/synth/issue1680 std=93c sha=b70b9c2a264113bf
+ test_fail.vhdl ghdl=0 nvc=0
+run synth/issue1681#1 dir=testdata/ghdl/testsuite/synth/issue1681 std=93c sha=98d53db8d9b8c345
+ test_fail.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run synth/issue1685#1 dir=testdata/ghdl/testsuite/synth/issue1685 std=93c sha=61ae64d462c03a26
+ test_case.vhdl ghdl=0 nvc=0
+run synth/issue1698#1 dir=testdata/ghdl/testsuite/synth/issue1698 std=08 sha=d9983f5a5aa539ab
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1703#1 dir=testdata/ghdl/testsuite/synth/issue1703 std=93c sha=84f8e4622d922388
+ blinker.vhdl ghdl=0 nvc=0
+run synth/issue1731#1 dir=testdata/ghdl/testsuite/synth/issue1731 std=08 sha=d938b9dccfba97d2
+ fifo.vhdl ghdl=0 nvc=0
+ axis_conv1d9x1.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1734#1 dir=testdata/ghdl/testsuite/synth/issue1734 std=08 sha=495919e2fa5ce3b0
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1780#1 dir=testdata/ghdl/testsuite/synth/issue1780 std=08 sha=7ca0d517d63e9817
+ imem2.vhdl ghdl=0 nvc=0
+run synth/issue1781#1 dir=testdata/ghdl/testsuite/synth/issue1781 std=08 sha=65e3fc0b30cb120a
+ simple2.vhdl ghdl=0 nvc=0
+ tb_simple2.vhdl ghdl=0 nvc=0
+run synth/issue1781#2 dir=testdata/ghdl/testsuite/synth/issue1781 std=08 sha=d0d8dafbcb9987da
+ imem2a.vhdl ghdl=0 nvc=0
+ imem2.vhdl ghdl=0 nvc=0
+run synth/issue1832#1 dir=testdata/ghdl/testsuite/synth/issue1832 std=08 sha=9ff08fad21a1484a
+ issue.vhdl ghdl=0 nvc=1@17,20
+run synth/issue1838#1 dir=testdata/ghdl/testsuite/synth/issue1838 std=08 sha=3dfde6fdcfd8322b
+ regfile.vhdl ghdl=0 nvc=0
+run synth/issue1850#1 dir=testdata/ghdl/testsuite/synth/issue1850 std=08 sha=c3c7ade50bf4bdf4
+ pulse.vhdl ghdl=0 nvc=0
+ issue2.vhdl ghdl=0 nvc=1@113
+run synth/issue1856#1 dir=testdata/ghdl/testsuite/synth/issue1856 std=08 sha=caaceab43f6da6a4
+ pulse.vhdl ghdl=0 nvc=0
+run synth/issue1859#1 dir=testdata/ghdl/testsuite/synth/issue1859 std=08 sha=91a87b4e4977a792
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1860#1 dir=testdata/ghdl/testsuite/synth/issue1860 std=08 sha=9d734edc4d41fb72
+ test.vhdl ghdl=0 nvc=0
+ test_sub.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+ test_sub.vhdl ghdl=0 nvc=0
+run synth/issue1886#1 dir=testdata/ghdl/testsuite/synth/issue1886 std=08 sha=b777eb9288b5c00a
+ test.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=0 nvc=0
+run synth/issue1886#2 dir=testdata/ghdl/testsuite/synth/issue1886 std=08 sha=57871a911667214b
+ test2.vhdl ghdl=0 nvc=0
+ tb_test2.vhdl ghdl=0 nvc=0
+run synth/issue1886#3 dir=testdata/ghdl/testsuite/synth/issue1886 std=08 sha=4c544f84d17f4c31
+ test3.vhdl ghdl=0 nvc=0
+ tb_test3.vhdl ghdl=0 nvc=0
+run synth/issue1889#1 dir=testdata/ghdl/testsuite/synth/issue1889 std=08 sha=22eaf2fd354374b1
+ shiftmux2.vhdl ghdl=0 nvc=0
+run synth/issue1899#1 dir=testdata/ghdl/testsuite/synth/issue1899 std=08 sha=8e89fe58ff8f9902
+ issue1899.vhdl ghdl=0 nvc=1@67
+run synth/issue1903#1 dir=testdata/ghdl/testsuite/synth/issue1903 std=93c sha=7e6af28d694caf90
+ tb.vhdl ghdl=0 nvc=0
+run synth/issue1909#1 dir=testdata/ghdl/testsuite/synth/issue1909 std=93c sha=657e592402177cac
+ reproducebug.vhdl ghdl=0 nvc=0
+ tb_reproducebug.vhdl ghdl=0 nvc=0
+run synth/issue1911#1 dir=testdata/ghdl/testsuite/synth/issue1911 std=93c sha=cf11eb14e70cab48
+ neorv32_package.vhd lib=neorv32 ghdl=0 nvc=0
+ neorv32_fifo.vhd lib=neorv32 ghdl=0 nvc=0
+run synth/issue1912#1 dir=testdata/ghdl/testsuite/synth/issue1912 std=93c sha=1cd809cecf832486
+ popcount.vhdl ghdl=0 nvc=0
+run synth/issue1920#1 dir=testdata/ghdl/testsuite/synth/issue1920 std=93 sha=aef3dfb29c432b65
+ ent1.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+run synth/issue1926#1 dir=testdata/ghdl/testsuite/synth/issue1926 std=93c sha=8d70e32c40a73094
+ ecp5pll.vhdl -fsynopsys ghdl=0 nvc=0
+ top_ecp5pll.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1936#1 dir=testdata/ghdl/testsuite/synth/issue1936 std=93c sha=6f48583d2ee12b12
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue1938#1 dir=testdata/ghdl/testsuite/synth/issue1938 std=08 sha=0482dddb12fa0843
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1942#1 dir=testdata/ghdl/testsuite/synth/issue1942 std=08 sha=d5f43f77fdd36e55
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue1944#1 dir=testdata/ghdl/testsuite/synth/issue1944 std=08 sha=f9f8a24cad77204c
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1945#1 dir=testdata/ghdl/testsuite/synth/issue1945 std=08 sha=d55c15c30a48104e
+ mwe.vhdl ghdl=0 nvc=0
+ alias01.vhdl ghdl=0 nvc=0
+ tb_alias01.vhdl ghdl=0 nvc=0
+run synth/issue1945#2 dir=testdata/ghdl/testsuite/synth/issue1945 std=08 sha=4d55676dc8e79e07
+ alias02.vhdl ghdl=0 nvc=0
+ tb_alias02.vhdl ghdl=0 nvc=0
+run synth/issue1947#1 dir=testdata/ghdl/testsuite/synth/issue1947 std=08 sha=199f2154ff672f31
+ circuit.vhdl ghdl=0 nvc=0
+run synth/issue1948#1 dir=testdata/ghdl/testsuite/synth/issue1948 std=08 sha=20e4fc23249ffe7e
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1949#1 dir=testdata/ghdl/testsuite/synth/issue1949 std=08 sha=3da67ae5fd8060b5
+ test.vhdl ghdl=0 nvc=0
+run synth/issue1951#1 dir=testdata/ghdl/testsuite/synth/issue1951 std=93c sha=ed5c4e328af338cc
+ ent.vhdl -fsynopsys ghdl=0 nvc=0
+ sub01.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_sub01.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1951#2 dir=testdata/ghdl/testsuite/synth/issue1951 std=93c sha=c65409574ab7835b
+ sub02.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_sub02.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1951#3 dir=testdata/ghdl/testsuite/synth/issue1951 std=93c sha=d4cdd0f631e24355
+ sub03.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_sub03.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1951#4 dir=testdata/ghdl/testsuite/synth/issue1951 std=93c sha=62cd82b5711970e9
+ sub04.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_sub04.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1962#1 dir=testdata/ghdl/testsuite/synth/issue1962 std=08 sha=638345a66aed2033
+ bug.vhdl ghdl=0 nvc=0
+ bug2.vhdl ghdl=0 nvc=0
+run synth/issue1968#1 dir=testdata/ghdl/testsuite/synth/issue1968 std=08 sha=deb0322cacca59e3
+ dummy_pkg.vhdl -fsynopsys ghdl=0 nvc=0
+ dummy.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue1971#1 dir=testdata/ghdl/testsuite/synth/issue1971 std=08 sha=e9e48a3a564862a5
+ repro_bit_oper.vhdl ghdl=0 nvc=0
+run synth/issue1972#1 dir=testdata/ghdl/testsuite/synth/issue1972 std=93c sha=4688c1c65340c25f
+ ent.vhdl ghdl=0 nvc=1@11
+run synth/issue1977#1 dir=testdata/ghdl/testsuite/synth/issue1977 std=08 sha=b6b35c9e18a698ff
+ triangularcounter.vhdl ghdl=0 nvc=0
+run synth/issue1978#1 dir=testdata/ghdl/testsuite/synth/issue1978 std=08 sha=7b21f2b7fb12ef09
+ reproducer.vhdl ghdl=0 nvc=0
+run synth/issue1986#1 dir=testdata/ghdl/testsuite/synth/issue1986 std=08 sha=2050d9ee0c90d7ca
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue1991#1 dir=testdata/ghdl/testsuite/synth/issue1991 std=93c sha=d1d9615dd485fb30
+ issue.vhdl ghdl=0 nvc=0
+run synth/issue1993#1 dir=testdata/ghdl/testsuite/synth/issue1993 std=08 sha=9543efda32f1d323
+ repro1.vhdl ghdl=0 nvc=0
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2002#1 dir=testdata/ghdl/testsuite/synth/issue2002 std=93c sha=feb1d70fed28eb25
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2010#1 dir=testdata/ghdl/testsuite/synth/issue2010 std=93c sha=dadc4429264e4b9c
+ top.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2011#1 dir=testdata/ghdl/testsuite/synth/issue2011 std=08 sha=0bd86ef2f4f0db40
+ testcase.vhdl ghdl=0 nvc=0
+ tb_testcase.vhdl ghdl=0 nvc=0
+run synth/issue2013#1 dir=testdata/ghdl/testsuite/synth/issue2013 std=08 sha=dc7a58e5967a13c4
+ testcase.vhdl ghdl=0 nvc=0
+ tb_testcase.vhdl ghdl=0 nvc=0
+run synth/issue2013#2 dir=testdata/ghdl/testsuite/synth/issue2013 std=08 sha=07c735351f930387
+ tc3.vhdl ghdl=0 nvc=0
+ tb_tc3.vhdl ghdl=0 nvc=0
+run synth/issue2013#3 dir=testdata/ghdl/testsuite/synth/issue2013 std=08 sha=f5621d045864112f
+ tc2.vhdl ghdl=0 nvc=0
+ tb_tc2.vhdl ghdl=0 nvc=0
+run synth/issue2013#4 dir=testdata/ghdl/testsuite/synth/issue2013 std=08 sha=f6c546d654508ca2
+ tc4.vhdl ghdl=0 nvc=0
+ tb_tc4.vhdl ghdl=0 nvc=0
+run synth/issue2019#1 dir=testdata/ghdl/testsuite/synth/issue2019 std=93c sha=883a5e0ddc8ee67b
+ repro2.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue2021#1 dir=testdata/ghdl/testsuite/synth/issue2021 std=08 sha=68ac12ef827e8ae8
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue2023#1 dir=testdata/ghdl/testsuite/synth/issue2023 std=93c sha=2ebdd24e233b8f6f
+ delay_bit.vhd -fsynopsys ghdl=0 nvc=0
+ delay_vector.vhd -fsynopsys ghdl=0 nvc=1@21
+ async_dpram.vhd -fsynopsys ghdl=0 nvc=0
+ abs_square.vhd -fsynopsys ghdl=0 nvc=1@74
+ test_comp.vhd -fsynopsys ghdl=0 nvc=1@94,112
+run synth/issue2025#1 dir=testdata/ghdl/testsuite/synth/issue2025 std=08 sha=ccc41b40bdd2e7b3
+ wb_standard_axi4_lite_bridge_rtl.vhd ghdl=0 nvc=0
+ wb_standard_formal_psl.vhd ghdl=0 nvc=0
+run synth/issue2032#1 dir=testdata/ghdl/testsuite/synth/issue2032 std=93c sha=ed8df0f28cafd15f
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+run synth/issue2033#1 dir=testdata/ghdl/testsuite/synth/issue2033 std=08 sha=241a895ae6f4f9d3
+ cdc_fifo.vhdl ghdl=0 nvc=0
+run synth/issue2034#1 dir=testdata/ghdl/testsuite/synth/issue2034 std=08 sha=f73bdf8e2bdb4b73
+ cdc_fifo_rtl.vhdl ghdl=0 nvc=0
+run synth/issue2035#1 dir=testdata/ghdl/testsuite/synth/issue2035 std=08 sha=24be4a0a81c64504
+ cdc_fifo_rtl.vhdl -Werror ghdl=0 nvc=0
+run synth/issue2041#1 dir=testdata/ghdl/testsuite/synth/issue2041 std=93c sha=194382e1edac8cfb
+ mymodule.vhdl ghdl=0 nvc=0
+run synth/issue2042#1 dir=testdata/ghdl/testsuite/synth/issue2042 std=08 sha=dda20cde62094c41
+ ent3.vhdl ghdl=0 nvc=0
+run synth/issue2043#1 dir=testdata/ghdl/testsuite/synth/issue2043 std=08 sha=6684fb9269524b6f
+ ent1.vhdl ghdl=0 nvc=0
+ tb_ent1.vhdl ghdl=0 nvc=0
+run synth/issue2043#2 dir=testdata/ghdl/testsuite/synth/issue2043 std=08 sha=ae60fc5ece110b2c
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue2045#1 dir=testdata/ghdl/testsuite/synth/issue2045 std=08 sha=0f81b970d145e166
+ ghdlcrash.vhdl ghdl=0 nvc=0
+run synth/issue2046#1 dir=testdata/ghdl/testsuite/synth/issue2046 std=08 sha=02efb6952e6a2b95
+ engine.vhdl ghdl=0 nvc=0
+run synth/issue2049#1 dir=testdata/ghdl/testsuite/synth/issue2049 std=08 sha=122c6e68ae2b1075
+ engine.vhdl ghdl=0 nvc=0
+run synth/issue2053#1 dir=testdata/ghdl/testsuite/synth/issue2053 std=08 sha=94ae448083d988b5
+ generic_fifo_fwft.vhdl ghdl=0 nvc=0
+ generic_fifo_fwft_inst.vhdl ghdl=0 nvc=0
+run synth/issue2054#1 dir=testdata/ghdl/testsuite/synth/issue2054 std=93c sha=430474686f6eaaa7
+ flip_flop.vhdl ghdl=0 nvc=0
+ testcase2.vhdl ghdl=0 nvc=0
+ testcase3.vhdl ghdl=0 nvc=0
+run synth/issue2062#1 dir=testdata/ghdl/testsuite/synth/issue2062 std=93c sha=6c9c3bc6c49d405b
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue2062#2 dir=testdata/ghdl/testsuite/synth/issue2062 std=08 sha=1d0f04fa28a62749
+ fxt2.vhdl ghdl=0 nvc=0
+run synth/issue2063#1 dir=testdata/ghdl/testsuite/synth/issue2063 std=93c sha=ff294e9f34ccde57
+ array_index_crash.vhdl ghdl=0 nvc=0
+run synth/issue2072#1 dir=testdata/ghdl/testsuite/synth/issue2072 std=93c sha=d3a5ffc64fc87585
+ swaptest.vhdl ghdl=0 nvc=0
+ tb_swaptest.vhdl ghdl=0 nvc=0
+run synth/issue2073#1 dir=testdata/ghdl/testsuite/synth/issue2073 std=93c sha=173d04b494adb741
+ ivoice.vhdl ghdl=0 nvc=0
+ ivoice2.vhdl ghdl=0 nvc=0
+ tb_ivoice2.vhdl ghdl=0 nvc=0
+run synth/issue2074#1 dir=testdata/ghdl/testsuite/synth/issue2074 std=93c sha=53c1987310bfbfbe
+ bitvec.vhdl ghdl=0 nvc=0
+run synth/issue2077#1 dir=testdata/ghdl/testsuite/synth/issue2077 std=08 sha=d76e48bb16bbbb4b
+ ent1.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+ tb_ent2.vhdl ghdl=0 nvc=0
+run synth/issue2077#2 dir=testdata/ghdl/testsuite/synth/issue2077 std=08 sha=24d4a48bf301d4d9
+ ent3.vhdl ghdl=0 nvc=0
+ tb_ent3.vhdl ghdl=0 nvc=0
+run synth/issue2077#3 dir=testdata/ghdl/testsuite/synth/issue2077 std=08 sha=d17b61da558e5d07
+ ent5.vhdl ghdl=0 nvc=0
+ tb_ent5.vhdl ghdl=0 nvc=0
+run synth/issue2077#4 dir=testdata/ghdl/testsuite/synth/issue2077 std=08 sha=28845f6f63d370b4
+ ent6.vhdl ghdl=0 nvc=0
+ tb_ent6.vhdl ghdl=0 nvc=0
+run synth/issue2080#1 dir=testdata/ghdl/testsuite/synth/issue2080 std=93c sha=aa435f04c20fbbd8
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue2081#1 dir=testdata/ghdl/testsuite/synth/issue2081 std=93c sha=286f87005e8015aa
+ ent.vhdl ghdl=0 nvc=0
+ ent.vhdl -Werror=nowrite ghdl=0 nvc=0
+run synth/issue2083#1 dir=testdata/ghdl/testsuite/synth/issue2083 std=08 sha=90bab662320c5fe9
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2084#1 dir=testdata/ghdl/testsuite/synth/issue2084 std=08 sha=36ab59925296cb5d
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2085#1 dir=testdata/ghdl/testsuite/synth/issue2085 std=08 sha=a97c501ad543974a
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2086#1 dir=testdata/ghdl/testsuite/synth/issue2086 std=93c sha=d20f63b8b0a5c847
+ repro4.vhdl ghdl=0 nvc=0
+run synth/issue2088#1 dir=testdata/ghdl/testsuite/synth/issue2088 std=93c sha=eb55565ba46e13e8
+ bug.vhdl ghdl=0 nvc=0
+ bug2.vhdl ghdl=0 nvc=0
+ bug3.vhdl ghdl=0 nvc=0
+run synth/issue2089#1 dir=testdata/ghdl/testsuite/synth/issue2089 std=93c sha=698f76482ac3feee
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2090#1 dir=testdata/ghdl/testsuite/synth/issue2090 std=93c sha=819b8a8e6fd7882f
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2092#1 dir=testdata/ghdl/testsuite/synth/issue2092 std=93c sha=767dab292faaf1c9
+ testcase.vhdl ghdl=0 nvc=0
+run synth/issue2099#1 dir=testdata/ghdl/testsuite/synth/issue2099 std=93c sha=5ce3381c38037519
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2109#1 dir=testdata/ghdl/testsuite/synth/issue2109 std=93c sha=3fda58fdab088723
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2113#1 dir=testdata/ghdl/testsuite/synth/issue2113 std=08 sha=a00239a840b7b95f
+ a.vhdl -Wno-nowrite ghdl=0 nvc=0
+ c.vhdl -Wno-nowrite ghdl=0 nvc=0
+run synth/issue2119#1 dir=testdata/ghdl/testsuite/synth/issue2119 std=08 sha=3f0fe44b25922a1b
+ test.vhdl ghdl=0 nvc=0
+run synth/issue2123#1 dir=testdata/ghdl/testsuite/synth/issue2123 std=93c sha=a46c0308589391b2
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2124#1 dir=testdata/ghdl/testsuite/synth/issue2124 std=93c sha=8b9e2df594cb9665
+ a.vhdl ghdl=0 nvc=0
+ b.vhdl ghdl=0 nvc=0
+ a2.vhdl ghdl=0 nvc=1@16
+ b.vhdl ghdl=0 nvc=0
+run synth/issue2125#1 dir=testdata/ghdl/testsuite/synth/issue2125 std=93c sha=d1f0591509942196
+ afed.vhdl ghdl=0 nvc=0
+ tb_afed.vhdl ghdl=0 nvc=0
+run synth/issue2126#1 dir=testdata/ghdl/testsuite/synth/issue2126 std=08 sha=aaae6c1459e2061e
+ test.vhdl ghdl=0 nvc=0
+run synth/issue2129#1 dir=testdata/ghdl/testsuite/synth/issue2129 std=08 sha=e52f7165b3283958
+ isx.vhdl ghdl=0 nvc=0
+run synth/issue2139#1 dir=testdata/ghdl/testsuite/synth/issue2139 std=08 sha=8e19ab160f11e06b
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue2140#1 dir=testdata/ghdl/testsuite/synth/issue2140 std=93c sha=9d2fae0030ad0f52
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2142#1 dir=testdata/ghdl/testsuite/synth/issue2142 std=93c sha=9816d01eb8eaf18e
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue2143#1 dir=testdata/ghdl/testsuite/synth/issue2143 std=93c sha=34feb2fe7d1a3bb6
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ bug.vhdl ghdl=0 nvc=0
+ bug2.vhdl ghdl=0 nvc=0
+run synth/issue2144#1 dir=testdata/ghdl/testsuite/synth/issue2144 std=93c sha=46f5d11e6a054144
+ repro.vhdl ghdl=0 nvc=1@35,36
+ bug.vhdl ghdl=0 nvc=1@22,23
+run synth/issue2145#1 dir=testdata/ghdl/testsuite/synth/issue2145 std=93c sha=d3dd10f4f10d92b1
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2146#1 dir=testdata/ghdl/testsuite/synth/issue2146 std=93c sha=3c1330e8bbf0f18c
+ rom_test.vhdl ghdl=0 nvc=0
+run synth/issue2149#1 dir=testdata/ghdl/testsuite/synth/issue2149 std=93c sha=4468e8b821f5a8d8
+ rom_test.vhdl ghdl=0 nvc=0
+run synth/issue2159#1 dir=testdata/ghdl/testsuite/synth/issue2159 std=08 sha=0a0ed557194a1c96
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2169#1 dir=testdata/ghdl/testsuite/synth/issue2169 std=93c sha=3b31a8d27dc1204f
+ mul.vhdl ghdl=0 nvc=0
+ tb_mul.vhdl ghdl=0 nvc=0
+run synth/issue2176#1 dir=testdata/ghdl/testsuite/synth/issue2176 std=93c sha=0b8a0d424a44768b
+ math_real_test.vhdl ghdl=0 nvc=0
+run synth/issue2177#1 dir=testdata/ghdl/testsuite/synth/issue2177 std=93c sha=9f4ad6b022be110c
+ vlm5030_pack.vhd ghdl=0 nvc=0
+ clock_functions_pack.vhd ghdl=0 nvc=0
+ vlm5030_subcircuits.vhd ghdl=0 nvc=0
+ vlm5030_gl.vhd ghdl=0 nvc=0
+run synth/issue2187#1 dir=testdata/ghdl/testsuite/synth/issue2187 std=93c sha=d239c14a80e27636
+ rawfile_pkg.vhd ghdl=0 nvc=1@130,151,172,202,259,316
+ rom16.vhd ghdl=0 nvc=1@6,18
+run synth/issue2204#1 dir=testdata/ghdl/testsuite/synth/issue2204 std=93c sha=7e27c19468d959fd
+ crash.vhdl -fpsl ghdl=0 nvc=0
+ crash2.vhdl -fpsl ghdl=0 nvc=0
+ crash3.vhdl -fpsl ghdl=0 nvc=0
+ crash4.vhdl -fpsl ghdl=0 nvc=0
+ crash5.vhdl -fpsl ghdl=0 nvc=0
+run synth/issue2205#1 dir=testdata/ghdl/testsuite/synth/issue2205 std=93c sha=6348e0ae75199e8e
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run synth/issue2214#1 dir=testdata/ghdl/testsuite/synth/issue2214 std=08 sha=9be78427891b3bab
+ avm_cache.vhd ghdl=0 nvc=0
+run synth/issue2222#1 dir=testdata/ghdl/testsuite/synth/issue2222 std=93c sha=0e3d94faf7c7d16b
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue2224#1 dir=testdata/ghdl/testsuite/synth/issue2224 std=93c sha=943971d4e285e3af
+ test.vhdl ghdl=0 nvc=0
+run synth/issue2231#1 dir=testdata/ghdl/testsuite/synth/issue2231 std=93c sha=ad41dbdb57ebe2d7
+ areset.vhdl ghdl=0 nvc=0
+ tb_areset.vhdl ghdl=0 nvc=0
+run synth/issue2232#1 dir=testdata/ghdl/testsuite/synth/issue2232 std=93c sha=a19c1a1c74676378
+ sipo.vhdl ghdl=0 nvc=0
+ sipo.vhdl ghdl=0 nvc=0
+run synth/issue2234#1 dir=testdata/ghdl/testsuite/synth/issue2234 std=93c sha=988b347bccf6e906
+ neorv32_package.vhd lib=neorv32 ghdl=0 nvc=0
+ neorv32_icache.vhd lib=neorv32 ghdl=0 nvc=0
+run synth/issue2237#1 dir=testdata/ghdl/testsuite/synth/issue2237 std=08 sha=10ac1935abcde04a
+ implicit_wide.vhdl ghdl=0 nvc=0
+ tb_implicit_wide.vhdl ghdl=0 nvc=0
+run synth/issue2237#2 dir=testdata/ghdl/testsuite/synth/issue2237 std=08 sha=778d1acb22beee98
+ implicit_wide2.vhdl ghdl=0 nvc=0
+ tb_implicit_wide2.vhdl ghdl=0 nvc=0
+run synth/issue2237#3 dir=testdata/ghdl/testsuite/synth/issue2237 std=08 sha=64e070a6dcf1cf46
+ implicit_wide3.vhdl ghdl=0 nvc=0
+ tb_implicit_wide3.vhdl ghdl=0 nvc=0
+run synth/issue2240#1 dir=testdata/ghdl/testsuite/synth/issue2240 std=93c sha=c7440a6c8d4360da
+ case_concat.vhdl ghdl=0 nvc=0
+run synth/issue2240#2 dir=testdata/ghdl/testsuite/synth/issue2240 std=08 sha=c7440a6c8d4360da
+ case_concat.vhdl ghdl=0 nvc=0
+run synth/issue2266#1 dir=testdata/ghdl/testsuite/synth/issue2266 std=08 sha=508004fb26a0be83
+ reproducer.vhdl ghdl=0 nvc=1@24,25
+ repro2.vhdl ghdl=0 nvc=1@24,25
+run synth/issue2270#1 dir=testdata/ghdl/testsuite/synth/issue2270 std=93c sha=cd1eb8e77490d441
+ fun.vhdl ghdl=0 nvc=0
+run synth/issue2279#1 dir=testdata/ghdl/testsuite/synth/issue2279 std=08 sha=997878966303c535
+ ent.vhdl ghdl=0 nvc=0
+ aggr1.vhdl ghdl=0 nvc=0
+ tb_aggr1.vhdl ghdl=0 nvc=0
+run synth/issue2285#1 dir=testdata/ghdl/testsuite/synth/issue2285 std=93c sha=529639b77feba59e
+ test_to_x01z.vhdl ghdl=0 nvc=0
+run synth/issue2286#1 dir=testdata/ghdl/testsuite/synth/issue2286 std=08 sha=7b9504a70675ebd8
+ test_addsub.vhdl ghdl=0 nvc=0
+ tb_test_addsub.vhdl ghdl=0 nvc=0
+run synth/issue2327#1 dir=testdata/ghdl/testsuite/synth/issue2327 std=08 sha=cfbf53a9278e818e
+ test_and.vhdl ghdl=0 nvc=0
+ test_tf.vhdl ghdl=0 nvc=0
+ tb_test_tf.vhdl ghdl=0 nvc=0
+run synth/issue2328#1 dir=testdata/ghdl/testsuite/synth/issue2328 std=08 sha=6f0df225739e1e9b
+ test.vhdl ghdl=0 nvc=0
+ test_tf.vhdl ghdl=0 nvc=0
+ tb_test_tf.vhdl ghdl=0 nvc=0
+run synth/issue2330#1 dir=testdata/ghdl/testsuite/synth/issue2330 std=93c sha=09ef0fbf42e899ed
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue2334#1 dir=testdata/ghdl/testsuite/synth/issue2334 std=93c sha=d225030fae8c943f
+ repro.vhdl ghdl=0 nvc=1@15
+ top_ecp5pll.vhd ghdl=1@28,29,30,31,32,37 nvc=1@25
+ ecp5pll.vhd ghdl=0 nvc=1@62,77,78,99,100
+run synth/issue2339#1 dir=testdata/ghdl/testsuite/synth/issue2339 std=08 sha=a578fc807c3fc73e
+ top_ecp5pll.vhd ghdl=1@25 nvc=1@25
+ ecp5pll.vhd ghdl=0 nvc=1@62,77,78,99,100
+run synth/issue2347#1 dir=testdata/ghdl/testsuite/synth/issue2347 std=93c sha=5f6a3989d454c936
+ ent.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue2361#1 dir=testdata/ghdl/testsuite/synth/issue2361 std=08 sha=a6ea2c7833d985bb
+ jkff.vhdl ghdl=0 nvc=0
+run synth/issue2369#1 dir=testdata/ghdl/testsuite/synth/issue2369 std=08 sha=a4b25f6974548864
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2372#1 dir=testdata/ghdl/testsuite/synth/issue2372 std=08 sha=844726044ec5c28b
+ to01.vhdl ghdl=0 nvc=0
+run synth/issue2390#1 dir=testdata/ghdl/testsuite/synth/issue2390 std=08 sha=c0eb03f2631ea677
+ types.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=1@23,25,27 nvc=1@23,25,27
+ ram.vhdl ghdl=0 nvc=0
+ ucpu.vhdl ghdl=0 nvc=0
+ rom.vhdl ghdl=0 nvc=0
+run synth/issue2399#1 dir=testdata/ghdl/testsuite/synth/issue2399 std=93c sha=a0390695c02b59a5
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue2408#1 dir=testdata/ghdl/testsuite/synth/issue2408 std=93c sha=7355ceb8d312535c
+ bug.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue2418#1 dir=testdata/ghdl/testsuite/synth/issue2418 std=93c sha=bde68b1c26a22d6e
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue2428#1 dir=testdata/ghdl/testsuite/synth/issue2428 std=93c sha=ef513d7ee50cbf9d
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ blackboxexample.vhdl ghdl=0 nvc=0
+run synth/issue2436#1 dir=testdata/ghdl/testsuite/synth/issue2436 std=93c sha=8bd96baacd9625f2
+ definitions.vhdl ghdl=0 nvc=0
+ cm_target.vhdl ghdl=0 nvc=0
+ dff1.vhdl ghdl=0 nvc=0
+ tb_dff1.vhdl ghdl=0 nvc=0
+run synth/issue2436#2 dir=testdata/ghdl/testsuite/synth/issue2436 std=93c sha=45321e6d8d6229bc
+ dff2.vhdl ghdl=0 nvc=0
+ tb_dff2.vhdl ghdl=0 nvc=0
+run synth/issue2436#3 dir=testdata/ghdl/testsuite/synth/issue2436 std=93c sha=2099311cf25efd7f
+ dff3.vhdl ghdl=0 nvc=0
+ tb_dff3.vhdl ghdl=0 nvc=0
+run synth/issue2438#1 dir=testdata/ghdl/testsuite/synth/issue2438 std=93c sha=c5be2e8ee165fa3e
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+ repro5.vhdl ghdl=0 nvc=0
+ test_case.vhdl ghdl=0 nvc=0
+run synth/issue2444#1 dir=testdata/ghdl/testsuite/synth/issue2444 std=93c sha=ead1fc84c0249bd9
+ test.vhdl ghdl=0 nvc=0
+run synth/issue2456#1 dir=testdata/ghdl/testsuite/synth/issue2456 std=08 sha=b7f288548f3046bb
+ repro2.vhdl ghdl=0 nvc=0
+ tb_repro2.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+ tb_repro1.vhdl ghdl=0 nvc=0
+run synth/issue2461#1 dir=testdata/ghdl/testsuite/synth/issue2461 std=08 sha=ab2dda813e7cdff8
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+ knn.vhdl ghdl=1@5,18,19,20,26~ nvc=1@5,26
+ argmin.vhdl ghdl=1@5,16,17,22~ nvc=1@5,22
+ distancias.vhdl ghdl=1@5,16,17,18,23~ nvc=1@5,23
+ insere.vhdl ghdl=1@2,12,15,20~ nvc=1@2,20
+ moda.vhdl ghdl=1@2,13,19~ nvc=1@2,19
+ norm.vhdl ghdl=1@5,16,17,18,19,24,28,29,30,31,34,36,41,45,46,47,55,56,63,64,65,70,71,74,77 nvc=1@5,24
+ pacote_aux.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=1@22 nvc=1@22
+run synth/issue2467#1 dir=testdata/ghdl/testsuite/synth/issue2467 std=93c sha=53475f95094801a9
+ rvapo.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2474#1 dir=testdata/ghdl/testsuite/synth/issue2474 std=93c sha=dc0543110ebd96c4
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+run synth/issue2484#1 dir=testdata/ghdl/testsuite/synth/issue2484 std=08 sha=d48d218aec480192
+ issue.vhdl ghdl=0 nvc=0
+ issue2.vhdl ghdl=0 nvc=0
+run synth/issue2504#1 dir=testdata/ghdl/testsuite/synth/issue2504 std=93c sha=bb910f306118228a
+ shift1.vhdl ghdl=0 nvc=0
+ tb_shift1.vhdl ghdl=0 nvc=0
+run synth/issue2504#2 dir=testdata/ghdl/testsuite/synth/issue2504 std=93c sha=92383032b6e6c6d9
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ nomem1.vhdl ghdl=0 nvc=0
+ nomem2.vhdl ghdl=0 nvc=0
+ nomem3.vhdl ghdl=0 nvc=0
+run synth/issue2511#1 dir=testdata/ghdl/testsuite/synth/issue2511 std=93c sha=9a70eae144dc420e
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run synth/issue2513#1 dir=testdata/ghdl/testsuite/synth/issue2513 std=08 sha=a76602f0f404ae54
+ test.vhdl ghdl=0 nvc=0
+run synth/issue2514#1 dir=testdata/ghdl/testsuite/synth/issue2514 std=08 sha=52ad876789d3836c
+ test.vhdl -Werror ghdl=0 nvc=0
+run synth/issue2521#1 dir=testdata/ghdl/testsuite/synth/issue2521 std=93c sha=f44bb5197cc2768b
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue2529#1 dir=testdata/ghdl/testsuite/synth/issue2529 std=08 sha=d38837f7678d6e6e
+ utility.vhdl ghdl=0 nvc=0
+ inner.vhdl ghdl=0 nvc=0
+ outer.vhdl ghdl=0 nvc=0
+run synth/issue2537#1 dir=testdata/ghdl/testsuite/synth/issue2537 std=08 sha=61e5c243d09b9634
+ shifter.vhdl ghdl=0 nvc=0
+run synth/issue2545#1 dir=testdata/ghdl/testsuite/synth/issue2545 std=93c sha=841224345ad6042e
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2551#1 dir=testdata/ghdl/testsuite/synth/issue2551 std=93c sha=6ae9afd4b43f3a70
+ test_func.vhdl ghdl=0 nvc=0
+run synth/issue2553#1 dir=testdata/ghdl/testsuite/synth/issue2553 std=93c sha=6889bae34cc4cb84
+ debounce.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2599#1 dir=testdata/ghdl/testsuite/synth/issue2599 std=08 sha=ccda62d56fbdc938
+ repro1.vhdl --force-analysis ghdl=0 nvc=0
+ repro2.vhdl --force-analysis ghdl=0 nvc=0
+ repro3.vhdl --force-analysis ghdl=0 nvc=0
+run synth/issue2605#1 dir=testdata/ghdl/testsuite/synth/issue2605 std=93c sha=09cb8c5a3991d5af
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run synth/issue2606#1 dir=testdata/ghdl/testsuite/synth/issue2606 std=93c sha=d05921dd058c2bf4
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue2616#1 dir=testdata/ghdl/testsuite/synth/issue2616 std=08 sha=d221c649b5870345
+ mre.vhdl ghdl=0 nvc=0
+run synth/issue2634#1 dir=testdata/ghdl/testsuite/synth/issue2634 std=93c sha=0559af4d00200078
+ uart_rx.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/issue2647#1 dir=testdata/ghdl/testsuite/synth/issue2647 std=08 sha=c7445f45a2401098
+ not_full.vhdl ghdl=0 nvc=0
+run synth/issue2658#1 dir=testdata/ghdl/testsuite/synth/issue2658 std=93c sha=58a63c6538a823d7
+ bugtest.vhdl ghdl=0 nvc=0
+run synth/issue2667#1 dir=testdata/ghdl/testsuite/synth/issue2667 std=08 sha=7f7a5a6beb60d3a5
+ bin_to_7seg.vhdl ghdl=0 nvc=0
+ tb_bin_to_7seg.vhdl ghdl=0 nvc=0
+run synth/issue2675#1 dir=testdata/ghdl/testsuite/synth/issue2675 std=93c sha=e68593d9749a5e7a
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2678#1 dir=testdata/ghdl/testsuite/synth/issue2678 std=08 sha=6ab99feaa633ea3c
+ repro.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=1@28
+run synth/issue2679#1 dir=testdata/ghdl/testsuite/synth/issue2679 std=93c sha=033e3c0a44b9699c
+ bugr.vhdl ghdl=0 nvc=0
+ bugw.vhdl ghdl=0 nvc=0
+ bug.vhdl ghdl=0 nvc=0
+run synth/issue2682#1 dir=testdata/ghdl/testsuite/synth/issue2682 std=08 sha=22ec4cacabe3bdf7
+ ent.vhdl ghdl=0 nvc=0
+ entr.vhdl ghdl=0 nvc=0
+run synth/issue2683#1 dir=testdata/ghdl/testsuite/synth/issue2683 std=08 sha=c2489efddf85aadc
+ slow.vhdl ghdl=0 nvc=1@14
+ slow-orig.vhdl ghdl=0 nvc=1@14
+ fast.vhdl ghdl=0 nvc=1@14
+run synth/issue2692#1 dir=testdata/ghdl/testsuite/synth/issue2692 std=93c sha=b487674a90f93fa9
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ spi_slave.vhdl ghdl=0 nvc=0
+run synth/issue2713#1 dir=testdata/ghdl/testsuite/synth/issue2713 std=93c sha=f7ffc322d5ecb0d8
+ reprod.vhdl ghdl=0 nvc=0
+run synth/issue2717#1 dir=testdata/ghdl/testsuite/synth/issue2717 std=08 sha=b0ee41466d9f2a20
+ mwe.vhdl ghdl=1@8 nvc=1@8
+run synth/issue2740#1 dir=testdata/ghdl/testsuite/synth/issue2740 std=08 sha=cc8ff240cf9f3fe6
+ uart.vhd -fsynopsys ghdl=1@62,92,113,135 nvc=1@62,92,113,135
+ uart_clk_div.vhd -fsynopsys ghdl=0 nvc=0
+ uart_debouncer.vhd -fsynopsys ghdl=0 nvc=0
+ uart_parity.vhd -fsynopsys ghdl=0 nvc=0
+ uart_rx.vhd -fsynopsys ghdl=0 nvc=0
+ uart_tx.vhd -fsynopsys ghdl=0 nvc=0
+ uart.vhd -fsynopsys ghdl=0 nvc=0
+ uart_clk_div.vhd -fsynopsys ghdl=0 nvc=0
+ uart_debouncer.vhd -fsynopsys ghdl=0 nvc=0
+ uart_parity.vhd -fsynopsys ghdl=0 nvc=0
+ uart_rx.vhd -fsynopsys ghdl=0 nvc=0
+ uart_tx.vhd -fsynopsys ghdl=0 nvc=0
+run synth/issue2742#1 dir=testdata/ghdl/testsuite/synth/issue2742 std=93c sha=e257d0590bf9c818
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2743#1 dir=testdata/ghdl/testsuite/synth/issue2743 std=08 sha=ec980b8a83473f32
+ test.vhdl ghdl=0 nvc=0
+run synth/issue2745#1 dir=testdata/ghdl/testsuite/synth/issue2745 std=93c sha=891367ace895a05e
+ init.vhdl ghdl=0 nvc=0
+ tb_init.vhdl ghdl=0 nvc=0
+run synth/issue2745#2 dir=testdata/ghdl/testsuite/synth/issue2745 std=93c sha=291e36c34d043b67
+ initport.vhdl ghdl=0 nvc=0
+ tb_initport.vhdl ghdl=0 nvc=0
+run synth/issue2746#1 dir=testdata/ghdl/testsuite/synth/issue2746 std=93c sha=9aa204297e49b7d1
+ repro1b.vhdl ghdl=0 nvc=0
+run synth/issue2747#1 dir=testdata/ghdl/testsuite/synth/issue2747 std=93c sha=dd0401a4c87e9caf
+ top.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2750#1 dir=testdata/ghdl/testsuite/synth/issue2750 std=93c sha=e2f039cfbc25d76f
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2751#1 dir=testdata/ghdl/testsuite/synth/issue2751 std=93c sha=7a6c853f439e4829
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2753#1 dir=testdata/ghdl/testsuite/synth/issue2753 std=93c sha=bb11e9dc7ff50072
+ zybo_top.vhdl ghdl=0 nvc=0
+run synth/issue2755#1 dir=testdata/ghdl/testsuite/synth/issue2755 std=93c sha=0cfb469e3cfc3520
+ mul_block.vhdl ghdl=0 nvc=0
+ mul_block.vhdl ghdl=0 nvc=0
+run synth/issue2766#1 dir=testdata/ghdl/testsuite/synth/issue2766 std=93c sha=bc20cf06473647eb
+ vcomponents.vhdl lib=unisim ghdl=0 nvc=0
+ ibufds.vhdl lib=unisim ghdl=0 nvc=0
+ demo_comp.vhdl ghdl=0 nvc=0
+ demo_direct.vhdl ghdl=0 nvc=0
+run synth/issue2782#1 dir=testdata/ghdl/testsuite/synth/issue2782 std=08 sha=18eb6cf940ee062d
+ outer.vhdl ghdl=0 nvc=0
+run synth/issue2786#1 dir=testdata/ghdl/testsuite/synth/issue2786 std=93c sha=2c57df5b85a3d6a3
+ burst.vhdl ghdl=0 nvc=0
+run synth/issue2798#1 dir=testdata/ghdl/testsuite/synth/issue2798 std=93c sha=4d494bc0a79b9f5a
+ test.vhdl ghdl=0 nvc=0
+run synth/issue2824#1 dir=testdata/ghdl/testsuite/synth/issue2824 std=93c sha=40f36d45a380fdee
+ top.vhdl ghdl=0 nvc=0
+ top2.vhdl ghdl=0 nvc=0
+run synth/issue2826#1 dir=testdata/ghdl/testsuite/synth/issue2826 std=93c sha=8b52c594870a3fde
+ top.vhdl ghdl=0 nvc=0
+ topsub.vhdl ghdl=0 nvc=0
+run synth/issue2827#1 dir=testdata/ghdl/testsuite/synth/issue2827 std=93c sha=84e22834886cc55f
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2834#1 dir=testdata/ghdl/testsuite/synth/issue2834 std=93c sha=0cf4cec7d76f928d
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2850#1 dir=testdata/ghdl/testsuite/synth/issue2850 std=08 sha=73181dc88ee48e14
+ issue.vhdl ghdl=0 nvc=0
+ tb_issue.vhdl ghdl=0 nvc=0
+run synth/issue2865#1 dir=testdata/ghdl/testsuite/synth/issue2865 std=08 sha=9c198f4cf0acd5f1
+ memac_rmii_rx.vhdl ghdl=0 nvc=0
+run synth/issue2876#1 dir=testdata/ghdl/testsuite/synth/issue2876 std=08 sha=f4143b23ce886983
+ record_bug.vhdl ghdl=0 nvc=0
+ tb_record_bug.vhdl ghdl=0 nvc=0
+run synth/issue2876#2 dir=testdata/ghdl/testsuite/synth/issue2876 std=08 sha=b6611416dffc01a1
+ record_bug2.vhdl ghdl=0 nvc=0
+ tb_record_bug2.vhdl ghdl=0 nvc=0
+run synth/issue2876#3 dir=testdata/ghdl/testsuite/synth/issue2876 std=08 sha=c57b247dc96ddd98
+ record_bug3.vhdl ghdl=0 nvc=0
+ tb_record_bug3.vhdl ghdl=0 nvc=0
+run synth/issue2876#4 dir=testdata/ghdl/testsuite/synth/issue2876 std=08 sha=c82af2acdec37393
+ record_bug4.vhdl ghdl=0 nvc=0
+ tb_record_bug4.vhdl ghdl=0 nvc=0
+run synth/issue2876#5 dir=testdata/ghdl/testsuite/synth/issue2876 std=08 sha=c82af2acdec37393
+ record_bug4.vhdl ghdl=0 nvc=0
+ tb_record_bug4.vhdl ghdl=0 nvc=0
+run synth/issue2912#1 dir=testdata/ghdl/testsuite/synth/issue2912 std=93c sha=216849aa067b1c49
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2914#1 dir=testdata/ghdl/testsuite/synth/issue2914 std=08 sha=33709029940b894d
+ module.vhdl ghdl=0 nvc=0
+run synth/issue2930#1 dir=testdata/ghdl/testsuite/synth/issue2930 std=93c sha=fa040fe9571a25da
+ rom1.vhdl ghdl=1@4,11~ nvc=1@4,11
+ tb_rom1.vhdl ghdl=1@7,13,18,19,21 nvc=1@7
+ mem_pkg.vhdl ghdl=0 nvc=0
+run synth/issue2930#2 dir=testdata/ghdl/testsuite/synth/issue2930 std=93c sha=971b327f0eb521c1
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2937#1 dir=testdata/ghdl/testsuite/synth/issue2937 std=93c sha=e9e3e69125c56cf7
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue2954#1 dir=testdata/ghdl/testsuite/synth/issue2954 std=93c sha=df79867c1662b889
+ fir_fxp.vhdl ghdl=0 nvc=0
+run synth/issue2961#1 dir=testdata/ghdl/testsuite/synth/issue2961 std=93c sha=00b40143eb2c3f7d
+ top.vhdl ghdl=0 nvc=0
+ tb_top.vhdl ghdl=0 nvc=0
+run synth/issue2966#1 dir=testdata/ghdl/testsuite/synth/issue2966 std=93c sha=a0f0043b22058499
+ repro1.vhdl ghdl=0 nvc=0
+ repro2_pkg.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro2b.vhdl ghdl=0 nvc=0
+run synth/issue2966#2 dir=testdata/ghdl/testsuite/synth/issue2966 std=93c sha=96fa07c08eb8105b
+ repro2_pkg.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run synth/issue2984#1 dir=testdata/ghdl/testsuite/synth/issue2984 std=93c sha=0affc2751c200716
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2989#1 dir=testdata/ghdl/testsuite/synth/issue2989 std=08 sha=4c076940d0f84103
+ top2.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2992#1 dir=testdata/ghdl/testsuite/synth/issue2992 std=93c sha=19f3613925a2231e
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run synth/issue2993#1 dir=testdata/ghdl/testsuite/synth/issue2993 std=08 sha=2084ed65e95d79fc
+ pb1.vhdl ghdl=0 nvc=0
+ tb_pb1.vhdl ghdl=0 nvc=0
+run synth/issue2993#2 dir=testdata/ghdl/testsuite/synth/issue2993 std=08 sha=2084ed65e95d79fc
+ pb1.vhdl ghdl=0 nvc=0
+ tb_pb1.vhdl ghdl=0 nvc=0
+run synth/issue2993#3 dir=testdata/ghdl/testsuite/synth/issue2993 std=08 sha=2b7270cb999f23bd
+ repro1.vhdl ghdl=0 nvc=0
+ tb_repro1.vhdl ghdl=0 nvc=0
+run synth/issue2995#1 dir=testdata/ghdl/testsuite/synth/issue2995 std=93c sha=f0df3970d85e8ae9
+ top.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run synth/issue2998#1 dir=testdata/ghdl/testsuite/synth/issue2998 std=93c sha=6310a92a82c15919
+ repro.vhdl ghdl=0 nvc=0
+run synth/issue3000#1 dir=testdata/ghdl/testsuite/synth/issue3000 std=93c sha=ca39ce2939dc36fa
+ memory.vhdl ghdl=0 nvc=0
+run synth/issue3027#1 dir=testdata/ghdl/testsuite/synth/issue3027 std=93c sha=893dfe1b660ac768
+ top_module.vhdl ghdl=0 nvc=0
+ tb_top_module.vhdl ghdl=0 nvc=0
+run synth/issue3027#2 dir=testdata/ghdl/testsuite/synth/issue3027 std=93c sha=893dfe1b660ac768
+ top_module.vhdl ghdl=0 nvc=0
+ tb_top_module.vhdl ghdl=0 nvc=0
+run synth/issue3029#1 dir=testdata/ghdl/testsuite/synth/issue3029 std=08 sha=9074f906f25ceef3
+ sequencer.vhd -fpsl ghdl=0 nvc=0
+ blackbox_sequencer.vhd -fpsl ghdl=0 nvc=0
+run synth/issue3032#1 dir=testdata/ghdl/testsuite/synth/issue3032 std=93c sha=57375f7465a7abf6
+ ent.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+ inp.vhdl ghdl=0 nvc=0
+ inp.vhdl ghdl=0 nvc=0
+ outp.vhdl ghdl=0 nvc=0
+ outp.vhdl ghdl=0 nvc=0
+ attr2.vhdl ghdl=0 nvc=0
+run synth/issue3035#1 dir=testdata/ghdl/testsuite/synth/issue3035 std=93c sha=63684ebf0321ea67
+ top.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run synth/issue3061#1 dir=testdata/ghdl/testsuite/synth/issue3061 std=93c sha=a1645b08973d5e12
+ ent.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+ ent3.vhdl ghdl=0 nvc=0
+ ent4.vhdl ghdl=0 nvc=0
+run synth/issue3063#1 dir=testdata/ghdl/testsuite/synth/issue3063 std=08 sha=5eb32fb1d022005c
+ crc-orig.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run synth/issue3065#1 dir=testdata/ghdl/testsuite/synth/issue3065 std=93c sha=4d530ee8a874b671
+ top.vhdl ghdl=0 nvc=0
+run synth/issue3067#1 dir=testdata/ghdl/testsuite/synth/issue3067 std=93c sha=03f2b494d7d95ae6
+ attr.vhdl ghdl=0 nvc=0
+run synth/issue3083#1 dir=testdata/ghdl/testsuite/synth/issue3083 std=93c sha=1a1e81a6637f377d
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue3084#1 dir=testdata/ghdl/testsuite/synth/issue3084 std=08 sha=805bd7bde1b517a1
+ ent.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+run synth/issue3087#1 dir=testdata/ghdl/testsuite/synth/issue3087 std=08 sha=29aade760e54f217
+ example.vhdl ghdl=0 nvc=0
+run synth/issue3094#1 dir=testdata/ghdl/testsuite/synth/issue3094 std=93c sha=4180d8c363de237a
+ entityA.vhdl ghdl=0 nvc=0
+ entityB.vhdl ghdl=0 nvc=0
+ wrapperA.vhdl ghdl=1@4,13~ nvc=1@4,13
+ wrapperB.vhdl ghdl=1@4,13~ nvc=1@4,13
+ top.vhdl ghdl=1@11,13 nvc=1@11,13
+ entityA.vhdl ghdl=0 nvc=0
+run synth/issue3095#1 dir=testdata/ghdl/testsuite/synth/issue3095 std=93c sha=136d79e61966237d
+ reprod.vhdl ghdl=0 nvc=0
+ reprod1.vhdl ghdl=0 nvc=0
+run synth/issue3096#1 dir=testdata/ghdl/testsuite/synth/issue3096 std=93c sha=773ced4dc67ac1c9
+ repro_pkg.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+ simple3.vhdl ghdl=0 nvc=0
+run synth/issue3111#1 dir=testdata/ghdl/testsuite/synth/issue3111 std=08 sha=4b79fe4eccf87aee
+ repro_for.vhdl ghdl=0 nvc=0
+ repro_if.vhdl ghdl=0 nvc=0
+run synth/issue3114#1 dir=testdata/ghdl/testsuite/synth/issue3114 std=08 sha=2c2991eda7c2adae
+ repro_proc.vhdl ghdl=0 nvc=0
+run synth/issue3115#1 dir=testdata/ghdl/testsuite/synth/issue3115 std=08 sha=171e099f4acc1a44
+ repro_in.vhdl ghdl=0 nvc=0
+ repro_out.vhdl ghdl=0 nvc=0
+run synth/issue3116#1 dir=testdata/ghdl/testsuite/synth/issue3116 std=93c sha=a7128f84ba5b0501
+ dpram2.vhdl ghdl=0 nvc=0
+ dpram3.vhdl ghdl=0 nvc=0
+run synth/issue3121#1 dir=testdata/ghdl/testsuite/synth/issue3121 std=08 sha=c0a6a50ee119e20c
+ repro_alias2.vhdl ghdl=0 nvc=0
+ repro_alias3.vhdl ghdl=0 nvc=0
+ repro_alias4.vhdl ghdl=0 nvc=0
+ repro_alias4.vhdl -frelaxed ghdl=0 nvc=0
+run synth/issue3127#1 dir=testdata/ghdl/testsuite/synth/issue3127 std=08 sha=e873a92c3cad7843
+ pkg.vhd lib=gaisler ghdl=0 nvc=0
+ top.vhd ghdl=0 nvc=0
+ entityA.vhd lib=gaisler ghdl=0 nvc=0
+run synth/issue3129#1 dir=testdata/ghdl/testsuite/synth/issue3129 std=08 sha=c340b9803b9afb6b
+ unstatic_loop2.vhdl ghdl=0 nvc=0
+ tb_unstatic_loop2.vhdl ghdl=0 nvc=0
+run synth/issue3129#2 dir=testdata/ghdl/testsuite/synth/issue3129 std=08 sha=819d318d4c43277b
+ unstatic_loop2_orig.vhdl ghdl=0 nvc=0
+ tb_unstatic_loop2.vhdl ghdl=0 nvc=0
+run synth/issue3139#1 dir=testdata/ghdl/testsuite/synth/issue3139 std=93c sha=8813c1fd7df05df7
+ a.vhdl ghdl=0 nvc=0
+ a2.vhdl ghdl=0 nvc=0
+ a3.vhdl ghdl=0 nvc=0
+run synth/issue3144#1 dir=testdata/ghdl/testsuite/synth/issue3144 std=08 sha=07d75c3c950daa9d
+ generic_type_prev.vhdl ghdl=2 nvc=1
+ generic_type_prev_tb.vhdl ghdl=1@11 nvc=1@11
+ sl_prev.vhdl ghdl=2 nvc=1
+ generic_type_prev_tb.vhdl ghdl=1@11 nvc=1@11
+ workaround_prev.vhdl ghdl=0 nvc=0
+ generic_type_prev_tb.vhdl ghdl=0 nvc=0
+run synth/issue3156#1 dir=testdata/ghdl/testsuite/synth/issue3156 std=93c sha=7db5a6ff6a62ffc6
+ blinky.vhdl -Wno-binding ghdl=0 nvc=0
+ blinky.vhdl -Wno-binding ghdl=0 nvc=0
+ blinky.vhdl -Wno-binding ghdl=0 nvc=0
+run synth/issue3166#1 dir=testdata/ghdl/testsuite/synth/issue3166 std=93c sha=6d266f7340c5e480
+ board.vhdl ghdl=0 nvc=0
+ gate_midff.vhdl ghdl=0 nvc=0
+ board.vhdl ghdl=0 nvc=0
+run synth/issue3170#1 dir=testdata/ghdl/testsuite/synth/issue3170 std=08 sha=96bee0aad578baec
+ repro_case_qm.vhdl ghdl=0 nvc=0
+ tb_repro_case_qm.vhdl ghdl=0 nvc=0
+run synth/issue3171#1 dir=testdata/ghdl/testsuite/synth/issue3171 std=93c sha=b7441c148492f2e5
+ rotate_byte.vhdl ghdl=0 nvc=0
+ rotate_rl.vhdl ghdl=0 nvc=0
+ rotate_rl_conf.vhdl ghdl=0 nvc=0
+ top_level.vhdl ghdl=0 nvc=0
+ top_level_conf.vhdl ghdl=0 nvc=0
+run synth/issue3175#1 dir=testdata/ghdl/testsuite/synth/issue3175 std=93c sha=67f56d9ee0abda19
+ t2.vhdl ghdl=0 nvc=0
+run synth/issue3175#2 dir=testdata/ghdl/testsuite/synth/issue3175 std=08 sha=383584f13e28d011
+ t.vhdl ghdl=0 nvc=0
+run synth/issue3184#1 dir=testdata/ghdl/testsuite/synth/issue3184 std=93c sha=d0dae047290d8ffc
+ repro3.vhdl ghdl=0 nvc=0
+ tb_repro3.vhdl ghdl=0 nvc=0
+run synth/issue3184#2 dir=testdata/ghdl/testsuite/synth/issue3184 std=93c sha=e91e59d1c6aabada
+ repro4_pkg.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+ tb_repro4.vhdl ghdl=0 nvc=0
+run synth/issue3184#3 dir=testdata/ghdl/testsuite/synth/issue3184 std=93c sha=436c40f8d8f43216
+ repro4_pkg.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+ repro4_pkg.vhdl ghdl=0 nvc=0
+ tb_repro4.vhdl ghdl=1@14 nvc=0
+run synth/issue3184#4 dir=testdata/ghdl/testsuite/synth/issue3184 std=93c sha=436c40f8d8f43216
+ repro4_pkg.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+ repro4_pkg.vhdl ghdl=0 nvc=0
+ tb_repro4.vhdl ghdl=1@14 nvc=0
+run synth/issue3185#1 dir=testdata/ghdl/testsuite/synth/issue3185 std=08 sha=f1bb0c36dca0a78a
+ test.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=0 nvc=0
+run synth/issue3188#1 dir=testdata/ghdl/testsuite/synth/issue3188 std=08 sha=a5685691720cddef
+ test2.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=0 nvc=0
+run synth/issue3191#1 dir=testdata/ghdl/testsuite/synth/issue3191 std=93c sha=e7c22a957f61ec81
+ repro1.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run synth/issue412#1 dir=testdata/ghdl/testsuite/synth/issue412 std=08 sha=0ecb2bfbe68c96b0
+ generic_sfifo.vhdl ghdl=0 nvc=0
+ my_fifo.vhdl ghdl=0 nvc=0
+ tb_my_fifo.vhdl ghdl=0 nvc=0
+run synth/issue662#1 dir=testdata/ghdl/testsuite/synth/issue662 std=08 sha=03ec21b327c7ccad
+ psl_prev.vhdl ghdl=0 nvc=1@12,15
+ tb_psl_prev.vhdl ghdl=0 nvc=1@27
+ psl_stable.vhdl ghdl=0 nvc=1@15,18,21
+ tb_psl_stable.vhdl ghdl=0 nvc=1@58
+ psl_rose.vhdl ghdl=0 nvc=1@14,17
+ tb_psl_rose.vhdl ghdl=0 nvc=1@29
+ psl_fell.vhdl ghdl=0 nvc=1@14,17
+ tb_psl_fell.vhdl ghdl=0 nvc=1@29
+ psl_onehot.vhdl ghdl=0 nvc=1@16,19
+ tb_psl_onehot.vhdl ghdl=0 nvc=1@58
+ psl_onehot0.vhdl ghdl=0 nvc=1@15,18
+ tb_psl_onehot0.vhdl ghdl=0 nvc=1@58
+ psl_fell_err1.vhdl ghdl=1@14 nvc=1@14
+ psl_onehot_err.vhdl ghdl=1@26 nvc=1@17,20,26
+run synth/issue872#1 dir=testdata/ghdl/testsuite/synth/issue872 std=93c sha=37c06bbd6a5a76c9
+ alu.vhdl ghdl=0 nvc=0
+run synth/issue882#1 dir=testdata/ghdl/testsuite/synth/issue882 std=08 sha=894a34221cb71fbd
+ cpu.vhdl ghdl=0 nvc=0
+run synth/issue936#1 dir=testdata/ghdl/testsuite/synth/issue936 std=93c sha=e50c56659c285e33
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue937#1 dir=testdata/ghdl/testsuite/synth/issue937 std=93c sha=d517ae69d9a4dcbd
+ enot.vhdl ghdl=0 nvc=0
+ tb_enot.vhdl ghdl=0 nvc=0
+run synth/issue937#2 dir=testdata/ghdl/testsuite/synth/issue937 std=93c sha=70baed1967d10e61
+ bnot.vhdl ghdl=0 nvc=0
+ tb_bnot.vhdl ghdl=0 nvc=0
+run synth/issue938#1 dir=testdata/ghdl/testsuite/synth/issue938 std=93c sha=1519518e9dc45bf4
+ latches.vhdl ghdl=0 nvc=0
+ tb_latches.vhdl ghdl=0 nvc=0
+run synth/issue938#2 dir=testdata/ghdl/testsuite/synth/issue938 std=93c sha=1519518e9dc45bf4
+ latches.vhdl ghdl=0 nvc=0
+ tb_latches.vhdl ghdl=0 nvc=0
+run synth/issue940#1 dir=testdata/ghdl/testsuite/synth/issue940 std=93c sha=bf03a1f1ec9a1987
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue941#1 dir=testdata/ghdl/testsuite/synth/issue941 std=93c sha=421522ff4a5a6541
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue944#1 dir=testdata/ghdl/testsuite/synth/issue944 std=08 sha=24128684df4a8e02
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue945#1 dir=testdata/ghdl/testsuite/synth/issue945 std=93c sha=50537ae26757b0fa
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue946#1 dir=testdata/ghdl/testsuite/synth/issue946 std=93c sha=d9be368f867f1b83
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue947#1 dir=testdata/ghdl/testsuite/synth/issue947 std=93c sha=c75036bc452cbeff
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue948#1 dir=testdata/ghdl/testsuite/synth/issue948 std=93c sha=f99e40fdb3ea3b61
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue951#1 dir=testdata/ghdl/testsuite/synth/issue951 std=93c sha=ca2f66003522a653
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue953#1 dir=testdata/ghdl/testsuite/synth/issue953 std=93c sha=bd950abdb9252eab
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue954#1 dir=testdata/ghdl/testsuite/synth/issue954 std=93c sha=8b7439ed2bd19f1b
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue955#1 dir=testdata/ghdl/testsuite/synth/issue955 std=93c sha=7807ea6474a98907
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue955#2 dir=testdata/ghdl/testsuite/synth/issue955 std=93c sha=b1de0fbecf8c99a4
+ ent1.vhdl ghdl=0 nvc=0
+ tb_ent1.vhdl ghdl=0 nvc=0
+run synth/issue956#1 dir=testdata/ghdl/testsuite/synth/issue956 std=93c sha=5003b2a655d2ea1c
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue958#1 dir=testdata/ghdl/testsuite/synth/issue958 std=93c sha=4f73925073a8a025
+ ent.vhdl ghdl=0 nvc=0
+ c.vhdl ghdl=0 nvc=0
+run synth/issue958#2 dir=testdata/ghdl/testsuite/synth/issue958 std=93c sha=d3c8d981140b2408
+ ent1.vhdl ghdl=0 nvc=0
+ c.vhdl ghdl=0 nvc=0
+run synth/issue960#1 dir=testdata/ghdl/testsuite/synth/issue960 std=93c sha=743ebbaaef149422
+ ent2.vhdl ghdl=0 nvc=0
+ tb_ent2.vhdl ghdl=0 nvc=0
+run synth/issue960#2 dir=testdata/ghdl/testsuite/synth/issue960 std=93c sha=ae2c159e023da4e6
+ ent.vhdl ghdl=0 nvc=0
+run synth/issue962#1 dir=testdata/ghdl/testsuite/synth/issue962 std=93c sha=0238616f0c090981
+ ent2.vhdl ghdl=0 nvc=0
+run synth/issue963#1 dir=testdata/ghdl/testsuite/synth/issue963 std=93c sha=12617d28d87331d6
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue963#2 dir=testdata/ghdl/testsuite/synth/issue963 std=93c sha=fd089281c6ce7fcc
+ ent2.vhdl ghdl=0 nvc=0
+ tb_ent2.vhdl ghdl=0 nvc=0
+run synth/issue964#1 dir=testdata/ghdl/testsuite/synth/issue964 std=93c sha=ebc8a7ae64105e81
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/issue965#1 dir=testdata/ghdl/testsuite/synth/issue965 std=08 sha=c36bff68125dd00e
+ test_block.vhdl ghdl=0 nvc=0
+run synth/issue972#1 dir=testdata/ghdl/testsuite/synth/issue972 std=08 sha=1b79740f827290c8
+ test2.vhdl ghdl=0 nvc=0
+run synth/issue973#1 dir=testdata/ghdl/testsuite/synth/issue973 std=93c sha=693312d08dbed1b1
+ ent.vhdl ghdl=0 nvc=0
+ tb_ent.vhdl ghdl=0 nvc=0
+run synth/latch01#1 dir=testdata/ghdl/testsuite/synth/latch01 std=93c sha=d607b45266af0d7a
+ latch01.vhdl ghdl=0 nvc=0
+ tb_latch01.vhdl ghdl=0 nvc=0
+run synth/latch02#1 dir=testdata/ghdl/testsuite/synth/latch02 std=08 sha=3686aad4a0a5aced
+ nolatch1.vhdl ghdl=0 nvc=0
+ nolatch2.vhdl ghdl=0 nvc=0
+ nolatch3.vhdl ghdl=0 nvc=0
+run synth/lib01#1 dir=testdata/ghdl/testsuite/synth/lib01 std=93c sha=7e5a9b8e12850dfe
+ and2.vhdl lib=mylib ghdl=0 nvc=0
+ and3.vhdl ghdl=0 nvc=0
+ tb_and3.vhdl ghdl=0 nvc=0
+run synth/lib01#2 dir=testdata/ghdl/testsuite/synth/lib01 std=93c sha=d890fd25dc9d1130
+ and3.vhdl ghdl=1@3,10~ nvc=1@3,10
+ and2.vhdl ghdl=0 nvc=0
+ and2.vhdl lib=mylib ghdl=0 nvc=0
+ tb_and3.vhdl ghdl=1@12 nvc=1@12
+run synth/lit01#1 dir=testdata/ghdl/testsuite/synth/lit01 std=93c sha=bae1aba55d9c543c
+ aggr02.vhdl ghdl=0 nvc=0
+ tb_aggr02.vhdl ghdl=0 nvc=0
+run synth/loop01#1 dir=testdata/ghdl/testsuite/synth/loop01 std=93c sha=b97018d31baa91f4
+ loop01.vhdl ghdl=0 nvc=0
+ tb_loop01.vhdl ghdl=0 nvc=0
+run synth/loop01#2 dir=testdata/ghdl/testsuite/synth/loop01 std=93c sha=6623eaf9bc84e94c
+ loop02.vhdl ghdl=0 nvc=0
+ loop03.vhdl ghdl=0 nvc=0
+ loop04.vhdl ghdl=0 nvc=0
+ tb_loop04.vhdl ghdl=0 nvc=0
+run synth/loop01#3 dir=testdata/ghdl/testsuite/synth/loop01 std=93c sha=e1d9cb6713246be6
+ loop05.vhdl ghdl=0 nvc=0
+ tb_loop05.vhdl ghdl=0 nvc=0
+run synth/loop01#4 dir=testdata/ghdl/testsuite/synth/loop01 std=93c sha=4821cb0de1a649ed
+ loop06.vhdl ghdl=0 nvc=0
+ loop07.vhdl ghdl=0 nvc=0
+ tb_loop07.vhdl ghdl=0 nvc=0
+run synth/match01#1 dir=testdata/ghdl/testsuite/synth/match01 std=08 sha=8e193bf7ebc1208b
+ match01.vhdl ghdl=0 nvc=0
+ tb_match01.vhdl ghdl=0 nvc=0
+run synth/match01#2 dir=testdata/ghdl/testsuite/synth/match01 std=08 sha=9d5f975704ffeb60
+ match02.vhdl ghdl=0 nvc=0
+ tb_match02.vhdl ghdl=0 nvc=0
+run synth/match01#3 dir=testdata/ghdl/testsuite/synth/match01 std=08 sha=120e66abd68aed8c
+ match03.vhdl ghdl=0 nvc=0
+ tb_match03.vhdl ghdl=0 nvc=0
+run synth/match01#4 dir=testdata/ghdl/testsuite/synth/match01 std=08 sha=11215dbbf2c72c06
+ match05.vhdl ghdl=0 nvc=0
+ tb_match05.vhdl ghdl=0 nvc=0
+run synth/match01#5 dir=testdata/ghdl/testsuite/synth/match01 std=08 sha=38da7ce93495ee58
+ match07.vhdl ghdl=0 nvc=0
+ tb_match07.vhdl ghdl=0 nvc=0
+run synth/match01#6 dir=testdata/ghdl/testsuite/synth/match01 std=08 sha=7f0da5e8d70cd124
+ match08.vhdl ghdl=0 nvc=0
+ tb_match08.vhdl ghdl=0 nvc=0
+run synth/match01#7 dir=testdata/ghdl/testsuite/synth/match01 std=08 sha=4dba9bbec33881c8
+ match04.vhdl ghdl=0 nvc=0
+ match06.vhdl ghdl=0 nvc=0
+run synth/mem01#1 dir=testdata/ghdl/testsuite/synth/mem01 std=93c sha=c7f80c8e13d5303c
+ rom1.vhdl ghdl=0 nvc=0
+ tb_rom1.vhdl ghdl=0 nvc=0
+run synth/mem01#2 dir=testdata/ghdl/testsuite/synth/mem01 std=93c sha=b25a187f527548ca
+ srom01.vhdl ghdl=0 nvc=0
+ tb_srom01.vhdl ghdl=0 nvc=0
+run synth/mem01#3 dir=testdata/ghdl/testsuite/synth/mem01 std=93c sha=6f5efe55d07a630e
+ srom02.vhdl ghdl=0 nvc=0
+ tb_srom02.vhdl ghdl=0 nvc=0
+run synth/mem01#4 dir=testdata/ghdl/testsuite/synth/mem01 std=93c sha=bbf30e08d0e23fcb
+ sram01.vhdl ghdl=0 nvc=0
+ tb_sram01.vhdl ghdl=0 nvc=0
+run synth/mem01#5 dir=testdata/ghdl/testsuite/synth/mem01 std=93c sha=066fb301a7b8ebd2
+ sram02.vhdl ghdl=0 nvc=0
+ tb_sram02.vhdl ghdl=0 nvc=0
+run synth/mem01#6 dir=testdata/ghdl/testsuite/synth/mem01 std=93c sha=3e16603196fb0478
+ sram03.vhdl ghdl=0 nvc=0
+ tb_sram03.vhdl ghdl=0 nvc=0
+run synth/mem01#7 dir=testdata/ghdl/testsuite/synth/mem01 std=93c sha=7388c3c8d09feeb0
+ sram05.vhdl ghdl=0 nvc=0
+ tb_sram05.vhdl ghdl=0 nvc=0
+run synth/mem01#8 dir=testdata/ghdl/testsuite/synth/mem01 std=93c sha=63bd72641668fe37
+ dpram1.vhdl ghdl=0 nvc=0
+ tb_dpram1.vhdl ghdl=0 nvc=0
+run synth/mem01#9 dir=testdata/ghdl/testsuite/synth/mem01 std=93c sha=ba345f6d1276562e
+ dpram2.vhdl ghdl=0 nvc=0
+ tb_dpram2.vhdl ghdl=0 nvc=0
+run synth/mem01#10 dir=testdata/ghdl/testsuite/synth/mem01 std=93c sha=fc08a0ec5b989b73
+ dpram3.vhdl ghdl=0 nvc=0
+ tb_dpram3.vhdl ghdl=0 nvc=0
+run synth/mem01#11 dir=testdata/ghdl/testsuite/synth/mem01 std=93c sha=d1b90f7be1726101
+ rom2.vhdl ghdl=0 nvc=0
+ rom3.vhdl ghdl=0 nvc=0
+run synth/mem02#1 dir=testdata/ghdl/testsuite/synth/mem02 std=93c sha=f76c23aea998625d
+ dpram1.vhdl ghdl=0 nvc=0
+ tb_dpram1.vhdl ghdl=0 nvc=0
+run synth/mem02#2 dir=testdata/ghdl/testsuite/synth/mem02 std=93c sha=ab64e636dc7e4d61
+ dpram3.vhdl ghdl=0 nvc=0
+ tb_dpram3.vhdl ghdl=0 nvc=0
+run synth/mem02#3 dir=testdata/ghdl/testsuite/synth/mem02 std=93c sha=25843cbfaf4df4e0
+ dpram4.vhdl ghdl=0 nvc=0
+ tb_dpram4.vhdl ghdl=0 nvc=0
+run synth/mem02#4 dir=testdata/ghdl/testsuite/synth/mem02 std=93c sha=446ce1a73f447fae
+ dpram5.vhdl ghdl=0 nvc=0
+ tb_dpram5.vhdl ghdl=0 nvc=0
+run synth/mem02#5 dir=testdata/ghdl/testsuite/synth/mem02 std=93c sha=e023fb7d9f6f40ca
+ dpram7.vhdl ghdl=0 nvc=0
+ tb_dpram7.vhdl ghdl=0 nvc=0
+run synth/mem02#6 dir=testdata/ghdl/testsuite/synth/mem02 std=93c sha=076d27447465c501
+ dpram8.vhdl ghdl=0 nvc=0
+ tb_dpram8.vhdl ghdl=0 nvc=0
+run synth/mem02#7 dir=testdata/ghdl/testsuite/synth/mem02 std=93c sha=b6684594ac52dd82
+ ram3.vhdl ghdl=0 nvc=0
+ tb_ram3.vhdl ghdl=0 nvc=0
+run synth/mem02#8 dir=testdata/ghdl/testsuite/synth/mem02 std=93c sha=9828e388166b9390
+ ram4.vhdl ghdl=0 nvc=0
+ tb_ram4.vhdl ghdl=0 nvc=0
+run synth/mem02#9 dir=testdata/ghdl/testsuite/synth/mem02 std=93c sha=a896d421ad1de8f9
+ ram6.vhdl ghdl=0 nvc=0
+ tb_ram6.vhdl ghdl=0 nvc=0
+run synth/mem02#10 dir=testdata/ghdl/testsuite/synth/mem02 std=93c sha=9d45fbfdf807a2f3
+ ram8.vhdl ghdl=0 nvc=0
+ ram9.vhdl ghdl=0 nvc=0
+run synth/mem03#1 dir=testdata/ghdl/testsuite/synth/mem03 std=93c sha=a95ef445a56045c3
+ ram01.vhdl ghdl=0 nvc=0
+ tb_ram01.vhdl ghdl=0 nvc=0
+run synth/mem03#2 dir=testdata/ghdl/testsuite/synth/mem03 std=93c sha=0ed25bfd8a8048ff
+ ram02.vhdl ghdl=0 nvc=0
+ tb_ram02.vhdl ghdl=0 nvc=0
+run synth/mem04#1 dir=testdata/ghdl/testsuite/synth/mem04 std=93c sha=b1b8d06ebf6aa669
+ rom_bit.vhdl ghdl=0 nvc=0
+ tb_rom_bit.vhdl ghdl=0 nvc=0
+run synth/mem04#2 dir=testdata/ghdl/testsuite/synth/mem04 std=93c sha=9d1777ceda3ef1b2
+ rom_ub32.vhdl ghdl=0 nvc=0
+ tb_rom_ub32.vhdl ghdl=0 nvc=0
+run synth/mem04#3 dir=testdata/ghdl/testsuite/synth/mem04 std=93c sha=d63635be016fcd65
+ rom_log.vhdl ghdl=0 nvc=0
+ tb_rom_log.vhdl ghdl=0 nvc=0
+run synth/mem04#4 dir=testdata/ghdl/testsuite/synth/mem04 std=93c sha=c44ba980b1c22c87
+ rom_sig_bit.vhdl ghdl=0 nvc=0
+ tb_rom_sig_bit.vhdl ghdl=0 nvc=0
+run synth/mem05#1 dir=testdata/ghdl/testsuite/synth/mem05 std=93c sha=ed1bf410f8349a64
+ tb_rom01.vhdl ghdl=1@11 nvc=1@11
+run synth/mem05#2 dir=testdata/ghdl/testsuite/synth/mem05 std=93c sha=9af2b765ec409256
+ tb_rom02.vhdl ghdl=1@12 nvc=1@12
+run synth/memdp01#1 dir=testdata/ghdl/testsuite/synth/memdp01 std=93c sha=9c2fccd1a2f19b2a
+ memmux04.vhdl ghdl=0 nvc=0
+ tb_memmux04.vhdl ghdl=0 nvc=0
+run synth/memdp01#2 dir=testdata/ghdl/testsuite/synth/memdp01 std=93c sha=087ed632f14a5049
+ dpram1r.vhdl ghdl=0 nvc=0
+ tb_dpram1r.vhdl ghdl=0 nvc=0
+run synth/memdp01#3 dir=testdata/ghdl/testsuite/synth/memdp01 std=93c sha=2fe35158a1eebfe4
+ dpram2r.vhdl ghdl=0 nvc=0
+ tb_dpram2r.vhdl ghdl=0 nvc=0
+run synth/memdp01#4 dir=testdata/ghdl/testsuite/synth/memdp01 std=93c sha=342da5772a82b528
+ dpram2w.vhdl ghdl=0 nvc=0
+ tb_dpram2w.vhdl ghdl=0 nvc=0
+run synth/memmux01#1 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=b9780cae853a2666
+ memmux01.vhdl ghdl=0 nvc=0
+ tb_memmux01.vhdl ghdl=0 nvc=0
+run synth/memmux01#2 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=b9780cae853a2666
+ memmux01.vhdl ghdl=0 nvc=0
+ tb_memmux01.vhdl ghdl=0 nvc=0
+run synth/memmux01#3 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=d6b5c38916d91446
+ memmux02.vhdl ghdl=0 nvc=0
+ tb_memmux02.vhdl ghdl=0 nvc=0
+run synth/memmux01#4 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=d6b5c38916d91446
+ memmux02.vhdl ghdl=0 nvc=0
+ tb_memmux02.vhdl ghdl=0 nvc=0
+run synth/memmux01#5 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=a750d04fd63eeb1e
+ memmux02b.vhdl ghdl=0 nvc=0
+ tb_memmux02b.vhdl ghdl=0 nvc=0
+run synth/memmux01#6 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=a750d04fd63eeb1e
+ memmux02b.vhdl ghdl=0 nvc=0
+ tb_memmux02b.vhdl ghdl=0 nvc=0
+run synth/memmux01#7 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=fd95d6503f5b2bca
+ memmux03.vhdl ghdl=0 nvc=0
+ tb_memmux03.vhdl ghdl=0 nvc=0
+run synth/memmux01#8 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=fd95d6503f5b2bca
+ memmux03.vhdl ghdl=0 nvc=0
+ tb_memmux03.vhdl ghdl=0 nvc=0
+run synth/memmux01#9 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=1ae082a4d9b3cb88
+ memmux03b.vhdl ghdl=0 nvc=0
+ tb_memmux03b.vhdl ghdl=0 nvc=0
+run synth/memmux01#10 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=1ae082a4d9b3cb88
+ memmux03b.vhdl ghdl=0 nvc=0
+ tb_memmux03b.vhdl ghdl=0 nvc=0
+run synth/memmux01#11 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=4cf6d0ae8c926897
+ memmux03c.vhdl ghdl=0 nvc=0
+ tb_memmux03c.vhdl ghdl=0 nvc=0
+run synth/memmux01#12 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=4cf6d0ae8c926897
+ memmux03c.vhdl ghdl=0 nvc=0
+ tb_memmux03c.vhdl ghdl=0 nvc=0
+run synth/memmux01#13 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=c2357d594f1204f0
+ memmux04.vhdl ghdl=0 nvc=0
+ tb_memmux04.vhdl ghdl=0 nvc=0
+run synth/memmux01#14 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=c2357d594f1204f0
+ memmux04.vhdl ghdl=0 nvc=0
+ tb_memmux04.vhdl ghdl=0 nvc=0
+run synth/memmux01#15 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=b3fdccc7cd26af32
+ memmux05.vhdl ghdl=0 nvc=0
+ tb_memmux05.vhdl ghdl=0 nvc=0
+run synth/memmux01#16 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=b3fdccc7cd26af32
+ memmux05.vhdl ghdl=0 nvc=0
+ tb_memmux05.vhdl ghdl=0 nvc=0
+run synth/memmux01#17 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=5ca89a6ef21ff000
+ memmux07.vhdl ghdl=0 nvc=0
+ tb_memmux07.vhdl ghdl=0 nvc=0
+run synth/memmux01#18 dir=testdata/ghdl/testsuite/synth/memmux01 std=08 sha=5ca89a6ef21ff000
+ memmux07.vhdl ghdl=0 nvc=0
+ tb_memmux07.vhdl ghdl=0 nvc=0
+run synth/mixed1#1 dir=testdata/ghdl/testsuite/synth/mixed1 std=93c sha=233ee1e59ae259fb
+ comparator1.vhdl ghdl=0 nvc=0
+ comparator2.vhdl ghdl=0 nvc=0
+ tb_comparator2.vhdl ghdl=0 nvc=0
+run synth/mixed1#2 dir=testdata/ghdl/testsuite/synth/mixed1 std=93c sha=4ef37a5ce8d29f84
+ comparator2.vhdl ghdl=0 nvc=0
+ tb_comparator2.vhdl ghdl=0 nvc=0
+run synth/mixed1#3 dir=testdata/ghdl/testsuite/synth/mixed1 std=93c sha=91d828eaae126cd5
+ param1t.vhdl ghdl=0 nvc=0
+ tb_param1.vhdl ghdl=0 nvc=0
+run synth/name01#1 dir=testdata/ghdl/testsuite/synth/name01 std=93c sha=5bd4d9db65812253
+ name01.vhdl ghdl=0 nvc=0
+ name02.vhdl ghdl=0 nvc=0
+run synth/null01#1 dir=testdata/ghdl/testsuite/synth/null01 std=08 sha=4448e8b2e4d9a06c
+ null01.vhdl ghdl=0 nvc=0
+ null02.vhdl ghdl=0 nvc=0
+run synth/oper01#1 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=462500b804ef24b6
+ snum01.vhdl ghdl=0 nvc=0
+ tb_snum01.vhdl ghdl=0 nvc=0
+run synth/oper01#2 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=a3112e8386f025f0
+ snum02.vhdl ghdl=0 nvc=0
+ tb_snum02.vhdl ghdl=0 nvc=0
+run synth/oper01#3 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=ba2e35482961fc6d
+ snum03.vhdl ghdl=0 nvc=0
+ tb_snum03.vhdl ghdl=0 nvc=0
+run synth/oper01#4 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=46dcd5571d29a270
+ snum04.vhdl ghdl=0 nvc=0
+ tb_snum04.vhdl ghdl=0 nvc=0
+run synth/oper01#5 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=9cea645676226694
+ snum05.vhdl ghdl=0 nvc=0
+ tb_snum05.vhdl ghdl=0 nvc=0
+run synth/oper01#6 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=ec054f22db4820c5
+ cmp01.vhdl ghdl=0 nvc=0
+ tb_cmp01.vhdl ghdl=0 nvc=0
+run synth/oper01#7 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=8efd826295125f62
+ cmp02.vhdl ghdl=0 nvc=0
+ tb_cmp02.vhdl ghdl=0 nvc=0
+run synth/oper01#8 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=6e9afafb547c253e
+ cmp04.vhdl ghdl=0 nvc=0
+ tb_cmp04.vhdl ghdl=0 nvc=0
+run synth/oper01#9 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=830918db2d810f49
+ match01.vhdl ghdl=0 nvc=0
+ tb_match01.vhdl ghdl=0 nvc=0
+run synth/oper01#10 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=45a447709e3b1fbf
+ match02.vhdl ghdl=0 nvc=0
+ tb_match02.vhdl ghdl=0 nvc=0
+run synth/oper01#11 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=97bdc0954d6d498a
+ match05.vhdl ghdl=0 nvc=0
+ tb_match05.vhdl ghdl=0 nvc=0
+run synth/oper01#12 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=0ef0f60f3504a1c0
+ uns01.vhdl ghdl=0 nvc=0
+ tb_uns01.vhdl ghdl=0 nvc=0
+run synth/oper01#13 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=daddaba882a8df4f
+ nand01.vhdl ghdl=0 nvc=0
+ tb_nand01.vhdl ghdl=0 nvc=0
+run synth/oper01#14 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=e64f0a31a52366de
+ nor01.vhdl ghdl=0 nvc=0
+ tb_nor01.vhdl ghdl=0 nvc=0
+run synth/oper01#15 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=8bccd55e6b4378a3
+ xnor01.vhdl ghdl=0 nvc=0
+ tb_xnor01.vhdl ghdl=0 nvc=0
+run synth/oper01#16 dir=testdata/ghdl/testsuite/synth/oper01 std=93c sha=2074d52d19ca21f4
+ cmp03.vhdl ghdl=0 nvc=0
+ snum06.vhdl ghdl=0 nvc=0
+ match03.vhdl ghdl=0 nvc=0
+ match04.vhdl ghdl=0 nvc=0
+run synth/oper02#1 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=c7d152c0be628600
+ min01.vhdl ghdl=0 nvc=0
+ tb_min01.vhdl ghdl=0 nvc=0
+run synth/oper02#2 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=d747fecf44932eea
+ smin01.vhdl ghdl=0 nvc=0
+ tb_smin01.vhdl ghdl=0 nvc=0
+run synth/oper02#3 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=3dbd54ea690fef1f
+ smin02.vhdl ghdl=0 nvc=0
+ tb_smin02.vhdl ghdl=0 nvc=0
+run synth/oper02#4 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=c53dc6b37693d33b
+ smin03.vhdl ghdl=0 nvc=0
+ tb_smin03.vhdl ghdl=0 nvc=0
+run synth/oper02#5 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=ba4c517c22f303fa
+ umin01.vhdl ghdl=0 nvc=0
+ tb_umin01.vhdl ghdl=0 nvc=0
+run synth/oper02#6 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=0ae0093088080699
+ umin02.vhdl ghdl=0 nvc=0
+ tb_umin02.vhdl ghdl=0 nvc=0
+run synth/oper02#7 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=dc56a8647280a166
+ umin03.vhdl ghdl=0 nvc=0
+ tb_umin03.vhdl ghdl=0 nvc=0
+run synth/oper02#8 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=f284d3f6ffe5824f
+ max01.vhdl ghdl=0 nvc=0
+ tb_max01.vhdl ghdl=0 nvc=0
+run synth/oper02#9 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=5346403f9b5aad44
+ smax01.vhdl ghdl=0 nvc=0
+ tb_smax01.vhdl ghdl=0 nvc=0
+run synth/oper02#10 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=0e2ef5a2acd54b0d
+ smax02.vhdl ghdl=0 nvc=0
+ tb_smax02.vhdl ghdl=0 nvc=0
+run synth/oper02#11 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=70978dcc9e70744c
+ smax03.vhdl ghdl=0 nvc=0
+ tb_smax03.vhdl ghdl=0 nvc=0
+run synth/oper02#12 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=9fcd4dfb9a499ee8
+ umax01.vhdl ghdl=0 nvc=0
+ tb_umax01.vhdl ghdl=0 nvc=0
+run synth/oper02#13 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=d17e36176cb269f9
+ umax02.vhdl ghdl=0 nvc=0
+ tb_umax02.vhdl ghdl=0 nvc=0
+run synth/oper02#14 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=13d1883fc6179844
+ umax03.vhdl ghdl=0 nvc=0
+ tb_umax03.vhdl ghdl=0 nvc=0
+run synth/oper02#15 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=41e6714378b988f7
+ uns02.vhdl ghdl=0 nvc=0
+ tb_uns02.vhdl ghdl=0 nvc=0
+run synth/oper02#16 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=09e1c9c02bd1cd3e
+ urot01.vhdl ghdl=0 nvc=0
+ tb_urot01.vhdl ghdl=0 nvc=0
+run synth/oper02#17 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=6cbc74ceac57dcd9
+ srot01.vhdl ghdl=0 nvc=0
+ tb_srot01.vhdl ghdl=0 nvc=0
+run synth/oper02#18 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=332ecec0e3911997
+ sshift01.vhdl ghdl=0 nvc=0
+ tb_sshift01.vhdl ghdl=0 nvc=0
+run synth/oper02#19 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=553c5f5cfbd25f8e
+ ushift01.vhdl ghdl=0 nvc=0
+ tb_ushift01.vhdl ghdl=0 nvc=0
+run synth/oper02#20 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=ac81270f969cf4f6
+ nushift01.vhdl ghdl=0 nvc=0
+ tb_nushift01.vhdl ghdl=0 nvc=0
+run synth/oper02#21 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=532cd7ca42362726
+ nand01.vhdl ghdl=0 nvc=0
+ tb_nand01.vhdl ghdl=0 nvc=0
+run synth/oper02#22 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=dd5ee3d2d5f8efe1
+ nand02.vhdl ghdl=0 nvc=0
+ tb_nand02.vhdl ghdl=0 nvc=0
+run synth/oper02#23 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=536b3a620233632b
+ nor01.vhdl ghdl=0 nvc=0
+ tb_nor01.vhdl ghdl=0 nvc=0
+run synth/oper02#24 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=a2c9e4cbb95aefb4
+ nor02.vhdl ghdl=0 nvc=0
+ tb_nor02.vhdl ghdl=0 nvc=0
+run synth/oper02#25 dir=testdata/ghdl/testsuite/synth/oper02 std=08 sha=1d7953ad4ed1ee66
+ shift02.vhdl ghdl=0 nvc=0
+ ushift02.vhdl ghdl=0 nvc=0
+ nor03.vhdl ghdl=0 nvc=0
+ nor04.vhdl ghdl=0 nvc=0
+ nor05.vhdl ghdl=0 nvc=0
+ nor06.vhdl ghdl=0 nvc=0
+ nor07.vhdl ghdl=0 nvc=0
+ urot02.vhdl ghdl=0 nvc=0
+run synth/oper03#1 dir=testdata/ghdl/testsuite/synth/oper03 std=93c sha=9d0a5184e9e89154
+ mul01.vhdl ghdl=0 nvc=0
+ mul02.vhdl ghdl=0 nvc=0
+ div01.vhdl ghdl=0 nvc=0
+ divz01.vhdl ghdl=0 nvc=0
+ divz02.vhdl ghdl=0 nvc=0
+ divz03.vhdl ghdl=0 nvc=0
+ expov01.vhdl ghdl=0 nvc=0
+ concat01.vhdl ghdl=0 nvc=1@14
+run synth/oper03#2 dir=testdata/ghdl/testsuite/synth/oper03 std=08 sha=ab6ffc0b09d5106b
+ match01.vhdl ghdl=0 nvc=0
+ tox01.vhdl ghdl=0 nvc=0
+run synth/output01#1 dir=testdata/ghdl/testsuite/synth/output01 std=93c sha=259ce2c1602d454e
+ output01.vhdl ghdl=0 nvc=0
+ tb_output01.vhdl ghdl=0 nvc=0
+run synth/output01#2 dir=testdata/ghdl/testsuite/synth/output01 std=93c sha=d0233cd90e2240e4
+ output06.vhdl ghdl=0 nvc=0
+ tb_output06.vhdl ghdl=0 nvc=0
+run synth/output01#3 dir=testdata/ghdl/testsuite/synth/output01 std=93c sha=9a0f80b2e9d7c0f5
+ output07.vhdl ghdl=0 nvc=0
+ tb_output07.vhdl ghdl=0 nvc=0
+run synth/outvlg#1 dir=testdata/ghdl/testsuite/synth/outvlg std=93c sha=2889adbca792ed95
+ const01.vhdl ghdl=0 nvc=0
+ const02.vhdl ghdl=0 nvc=0
+ rom01.vhdl ghdl=0 nvc=0
+ dff08.vhdl ghdl=0 nvc=0
+ port01.vhdl ghdl=0 nvc=0
+run synth/outvlg#2 dir=testdata/ghdl/testsuite/synth/outvlg std=08 sha=82fbc0d09b05462d
+ oper01.vhdl ghdl=0 nvc=0
+ oper02.vhdl ghdl=0 nvc=0
+ oper03.vhdl ghdl=0 nvc=0
+run synth/param01#1 dir=testdata/ghdl/testsuite/synth/param01 std=93c sha=7511030cf84daf37
+ tb_param03.vhdl ghdl=1@10 nvc=1@10
+ tb_param05.vhdl ghdl=1@10 nvc=1@10
+run synth/physical01#1 dir=testdata/ghdl/testsuite/synth/physical01 std=93c sha=212e7c2e8cd9b1e5
+ physical_division.vhdl ghdl=0 nvc=0
+run synth/pkg01#1 dir=testdata/ghdl/testsuite/synth/pkg01 std=93c sha=e09092c67ac608ec
+ pkg.vhdl ghdl=0 nvc=0
+ cmask.vhdl ghdl=0 nvc=0
+ mixer.vhdl ghdl=0 nvc=0
+ tb_mixer.vhdl ghdl=0 nvc=0
+run synth/pkg01#2 dir=testdata/ghdl/testsuite/synth/pkg01 std=93c sha=e09092c67ac608ec
+ pkg.vhdl ghdl=0 nvc=0
+ cmask.vhdl ghdl=0 nvc=0
+ mixer.vhdl ghdl=0 nvc=0
+ tb_mixer.vhdl ghdl=0 nvc=0
+run synth/plugin200#1 dir=testdata/ghdl/testsuite/synth/plugin200 std=93c sha=632c3dc7db26cb94
+ test.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+run synth/pragma01#1 dir=testdata/ghdl/testsuite/synth/pragma01 std=93c sha=b8ed3164ef9b72a8
+ pragma01.vhdl ghdl=0 nvc=0
+ tb_pragma01_sim.vhdl ghdl=0 nvc=0
+run synth/pragma01#2 dir=testdata/ghdl/testsuite/synth/pragma01 std=93c sha=641272360b21c916
+ pragma01.vhdl ghdl=0 nvc=0
+ tb_pragma01_syn.vhdl ghdl=0 nvc=0
+run synth/psl01#1 dir=testdata/ghdl/testsuite/synth/psl01 std=08 sha=b6fdc601e030a9e8
+ restrict1.vhdl -fpsl ghdl=0 nvc=0
+ restrict2.vhdl -fpsl ghdl=0 nvc=1@26
+ assume1.vhdl -fpsl ghdl=0 nvc=0
+ assume2.vhdl -fpsl ghdl=0 nvc=0
+ assert1.vhdl -fpsl ghdl=0 nvc=0
+ cover1.vhdl -fpsl ghdl=0 nvc=0
+ cover2.vhdl -fpsl ghdl=0 nvc=0
+ property0.vhdl -fpsl ghdl=0 nvc=1@26
+ sequence0.vhdl -fpsl ghdl=0 nvc=1@26
+ cover3.vhdl ghdl=0 nvc=0
+ eventually1.vhdl ghdl=0 nvc=0
+run synth/psl02#1 dir=testdata/ghdl/testsuite/synth/psl02 std=08 sha=9c21892e49115ca7
+ assert1.vhdl ghdl=0 nvc=1@26
+ assert2.vhdl ghdl=0 nvc=0
+ verif1.vhdl ghdl=0 nvc=1@1
+run synth/psl02#2 dir=testdata/ghdl/testsuite/synth/psl02 std=08 sha=15728d6f4acfb30b
+ assert2.vhdl ghdl=0 nvc=0
+ verif2.vhdl ghdl=0 nvc=1@1
+run synth/psl02#3 dir=testdata/ghdl/testsuite/synth/psl02 std=08 sha=ec9d3c162d32e274
+ assert2.vhdl ghdl=0 nvc=0
+ verif3.vhdl ghdl=0 nvc=1@1
+run synth/psl02#4 dir=testdata/ghdl/testsuite/synth/psl02 std=08 sha=3e1c24f778d8ad53
+ assert2.vhdl ghdl=0 nvc=0
+ verif4.vhdl ghdl=0 nvc=1@1
+run synth/psl02#5 dir=testdata/ghdl/testsuite/synth/psl02 std=08 sha=7f5a2d00dc821b6c
+ assert2.vhdl ghdl=0 nvc=0
+ verif5.vhdl ghdl=0 nvc=1@1
+run synth/psl02#6 dir=testdata/ghdl/testsuite/synth/psl02 std=08 sha=37f5c3de3aefb359
+ err_attr01.vhdl ghdl=0 nvc=1@14,16
+ err_attr02.vhdl ghdl=0 nvc=1@14,16
+run synth/range01#1 dir=testdata/ghdl/testsuite/synth/range01 std=93c sha=dc22821e88cbc32f
+ revrng01.vhdl ghdl=0 nvc=0
+ tb_revrng01.vhdl ghdl=0 nvc=0
+run synth/rec01#1 dir=testdata/ghdl/testsuite/synth/rec01 std=93c sha=5e70ba0fd2ebaa1e
+ rec01.vhdl ghdl=1@3,6,12~ nvc=1@3,12
+ tb_rec01.vhdl ghdl=1@6,9,14 nvc=1@6
+ pkg_rec01.vhdl ghdl=0 nvc=0
+run synth/ret01#1 dir=testdata/ghdl/testsuite/synth/ret01 std=93c sha=b9565bc69d58d5a0
+ ret01.vhdl ghdl=0 nvc=0
+ tb_ret01.vhdl ghdl=0 nvc=0
+run synth/ret01#2 dir=testdata/ghdl/testsuite/synth/ret01 std=93c sha=b9565bc69d58d5a0
+ ret01.vhdl ghdl=0 nvc=0
+ tb_ret01.vhdl ghdl=0 nvc=0
+run synth/ret01#3 dir=testdata/ghdl/testsuite/synth/ret01 std=93c sha=752cfe9a8b7d64e3
+ ret02.vhdl ghdl=0 nvc=0
+ tb_ret02.vhdl ghdl=0 nvc=0
+run synth/ret01#4 dir=testdata/ghdl/testsuite/synth/ret01 std=93c sha=752cfe9a8b7d64e3
+ ret02.vhdl ghdl=0 nvc=0
+ tb_ret02.vhdl ghdl=0 nvc=0
+run synth/ret01#5 dir=testdata/ghdl/testsuite/synth/ret01 std=93c sha=56ab42777578c875
+ ret03.vhdl ghdl=0 nvc=0
+ tb_ret03.vhdl ghdl=0 nvc=0
+run synth/ret01#6 dir=testdata/ghdl/testsuite/synth/ret01 std=93c sha=56ab42777578c875
+ ret03.vhdl ghdl=0 nvc=0
+ tb_ret03.vhdl ghdl=0 nvc=0
+run synth/simple01#1 dir=testdata/ghdl/testsuite/synth/simple01 std=93c sha=af8c73ef639b65b1
+ simple01.vhdl ghdl=0 nvc=0
+ tb_simple01.vhdl ghdl=0 nvc=0
+run synth/simple01#2 dir=testdata/ghdl/testsuite/synth/simple01 std=93c sha=9510d6c64d8c2c60
+ simple01.vhdl ghdl=0 nvc=0
+run synth/slice01#1 dir=testdata/ghdl/testsuite/synth/slice01 std=93c sha=a69ef3e7db8d0b95
+ slice01.vhdl ghdl=0 nvc=0
+ tb_slice01.vhdl ghdl=0 nvc=0
+run synth/slice01#2 dir=testdata/ghdl/testsuite/synth/slice01 std=93c sha=95fca5ae42371b76
+ slice02.vhdl ghdl=0 nvc=0
+ tb_slice02.vhdl ghdl=0 nvc=0
+run synth/slice01#3 dir=testdata/ghdl/testsuite/synth/slice01 std=93c sha=22b3d04536f4a56d
+ slice03.vhdl ghdl=0 nvc=0
+ tb_slice03.vhdl ghdl=0 nvc=0
+run synth/slice01#4 dir=testdata/ghdl/testsuite/synth/slice01 std=93c sha=2300ddb2c741e4bf
+ slice04.vhdl ghdl=0 nvc=0
+ slice05.vhdl ghdl=0 nvc=0
+ slice06.vhdl ghdl=0 nvc=0
+ slice07.vhdl ghdl=0 nvc=0
+ slice09.vhdl ghdl=0 nvc=0
+ slice10.vhdl ghdl=0 nvc=0
+ slice11.vhdl ghdl=0 nvc=0
+ slice12.vhdl ghdl=0 nvc=0
+ slice13.vhdl ghdl=0 nvc=0
+run synth/slice02#1 dir=testdata/ghdl/testsuite/synth/slice02 std=93c sha=0df0f2df7f46a89e
+ slice01.vhdl ghdl=0 nvc=0
+ tb_slice01.vhdl ghdl=0 nvc=0
+run synth/slice02#2 dir=testdata/ghdl/testsuite/synth/slice02 std=93c sha=63c1a356b1eafc61
+ slice02.vhdl ghdl=0 nvc=0
+ tb_slice02.vhdl ghdl=0 nvc=0
+run synth/slice02#3 dir=testdata/ghdl/testsuite/synth/slice02 std=93c sha=0a264b0e82de4b9a
+ slice03.vhdl ghdl=0 nvc=0
+ tb_slice03.vhdl ghdl=0 nvc=0
+run synth/slice02#4 dir=testdata/ghdl/testsuite/synth/slice02 std=93c sha=2e2d04c657867aa2
+ slice04.vhdl ghdl=0 nvc=0
+ tb_slice04.vhdl ghdl=0 nvc=0
+run synth/sns01#1 dir=testdata/ghdl/testsuite/synth/sns01 std=93c sha=0c15286f8dc42cba
+ adds.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_adds.vhdl -fsynopsys ghdl=0 nvc=0
+ adds.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_adds.vhdl -fsynopsys ghdl=0 nvc=0
+ subs.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_subs.vhdl -fsynopsys ghdl=0 nvc=0
+ subs.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_subs.vhdl -fsynopsys ghdl=0 nvc=0
+ unaries.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_unaries.vhdl -fsynopsys ghdl=0 nvc=0
+ unaries.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_unaries.vhdl -fsynopsys ghdl=0 nvc=0
+ muls.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_muls.vhdl -fsynopsys ghdl=0 nvc=0
+ muls.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_muls.vhdl -fsynopsys ghdl=0 nvc=0
+ cmplt.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_cmplt.vhdl -fsynopsys ghdl=0 nvc=0
+ cmplt.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_cmplt.vhdl -fsynopsys ghdl=0 nvc=0
+ cmple.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_cmple.vhdl -fsynopsys ghdl=0 nvc=0
+ cmple.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_cmple.vhdl -fsynopsys ghdl=0 nvc=0
+ cmpgt.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_cmpgt.vhdl -fsynopsys ghdl=0 nvc=0
+ cmpgt.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_cmpgt.vhdl -fsynopsys ghdl=0 nvc=0
+ cmpge.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_cmpge.vhdl -fsynopsys ghdl=0 nvc=0
+ cmpge.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_cmpge.vhdl -fsynopsys ghdl=0 nvc=0
+ cmpeq.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_cmpeq.vhdl -fsynopsys ghdl=0 nvc=0
+ cmpeq.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_cmpeq.vhdl -fsynopsys ghdl=0 nvc=0
+ cmpne.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_cmpne.vhdl -fsynopsys ghdl=0 nvc=0
+ cmpne.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_cmpne.vhdl -fsynopsys ghdl=0 nvc=0
+ shrs.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_shrs.vhdl -fsynopsys ghdl=0 nvc=0
+ shrs.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_shrs.vhdl -fsynopsys ghdl=0 nvc=0
+ exts.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_exts.vhdl -fsynopsys ghdl=0 nvc=0
+ exts.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_exts.vhdl -fsynopsys ghdl=0 nvc=0
+ sns01.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/sns01#2 dir=testdata/ghdl/testsuite/synth/sns01 std=93c sha=880631806ab67f93
+ reduce.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_reduce.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/sns01#3 dir=testdata/ghdl/testsuite/synth/sns01 std=93c sha=774f1b977416ae38
+ add03.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_add03.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/sns02#1 dir=testdata/ghdl/testsuite/synth/sns02 std=93c sha=f7a7d478798ae8d4
+ conv01.vhdl -fsynopsys ghdl=0 nvc=0
+ conv01.vhdl -fsynopsys ghdl=0 nvc=0
+ conv02.vhdl -fsynopsys ghdl=0 nvc=0
+ conv02.vhdl -fsynopsys ghdl=0 nvc=0
+ conv03.vhdl -fsynopsys ghdl=0 nvc=0
+ conv03.vhdl -fsynopsys ghdl=0 nvc=0
+ id01.vhdl -fsynopsys ghdl=0 nvc=0
+ id01.vhdl -fsynopsys ghdl=0 nvc=0
+ neg01.vhdl -fsynopsys ghdl=0 nvc=0
+ neg01.vhdl -fsynopsys ghdl=0 nvc=0
+ abs01.vhdl -fsynopsys ghdl=0 nvc=0
+ abs01.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp01.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp01.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp02.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp02.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp03.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp03.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp04.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp04.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp05.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp05.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp06.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp06.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp07.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp07.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp08.vhdl -fsynopsys ghdl=0 nvc=0
+ cmp08.vhdl -fsynopsys ghdl=0 nvc=0
+ add01.vhdl -fsynopsys ghdl=0 nvc=0
+ add01.vhdl -fsynopsys ghdl=0 nvc=0
+ sub01.vhdl -fsynopsys ghdl=0 nvc=0
+ sub01.vhdl -fsynopsys ghdl=0 nvc=0
+ mul01.vhdl -fsynopsys ghdl=0 nvc=0
+ mul01.vhdl -fsynopsys ghdl=0 nvc=0
+ ext01.vhdl -fsynopsys ghdl=0 nvc=0
+ ext01.vhdl -fsynopsys ghdl=0 nvc=0
+ shift01.vhdl -fsynopsys ghdl=0 nvc=0
+ shift01.vhdl -fsynopsys ghdl=0 nvc=0
+ reduce01.vhdl -fsynopsys ghdl=0 nvc=0
+ reduce01.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/snsuns01#1 dir=testdata/ghdl/testsuite/synth/snsuns01 std=93c sha=cb5749d2be17ca25
+ uadds.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_adds.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ uadds.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_adds.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ usubs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_subs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ usubs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_subs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ uunaries.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_unaries.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ uunaries.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_unaries.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ umuls.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_muls.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ umuls.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_muls.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ ucmplt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmplt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ ucmplt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmplt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ ucmple.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmple.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ ucmple.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmple.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ ucmpgt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpgt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ ucmpgt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpgt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ ucmpge.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpge.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ ucmpge.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpge.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ ucmpeq.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpeq.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ ucmpeq.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpeq.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ ucmpne.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpne.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ ucmpne.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpne.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ ushrs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_shrs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ ushrs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_shrs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+run synth/snsuns01#2 dir=testdata/ghdl/testsuite/synth/snsuns01 std=93c sha=1bc8f5cbefbf569a
+ sadds.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_adds.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ sadds.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_adds.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ ssubs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_subs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ ssubs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_subs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ sunaries.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_unaries.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ sunaries.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_unaries.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ smuls.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_muls.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ smuls.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_muls.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ scmplt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmplt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ scmplt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmplt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ scmple.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmple.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ scmple.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmple.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ scmpgt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpgt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ scmpgt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpgt.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ scmpge.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpge.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ scmpge.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpge.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ scmpeq.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpeq.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ scmpeq.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpeq.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ scmpne.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpne.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ scmpne.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@21
+ tb_cmpne.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@18
+ sshrs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_shrs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ sshrs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+ tb_shrs.vhdl -fsynopsys -fexplicit ghdl=0 nvc=0
+run synth/stmt01#1 dir=testdata/ghdl/testsuite/synth/stmt01 std=93c sha=f49195b0f814f732
+ forloop2.vhdl ghdl=0 nvc=0
+ tb_forloop2.vhdl ghdl=0 nvc=0
+run synth/string01#1 dir=testdata/ghdl/testsuite/synth/string01 std=93c sha=433833a1fadab648
+ string01.vhdl ghdl=0 nvc=0
+ tb_string01.vhdl ghdl=0 nvc=0
+run synth/subprg01#1 dir=testdata/ghdl/testsuite/synth/subprg01 std=93c sha=acdf6594da6e65db
+ subprg01.vhdl ghdl=0 nvc=0
+ tb_subprg01.vhdl ghdl=0 nvc=0
+run synth/subprg01#2 dir=testdata/ghdl/testsuite/synth/subprg01 std=93c sha=4dbc3694a7389793
+ subprg02.vhdl ghdl=0 nvc=0
+ tb_subprg02.vhdl ghdl=0 nvc=0
+run synth/synth104#1 dir=testdata/ghdl/testsuite/synth/synth104 std=93c sha=57e8410d8057daf2
+ testcase1.vhdl ghdl=0 nvc=0
+ tb_testcase1.vhdl ghdl=0 nvc=0
+run synth/synth104#2 dir=testdata/ghdl/testsuite/synth/synth104 std=93c sha=b6456eba41b9c0c4
+ case02.vhdl ghdl=0 nvc=0
+ tb_case02.vhdl ghdl=0 nvc=0
+run synth/synth108#1 dir=testdata/ghdl/testsuite/synth/synth108 std=93c sha=39398688ea59b631
+ mwe.vhdl ghdl=0 nvc=0
+run synth/synth109#1 dir=testdata/ghdl/testsuite/synth/synth109 std=93c sha=30a2241d86f402da
+ ram1.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_ram1.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/synth109#2 dir=testdata/ghdl/testsuite/synth/synth109 std=93c sha=0acdda86d2647bd2
+ ram10.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_ram10.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/synth109#3 dir=testdata/ghdl/testsuite/synth/synth109 std=93c sha=8b18de8fe518b091
+ ram2.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_ram2.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/synth109#4 dir=testdata/ghdl/testsuite/synth/synth109 std=93c sha=8bf4b9a0f1f71058
+ ram4.vhdl -fsynopsys ghdl=0 nvc=0
+ tb_ram4.vhdl -fsynopsys ghdl=0 nvc=0
+run synth/synth109#5 dir=testdata/ghdl/testsuite/synth/synth109 std=93c sha=0c05a152717a1ab9
+ ram9.vhdl -fsynopsys ghdl=0 nvc=0
+ asymmetric_ram_2a.vhd -fsynopsys ghdl=0 nvc=0
+run synth/synth110#1 dir=testdata/ghdl/testsuite/synth/synth110 std=93c sha=551bc54d6b889044
+ top.vhdl ghdl=0 nvc=0
+run synth/synth111#1 dir=testdata/ghdl/testsuite/synth/synth111 std=08 sha=14e7944a4defd276
+ rams_sp_3d.vhdl ghdl=0 nvc=0
+run synth/synth115#1 dir=testdata/ghdl/testsuite/synth/synth115 std=93c sha=2bc298f649d79665
+ testcase.vhdl ghdl=0 nvc=0
+ tb_testcase.vhdl ghdl=0 nvc=0
+run synth/synth12#1 dir=testdata/ghdl/testsuite/synth/synth12 std=93c sha=79ca9ce02967117f
+ lut.vhdl ghdl=0 nvc=0
+ tb_lut.vhdl ghdl=0 nvc=0
+run synth/synth121#1 dir=testdata/ghdl/testsuite/synth/synth121 std=93c sha=e2755abe32217867
+ fpadd_normalize_struct.vhdl -fsynopsys -fexplicit ghdl=1@77 nvc=1@77,145,148
+run synth/synth128#1 dir=testdata/ghdl/testsuite/synth/synth128 std=93c sha=b260cc2e86841350
+ test.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=0 nvc=0
+run synth/synth129#1 dir=testdata/ghdl/testsuite/synth/synth129 std=93c sha=a034f80358095ab0
+ test.vhdl ghdl=0 nvc=0
+ tb_test.vhdl ghdl=0 nvc=0
+run synth/synth14#1 dir=testdata/ghdl/testsuite/synth/synth14 std=93c sha=45d30f95f98b4f75
+ top_pkg.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+ top_pkg.vhdl ghdl=0 nvc=0
+run synth/synth154#1 dir=testdata/ghdl/testsuite/synth/synth154 std=08 sha=b41079c35ffe3506
+ keep.vhdl ghdl=0 nvc=0
+run synth/synth154#2 dir=testdata/ghdl/testsuite/synth/synth154 std=08 sha=38d0163eb379ed3f
+ keep2.vhdl -Werror ghdl=0 nvc=0
+run synth/synth154#3 dir=testdata/ghdl/testsuite/synth/synth154 std=08 sha=78583e1b3626c14c
+ err1.vhdl -Werror ghdl=0 nvc=0
+run synth/synth174#1 dir=testdata/ghdl/testsuite/synth/synth174 std=93c sha=3f4683ba0f273186
+ repro.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run synth/synth179#1 dir=testdata/ghdl/testsuite/synth/synth179 std=93c sha=4436c0f96b9f12a8
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run synth/synth180#1 dir=testdata/ghdl/testsuite/synth/synth180 std=93c sha=80e743ee9fce4ee8
+ bitbang.vhdl ghdl=0 nvc=0
+ bitbang2.vhdl ghdl=0 nvc=0
+run synth/synth183#1 dir=testdata/ghdl/testsuite/synth/synth183 std=08 sha=0f1c9eb47f4d2dc3
+ test.vhdl ghdl=0 nvc=0
+run synth/synth188#1 dir=testdata/ghdl/testsuite/synth/synth188 std=93c sha=3875a3fff2cf2b66
+ slice_bug.vhdl ghdl=0 nvc=0
+ tb_slice_bug.vhdl ghdl=0 nvc=0
+run synth/synth218#1 dir=testdata/ghdl/testsuite/synth/synth218 std=93c sha=8fe202774b5f2e15
+ top_test.vhdl ghdl=0 nvc=0
+ tb_top_test.vhdl ghdl=0 nvc=0
+run synth/synth26#1 dir=testdata/ghdl/testsuite/synth/synth26 std=93c sha=de2653f99ace194e
+ int_test.vhdl ghdl=0 nvc=0
+run synth/synth27#1 dir=testdata/ghdl/testsuite/synth/synth27 std=08 sha=eeae92237189838f
+ dff.vhdl ghdl=0 nvc=1@35,36
+run synth/synth33#1 dir=testdata/ghdl/testsuite/synth/synth33 std=93c sha=36b5b1d5167026b4
+ int_test.vhdl ghdl=0 nvc=0
+run synth/synth33#2 dir=testdata/ghdl/testsuite/synth/synth33 std=93c sha=6936403f063d5282
+ int_test2.vhdl ghdl=0 nvc=0
+run synth/synth34#1 dir=testdata/ghdl/testsuite/synth/synth34 std=93c sha=cc576d932b34af0f
+ repro_slv.vhdl ghdl=0 nvc=0
+ tb_repro_slv.vhdl ghdl=0 nvc=0
+run synth/synth34#2 dir=testdata/ghdl/testsuite/synth/synth34 std=93c sha=bb265291db20e569
+ repro_uns.vhdl ghdl=0 nvc=0
+ tb_repro_uns.vhdl ghdl=0 nvc=0
+run synth/synth34#3 dir=testdata/ghdl/testsuite/synth/synth34 std=93c sha=00b07e3aab2d55f4
+ repro_sgn.vhdl ghdl=0 nvc=0
+ tb_repro_sgn.vhdl ghdl=0 nvc=0
+run synth/synth34#4 dir=testdata/ghdl/testsuite/synth/synth34 std=93c sha=f50f4ada3ed08ce4
+ repro_nat.vhdl ghdl=0 nvc=0
+ tb_repro_nat.vhdl ghdl=0 nvc=0
+run synth/synth34#5 dir=testdata/ghdl/testsuite/synth/synth34 std=93c sha=8e2ff0811c074948
+ repro_rng1.vhdl ghdl=0 nvc=0
+ tb_repro_rng1.vhdl ghdl=0 nvc=0
+run synth/synth36#1 dir=testdata/ghdl/testsuite/synth/synth36 std=93c sha=7b4034e5896ff0a5
+ bram.vhdl ghdl=0 nvc=0
+ tb_bram.vhdl ghdl=0 nvc=0
+run synth/synth38#1 dir=testdata/ghdl/testsuite/synth/synth38 std=93c sha=9fbf4befad1af8c9
+ modulo_test.vhdl ghdl=0 nvc=0
+ tb_modulo_test.vhdl ghdl=0 nvc=0
+run synth/synth39#1 dir=testdata/ghdl/testsuite/synth/synth39 std=93c sha=2ad47ed6037d6f94
+ record_test.vhdl ghdl=0 nvc=0
+ tb_record_test.vhdl ghdl=0 nvc=0
+run synth/synth39#2 dir=testdata/ghdl/testsuite/synth/synth39 std=93c sha=68046269e93a1d27
+ rec2.vhdl ghdl=0 nvc=0
+ tb_rec2.vhdl ghdl=0 nvc=0
+run synth/synth40#1 dir=testdata/ghdl/testsuite/synth/synth40 std=08 sha=2c01e001ec7e1d66
+ testcase.vhdl ghdl=0 nvc=0
+ tb_testcase.vhdl ghdl=0 nvc=0
+run synth/synth44#1 dir=testdata/ghdl/testsuite/synth/synth44 std=93c sha=cd6cbc5f983d47fd
+ record_test.vhdl ghdl=0 nvc=0
+run synth/synth45#1 dir=testdata/ghdl/testsuite/synth/synth45 std=93c sha=8dcb28e18db430b0
+ test.vhdl ghdl=0 nvc=0
+run synth/synth45#2 dir=testdata/ghdl/testsuite/synth/synth45 std=93c sha=4cc230beed76dfc4
+ test2.vhdl ghdl=0 nvc=0
+run synth/synth47#1 dir=testdata/ghdl/testsuite/synth/synth47 std=93c sha=116a241b2d025ec7
+ test2.vhdl ghdl=0 nvc=0
+run synth/synth47#2 dir=testdata/ghdl/testsuite/synth/synth47 std=93c sha=ca895d95d8e37fcb
+ test3.vhdl ghdl=0 nvc=0
+run synth/synth48#1 dir=testdata/ghdl/testsuite/synth/synth48 std=08 sha=5768143b99c8fb43
+ test.vhdl ghdl=0 nvc=1@17
+run synth/synth50#1 dir=testdata/ghdl/testsuite/synth/synth50 std=93c sha=c963dc01e8aa2245
+ slv_negation.vhdl ghdl=0 nvc=0
+run synth/synth52#1 dir=testdata/ghdl/testsuite/synth/synth52 std=93c sha=1acf3027b347a919
+ sample_pkg.vhdl ghdl=0 nvc=0
+ pkg_test.vhdl ghdl=0 nvc=0
+run synth/synth56#1 dir=testdata/ghdl/testsuite/synth/synth56 std=93c sha=8e24c03097e3438d
+ test2.vhdl ghdl=0 nvc=0
+ tb_test2.vhdl ghdl=0 nvc=0
+run synth/synth58#1 dir=testdata/ghdl/testsuite/synth/synth58 std=93c sha=96e384905590e81d
+ function_test.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run synth/synth60#1 dir=testdata/ghdl/testsuite/synth/synth60 std=93c sha=2bdaa94508ec106b
+ leds.vhdl ghdl=0 nvc=0
+ spin1.vhdl ghdl=0 nvc=0
+ leds_wrapper.vhdl ghdl=0 nvc=0
+ leds_wrapper_arch_entity_inst.vhdl ghdl=0 nvc=0
+run synth/synth76#1 dir=testdata/ghdl/testsuite/synth/synth76 std=93c sha=949556f40f613534
+ dff02.vhdl ghdl=0 nvc=0
+ tb_dff02.vhdl ghdl=0 nvc=0
+run synth/synth8#1 dir=testdata/ghdl/testsuite/synth/synth8 std=93c sha=913d2a0dde8d7345
+ vector8_test1.vhdl ghdl=0 nvc=0
+ tb_vector8_test1.vhdl ghdl=0 nvc=0
+run synth/synth8#2 dir=testdata/ghdl/testsuite/synth/synth8 std=93c sha=62eba7062f7bf5c6
+ test5.vhdl ghdl=0 nvc=0
+ tb_test5.vhdl ghdl=0 nvc=0
+run synth/synth80#1 dir=testdata/ghdl/testsuite/synth/synth80 std=93c sha=84ca50f2a46c2306
+ testcase.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+run synth/synth87#1 dir=testdata/ghdl/testsuite/synth/synth87 std=93c sha=04d1e5bc46599e32
+ repro01.vhdl ghdl=0 nvc=0
+ tb_repro01.vhdl ghdl=0 nvc=0
+run synth/synth93#1 dir=testdata/ghdl/testsuite/synth/synth93 std=93c sha=c21613cfa497ac4d
+ a.vhdl ghdl=0 nvc=0
+run synth/types01#1 dir=testdata/ghdl/testsuite/synth/types01 std=93c sha=badc89ba0321fff6
+ float01.vhdl ghdl=0 nvc=0
+ float02.vhdl ghdl=0 nvc=0
+ file01.vhdl ghdl=0 nvc=0
+ access01.vhdl ghdl=0 nvc=0
+run synth/uassoc01#1 dir=testdata/ghdl/testsuite/synth/uassoc01 std=93c sha=8302aa9c6a4ec85f
+ uassoc01.vhdl ghdl=0 nvc=0
+ tb_uassoc01.vhdl ghdl=0 nvc=0
+run synth/uassoc01#2 dir=testdata/ghdl/testsuite/synth/uassoc01 std=93c sha=0fe3a3f44a472cdc
+ uassoc02.vhdl ghdl=0 nvc=0
+ tb_uassoc02.vhdl ghdl=0 nvc=0
+run synth/uassoc01#3 dir=testdata/ghdl/testsuite/synth/uassoc01 std=93c sha=dfc198e11cf8966e
+ uassoc03.vhdl ghdl=0 nvc=0
+ tb_uassoc03.vhdl ghdl=0 nvc=0
+run synth/unary01#1 dir=testdata/ghdl/testsuite/synth/unary01 std=08 sha=1ca0734a294552ae
+ test.vhdl ghdl=0 nvc=0
+ func.vhdl ghdl=0 nvc=0
+ snot.vhdl ghdl=0 nvc=0
+run synth/var01#1 dir=testdata/ghdl/testsuite/synth/var01 std=08 sha=64b35ed37366a7b5
+ var01c.vhdl ghdl=0 nvc=0
+ tb_var01c.vhdl ghdl=0 nvc=0
+run synth/var01#2 dir=testdata/ghdl/testsuite/synth/var01 std=08 sha=90e7beb5e1e75d33
+ var01b.vhdl ghdl=0 nvc=0
+ tb_var01b.vhdl ghdl=0 nvc=0
+run synth/var01#3 dir=testdata/ghdl/testsuite/synth/var01 std=08 sha=278573250479a55e
+ var01a.vhdl ghdl=0 nvc=0
+ tb_var01a.vhdl ghdl=0 nvc=0
+run synth/var01#4 dir=testdata/ghdl/testsuite/synth/var01 std=08 sha=15dd8eed840f40db
+ var01.vhdl ghdl=0 nvc=0
+ tb_var01.vhdl ghdl=0 nvc=0
+run synth/var01#5 dir=testdata/ghdl/testsuite/synth/var01 std=08 sha=b90724b34262baa6
+ var02.vhdl ghdl=0 nvc=0
+ tb_var02.vhdl ghdl=0 nvc=0
+run synth/var01#6 dir=testdata/ghdl/testsuite/synth/var01 std=08 sha=99d06af263f3a72d
+ var03.vhdl ghdl=0 nvc=0
+ tb_var03.vhdl ghdl=0 nvc=0
+run synth/var01#7 dir=testdata/ghdl/testsuite/synth/var01 std=08 sha=b3ba7ce3b6fad969
+ var04.vhdl ghdl=0 nvc=0
+ tb_var04.vhdl ghdl=0 nvc=0
+run synth/var01#8 dir=testdata/ghdl/testsuite/synth/var01 std=08 sha=613f537f8b236328
+ var05.vhdl ghdl=0 nvc=0
+ tb_var05.vhdl ghdl=0 nvc=0
+run synth/var01#9 dir=testdata/ghdl/testsuite/synth/var01 std=08 sha=3bfad56a74e0f866
+ var06.vhdl ghdl=0 nvc=0
+ tb_var06.vhdl ghdl=0 nvc=0
+run synth/var02#1 dir=testdata/ghdl/testsuite/synth/var02 std=08 sha=bb1e71b6227a69b7
+ var01.vhdl ghdl=0 nvc=0
+ tb_var01.vhdl ghdl=0 nvc=0
+run synth/var02#2 dir=testdata/ghdl/testsuite/synth/var02 std=08 sha=41768839d12d757a
+ var02.vhdl ghdl=0 nvc=0
+ tb_var02.vhdl ghdl=0 nvc=0
+run synth/warn01#1 dir=testdata/ghdl/testsuite/synth/warn01 std=93c sha=7b47282478ef2818
+ tobv01.vhdl ghdl=0 nvc=0
+ tobv01.vhdl -Werror ghdl=0 nvc=0
+ tobv02.vhdl ghdl=0 nvc=0
+ tobv02.vhdl -Werror ghdl=0 nvc=0
+ toint01.vhdl ghdl=0 nvc=0
+ toint01.vhdl -Werror ghdl=0 nvc=0
+ toint02.vhdl ghdl=0 nvc=0
+ toint02.vhdl -Werror ghdl=0 nvc=0
+ toint03.vhdl ghdl=0 nvc=0
+ toint03.vhdl -Werror ghdl=0 nvc=0
+ toint04.vhdl ghdl=0 nvc=0
+ toint04.vhdl -Werror ghdl=0 nvc=0
+ toint05.vhdl -fsynopsys ghdl=0 nvc=0
+ toint05.vhdl -Werror -fsynopsys ghdl=0 nvc=0

@@ -1,0 +1,4 @@
+standard: "2019"
+format:
+  keyword_case: upper
+  indent: 4

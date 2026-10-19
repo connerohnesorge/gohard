@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  constant c1, c2 : integer := 4;\n  constant deferred : integer;\nend;\n")

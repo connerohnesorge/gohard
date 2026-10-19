@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("library ieee, std, work;\nentity e is\nend;\n")

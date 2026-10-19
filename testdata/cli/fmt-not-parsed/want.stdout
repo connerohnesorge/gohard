@@ -1,0 +1,4 @@
+broken.vhd:1:1: error[format/not-parsed]: file does not parse; it was not formatted
+broken.vhd:2:17: error[syntax/error]: expected ')', found reserved word end
+broken.vhd:2:17: error[syntax/error]: expected ';', found reserved word end
+summary: 3 errors, 0 warnings, 0 hints, 2 files

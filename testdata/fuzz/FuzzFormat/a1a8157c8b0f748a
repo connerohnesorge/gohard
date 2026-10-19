@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  view outer of outer_t is\n    plain : inout;\n    nested : view inner;\n    arr : view (inner);\n  end view;\nend;\n")

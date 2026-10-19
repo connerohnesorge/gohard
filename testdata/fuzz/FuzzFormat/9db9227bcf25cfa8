@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\n  default clock is rising_edge(clk);\nbegin\nend;\n")

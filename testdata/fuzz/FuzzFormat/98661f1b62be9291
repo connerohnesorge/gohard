@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\n  file f1 : text open write_mode is \"out.txt\";\nbegin\nend;\n")

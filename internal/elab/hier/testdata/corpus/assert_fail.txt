@@ -1,0 +1,2 @@
+assert_fail_tb entity work.assert_fail_tb(sim)
+  assert_fail_tb.dut entity work.assert_fail(rtl)

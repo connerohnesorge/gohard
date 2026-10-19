@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type pair is record\n    a : integer;\n    b, c : bit;\n  end record pair;\nend;\n")

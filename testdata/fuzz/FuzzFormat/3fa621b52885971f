@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- test: define=PROFILE=wide kind=InactiveBranch\n`if PROFILE = \"wide\" then\npackage wide_p is\nend;\n`elsif PROFILE = \"narrow\" or not (PROFILE /= \"tiny\") then\npackage narrow_p is\nend;\n`end if\n")

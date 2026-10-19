@@ -29,6 +29,9 @@ type setup struct {
 	// read; nil means none.
 	interrupt *env.Interrupt
 	intrOn    string
+	// tamper lists bundled std/ieee files (stdlib.File paths) whose
+	// integrity check fails, through the stdlib.WithTamper test hook.
+	tamper []string
 }
 
 func applySetup(t tb, dir, work string) setup {
@@ -97,6 +100,8 @@ func applySetup(t tb, dir, work string) setup {
 			st.broken = true
 		case line == "stdout full":
 			st.full = true
+		case f[0] == "tamper-stdlib" && len(f) == 2:
+			st.tamper = append(st.tamper, f[1])
 		case f[0] == "panic-on-read" && len(f) == 2:
 			st.panicOn = append(st.panicOn, f[1])
 		case f[0] == "interrupt" && len(f) == 4 && f[2] == "on-read":

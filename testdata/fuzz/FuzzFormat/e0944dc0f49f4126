@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  process is\n  begin\n    assert x = 1 report \"x is \" & integer'image(x) severity error;\n    assert y;\n  end process;\nend;\n")

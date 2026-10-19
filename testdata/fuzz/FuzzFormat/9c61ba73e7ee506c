@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  function f1 return integer;\n  function f2 return r of bit_vector;\nend;\n")

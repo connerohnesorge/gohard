@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  constant c : integer := 1 when sel else 2;\n  constant d : integer := 1 when a else 2 when b else 3;\nend;\n")

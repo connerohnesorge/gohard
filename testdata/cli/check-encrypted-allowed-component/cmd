@@ -1,0 +1,3 @@
+# The encrypted entity is reached through a component instantiation
+# with default binding: top is still unchecked and the run exits 1.
+gohard check

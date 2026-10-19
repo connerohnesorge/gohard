@@ -1,0 +1,22 @@
+# GoHard formatter oracle (#32): standin_model, nvc.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool nvc 1.23.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file models/crypt_core_model.vhd std=2008 sha256=2527f691f238c57cbddc635c09463390fa559b1c81edc803d46c87b0ad733247 formatted=cee04a4a7c3a75245a2968c8a9889c6a1ba31b89927d93ee1eb6b8386195132d changed
+  exit original=0 formatted=0
+file crypt_core.vhd std=2008 sha256=a84c5276ea50f7e6172d7c8f3262e9ee06ada30aed2e88193c73d8b8d0a0d100 formatted=912ba0e9cd461f9943f9f2484a483302743ef920056623808a5cdfb871619a51 changed
+  exit original=1 formatted=1
+  error 20: `protect directives are not supported
+file standin_model.vhd std=2008 sha256=530614dd17c6e9e40085dec1c27ccafd55cb287d908568092160a006dcbab0b8 formatted=6a56733139181bfc2a4bdfffe8810363cfc5aeecd59a31ed8bcc7985d6ac1d2f changed
+  exit original=0 formatted=0
+file standin_model_tb.vhd std=2008 sha256=6013a578c7e419b2762144a7341c6c1ce36cd9880cf96e0ed6b39a7febcd9ea9 formatted=c7e0977197316fc8a40242b2d9a2d5eff0b12774958794f94cf4879971e131b7 changed
+  exit original=0 formatted=0
+result new=0

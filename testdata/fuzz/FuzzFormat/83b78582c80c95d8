@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  process is\n  begin\n    s <= force '1';\n    t <= force in x;\n    u <= force out y;\n  end process;\nend;\n")

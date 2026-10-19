@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  constant c : integer := a + b * c ** 2 - d mod 3 rem 2;\n  constant d : boolean := ((a = b) and (c /= d)) or (e xor f);\n  constant e : bit_vector := v sll 2 & w;\n  constant f : boolean := a ?= b;\nend;\n")

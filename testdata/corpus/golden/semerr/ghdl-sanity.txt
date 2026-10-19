@@ -1,0 +1,32 @@
+# GoHard semantic-error oracle (#34, R12): ghdl-sanity.txt.
+# Written by go run ./tools/oracle --update semerr; do not edit.
+# Each "run" is one analysis group of the project's own driver (a
+# testsuite.sh between cleans, a VESTS list, an NVC regression test or
+# unit-test block, a corpus design run, or a file no driver names,
+# alone under 2008): its files are analyzed in order, one command per
+# file, in a fresh work directory per tool ("dir" is the working
+# directory; the run's GHDL --std and the sha256 prefix of its sources
+# follow). Each file line is the argument, the library when not work,
+# the GHDL options, then per tool the exit code and the lines of that
+# file it reports errors on; "~" marks a line whose only errors are
+# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
+# reports an error on every line both tools report one on
+# (semerr_check.go).
+tool ghdl 6.0.0
+tool nvc 1.23.0
+run sanity/000hello#1 dir=testdata/ghdl/testsuite/sanity/000hello std=93c sha=c48841c227d614a0
+ hello.vhdl ghdl=0 nvc=0
+run sanity/001hello87#1 dir=testdata/ghdl/testsuite/sanity/001hello87 std=93c sha=87e603378e785fd6
+ err87.vhdl ghdl=0 nvc=0
+run sanity/002hello2008#1 dir=testdata/ghdl/testsuite/sanity/002hello2008 std=08 sha=9483ef943052fd5c
+ hello.vhdl ghdl=0 nvc=0
+ err93.vhdl ghdl=0 nvc=0
+run sanity/002hello2008#2 dir=testdata/ghdl/testsuite/sanity/002hello2008 std=93c sha=32c95fe80e29686d
+ err93.vhdl ghdl=1@6 nvc=1@6
+run sanity/004all08#1 dir=testdata/ghdl/testsuite/sanity/004all08 std=08 sha=7dce1d58d8ab4684
+ all08.vhdl ghdl=0 nvc=0
+run sanity/006upf#1 dir=testdata/ghdl/testsuite/sanity/006upf std=93c sha=f3c292ea215475aa
+ test.vhdl ghdl=0 nvc=1@2
+run sanity/008coverage#1 dir=testdata/ghdl/testsuite/sanity/008coverage std=93c sha=046f9fc6041b213d
+ ecounter.vhdl ghdl=0 nvc=0
+ tb1.vhdl ghdl=0 nvc=0

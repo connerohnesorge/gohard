@@ -1,0 +1,4 @@
+# work.p uses a construct GoHard does not implement, so it is opaque;
+# work.user depends on it and is unchecked (a warning that, like every
+# unchecked unit, keeps the run from exiting 0).
+gohard check

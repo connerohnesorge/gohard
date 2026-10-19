@@ -1,0 +1,166 @@
+# GoHard semantic-error oracle (#34, R12): nvc-alone.txt.
+# Written by go run ./tools/oracle --update semerr; do not edit.
+# Each "run" is one analysis group of the project's own driver (a
+# testsuite.sh between cleans, a VESTS list, an NVC regression test or
+# unit-test block, a corpus design run, or a file no driver names,
+# alone under 2008): its files are analyzed in order, one command per
+# file, in a fresh work directory per tool ("dir" is the working
+# directory; the run's GHDL --std and the sha256 prefix of its sources
+# follow). Each file line is the argument, the library when not work,
+# the GHDL options, then per tool the exit code and the lines of that
+# file it reports errors on; "~" marks a line whose only errors are
+# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
+# reports an error on every line both tools report one on
+# (semerr_check.go).
+tool ghdl 6.0.0
+tool nvc 1.23.0
+run alone:diag/diag1.vhd dir=testdata/nvc/test/diag std=08 sha=028cbe7eccd3ef50
+ diag1.vhd ghdl=1@7,9,13,18,23 nvc=1@9,18,23
+run alone:eopt/alias1.vhd dir=testdata/nvc/test/eopt std=08 sha=44c4f0625f87f40d
+ alias1.vhd ghdl=0 nvc=0
+run alone:eopt/array3.vhd dir=testdata/nvc/test/eopt std=08 sha=64d2fdd94cc6cf1a
+ array3.vhd ghdl=0 nvc=0
+run alone:eopt/arrayref1.vhd dir=testdata/nvc/test/eopt std=08 sha=d5e3e87e14d362c7
+ arrayref1.vhd ghdl=1@4 nvc=1@5
+run alone:eopt/arrayref2.vhd dir=testdata/nvc/test/eopt std=08 sha=78d28243e8ff4add
+ arrayref2.vhd ghdl=0 nvc=0
+run alone:eopt/arrayref3.vhd dir=testdata/nvc/test/eopt std=08 sha=0d1de644d5899b6d
+ arrayref3.vhd ghdl=0 nvc=0
+run alone:eopt/arrayref4.vhd dir=testdata/nvc/test/eopt std=08 sha=1f607ae292107ccb
+ arrayref4.vhd ghdl=0 nvc=0
+run alone:eopt/buffer1.vhd dir=testdata/nvc/test/eopt std=08 sha=9eb1243b258b72b7
+ buffer1.vhd ghdl=0 nvc=0
+run alone:eopt/issue250.vhd dir=testdata/nvc/test/eopt std=08 sha=0308c5fb5ae51a43
+ issue250.vhd ghdl=0 nvc=0
+run alone:eopt/issue371.vhd dir=testdata/nvc/test/eopt std=08 sha=1a6c0c7db98d7a50
+ issue371.vhd ghdl=0 nvc=0
+run alone:eopt/issue427.vhd dir=testdata/nvc/test/eopt std=08 sha=26d4971494190f5e
+ issue427.vhd ghdl=0 nvc=0
+run alone:eopt/issue72.vhd dir=testdata/nvc/test/eopt std=08 sha=3d33dee9657352c4
+ issue72.vhd ghdl=0 nvc=0
+run alone:eopt/issue73.vhd dir=testdata/nvc/test/eopt std=08 sha=30bfb3655bc557e7
+ issue73.vhd ghdl=0 nvc=0
+run alone:eopt/issue95.vhd dir=testdata/nvc/test/eopt std=08 sha=bd354a6d4efd6e90
+ issue95.vhd ghdl=0 nvc=0
+run alone:eopt/jcore2.vhd dir=testdata/nvc/test/eopt std=08 sha=afb1ed115cb46bf3
+ jcore2.vhd ghdl=0 nvc=0
+run alone:eopt/jcore4.vhd dir=testdata/nvc/test/eopt std=08 sha=cfc742ea46082dff
+ jcore4.vhd ghdl=0 nvc=0
+run alone:eopt/map1.vhd dir=testdata/nvc/test/eopt std=08 sha=22947e3b4727d96d
+ map1.vhd ghdl=0 nvc=0
+run alone:eopt/map2.vhd dir=testdata/nvc/test/eopt std=08 sha=56b9f0f7ca4e7a25
+ map2.vhd ghdl=0 nvc=0
+run alone:eopt/nonconst1.vhd dir=testdata/nvc/test/eopt std=08 sha=983094cb23fb9596
+ nonconst1.vhd ghdl=0 nvc=0
+run alone:eopt/partial1.vhd dir=testdata/nvc/test/eopt std=08 sha=5ccb7338dcc70117
+ partial1.vhd ghdl=0 nvc=0
+run alone:eopt/pcall1.vhd dir=testdata/nvc/test/eopt std=08 sha=102a9bf65a0624b2
+ pcall1.vhd ghdl=0 nvc=0
+run alone:eopt/pcall2.vhd dir=testdata/nvc/test/eopt std=08 sha=87cab61360e25ecc
+ pcall2.vhd ghdl=0 nvc=0
+run alone:eopt/ram1.vhd dir=testdata/nvc/test/eopt std=08 sha=ef28e638f177dc88
+ ram1.vhd ghdl=0 nvc=0
+run alone:eopt/recref1.vhd dir=testdata/nvc/test/eopt std=08 sha=bba9e8041a495966
+ recref1.vhd ghdl=0 nvc=0
+run alone:eopt/recref2.vhd dir=testdata/nvc/test/eopt std=08 sha=40c4e344a8764adc
+ recref2.vhd ghdl=0 nvc=0
+run alone:eopt/slice1.vhd dir=testdata/nvc/test/eopt std=08 sha=ded8f3b5f3ce2a87
+ slice1.vhd ghdl=1@4 nvc=1@5
+run alone:eopt/slice2.vhd dir=testdata/nvc/test/eopt std=08 sha=80d788ad1f3b1b1e
+ slice2.vhd ghdl=0 nvc=0
+run alone:eopt/source1.vhd dir=testdata/nvc/test/eopt std=08 sha=23676afd9b4ef154
+ source1.vhd ghdl=0 nvc=0
+run alone:expect.vhd dir=testdata/nvc/test std=08 sha=aa4d533462c9b38c
+ expect.vhd ghdl=0 nvc=0
+run alone:misc/bufr_test.vhd dir=testdata/nvc/test/misc std=08 sha=49050fa1d34f46ea
+ bufr_test.vhd ghdl=1@4,5,10~ nvc=1@4
+run alone:misc/elide.vhd dir=testdata/nvc/test/misc std=08 sha=07c017ccc27c982b
+ elide.vhd ghdl=0 nvc=0
+run alone:misc/kcuart.vhd dir=testdata/nvc/test/misc std=08 sha=4f40fd5c0a9d668a
+ kcuart.vhd ghdl=1@18 nvc=1@18
+run alone:misc/lut4_test.vhd dir=testdata/nvc/test/misc std=08 sha=b952617c6426bb57
+ lut4_test.vhd ghdl=1@4,5,15 nvc=1@4
+run alone:misc/ramb_test.vhd dir=testdata/nvc/test/misc std=08 sha=fb6b13107df3dd9a
+ ramb_test.vhd ghdl=1@7,8,33 nvc=1@7
+run alone:parse/issue1308.vhd dir=testdata/nvc/test/parse std=08 sha=b2ec89b5ff5c13c8
+ issue1308.vhd ghdl=1@10,12,13,15,18,21,22,23,27,30,31,32,33,35 nvc=1@10,15
+run alone:parse/issue663.vhd dir=testdata/nvc/test/parse std=08 sha=634fadebb58cba9c
+ issue663.vhd ghdl=1@36,38 nvc=0
+run alone:perf/alloc.vhd dir=testdata/nvc/test/perf std=08 sha=cdc1039027962433
+ alloc.vhd ghdl=1@151,155,156,157,159,161,163,165,166,167,168,169,171 nvc=1@21,22,23,24
+run alone:perf/arraycase.vhd dir=testdata/nvc/test/perf std=08 sha=141dd14b69ae1a15
+ arraycase.vhd ghdl=0 nvc=0
+run alone:perf/bigcase.vhd dir=testdata/nvc/test/perf std=08 sha=879e2ae7a2dd05c9
+ bigcase.vhd ghdl=0 nvc=0
+run alone:perf/bigram.vhd dir=testdata/nvc/test/perf std=08 sha=46ff58f2a3af9e01
+ bigram.vhd ghdl=0 nvc=0
+run alone:perf/binarytrees.vhd dir=testdata/nvc/test/perf std=08 sha=9d48dd69fce262c1
+ binarytrees.vhd ghdl=0 nvc=0
+run alone:perf/dyn_agg.vhd dir=testdata/nvc/test/perf std=08 sha=69c1b34ba072e0a2
+ dyn_agg.vhd ghdl=0 nvc=0
+run alone:perf/ename.vhd dir=testdata/nvc/test/perf std=08 sha=57e0ff83b6c16e5f
+ ename.vhd ghdl=0 nvc=0
+run alone:perf/grind.vhd dir=testdata/nvc/test/perf std=08 sha=94ecec9e620711a4
+ grind.vhd ghdl=0 nvc=0
+run alone:perf/math_real.vhd dir=testdata/nvc/test/perf std=08 sha=510f37c1d64c5fdb
+ math_real.vhd ghdl=0 nvc=0
+run alone:perf/numeric_std.vhd dir=testdata/nvc/test/perf std=08 sha=95ded95dfa0745a7
+ numeric_std.vhd ghdl=2 nvc=0
+run alone:perf/simple.vhd dir=testdata/nvc/test/perf std=08 sha=557ffc7a3fb3b6c3
+ simple.vhd ghdl=1@78 nvc=0
+run alone:perf/std_logic.vhd dir=testdata/nvc/test/perf std=08 sha=eff866ae2d0f1886
+ std_logic.vhd ghdl=0 nvc=0
+run alone:perf/synopsys.vhd dir=testdata/nvc/test/perf std=08 sha=e406384fe2dbab39
+ synopsys.vhd ghdl=1@12,13 nvc=0
+run alone:perf/textio.vhd dir=testdata/nvc/test/perf std=08 sha=cad87fd75aa0ee5d
+ textio.vhd ghdl=0 nvc=0
+run alone:perf/toggle_cov.vhd dir=testdata/nvc/test/perf std=08 sha=1527977dde5092ee
+ toggle_cov.vhd ghdl=0 nvc=0
+run alone:perf/value.vhd dir=testdata/nvc/test/perf std=08 sha=586d3f1cd7a1cf3e
+ value.vhd ghdl=0 nvc=0
+run alone:perf/vital.vhd dir=testdata/nvc/test/perf std=08 sha=15ce1bd9d2e9ffc4
+ vital.vhd ghdl=1 nvc=0
+run alone:regress/cover10.vhd dir=testdata/nvc/test/regress std=08 sha=a0164525274ee894
+ cover10.vhd ghdl=0 nvc=0
+run alone:regress/cover11.vhd dir=testdata/nvc/test/regress std=08 sha=08b570807e2e398e
+ cover11.vhd ghdl=0 nvc=0
+run alone:regress/cover12.vhd dir=testdata/nvc/test/regress std=08 sha=b95239284dd6cd61
+ cover12.vhd ghdl=0 nvc=0
+run alone:regress/cover14.vhd dir=testdata/nvc/test/regress std=08 sha=7ccaa81eb3f6b428
+ cover14.vhd ghdl=0 nvc=0
+run alone:regress/cover18.vhd dir=testdata/nvc/test/regress std=08 sha=0f4c92c15f4f9847
+ cover18.vhd ghdl=0 nvc=0
+run alone:regress/cover20.vhd dir=testdata/nvc/test/regress std=08 sha=99aadb9c9b07d53b
+ cover20.vhd ghdl=0 nvc=0
+run alone:regress/cover22.vhd dir=testdata/nvc/test/regress std=08 sha=11e5505bbcf60634
+ cover22.vhd ghdl=0 nvc=0
+run alone:regress/cover23.vhd dir=testdata/nvc/test/regress std=08 sha=e3cc20821b7b3d84
+ cover23.vhd ghdl=0 nvc=0
+run alone:regress/cover26.vhd dir=testdata/nvc/test/regress std=08 sha=5f8d691f0c67608a
+ cover26.vhd ghdl=0 nvc=0
+run alone:regress/cover27.vhd dir=testdata/nvc/test/regress std=08 sha=13129ac1e8b5efad
+ cover27.vhd ghdl=1@30,31 nvc=0
+run alone:regress/cover5.vhd dir=testdata/nvc/test/regress std=08 sha=b671fb5810efc9fe
+ cover5.vhd ghdl=0 nvc=0
+run alone:regress/cover6.vhd dir=testdata/nvc/test/regress std=08 sha=4be32ebbb60a0fd8
+ cover6.vhd ghdl=0 nvc=0
+run alone:regress/cover9.vhd dir=testdata/nvc/test/regress std=08 sha=780da06417fefe29
+ cover9.vhd ghdl=0 nvc=0
+run alone:regress/issue454.vhd dir=testdata/nvc/test/regress std=08 sha=d40a193525453954
+ issue454.vhd ghdl=0 nvc=0
+run alone:regress/issue524.vhd dir=testdata/nvc/test/regress std=08 sha=989e62e94524db57
+ issue524.vhd ghdl=0 nvc=0
+run alone:regress/issue586.vhd dir=testdata/nvc/test/regress std=08 sha=5cf06fa25980d460
+ issue586.vhd ghdl=0 nvc=0
+run alone:regress/link3.vhd dir=testdata/nvc/test/regress std=08 sha=45b39945172f7c41
+ link3.vhd ghdl=0 nvc=0
+run alone:regress/order4.vhd dir=testdata/nvc/test/regress std=08 sha=b5128a5087a00657
+ order4.vhd ghdl=1@25 nvc=1@9,27
+run alone:regress/wave14.vhd dir=testdata/nvc/test/regress std=08 sha=32dce285a23815e4
+ wave14.vhd ghdl=0 nvc=0
+run alone:regress/wave2.vhd dir=testdata/nvc/test/regress std=08 sha=5f1e74cc5a0fce08
+ wave2.vhd ghdl=0 nvc=0
+run alone:regress/wave7.vhd dir=testdata/nvc/test/regress std=08 sha=9486c677290473ce
+ wave7.vhd ghdl=0 nvc=0
+run alone:shell/wave1.vhd dir=testdata/nvc/test/shell std=08 sha=da5a36c5d8c49881
+ wave1.vhd ghdl=0 nvc=0

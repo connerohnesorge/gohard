@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  constant i : integer := 16#FF#;\n  constant r : real := 1.5e-3;\n  constant s : string := \"text\";\n  constant b : bit_vector := x\"0F\";\n  constant q : bit_vector := 8ub\"101\";\n  constant p : ptr_t := null;\nend;\n")

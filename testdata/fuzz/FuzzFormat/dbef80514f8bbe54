@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("use ieee.std_logic_1164.all, work.p.\"+\", work.q.c;\nentity e is\nend;\n")

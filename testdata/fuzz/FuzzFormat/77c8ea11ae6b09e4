@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type pt is protected\n    private variable count : natural;\n    procedure inc;\n  end protected pt;\nend;\n")

@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  attribute foreign of f [integer return bit] : function is \"c\";\n  attribute op of \"and\" : function is 1;\n  attribute ch of '0' : literal is 2;\nend;\n")

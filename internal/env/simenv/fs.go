@@ -55,7 +55,7 @@ type Faults struct {
 	// listing, so the walk finds it gone.
 	Vanish Rate
 	// WriteError: WriteFile writes a prefix and fails; WriteTemp,
-	// Rename and MkdirAll fail without a change; a streaming Write
+	// Rename, Chmod and MkdirAll fail without a change; a streaming Write
 	// writes a prefix and fails.
 	WriteError Rate
 }
@@ -68,6 +68,7 @@ const (
 	OpRead    Op = "read"    // ReadFile, Open and streaming reads
 	OpWrite   Op = "write"   // WriteFile, WriteTemp, streaming writes
 	OpRename  Op = "rename"  // Rename (matched on the old name)
+	OpChmod   Op = "chmod"   // Chmod
 	OpRemove  Op = "remove"  // Remove
 	OpMkdir   Op = "mkdir"   // MkdirAll
 	OpStat    Op = "stat"    // Stat and Lstat
@@ -357,6 +358,23 @@ func (f *FS) WriteTemp(dir, prefix string, data []byte) (string, error) {
 	n.data = bytes.Clone(data)
 	parent.kids[base] = n
 	return p, nil
+}
+
+// Chmod implements env.FS: it replaces the permission bits of the node
+// name resolves to, keeping its type bits.
+func (f *FS) Chmod(name string, perm fs.FileMode) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	p := f.abs(name)
+	n, _, err := f.lookup(p, true)
+	if err == nil {
+		err = f.fault(OpChmod, p, f.faults.WriteError)
+	}
+	if err != nil {
+		return pathErr("chmod", name, err)
+	}
+	n.mode = n.mode&^fs.ModePerm | perm.Perm()
+	return nil
 }
 
 // Rename implements env.FS with the rules of os.Rename on Unix: a file

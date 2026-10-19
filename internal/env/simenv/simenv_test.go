@@ -976,3 +976,34 @@ func TestDotDotAfterLinkMatchesOS(t *testing.T) {
 		}
 	}
 }
+
+// TestChmod shows Chmod replaces only the permission bits, follows a
+// symbolic link, and fails on a missing file or a scripted fault.
+func TestChmod(t *testing.T) {
+	s := New(Options{Files: map[string][]byte{"a": []byte("x")}})
+	f := s.FS
+	if err := f.Symlink("a", "l"); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.Chmod("l", 0o4755|fs.ModeDir); err != nil {
+		t.Fatal(err)
+	}
+	fi, err := f.Lstat("a")
+	if err != nil || fi.Mode() != 0o755 {
+		t.Fatalf("mode %v, %v; want -rwxr-xr-x", fi.Mode(), err)
+	}
+	if fi, _ := f.Lstat("l"); fi.Mode()&fs.ModeSymlink == 0 {
+		t.Fatalf("the link itself changed: %v", fi.Mode())
+	}
+	if err := f.Chmod("missing", 0o600); !errors.Is(err,
+		fs.ErrNotExist) {
+		t.Fatalf("chmod of a missing file: %v", err)
+	}
+	f.FailNext(OpChmod, "a", nil)
+	if err := f.Chmod("a", 0o600); !errors.Is(err, ErrInjected) {
+		t.Fatalf("scripted chmod fault: %v", err)
+	}
+	if fi, _ := f.Lstat("a"); fi.Mode() != 0o755 {
+		t.Fatalf("a failed chmod changed the mode: %v", fi.Mode())
+	}
+}

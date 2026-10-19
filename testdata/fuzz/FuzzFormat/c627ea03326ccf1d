@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- test: kind=none allow=syntax/directive-warning\n`if VHDL_VERSION < \"2019\" then\n`warning \"this design needs VHDL-2019\"\n`else\n`warning \"analysing with VHDL-2019\"\n`end if\npackage p is\nend;\n")

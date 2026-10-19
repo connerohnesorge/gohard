@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  g : for i in 0 to 1 generate\n    signal t : bit;\n  begin\n    t <= a(i);\n  end;\n  end generate;\nend;\n")

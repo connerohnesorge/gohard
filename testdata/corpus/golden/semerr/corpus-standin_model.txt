@@ -1,0 +1,21 @@
+# GoHard semantic-error oracle (#34, R12): corpus-standin_model.txt.
+# Written by go run ./tools/oracle --update semerr; do not edit.
+# Each "run" is one analysis group of the project's own driver (a
+# testsuite.sh between cleans, a VESTS list, an NVC regression test or
+# unit-test block, a corpus design run, or a file no driver names,
+# alone under 2008): its files are analyzed in order, one command per
+# file, in a fresh work directory per tool ("dir" is the working
+# directory; the run's GHDL --std and the sha256 prefix of its sources
+# follow). Each file line is the argument, the library when not work,
+# the GHDL options, then per tool the exit code and the lines of that
+# file it reports errors on; "~" marks a line whose only errors are
+# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
+# reports an error on every line both tools report one on
+# (semerr_check.go).
+tool ghdl 6.0.0
+tool nvc 1.23.0
+run corpus:standin_model:main dir=testdata/corpus/standin_model std=08 sha=031f4a00df0432ab
+ models/crypt_core_model.vhd ghdl=0 nvc=0
+ crypt_core.vhd ghdl=1@29 nvc=1@20
+ standin_model.vhd ghdl=0 nvc=0
+ standin_model_tb.vhd ghdl=0 nvc=0

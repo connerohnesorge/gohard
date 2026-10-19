@@ -1,0 +1,3 @@
+src/top.vhd:1:9: error[library/unmapped]: library nowhere is not mapped; add it under libraries: in gohard.yaml
+  gohard.yaml:1:1: note: quick fix: add `nowhere: [ip/nowhere]` under libraries: (ip/nowhere declares nowhere.npkg)
+summary: 1 errors, 0 warnings, 0 hints, 2 files

@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- test: define=MODE=fast kind=InactiveBranch\n`if MODE = \"slow\" then\npackage slow_p is\nend;\n`else\npackage fast_p is\nend;\n`end if\n")

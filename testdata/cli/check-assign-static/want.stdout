@@ -1,0 +1,7 @@
+leaf.vhd:10:8: error[sema/static-error]: assignment to x: length mismatch: expected 2 elements, got 4 in tb.u (W=2)
+leaf.vhd:11:8: error[sema/static-error]: assignment to b: index 4 is out of range 3 downto 0 in tb.v (W=4)
+leaf.vhd:12:8: error[sema/static-error]: assignment to z: length mismatch: expected 2 elements, got 4 in work.leaf(a)
+leaf.vhd:16:10: error[sema/static-error]: assignment to v: length mismatch: expected 2 elements, got 4 in work.leaf(a)
+leaf.vhd:17:10: error[sema/static-error]: assignment to b: index 7 is out of range 3 downto 0 in work.leaf(a)
+leaf.vhd:26:10: error[sema/static-error]: assignment to z: length mismatch: expected 2 elements, got 4 in tb.v.g
+summary: 6 errors, 0 warnings, 0 hints, 2 files

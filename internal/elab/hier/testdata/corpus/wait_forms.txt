@@ -1,0 +1,2 @@
+wait_forms_tb entity work.wait_forms_tb(tb)
+  wait_forms_tb.dut entity work.wait_forms(rtl)

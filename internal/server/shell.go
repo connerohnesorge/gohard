@@ -23,7 +23,13 @@ import (
 // While the core has queued events Serve runs them one at a time and,
 // before each, queues every client message that has already arrived,
 // so a $/cancelRequest or an edit reaches running work at its next
-// slice boundary (#25). When the core is idle Serve waits for input.
+// slice boundary (#25). "Arrived" means received from the transport,
+// not merely decoded: jsonrpc2.Conn.Next hands over every message whose
+// bytes are in hand before it lets the core step, so the step a message
+// is queued at depends on when the client sent it, never on how fast
+// the reader goroutine ran, and a simulated transport (simenv.Script)
+// is queued whole before the first step (P1). When the core is idle
+// Serve waits for input.
 //
 // Every gohard.yaml read is passed to record too (Arrival.Config), so
 // a session that reloads its configuration replays byte for byte. A

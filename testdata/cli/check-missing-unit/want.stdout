@@ -1,0 +1,2 @@
+top.vhd:2:11: error[library/missing-unit]: library mylib has no unit q (scanned lib)
+summary: 1 errors, 0 warnings, 0 hints, 2 files

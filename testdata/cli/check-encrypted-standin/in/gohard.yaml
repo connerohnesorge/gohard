@@ -1,0 +1,5 @@
+allow_opaque:
+  - work.core
+simulation:
+  models:
+    work.core: models/core_model.vhd

@@ -1,0 +1,4 @@
+# A stand-in without allow_opaque: the encrypted unit is still opaque
+# (exit 2) and top, checked through the stand-in, is unchecked. The
+# stand-in is not a duplicate unit.
+gohard check

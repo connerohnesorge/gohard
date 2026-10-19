@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  constant c : integer := work.p.width;\n  constant d : integer := rec.field.sub;\n  constant e : integer := ptr.all;\nend;\n")

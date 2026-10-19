@@ -42,6 +42,15 @@ func (in Incoming) Terminal() bool {
 	return !errors.As(in.Err, &de) && !errors.As(in.Err, &se)
 }
 
+// Readier is implemented by an input that can tell whether its next
+// Read returns without waiting for the client: the bytes (or the end of
+// the input) it returns have already arrived. A simulated transport
+// (simenv.Script) is always ready. [Conn] treats any other input as
+// one whose Read may wait.
+type Readier interface {
+	Ready() bool
+}
+
 // EventKind says what [Conn.Next] returned.
 type EventKind uint8
 
@@ -77,6 +86,14 @@ type Conn struct {
 	in   chan Incoming
 	quit chan struct{} // closed by Close; stops a blocked reader
 
+	// rmu guards waiting: a channel that is closed while the reader
+	// goroutine waits for the client (in a Read that may block) or has
+	// exited, and open while it reads, decodes or delivers input that
+	// has already arrived.
+	rmu     sync.Mutex
+	waiting chan struct{}
+	parked  bool
+
 	mu     sync.Mutex
 	cond   *sync.Cond
 	queue  [][]byte
@@ -95,17 +112,20 @@ func NewConn(r io.Reader, w io.Writer, o Options) *Conn {
 		buf = 64
 	}
 	c := &Conn{
-		in:    make(chan Incoming, buf),
-		quit:  make(chan struct{}),
-		wdone: make(chan struct{}),
+		in:      make(chan Incoming, buf),
+		quit:    make(chan struct{}),
+		wdone:   make(chan struct{}),
+		waiting: make(chan struct{}),
 	}
 	c.cond = sync.NewCond(&c.mu)
-	go c.read(NewReader(r, o.MaxMessage))
+	ready, _ := r.(Readier)
+	go c.read(NewReader(&input{r: r, ready: ready, c: c}, o.MaxMessage))
 	go c.write(w)
 	return c
 }
 
 func (c *Conn) read(fr *Reader) {
+	defer c.park()
 	defer close(c.in)
 	for {
 		in := receive(fr)
@@ -117,6 +137,43 @@ func (c *Conn) read(fr *Reader) {
 		if in.Terminal() {
 			return
 		}
+	}
+}
+
+// input is the transport as the reader goroutine sees it: a Read that
+// may wait for the client parks the reader for its duration, so
+// [Conn.Next] knows that everything that has arrived was delivered.
+type input struct {
+	r     io.Reader
+	ready Readier // nil: every Read may wait
+	c     *Conn
+}
+
+func (in *input) Read(p []byte) (int, error) {
+	if in.ready == nil || !in.ready.Ready() {
+		in.c.park()
+		defer in.c.unpark()
+	}
+	return in.r.Read(p)
+}
+
+// park marks the reader as waiting for the client (or gone).
+func (c *Conn) park() {
+	c.rmu.Lock()
+	defer c.rmu.Unlock()
+	if !c.parked {
+		c.parked = true
+		close(c.waiting)
+	}
+}
+
+// unpark marks the reader as busy with input that has arrived.
+func (c *Conn) unpark() {
+	c.rmu.Lock()
+	defer c.rmu.Unlock()
+	if c.parked {
+		c.parked = false
+		c.waiting = make(chan struct{})
 	}
 }
 
@@ -162,8 +219,18 @@ func (c *Conn) write(w io.Writer) {
 // Next blocks until a message arrives, wake delivers a time or done is
 // closed, and returns which. A nil wake or done never fires, so a
 // shell with no pending timer passes nil. When several are ready Next
-// prefers done, then input, then wake; the order the core sees is the
-// order the shell records (#29), so replay does not depend on it.
+// prefers done, then input, then wake.
+//
+// Input that has arrived always comes before wake: while the reader
+// goroutine is reading, decoding or delivering bytes it has already
+// received (or bytes a [Readier] input has ready), Next waits for that
+// message instead of returning EventWake. Only once the reader waits
+// for the client can wake fire. So how far the core gets before a
+// message reaches it depends on when the client sent it, never on how
+// fast the reader goroutine ran; with a transport that never waits
+// (simenv) the whole input reaches the core before it runs (P1). The
+// order the core sees is the order the shell records (#29), so replay
+// does not depend on it either.
 func (c *Conn) Next(wake <-chan time.Time, done <-chan struct{}) Event {
 	select {
 	case <-done:
@@ -174,6 +241,25 @@ func (c *Conn) Next(wake <-chan time.Time, done <-chan struct{}) Event {
 	case in, ok := <-c.in:
 		return message(in, ok)
 	default:
+	}
+	if wake != nil {
+		c.rmu.Lock()
+		waiting := c.waiting
+		c.rmu.Unlock()
+		select {
+		case <-done:
+			return Event{Kind: EventDone}
+		case in, ok := <-c.in:
+			return message(in, ok)
+		case <-waiting:
+		}
+		// The reader delivers a message before it waits again, so
+		// one that arrived is in c.in now.
+		select {
+		case in, ok := <-c.in:
+			return message(in, ok)
+		default:
+		}
 	}
 	select {
 	case <-done:

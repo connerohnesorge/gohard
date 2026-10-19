@@ -1,0 +1,3 @@
+# nowhere is not mapped; ip/nowhere declares nowhere.npkg, so the
+# quick fix maps it there.
+gohard check

@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type fifo16 is new fifo generic map (depth => 16);\nend;\n")

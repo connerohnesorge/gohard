@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- test: kind=none\npackage inherit is\n  constant inherit : integer := 1;\nend package inherit;\n")

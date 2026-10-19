@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  g : for i in 0 to 3 generate\n    s(i) <= a(i);\n  end generate g;\nend;\n")

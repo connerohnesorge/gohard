@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\n  property p2 (boolean x, y; const numeric n) is always x -> next[n] y;\nbegin\nend;\n")

@@ -1,0 +1,6 @@
+bus_pkg.vhd:18:8: error[sema/error]: view broken_v gives no mode for element ack of bus_t
+bus_pkg.vhd:21:5: error[sema/error]: element req is given a mode twice in view broken_v
+design.vhd:11:3: error[sema/error]: cannot assign to b.req: it has mode in in view producer_v'converse of port b
+design.vhd:25:3: error[sema/error]: cannot assign to b: element b.ack has mode in in view producer_v of port b
+design.vhd:40:47: error[sema/error]: view producer_v of port b gives element req mode out, but it has mode in in the actual link_in, a port of mode in
+summary: 5 errors, 0 warnings, 0 hints, 2 files

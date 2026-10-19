@@ -1,0 +1,4 @@
+# Every VHDL-2019 construct planned for v1.1 (#18) is
+# unsupported/construct under v1.0: exit 2, the unit is opaque, and the
+# message says "planned for v1.1". One file per construct.
+gohard check

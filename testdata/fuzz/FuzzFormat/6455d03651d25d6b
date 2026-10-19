@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- textio_env: design under test for the textio_env corpus design (#8).\n-- An 8-bit inverter; the testbench logs it through textio.\nlibrary ieee;\nuse ieee.std_logic_1164.all;\n\nentity textio_env is\n  port (\n    a : in  std_logic_vector(7 downto 0);\n    y : out std_logic_vector(7 downto 0)\n  );\nend entity textio_env;\n\narchitecture rtl of textio_env is\nbegin\n  y <= not a;\nend architecture rtl;\n")

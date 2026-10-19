@@ -1,0 +1,3 @@
+# Only other.vhd is named: the bad top generic in top.vhd belongs to
+# that file and is not reported.
+gohard check other.vhd

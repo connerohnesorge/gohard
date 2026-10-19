@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- test: kind=none allow=syntax/directive-error\n`if TOOL_TYPE = \"SIMULATION\" then\n`error \"not for simulation\"\n`end if\npackage p is\nend;\n")

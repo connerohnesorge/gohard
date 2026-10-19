@@ -17,6 +17,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/cli"
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/env/realenv"
+	"github.com/connerohnesorge/gohard/internal/stdlib"
 )
 
 var update = flag.Bool("update", false,
@@ -158,6 +159,9 @@ func runOnce(t tb, dir string, args []string,
 	ctx, cancel := context.WithCancelCause(context.Background())
 	defer cancel(nil)
 	st.wrap(&e, cancel)
+	for _, p := range st.tamper {
+		ctx = stdlib.WithTamper(ctx, p)
+	}
 	exit := run(ctx, e, args)
 	clean := func(b []byte) []byte {
 		for _, w := range []string{work, filepath.ToSlash(work)} {

@@ -1,0 +1,3 @@
+# Legal VHDL GoHard does not implement and that is not planned for
+# v1.1: unsupported/construct, "please report", exit 2.
+gohard check

@@ -1,0 +1,2384 @@
+# GoHard semantic-error oracle (#34, R12): nvc-regress.txt.
+# Written by go run ./tools/oracle --update semerr; do not edit.
+# Each "run" is one analysis group of the project's own driver (a
+# testsuite.sh between cleans, a VESTS list, an NVC regression test or
+# unit-test block, a corpus design run, or a file no driver names,
+# alone under 2008): its files are analyzed in order, one command per
+# file, in a fresh work directory per tool ("dir" is the working
+# directory; the run's GHDL --std and the sha256 prefix of its sources
+# follow). Each file line is the argument, the library when not work,
+# the GHDL options, then per tool the exit code and the lines of that
+# file it reports errors on; "~" marks a line whose only errors are
+# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
+# reports an error on every line both tools report one on
+# (semerr_check.go).
+tool ghdl 6.0.0
+tool nvc 1.23.0
+run regress:wait1 dir=testdata/nvc/test/regress std=93 sha=d7cb105f78b2c75c
+ wait1.vhd ghdl=0 nvc=0
+run regress:assert1 dir=testdata/nvc/test/regress std=93 sha=e90ffd94b4265b39
+ assert1.vhd ghdl=0 nvc=0
+run regress:assign1 dir=testdata/nvc/test/regress std=93 sha=26dc95c2970f9061
+ assign1.vhd ghdl=0 nvc=0
+run regress:wait2 dir=testdata/nvc/test/regress std=93 sha=5aa2760a7f78f6f8
+ wait2.vhd ghdl=0 nvc=0
+run regress:arith1 dir=testdata/nvc/test/regress std=93 sha=d36af49b3a8759cf
+ arith1.vhd ghdl=0 nvc=0
+run regress:signal1 dir=testdata/nvc/test/regress std=93 sha=7335591acf263171
+ signal1.vhd ghdl=0 nvc=0
+run regress:attr1 dir=testdata/nvc/test/regress std=93 sha=1c6c39c0c34dda22
+ attr1.vhd ghdl=0 nvc=0
+run regress:signal2 dir=testdata/nvc/test/regress std=93 sha=9daac31a773acf79
+ signal2.vhd ghdl=0 nvc=0
+run regress:signal3 dir=testdata/nvc/test/regress std=93 sha=f7f61eb3522ed7f7
+ signal3.vhd ghdl=0 nvc=0
+run regress:assign2 dir=testdata/nvc/test/regress std=93 sha=dbee23171b510998
+ assign2.vhd ghdl=0 nvc=0
+run regress:assign3 dir=testdata/nvc/test/regress std=93 sha=4a70e2dac036da12
+ assign3.vhd ghdl=0 nvc=0
+run regress:signal4 dir=testdata/nvc/test/regress std=93 sha=f5add5d0e420dcbe
+ signal4.vhd ghdl=0 nvc=0
+run regress:wait3 dir=testdata/nvc/test/regress std=93 sha=ac5a8b6f5496eb5f
+ wait3.vhd ghdl=0 nvc=0
+run regress:wait4 dir=testdata/nvc/test/regress std=93 sha=61971473c1e85c28
+ wait4.vhd ghdl=0 nvc=0
+run regress:wait5 dir=testdata/nvc/test/regress std=93 sha=e3645d2423f90986
+ wait5.vhd ghdl=0 nvc=0
+run regress:elab1 dir=testdata/nvc/test/regress std=93 sha=5bca2c891424c370
+ elab1.vhd ghdl=0 nvc=0
+run regress:image1 dir=testdata/nvc/test/regress std=93 sha=d5c2574b25b1ef1d
+ image1.vhd ghdl=0 nvc=0
+run regress:cond1 dir=testdata/nvc/test/regress std=93 sha=6539823b62a89be5
+ cond1.vhd ghdl=0 nvc=0
+run regress:counter dir=testdata/nvc/test/regress std=93 sha=ff99a916c9c1532e
+ counter.vhd ghdl=0 nvc=0
+run regress:cond2 dir=testdata/nvc/test/regress std=93 sha=13c1e320c761a3b2
+ cond2.vhd ghdl=0 nvc=0
+run regress:vecorder1 dir=testdata/nvc/test/regress std=93 sha=fa3d2ecca5bfce3d
+ vecorder1.vhd ghdl=0 nvc=0
+run regress:elab2 dir=testdata/nvc/test/regress std=93 sha=691b6b69472a5c17
+ elab2.vhd ghdl=0 nvc=0
+run regress:func1 dir=testdata/nvc/test/regress std=93 sha=5a31d293d7026774
+ func1.vhd ghdl=0 nvc=0
+run regress:signal5 dir=testdata/nvc/test/regress std=93 sha=572ee1576408465d
+ signal5.vhd ghdl=0 nvc=0
+run regress:while1 dir=testdata/nvc/test/regress std=93 sha=e0c2164a3cbb0fae
+ while1.vhd ghdl=0 nvc=0
+run regress:signal6 dir=testdata/nvc/test/regress std=93 sha=b3e7ecb0139440e0
+ signal6.vhd ghdl=0 nvc=0
+run regress:slice1 dir=testdata/nvc/test/regress std=93 sha=f6d0066b155b8028
+ slice1.vhd ghdl=0 nvc=0
+run regress:logical1 dir=testdata/nvc/test/regress std=93 sha=9d0b1352067dc6d8
+ logical1.vhd ghdl=0 nvc=0
+run regress:lfsr dir=testdata/nvc/test/regress std=93 sha=1fcbe9621a73fe03
+ lfsr.vhd ghdl=0 nvc=0
+run regress:link1 dir=testdata/nvc/test/regress std=93 sha=7fdf5d22b39e0dcf
+ link1.vhd ghdl=0 nvc=0
+run regress:for1 dir=testdata/nvc/test/regress std=93 sha=f97d9efe6cc3a1bd
+ for1.vhd ghdl=0 nvc=0
+run regress:operator1 dir=testdata/nvc/test/regress std=93 sha=dbf0ae6f452ba6b3
+ operator1.vhd ghdl=0 nvc=0
+run regress:fact dir=testdata/nvc/test/regress std=93 sha=17d6c47000d3f783
+ fact.vhd ghdl=0 nvc=0
+run regress:func2 dir=testdata/nvc/test/regress std=93 sha=3db11591c6a29d61
+ func2.vhd ghdl=0 nvc=0
+run regress:alias1 dir=testdata/nvc/test/regress std=93 sha=d9a317f49554dc76
+ alias1.vhd ghdl=0 nvc=0
+run regress:alias2 dir=testdata/nvc/test/regress std=93 sha=8c49a9296990d01b
+ alias2.vhd ghdl=0 nvc=0
+run regress:func3 dir=testdata/nvc/test/regress std=93 sha=c9dfbbe2decce02c
+ func3.vhd ghdl=0 nvc=0
+run regress:func4 dir=testdata/nvc/test/regress std=93 sha=45662a12a9a3c419
+ func4.vhd ghdl=0 nvc=0
+run regress:operator2 dir=testdata/nvc/test/regress std=93 sha=1410443085314e62
+ operator2.vhd ghdl=0 nvc=0
+run regress:array1 dir=testdata/nvc/test/regress std=93 sha=5b8d99ddbfe5b8c4
+ array1.vhd ghdl=0 nvc=0
+run regress:agg1 dir=testdata/nvc/test/regress std=93 sha=10055b57fbeff59c
+ agg1.vhd ghdl=0 nvc=0
+run regress:agg2 dir=testdata/nvc/test/regress std=93 sha=98d7be47e5aa4307
+ agg2.vhd ghdl=0 nvc=0
+run regress:case1 dir=testdata/nvc/test/regress std=93 sha=aa6c61b52e0a6138
+ case1.vhd ghdl=0 nvc=0
+run regress:func5 dir=testdata/nvc/test/regress std=93 sha=f402393bf4e8de4b
+ func5.vhd ghdl=0 nvc=0
+run regress:ieee1 dir=testdata/nvc/test/regress std=93 sha=47477ca9b8208b75
+ ieee1.vhd ghdl=0 nvc=0
+run regress:ieee2 dir=testdata/nvc/test/regress std=93 sha=21080066101a2cbc
+ ieee2.vhd ghdl=0 nvc=0
+run regress:cond3 dir=testdata/nvc/test/regress std=93 sha=832585e5bc7c009c
+ cond3.vhd ghdl=0 nvc=0
+run regress:concat1 dir=testdata/nvc/test/regress std=93 sha=e5859714f8afb74e
+ concat1.vhd ghdl=0 nvc=0
+run regress:concat2 dir=testdata/nvc/test/regress std=93 sha=cecec40857114f8f
+ concat2.vhd ghdl=0 nvc=0
+run regress:null1 dir=testdata/nvc/test/regress std=93 sha=202bec1742de163d
+ null1.vhd ghdl=0 nvc=0
+run regress:agg3 dir=testdata/nvc/test/regress std=93 sha=0b41358bc1724503
+ agg3.vhd ghdl=0 nvc=0
+run regress:proc1 dir=testdata/nvc/test/regress std=93 sha=4e7693cf8389cb3e
+ proc1.vhd ghdl=0 nvc=0
+run regress:alias3 dir=testdata/nvc/test/regress std=93 sha=b21318ce8f6d758f
+ alias3.vhd ghdl=0 nvc=0
+run regress:proc2 dir=testdata/nvc/test/regress std=93 sha=0ba9d035caf0f8c3
+ proc2.vhd ghdl=0 nvc=0
+run regress:operator3 dir=testdata/nvc/test/regress std=93 sha=e1e225821d3850d9
+ operator3.vhd ghdl=0 nvc=0
+run regress:agg4 dir=testdata/nvc/test/regress std=93 sha=f73019f46a63a1b7
+ agg4.vhd ghdl=0 nvc=0
+run regress:ieee3 dir=testdata/nvc/test/regress std=93 sha=1c01a879bdcd5a73
+ ieee3.vhd ghdl=0 nvc=0
+run regress:default1 dir=testdata/nvc/test/regress std=93 sha=99070e0b7a6a465c
+ default1.vhd ghdl=0 nvc=0
+run regress:generic1 dir=testdata/nvc/test/regress std=93 sha=72e92edfd4cebb6a
+ generic1.vhd ghdl=0 nvc=0
+run regress:signal7 dir=testdata/nvc/test/regress std=93 sha=5db8d280e1da85cc
+ signal7.vhd ghdl=0 nvc=0
+run regress:synopsys1 dir=testdata/nvc/test/regress std=93 sha=7a3228efbb2058c1
+ synopsys1.vhd ghdl=1@3,4,9~ nvc=0
+run regress:block1 dir=testdata/nvc/test/regress std=93 sha=601fa9c05fad6983
+ block1.vhd ghdl=0 nvc=0
+run regress:elab3 dir=testdata/nvc/test/regress std=93 sha=80931f1bb215c4fc
+ elab3.vhd ghdl=0 nvc=0
+run regress:func6 dir=testdata/nvc/test/regress std=93 sha=0f5391f13b4aa03f
+ func6.vhd ghdl=0 nvc=0
+run regress:case2 dir=testdata/nvc/test/regress std=93 sha=2bab27895e4bfce6
+ case2.vhd ghdl=0 nvc=0
+run regress:case3 dir=testdata/nvc/test/regress std=93 sha=9125e74699828fc2
+ case3.vhd ghdl=0 nvc=0
+run regress:wait6 dir=testdata/nvc/test/regress std=93 sha=bdc465650c93413c
+ wait6.vhd ghdl=0 nvc=0
+run regress:elab4 dir=testdata/nvc/test/regress std=93 sha=88adeb611e0a6cf8
+ elab4.vhd ghdl=0 nvc=0
+run regress:elab5 dir=testdata/nvc/test/regress std=93 sha=216dccbc63077cdd
+ elab5.vhd ghdl=0 nvc=0
+run regress:signal8 dir=testdata/nvc/test/regress std=93 sha=31add4f499b8b04d
+ signal8.vhd ghdl=0 nvc=0
+run regress:ram1 dir=testdata/nvc/test/regress std=93 sha=a87731aa60bbb6c8
+ ram1.vhd ghdl=0 nvc=0
+run regress:wait7 dir=testdata/nvc/test/regress std=93 sha=6687e9992a7f507e
+ wait7.vhd ghdl=0 nvc=0
+run regress:const1 dir=testdata/nvc/test/regress std=93 sha=e50c82dca48d4851
+ const1.vhd ghdl=0 nvc=0
+run regress:driver1 dir=testdata/nvc/test/regress std=93 sha=e9f7067cfdb82cd3
+ driver1.vhd ghdl=0 nvc=0
+run regress:driver2 dir=testdata/nvc/test/regress std=93 sha=932cd273d26fae9a
+ driver2.vhd ghdl=0 nvc=0
+run regress:delay1 dir=testdata/nvc/test/regress std=93 sha=efa63a32ca6aabb8
+ delay1.vhd ghdl=0 nvc=0
+run regress:record1 dir=testdata/nvc/test/regress std=93 sha=c3275810ac836e28
+ record1.vhd ghdl=0 nvc=0
+run regress:proc3 dir=testdata/nvc/test/regress std=93 sha=277e5ba7b13aa7e7
+ proc3.vhd ghdl=0 nvc=0
+run regress:access1 dir=testdata/nvc/test/regress std=93 sha=7807fe4258e4f212
+ access1.vhd ghdl=0 nvc=0
+run regress:proc4 dir=testdata/nvc/test/regress std=93 sha=87e7de7bfc694376
+ proc4.vhd ghdl=0 nvc=0
+run regress:file1 dir=testdata/nvc/test/regress std=93 sha=623ea0be3953ac32
+ file1.vhd ghdl=0 nvc=0
+run regress:real1 dir=testdata/nvc/test/regress std=93 sha=90dae5f88323f39c
+ real1.vhd ghdl=0 nvc=0
+run regress:shared1 dir=testdata/nvc/test/regress std=93 sha=0bf08aff97b72936
+ shared1.vhd ghdl=0 nvc=0
+run regress:proc5 dir=testdata/nvc/test/regress std=93 sha=f4cced71362a0ca9
+ proc5.vhd ghdl=0 nvc=0
+run regress:proc6 dir=testdata/nvc/test/regress std=93 sha=f91545de0795f771
+ proc6.vhd ghdl=0 nvc=0
+run regress:assert2 dir=testdata/nvc/test/regress std=93 sha=ef53100224e776b2
+ assert2.vhd ghdl=0 nvc=0
+run regress:concat3 dir=testdata/nvc/test/regress std=93 sha=cd01c00bd56a166d
+ concat3.vhd ghdl=0 nvc=0
+run regress:const2 dir=testdata/nvc/test/regress std=93 sha=be8ebdf22cbcd15c
+ const2.vhd ghdl=0 nvc=0
+run regress:func7 dir=testdata/nvc/test/regress std=93 sha=9ca2fdc0df3b2e30
+ func7.vhd ghdl=0 nvc=0
+run regress:func8 dir=testdata/nvc/test/regress std=93 sha=24148f2c2f573d37
+ func8.vhd ghdl=0 nvc=0
+run regress:ieee4 dir=testdata/nvc/test/regress std=93 sha=2d9ee44f3b71533e
+ ieee4.vhd ghdl=0 nvc=0
+run regress:bounds1 dir=testdata/nvc/test/regress std=93 sha=86c61455bb65d32b
+ bounds1.vhd ghdl=0 nvc=0
+run regress:bounds2 dir=testdata/nvc/test/regress std=93 sha=634e35ff4736d512
+ bounds2.vhd ghdl=0 nvc=0
+run regress:bounds3 dir=testdata/nvc/test/regress std=93 sha=48ab1b5f89588b46
+ bounds3.vhd ghdl=0 nvc=0
+run regress:bounds4 dir=testdata/nvc/test/regress std=93 sha=db9a6c8b8bc6161b
+ bounds4.vhd ghdl=0 nvc=0
+run regress:signal9 dir=testdata/nvc/test/regress std=93 sha=336ce78fc4206bb4
+ signal9.vhd ghdl=0 nvc=0
+run regress:bounds5 dir=testdata/nvc/test/regress std=93 sha=361e572a72442c36
+ bounds5.vhd ghdl=0 nvc=0
+run regress:loop1 dir=testdata/nvc/test/regress std=93 sha=508dbe70d76ac11f
+ loop1.vhd ghdl=0 nvc=0
+run regress:record2 dir=testdata/nvc/test/regress std=93 sha=c814af0bddbff3b7
+ record2.vhd ghdl=0 nvc=0
+run regress:access2 dir=testdata/nvc/test/regress std=93 sha=ca91ebc2dfcf5e88
+ access2.vhd ghdl=1@34 nvc=0
+run regress:func9 dir=testdata/nvc/test/regress std=93 sha=c8e57eb6405397b8
+ func9.vhd ghdl=0 nvc=0
+run regress:record3 dir=testdata/nvc/test/regress std=93 sha=5b3977f532396c1f
+ record3.vhd ghdl=0 nvc=0
+run regress:issue8 dir=testdata/nvc/test/regress std=93 sha=28507402b2df0d77
+ issue8.vhd ghdl=0 nvc=0
+run regress:issue9 dir=testdata/nvc/test/regress std=93 sha=0ea693fac807a3de
+ issue9.vhd ghdl=0 nvc=0
+run regress:record4 dir=testdata/nvc/test/regress std=93 sha=bf70cd6ff40eb62e
+ record4.vhd ghdl=0 nvc=0
+run regress:record5 dir=testdata/nvc/test/regress std=93 sha=be0a80fe9cadf1ea
+ record5.vhd ghdl=0 nvc=0
+run regress:const3 dir=testdata/nvc/test/regress std=93 sha=d2a37ccde10df72c
+ const3.vhd ghdl=0 nvc=0
+run regress:proc7 dir=testdata/nvc/test/regress std=93 sha=f044f042122a50bc
+ proc7.vhd ghdl=0 nvc=0
+run regress:attr2 dir=testdata/nvc/test/regress std=93 sha=951031a8a512dc4a
+ attr2.vhd ghdl=0 nvc=0
+run regress:func10 dir=testdata/nvc/test/regress std=93 sha=1b3648c279873ff4
+ func10.vhd ghdl=0 nvc=0
+run regress:attr3 dir=testdata/nvc/test/regress std=93 sha=8d40f27336a43056
+ attr3.vhd ghdl=0 nvc=0
+run regress:proc8 dir=testdata/nvc/test/regress std=93 sha=66ccf00e8a36eb33
+ proc8.vhd ghdl=0 nvc=0
+run regress:wait8 dir=testdata/nvc/test/regress std=93 sha=12425949224e245b
+ wait8.vhd ghdl=0 nvc=0
+run regress:func11 dir=testdata/nvc/test/regress std=93 sha=2363c4cc871bc243
+ func11.vhd ghdl=0 nvc=0
+run regress:const4 dir=testdata/nvc/test/regress std=93 sha=474772bfda2ddd63
+ const4.vhd ghdl=0 nvc=0
+run regress:shift1 dir=testdata/nvc/test/regress std=93 sha=007011a1c72e3150
+ shift1.vhd ghdl=0 nvc=0
+run regress:wait9 dir=testdata/nvc/test/regress std=93 sha=014a81f2ffefa6c9
+ wait9.vhd ghdl=0 nvc=0
+run regress:wait10 dir=testdata/nvc/test/regress std=93 sha=aeb54747996574c2
+ wait10.vhd ghdl=0 nvc=0
+run regress:attr4 dir=testdata/nvc/test/regress std=93 sha=91b7e31a405d94fa
+ attr4.vhd ghdl=0 nvc=0
+run regress:bounds6 dir=testdata/nvc/test/regress std=93 sha=d9dcb491e0c3f84e
+ bounds6.vhd ghdl=0 nvc=0
+run regress:elab6 dir=testdata/nvc/test/regress std=93 sha=95e5ae162050e7ef
+ elab6.vhd ghdl=0 nvc=0
+run regress:elab7 dir=testdata/nvc/test/regress std=93 sha=274e8c0cf8c8bb7e
+ elab7.vhd ghdl=0 nvc=0
+run regress:bounds7 dir=testdata/nvc/test/regress std=93 sha=8219e9a51b1a376c
+ bounds7.vhd ghdl=0 nvc=0
+run regress:arith2 dir=testdata/nvc/test/regress std=93 sha=d10734a0128436c9
+ arith2.vhd ghdl=0 nvc=0
+run regress:attr5 dir=testdata/nvc/test/regress std=93 sha=877df0a81c005999
+ attr5.vhd ghdl=0 nvc=0
+run regress:attr6 dir=testdata/nvc/test/regress std=93 sha=863241001d1365ac
+ attr6.vhd ghdl=0 nvc=0
+run regress:elab8 dir=testdata/nvc/test/regress std=93 sha=db881ee94fab84de
+ elab8.vhd ghdl=0 nvc=0
+run regress:arith3 dir=testdata/nvc/test/regress std=93 sha=2d480dc94dc8a139
+ arith3.vhd ghdl=0 nvc=0
+run regress:bounds8 dir=testdata/nvc/test/regress std=93 sha=7c4c5aac2234de7e
+ bounds8.vhd ghdl=0 nvc=0
+run regress:bounds9 dir=testdata/nvc/test/regress std=93 sha=f8456a17a0b3516a
+ bounds9.vhd ghdl=0 nvc=0
+run regress:bounds10 dir=testdata/nvc/test/regress std=93 sha=b6d4812f8944d9dd
+ bounds10.vhd ghdl=0 nvc=0
+run regress:access3 dir=testdata/nvc/test/regress std=93 sha=238a405f8dde54d3
+ access3.vhd ghdl=0 nvc=0
+run regress:access4 dir=testdata/nvc/test/regress std=93 sha=0f398293260c7cf1
+ access4.vhd ghdl=0 nvc=0
+run regress:textio1 dir=testdata/nvc/test/regress std=93 sha=b6b02e9e31b2c0f6
+ textio1.vhd ghdl=0 nvc=0
+run regress:proc9 dir=testdata/nvc/test/regress std=93 sha=d2a4ac0286b8f794
+ proc9.vhd ghdl=0 nvc=0
+run regress:elab9 dir=testdata/nvc/test/regress std=93 sha=3c7afac72b5fc725
+ elab9.vhd ghdl=0 nvc=0
+run regress:elab10 dir=testdata/nvc/test/regress std=93 sha=ee1c085f32999380
+ elab10.vhd ghdl=0 nvc=0
+run regress:conv1 dir=testdata/nvc/test/regress std=93 sha=e60ac6fd43b239d6
+ conv1.vhd ghdl=0 nvc=0
+run regress:elab11 dir=testdata/nvc/test/regress std=93 sha=2a780a22d1da325d
+ elab11.vhd ghdl=0 nvc=0
+run regress:link2 dir=testdata/nvc/test/regress std=93 sha=9dbf0bb3e21a781c
+ link2.vhd ghdl=0 nvc=0
+run regress:driver3 dir=testdata/nvc/test/regress std=93 sha=b479be3338ca1104
+ driver3.vhd ghdl=0 nvc=0
+run regress:elab12 dir=testdata/nvc/test/regress std=93 sha=5349783ecc2afeb5
+ elab12.vhd ghdl=0 nvc=0
+run regress:issue10 dir=testdata/nvc/test/regress std=93 sha=c44cc48e5e5bd654
+ issue10.vhd ghdl=0 nvc=0
+run regress:elab13 dir=testdata/nvc/test/regress std=93 sha=7c6157b6dd5d9e63
+ elab13.vhd ghdl=0 nvc=0
+run regress:delay2 dir=testdata/nvc/test/regress std=93 sha=57290535c238451f
+ delay2.vhd ghdl=0 nvc=0
+run regress:issue13 dir=testdata/nvc/test/regress std=93 sha=8fa7cfa25ff7f454
+ issue13.vhd ghdl=0 nvc=0
+run regress:attr7 dir=testdata/nvc/test/regress std=93 sha=b558a60952a89fe5
+ attr7.vhd ghdl=0 nvc=0
+run regress:shift2 dir=testdata/nvc/test/regress std=93 sha=e20df08f2468cfca
+ shift2.vhd ghdl=0 nvc=0
+run regress:case4 dir=testdata/nvc/test/regress std=93 sha=adf1bb955eab66a6
+ case4.vhd ghdl=0 nvc=0
+run regress:signal10 dir=testdata/nvc/test/regress std=93 sha=c1748af2ebc8a81e
+ signal10.vhd ghdl=0 nvc=0
+run regress:signal11 dir=testdata/nvc/test/regress std=93 sha=3c367c4e3edae5fb
+ signal11.vhd ghdl=0 nvc=0
+run regress:wait11 dir=testdata/nvc/test/regress std=93 sha=1375e95e69a69ddf
+ wait11.vhd ghdl=0 nvc=0
+run regress:bounds11 dir=testdata/nvc/test/regress std=93 sha=b05496632c7b9a46
+ bounds11.vhd ghdl=0 nvc=0
+run regress:wait12 dir=testdata/nvc/test/regress std=93 sha=1b205ac21a5d01b7
+ wait12.vhd ghdl=0 nvc=0
+run regress:array2 dir=testdata/nvc/test/regress std=93 sha=f8e4b6d3b4499a16
+ array2.vhd ghdl=0 nvc=0
+run regress:driver4 dir=testdata/nvc/test/regress std=93 sha=53dfcaafeb305d65
+ driver4.vhd ghdl=0 nvc=0
+run regress:comp1 dir=testdata/nvc/test/regress std=93 sha=bc1a5f7d4bd129de
+ comp1.vhd ghdl=0 nvc=0
+run regress:bitvec dir=testdata/nvc/test/regress std=93 sha=72c58635a3c52bc5
+ bitvec.vhd ghdl=0 nvc=0
+run regress:elab14 dir=testdata/nvc/test/regress std=93 sha=39fdfbb526795917
+ elab14.vhd ghdl=0 nvc=0
+run regress:operator4 dir=testdata/nvc/test/regress std=93 sha=896eda6e99f52809
+ operator4.vhd ghdl=0 nvc=0
+run regress:issue16 dir=testdata/nvc/test/regress std=93 sha=6f49c744ce8fb368
+ issue16.vhd ghdl=0 nvc=0
+run regress:elab15 dir=testdata/nvc/test/regress std=93 sha=081117aac367759a
+ elab15.vhd ghdl=0 nvc=0
+run regress:const5 dir=testdata/nvc/test/regress std=93 sha=2b6cc671781d69eb
+ const5.vhd ghdl=0 nvc=0
+run regress:issue18 dir=testdata/nvc/test/regress std=93 sha=c10040b41cc32f18
+ issue18.vhd ghdl=0 nvc=0
+run regress:elab16 dir=testdata/nvc/test/regress std=93 sha=ebbf18f9b62c75fd
+ elab16.vhd ghdl=0 nvc=0
+run regress:signal12 dir=testdata/nvc/test/regress std=93 sha=b33ffcb1195847b3
+ signal12.vhd ghdl=0 nvc=0
+run regress:const6 dir=testdata/nvc/test/regress std=93 sha=e6f50c5a62af6860
+ const6.vhd ghdl=0 nvc=0
+run regress:func12 dir=testdata/nvc/test/regress std=93 sha=a33e44bbed42c1f0
+ func12.vhd ghdl=0 nvc=0
+run regress:agg5 dir=testdata/nvc/test/regress std=93 sha=6eacd386bdb64deb
+ agg5.vhd ghdl=0 nvc=0
+run regress:elab17 dir=testdata/nvc/test/regress std=93 sha=1ca29063cfc35735
+ elab17.vhd ghdl=0 nvc=0
+run regress:null2 dir=testdata/nvc/test/regress std=93 sha=4f419141899a23e6
+ null2.vhd ghdl=0 nvc=0
+run regress:func13 dir=testdata/nvc/test/regress std=93 sha=a02cc90984418812
+ func13.vhd ghdl=0 nvc=0
+run regress:proc10 dir=testdata/nvc/test/regress std=93 sha=e211587541f17334
+ proc10.vhd ghdl=0 nvc=0
+run regress:array3 dir=testdata/nvc/test/regress std=93 sha=fc2ecea3b0be5bd0
+ array3.vhd ghdl=0 nvc=0
+run regress:slice2 dir=testdata/nvc/test/regress std=93 sha=008841304b3daf9c
+ slice2.vhd ghdl=0 nvc=0
+run regress:attr8 dir=testdata/nvc/test/regress std=93 sha=ce53d96fbaa65e02
+ attr8.vhd ghdl=0 nvc=0
+run regress:value1 dir=testdata/nvc/test/regress std=93 sha=3a2777ed32b4c774
+ value1.vhd ghdl=0 nvc=0
+run regress:bounds12 dir=testdata/nvc/test/regress std=93 sha=a640c4a95a4826b8
+ bounds12.vhd ghdl=0 nvc=0
+run regress:bounds13 dir=testdata/nvc/test/regress std=93 sha=24a6bc3af49859e5
+ bounds13.vhd ghdl=0 nvc=0
+run regress:access5 dir=testdata/nvc/test/regress std=93 sha=3b0f068fdecdad27
+ access5.vhd ghdl=0 nvc=0
+run regress:record6 dir=testdata/nvc/test/regress std=93 sha=3f0c2e3c5219e982
+ record6.vhd ghdl=0 nvc=0
+run regress:agg6 dir=testdata/nvc/test/regress std=93 sha=67611c8b607b4eef
+ agg6.vhd ghdl=0 nvc=0
+run regress:func14 dir=testdata/nvc/test/regress std=93 sha=adc0363de50c619e
+ func14.vhd ghdl=0 nvc=0
+run regress:operator5 dir=testdata/nvc/test/regress std=93 sha=cbf8cbceb9bd0fcd
+ operator5.vhd ghdl=0 nvc=0
+run regress:alias4 dir=testdata/nvc/test/regress std=93 sha=4e2e613b1e2de11d
+ alias4.vhd ghdl=0 nvc=0
+run regress:alias5 dir=testdata/nvc/test/regress std=93 sha=fc2920bd3ad72b43
+ alias5.vhd ghdl=0 nvc=0
+run regress:alias6 dir=testdata/nvc/test/regress std=93 sha=10011978d2895eee
+ alias6.vhd ghdl=0 nvc=0
+run regress:alias7 dir=testdata/nvc/test/regress std=93 sha=058bd6e9f4ef6ee5
+ alias7.vhd ghdl=0 nvc=0
+run regress:const7 dir=testdata/nvc/test/regress std=93 sha=b19ea5d14c1ad299
+ const7.vhd ghdl=0 nvc=0
+run regress:bounds15 dir=testdata/nvc/test/regress std=93 sha=672ee60455845949
+ bounds15.vhd ghdl=0 nvc=0
+run regress:bounds16 dir=testdata/nvc/test/regress std=93 sha=a12140fbc76d16f3
+ bounds16.vhd ghdl=0 nvc=0
+run regress:bounds17 dir=testdata/nvc/test/regress std=93 sha=a630b5a705881f47
+ bounds17.vhd ghdl=0 nvc=0
+run regress:signal13 dir=testdata/nvc/test/regress std=93 sha=59ffa34c488be45c
+ signal13.vhd ghdl=0 nvc=0
+run regress:elab18 dir=testdata/nvc/test/regress std=93 sha=71f36bc39976e8e0
+ elab18.vhd ghdl=0 nvc=0
+run regress:wait13 dir=testdata/nvc/test/regress std=93 sha=aeb876ee1bee4ab1
+ wait13.vhd ghdl=0 nvc=0
+run regress:shared2 dir=testdata/nvc/test/regress std=93 sha=a6da2121232f4983
+ shared2.vhd ghdl=0 nvc=0
+run regress:func15 dir=testdata/nvc/test/regress std=93 sha=116c3df44341020c
+ func15.vhd ghdl=0 nvc=0
+run regress:elab19 dir=testdata/nvc/test/regress std=93 sha=3febda8d7f5d950b
+ elab19.vhd ghdl=0 nvc=0
+run regress:concat4 dir=testdata/nvc/test/regress std=93 sha=61035f15391690ea
+ concat4.vhd ghdl=0 nvc=0
+run regress:issue29 dir=testdata/nvc/test/regress std=93 sha=fc940d2ae6ef3c41
+ issue29.vhd ghdl=0 nvc=0
+run regress:assert3 dir=testdata/nvc/test/regress std=93 sha=68102183463f1ad2
+ assert3.vhd ghdl=0 nvc=0
+run regress:alias8 dir=testdata/nvc/test/regress std=93 sha=f5ef32756f7ebab4
+ alias8.vhd ghdl=0 nvc=0
+run regress:textio2 dir=testdata/nvc/test/regress std=93 sha=bb6f74df483ac2d5
+ textio2.vhd ghdl=0 nvc=0
+run regress:elab20 dir=testdata/nvc/test/regress std=93 sha=a943a2e01f4348e3
+ elab20.vhd ghdl=0 nvc=0
+run regress:issue38 dir=testdata/nvc/test/regress std=93 sha=dfa9119093ce2ff7
+ issue38.vhd ghdl=0 nvc=0
+run regress:stop1 dir=testdata/nvc/test/regress std=08 sha=c2222c861be1a299
+ stop1.vhd ghdl=0 nvc=0
+run regress:record7 dir=testdata/nvc/test/regress std=93 sha=5d9d0bf00d67ffad
+ record7.vhd ghdl=0 nvc=0
+run regress:record8 dir=testdata/nvc/test/regress std=93 sha=cef288fd47f627b8
+ record8.vhd ghdl=0 nvc=0
+run regress:elab21 dir=testdata/nvc/test/regress std=93 sha=39bf17a095af9c60
+ elab21.vhd ghdl=0 nvc=0
+run regress:record9 dir=testdata/nvc/test/regress std=93 sha=d41e2260d30e289c
+ record9.vhd ghdl=0 nvc=0
+run regress:record10 dir=testdata/nvc/test/regress std=93 sha=bbfc9fdc2c4202cf
+ record10.vhd ghdl=0 nvc=0
+run regress:real2 dir=testdata/nvc/test/regress std=93 sha=b9ab4cec320d758e
+ real2.vhd ghdl=0 nvc=0
+run regress:issue45 dir=testdata/nvc/test/regress std=93 sha=84f5218199a956b8
+ issue45.vhd ghdl=0 nvc=0
+run regress:for2 dir=testdata/nvc/test/regress std=93 sha=73527a8f5ec5aa20
+ for2.vhd ghdl=0 nvc=0
+run regress:issue57 dir=testdata/nvc/test/regress std=93 sha=f14a9f203b32e53b
+ issue57.vhd ghdl=0 nvc=0
+run regress:attr10 dir=testdata/nvc/test/regress std=93 sha=917a745023687ad3
+ attr10.vhd ghdl=0 nvc=0
+run regress:assert4 dir=testdata/nvc/test/regress std=93 sha=b5b1a13f73f19a97
+ assert4.vhd ghdl=0 nvc=0
+run regress:issue56 dir=testdata/nvc/test/regress std=93 sha=8fb971196c70b189
+ issue56.vhd ghdl=0 nvc=0
+run regress:issue53 dir=testdata/nvc/test/regress std=93 sha=98ac2db78bba9bf8
+ issue53.vhd ghdl=0 nvc=0
+run regress:issue59 dir=testdata/nvc/test/regress std=93 sha=3620de56e0e4a4d2
+ issue59.vhd ghdl=0 nvc=0
+run regress:issue60 dir=testdata/nvc/test/regress std=93 sha=8e743315b67574c5
+ issue60.vhd ghdl=0 nvc=0
+run regress:record11 dir=testdata/nvc/test/regress std=93 sha=ae7d7d9d18107d53
+ record11.vhd ghdl=0 nvc=0
+run regress:issue63 dir=testdata/nvc/test/regress std=93 sha=88e818edc5a0d552
+ issue63.vhd ghdl=0 nvc=0
+run regress:driver5 dir=testdata/nvc/test/regress std=93 sha=44c9da15422f1625
+ driver5.vhd ghdl=0 nvc=0
+run regress:textio3 dir=testdata/nvc/test/regress std=93 sha=b382d35ee2460ec2
+ textio3.vhd ghdl=0 nvc=0
+run regress:record12 dir=testdata/nvc/test/regress std=93 sha=d6894c795c3f0ac3
+ record12.vhd ghdl=0 nvc=0
+run regress:attr11 dir=testdata/nvc/test/regress std=93 sha=674689efba4bdf2d
+ attr11.vhd ghdl=0 nvc=0
+run regress:implicit1 dir=testdata/nvc/test/regress std=93 sha=c734198a15d3ec74
+ implicit1.vhd ghdl=0 nvc=0
+run regress:implicit2 dir=testdata/nvc/test/regress std=93 sha=887ee70185c7609e
+ implicit2.vhd ghdl=0 nvc=0
+run regress:file2 dir=testdata/nvc/test/regress std=93 sha=91c78e7806dd6663
+ file2.vhd ghdl=0 nvc=0
+run regress:case5 dir=testdata/nvc/test/regress std=93 sha=338d9f9c9668c5cf
+ case5.vhd ghdl=0 nvc=0
+run regress:toplevel1 dir=testdata/nvc/test/regress std=93 sha=1619f4b1e3b52b7e
+ toplevel1.vhd ghdl=0 nvc=0
+run regress:vhpi1 dir=testdata/nvc/test/regress std=93 sha=d78d0b8c84267514
+ vhpi1.vhd ghdl=0 nvc=0
+run regress:vhpi2 dir=testdata/nvc/test/regress std=93 sha=4ec393cb80c907c3
+ vhpi2.vhd ghdl=0 nvc=0
+run regress:issue69 dir=testdata/nvc/test/regress std=93 sha=a1ddf04b51d3c17b
+ issue69.vhd ghdl=0 nvc=0
+run regress:issue70 dir=testdata/nvc/test/regress std=93 sha=b4b3e27346e56e69
+ issue70.vhd ghdl=0 nvc=0
+run regress:elab22 dir=testdata/nvc/test/regress std=93 sha=46dee8c060151aee
+ elab22.vhd ghdl=0 nvc=0
+run regress:array4 dir=testdata/nvc/test/regress std=93 sha=c3b3a54777295dba
+ array4.vhd ghdl=0 nvc=0
+run regress:issue72 dir=testdata/nvc/test/regress std=93 sha=6c75dfdaeb580cb0
+ issue72.vhd ghdl=0 nvc=0
+run regress:protected1 dir=testdata/nvc/test/regress std=02 sha=000eb656fcb02442
+ protected1.vhd ghdl=0 nvc=0
+run regress:protected2 dir=testdata/nvc/test/regress std=02 sha=85fc7289faed2017
+ protected2.vhd ghdl=0 nvc=0
+run regress:slice3 dir=testdata/nvc/test/regress std=93 sha=aab803738703ac76
+ slice3.vhd ghdl=0 nvc=0
+run regress:alias9 dir=testdata/nvc/test/regress std=93 sha=a2e2f62d898709a9
+ alias9.vhd ghdl=0 nvc=0
+run regress:issue79 dir=testdata/nvc/test/regress std=93 sha=8e3693a83387e89b
+ issue79.vhd ghdl=0 nvc=0
+run regress:issue84 dir=testdata/nvc/test/regress std=02 sha=2f78776e7f5858e1
+ issue84.vhd ghdl=0 nvc=0
+run regress:issue82 dir=testdata/nvc/test/regress std=93 sha=75d9c411b1e22802
+ issue82.vhd ghdl=0 nvc=0
+run regress:issue86 dir=testdata/nvc/test/regress std=93 sha=66d7a024eeb43dee
+ issue86.vhd ghdl=0 nvc=0
+run regress:issue94 dir=testdata/nvc/test/regress std=93 sha=0aa818a6d00aa272
+ issue94.vhd ghdl=0 nvc=0
+run regress:access6 dir=testdata/nvc/test/regress std=93 sha=1780e5c3c3b0434d
+ access6.vhd ghdl=0 nvc=0
+run regress:issue90 dir=testdata/nvc/test/regress std=93 sha=e7333ae6da6629aa
+ issue90.vhd ghdl=0 nvc=0
+run regress:issue104 dir=testdata/nvc/test/regress std=93 sha=2ab3c214055ed03e
+ issue104.vhd ghdl=0 nvc=0
+run regress:proc11 dir=testdata/nvc/test/regress std=93 sha=db1d1c0010a74961
+ proc11.vhd ghdl=0 nvc=0
+run regress:elab23 dir=testdata/nvc/test/regress std=93 sha=7265c3c46f7d94dc
+ elab23.vhd ghdl=0 nvc=0
+run regress:issue91 dir=testdata/nvc/test/regress std=02 sha=8f8cdef08f853714
+ issue91.vhd ghdl=0 nvc=0
+run regress:issue109 dir=testdata/nvc/test/regress std=93 sha=becae3095b100cd9
+ issue109.vhd ghdl=0 nvc=0
+run regress:issue110 dir=testdata/nvc/test/regress std=93 sha=b7b52fd6ce5102e7
+ issue110.vhd ghdl=0 nvc=0
+run regress:concat5 dir=testdata/nvc/test/regress std=93 sha=d0130f4c7b8d9be5
+ concat5.vhd ghdl=0 nvc=0
+run regress:issue111 dir=testdata/nvc/test/regress std=93 sha=5a75c4feeb3901b3
+ issue111.vhd ghdl=0 nvc=0
+run regress:issue115 dir=testdata/nvc/test/regress std=93 sha=ee9c055a726eb7ec
+ issue115.vhd ghdl=0 nvc=0
+run regress:issue116 dir=testdata/nvc/test/regress std=93 sha=daa234f6b2ef0a57
+ issue116.vhd ghdl=0 nvc=0
+run regress:issue112 dir=testdata/nvc/test/regress std=93 sha=2f9c61caa60b2ca0
+ issue112.vhd ghdl=0 nvc=0
+run regress:cover1 dir=testdata/nvc/test/regress std=93 sha=7883a9806d75d698
+ cover1.vhd ghdl=0 nvc=0
+run regress:issue121 dir=testdata/nvc/test/regress std=93 sha=0a6d35631b53774e
+ issue121.vhd ghdl=0 nvc=0
+run regress:issue122 dir=testdata/nvc/test/regress std=93 sha=89493f92ca29dea6
+ issue122.vhd ghdl=0 nvc=0
+run regress:issue95 dir=testdata/nvc/test/regress std=93 sha=547cf7654579d2a9
+ issue95.vhd ghdl=0 nvc=0
+run regress:func16 dir=testdata/nvc/test/regress std=93 sha=3a2a3f838141d455
+ func16.vhd ghdl=0 nvc=0
+run regress:issue123 dir=testdata/nvc/test/regress std=93 sha=eac2ac417540837c
+ issue123.vhd ghdl=0 nvc=0
+run regress:issue126 dir=testdata/nvc/test/regress std=93 sha=1b9e69e0bd81a168
+ issue126.vhd ghdl=1@3,9~ nvc=0
+run regress:range1 dir=testdata/nvc/test/regress std=93 sha=5b14ff570e11b24e
+ range1.vhd ghdl=1@53 nvc=0
+run regress:slice4 dir=testdata/nvc/test/regress std=93 sha=6207cb4f46ade3ad
+ slice4.vhd ghdl=0 nvc=0
+run regress:issue103 dir=testdata/nvc/test/regress std=93 sha=4a4ef1ce8f60fb46
+ issue103.vhd ghdl=0 nvc=0
+run regress:access7 dir=testdata/nvc/test/regress std=93 sha=58cade22789f90a3
+ access7.vhd ghdl=0 nvc=0
+run regress:implicit3 dir=testdata/nvc/test/regress std=93 sha=0b56635c095a63b7
+ implicit3.vhd ghdl=0 nvc=0
+run regress:protected3 dir=testdata/nvc/test/regress std=02 sha=1cb98d276a59e508
+ protected3.vhd ghdl=0 nvc=0
+run regress:issue146 dir=testdata/nvc/test/regress std=93 sha=834f861e093dda81
+ issue146.vhd ghdl=0 nvc=0
+run regress:issue148 dir=testdata/nvc/test/regress std=93 sha=3782a84ea1566c9e
+ issue148.vhd ghdl=0 nvc=0
+run regress:issue152 dir=testdata/nvc/test/regress std=93 sha=34b19ee5e0b26dd9
+ issue152.vhd ghdl=0 nvc=0
+run regress:issue83 dir=testdata/nvc/test/regress std=08 sha=6da686f93a6ab853
+ issue83.vhd ghdl=0 nvc=0
+run regress:issue153 dir=testdata/nvc/test/regress std=93 sha=663259dee18536ef
+ issue153.vhd ghdl=0 nvc=0
+run regress:issue143 dir=testdata/nvc/test/regress std=02 sha=9e5c6c4acee635ce
+ issue143.vhd ghdl=0 nvc=0
+run regress:issue141 dir=testdata/nvc/test/regress std=02 sha=9639a236167a1cd4
+ issue141.vhd ghdl=0 nvc=0
+run regress:issue163 dir=testdata/nvc/test/regress std=93 sha=1012111627ae5cc0
+ issue163.vhd ghdl=0 nvc=0
+run regress:issue169 dir=testdata/nvc/test/regress std=93 sha=045e28af699d536b
+ issue169.vhd ghdl=0 nvc=0
+run regress:case6 dir=testdata/nvc/test/regress std=93 sha=25141f961dfb30d0
+ case6.vhd ghdl=0 nvc=0
+run regress:issue183 dir=testdata/nvc/test/regress std=93 sha=893d5bc1ab8703c9
+ issue183.vhd ghdl=0 nvc=0
+run regress:issue185 dir=testdata/nvc/test/regress std=93 sha=25e68ff38f4169e0
+ issue185.vhd ghdl=0 nvc=0
+run regress:toplevel2 dir=testdata/nvc/test/regress std=93 sha=b4595ef5f97a312f
+ toplevel2.vhd ghdl=0 nvc=0
+run regress:issue186 dir=testdata/nvc/test/regress std=93 sha=a4b8a43cc3a3fc6b
+ issue186.vhd ghdl=0 nvc=0
+run regress:issue194 dir=testdata/nvc/test/regress std=93 sha=3c0d1ccb85e7048a
+ issue194.vhd ghdl=0 nvc=0
+run regress:issue196 dir=testdata/nvc/test/regress std=93 sha=b38dcf0b3abc5a94
+ issue196.vhd ghdl=0 nvc=0
+run regress:issue201 dir=testdata/nvc/test/regress std=02 sha=680088ffb8f4597f
+ issue201.vhd ghdl=0 nvc=0
+run regress:issue200 dir=testdata/nvc/test/regress std=93 sha=4326a9b67ba44e90
+ issue200.vhd ghdl=0 nvc=0
+run regress:issue204 dir=testdata/nvc/test/regress std=93 sha=d4fee2bdb2e413a1
+ issue204.vhd ghdl=0 nvc=0
+run regress:issue206 dir=testdata/nvc/test/regress std=93 sha=821fa24d654cc600
+ issue206.vhd ghdl=0 nvc=0
+run regress:issue187 dir=testdata/nvc/test/regress std=93 sha=eb69be19c9cbade7
+ issue187.vhd ghdl=0 nvc=0
+run regress:func17 dir=testdata/nvc/test/regress std=93 sha=cf75f66b6265b093
+ func17.vhd ghdl=0 nvc=0
+run regress:elab24 dir=testdata/nvc/test/regress std=93 sha=bd54812c40a644cf
+ elab24.vhd ghdl=0 nvc=0
+run regress:elab25 dir=testdata/nvc/test/regress std=93 sha=5883d502291a787a
+ elab25.vhd ghdl=0 nvc=0
+run regress:logical2 dir=testdata/nvc/test/regress std=93 sha=c1df0ac59b54b9b0
+ logical2.vhd ghdl=0 nvc=0
+run regress:attr12 dir=testdata/nvc/test/regress std=93 sha=e0a8caa97abd701c
+ attr12.vhd ghdl=0 nvc=0
+run regress:issue229 dir=testdata/nvc/test/regress std=93 sha=f387472dea3a2142
+ issue229.vhd ghdl=0 nvc=0
+run regress:issue217 dir=testdata/nvc/test/regress std=93 sha=30afac1cec38d1c8
+ issue217.vhd ghdl=0 nvc=0
+run regress:issue234 dir=testdata/nvc/test/regress std=93 sha=9c751f6b225303d3
+ issue234.vhd ghdl=0 nvc=0
+run regress:issue227 dir=testdata/nvc/test/regress std=93 sha=604a5c1006fd5a0a
+ issue227.vhd ghdl=0 nvc=0
+run regress:real3 dir=testdata/nvc/test/regress std=93 sha=43666c563abc3a5e
+ real3.vhd ghdl=0 nvc=0
+run regress:for3 dir=testdata/nvc/test/regress std=93 sha=ceea4600c7c4fb3f
+ for3.vhd ghdl=0 nvc=0
+run regress:issue197 dir=testdata/nvc/test/regress std=93 sha=e42d015eb14e611c
+ issue197.vhd ghdl=0 nvc=0
+run regress:issue225 dir=testdata/nvc/test/regress std=93 sha=8a3eeec771c87707
+ issue225.vhd ghdl=0 nvc=0
+run regress:issue262 dir=testdata/nvc/test/regress std=93 sha=e19a71f32eaff00c
+ issue262.vhd ghdl=0 nvc=0
+run regress:issue284 dir=testdata/nvc/test/regress std=93 sha=7ee7bb09c8a03c0f
+ issue284.vhd ghdl=0 nvc=0
+run regress:jcore1 dir=testdata/nvc/test/regress std=93 sha=921a3266322341d8
+ jcore1.vhd ghdl=0 nvc=0
+run regress:jcore2 dir=testdata/nvc/test/regress std=93 sha=14283c9c2bcaf148
+ jcore2.vhd ghdl=0 nvc=0
+run regress:assert5 dir=testdata/nvc/test/regress std=93 sha=08e2f8fc8717d082
+ assert5.vhd ghdl=0 nvc=0
+run regress:jcore3 dir=testdata/nvc/test/regress std=93 sha=f10d70af086f01b1
+ jcore3.vhd ghdl=0 nvc=0
+run regress:jcore4 dir=testdata/nvc/test/regress std=93 sha=b08061769d3828f1
+ jcore4.vhd ghdl=0 nvc=0
+run regress:jcore5 dir=testdata/nvc/test/regress std=93 sha=37240dab1331a897
+ jcore5.vhd ghdl=0 nvc=0
+run regress:vhpi3 dir=testdata/nvc/test/regress std=93 sha=310458b6704707a4
+ vhpi3.vhd ghdl=0 nvc=0
+run regress:jcore6 dir=testdata/nvc/test/regress std=93 sha=10a060dd0da59c61
+ jcore6.vhd ghdl=0 nvc=0
+run regress:issue106 dir=testdata/nvc/test/regress std=08 sha=6d7f927d173d21cd
+ issue106.vhd ghdl=0 nvc=0
+run regress:case7 dir=testdata/nvc/test/regress std=08 sha=4ff9bf7c0d667349
+ case7.vhd ghdl=2 nvc=0
+run regress:ieee5 dir=testdata/nvc/test/regress std=93 sha=72366122a6110ed3
+ ieee5.vhd ghdl=0 nvc=0
+run regress:issue309 dir=testdata/nvc/test/regress std=93 sha=86479aa515b02ea1
+ issue309.vhd ghdl=0 nvc=0
+run regress:issue308 dir=testdata/nvc/test/regress std=93 sha=42e4835e67831642
+ issue308.vhd ghdl=0 nvc=0
+run regress:issue315 dir=testdata/nvc/test/regress std=93 sha=8e41b825a17ad1b8
+ issue315.vhd ghdl=0 nvc=0
+run regress:issue323 dir=testdata/nvc/test/regress std=02 sha=de5513c085527ee5
+ issue323.vhd ghdl=0 nvc=0
+run regress:protected4 dir=testdata/nvc/test/regress std=02 sha=a444380b67d349c2
+ protected4.vhd ghdl=0 nvc=0
+run regress:textio4 dir=testdata/nvc/test/regress std=93 sha=763b04181baffd54
+ textio4.vhd ghdl=0 nvc=0
+run regress:issue327 dir=testdata/nvc/test/regress std=93 sha=89ac49baa672e4f8
+ issue327.vhd ghdl=0 nvc=0
+run regress:issue335 dir=testdata/nvc/test/regress std=93 sha=2cb1ed332eb04722
+ issue335.vhd ghdl=0 nvc=0
+run regress:file3 dir=testdata/nvc/test/regress std=93 sha=aecf4b2d759bac83
+ file3.vhd ghdl=0 nvc=0
+run regress:issue338 dir=testdata/nvc/test/regress std=93 sha=857ee957020af88c
+ issue338.vhd ghdl=1@270,271,272 nvc=0
+run regress:issue338b dir=testdata/nvc/test/regress std=93 sha=b2d07bd12f19f15f
+ issue338b.vhd ghdl=0 nvc=0
+run regress:textio5 dir=testdata/nvc/test/regress std=08 sha=ae7b7c3e5031debd
+ textio5.vhd ghdl=0 nvc=0
+run regress:issue349 dir=testdata/nvc/test/regress std=93 sha=ca7da01c21f34259
+ issue349.vhd ghdl=0 nvc=0
+run regress:signal14 dir=testdata/nvc/test/regress std=93 sha=3d0fa7e7d3bba660
+ signal14.vhd ghdl=0 nvc=0
+run regress:issue352 dir=testdata/nvc/test/regress std=93 sha=981ac6794d9cd300
+ issue352.vhd ghdl=1@3,10~ nvc=0
+run regress:issue354 dir=testdata/nvc/test/regress std=93 sha=d22287d76722963b
+ issue354.vhd ghdl=1@16 nvc=0
+run regress:issue351 dir=testdata/nvc/test/regress std=93 sha=81683c0bfd075c1a
+ issue351.vhd ghdl=0 nvc=0
+run regress:issue367 dir=testdata/nvc/test/regress std=93 sha=2a366c486df3dffe
+ issue367.vhd ghdl=0 nvc=0
+run regress:issue369 dir=testdata/nvc/test/regress std=93 sha=816d964a89234d35
+ issue369.vhd ghdl=1@14 nvc=0
+run regress:issue293 dir=testdata/nvc/test/regress std=93 sha=c28ede2575030769
+ issue293.vhd ghdl=0 nvc=0
+run regress:issue340 dir=testdata/nvc/test/regress std=93 sha=3db2491fa12b11b9
+ issue340.vhd ghdl=0 nvc=0
+run regress:issue348 dir=testdata/nvc/test/regress std=08 sha=17bf6cbc592c1e01
+ issue348.vhd ghdl=0 nvc=0
+run regress:issue202 dir=testdata/nvc/test/regress std=93 sha=40b3cbf2a02126f3
+ issue202.vhd ghdl=0 nvc=0
+run regress:issue371 dir=testdata/nvc/test/regress std=93 sha=a1d0ec34076bf338
+ issue371.vhd ghdl=0 nvc=0
+run regress:record13 dir=testdata/nvc/test/regress std=93 sha=bbe18746977ce72d
+ record13.vhd ghdl=0 nvc=0
+run regress:issue370 dir=testdata/nvc/test/regress std=93 sha=452a40858c82b59f
+ issue370.vhd ghdl=0 nvc=0
+run regress:issue376 dir=testdata/nvc/test/regress std=93 sha=72a3073f10ee4474
+ issue376.vhd ghdl=0 nvc=0
+run regress:stack1 dir=testdata/nvc/test/regress std=93 sha=9705f9302981bba8
+ stack1.vhd ghdl=0 nvc=0
+run regress:issue377 dir=testdata/nvc/test/regress std=93 sha=f7c36fd8be91bdf7
+ issue377.vhd ghdl=1@3,4,9~ nvc=1@13
+run regress:issue397 dir=testdata/nvc/test/regress std=93 sha=9fe7cb85ad88b516
+ issue397.vhd ghdl=0 nvc=0
+run regress:issue96 dir=testdata/nvc/test/regress std=93 sha=a6efa5952548c850
+ issue96.vhd ghdl=0 nvc=0
+run regress:wait14 dir=testdata/nvc/test/regress std=93 sha=f451e7e19cbe0567
+ wait14.vhd ghdl=0 nvc=0
+run regress:block2 dir=testdata/nvc/test/regress std=93 sha=a3dd7e80fcdb3bba
+ block2.vhd ghdl=0 nvc=0
+run regress:issue407 dir=testdata/nvc/test/regress std=93 sha=0f7783c4e5b8e809
+ issue407.vhd ghdl=0 nvc=0
+run regress:issue412 dir=testdata/nvc/test/regress std=93 sha=26584904e59115cf
+ issue412.vhd ghdl=0 nvc=0
+run regress:issue414 dir=testdata/nvc/test/regress std=93 sha=5f65ab26cda3471f
+ issue414.vhd ghdl=0 nvc=0
+run regress:issue415 dir=testdata/nvc/test/regress std=93 sha=2393af69535bd15e
+ issue415.vhd ghdl=0 nvc=0
+run regress:predef1 dir=testdata/nvc/test/regress std=08 sha=295e1e806e87c798
+ predef1.vhd ghdl=2 nvc=0
+run regress:signal15 dir=testdata/nvc/test/regress std=08 sha=595f8e258026f26d
+ signal15.vhd ghdl=0 nvc=0
+run regress:logical3 dir=testdata/nvc/test/regress std=08 sha=27e4b47cff0c9312
+ logical3.vhd ghdl=0 nvc=0
+run regress:debug1 dir=testdata/nvc/test/regress std=93 sha=0105f8827b1cd42e
+ debug1.vhd ghdl=1@6,7 nvc=0
+run regress:assign4 dir=testdata/nvc/test/regress std=93 sha=796769fbd0d97abd
+ assign4.vhd ghdl=0 nvc=0
+run regress:vests1 dir=testdata/nvc/test/regress std=93 sha=4263ab4385ad54f9
+ vests1.vhd ghdl=1@249,415~,1231,1235~ nvc=0
+run regress:wait15 dir=testdata/nvc/test/regress std=93 sha=712833b63e0e7165
+ wait15.vhd ghdl=0 nvc=0
+run regress:grlib1 dir=testdata/nvc/test/regress std=93 sha=ae41146f0974bd88
+ grlib1.vhd ghdl=0 nvc=0
+run regress:issue420 dir=testdata/nvc/test/regress std=93 sha=33796cabce4d749a
+ issue420.vhd ghdl=0 nvc=0
+run regress:debug2 dir=testdata/nvc/test/regress std=93 sha=187674ccbda29c2e
+ debug2.vhd ghdl=0 nvc=0
+run regress:alias10 dir=testdata/nvc/test/regress std=93 sha=5546cbcea2a50d4e
+ alias10.vhd ghdl=0 nvc=0
+run regress:record14 dir=testdata/nvc/test/regress std=93 sha=c5e1af430f27c269
+ record14.vhd ghdl=0 nvc=0
+run regress:alias11 dir=testdata/nvc/test/regress std=93 sha=80ba4c10bb69f981
+ alias11.vhd ghdl=0 nvc=0
+run regress:bounds18 dir=testdata/nvc/test/regress std=93 sha=a56b4e0f8dbf38cb
+ bounds18.vhd ghdl=0 nvc=0
+run regress:bounds19 dir=testdata/nvc/test/regress std=93 sha=6ce2b564ebe40568
+ bounds19.vhd ghdl=0 nvc=0
+run regress:ieee6 dir=testdata/nvc/test/regress std=93 sha=d516ead618963d5d
+ ieee6.vhd ghdl=0 nvc=0
+run regress:attr13 dir=testdata/nvc/test/regress std=93 sha=93cfa953b5892582
+ attr13.vhd lib=lib ghdl=0 nvc=0
+run regress:record15 dir=testdata/nvc/test/regress std=93 sha=72196adc61e28db1
+ record15.vhd ghdl=0 nvc=0
+run regress:record16 dir=testdata/nvc/test/regress std=93 sha=7f4db3d69e61992d
+ record16.vhd ghdl=0 nvc=0
+run regress:signal16 dir=testdata/nvc/test/regress std=93 sha=aa41c11cbdddf73c
+ signal16.vhd ghdl=0 nvc=0
+run regress:record17 dir=testdata/nvc/test/regress std=93 sha=ca4812c0e8271eef
+ record17.vhd ghdl=0 nvc=0
+run regress:issue405 dir=testdata/nvc/test/regress std=93 sha=c0a02fb1a525bd3c
+ issue405.vhd ghdl=0 nvc=0
+run regress:issue423 dir=testdata/nvc/test/regress std=93 sha=35a46a20f9500bee
+ issue423.vhd ghdl=0 nvc=0
+run regress:driver6 dir=testdata/nvc/test/regress std=93 sha=95a1ba0712b5b4cc
+ driver6.vhd ghdl=0 nvc=0
+run regress:driver7 dir=testdata/nvc/test/regress std=93 sha=f6a1e48be105ad95
+ driver7.vhd ghdl=0 nvc=0
+run regress:issue428 dir=testdata/nvc/test/regress std=93 sha=393ef751dc4ff1b3
+ issue428.vhd ghdl=0 nvc=0
+run regress:protected5 dir=testdata/nvc/test/regress std=02 sha=deeeee31a7afd5ca
+ protected5.vhd ghdl=0 nvc=0
+run regress:issue429 dir=testdata/nvc/test/regress std=93 sha=abae4c7a41742122
+ issue429.vhd ghdl=0 nvc=0
+run regress:record18 dir=testdata/nvc/test/regress std=93 sha=62477e472863f363
+ record18.vhd ghdl=0 nvc=0
+run regress:issue98 dir=testdata/nvc/test/regress std=93 sha=42418eea182f7148
+ issue98.vhd ghdl=0 nvc=0
+run regress:issue430 dir=testdata/nvc/test/regress std=93 sha=5ada57cc1d14bf96
+ issue430.vhd ghdl=0 nvc=0
+run regress:vests2 dir=testdata/nvc/test/regress std=93 sha=5f1d95b37d908b97
+ vests2.vhd ghdl=0 nvc=0
+run regress:vests3 dir=testdata/nvc/test/regress std=93 sha=5a323cd9fc4e66b7
+ vests3.vhd ghdl=0 nvc=0
+run regress:vests4 dir=testdata/nvc/test/regress std=93 sha=1654d9aa11f26165
+ vests4.vhd ghdl=0 nvc=0
+run regress:vests5 dir=testdata/nvc/test/regress std=93 sha=0f9f793a5fbe3de8
+ vests5.vhd ghdl=0 nvc=0
+run regress:vests6 dir=testdata/nvc/test/regress std=93 sha=c72cae0ce364b566
+ vests6.vhd ghdl=0 nvc=0
+run regress:vests7 dir=testdata/nvc/test/regress std=93 sha=1ded804f6e521a55
+ vests7.vhd ghdl=1@249,415~,1230,1234~ nvc=0
+run regress:vests8 dir=testdata/nvc/test/regress std=93 sha=9306402a3556cbeb
+ vests8.vhd ghdl=0 nvc=0
+run regress:signal17 dir=testdata/nvc/test/regress std=93 sha=a7daea2e37eee27d
+ signal17.vhd ghdl=0 nvc=0
+run regress:assign5 dir=testdata/nvc/test/regress std=93 sha=021f9894352c561d
+ assign5.vhd ghdl=0 nvc=0
+run regress:bounds20 dir=testdata/nvc/test/regress std=93 sha=4fb8d0145762d6fa
+ bounds20.vhd ghdl=1@20 nvc=0
+run regress:vests9 dir=testdata/nvc/test/regress std=93 sha=035d6f2955fe5cda
+ vests9.vhd ghdl=0 nvc=0
+run regress:vests10 dir=testdata/nvc/test/regress std=93 sha=9b590cb07edc4347
+ vests10.vhd ghdl=0 nvc=0
+run regress:vests11 dir=testdata/nvc/test/regress std=93 sha=bb0dcc9490184b1a
+ vests11.vhd ghdl=0 nvc=0
+run regress:vests12 dir=testdata/nvc/test/regress std=93 sha=c45f2654d57b9e72
+ vests12.vhd ghdl=0 nvc=0
+run regress:vests13 dir=testdata/nvc/test/regress std=93 sha=df8571f6b0051f39
+ vests13.vhd ghdl=0 nvc=0
+run regress:elab26 dir=testdata/nvc/test/regress std=93 sha=368b171afdeb0f21
+ elab26.vhd ghdl=0 nvc=0
+run regress:conv2 dir=testdata/nvc/test/regress std=93 sha=78611769ae7f9c36
+ conv2.vhd ghdl=0 nvc=0
+run regress:conv3 dir=testdata/nvc/test/regress std=93 sha=190b124257b85d4d
+ conv3.vhd ghdl=0 nvc=0
+run regress:conv4 dir=testdata/nvc/test/regress std=93 sha=80bc38db334e5012
+ conv4.vhd ghdl=0 nvc=0
+run regress:conv5 dir=testdata/nvc/test/regress std=93 sha=61d765dd7d3a5ffc
+ conv5.vhd ghdl=0 nvc=0
+run regress:bounds22 dir=testdata/nvc/test/regress std=93 sha=57e18b001fe6d99b
+ bounds22.vhd ghdl=0 nvc=0
+run regress:bounds23 dir=testdata/nvc/test/regress std=93 sha=d126da15b5413ad4
+ bounds23.vhd ghdl=0 nvc=0
+run regress:vests14 dir=testdata/nvc/test/regress std=93 sha=4315c21e12c7f37f
+ vests14.vhd ghdl=0 nvc=0
+run regress:conv6 dir=testdata/nvc/test/regress std=93 sha=6750bba5f9dc20d6
+ conv6.vhd ghdl=0 nvc=0
+run regress:driver8 dir=testdata/nvc/test/regress std=93 sha=a26e4ce65226ee2f
+ driver8.vhd ghdl=0 nvc=0
+run regress:vests15 dir=testdata/nvc/test/regress std=93 sha=91a0a36e2e787b8c
+ vests15.vhd ghdl=0 nvc=0
+run regress:elab27 dir=testdata/nvc/test/regress std=93 sha=bf07570f7533b9c1
+ elab27.vhd ghdl=0 nvc=0
+run regress:conf1 dir=testdata/nvc/test/regress std=93 sha=0d676deb55175305
+ conf1.vhd ghdl=0 nvc=0
+run regress:conf2 dir=testdata/nvc/test/regress std=93 sha=c3938354f2798c11
+ conf2.vhd ghdl=0 nvc=0
+run regress:vests16 dir=testdata/nvc/test/regress std=93 sha=86a6b050fd10680d
+ vests16.vhd ghdl=0 nvc=0
+run regress:file4 dir=testdata/nvc/test/regress std=93 sha=b5828953eae3cf13
+ file4.vhd ghdl=0 nvc=0
+run regress:vests17 dir=testdata/nvc/test/regress std=93 sha=695b3ae30dc1c375
+ vests17.vhd ghdl=0 nvc=0
+run regress:vests18 dir=testdata/nvc/test/regress std=93 sha=626850961d8766c4
+ vests18.vhd ghdl=0 nvc=0
+run regress:vests19 dir=testdata/nvc/test/regress std=93 sha=3978f2c085681a40
+ vests19.vhd ghdl=0 nvc=0
+run regress:protected6 dir=testdata/nvc/test/regress std=02 sha=082e6ee6894753da
+ protected6.vhd ghdl=0 nvc=0
+run regress:vests20 dir=testdata/nvc/test/regress std=93 sha=808715516467091d
+ vests20.vhd ghdl=0 nvc=0
+run regress:vests21 dir=testdata/nvc/test/regress std=93 sha=f62bf5676d8449c3
+ vests21.vhd ghdl=0 nvc=0
+run regress:guard1 dir=testdata/nvc/test/regress std=93 sha=2da6d69cfa4805da
+ guard1.vhd ghdl=0 nvc=0
+run regress:guard2 dir=testdata/nvc/test/regress std=93 sha=565a376bb42b0a85
+ guard2.vhd ghdl=0 nvc=0
+run regress:vests22 dir=testdata/nvc/test/regress std=93 sha=d48f9bb3c8208f5f
+ vests22.vhd ghdl=0 nvc=0
+run regress:vests23 dir=testdata/nvc/test/regress std=93 sha=50b8f57c66e34bd9
+ vests23.vhd ghdl=0 nvc=0
+run regress:func18 dir=testdata/nvc/test/regress std=93 sha=2b52ad0b0d4c2755
+ func18.vhd ghdl=0 nvc=0
+run regress:file5 dir=testdata/nvc/test/regress std=93 sha=aef013ab0dbc6b44
+ file5.vhd ghdl=0 nvc=0
+run regress:case8 dir=testdata/nvc/test/regress std=93 sha=6dc7f441dca63ffa
+ case8.vhd ghdl=0 nvc=0
+run regress:textio6 dir=testdata/nvc/test/regress std=08 sha=5c86433120fdc186
+ textio6.vhd ghdl=0 nvc=0
+run regress:predef2 dir=testdata/nvc/test/regress std=08 sha=d832b23f49036fe8
+ predef2.vhd ghdl=0 nvc=0
+run regress:file6 dir=testdata/nvc/test/regress std=08 sha=6ceaddf3abc45201
+ file6.vhd ghdl=0 nvc=0
+run regress:elab28 dir=testdata/nvc/test/regress std=93 sha=af21c242f21e2662
+ elab28.vhd ghdl=0 nvc=0
+run regress:vests24 dir=testdata/nvc/test/regress std=93 sha=70a788f8218509af
+ vests24.vhd ghdl=0 nvc=0
+run regress:record19 dir=testdata/nvc/test/regress std=93 sha=7b9afa26a008a5e9
+ record19.vhd ghdl=0 nvc=0
+run regress:conf3 dir=testdata/nvc/test/regress std=93 sha=ceaf687829636f97
+ conf3.vhd ghdl=0 nvc=0
+run regress:vests25 dir=testdata/nvc/test/regress std=93 sha=f252caae9ab38ff6
+ vests25.vhd ghdl=0 nvc=0
+run regress:vests26 dir=testdata/nvc/test/regress std=93 sha=440befdabb17f139
+ vests26.vhd ghdl=0 nvc=0
+run regress:vests27 dir=testdata/nvc/test/regress std=93 sha=eeb10a99c4d4ecce
+ vests27.vhd ghdl=0 nvc=0
+run regress:order1 dir=testdata/nvc/test/regress std=93 sha=f1a59c653266f308
+ order1.vhd ghdl=0 nvc=0
+run regress:textio7 dir=testdata/nvc/test/regress std=93 sha=fbb849b152ba69f3
+ textio7.vhd ghdl=0 nvc=0
+run regress:vests28 dir=testdata/nvc/test/regress std=93 sha=0a7d502373623518
+ vests28.vhd ghdl=0 nvc=0
+run regress:vests29 dir=testdata/nvc/test/regress std=93 sha=a589fbc1d0ade329
+ vests29.vhd ghdl=0 nvc=0
+run regress:vests30 dir=testdata/nvc/test/regress std=93 sha=c2056e62c9aa2a42
+ vests30.vhd ghdl=0 nvc=0
+run regress:vests31 dir=testdata/nvc/test/regress std=93 sha=45b689275101c0e0
+ vests31.vhd ghdl=0 nvc=0
+run regress:vests32 dir=testdata/nvc/test/regress std=93 sha=e917f2abbaf36d69
+ vests32.vhd ghdl=0 nvc=0
+run regress:vests33 dir=testdata/nvc/test/regress std=93 sha=dc84813551fdeaf0
+ vests33.vhd ghdl=0 nvc=0
+run regress:buffer1 dir=testdata/nvc/test/regress std=93 sha=78818730a5544a87
+ buffer1.vhd ghdl=0 nvc=0
+run regress:file7 dir=testdata/nvc/test/regress std=93 sha=1110f8f4dfe8e404
+ file7.vhd ghdl=0 nvc=0
+run regress:vests34 dir=testdata/nvc/test/regress std=93 sha=6282f76025eb6ccc
+ vests34.vhd ghdl=0 nvc=0
+run regress:vests35 dir=testdata/nvc/test/regress std=93 sha=e6c423abc9aa70f2
+ vests35.vhd ghdl=0 nvc=0
+run regress:issue432 dir=testdata/nvc/test/regress std=93 sha=c5a269133445778d
+ issue432.vhd ghdl=0 nvc=0
+run regress:vests36 dir=testdata/nvc/test/regress std=93 sha=2f6386961908f9c5
+ vests36.vhd ghdl=0 nvc=0
+run regress:issue433 dir=testdata/nvc/test/regress std=93 sha=445cfb731b5626c9
+ issue433.vhd ghdl=0 nvc=0
+run regress:vests37 dir=testdata/nvc/test/regress std=93 sha=1d36755aa6b8f6e0
+ vests37.vhd ghdl=0 nvc=0
+run regress:vests38 dir=testdata/nvc/test/regress std=93 sha=3b214fbe3b9f3134
+ vests38.vhd ghdl=0 nvc=0
+run regress:debug3 dir=testdata/nvc/test/regress std=02 sha=26f67635fae0ac37
+ debug3.vhd ghdl=0 nvc=0
+run regress:file8 dir=testdata/nvc/test/regress std=93 sha=e8d92a94a88ae426
+ file8.vhd ghdl=0 nvc=0
+run regress:concat6 dir=testdata/nvc/test/regress std=93 sha=ba2d7898c59e0b9e
+ concat6.vhd ghdl=0 nvc=0
+run regress:issue434 dir=testdata/nvc/test/regress std=93 sha=435c5d21cddb6654
+ issue434.vhd ghdl=0 nvc=0
+run regress:bounds24 dir=testdata/nvc/test/regress std=93 sha=9f88e6fd7668ed06
+ bounds24.vhd ghdl=0 nvc=0
+run regress:bounds25 dir=testdata/nvc/test/regress std=93 sha=c1e242604f960561
+ bounds25.vhd ghdl=0 nvc=0
+run regress:bounds26 dir=testdata/nvc/test/regress std=93 sha=2af766b6a610e009
+ bounds26.vhd ghdl=0 nvc=0
+run regress:bounds27 dir=testdata/nvc/test/regress std=93 sha=2998da5858ea1d61
+ bounds27.vhd ghdl=0 nvc=0
+run regress:bounds28 dir=testdata/nvc/test/regress std=93 sha=8441af07465cf9bd
+ bounds28.vhd ghdl=0 nvc=0
+run regress:assert6 dir=testdata/nvc/test/regress std=93 sha=502ec4e04afc5cba
+ assert6.vhd ghdl=0 nvc=0
+run regress:assign6 dir=testdata/nvc/test/regress std=93 sha=2f5c32bb9e11ae3d
+ assign6.vhd ghdl=0 nvc=0
+run regress:bitstr1 dir=testdata/nvc/test/regress std=08 sha=dc4f2386396a8cfa
+ bitstr1.vhd ghdl=0 nvc=0
+run regress:elab29 dir=testdata/nvc/test/regress std=08 sha=2ff8221df8771086
+ elab29.vhd ghdl=0 nvc=0
+run regress:signal18 dir=testdata/nvc/test/regress std=08 sha=4f443c31998c245d
+ signal18.vhd ghdl=0 nvc=0
+run regress:genpack1 dir=testdata/nvc/test/regress std=08 sha=15355203b25eed31
+ genpack1.vhd ghdl=0 nvc=0
+run regress:ieee7 dir=testdata/nvc/test/regress std=08 sha=73ee449035e75332
+ ieee7.vhd ghdl=0 nvc=0
+run regress:wave1 dir=testdata/nvc/test/regress std=93 sha=5ac52798f3264acb
+ wave1.vhd ghdl=0 nvc=0
+run regress:wave3 dir=testdata/nvc/test/regress std=93 sha=9a9b6c1718f8954e
+ wave3.vhd ghdl=0 nvc=0
+run regress:wave4 dir=testdata/nvc/test/regress std=93 sha=e6caaea6467946cb
+ wave4.vhd ghdl=0 nvc=0
+run regress:wave5 dir=testdata/nvc/test/regress std=93 sha=a217586e6d8ecff0
+ wave5.vhd ghdl=0 nvc=0
+run regress:record20 dir=testdata/nvc/test/regress std=93 sha=ca8d7023fc1d3e11
+ record20.vhd ghdl=0 nvc=0
+run regress:attr14 dir=testdata/nvc/test/regress std=93 sha=04d6f82eae227861
+ attr14.vhd ghdl=0 nvc=0
+run regress:vhpi4 dir=testdata/nvc/test/regress std=93 sha=bd5cbbd7d8a32c76
+ vhpi4.vhd ghdl=0 nvc=0
+run regress:wait16 dir=testdata/nvc/test/regress std=93 sha=0ed8a6dd2703fc34
+ wait16.vhd ghdl=0 nvc=0
+run regress:default2 dir=testdata/nvc/test/regress std=93 sha=4426e80b3ccee232
+ default2.vhd ghdl=1@17 nvc=0
+run regress:vests39 dir=testdata/nvc/test/regress std=93 sha=ea0758b0629461b1
+ vests39.vhd ghdl=0 nvc=0
+run regress:bounds29 dir=testdata/nvc/test/regress std=93 sha=adad81cf393eb3c8
+ bounds29.vhd ghdl=0 nvc=0
+run regress:gentype1 dir=testdata/nvc/test/regress std=08 sha=18a97e2eb1bd8294
+ gentype1.vhd ghdl=0 nvc=0
+run regress:gentype2 dir=testdata/nvc/test/regress std=08 sha=c42c7e7b59ade6ff
+ gentype2.vhd ghdl=0 nvc=0
+run regress:gentype3 dir=testdata/nvc/test/regress std=08 sha=3d739d72422e4673
+ gentype3.vhd ghdl=0 nvc=0
+run regress:gentype4 dir=testdata/nvc/test/regress std=08 sha=79061ee7d56323ab
+ gentype4.vhd ghdl=0 nvc=0
+run regress:genpack2 dir=testdata/nvc/test/regress std=08 sha=a8168f9f9b4e47d7
+ genpack2.vhd ghdl=0 nvc=0
+run regress:genpack3 dir=testdata/nvc/test/regress std=08 sha=bc3b8678010e1be1
+ genpack3.vhd ghdl=0 nvc=0
+run regress:genpack4 dir=testdata/nvc/test/regress std=08 sha=0578221f15493ba3
+ genpack4.vhd ghdl=0 nvc=0
+run regress:genpack5 dir=testdata/nvc/test/regress std=08 sha=d45e782e273f7d77
+ genpack5.vhd ghdl=0 nvc=0
+run regress:genpack6 dir=testdata/nvc/test/regress std=08 sha=07413af70a8b2ede
+ genpack6.vhd ghdl=0 nvc=0
+run regress:genpack7 dir=testdata/nvc/test/regress std=08 sha=4ca2772780eecce5
+ genpack7.vhd ghdl=0 nvc=0
+run regress:ieee8 dir=testdata/nvc/test/regress std=08 sha=d4f6b50ad83a086e
+ ieee8.vhd ghdl=0 nvc=0
+run regress:array5 dir=testdata/nvc/test/regress std=93 sha=3c29c96e5d575c86
+ array5.vhd ghdl=0 nvc=0
+run regress:vests40 dir=testdata/nvc/test/regress std=93 sha=2d1f10f23fbf75bf
+ vests40.vhd ghdl=0 nvc=0
+run regress:issue447 dir=testdata/nvc/test/regress std=93 sha=637b9ca5958bec8f
+ issue447.vhd ghdl=0 nvc=0
+run regress:bounds30 dir=testdata/nvc/test/regress std=93 sha=4406900227167ba7
+ bounds30.vhd ghdl=0 nvc=0
+run regress:wait17 dir=testdata/nvc/test/regress std=93 sha=d88d7ddf1c9ccd1c
+ wait17.vhd ghdl=0 nvc=0
+run regress:wait18 dir=testdata/nvc/test/regress std=93 sha=444746b60a9e4213
+ wait18.vhd ghdl=0 nvc=0
+run regress:wait19 dir=testdata/nvc/test/regress std=93 sha=f8a2129e4292b17b
+ wait19.vhd ghdl=0 nvc=0
+run regress:record21 dir=testdata/nvc/test/regress std=93 sha=1677843d01de53df
+ record21.vhd ghdl=0 nvc=0
+run regress:record22 dir=testdata/nvc/test/regress std=93 sha=9e6d3ec925957260
+ record22.vhd ghdl=0 nvc=0
+run regress:case9 dir=testdata/nvc/test/regress std=93 sha=9d76d78eebafd9ee
+ case9.vhd ghdl=0 nvc=0
+run regress:vests41 dir=testdata/nvc/test/regress std=93 sha=3323c71c53f658e4
+ vests41.vhd ghdl=0 nvc=0
+run regress:conv7 dir=testdata/nvc/test/regress std=93 sha=8b630356c043bf51
+ conv7.vhd ghdl=0 nvc=0
+run regress:conv8 dir=testdata/nvc/test/regress std=93 sha=8ec620440faaf68a
+ conv8.vhd ghdl=0 nvc=0
+run regress:driver9 dir=testdata/nvc/test/regress std=93 sha=a9e79156ba123bda
+ driver9.vhd ghdl=0 nvc=0
+run regress:record23 dir=testdata/nvc/test/regress std=93 sha=c45571034b5aa573
+ record23.vhd ghdl=0 nvc=0
+run regress:vests42 dir=testdata/nvc/test/regress std=93 sha=bd08fc249b24d6e8
+ vests42.vhd ghdl=0 nvc=0
+run regress:wait20 dir=testdata/nvc/test/regress std=93 sha=b8266afdee7cc85b
+ wait20.vhd ghdl=0 nvc=0
+run regress:signal19 dir=testdata/nvc/test/regress std=93 sha=34e52d5c9243a661
+ signal19.vhd ghdl=0 nvc=0
+run regress:record24 dir=testdata/nvc/test/regress std=93 sha=a3cad1cb721a0d5d
+ record24.vhd ghdl=0 nvc=0
+run regress:record25 dir=testdata/nvc/test/regress std=93 sha=33c86558cc1e6013
+ record25.vhd ghdl=0 nvc=0
+run regress:record26 dir=testdata/nvc/test/regress std=93 sha=11e594ae8bd99c86
+ record26.vhd ghdl=0 nvc=0
+run regress:bounds31 dir=testdata/nvc/test/regress std=93 sha=2accd34057925f8d
+ bounds31.vhd ghdl=0 nvc=0
+run regress:record27 dir=testdata/nvc/test/regress std=93 sha=208f5b70a8029518
+ record27.vhd ghdl=0 nvc=0
+run regress:record28 dir=testdata/nvc/test/regress std=93 sha=c0669238032f37db
+ record28.vhd ghdl=0 nvc=0
+run regress:vests43 dir=testdata/nvc/test/regress std=93 sha=5a291a899cf22c6c
+ vests43.vhd ghdl=0 nvc=0
+run regress:record29 dir=testdata/nvc/test/regress std=08 sha=4a20d02b715b2633
+ record29.vhd ghdl=0 nvc=0
+run regress:record30 dir=testdata/nvc/test/regress std=08 sha=6d737cad80e888cb
+ record30.vhd ghdl=0 nvc=0
+run regress:bounds32 dir=testdata/nvc/test/regress std=08 sha=e103c8deda568775
+ bounds32.vhd ghdl=0 nvc=0
+run regress:bounds33 dir=testdata/nvc/test/regress std=08 sha=72526201a18b428a
+ bounds33.vhd ghdl=0 nvc=0
+run regress:for4 dir=testdata/nvc/test/regress std=93 sha=484f5b9cb1d8ad43
+ for4.vhd ghdl=0 nvc=0
+run regress:alias12 dir=testdata/nvc/test/regress std=93 sha=0fdd17c652266879
+ alias12.vhd ghdl=0 nvc=0
+run regress:alias13 dir=testdata/nvc/test/regress std=08 sha=17d1b59456c74df8
+ alias13.vhd ghdl=1@7 nvc=0
+run regress:agg7 dir=testdata/nvc/test/regress std=08 sha=d76493397438b138
+ agg7.vhd ghdl=1@23 nvc=0
+run regress:bounds34 dir=testdata/nvc/test/regress std=08 sha=3e1550cab836cd0c
+ bounds34.vhd ghdl=1@15 nvc=0
+run regress:assign7 dir=testdata/nvc/test/regress std=08 sha=7bfcc69219958a05
+ assign7.vhd ghdl=0 nvc=0
+run regress:signal20 dir=testdata/nvc/test/regress std=08 sha=39de3052c8ba6070
+ signal20.vhd ghdl=0 nvc=0
+run regress:bounds35 dir=testdata/nvc/test/regress std=08 sha=21f4d102359d7015
+ bounds35.vhd ghdl=0 nvc=0
+run regress:bounds36 dir=testdata/nvc/test/regress std=08 sha=0ea11a2ef96d37b5
+ bounds36.vhd ghdl=0 nvc=0
+run regress:bounds37 dir=testdata/nvc/test/regress std=08 sha=7b80748105f57968
+ bounds37.vhd ghdl=0 nvc=0
+run regress:case10 dir=testdata/nvc/test/regress std=93 sha=0b8619d094df107f
+ case10.vhd ghdl=0 nvc=0
+run regress:record31 dir=testdata/nvc/test/regress std=08 sha=c7d194b76170832f
+ record31.vhd ghdl=0 nvc=0
+run regress:genpack8 dir=testdata/nvc/test/regress std=08 sha=6f82fc54249c9bb6
+ genpack8.vhd ghdl=0 nvc=0
+run regress:wave6 dir=testdata/nvc/test/regress std=08 sha=021fb1ceb3aa2e6a
+ wave6.vhd ghdl=0 nvc=0
+run regress:issue101 dir=testdata/nvc/test/regress std=93 sha=7c5e920453f37f2c
+ issue101.vhd ghdl=0 nvc=0
+run regress:vests44 dir=testdata/nvc/test/regress std=93 sha=2356a5c7b7ba33b1
+ vests44.vhd ghdl=0 nvc=0
+run regress:force1 dir=testdata/nvc/test/regress std=08 sha=3cbce03fb65e956b
+ force1.vhd ghdl=0 nvc=0
+run regress:ename1 dir=testdata/nvc/test/regress std=08 sha=42cab5fd53f5f138
+ ename1.vhd ghdl=0 nvc=0
+run regress:ename2 dir=testdata/nvc/test/regress std=08 sha=7043a0397a947f8f
+ ename2.vhd ghdl=0 nvc=0
+run regress:wait21 dir=testdata/nvc/test/regress std=08 sha=56954e38bc9dee36
+ wait21.vhd ghdl=1@6,7,22~,48,51,54~,69,74~ nvc=0
+run regress:driver10 dir=testdata/nvc/test/regress std=93 sha=b3d74235caf69818
+ driver10.vhd ghdl=0 nvc=0
+run regress:case11 dir=testdata/nvc/test/regress std=08 sha=b1b23940929b32f9
+ case11.vhd ghdl=1@78,79 nvc=0
+run regress:driver11 dir=testdata/nvc/test/regress std=93 sha=c290c9e79d1ac5e3
+ driver11.vhd ghdl=0 nvc=0
+run regress:signal21 dir=testdata/nvc/test/regress std=08 sha=1dab83eb6e011d45
+ signal21.vhd ghdl=0 nvc=0
+run regress:vests45 dir=testdata/nvc/test/regress std=93 sha=856dc32ad4456319
+ vests45.vhd ghdl=0 nvc=0
+run regress:elab30 dir=testdata/nvc/test/regress std=08 sha=e456ebf13838a9ae
+ elab30.vhd ghdl=0 nvc=0
+run regress:shared3 dir=testdata/nvc/test/regress std=93 sha=f6f9accc1072ccfd
+ shared3.vhd ghdl=0 nvc=0
+run regress:assign8 dir=testdata/nvc/test/regress std=08 sha=5585a76a7fa0cb57
+ assign8.vhd ghdl=0 nvc=0
+run regress:func19 dir=testdata/nvc/test/regress std=93 sha=224d91028c62239f
+ func19.vhd ghdl=0 nvc=0
+run regress:issue460 dir=testdata/nvc/test/regress std=08 sha=4777578d6897a558
+ issue460.vhd ghdl=0 nvc=0
+run regress:case13 dir=testdata/nvc/test/regress std=08 sha=857d27fa98b69634
+ case13.vhd ghdl=0 nvc=0
+run regress:access8 dir=testdata/nvc/test/regress std=93 sha=a02d1cdab88f189c
+ access8.vhd ghdl=0 nvc=0
+run regress:access9 dir=testdata/nvc/test/regress std=93 sha=b4c26e2fddf6251b
+ access9.vhd ghdl=0 nvc=0
+run regress:access10 dir=testdata/nvc/test/regress std=93 sha=d85b1eb60a5eba85
+ access10.vhd ghdl=0 nvc=0
+run regress:record32 dir=testdata/nvc/test/regress std=08 sha=79b6cad8fbed06ae
+ record32.vhd ghdl=0 nvc=0
+run regress:alias14 dir=testdata/nvc/test/regress std=08 sha=5b7957ca79d40f9d
+ alias14.vhd ghdl=0 nvc=0
+run regress:proc12 dir=testdata/nvc/test/regress std=08 sha=8084cb3fa0852f83
+ proc12.vhd ghdl=0 nvc=0
+run regress:bounds38 dir=testdata/nvc/test/regress std=93 sha=69af2904341417e5
+ bounds38.vhd ghdl=0 nvc=0
+run regress:attr15 dir=testdata/nvc/test/regress std=08 sha=f1528a9dfb4a7b00
+ attr15.vhd ghdl=0 nvc=0
+run regress:attr16 dir=testdata/nvc/test/regress std=08 sha=579a599813e6d00c
+ attr16.vhd ghdl=0 nvc=0
+run regress:array6 dir=testdata/nvc/test/regress std=08 sha=c1e306bd11cf5b75
+ array6.vhd ghdl=0 nvc=0
+run regress:array7 dir=testdata/nvc/test/regress std=08 sha=99cc683f8457a908
+ array7.vhd ghdl=0 nvc=0
+run regress:protected7 dir=testdata/nvc/test/regress std=02 sha=eca0fc2e23d8fe07
+ protected7.vhd ghdl=0 nvc=0
+run regress:shared4 dir=testdata/nvc/test/regress std=08 sha=1a31a3b3483e64c4
+ shared4.vhd ghdl=1@6 nvc=1@6
+run regress:elab31 dir=testdata/nvc/test/regress std=02 sha=3bc460918894b6a1
+ elab31.vhd ghdl=0 nvc=0
+run regress:access11 dir=testdata/nvc/test/regress std=93 sha=0beb83f9fd27f5a3
+ access11.vhd ghdl=0 nvc=0
+run regress:issue467 dir=testdata/nvc/test/regress std=08 sha=5ccd43a8a8b09759
+ issue467.vhd ghdl=0 nvc=0
+run regress:issue469 dir=testdata/nvc/test/regress std=93 sha=0773845e0d1789ed
+ issue469.vhd -frelaxed ghdl=0 nvc=0
+run regress:ieee9 dir=testdata/nvc/test/regress std=08 sha=7b21ad7ed04d7d79
+ ieee9.vhd ghdl=0 nvc=0
+run regress:textio8 dir=testdata/nvc/test/regress std=93 sha=7466b5468628cc5f
+ textio8.vhd ghdl=0 nvc=0
+run regress:gensub1 dir=testdata/nvc/test/regress std=08 sha=a837b2e746bf6401
+ gensub1.vhd ghdl=0 nvc=0
+run regress:gensub2 dir=testdata/nvc/test/regress std=08 sha=8a85995a65b16583
+ gensub2.vhd ghdl=0 nvc=0
+run regress:gensub3 dir=testdata/nvc/test/regress std=08 sha=1a8831f5509d1c80
+ gensub3.vhd ghdl=2 nvc=0
+run regress:gensub4 dir=testdata/nvc/test/regress std=08 sha=46992a83c1a875d4
+ gensub4.vhd ghdl=2 nvc=0
+run regress:elab32 dir=testdata/nvc/test/regress std=93 sha=03efc9ed1b8673fd
+ elab32.vhd ghdl=0 nvc=0
+run regress:gensub5 dir=testdata/nvc/test/regress std=08 sha=03cab2cb621603e6
+ gensub5.vhd ghdl=2 nvc=0
+run regress:vhpi5 dir=testdata/nvc/test/regress std=08 sha=43f43bfbb62f8fb0
+ vhpi5.vhd ghdl=0 nvc=0
+run regress:gensub6 dir=testdata/nvc/test/regress std=08 sha=905af72cb4127bf6
+ gensub6.vhd ghdl=0 nvc=0
+run regress:concat7 dir=testdata/nvc/test/regress std=08 sha=87580428758b3139
+ concat7.vhd ghdl=0 nvc=0
+run regress:func20 dir=testdata/nvc/test/regress std=93 sha=709d3107d030fb33
+ func20.vhd ghdl=0 nvc=0
+run regress:array8 dir=testdata/nvc/test/regress std=08 sha=85999a469bfb7c95
+ array8.vhd ghdl=0 nvc=0
+run regress:array9 dir=testdata/nvc/test/regress std=08 sha=f27b59129a59ace5
+ array9.vhd ghdl=0 nvc=0
+run regress:signal22 dir=testdata/nvc/test/regress std=93 sha=72faa05d93cf8cff
+ signal22.vhd ghdl=0 nvc=0
+run regress:genpack9 dir=testdata/nvc/test/regress std=08 sha=a3e19bce0e085b9b
+ genpack9.vhd ghdl=0 nvc=0
+run regress:file9 dir=testdata/nvc/test/regress std=93 sha=e8bcd9b6cc1f01a1
+ file9.vhd ghdl=0 nvc=0
+run regress:array10 dir=testdata/nvc/test/regress std=93 sha=3b5563ada6d03b21
+ array10.vhd ghdl=0 nvc=0
+run regress:wait22 dir=testdata/nvc/test/regress std=08 sha=ec57a4f8ffef0d10
+ wait22.vhd ghdl=0 nvc=0
+run regress:array11 dir=testdata/nvc/test/regress std=08 sha=0c229fc588843063
+ array11.vhd ghdl=0 nvc=0
+run regress:array12 dir=testdata/nvc/test/regress std=08 sha=f3cc9efeaabb586b
+ array12.vhd ghdl=0 nvc=0
+run regress:array13 dir=testdata/nvc/test/regress std=93 sha=39815f72d521d27c
+ array13.vhd -frelaxed ghdl=0 nvc=0
+run regress:const8 dir=testdata/nvc/test/regress std=08 sha=de50d2ae77dec7da
+ const8.vhd ghdl=0 nvc=0
+run regress:wait23 dir=testdata/nvc/test/regress std=93 sha=1edd80e74c5056c0
+ wait23.vhd ghdl=0 nvc=0
+run regress:genpack10 dir=testdata/nvc/test/regress std=08 sha=15bf4dd94d7c0c74
+ genpack10.vhd ghdl=0 nvc=0
+run regress:attr17 dir=testdata/nvc/test/regress std=02 sha=b857bede2a104b2a
+ attr17.vhd ghdl=0 nvc=0
+run regress:signal23 dir=testdata/nvc/test/regress std=08 sha=5afa01feb9cb8995
+ signal23.vhd ghdl=0 nvc=0
+run regress:driver12 dir=testdata/nvc/test/regress std=93 sha=52e29d37e336553d
+ driver12.vhd ghdl=0 nvc=0
+run regress:record33 dir=testdata/nvc/test/regress std=08 sha=ffe963f6bed5fab4
+ record33.vhd ghdl=0 nvc=0
+run regress:const9 dir=testdata/nvc/test/regress std=93 sha=0cfd51afbcb0a534
+ const9.vhd ghdl=0 nvc=0
+run regress:driver13 dir=testdata/nvc/test/regress std=08 sha=d71a52496395f04e
+ driver13.vhd ghdl=0 nvc=0
+run regress:record34 dir=testdata/nvc/test/regress std=08 sha=95aac66633f40c9a
+ record34.vhd ghdl=0 nvc=0
+run regress:elab33 dir=testdata/nvc/test/regress std=08 sha=46e2aebf4301572f
+ elab33.vhd ghdl=0 nvc=0
+run regress:agg8 dir=testdata/nvc/test/regress std=08 sha=a7117543f6e9e9b6
+ agg8.vhd ghdl=0 nvc=0
+run regress:record35 dir=testdata/nvc/test/regress std=08 sha=3fd1c6b41f82faea
+ record35.vhd ghdl=0 nvc=0
+run regress:array14 dir=testdata/nvc/test/regress std=08 sha=37afa3f3bb9f61af
+ array14.vhd ghdl=0 nvc=0
+run regress:array15 dir=testdata/nvc/test/regress std=08 sha=d36bd841c253dc44
+ array15.vhd ghdl=0 nvc=0
+run regress:signal24 dir=testdata/nvc/test/regress std=08 sha=5610ff7812def23f
+ signal24.vhd ghdl=0 nvc=0
+run regress:issue481 dir=testdata/nvc/test/regress std=08 sha=1b66361667dcf702
+ issue481.vhd ghdl=0 nvc=0
+run regress:issue484 dir=testdata/nvc/test/regress std=93 sha=9913e913c782a46e
+ issue484.vhd ghdl=0 nvc=0
+run regress:ename3 dir=testdata/nvc/test/regress std=08 sha=cccdc98b0bf3b1cd
+ ename3.vhd ghdl=0 nvc=0
+run regress:issue483 dir=testdata/nvc/test/regress std=93 sha=794afc0ec9e7430c
+ issue483.vhd -frelaxed ghdl=0 nvc=0
+run regress:issue494 dir=testdata/nvc/test/regress std=93 sha=5dde20222bd88228
+ issue494.vhd ghdl=0 nvc=0
+run regress:record36 dir=testdata/nvc/test/regress std=08 sha=4383855d39b7d890
+ record36.vhd ghdl=0 nvc=0
+run regress:issue497 dir=testdata/nvc/test/regress std=08 sha=ddabdae6a5322305
+ issue497.vhd ghdl=0 nvc=0
+run regress:implicit4 dir=testdata/nvc/test/regress std=93 sha=951af8b8d901d3f1
+ implicit4.vhd ghdl=0 nvc=0
+run regress:genpack11 dir=testdata/nvc/test/regress std=08 sha=6678079afd215878
+ genpack11.vhd ghdl=0 nvc=0
+run regress:signal25 dir=testdata/nvc/test/regress std=08 sha=8c6db3fef13b29bd
+ signal25.vhd ghdl=0 nvc=0
+run regress:wait24 dir=testdata/nvc/test/regress std=93 sha=5086ddaddd763695
+ wait24.vhd ghdl=1@1,2,7~ nvc=0
+run regress:agg9 dir=testdata/nvc/test/regress std=93 sha=e77e321c4ec5eb8f
+ agg9.vhd ghdl=0 nvc=0
+run regress:agg10 dir=testdata/nvc/test/regress std=08 sha=5924573a66316424
+ agg10.vhd ghdl=0 nvc=0
+run regress:signal26 dir=testdata/nvc/test/regress std=08 sha=358441f161d0ee66
+ signal26.vhd ghdl=0 nvc=0
+run regress:file10 dir=testdata/nvc/test/regress std=93 sha=1c02c692a3c70e0f
+ file10.vhd ghdl=0 nvc=0
+run regress:stdenv1 dir=testdata/nvc/test/regress std=19 sha=a1264fb88b2a4769
+ stdenv1.vhd ghdl=1@13,14,15,16,18,19,20,21,28,29,30,35,37,38,39,41,42,45,46 nvc=0
+run regress:issue502 dir=testdata/nvc/test/regress std=93 sha=7864144c44f25bf1
+ issue502.vhd ghdl=0 nvc=0
+run regress:elab34 dir=testdata/nvc/test/regress std=08 sha=fde1114465039b51
+ elab34.vhd ghdl=0 nvc=0
+run regress:issue508 dir=testdata/nvc/test/regress std=08 sha=d7509b4f3d34074e
+ issue508.vhd ghdl=0 nvc=0
+run regress:record37 dir=testdata/nvc/test/regress std=93 sha=431803b3f21f0d93
+ record37.vhd ghdl=0 nvc=0
+run regress:func21 dir=testdata/nvc/test/regress std=93 sha=482765ad51d30788
+ func21.vhd ghdl=0 nvc=0
+run regress:issue521 dir=testdata/nvc/test/regress std=93 sha=dd781f63d94b3eb6
+ issue521.vhd ghdl=0 nvc=0
+run regress:issue552 dir=testdata/nvc/test/regress std=08 sha=37ba47a3e8b8084f
+ issue552.vhd ghdl=0 nvc=0
+run regress:stdenv2 dir=testdata/nvc/test/regress std=19 sha=4eb68cc5855f4e18
+ stdenv2.vhd ghdl=1@11,12,15,17,20,21,22,23,24,25,26,28,29,34,36,37,38,40,41 nvc=0
+run regress:driver14 dir=testdata/nvc/test/regress std=93 sha=43772c5cb219c181
+ driver14.vhd ghdl=0 nvc=0
+run regress:issue516 dir=testdata/nvc/test/regress std=93 sha=a90c85e0dbc5d939
+ issue516.vhd ghdl=0 nvc=0
+run regress:elab35 dir=testdata/nvc/test/regress std=93 sha=7cd6b627af3810bd
+ elab35.vhd ghdl=1@35,58~ nvc=0
+run regress:issue527 dir=testdata/nvc/test/regress std=93 sha=a5861ac07f5f9e74
+ issue527.vhd ghdl=0 nvc=0
+run regress:ieee10 dir=testdata/nvc/test/regress std=93 sha=8a779e4c2019bd06
+ ieee10.vhd ghdl=0 nvc=0
+run regress:driver15 dir=testdata/nvc/test/regress std=93 sha=bae73cbea4d5543b
+ driver15.vhd ghdl=0 nvc=0
+run regress:issue520 dir=testdata/nvc/test/regress std=08 sha=d12130a12cb49f40
+ issue520.vhd ghdl=0 nvc=0
+run regress:vests46 dir=testdata/nvc/test/regress std=93 sha=fd5cb00917baf641
+ vests46.vhd ghdl=0 nvc=0
+run regress:vests47 dir=testdata/nvc/test/regress std=93 sha=33455dbc8f9ff67b
+ vests47.vhd ghdl=0 nvc=0
+run regress:vests48 dir=testdata/nvc/test/regress std=93 sha=a9fa36875074ed5b
+ vests48.vhd ghdl=0 nvc=0
+run regress:signal27 dir=testdata/nvc/test/regress std=93 sha=765e5d6ff24cfca9
+ signal27.vhd ghdl=0 nvc=0
+run regress:issue519 dir=testdata/nvc/test/regress std=08 sha=e156283ce641a592
+ issue519.vhd ghdl=0 nvc=0
+run regress:delay3 dir=testdata/nvc/test/regress std=93 sha=cc71d60045b3b9e1
+ delay3.vhd ghdl=0 nvc=0
+run regress:issue536 dir=testdata/nvc/test/regress std=93 sha=c7af416543e90870
+ issue536.vhd ghdl=0 nvc=0
+run regress:wait25 dir=testdata/nvc/test/regress std=93 sha=cf272ca9cfb8e015
+ wait25.vhd ghdl=0 nvc=0
+run regress:issue539 dir=testdata/nvc/test/regress std=08 sha=07da731cddb8d09f
+ issue539.vhd ghdl=0 nvc=0
+run regress:issue542 dir=testdata/nvc/test/regress std=93 sha=95f2bb43a448d4a5
+ issue542.vhd ghdl=0 nvc=0
+run regress:issue540 dir=testdata/nvc/test/regress std=08 sha=2335f7c4b18c468f
+ issue540.vhd ghdl=0 nvc=0
+run regress:guard3 dir=testdata/nvc/test/regress std=93 sha=4cf486eee976295f
+ guard3.vhd ghdl=0 nvc=0
+run regress:issue543 dir=testdata/nvc/test/regress std=08 sha=aaf09bf07ca1c77d
+ issue543.vhd ghdl=0 nvc=0
+run regress:issue547 dir=testdata/nvc/test/regress std=93 sha=5d3771fbdcf485a0
+ issue547.vhd ghdl=0 nvc=0
+run regress:protected8 dir=testdata/nvc/test/regress std=02 sha=3530e04427aed777
+ protected8.vhd ghdl=0 nvc=0
+run regress:issue551 dir=testdata/nvc/test/regress std=93 sha=5722d2977de119c3
+ issue551.vhd ghdl=0 nvc=0
+run regress:issue544 dir=testdata/nvc/test/regress std=08 sha=841dc9969b680f78
+ issue544.vhd ghdl=0 nvc=0
+run regress:issue550 dir=testdata/nvc/test/regress std=08 sha=17b82ec05196f8ff
+ issue550.vhd -frelaxed ghdl=0 nvc=0
+run regress:ename4 dir=testdata/nvc/test/regress std=08 sha=f91bb4357d6e7d5a
+ ename4.vhd ghdl=0 nvc=0
+run regress:genpack12 dir=testdata/nvc/test/regress std=08 sha=9104b3904ff1c463
+ genpack12.vhd ghdl=0 nvc=0
+run regress:wave8 dir=testdata/nvc/test/regress std=93 sha=68ddc4b58b8dbcb9
+ wave8.vhd ghdl=0 nvc=0
+run regress:signal28 dir=testdata/nvc/test/regress std=93 sha=f7049a43f35ddea5
+ signal28.vhd -frelaxed ghdl=1@17 nvc=0
+run regress:issue549 dir=testdata/nvc/test/regress std=93 sha=3b9a6ce2e4a12063
+ issue549.vhd ghdl=0 nvc=0
+run regress:case14 dir=testdata/nvc/test/regress std=08 sha=da4f4c7ce445d897
+ case14.vhd ghdl=0 nvc=0
+run regress:issue560 dir=testdata/nvc/test/regress std=08 sha=61581f3fa5828919
+ issue560.vhd ghdl=0 nvc=0
+run regress:issue570 dir=testdata/nvc/test/regress std=08 sha=6e39448af4c6d776
+ issue570.vhd ghdl=0 nvc=0
+run regress:issue571 dir=testdata/nvc/test/regress std=08 sha=2e1a5a7b7b60f5ec
+ issue571.vhd -frelaxed ghdl=0 nvc=0
+run regress:operator6 dir=testdata/nvc/test/regress std=08 sha=4f5f2fad26491b26
+ operator6.vhd ghdl=0 nvc=0
+run regress:vecorder2 dir=testdata/nvc/test/regress std=08 sha=3f7ed1459b5fa3de
+ vecorder2.vhd ghdl=0 nvc=0
+run regress:cover2 dir=testdata/nvc/test/regress std=93 sha=44b07e9b6cb33e4d
+ cover2.vhd ghdl=0 nvc=0
+run regress:cover3 dir=testdata/nvc/test/regress std=93 sha=cdac1c97e9dac28d
+ cover3.vhd ghdl=0 nvc=0
+run regress:cover4 dir=testdata/nvc/test/regress std=93 sha=ea0108c0aaba9109
+ cover4.vhd ghdl=0 nvc=0
+run regress:issue577 dir=testdata/nvc/test/regress std=08 sha=8639a633c7cee2cf
+ issue577.vhd ghdl=0 nvc=0
+run regress:cover7 dir=testdata/nvc/test/regress std=93 sha=d771daeabef5ad37
+ cover7.vhd ghdl=0 nvc=0
+run regress:cover8 dir=testdata/nvc/test/regress std=93 sha=7516ab14206626ad
+ cover8.vhd ghdl=0 nvc=0
+run regress:case15 dir=testdata/nvc/test/regress std=08 sha=85830c714c47d3db
+ case15.vhd ghdl=0 nvc=0
+run regress:driver16 dir=testdata/nvc/test/regress std=93 sha=6c2f86b538828223
+ driver16.vhd ghdl=0 nvc=0
+run regress:issue589 dir=testdata/nvc/test/regress std=02 sha=13c4a649d98ae18a
+ issue589.vhd ghdl=0 nvc=0
+run regress:issue590 dir=testdata/nvc/test/regress std=93 sha=b37e20c165bf7b8f
+ issue590.vhd ghdl=0 nvc=0
+run regress:issue595 dir=testdata/nvc/test/regress std=08 sha=a783742f41c7ce46
+ issue595.vhd ghdl=0 nvc=0
+run regress:issue592 dir=testdata/nvc/test/regress std=93 sha=e0bd28b743a05d72
+ issue592.vhd ghdl=0 nvc=0
+run regress:issue597 dir=testdata/nvc/test/regress std=93 sha=5dca876c5d66ddd7
+ issue597.vhd ghdl=0 nvc=0
+run regress:stdenv3 dir=testdata/nvc/test/regress std=19 sha=cb82230813f5c748
+ stdenv3.vhd ghdl=1@9,11,12,13,25,26,27,28,34,36,41,42,49,50 nvc=0
+run regress:issue603 dir=testdata/nvc/test/regress std=93 sha=050da5d329f63c04
+ issue603.vhd ghdl=0 nvc=0
+run regress:issue609 dir=testdata/nvc/test/regress std=93 sha=861e7f12f159704b
+ issue609.vhd ghdl=0 nvc=0
+run regress:implicit5 dir=testdata/nvc/test/regress std=93 sha=44739f4df1a09c41
+ implicit5.vhd ghdl=0 nvc=0
+run regress:issue612 dir=testdata/nvc/test/regress std=93 sha=d11286cae12880d7
+ issue612.vhd ghdl=0 nvc=0
+run regress:force2 dir=testdata/nvc/test/regress std=08 sha=a9bd0e8acdfd4f44
+ force2.vhd ghdl=0 nvc=0
+run regress:issue618 dir=testdata/nvc/test/regress std=93 sha=d6e9d70f8247a779
+ issue618.vhd ghdl=0 nvc=0
+run regress:issue613 dir=testdata/nvc/test/regress std=08 sha=e36ca82a76a8ceaf
+ issue613.vhd ghdl=0 nvc=0
+run regress:issue615 dir=testdata/nvc/test/regress std=08 sha=369db5b8d1055c68
+ issue615.vhd ghdl=0 nvc=0
+run regress:arith4 dir=testdata/nvc/test/regress std=93 sha=10eff4180f7a7eef
+ arith4.vhd ghdl=0 nvc=0
+run regress:const10 dir=testdata/nvc/test/regress std=93 sha=50441c653157da7f
+ const10.vhd ghdl=0 nvc=0
+run regress:null3 dir=testdata/nvc/test/regress std=93 sha=30c3c96eb6ba646c
+ null3.vhd ghdl=0 nvc=0
+run regress:link4 dir=testdata/nvc/test/regress std=93 sha=00774a03844260cf
+ link4.vhd ghdl=0 nvc=0
+run regress:predef3 dir=testdata/nvc/test/regress std=93 sha=fe2eebafc3d510ba
+ predef3.vhd ghdl=0 nvc=0
+run regress:wait26 dir=testdata/nvc/test/regress std=93 sha=3d6ad1599bc72e90
+ wait26.vhd ghdl=0 nvc=0
+run regress:signal29 dir=testdata/nvc/test/regress std=93 sha=0c7d3b7859407d99
+ signal29.vhd ghdl=0 nvc=0
+run regress:file11 dir=testdata/nvc/test/regress std=08 sha=0ea2d145afa0d923
+ file11.vhd ghdl=0 nvc=0
+run regress:issue617 dir=testdata/nvc/test/regress std=93 sha=d0148cd38dd32af9
+ issue617.vhd ghdl=0 nvc=0
+run regress:bounds39 dir=testdata/nvc/test/regress std=93 sha=58ec5e9af25fca51
+ bounds39.vhd ghdl=0 nvc=0
+run regress:issue610 dir=testdata/nvc/test/regress std=08 sha=43e03381a1572dfe
+ issue610.vhd ghdl=0 nvc=0
+run regress:issue640 dir=testdata/nvc/test/regress std=93 sha=3b447f8d04ae2f32
+ issue640.vhd ghdl=1@14 nvc=0
+run regress:vests49 dir=testdata/nvc/test/regress std=93 sha=4ef4b98dd4c2de20
+ vests49.vhd ghdl=0 nvc=0
+run regress:signal30 dir=testdata/nvc/test/regress std=93 sha=2c2252e5f0272ce8
+ signal30.vhd ghdl=0 nvc=0
+run regress:psl1 dir=testdata/nvc/test/regress std=93 sha=2a9ccafa9a4e5296
+ psl1.vhd -fpsl ghdl=0 nvc=0
+run regress:elab36 dir=testdata/nvc/test/regress std=93 sha=c1f2f6741298439a
+ elab36.vhd ghdl=0 nvc=0
+run regress:cover13 dir=testdata/nvc/test/regress std=93 sha=ed7bddc71da7b7a5
+ cover13.vhd ghdl=0 nvc=0
+run regress:gentype5 dir=testdata/nvc/test/regress std=08 sha=fed538f2151888c3
+ gentype5.vhd ghdl=0 nvc=0
+run regress:issue620 dir=testdata/nvc/test/regress std=08 sha=8b2b0abf67fe2ba0
+ issue620.vhd ghdl=0 nvc=0
+run regress:issue643 dir=testdata/nvc/test/regress std=08 sha=edce79b3c47a4bd9
+ issue643.vhd ghdl=0 nvc=0
+run regress:file12 dir=testdata/nvc/test/regress std=19 sha=f2697c8cadd5a134
+ file12.vhd ghdl=1@13,14,18,19,20,21,24,26,29,31,32,37,44,45,46,52,55,57,64,65,67 nvc=0
+run regress:driver17 dir=testdata/nvc/test/regress std=93 sha=6f1954150cf72861
+ driver17.vhd ghdl=0 nvc=0
+run regress:cond4 dir=testdata/nvc/test/regress std=19 define=USER_DIRECTIVE=VALID_VALUE sha=37b0bab743784a8b
+ cond4.vhd ghdl=1@12,14,17 nvc=0
+run regress:issue646 dir=testdata/nvc/test/regress std=93 sha=e2303e46d062ad04
+ issue646.vhd -frelaxed ghdl=0 nvc=0
+run regress:array16 dir=testdata/nvc/test/regress std=08 sha=13b7a537321899e6
+ array16.vhd ghdl=0 nvc=0
+run regress:stdenv4 dir=testdata/nvc/test/regress std=19 sha=44c27e5075a9c7d3
+ stdenv4.vhd ghdl=1@19,20,21,22,23,24 nvc=0
+run regress:issue655 dir=testdata/nvc/test/regress std=08 sha=dfed5d17aaa0f852
+ issue655.vhd ghdl=0 nvc=0
+run regress:genpack13 dir=testdata/nvc/test/regress std=08 sha=b846654f4ec8358c
+ genpack13.vhd ghdl=0 nvc=0
+run regress:genpack14 dir=testdata/nvc/test/regress std=08 sha=1b8914520e6cfba0
+ genpack14.vhd ghdl=0 nvc=0
+run regress:slice5 dir=testdata/nvc/test/regress std=93 sha=a1556e8adb26f633
+ slice5.vhd ghdl=0 nvc=0
+run regress:access12 dir=testdata/nvc/test/regress std=93 sha=022275c528ada550
+ access12.vhd ghdl=0 nvc=0
+run regress:arith5 dir=testdata/nvc/test/regress std=93 sha=dc560ac7c35e4b13
+ arith5.vhd ghdl=0 nvc=0
+run regress:real4 dir=testdata/nvc/test/regress std=93 sha=0aa6f82f97234a66
+ real4.vhd ghdl=0 nvc=0
+run regress:issue616 dir=testdata/nvc/test/regress std=08 sha=c51547ffffbab086
+ issue616.vhd ghdl=0 nvc=0
+run regress:record38 dir=testdata/nvc/test/regress std=08 sha=de450cec472d6919
+ record38.vhd ghdl=0 nvc=0
+run regress:tcl1 dir=testdata/nvc/test/regress std=93 sha=cdb9f01b28dba670
+ tcl1.vhd ghdl=0 nvc=0
+run regress:issue668 dir=testdata/nvc/test/regress std=93 sha=8eae0843a2230785
+ issue668.vhd ghdl=0 nvc=0
+run regress:issue670 dir=testdata/nvc/test/regress std=08 sha=13dc53f497435087
+ issue670.vhd ghdl=0 nvc=0
+run regress:elab37 dir=testdata/nvc/test/regress std=93 sha=e7572789bac9ee26
+ elab37.vhd ghdl=0 nvc=0
+run regress:elab38 dir=testdata/nvc/test/regress std=93 sha=7526b7e0cd03ab0a
+ elab38.vhd ghdl=0 nvc=0
+run regress:vital1 dir=testdata/nvc/test/regress std=93 sha=3b231cfefe7923f0
+ vital1.vhd ghdl=0 nvc=0
+run regress:issue674 dir=testdata/nvc/test/regress std=08 sha=3c82feed990a4193
+ issue674.vhd ghdl=0 nvc=0
+run regress:integer1 dir=testdata/nvc/test/regress std=93 sha=b7b1edf387e9012c
+ integer1.vhd ghdl=1@15 nvc=0
+run regress:integer2 dir=testdata/nvc/test/regress std=19 sha=b69945a603dbcc19
+ integer2.vhd ghdl=0 nvc=0
+run regress:issue675 dir=testdata/nvc/test/regress std=02 sha=e7dd3e66f4c1cefe
+ issue675.vhd ghdl=0 nvc=0
+run regress:issue676 dir=testdata/nvc/test/regress std=08 sha=280d38c9309b2a1b
+ issue676.vhd ghdl=0 nvc=0
+run regress:issue677 dir=testdata/nvc/test/regress std=93 sha=0601fc7c1d562a16
+ issue677.vhd ghdl=1@22 nvc=0
+run regress:issue681 dir=testdata/nvc/test/regress std=08 sha=30f99dab99341c44
+ issue681.vhd ghdl=0 nvc=0
+run regress:issue658 dir=testdata/nvc/test/regress std=08 sha=5988dd58bdad09ce
+ issue658.vhd ghdl=1@3,4,5,17,22,32~ nvc=0
+run regress:vlog1 dir=testdata/nvc/test/regress std=93 sha=bda83170e18047f8
+ vlog1.vhd ghdl=0 nvc=0
+run regress:issue690 dir=testdata/nvc/test/regress std=93 sha=e688c30ba0b3931c
+ issue690.vhd ghdl=0 nvc=0
+run regress:issue644 dir=testdata/nvc/test/regress std=08 sha=3fc8d679a14260cf
+ issue644.vhd ghdl=2 nvc=0
+run regress:cond5 dir=testdata/nvc/test/regress std=19 sha=e37ffcd9852af99a
+ cond5.vhd ghdl=1@9,10,11 nvc=0
+run regress:cond6 dir=testdata/nvc/test/regress std=19 sha=cf8502bbfdc554d5
+ cond6.vhd ghdl=1@11,14,15,16,17,19 nvc=0
+run regress:cover15 dir=testdata/nvc/test/regress std=19 sha=85d82409f4220e42
+ cover15.vhd ghdl=1@11,16,17,18,27,29 nvc=0
+run regress:func22 dir=testdata/nvc/test/regress std=19 sha=a27dec7faa449aaf
+ func22.vhd ghdl=0 nvc=0
+run regress:func23 dir=testdata/nvc/test/regress std=19 sha=a4e5b4e2d039d0bf
+ func23.vhd ghdl=0 nvc=0
+run regress:protected9 dir=testdata/nvc/test/regress std=19 sha=37e61a440842ee8d
+ protected9.vhd ghdl=1@31 nvc=0
+run regress:func24 dir=testdata/nvc/test/regress std=19 sha=c299df950cf2b262
+ func24.vhd ghdl=0 nvc=0
+run regress:vhpi6 dir=testdata/nvc/test/regress std=93 sha=64b96ddb97eb6588
+ vhpi6.vhd ghdl=0 nvc=0
+run regress:cover16 dir=testdata/nvc/test/regress std=19 sha=c6801953d220688f
+ cover16.vhd ghdl=0 nvc=0
+run regress:view1 dir=testdata/nvc/test/regress std=19 sha=858f326f897ad2b2
+ view1.vhd ghdl=0 nvc=0
+run regress:issue701 dir=testdata/nvc/test/regress std=08 sha=6c60b80c85fd3114
+ issue701.vhd ghdl=0 nvc=0
+run regress:issue700 dir=testdata/nvc/test/regress std=93 sha=ab8d809717aa8e1e
+ issue700.vhd ghdl=0 nvc=0
+run regress:issue703 dir=testdata/nvc/test/regress std=93 sha=5a78195a9f80a1e0
+ issue703.vhd ghdl=0 nvc=0
+run regress:view2 dir=testdata/nvc/test/regress std=19 sha=bebe2015c791e932
+ view2.vhd ghdl=0 nvc=0
+run regress:view3 dir=testdata/nvc/test/regress std=19 sha=6f98b39ac669bc45
+ view3.vhd ghdl=0 nvc=0
+run regress:view4 dir=testdata/nvc/test/regress std=19 sha=ba16132722bb7f8d
+ view4.vhd ghdl=0 nvc=0
+run regress:view5 dir=testdata/nvc/test/regress std=19 sha=104385f7d5acb9f3
+ view5.vhd ghdl=2 nvc=0
+run regress:issue705 dir=testdata/nvc/test/regress std=08 sha=cb1dad04f560ff70
+ issue705.vhd ghdl=1@70,71 nvc=0
+run regress:array17 dir=testdata/nvc/test/regress std=08 sha=24ce8ed9b32acf5d
+ array17.vhd ghdl=0 nvc=0
+run regress:stdenv5 dir=testdata/nvc/test/regress std=19 sha=65845799166d3d00
+ stdenv5.vhd ghdl=1@10,12,13,14,15,23,24,26,27,29,30,33,34,37,38,41,42 nvc=0
+run regress:assert7 dir=testdata/nvc/test/regress std=08 sha=c28fec09a0c77376
+ assert7.vhd ghdl=0 nvc=0
+run regress:vhpi7 dir=testdata/nvc/test/regress std=08 sha=f705627bf027af25
+ vhpi7.vhd ghdl=0 nvc=0
+run regress:vhpi8 dir=testdata/nvc/test/regress std=08 sha=d6cc732b0d8d6289
+ vhpi8.vhd ghdl=0 nvc=0
+run regress:issue704 dir=testdata/nvc/test/regress std=93 sha=733358520236d0fa
+ issue704.vhd ghdl=0 nvc=0
+run regress:real5 dir=testdata/nvc/test/regress std=19 sha=f8446c2b05d04530
+ real5.vhd ghdl=1@12,13,14,15 nvc=0
+run regress:assign9 dir=testdata/nvc/test/regress std=08 sha=2f40e01d893f2056
+ assign9.vhd ghdl=0 nvc=0
+run regress:array18 dir=testdata/nvc/test/regress std=02 sha=6975a989dfec7e84
+ array18.vhd ghdl=0 nvc=0
+run regress:signal31 dir=testdata/nvc/test/regress std=08 sha=c32fb0590d7ae66a
+ signal31.vhd ghdl=0 nvc=0
+run regress:range2 dir=testdata/nvc/test/regress std=08 sha=37a1e435abc7ad61
+ range2.vhd ghdl=0 nvc=0
+run regress:issue714 dir=testdata/nvc/test/regress std=93 sha=0b9816ff82209b93
+ issue714.vhd ghdl=0 nvc=0
+run regress:issue718 dir=testdata/nvc/test/regress std=08 sha=d17f9b0404e06cc8
+ issue718.vhd ghdl=0 nvc=0
+run regress:issue726 dir=testdata/nvc/test/regress std=08 sha=1815bf5977ac7efe
+ issue726.vhd ghdl=0 nvc=0
+run regress:issue724 dir=testdata/nvc/test/regress std=19 sha=d7370c25e11c63d3
+ issue724.vhd ghdl=0 nvc=0
+run regress:issue653 dir=testdata/nvc/test/regress std=08 sha=1d48d8b5976348c1
+ issue653.vhd ghdl=0 nvc=0
+run regress:protected10 dir=testdata/nvc/test/regress std=19 sha=996c9b8369bf44a6
+ protected10.vhd ghdl=2@36 nvc=0
+run regress:reflect1 dir=testdata/nvc/test/regress std=19 sha=6c4548dcdd2b5e98
+ reflect1.vhd ghdl=1@4,15,16,17,18,19,20,21,22,23,24,26,34,50,52,69,73,81,84 nvc=0
+run regress:signal32 dir=testdata/nvc/test/regress std=19 sha=bbac023cf06dc0cf
+ signal32.vhd ghdl=1@15,16,20,21 nvc=0
+run regress:reflect2 dir=testdata/nvc/test/regress std=19 sha=78c6a00c18b2262a
+ reflect2.vhd ghdl=1@4,11,12,13,14,16,24,40,41,42,44,58,59 nvc=0
+run regress:issue734 dir=testdata/nvc/test/regress std=08 sha=de13431738c17ff9
+ issue734.vhd ghdl=0 nvc=0
+run regress:reflect3 dir=testdata/nvc/test/regress std=19 sha=e23c9afd069c7677
+ reflect3.vhd ghdl=1@4,15,16,17,18,20 nvc=0
+run regress:issue712 dir=testdata/nvc/test/regress std=08 sha=3b062986b4a6e31f
+ issue712.vhd ghdl=2@15 nvc=0
+run regress:psl2 dir=testdata/nvc/test/regress std=93 sha=15e0973c1657cdf6
+ psl2.vhd -fpsl ghdl=1@21 nvc=0
+run regress:signal33 dir=testdata/nvc/test/regress std=93 sha=eb9355578dedcb06
+ signal33.vhd ghdl=0 nvc=0
+run regress:tcl2 dir=testdata/nvc/test/regress std=93 sha=0cc906c33e9e4c79
+ tcl2.vhd ghdl=0 nvc=0
+run regress:psl3 dir=testdata/nvc/test/regress std=08 sha=75205b747fe320c0
+ psl3.vhd ghdl=0 nvc=0
+run regress:issue731 dir=testdata/nvc/test/regress std=08 sha=efb88ba2953be132
+ issue731.vhd ghdl=0 nvc=0
+run regress:psl4 dir=testdata/nvc/test/regress std=08 sha=6da99f7b67a0591f
+ psl4.vhd -fpsl ghdl=1@86,88,89,90,91,93 nvc=0
+run regress:cover17 dir=testdata/nvc/test/regress std=93 sha=52c55471974375e8
+ cover17.vhd ghdl=0 nvc=0
+run regress:toplevel3 dir=testdata/nvc/test/regress std=93 sha=7cf0dc5adb9967dd
+ toplevel3.vhd ghdl=0 nvc=0
+run regress:predef4 dir=testdata/nvc/test/regress std=08 sha=53bbc2448dca0601
+ predef4.vhd ghdl=0 nvc=0
+run regress:protected11 dir=testdata/nvc/test/regress std=02 sha=9759294f9e235288
+ protected11.vhd ghdl=0 nvc=0
+run regress:issue744 dir=testdata/nvc/test/regress std=93 sha=fc7081aa363402cc
+ issue744.vhd ghdl=0 nvc=0
+run regress:reflect4 dir=testdata/nvc/test/regress std=19 sha=e63a3b54e694504e
+ reflect4.vhd ghdl=1@4,14,15,16,17,18,20 nvc=0
+run regress:reflect5 dir=testdata/nvc/test/regress std=19 sha=6f112c55c6b3f8bd
+ reflect5.vhd ghdl=1@4,30,31,32,33,34,35,36,42,49,53,57,62,66,72,82,86,90 nvc=0
+run regress:seqblock1 dir=testdata/nvc/test/regress std=19 sha=2d574caaf307022f
+ seqblock1.vhd ghdl=1@11,12,14,16,20,21,22,24 nvc=0
+run regress:seqblock2 dir=testdata/nvc/test/regress std=19 sha=f44d098f62c9ae82
+ seqblock2.vhd ghdl=1@14,15,20,21,22,24,26,29,30,31,33 nvc=0
+run regress:stdenv6 dir=testdata/nvc/test/regress std=19 sha=ae586021b6f4aa1b
+ stdenv6.vhd ghdl=1@12,13,19,21,35,37,38,40,42,44,45,46,48,50,53,56,58,59 nvc=0
+run regress:issue747 dir=testdata/nvc/test/regress std=93 sha=d3e6809673cffcad
+ issue747.vhd ghdl=0 nvc=0
+run regress:assert8 dir=testdata/nvc/test/regress std=19 sha=fe27903880b9dcdc
+ assert8.vhd ghdl=1@12,13,14,15,16,27,28,29,30,31,42,43,44,45,46,57,58,59,60,61,72,73,74,75,76,87,88,89,90,91,102,103,104,105,106,118,119,120,121,122 nvc=0
+run regress:assert9 dir=testdata/nvc/test/regress std=19 sha=b223f1a709555bea
+ assert9.vhd ghdl=1@12,13,14,15,19,20,21,22,25,26,27,28,31,32,33,34,38,39,40,41,45,53,60,67,75 nvc=0
+run regress:assert10 dir=testdata/nvc/test/regress std=19 sha=67fde3c6e909b711
+ assert10.vhd ghdl=1@12,17,18,19,22,26,29 nvc=0
+run regress:assert11 dir=testdata/nvc/test/regress std=19 sha=d1a1014a5bd81824
+ assert11.vhd ghdl=1@14,15,17 nvc=0
+run regress:assert12 dir=testdata/nvc/test/regress std=93 sha=7880426978d9bc8d
+ assert12.vhd ghdl=0 nvc=0
+run regress:image2 dir=testdata/nvc/test/regress std=19 sha=65f716a072c021f6
+ image2.vhd ghdl=1@34,35,36,37,38,40,42,43,44,45,46,47 nvc=0
+run regress:value2 dir=testdata/nvc/test/regress std=19 sha=7ce8674958c226d8
+ value2.vhd ghdl=1@26,27,28,29,30,31,32 nvc=0
+run regress:value3 dir=testdata/nvc/test/regress std=19 sha=133dd279f1608725
+ value3.vhd ghdl=1@14 nvc=0
+run regress:value4 dir=testdata/nvc/test/regress std=19 sha=baaf4c49dc3ef4f0
+ value4.vhd ghdl=1@11 nvc=0
+run regress:open1 dir=testdata/nvc/test/regress std=19 sha=30dd01d6fd424718
+ open1.vhd ghdl=1@38,39,42 nvc=0
+run regress:issue750 dir=testdata/nvc/test/regress std=08 sha=8279f914a93c5933
+ issue750.vhd ghdl=0 nvc=0
+run regress:driver18 dir=testdata/nvc/test/regress std=08 sha=6bf970ebd9292cc4
+ driver18.vhd ghdl=0 nvc=0
+run regress:vhpi9 dir=testdata/nvc/test/regress std=93 sha=33afed8ea374c90a
+ vhpi9.vhd ghdl=0 nvc=0
+run regress:issue730 dir=testdata/nvc/test/regress std=08 sha=33ec72305ee5549d
+ issue730.vhd ghdl=0 nvc=0
+run regress:driver19 dir=testdata/nvc/test/regress std=08 sha=22e08ccced956806
+ driver19.vhd ghdl=0 nvc=0
+run regress:func25 dir=testdata/nvc/test/regress std=93 sha=8d9c153b3fce012d
+ func25.vhd ghdl=0 nvc=0
+run regress:conv9 dir=testdata/nvc/test/regress std=19 sha=add5109c8ba50c3c
+ conv9.vhd ghdl=1@34,37,42 nvc=0
+run regress:comp2 dir=testdata/nvc/test/regress std=93 sha=8fa3bf26cbfe747b
+ comp2.vhd ghdl=0 nvc=0
+run regress:issue751 dir=testdata/nvc/test/regress std=93 sha=c88b86cb83828837
+ issue751.vhd ghdl=0 nvc=0
+run regress:issue732 dir=testdata/nvc/test/regress std=08 sha=3945919c4195572d
+ issue732.vhd ghdl=0 nvc=0
+run regress:genpack15 dir=testdata/nvc/test/regress std=08 sha=34aec1163f46b843
+ genpack15.vhd ghdl=0 nvc=0
+run regress:alias15 dir=testdata/nvc/test/regress std=02 sha=f79694acba5fb755
+ alias15.vhd ghdl=0 nvc=0
+run regress:protected12 dir=testdata/nvc/test/regress std=19 sha=64b49f5bbc097132
+ protected12.vhd ghdl=1@25,26,27,28,29,30,31,32,33,35,39,40,42,43,48,49,50,51,52,53,54,56 nvc=0
+run regress:ieee11 dir=testdata/nvc/test/regress std=93 sha=25a0bd868a8d4836
+ ieee11.vhd ghdl=0 nvc=0
+run regress:ieee12 dir=testdata/nvc/test/regress std=93 sha=42d62517cce6dc04
+ ieee12.vhd ghdl=1@62,64,101,107,167,169,211,213,244,246,1090,1151,1162,1182,1243,1254 nvc=0
+run regress:ieee13 dir=testdata/nvc/test/regress std=93 sha=46011701e5d132c4
+ ieee13.vhd ghdl=1@32,43,54,65,76,87,98,109,120,131,142,153 nvc=0
+run regress:ieee14 dir=testdata/nvc/test/regress std=93 sha=cca60ecbc1bbb12b
+ ieee14.vhd ghdl=0 nvc=0
+run regress:ieee15 dir=testdata/nvc/test/regress std=93 sha=a7f1a7469ebebf15
+ ieee15.vhd ghdl=0 nvc=0
+run regress:predef5 dir=testdata/nvc/test/regress std=08 sha=734826db7e1d6e82
+ predef5.vhd ghdl=0 nvc=0
+run regress:vhpi10 dir=testdata/nvc/test/regress std=08 sha=5c23881175012e91
+ vhpi10.vhd ghdl=0 nvc=0
+run regress:bounds40 dir=testdata/nvc/test/regress std=93 sha=04e0ca04649224cd
+ bounds40.vhd ghdl=0 nvc=0
+run regress:bounds41 dir=testdata/nvc/test/regress std=93 sha=f895ae562d697fdc
+ bounds41.vhd ghdl=0 nvc=0
+run regress:ieee16 dir=testdata/nvc/test/regress std=93 sha=2304000afbc438a0
+ ieee16.vhd ghdl=0 nvc=0
+run regress:shuffle1 dir=testdata/nvc/test/regress std=02 sha=4a3eeee73616f40a
+ shuffle1.vhd ghdl=0 nvc=0
+run regress:vhpi11 dir=testdata/nvc/test/regress std=08 sha=4a6ad7980c3d7ac4
+ vhpi11.vhd ghdl=0 nvc=0
+run regress:attr18 dir=testdata/nvc/test/regress std=19 sha=b3a7cb035257ada2
+ attr18.vhd ghdl=1@13,14,15,16,17 nvc=0
+run regress:issue762 dir=testdata/nvc/test/regress std=93 sha=710731d1c54a6b9f
+ issue762.vhd ghdl=0 nvc=0
+run regress:issue766 dir=testdata/nvc/test/regress std=02 sha=a05641a9083144a4
+ issue766.vhd ghdl=0 nvc=0
+run regress:attr19 dir=testdata/nvc/test/regress std=08 sha=81372e11a9f6ca93
+ attr19.vhd ghdl=2 nvc=0
+run regress:attr20 dir=testdata/nvc/test/regress std=19 sha=cd21280d1584ac12
+ attr20.vhd lib=lib ghdl=0 nvc=0
+run regress:protected13 dir=testdata/nvc/test/regress std=19 sha=c9ebba82c3d037fa
+ protected13.vhd ghdl=1@30,33 nvc=0
+run regress:bounds42 dir=testdata/nvc/test/regress std=08 sha=b6b0ddd0e52d8b84
+ bounds42.vhd ghdl=1@12 nvc=0
+run regress:conv10 dir=testdata/nvc/test/regress std=08 sha=37015371132bc121
+ conv10.vhd ghdl=0 nvc=0
+run regress:psl5 dir=testdata/nvc/test/regress std=93 sha=d65cbdf161842217
+ psl5.vhd -fpsl ghdl=1@29,53 nvc=0
+run regress:psl6 dir=testdata/nvc/test/regress std=93 sha=a104e3fd77570c51
+ psl6.vhd -fpsl ghdl=1@31 nvc=0
+run regress:cover19 dir=testdata/nvc/test/regress std=93 sha=1a85ee28c6cadfe4
+ cover19.vhd ghdl=0 nvc=0
+run regress:gentype6 dir=testdata/nvc/test/regress std=08 sha=5a7c25a5a0332c57
+ gentype6.vhd ghdl=0 nvc=0
+run regress:mixed1 dir=testdata/nvc/test/regress std=93 sha=7f6f4359c54f397c
+ mixed1.vhd ghdl=0 nvc=0
+run regress:ename5 dir=testdata/nvc/test/regress std=08 sha=fe3a0e26b9a822eb
+ ename5.vhd ghdl=0 nvc=0
+run regress:ename6 dir=testdata/nvc/test/regress std=08 sha=d5fe5ead0b746dac
+ ename6.vhd ghdl=0 nvc=0
+run regress:issue787 dir=testdata/nvc/test/regress std=93 sha=8e9c46acebc0f471
+ issue787.vhd ghdl=0 nvc=0
+run regress:view6 dir=testdata/nvc/test/regress std=19 sha=a000f16599c6455b
+ view6.vhd ghdl=2 nvc=0
+run regress:issue790 dir=testdata/nvc/test/regress std=93 sha=7c1f4c65897d4f11
+ issue790.vhd ghdl=0 nvc=0
+run regress:issue791 dir=testdata/nvc/test/regress std=08 sha=cb00b6e84dc66850
+ issue791.vhd ghdl=0 nvc=0
+run regress:issue794 dir=testdata/nvc/test/regress std=08 sha=f661715e44549a2b
+ issue794.vhd ghdl=0 nvc=0
+run regress:psl7 dir=testdata/nvc/test/regress std=93 sha=7fac7588131ad74d
+ psl7.vhd -fpsl ghdl=0 nvc=0
+run regress:cover21 dir=testdata/nvc/test/regress std=93 sha=fe4e1cba448a60b9
+ cover21.vhd -fpsl ghdl=0 nvc=0
+run regress:issue799 dir=testdata/nvc/test/regress std=08 sha=553aedd2e8d84a64
+ issue799.vhd ghdl=0 nvc=0
+run regress:issue801 dir=testdata/nvc/test/regress std=08 sha=4cb5d109aaf441ae
+ issue801.vhd ghdl=0 nvc=0
+run regress:issue809 dir=testdata/nvc/test/regress std=08 sha=e3c686a658366aaf
+ issue809.vhd ghdl=0 nvc=0
+run regress:range3 dir=testdata/nvc/test/regress std=08 sha=209ebc309244920b
+ range3.vhd ghdl=0 nvc=0
+run regress:issue810 dir=testdata/nvc/test/regress std=08 sha=59f3468be4d08029
+ issue810.vhd ghdl=2@38,70,100,102,105 nvc=0
+run regress:elab40 dir=testdata/nvc/test/regress std=08 sha=36016baed2c4af9a
+ elab40.vhd ghdl=0 nvc=0
+run regress:genpack16 dir=testdata/nvc/test/regress std=08 sha=8f2fc89c51c646a5
+ genpack16.vhd ghdl=0 nvc=0
+run regress:issue815 dir=testdata/nvc/test/regress std=19 sha=e8d2ad7f704f2300
+ issue815.vhd ghdl=1@35 nvc=0
+run regress:issue816 dir=testdata/nvc/test/regress std=93 sha=08cbddcf4ae1fbe5
+ issue816.vhd ghdl=0 nvc=0
+run regress:gentype7 dir=testdata/nvc/test/regress std=19 sha=45a0203f3bb0e404
+ gentype7.vhd ghdl=1@11,12,14,15,21,22,23,24,26,27,35,36,38,39,40,42,49,52,54,57,58,59,60,61,63 nvc=0
+run regress:issue819 dir=testdata/nvc/test/regress std=08 sha=60e8839fe5711abe
+ issue819.vhd ghdl=0 nvc=0
+run regress:issue820 dir=testdata/nvc/test/regress std=93 sha=5c8b6cd7553905f4
+ issue820.vhd ghdl=0 nvc=0
+run regress:issue824 dir=testdata/nvc/test/regress std=93 sha=2372cea8e50c1f6a
+ issue824.vhd ghdl=0 nvc=0
+run regress:issue825 dir=testdata/nvc/test/regress std=93 sha=f478941eb6d08e07
+ issue825.vhd ghdl=0 nvc=0
+run regress:issue826 dir=testdata/nvc/test/regress std=08 sha=c39e4b3cebcb175b
+ issue826.vhd ghdl=0 nvc=0
+run regress:issue827 dir=testdata/nvc/test/regress std=08 sha=322d34cb2e944cf2
+ issue827.vhd ghdl=0 nvc=0
+run regress:issue831 dir=testdata/nvc/test/regress std=08 sha=65eee301615a6c3e
+ issue831.vhd ghdl=0 nvc=0
+run regress:issue829 dir=testdata/nvc/test/regress std=93 sha=db8548126faafe94
+ issue829.vhd ghdl=0 nvc=0
+run regress:issue839 dir=testdata/nvc/test/regress std=93 sha=306162a5a2f15e63
+ issue839.vhd ghdl=0 nvc=0
+run regress:issue840 dir=testdata/nvc/test/regress std=93 sha=34f70f283dfefd20
+ issue840.vhd ghdl=0 nvc=0
+run regress:issue842 dir=testdata/nvc/test/regress std=08 sha=c9ac6e97f01a0d5c
+ issue842.vhd ghdl=0 nvc=0
+run regress:conv11 dir=testdata/nvc/test/regress std=93 sha=b5ba09ed2ca869fa
+ conv11.vhd ghdl=0 nvc=0
+run regress:conv12 dir=testdata/nvc/test/regress std=93 sha=a8fd561e13e17043
+ conv12.vhd ghdl=0 nvc=0
+run regress:issue843 dir=testdata/nvc/test/regress std=08 sha=f063b230ebc1669d
+ issue843.vhd ghdl=0 nvc=0
+run regress:bounds43 dir=testdata/nvc/test/regress std=93 sha=e1efa035682e7036
+ bounds43.vhd ghdl=0 nvc=0
+run regress:signal35 dir=testdata/nvc/test/regress std=08 sha=0f6769fb655b51c8
+ signal35.vhd ghdl=1@11,12 nvc=0
+run regress:comp3 dir=testdata/nvc/test/regress std=93 sha=ccbfa88a4bc238d5
+ comp3.vhd ghdl=0 nvc=0
+run regress:conv13 dir=testdata/nvc/test/regress std=93 sha=307503abd9cf2d69
+ conv13.vhd ghdl=0 nvc=0
+run regress:wave9 dir=testdata/nvc/test/regress std=93 sha=56d56832ebfbbe2e
+ wave9.vhd ghdl=0 nvc=0
+run regress:wave10 dir=testdata/nvc/test/regress std=93 sha=d184da2b64dcac6f
+ wave10.vhd ghdl=0 nvc=0
+run regress:driver20 dir=testdata/nvc/test/regress std=93 sha=d1ed657600b33b61
+ driver20.vhd ghdl=0 nvc=0
+run regress:driver21 dir=testdata/nvc/test/regress std=93 sha=087a370a0be17325
+ driver21.vhd ghdl=0 nvc=0
+run regress:ename7 dir=testdata/nvc/test/regress std=08 sha=f6bd1bbd9918609f
+ ename7.vhd ghdl=0 nvc=0
+run regress:issue844 dir=testdata/nvc/test/regress std=08 sha=170557b6b016e565
+ issue844.vhd ghdl=0 nvc=0
+run regress:conv14 dir=testdata/nvc/test/regress std=08 sha=a0a849a61f50dc1a
+ conv14.vhd ghdl=0 nvc=0
+run regress:wait27 dir=testdata/nvc/test/regress std=93 sha=459800828e752cc3
+ wait27.vhd ghdl=0 nvc=0
+run regress:issue851 dir=testdata/nvc/test/regress std=08 sha=1d2ff06ae85e34dc
+ issue851.vhd ghdl=0 nvc=0
+run regress:issue852 dir=testdata/nvc/test/regress std=19 sha=f7ea9c6bac170614
+ issue852.vhd ghdl=1@25 nvc=0
+run regress:wave11 dir=testdata/nvc/test/regress std=08 sha=db90ef9728b5b2ca
+ wave11.vhd ghdl=1@26 nvc=0
+run regress:issue654 dir=testdata/nvc/test/regress std=08 sha=601af5431d52015d
+ issue654.vhd ghdl=1@26,30~,70,72~ nvc=0
+run regress:issue854 dir=testdata/nvc/test/regress std=19 sha=f962c730ce52ddae
+ issue854.vhd ghdl=0 nvc=0
+run regress:ename8 dir=testdata/nvc/test/regress std=08 sha=6a7679acd5e1dddc
+ ename8.vhd ghdl=0 nvc=0
+run regress:issue856 dir=testdata/nvc/test/regress std=19 sha=afb076ad90e051b4
+ issue856.vhd ghdl=2 nvc=0
+run regress:driver22 dir=testdata/nvc/test/regress std=19 sha=3eade9774dff89df
+ driver22.vhd ghdl=2 nvc=0
+run regress:vhpi12 dir=testdata/nvc/test/regress std=93 sha=c0a59f52cd119d37
+ vhpi12.vhd ghdl=0 nvc=0
+run regress:issue862 dir=testdata/nvc/test/regress std=08 sha=166ac9ca0ac2f342
+ issue862.vhd -frelaxed ghdl=1@24,25 nvc=0
+run regress:issue858 dir=testdata/nvc/test/regress std=08 sha=350cf0f4ef5e533f
+ issue858.vhd ghdl=0 nvc=0
+run regress:vhpi13 dir=testdata/nvc/test/regress std=93 sha=aa8a5879d85811bc
+ vhpi13.vhd ghdl=0 nvc=0
+run regress:issue873 dir=testdata/nvc/test/regress std=93 sha=938b9738b8f39ce7
+ issue873.vhd ghdl=0 nvc=0
+run regress:array19 dir=testdata/nvc/test/regress std=93 sha=1dc89e2bac9630a5
+ array19.vhd ghdl=0 nvc=0
+run regress:issue874 dir=testdata/nvc/test/regress std=08 sha=690881369522fa56
+ issue874.vhd ghdl=0 nvc=0
+run regress:vhpi14 dir=testdata/nvc/test/regress std=93 sha=d704ab5519c32c40
+ vhpi14.vhd ghdl=1@12,18,26,32,38,51,57,63,69 nvc=0
+run regress:issue877 dir=testdata/nvc/test/regress std=08 sha=4227aeb7e9571437
+ issue877.vhd ghdl=0 nvc=0
+run regress:issue878 dir=testdata/nvc/test/regress std=08 sha=1c9438da735728cd
+ issue878.vhd ghdl=0 nvc=0
+run regress:issue881 dir=testdata/nvc/test/regress std=08 sha=dea4e6578817159f
+ issue881.vhd ghdl=2 nvc=0
+run regress:issue884 dir=testdata/nvc/test/regress std=08 sha=d5432c0b3d7fab60
+ issue884.vhd ghdl=0 nvc=0
+run regress:issue885 dir=testdata/nvc/test/regress std=93 sha=a9f2689caccbebe1
+ issue885.vhd ghdl=0 nvc=0
+run regress:conf4 dir=testdata/nvc/test/regress std=93 sha=c4fb72b857f29477
+ conf4.vhd ghdl=0 nvc=0
+run regress:conf5 dir=testdata/nvc/test/regress std=08 sha=c313171b95ac3f83
+ conf5.vhd ghdl=1@68,72 nvc=0
+run regress:gentype8 dir=testdata/nvc/test/regress std=08 sha=34894b28bdd24b9a
+ gentype8.vhd ghdl=1@34 nvc=0
+run regress:gentype9 dir=testdata/nvc/test/regress std=08 sha=162e8b4e679e686b
+ gentype9.vhd ghdl=1@64 nvc=0
+run regress:genpack17 dir=testdata/nvc/test/regress std=08 sha=efe09f28cfa4e289
+ genpack17.vhd ghdl=1@41,52,54,79 nvc=0
+run regress:genpack18 dir=testdata/nvc/test/regress std=08 sha=20e9be6847b72868
+ genpack18.vhd ghdl=1@23,58,60,85 nvc=0
+run regress:implicit6 dir=testdata/nvc/test/regress std=93 sha=0017a1d8d6d2c32e
+ implicit6.vhd ghdl=0 nvc=0
+run regress:bounds44 dir=testdata/nvc/test/regress std=08 sha=a2f688a389770a90
+ bounds44.vhd ghdl=1@13,14 nvc=0
+run regress:issue887 dir=testdata/nvc/test/regress std=93 sha=573ba50f0e485b74
+ issue887.vhd ghdl=0 nvc=0
+run regress:issue890 dir=testdata/nvc/test/regress std=08 sha=65eaf5a57e1d5ff2
+ issue890.vhd ghdl=0 nvc=0
+run regress:vhpi15 dir=testdata/nvc/test/regress std=93 sha=078007e89b18e083
+ vhpi15.vhd ghdl=0 nvc=0
+run regress:attr21 dir=testdata/nvc/test/regress std=02 sha=da1c36ec063fb0c5
+ attr21.vhd ghdl=1@25 nvc=0
+run regress:issue894 dir=testdata/nvc/test/regress std=08 sha=4b0a0e3145275882
+ issue894.vhd ghdl=0 nvc=0
+run regress:real6 dir=testdata/nvc/test/regress std=93 sha=98518011778ed826
+ real6.vhd ghdl=0 nvc=0
+run regress:integer3 dir=testdata/nvc/test/regress std=08 sha=66d643f21143a27c
+ integer3.vhd ghdl=0 nvc=0
+run regress:wait28 dir=testdata/nvc/test/regress std=93 sha=9292e04eabb99808
+ wait28.vhd ghdl=1@2,27 nvc=0
+run regress:guard4 dir=testdata/nvc/test/regress std=93 sha=e2388120a937afda
+ guard4.vhd ghdl=0 nvc=0
+run regress:signal36 dir=testdata/nvc/test/regress std=08 sha=b23d1a7c84732720
+ signal36.vhd ghdl=1@15,16 nvc=0
+run regress:issue899 dir=testdata/nvc/test/regress std=08 sha=ab6bae3d271193f3
+ issue899.vhd ghdl=0 nvc=0
+run regress:file13 dir=testdata/nvc/test/regress std=93 sha=56e4f722e661621a
+ file13.vhd ghdl=0 nvc=0
+run regress:file14 dir=testdata/nvc/test/regress std=93 sha=08b3b842295f705e
+ file14.vhd ghdl=0 nvc=0
+run regress:file15 dir=testdata/nvc/test/regress std=93 sha=a1db754bbb0845db
+ file15.vhd ghdl=0 nvc=0
+run regress:issue903 dir=testdata/nvc/test/regress std=93 sha=3159f460516cc29a
+ issue903.vhd ghdl=0 nvc=0
+run regress:issue904 dir=testdata/nvc/test/regress std=93 sha=837d0bb7da1622b2
+ issue904.vhd -fpsl ghdl=0 nvc=0
+run regress:issue906 dir=testdata/nvc/test/regress std=93 sha=8a575ca36426a331
+ issue906.vhd ghdl=0 nvc=0
+run regress:implicit7 dir=testdata/nvc/test/regress std=93 sha=fd5dd04815a3689f
+ implicit7.vhd ghdl=1@14 nvc=0
+run regress:issue908 dir=testdata/nvc/test/regress std=08 sha=a8158312520dc4d5
+ issue908.vhd ghdl=0 nvc=0
+run regress:issue901 dir=testdata/nvc/test/regress std=93 sha=7d2b25f6d01c2e6e
+ issue901.vhd ghdl=0 nvc=0
+run regress:psl8 dir=testdata/nvc/test/regress std=93 sha=e02069f57bf9a8d6
+ psl8.vhd -fpsl ghdl=0 nvc=0
+run regress:issue921 dir=testdata/nvc/test/regress std=08 sha=1f12ba0bd505577b
+ issue921.vhd ghdl=0 nvc=0
+run regress:open2 dir=testdata/nvc/test/regress std=93 sha=4d1f6c2802225aa7
+ open2.vhd ghdl=0 nvc=0
+run regress:implicit8 dir=testdata/nvc/test/regress std=93 sha=1796e9b117e835cb
+ implicit8.vhd ghdl=0 nvc=0
+run regress:issue924 dir=testdata/nvc/test/regress std=19 sha=81c550a04a37cbaf
+ issue924.vhd ghdl=0 nvc=0
+run regress:issue925 dir=testdata/nvc/test/regress std=08 sha=a89eea2c7b30df82
+ issue925.vhd ghdl=2 nvc=0
+run regress:issue923 dir=testdata/nvc/test/regress std=19 sha=8ea704f0f162b911
+ issue923.vhd ghdl=0 nvc=0
+run regress:record39 dir=testdata/nvc/test/regress std=08 sha=bcaba66a23855b10
+ record39.vhd ghdl=0 nvc=0
+run regress:force3 dir=testdata/nvc/test/regress std=08 sha=fa204d5b430e2290
+ force3.vhd ghdl=0 nvc=0
+run regress:issue931 dir=testdata/nvc/test/regress std=08 sha=294b37f0988b816d
+ issue931.vhd ghdl=0 nvc=0
+run regress:implicit9 dir=testdata/nvc/test/regress std=93 sha=54d62678094d7ac1
+ implicit9.vhd ghdl=1@19,23,27,31,35,39,43,49,52 nvc=0
+run regress:issue932 dir=testdata/nvc/test/regress std=19 sha=8f9f4f5b662adeea
+ issue932.vhd ghdl=1@22,36 nvc=0
+run regress:bounds45 dir=testdata/nvc/test/regress std=08 sha=f0055148f9af0754
+ bounds45.vhd ghdl=0 nvc=0
+run regress:synopsys2 dir=testdata/nvc/test/regress std=08 sha=31abfed68b52c61e
+ synopsys2.vhd ghdl=1@3,8~ nvc=0
+run regress:synopsys3 dir=testdata/nvc/test/regress std=93 sha=95927d442c7166c7
+ synopsys3.vhd ghdl=1@3,8~ nvc=0
+run regress:issue941 dir=testdata/nvc/test/regress std=93 sha=b66338655df498a2
+ issue941.vhd ghdl=0 nvc=0
+run regress:mixed2 dir=testdata/nvc/test/regress std=93 sha=c3d366b375fdd5e7
+ mixed2.vhd ghdl=0 nvc=0
+run regress:issue943 dir=testdata/nvc/test/regress std=08 sha=a690d3ceb5fdeb81
+ issue943.vhd ghdl=0 nvc=0
+run regress:mixed3 dir=testdata/nvc/test/regress std=93 sha=072bac5cf2a82482
+ mixed3.vhd ghdl=0 nvc=0
+run regress:issue946 dir=testdata/nvc/test/regress std=08 sha=c813f4541fdda833
+ issue946.vhd ghdl=0 nvc=0
+run regress:issue954 dir=testdata/nvc/test/regress std=08 sha=64243524c574d772
+ issue954.vhd ghdl=0 nvc=0
+run regress:issue950 dir=testdata/nvc/test/regress std=08 sha=ab3ddfbee22fc481
+ issue950.vhd ghdl=0 nvc=0
+run regress:issue957 dir=testdata/nvc/test/regress std=08 sha=b376f090bcba0327
+ issue957.vhd ghdl=0 nvc=0
+run regress:signal37 dir=testdata/nvc/test/regress std=93 sha=586a1110d72c3a12
+ signal37.vhd ghdl=0 nvc=0
+run regress:issue960 dir=testdata/nvc/test/regress std=93 sha=d8855254dc86f5b6
+ issue960.vhd ghdl=0 nvc=0
+run regress:issue962 dir=testdata/nvc/test/regress std=93 sha=dab0b76e1b330329
+ issue962.vhd ghdl=0 nvc=0
+run regress:issue963 dir=testdata/nvc/test/regress std=93 sha=796aad4892f1cd30
+ issue963.vhd ghdl=0 nvc=0
+run regress:ename9 dir=testdata/nvc/test/regress std=08 sha=22a1e679af65093a
+ ename9.vhd ghdl=0 nvc=0
+run regress:ename10 dir=testdata/nvc/test/regress std=08 sha=98d7c09168b2a9f4
+ ename10.vhd ghdl=0 nvc=0
+run regress:ename11 dir=testdata/nvc/test/regress std=08 sha=cf08529547ebcce7
+ ename11.vhd ghdl=0 nvc=0
+run regress:ename12 dir=testdata/nvc/test/regress std=08 sha=0e5c2db3e8809f17
+ ename12.vhd ghdl=0 nvc=0
+run regress:ename13 dir=testdata/nvc/test/regress std=08 sha=99c81c65e13af454
+ ename13.vhd ghdl=0 nvc=0
+run regress:ename14 dir=testdata/nvc/test/regress std=08 sha=7565b99d716be6ce
+ ename14.vhd ghdl=0 nvc=0
+run regress:issue907 dir=testdata/nvc/test/regress std=08 sha=7933d7202adb2d30
+ issue907.vhd ghdl=0 nvc=0
+run regress:ename15 dir=testdata/nvc/test/regress std=08 sha=1be54bf41a5cda59
+ ename15.vhd ghdl=0 nvc=0
+run regress:wave12 dir=testdata/nvc/test/regress std=93 sha=f361ac4ae45837e8
+ wave12.vhd ghdl=0 nvc=0
+run regress:issue968 dir=testdata/nvc/test/regress std=93 sha=186c4c72e56fcd32
+ issue968.vhd ghdl=0 nvc=0
+run regress:issue971 dir=testdata/nvc/test/regress std=08 sha=e5a3f9c2159f1aa5
+ issue971.vhd ghdl=0 nvc=0
+run regress:ieee17 dir=testdata/nvc/test/regress std=93 sha=f14e49acf2cc49a4
+ ieee17.vhd ghdl=0 nvc=0
+run regress:issue978 dir=testdata/nvc/test/regress std=93 sha=c142e43be6ff166d
+ issue978.vhd ghdl=0 nvc=0
+run regress:issue985 dir=testdata/nvc/test/regress std=08 sha=c624142f8d945fbd
+ issue985.vhd ghdl=0 nvc=0
+run regress:issue970 dir=testdata/nvc/test/regress std=19 sha=1501e12fca62535c
+ issue970.vhd ghdl=1@15,18,19,22,23,24,27,28,32,33,34,36,37,38,39,41,42,44,46,49,50,52,54,56,57,58,59,60,62,66,68,69,71,72,77,78,79,81,82,84,85,86,88 nvc=0
+run regress:issue983 dir=testdata/nvc/test/regress std=93 sha=68d00e61f231839e
+ issue983.vhd -frelaxed ghdl=0 nvc=0
+run regress:issue972 dir=testdata/nvc/test/regress std=08 sha=cb70429ac4693018
+ issue972.vhd ghdl=1@24 nvc=0
+run regress:issue979 dir=testdata/nvc/test/regress std=08 sha=29faebc6cef5adfb
+ issue979.vhd ghdl=0 nvc=0
+run regress:psl9 dir=testdata/nvc/test/regress std=08 sha=2e4de00e8dc3b256
+ psl9.vhd ghdl=0 nvc=0
+run regress:psl10 dir=testdata/nvc/test/regress std=08 sha=bd61fabcbb0b2b04
+ psl10.vhd ghdl=0 nvc=0
+run regress:issue988 dir=testdata/nvc/test/regress std=93 sha=fdc3d26bc4cfafdc
+ issue988.vhd ghdl=1@10 nvc=0
+run regress:psl11 dir=testdata/nvc/test/regress std=08 sha=b00bd9d5bb013827
+ psl11.vhd ghdl=0 nvc=0
+run regress:cover24 dir=testdata/nvc/test/regress std=93 sha=5802167830060a8c
+ cover24.vhd ghdl=0 nvc=0
+run regress:conv15 dir=testdata/nvc/test/regress std=93 sha=01da30dd4d86d78a
+ conv15.vhd ghdl=0 nvc=0
+run regress:cover25 dir=testdata/nvc/test/regress std=93 sha=fb1ac15a208b3675
+ cover25.vhd ghdl=1@5,6,12,13,15,16,17,20,33,35~ nvc=0
+run regress:issue1035 dir=testdata/nvc/test/regress std=08 sha=99b35c654f6aa25c
+ issue1035.vhd ghdl=0 nvc=0
+run regress:issue1043 dir=testdata/nvc/test/regress std=93 sha=d9b487c94d42d47a
+ issue1043.vhd ghdl=2 nvc=0
+run regress:psl12 dir=testdata/nvc/test/regress std=08 sha=76103b37d7a7e971
+ psl12.vhd ghdl=1@23 nvc=0
+run regress:psl13 dir=testdata/nvc/test/regress std=93 sha=cd1ac1339d743561
+ psl13.vhd -fpsl ghdl=1@23 nvc=0
+run regress:issue1045 dir=testdata/nvc/test/regress std=93 sha=771ffa936e675314
+ issue1045.vhd ghdl=0 nvc=0
+run regress:issue1044 dir=testdata/nvc/test/regress std=93 sha=8eb0c46707fce3d4
+ issue1044.vhd ghdl=0 nvc=0
+run regress:issue1030 dir=testdata/nvc/test/regress std=08 sha=b3a89f8cb5d93ccd
+ issue1030.vhd ghdl=0 nvc=0
+run regress:issue1036 dir=testdata/nvc/test/regress std=93 sha=8c45a3cd8c220956
+ issue1036.vhd ghdl=0 nvc=0
+run regress:issue1057 dir=testdata/nvc/test/regress std=08 sha=766beb22a97c5426
+ issue1057.vhd ghdl=0 nvc=0
+run regress:issue1062 dir=testdata/nvc/test/regress std=08 sha=2bb495c1c5000092
+ issue1062.vhd ghdl=0 nvc=0
+run regress:psl14 dir=testdata/nvc/test/regress std=93 sha=4fa986db31304c8f
+ psl14.vhd -fpsl ghdl=0 nvc=0
+run regress:issue1074 dir=testdata/nvc/test/regress std=19 sha=19f118eba316402e
+ issue1074.vhd ghdl=0 nvc=0
+run regress:psl15 dir=testdata/nvc/test/regress std=93 sha=5adc7b5658ce3aad
+ psl15.vhd -fpsl ghdl=0 nvc=0
+run regress:psl16 dir=testdata/nvc/test/regress std=93 sha=e923c6b0a54c6551
+ psl16.vhd -fpsl ghdl=0 nvc=0
+run regress:issue1071 dir=testdata/nvc/test/regress std=08 sha=c53745fe0ca6a5ac
+ issue1071.vhd ghdl=0 nvc=0
+run regress:issue1079 dir=testdata/nvc/test/regress std=93 sha=0c8a66b02863101b
+ issue1079.vhd ghdl=0 nvc=0
+run regress:psl17 dir=testdata/nvc/test/regress std=93 sha=96fd3dd8536b578e
+ psl17.vhd -fpsl ghdl=1@23 nvc=0
+run regress:ename16 dir=testdata/nvc/test/regress std=08 sha=5951fdeba55b2993
+ ename16.vhd ghdl=0 nvc=0
+run regress:issue1094 dir=testdata/nvc/test/regress std=08 sha=995cfe1a30b52ef1
+ issue1094.vhd ghdl=0 nvc=0
+run regress:issue1060 dir=testdata/nvc/test/regress std=93 sha=ef10b1964e184c1e
+ issue1060.vhd ghdl=0 nvc=0
+run regress:guard5 dir=testdata/nvc/test/regress std=93 sha=27411faf14e9d6c1
+ guard5.vhd ghdl=0 nvc=0
+run regress:driver23 dir=testdata/nvc/test/regress std=08 sha=5a1b5fba69fe10c8
+ driver23.vhd ghdl=0 nvc=0
+run regress:conv16 dir=testdata/nvc/test/regress std=08 sha=f064b47f10f0060a
+ conv16.vhd ghdl=0 nvc=0
+run regress:conv17 dir=testdata/nvc/test/regress std=93 sha=64d8101bcc9eae5c
+ conv17.vhd ghdl=0 nvc=0
+run regress:conv18 dir=testdata/nvc/test/regress std=93 sha=6aa3852e1a43ab24
+ conv18.vhd ghdl=0 nvc=0
+run regress:ename17 dir=testdata/nvc/test/regress std=08 sha=7ef131aa3f756cbb
+ ename17.vhd ghdl=0 nvc=0
+run regress:issue1117 dir=testdata/nvc/test/regress std=08 sha=782a80388b4935ae
+ issue1117.vhd -fpsl ghdl=0 nvc=0
+run regress:issue1125 dir=testdata/nvc/test/regress std=08 sha=a60f12a90c2ba543
+ issue1125.vhd ghdl=0 nvc=0
+run regress:issue1137 dir=testdata/nvc/test/regress std=93 sha=0937ed8ee8b2da81
+ issue1137.vhd ghdl=0 nvc=0
+run regress:psl18 dir=testdata/nvc/test/regress std=08 sha=8354eb8148bdd776
+ psl18.vhd ghdl=0 nvc=0
+run regress:psl19 dir=testdata/nvc/test/regress std=93 sha=88b8db6142372f7c
+ psl19.vhd -fpsl ghdl=1@37 nvc=0
+run regress:psl20 dir=testdata/nvc/test/regress std=93 sha=7125cab27415a724
+ psl20.vhd -fpsl ghdl=1@17 nvc=0
+run regress:debug4 dir=testdata/nvc/test/regress std=93 sha=eef2399d9e568297
+ debug4.vhd ghdl=1@25 nvc=0
+run regress:issue1150 dir=testdata/nvc/test/regress std=93 sha=2fb03662ca4cc5be
+ issue1150.vhd -fpsl ghdl=0 nvc=0
+run regress:issue1161 dir=testdata/nvc/test/regress std=08 sha=78260d80b4fd1bac
+ issue1161.vhd ghdl=0 nvc=0
+run regress:conv19 dir=testdata/nvc/test/regress std=08 sha=b41f41ad2105d80a
+ conv19.vhd ghdl=1@29,30 nvc=0
+run regress:issue1164 dir=testdata/nvc/test/regress std=93 sha=7f63681fd74ec4c9
+ issue1164.vhd ghdl=1@30,36 nvc=0
+run regress:issue1171 dir=testdata/nvc/test/regress std=08 sha=ce6dba393689ba0a
+ issue1171.vhd ghdl=0 nvc=0
+run regress:genpack19 dir=testdata/nvc/test/regress std=08 sha=2c759b0c09780e02
+ genpack19.vhd ghdl=0 nvc=0
+run regress:rand1 dir=testdata/nvc/test/regress std=93 sha=d05b2d72f46b419b
+ rand1.vhd ghdl=1@4,5,13,14,15,16,17,18,19,20,21,22 nvc=0
+run regress:psl21 dir=testdata/nvc/test/regress std=93 sha=c7a3e2cdc17d5652
+ psl21.vhd -fpsl ghdl=1@29,30,31,34 nvc=0
+run regress:agg11 dir=testdata/nvc/test/regress std=08 sha=fd8eaaa399a5609a
+ agg11.vhd ghdl=0 nvc=0
+run regress:agg12 dir=testdata/nvc/test/regress std=08 sha=bc6e33b1979fff3f
+ agg12.vhd ghdl=0 nvc=0
+run regress:agg13 dir=testdata/nvc/test/regress std=08 sha=66466735dab51e58
+ agg13.vhd ghdl=0 nvc=0
+run regress:agg14 dir=testdata/nvc/test/regress std=08 sha=94463509a182ccb2
+ agg14.vhd ghdl=0 nvc=0
+run regress:proc13 dir=testdata/nvc/test/regress std=02 sha=8a90ce1658d905a5
+ proc13.vhd ghdl=2 nvc=0
+run regress:assert13 dir=testdata/nvc/test/regress std=93 sha=e88a10f6c82c1bf7
+ assert13.vhd ghdl=0 nvc=0
+run regress:issue1185 dir=testdata/nvc/test/regress std=08 sha=581f7be07cb82d9c
+ issue1185.vhd ghdl=1@77,80,81,83 nvc=0
+run regress:issue1186 dir=testdata/nvc/test/regress std=08 sha=ecaa4c0552adf77c
+ issue1186.vhd ghdl=0 nvc=0
+run regress:issue1177 dir=testdata/nvc/test/regress std=93 sha=0021e8fcf3514d5b
+ issue1177.vhd ghdl=0 nvc=0
+run regress:issue1192 dir=testdata/nvc/test/regress std=93 sha=fe96aca68e84337f
+ issue1192.vhd ghdl=0 nvc=0
+run regress:issue1143 dir=testdata/nvc/test/regress std=08 sha=010570fac9565bed
+ issue1143.vhd ghdl=0 nvc=0
+run regress:real7 dir=testdata/nvc/test/regress std=08 sha=8e013497bf5d85d3
+ real7.vhd ghdl=0 nvc=0
+run regress:issue1208 dir=testdata/nvc/test/regress std=19 sha=f4b224d9ab7e473d
+ issue1208.vhd ghdl=0 nvc=0
+run regress:ieee18 dir=testdata/nvc/test/regress std=08 sha=66bbff9ea774f82c
+ ieee18.vhd ghdl=0 nvc=0
+run regress:issue1213 dir=testdata/nvc/test/regress std=08 sha=3e670baca9ca002b
+ issue1213.vhd ghdl=0 nvc=0
+run regress:issue1218 dir=testdata/nvc/test/regress std=93 sha=ecd75cd3226bbe88
+ issue1218.vhd ghdl=1@4,5,12,13,15,16,17,18 nvc=0
+run regress:mixed4 dir=testdata/nvc/test/regress std=93 sha=ee0feff094706bd0
+ mixed4.vhd ghdl=0 nvc=0
+run regress:issue1229 dir=testdata/nvc/test/regress std=93 sha=911bed0e53bad96a
+ issue1229.vhd ghdl=0 nvc=0
+run regress:issue1231 dir=testdata/nvc/test/regress std=08 sha=cad267ad073f986b
+ issue1231.vhd ghdl=0 nvc=0
+run regress:conv20 dir=testdata/nvc/test/regress std=08 sha=33edcabbd6bb669c
+ conv20.vhd ghdl=0 nvc=0
+run regress:issue1233 dir=testdata/nvc/test/regress std=93 sha=cb1fe533930200dd
+ issue1233.vhd ghdl=1@10,16 nvc=0
+run regress:conv21 dir=testdata/nvc/test/regress std=08 sha=fae6d28c34789d19
+ conv21.vhd ghdl=0 nvc=0
+run regress:signed1 dir=testdata/nvc/test/regress std=93 sha=daca15c7d6c1cd6e
+ signed1.vhd ghdl=0 nvc=0
+run regress:issue1240 dir=testdata/nvc/test/regress std=08 sha=c15ee153e1edad54
+ issue1240.vhd ghdl=0 nvc=0
+run regress:array20 dir=testdata/nvc/test/regress std=08 sha=9b375b4f0dd1a5d1
+ array20.vhd ghdl=0 nvc=0
+run regress:issue1175 dir=testdata/nvc/test/regress std=93 sha=354d5bb618268e17
+ issue1175.vhd -frelaxed ghdl=0 nvc=0
+run regress:vhpi16 dir=testdata/nvc/test/regress std=93 sha=b38564702e3bb85c
+ vhpi16.vhd ghdl=0 nvc=0
+run regress:view7 dir=testdata/nvc/test/regress std=19 sha=a463009fe39426e1
+ view7.vhd ghdl=2 nvc=0
+run regress:issue1260 dir=testdata/nvc/test/regress std=08 sha=22fa89737027580b
+ issue1260.vhd ghdl=0 nvc=0
+run regress:mixed5 dir=testdata/nvc/test/regress std=93 sha=9f9376917a80e878
+ mixed5.vhd ghdl=0 nvc=0
+run regress:issue1266 dir=testdata/nvc/test/regress std=08 sha=56f9ed69c1c4dc9d
+ issue1266.vhd ghdl=0 nvc=0
+run regress:issue1270 dir=testdata/nvc/test/regress std=93 sha=8b8ee6084c60f70a
+ issue1270.vhd ghdl=0 nvc=0
+run regress:issue1267 dir=testdata/nvc/test/regress std=08 sha=67d8b2add8f9ef68
+ issue1267.vhd ghdl=0 nvc=0
+run regress:issue1273 dir=testdata/nvc/test/regress std=08 sha=1d4f26dd36979600
+ issue1273.vhd ghdl=0 nvc=0
+run regress:issue1272 dir=testdata/nvc/test/regress std=08 sha=289c05be5a540725
+ issue1272.vhd ghdl=0 nvc=0
+run regress:issue1277 dir=testdata/nvc/test/regress std=08 sha=0bee29c2f8874e96
+ issue1277.vhd ghdl=0 nvc=0
+run regress:issue1281 dir=testdata/nvc/test/regress std=08 sha=7a337fb54844460d
+ issue1281.vhd ghdl=0 nvc=0
+run regress:issue1269 dir=testdata/nvc/test/regress std=08 sha=b8f2e4e9d66d226a
+ issue1269.vhd ghdl=0 nvc=0
+run regress:issue1253 dir=testdata/nvc/test/regress std=08 sha=2234adbd98477806
+ issue1253.vhd ghdl=0 nvc=0
+run regress:issue1285 dir=testdata/nvc/test/regress std=08 sha=bf2490b98c512151
+ issue1285.vhd ghdl=0 nvc=0
+run regress:cover28 dir=testdata/nvc/test/regress std=93 sha=2c954a55ab73d6cc
+ cover28.vhd ghdl=0 nvc=0
+run regress:issue1274 dir=testdata/nvc/test/regress std=19 sha=14c81a891fef78af
+ issue1274.vhd ghdl=1@11,19,21 nvc=0
+run regress:wait29 dir=testdata/nvc/test/regress std=93 sha=6b111beeec0b0640
+ wait29.vhd ghdl=0 nvc=0
+run regress:wait30 dir=testdata/nvc/test/regress std=93 sha=45563a9199e0379e
+ wait30.vhd ghdl=0 nvc=0
+run regress:mixed6 dir=testdata/nvc/test/regress std=08 sha=73fea9c77970da96
+ mixed6.vhd ghdl=0 nvc=0
+run regress:issue1294 dir=testdata/nvc/test/regress std=08 sha=23f0d42bbc2c0c3b
+ issue1294.vhd ghdl=0 nvc=0
+run regress:issue1301 dir=testdata/nvc/test/regress std=93 sha=e4a9f16fbd6ac3e4
+ issue1301.vhd ghdl=1@11 nvc=0
+run regress:mixed7 dir=testdata/nvc/test/regress std=08 sha=5f95ca26a4cde991
+ mixed7.vhd ghdl=0 nvc=0
+run regress:psl22 dir=testdata/nvc/test/regress std=93 sha=1b365ce5df969d5b
+ psl22.vhd -fpsl ghdl=1@20,23 nvc=0
+run regress:psl23 dir=testdata/nvc/test/regress std=93 sha=e2498f88386d6db7
+ psl23.vhd -fpsl ghdl=0 nvc=0
+run regress:psl24 dir=testdata/nvc/test/regress std=93 sha=45b66ab6b0e3f503
+ psl24.vhd -fpsl ghdl=1@14 nvc=0
+run regress:issue1313 dir=testdata/nvc/test/regress std=08 sha=6edb41422d7d717a
+ issue1313.vhd ghdl=0 nvc=0
+run regress:issue1317 dir=testdata/nvc/test/regress std=08 sha=0860f7a978a3501b
+ issue1317.vhd ghdl=0 nvc=0
+run regress:issue1332 dir=testdata/nvc/test/regress std=93 sha=a53ea48917d868e6
+ issue1332.vhd ghdl=0 nvc=0
+run regress:issue1334 dir=testdata/nvc/test/regress std=08 sha=3a7513bdab491dcb
+ issue1334.vhd ghdl=0 nvc=0
+run regress:issue1348 dir=testdata/nvc/test/regress std=93 sha=43376776f3c3c63f
+ issue1348.vhd ghdl=0 nvc=0
+run regress:issue1351 dir=testdata/nvc/test/regress std=08 sha=f0303bb13d9b94b1
+ issue1351.vhd ghdl=0 nvc=0
+run regress:elab41 dir=testdata/nvc/test/regress std=08 sha=1ec5824f42bc4eab
+ elab41.vhd ghdl=1@27 nvc=0
+run regress:issue1361 dir=testdata/nvc/test/regress std=08 sha=97ca5c15ff7a236e
+ issue1361.vhd ghdl=0 nvc=0
+run regress:arith6 dir=testdata/nvc/test/regress std=19 sha=99928a1536c6ceff
+ arith6.vhd ghdl=0 nvc=0
+run regress:issue1366 dir=testdata/nvc/test/regress std=19 sha=6efb7b9acb868feb
+ issue1366.vhd ghdl=2 nvc=0
+run regress:vlog29 dir=testdata/nvc/test/regress std=08 sha=2ff6f45a2c777e65
+ vlog29.vhd ghdl=0 nvc=0
+run regress:ieee19 dir=testdata/nvc/test/regress std=08 sha=6e2f3d6ec04f77a8
+ ieee19.vhd ghdl=0 nvc=0
+run regress:mixed8 dir=testdata/nvc/test/regress std=93 sha=390d407df2afc668
+ mixed8.vhd ghdl=0 nvc=0
+run regress:vhpi17 dir=testdata/nvc/test/regress std=93 sha=cdbe8d7b1a2b20dd
+ vhpi17.vhd ghdl=0 nvc=0
+run regress:issue1362 dir=testdata/nvc/test/regress std=93 sha=f78c1402f5186dd5
+ issue1362.vhd ghdl=0 nvc=0
+run regress:issue1381 dir=testdata/nvc/test/regress std=19 sha=e06597166ed93052
+ issue1381.vhd ghdl=1@11,15,21,25,28,31,32,40 nvc=0
+run regress:issue1386 dir=testdata/nvc/test/regress std=93 sha=aa2cc851ce9e812c
+ issue1386.vhd ghdl=0 nvc=0
+run regress:issue1388 dir=testdata/nvc/test/regress std=19 sha=9878bcd6df2f5e88
+ issue1388.vhd ghdl=1@11,14,15,18,19,20,23,24,28,29,30,32,33,34,35,37,38,40,42,45,46,48,50,52,53,54,55,56,59,60,63,64,69,73,75,76,78,79,84,85,86,88,89,91,92,93,95 nvc=0
+run regress:issue1393 dir=testdata/nvc/test/regress std=19 sha=5c4d7def1bd7efdb
+ issue1393.vhd ghdl=1@21 nvc=0
+run regress:issue1396 dir=testdata/nvc/test/regress std=93 sha=b18392d3fd6bd250
+ issue1396.vhd ghdl=0 nvc=0
+run regress:issue1389 dir=testdata/nvc/test/regress std=93 sha=96c22d4ce3bd7d7e
+ issue1389.vhd ghdl=0 nvc=0
+run regress:issue1406 dir=testdata/nvc/test/regress std=08 sha=5d3b95d57347955d
+ issue1406.vhd ghdl=0 nvc=0
+run regress:issue1400 dir=testdata/nvc/test/regress std=93 sha=07986948afa40b28
+ issue1400.vhd -fpsl ghdl=0 nvc=0
+run regress:issue1405 dir=testdata/nvc/test/regress std=08 sha=cf8f3681fe4fe236
+ issue1405.vhd ghdl=0 nvc=0
+run regress:issue1420 dir=testdata/nvc/test/regress std=08 sha=06021b062167aa49
+ issue1420.vhd ghdl=0 nvc=0
+run regress:vhpi18 dir=testdata/nvc/test/regress std=08 sha=2af2db3374fd12a6
+ vhpi18.vhd ghdl=0 nvc=0
+run regress:issue1424 dir=testdata/nvc/test/regress std=19 sha=02b85e08ddf0ac52
+ issue1424.vhd ghdl=1@23 nvc=0
+run regress:issue1428 dir=testdata/nvc/test/regress std=08 sha=74512031f50a95b5
+ issue1428.vhd ghdl=0 nvc=0
+run regress:vhpi19 dir=testdata/nvc/test/regress std=93 sha=7b2af134cc0464aa
+ vhpi19.vhd ghdl=0 nvc=0
+run regress:reflect6 dir=testdata/nvc/test/regress std=19 sha=68944847222beefc
+ reflect6.vhd ghdl=1@1,6~ nvc=0
+run regress:issue1427 dir=testdata/nvc/test/regress std=08 sha=81d65796fd79ba1c
+ issue1427.vhd ghdl=1@33,34 nvc=0
+run regress:issue1453 dir=testdata/nvc/test/regress std=08 sha=ece54ad38ec523b7
+ issue1453.vhd ghdl=0 nvc=0
+run regress:issue1460 dir=testdata/nvc/test/regress std=19 sha=985ed7afc5ca97a3
+ issue1460.vhd ghdl=1@2,4,6 nvc=0
+run regress:issue1463 dir=testdata/nvc/test/regress std=08 sha=fc856701bb916847
+ issue1463.vhd ghdl=0 nvc=0
+run regress:implicit10 dir=testdata/nvc/test/regress std=93 sha=b03a845d1029d9d2
+ implicit10.vhd ghdl=1@10,11,12,16 nvc=0
+run regress:mixed9 dir=testdata/nvc/test/regress std=08 sha=bde84e837525fd7a
+ mixed9.vhd ghdl=0 nvc=0
+run regress:issue1473 dir=testdata/nvc/test/regress std=93 sha=9e62fefe24eeddff
+ issue1473.vhd ghdl=0 nvc=0
+run regress:issue1394 dir=testdata/nvc/test/regress std=93 sha=8053ae4b1ac5c6bb
+ issue1394.vhd ghdl=0 nvc=0
+run regress:ieee20 dir=testdata/nvc/test/regress std=08 sha=773ee62ef054ee42
+ ieee20.vhd ghdl=0 nvc=0
+run regress:range4 dir=testdata/nvc/test/regress std=19 sha=e7dfe9258a54fd82
+ range4.vhd ghdl=1@14,59,66,72 nvc=0
+run regress:gensub7 dir=testdata/nvc/test/regress std=08 sha=b516888aaffff96a
+ gensub7.vhd ghdl=2 nvc=0
+run regress:issue1476 dir=testdata/nvc/test/regress std=93 sha=80d254949a33e0a9
+ issue1476.vhd ghdl=0 nvc=0
+run regress:issue1472 dir=testdata/nvc/test/regress std=08 sha=a35159aca2569596
+ issue1472.vhd ghdl=0 nvc=0
+run regress:issue1474 dir=testdata/nvc/test/regress std=08 sha=57e2953f04318ede
+ issue1474.vhd ghdl=0 nvc=0
+run regress:issue1494 dir=testdata/nvc/test/regress std=93 sha=43fd6917150f8fdf
+ issue1494.vhd ghdl=1@16 nvc=0
+run regress:issue1505 dir=testdata/nvc/test/regress std=08 sha=47d45efbb306ead8
+ issue1505.vhd ghdl=0 nvc=0
+run regress:issue1512 dir=testdata/nvc/test/regress std=08 sha=4403b2e6fce0784a
+ issue1512.vhd ghdl=0 nvc=0
+run regress:tcl4 dir=testdata/nvc/test/regress std=93 sha=a57cadf39139a0c5
+ tcl4.vhd ghdl=0 nvc=0
+run regress:issue1506 dir=testdata/nvc/test/regress std=08 sha=d379d82425d20a28
+ issue1506.vhd ghdl=0 nvc=0
+run regress:issue1516 dir=testdata/nvc/test/regress std=08 sha=bd51cca324394e0e
+ issue1516.vhd ghdl=0 nvc=0
+run regress:issue1522 dir=testdata/nvc/test/regress std=93 sha=1adb6bc5cfd73571
+ issue1522.vhd ghdl=0 nvc=0
+run regress:issue1529 dir=testdata/nvc/test/regress std=08 sha=da5ede8b0c09d9b6
+ issue1529.vhd ghdl=0 nvc=0
+run regress:issue1541 dir=testdata/nvc/test/regress std=93 sha=477878661e54659d
+ issue1541.vhd ghdl=0 nvc=0
+run regress:issue1539 dir=testdata/nvc/test/regress std=08 sha=5977533f6c104904
+ issue1539.vhd ghdl=0 nvc=0
+run regress:issue1534 dir=testdata/nvc/test/regress std=08 sha=ec9e6909c63cc65a
+ issue1534.vhd ghdl=0 nvc=0
+run regress:issue1544 dir=testdata/nvc/test/regress std=19 sha=cbe257c947d7de31
+ issue1544.vhd ghdl=1@28 nvc=0
+run regress:issue1543 dir=testdata/nvc/test/regress std=08 sha=62b7f2e581fd83fb
+ issue1543.vhd ghdl=0 nvc=0
+run regress:issue1528 dir=testdata/nvc/test/regress std=19 sha=e84460b553dced71
+ issue1528.vhd ghdl=1@30,33~,45~ nvc=0
+run regress:issue1517 dir=testdata/nvc/test/regress std=93 sha=dfc39f922625c447
+ issue1517.vhd ghdl=0 nvc=0
+run regress:issue1559 dir=testdata/nvc/test/regress std=08 sha=68e99d92b4992c04
+ issue1559.vhd ghdl=0 nvc=0
+run regress:issue1562 dir=testdata/nvc/test/regress std=08 sha=0637cb55709f6a66
+ issue1562.vhd ghdl=0 nvc=0
+run regress:issue1576 dir=testdata/nvc/test/regress std=08 sha=502111c861cf5d22
+ issue1576.vhd ghdl=0 nvc=0
+run regress:issue1581 dir=testdata/nvc/test/regress std=93 sha=3e7c731931fbf640
+ issue1581.vhd ghdl=0 nvc=0
+run regress:issue1537 dir=testdata/nvc/test/regress std=93 sha=2904dbbf70cd1a38
+ issue1537.vhd ghdl=0 nvc=0
+run regress:conf6 dir=testdata/nvc/test/regress std=08 sha=c0b9531debd494b3
+ conf6.vhd ghdl=0 nvc=0
+run regress:issue1587 dir=testdata/nvc/test/regress std=08 sha=40c92974dc5527bb
+ issue1587.vhd ghdl=0 nvc=0
+run regress:force4 dir=testdata/nvc/test/regress std=08 sha=890d6cda455bdd42
+ force4.vhd ghdl=0 nvc=0
+run regress:issue1600 dir=testdata/nvc/test/regress std=02 sha=2e6877aec612fd1f
+ issue1600.vhd ghdl=0 nvc=0
+run regress:ename18 dir=testdata/nvc/test/regress std=08 sha=ca490ccef4d1acfe
+ ename18.vhd ghdl=2 nvc=0
+run regress:issue1609 dir=testdata/nvc/test/regress std=08 sha=3c139a18937d9e96
+ issue1609.vhd ghdl=0 nvc=0
+run regress:vhpi20 dir=testdata/nvc/test/regress std=08 sha=708f3bc764e5069d
+ vhpi20.vhd ghdl=0 nvc=0
+run regress:issue1606 dir=testdata/nvc/test/regress std=08 sha=e573287b95655f7b
+ issue1606.vhd ghdl=0 nvc=0
+run regress:vhpi21 dir=testdata/nvc/test/regress std=08 sha=b980feca495a8d34
+ vhpi21.vhd ghdl=0 nvc=0
+run regress:issue1616 dir=testdata/nvc/test/regress std=93 sha=134e979d7cbcee3b
+ issue1616.vhd ghdl=0 nvc=0
+run regress:issue1595 dir=testdata/nvc/test/regress std=08 sha=eaa8f3c7d3d9e1f5
+ issue1595.vhd ghdl=0 nvc=0
+run regress:issue1621 dir=testdata/nvc/test/regress std=08 sha=6e61a4901144be32
+ issue1621.vhd ghdl=0 nvc=0
+run regress:issue1624 dir=testdata/nvc/test/regress std=19 sha=af646296fd84ee3d
+ issue1624.vhd ghdl=0 nvc=0
+run regress:issue1626 dir=testdata/nvc/test/regress std=08 sha=8202699bf80bba0a
+ issue1626.vhd ghdl=0 nvc=0
+run regress:issue1627 dir=testdata/nvc/test/regress std=93 sha=dfdad3cc0bde1c32
+ issue1627.vhd ghdl=0 nvc=0
+run regress:issue1629 dir=testdata/nvc/test/regress std=08 sha=4213f66ea070360e
+ issue1629.vhd ghdl=0 nvc=0
+run regress:siginit1 dir=testdata/nvc/test/regress std=08 sha=61addf9955bdacf9
+ siginit1.vhd ghdl=0 nvc=0
+run regress:siginit2 dir=testdata/nvc/test/regress std=08 sha=24369c60275f4b30
+ siginit2.vhd ghdl=0 nvc=0
+run regress:siginit3 dir=testdata/nvc/test/regress std=08 sha=ab548d814a400462
+ siginit3.vhd ghdl=0 nvc=0
+run regress:timescale1 dir=testdata/nvc/test/regress std=93 sha=e2b7fb772c46df90
+ timescale1.vhd ghdl=0 nvc=0
+run regress:issue1632 dir=testdata/nvc/test/regress std=08 sha=625f7c60f5f60273
+ issue1632.vhd ghdl=0 nvc=0
+run regress:issue1641 dir=testdata/nvc/test/regress std=08 sha=db0c12b2bcd8b502
+ issue1641.vhd ghdl=0 nvc=0
+run regress:issue1579 dir=testdata/nvc/test/regress std=93 sha=ca15de03d3decfd2
+ issue1579.vhd ghdl=1@11 nvc=0
+run regress:cover30 dir=testdata/nvc/test/regress std=08 sha=b697c4674acd7998
+ cover30.vhd ghdl=0 nvc=0
+run regress:issue1658 dir=testdata/nvc/test/regress std=08 sha=046d645cd631b2a9
+ issue1658.vhd ghdl=0 nvc=0
+run regress:genpack20 dir=testdata/nvc/test/regress std=08 sha=f7b6d8522e6bdff0
+ genpack20.vhd ghdl=0 nvc=0
+run regress:implicit11 dir=testdata/nvc/test/regress std=08 sha=f10a861b97a9904b
+ implicit11.vhd ghdl=0 nvc=0
+run regress:elab42 dir=testdata/nvc/test/regress std=08 sha=e7b7c54ed44d9ec6
+ elab42.vhd ghdl=0 nvc=0
+run regress:inertial1 dir=testdata/nvc/test/regress std=08 sha=607fe55193155191
+ inertial1.vhd ghdl=0 nvc=0

@@ -1,0 +1,2 @@
+big.vhd:4:47: warning[sema/eval-limit]: constant ones could not be computed within 1,000,000 evaluation steps
+summary: 0 errors, 1 warnings, 0 hints, 1 files

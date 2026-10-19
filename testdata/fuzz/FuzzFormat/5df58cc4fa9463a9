@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("vunit v (e) {\n  inherit base, other;\n  assert always a;\n}\n")

@@ -31,6 +31,7 @@ trees, and must match the committed files.
 | `env NAME=VALUE` | Overrides an environment variable seen through the Env. |
 | `stdout broken` | Standard output fails every write, like a closed pipe (`env.ErrBrokenPipe`): the run keeps its exit code. |
 | `stdout full` | Standard output fails every write, like a full disk: the run logs `cli/output-failed` and exits 2. |
+| `tamper-stdlib PATH` | The bundled std/ieee file PATH (as `ieee/numeric_std.vhdl`) fails its integrity check, through the `stdlib.WithTamper` context hook (#33): the run reports `stdlib/integrity` and exits 2. |
 | `panic-on-read PATH` | Reading a file whose path ends in `/PATH` panics, to reach the crash path. |
 | `interrupt SIGINT\|SIGTERM on-read PATH` | Reading a file whose path ends in `/PATH` delivers the signal, as the shell does: the run's context is cancelled with `env.SIGINT` or `env.SIGTERM` as the cause (exit 130 or 143). The read itself succeeds. |
 

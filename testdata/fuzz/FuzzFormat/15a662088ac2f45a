@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- test: kind=AttributeName,ModeViewIndication\nentity e is\n  port (m : view master; s : view master'converse);\nend;\n")

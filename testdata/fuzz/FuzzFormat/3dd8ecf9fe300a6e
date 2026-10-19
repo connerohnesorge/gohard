@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  alias word : bit_vector(15 downto 0) is mem(31 downto 16);\n  alias s is sig;\n  alias plus is \"+\" [integer, integer return integer];\n  alias lit is '0' [return bit];\nend;\n")

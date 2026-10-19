@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("entity e is\n  generic (\n    package p1 is new work.gp generic map (<>);\n    package p2 is new work.gp generic map (default);\n    package p3 is new work.gp generic map (n => 4)\n  );\nend;\n")

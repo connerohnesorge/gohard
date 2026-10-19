@@ -1,0 +1,2 @@
+libraries:
+  vlib: [../vendor/vlib]

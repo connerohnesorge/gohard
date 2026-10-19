@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  assert always (a -> b until c);\n  assert always (a -> b until!_ c);\n  assert always (a -> b until_ c);\nend;\n")

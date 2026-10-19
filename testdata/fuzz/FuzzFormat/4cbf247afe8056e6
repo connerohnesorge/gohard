@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  with sel select s <= a when '0', b when others;\n  with sel select? t <= c when \"1-\", d when others;\nend;\n")

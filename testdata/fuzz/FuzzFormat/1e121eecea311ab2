@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  subtype byte is bit_vector(7 downto 0);\n  subtype small is integer range 0 to 9;\nend;\n")

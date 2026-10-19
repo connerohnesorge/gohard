@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  assert (always a -> next b) @ rising_edge(clk);\nend;\n")

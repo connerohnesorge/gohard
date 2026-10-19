@@ -1,0 +1,6 @@
+# A procedure whose signal parameter has mode out or inout writes its
+# actual: an element of mode in of a view port cannot be that actual,
+# just as it cannot be assigned (#17, LRM 6.5.2, 6.5.7.1). NVC 1.23
+# rejects the assignment b.ack <= '1' but misses these calls (an NVC
+# limitation; it rejects a plain port of mode in passed the same way).
+gohard check

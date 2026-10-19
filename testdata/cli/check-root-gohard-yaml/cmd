@@ -1,0 +1,4 @@
+# The root is the parent holding gohard.yaml: files are discovered
+# under it and the libraries folders are relative to it, not to the
+# current directory.
+gohard check

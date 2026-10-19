@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  subtype rbit is resolve_bits bit;\nend;\n")

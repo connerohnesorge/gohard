@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "status": "problems",
+  "exit": 1,
+  "summary": {
+    "errors": 5,
+    "warnings": 0,
+    "hints": 0,
+    "files": 2
+  },
+  "diagnostics": [
+    {
+      "path": "bus_pkg.vhd",
+      "line": 18,
+      "col": 8,
+      "end_line": 18,
+      "end_col": 16,
+      "severity": "error",
+      "code": "sema/error",
+      "message": "view broken_v gives no mode for element ack of bus_t",
+      "related": []
+    },
+    {
+      "path": "bus_pkg.vhd",
+      "line": 21,
+      "col": 5,
+      "end_line": 21,
+      "end_col": 8,
+      "severity": "error",
+      "code": "sema/error",
+      "message": "element req is given a mode twice in view broken_v",
+      "related": []
+    },
+    {
+      "path": "design.vhd",
+      "line": 11,
+      "col": 3,
+      "end_line": 11,
+      "end_col": 8,
+      "severity": "error",
+      "code": "sema/error",
+      "message": "cannot assign to b.req: it has mode in in view producer_v'converse of port b",
+      "related": []
+    },
+    {
+      "path": "design.vhd",
+      "line": 25,
+      "col": 3,
+      "end_line": 25,
+      "end_col": 4,
+      "severity": "error",
+      "code": "sema/error",
+      "message": "cannot assign to b: element b.ack has mode in in view producer_v of port b",
+      "related": []
+    },
+    {
+      "path": "design.vhd",
+      "line": 40,
+      "col": 47,
+      "end_line": 40,
+      "end_col": 54,
+      "severity": "error",
+      "code": "sema/error",
+      "message": "view producer_v of port b gives element req mode out, but it has mode in in the actual link_in, a port of mode in",
+      "related": []
+    }
+  ],
+  "incomplete": []
+}

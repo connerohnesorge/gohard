@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("entity e is\n  port (m : view master; s : view slave of bus_t);\nend;\n")

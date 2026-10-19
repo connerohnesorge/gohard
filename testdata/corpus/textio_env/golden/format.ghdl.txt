@@ -1,0 +1,17 @@
+# GoHard formatter oracle (#32): textio_env, ghdl.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool ghdl 6.0.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file textio_env.vhd std=2008 sha256=4d36321f02528c7a0cfc40002216f65f83d608fa878b13ba7f5e904e455a6b3a formatted=e05404d4523701c2702d6b3a43614bb4160a8a328c2066c767ab7941662aa512 changed
+  exit original=0 formatted=0
+file textio_env_tb.vhd std=2008 sha256=608b5e3e37166d4a23ff430153b2b5e4ab2865412cd9c7a8997f6bc775cbd2ae formatted=608b5e3e37166d4a23ff430153b2b5e4ab2865412cd9c7a8997f6bc775cbd2ae unchanged
+  exit original=0 formatted=0
+result new=0

@@ -111,6 +111,15 @@ func TestFSRelativeToDir(t *testing.T) {
 	if filepath.Dir(tmp) != filepath.Join(dir, "a", "b") {
 		t.Fatalf("temp file %q not in a/b", tmp)
 	}
+	if err := e.FS.Chmod(tmp, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if runtime.GOOS != "windows" {
+		if fi, err := e.FS.Stat(tmp); err != nil ||
+			fi.Mode().Perm() != 0o600 {
+			t.Fatalf("Chmod relative to Dir: %v, %v", fi, err)
+		}
+	}
 	if err := e.FS.Rename(tmp, "a/b/x.vhd"); err != nil {
 		t.Fatal(err)
 	}

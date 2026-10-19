@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\n  attribute keep of s1, s2, s3 : signal is true;\n  attribute keep of others : signal is false;\nbegin\nend;\n")

@@ -1,0 +1,4 @@
+# allow_opaque plus a simulation.models stand-in: top is checked
+# against the stand-in ports, the downgrade is a hint, the run exits 0
+# (#20 entry 4).
+gohard check

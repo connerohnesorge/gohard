@@ -1,0 +1,17 @@
+# GoHard formatter oracle (#32): force_ext, nvc.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool nvc 1.23.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file force_ext.vhd std=2008 sha256=194c2b2d58ba48d2592dd705659e4b24b9919619660dc48a29be46c390c5f926 formatted=5450be3a8e6f246368ccc2929394ee9644bf9952b9d21eb9bbe7d5f9d6afa6b3 changed
+  exit original=0 formatted=0
+file force_ext_tb.vhd std=2008 sha256=e8cee52a087340584e4443b28123a9903717872134cf719dee7d40388ea5d4f7 formatted=1a6c4a2959bb758f20c0ba4506a0a9f15d9497cae5b577a864f170f0e0ff2cf7 changed
+  exit original=0 formatted=0
+result new=0

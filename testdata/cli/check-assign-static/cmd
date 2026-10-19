@@ -1,0 +1,4 @@
+# Static widths and indices of signal and variable assignments
+# (#34): with the unit when they do not depend on the instance, per
+# instance when they do; branches that may never run are not checked.
+gohard check

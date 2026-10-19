@@ -81,6 +81,10 @@ type FS interface {
 	// Rename atomically replaces newname with oldname where the OS
 	// allows it.
 	Rename(oldname, newname string) error
+	// Chmod sets the permission bits of name, following symbolic links.
+	// gohard fmt gives the temp file the mode of the file it replaces,
+	// so a rewrite in place keeps the file's permissions (#32).
+	Chmod(name string, perm fs.FileMode) error
 	// Remove deletes a file or an empty directory.
 	Remove(name string) error
 	// MkdirAll creates a directory and any missing parents.

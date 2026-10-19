@@ -1,0 +1,37 @@
+# GoHard formatter oracle (#32): mode_views, ghdl.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool ghdl 6.0.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2019 define=MV_PROFILE=wide
+file mode_views_pkg.vhd std=2019 sha256=3d8d09087980154284d4f33735d0b4e19e0afedd4a3d9973386dfecc5bee913b formatted=bb107ab36da032826b596107a0460c8d03f9b9f2bfcf9ea248afb4330a5b4a06 changed
+  exit original=1 formatted=1
+  error 26: unknown tool directive "if" ignored
+  error 28: unknown tool directive "else" ignored
+  error 30: unknown tool directive "end" ignored
+  error 33: unknown tool directive "if" ignored
+  error 35: unknown tool directive "elsif" ignored
+  error 37: unknown tool directive "else" ignored
+  error 38: unknown tool directive "error" ignored
+  error 39: unknown tool directive "end" ignored
+file mode_views.vhd std=2019 sha256=635d99b8487e7894d4519bab9c7198603b7d5ef0efc4ea8b9fc8a7c07bf917f5 formatted=4531c7110b56033c8d560f2b507ea6408117383bdc90449acdd5a9b879b6a7ef changed
+  exit original=1 formatted=1
+  error 6: unit "mode_views_pkg" not found in library "work"
+  error 11: no declaration for "producer_v"
+  error 15: entity "mv_producer" was not analysed
+  error 37: unit "mode_views_pkg" not found in library "work"
+  error 42: no declaration for "consumer_v"
+  error 48: entity "mv_consumer" was not analysed
+  error 72: unit "mode_views_pkg" not found in library "work"
+  error 82: entity "mode_views" was not analysed
+file mode_views_tb.vhd std=2019 sha256=144a82e97376acb8b11b4bd4074e0fc4cf59266172650bca80cc09d35b9e1606 formatted=b10f5a2499b1539dc413d7e40a3445d6c16b0fdfc1c44bfb1de48cb6a3a3e441 changed
+  exit original=1 formatted=1
+  error 5: unit "mode_views_pkg" not found in library "work"
+  error 10: entity "mode_views_tb" was not analysed
+result new=0

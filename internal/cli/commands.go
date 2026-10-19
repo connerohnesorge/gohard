@@ -80,10 +80,15 @@ var commands = []Command{
 		Summary: "format VHDL files in place, or check formatting",
 		Flags: []Flag{
 			{
+				Name: "allow-empty", Kind: Bool,
+				Usage: "exit 0 when no VHDL files are found",
+			},
+			{
 				Name: "check", Kind: Bool,
 				Usage: "write nothing; exit 1 if a file would " +
 					"change",
 			},
+			defineFlag,
 			formatFlag,
 			strictFlag,
 		},

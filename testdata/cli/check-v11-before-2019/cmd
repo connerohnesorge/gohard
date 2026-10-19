@@ -1,0 +1,3 @@
+# Under VHDL-2008 the VHDL-2019 constructs are not unsupported but not
+# allowed: syntax/standard, exit 1, and the units are analyzed.
+gohard check

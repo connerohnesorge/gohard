@@ -1,0 +1,17 @@
+# GoHard formatter oracle (#32): wait_forms, nvc.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool nvc 1.23.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file wait_forms.vhd std=2008 sha256=86bd29b434be5f6c46c533a52b14f31114dbf8710b38e60a77c992bd8d2f3615 formatted=9a5bd133cc7db070bb1f46c725f76fca31098ce3a473c51229194f13f2443dc3 changed
+  exit original=0 formatted=0
+file wait_forms_tb.vhd std=2008 sha256=dadf1d1d5c33c86164a2dc97cb8bc5d19049b0677f3e2cb9ae0a3734719cfef4 formatted=e1eba5ed2fb6dd7a4acaf56e1d5f3fc287d3ccd82469a4b97425787b1a799518 changed
+  exit original=0 formatted=0
+result new=0

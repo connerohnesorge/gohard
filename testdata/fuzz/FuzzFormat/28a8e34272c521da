@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  constant c : integer := v'length;\n  constant d : integer := t'pos(x);\n  constant e : string := f[integer return bit]'path_name;\n  constant g : integer := v'length(1);\nend;\n")

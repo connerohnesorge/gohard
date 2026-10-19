@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  constant p : int_ptr := new integer;\n  constant q : int_ptr := new integer'(5);\nend;\n")

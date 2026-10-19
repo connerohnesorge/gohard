@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\n  property p1 is always (req -> next ack);\nbegin\nend;\n")

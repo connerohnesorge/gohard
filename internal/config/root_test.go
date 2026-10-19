@@ -148,6 +148,7 @@ func (m *memFS) WriteTemp(string, string, []byte) (string, error) {
 }
 func (m *memFS) Rename(string, string) error        { return errReadOnly }
 func (m *memFS) Remove(string) error                { return errReadOnly }
+func (m *memFS) Chmod(string, fs.FileMode) error    { return errReadOnly }
 func (m *memFS) MkdirAll(string, fs.FileMode) error { return errReadOnly }
 func (m *memFS) Readlink(string) (string, error)    { return "", errReadOnly }
 func (m *memFS) Open(string) (io.ReadCloser, error) { return nil, errReadOnly }

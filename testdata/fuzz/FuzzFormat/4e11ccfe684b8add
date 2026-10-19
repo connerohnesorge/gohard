@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  check(s);\n  c2 : postponed work.p.check(t, n => 2);\nend;\n")

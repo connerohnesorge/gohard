@@ -67,6 +67,13 @@ func (c cancelFS) Rename(oldname, newname string) error {
 	return c.FS.Rename(oldname, newname)
 }
 
+func (c cancelFS) Chmod(name string, perm fs.FileMode) error {
+	if err := c.err(); err != nil {
+		return err
+	}
+	return c.FS.Chmod(name, perm)
+}
+
 func (c cancelFS) Remove(name string) error {
 	if err := c.err(); err != nil {
 		return err

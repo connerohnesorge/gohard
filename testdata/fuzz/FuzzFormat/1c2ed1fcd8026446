@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  alias c is << constant @work.pkg.k : integer >>;\nend;\n")

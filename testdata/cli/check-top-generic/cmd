@@ -1,0 +1,3 @@
+# A top entity's generic default that leaves the generic's subtype is
+# located at the default, in the entity's file.
+gohard check

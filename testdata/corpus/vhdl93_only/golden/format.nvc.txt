@@ -1,0 +1,32 @@
+# GoHard formatter oracle (#32): vhdl93_only, nvc.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool nvc 1.23.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=1993
+file vhdl93_only.vhd std=1993 sha256=5c10ef74e4a9a9f32df2527cfce7afc5c2abb9725ad012dc38da2eb9707f603e formatted=56bfb64a364808cee8cf7629eff1d3268249668e46a8e5a1dccdaae7a7ad46cc changed
+  exit original=0 formatted=0
+file vhdl93_only_tb.vhd std=1993 sha256=5f951e00e24d21d66415d70f8b75b713035f599255c36a71a88ebd9f33c261cc formatted=43e5b83fe59cfa048decbedd9f2ed0f8f34e3ca3135601b84e1dac14feb68826 changed
+  exit original=0 formatted=0
+run std_2002 std=2002
+file vhdl93_only.vhd std=1993 sha256=5c10ef74e4a9a9f32df2527cfce7afc5c2abb9725ad012dc38da2eb9707f603e formatted=56bfb64a364808cee8cf7629eff1d3268249668e46a8e5a1dccdaae7a7ad46cc changed
+  exit original=1 formatted=1
+  error 19: unexpected protected while parsing signal declaration, expecting identifier
+  error 25: unexpected protected while parsing sequential statement, expecting one of wait, identifier, assert, report, if, null, return, case, while, for, loop, exit, next, with, <<, ( or block
+  error 27: unexpected protected while parsing sequential statement, expecting one of wait, identifier, assert, report, if, null, return, case, while, for, loop, exit, next, with, <<, ( or block
+  error 31: unexpected protected while parsing primary, expecting one of guarded, ??, (, integer, real, null, identifier, string, bit string or new
+run std_2008 std=2008
+file vhdl93_only.vhd std=1993 sha256=5c10ef74e4a9a9f32df2527cfce7afc5c2abb9725ad012dc38da2eb9707f603e formatted=56bfb64a364808cee8cf7629eff1d3268249668e46a8e5a1dccdaae7a7ad46cc changed
+  exit original=1 formatted=1
+  error 12: unexpected force while parsing interface declaration, expecting one of constant, signal, variable, file, identifier, type, function, procedure, pure, impure or package
+  error 18: design unit depends on WORK.VHDL93_ONLY which was analysed with errors
+  error 19: unexpected protected while parsing signal declaration, expecting identifier
+  error 22: unexpected force while parsing name, expecting one of string or identifier
+  error 31: unexpected context while parsing concurrent statement, expecting one of process, postponed, component, entity, configuration, with, assert, block, if, for, case, (, identifier or <<
+result new=0

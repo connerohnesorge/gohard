@@ -1,0 +1,3 @@
+# allow_opaque downgrades the encrypted unit to a hint, but without a
+# stand-in top is still unchecked, so the run does not exit 0.
+gohard check

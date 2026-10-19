@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type r is record\n    x, y : real;\n  end record;\nend;\n")

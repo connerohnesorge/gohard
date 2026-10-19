@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("`proteCtkeY_BloCk\n0")

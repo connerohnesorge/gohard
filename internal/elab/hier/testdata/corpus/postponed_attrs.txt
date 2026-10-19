@@ -1,0 +1,2 @@
+postponed_attrs_tb entity work.postponed_attrs_tb(tb)
+  postponed_attrs_tb.dut entity work.postponed_attrs(rtl)

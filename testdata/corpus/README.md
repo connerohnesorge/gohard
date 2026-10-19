@@ -25,6 +25,8 @@ testdata/corpus/
       ghdl.*         recorded GHDL results (trace, semantic errors,
                      --disp-tree hierarchy)
       nvc.*          recorded NVC results
+      format.ghdl.txt  formatter oracle (#32): GHDL analysis of every
+      format.nvc.txt   file as written and as formatted (NVC likewise)
       hierarchy.txt  hand-written expected hierarchy and generic values
                      (only when `hierarchy_oracle: "none, hand-checked"`)
 ```
@@ -140,7 +142,14 @@ by `path`) so tools rewrite the file deterministically.
 | `disagreements` | list | Every point where GHDL and NVC differ (below). Empty when they agree. |
 | `variants` | list | Optional. Extra runs of the same design with other files or another standard, each with its own expected outcome (below). |
 | `trace_sha256` | hex \| `pending` | sha256 of `golden/trace.txt`. |
-| `oracle_sha256` | hex \| `pending` | sha256 over the recorded oracle files in `golden/` (GHDL/NVC traces, semantic errors, `--disp-tree`), or over the hand-checked files for `none, hand-checked`. |
+| `oracle_sha256` | hex \| `pending` | sha256 over the recorded oracle files in `golden/` (GHDL/NVC traces, `--disp-tree`), or over the hand-checked files for `none, hand-checked`. |
+| `format_oracle_sha256` | hex | Formatter oracle (#32): hash over `golden/format.ghdl.txt` and `golden/format.nvc.txt` (see "Formatter oracle" below). Never `pending`; written by `tools/oracle` on the line after `oracle_sha256`. |
+| `semerr_sha256` | hex | Semantic-error oracle (#34): hash over `testdata/corpus/golden/semerr/corpus-<name>.txt` (see "Semantic-error oracle" below). Written by `tools/oracle` on the line after `format_oracle_sha256`. |
+| `semerr_follows` | list | Optional. Recorded semantic-error disagreements GoHard decides (see "Semantic-error oracle"). |
+
+Every hash field is the lower-case hex sha256 over the field's golden
+files in name order, each fed as its name (relative to `golden/`), a
+newline, its length in decimal, a newline and its bytes.
 
 `pending` is allowed only until `tools/oracle` and the #36 canonical trace
 format exist (S5). After that CI fails on `pending` and on any hash
@@ -256,3 +265,79 @@ way, from inside the copied design directory.
 Use `--std=93`/`--std=1993` or `--std=19`/`--std=2019` as the entry's
 `standard` requires. Append `--stop-time=<t>` (after the unit for GHDL,
 after `-r` for NVC) for any design that must not terminate on its own.
+
+## Formatter oracle
+
+`go run ./tools/oracle --update format` (inside `nix develop`) formats
+every file of every design with the design's `format.*` options
+(`config`, or the #28 defaults), under the standard the file is first
+listed with. It then analyzes each run (the design's `files`, with the
+`models` stand-ins first, and every variant's `files`, under the run's
+standard) twice in fresh `/tmp` work dirs, one `ghdl -a --std=XX` or
+`nvc --std=XXXX -a [-D NAME=VALUE]` per file: once as written, once as
+formatted. Error lines of the formatted text are mapped back to the
+original lines, and `golden/format.{ghdl,nvc}.txt` record, per file,
+the original and formatted sha256, both exit codes, the original
+errors and every `new` (only formatted) or `gone` (only original)
+error, ending in `result new=N`.
+
+CI never runs GHDL or NVC. `go test ./tools/oracle` (`TestRecorded`,
+the same check as `go run ./tools/oracle` without `--update`)
+recomputes the formatter output and fails with "rerun go run
+./tools/oracle --update" when a recorded `options`/`run`/`file` line no
+longer matches (the formatter, a source file or a design config
+changed), when a golden file is missing, or when
+`format_oracle_sha256` does not match the golden files. It also fails
+while any recording says `result new=` other than 0: fix the formatter
+first.
+
+## Semantic-error oracle
+
+`go run ./tools/oracle --update semerr` (inside `nix develop`, about a
+minute) runs GHDL and NVC analysis on every PR-set file and records,
+per analysis, each tool's exit code and the lines of the file it
+reports errors on, in `testdata/corpus/golden/semerr/`:
+
+| File | Runs |
+| --- | --- |
+| `corpus-<name>.txt` | each corpus design run (the `models` stand-ins, then `files`; each variant), under its standard and `gohard.yaml` defines |
+| `ghdl-<folder>.txt` | GHDL `testsuite/<folder>/*/testsuite.sh`: the `analyze`, `analyze_failure`, `elab_simulate` and `synth*` file operands in script order (the shell model of the parser-regression runner), one run per work directory and standard, a `clean` ending the runs; `--work=`, `-frelaxed`, `-fpsl`, `-fsynopsys` and the other analysis options kept; `--std=87` and generated files skipped |
+| `ghdl-vests.txt` | each VESTS `.exp` list sourced by `vests/testsuite.sh`, in list order, `LIBRARY=` honoured, under `--std=93c` |
+| `nvc-regress.txt` | each `test/regress/testlist.txt` test (`<name>.vhd` alone, its standard, `work=`, `relaxed`, `psl`, `define=`) |
+| `nvc-unit.txt` | each `START_TEST` block of `test/test_*.c` per standard it runs under: its `input_from_file` files in order (identical runs once) |
+| `ghdl-alone.txt`, `nvc-alone.txt` | every other `.vhd`/`.vhdl` file of the folder, alone, under 2008 |
+
+Each run is analyzed in a fresh work directory per tool, one command
+per file (`ghdl -a --std=XX [--work=L] [options] file`,
+`nvc --std=XXXX [--work=L] -L . -a --error-limit=0 [--relaxed]
+[--psl] [-D N=V] file`). A file line reads `<arg> [lib=L] [options]
+ghdl=<exit>[@lines] nvc=<exit>[@lines]`; `~` marks a line whose only
+GHDL errors are cascades (`<unit> was not analysed`). The run line
+carries a sha256 prefix of the run's sources, so a changed source or
+driver makes the recording stale. The hashes are `semerr_sha256` of
+each design and of the `ghdl` and `nvc` regression entries.
+
+`go test ./tools/oracle` (`TestRecorded`, a few seconds, no tool runs)
+checks that wherever both tools report an error on a line, GoHard
+reports an error on that line (an error diagnostic starting there, or
+one of at most three lines covering it). GoHard analyzes each file
+with the earlier files of its run it may depend on (a lexical scan for
+unit names, transitively). Not checked: files whose dependencies one
+tool rejected (cascades), GHDL cascade lines, lines after GoHard's
+first syntax error (recovery is implementation-defined), and files
+GoHard reports opaque (`unsupported/construct`, encrypted IP, exit 2).
+
+Known gaps are listed in `golden/semerr/gaps.txt`, written from
+GoHard's results by `go test ./tools/oracle -run TestSemerrGaps
+-update-gaps` (which also logs the agreement numbers; add
+`-semerr-false` to count GoHard errors in files both tools accept).
+The check fails on a gap the list lacks and on a listed gap that is
+closed, so the list only shrinks.
+
+Every line only one tool reports is a disagreement; the goldens record
+them all. A disagreement GoHard decides is a `semerr_follows` item of
+the design or regression entry: `path` (relative to the design
+directory or the entry's subfolder), `line`, `follows` (`ghdl` or
+`nvc`), `lrm` (the IEEE 1076 section) and `notes`. The check then
+requires GoHard to report an error on that line exactly when the
+followed tool does.

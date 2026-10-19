@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type weight is range 0 to 1000 units g; end units;\nend;\n")

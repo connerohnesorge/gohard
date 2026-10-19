@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  pure function f1 return bit;\n  impure function f2 (a : bit) return bit;\n  function \"+\" (a, b : t) return t;\nend;\n")

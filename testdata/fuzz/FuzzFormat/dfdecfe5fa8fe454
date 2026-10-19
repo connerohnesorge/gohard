@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  g : if a1 : n = 1 generate\n    s <= a;\n  elsif a2 : n = 2 generate\n    s <= b;\n  else a3 : generate\n    s <= c;\n  end generate g;\nend;\n")

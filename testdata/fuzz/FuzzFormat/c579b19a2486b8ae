@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  assert AG (req -> AF ack);\n  assert EX a;\n  assert AX b;\n  assert EG c;\n  assert EF d;\nend;\n")

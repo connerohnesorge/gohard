@@ -1,0 +1,3 @@
+standard: "2019"
+defines:
+  MODE: "fast"

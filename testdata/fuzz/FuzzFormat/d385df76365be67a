@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- test: std=2008 kind=none\npackage p is\n  signal view, private : bit;\nend;\n")

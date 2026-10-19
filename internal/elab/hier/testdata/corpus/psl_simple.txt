@@ -1,0 +1,2 @@
+psl_simple_tb entity work.psl_simple_tb(sim)
+  psl_simple_tb.dut entity work.psl_simple(rtl)

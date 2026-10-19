@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  subtype rrec is (a resolve_a, b resolve_b) rec_t;\nend;\n")

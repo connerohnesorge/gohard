@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  constant t1 : time := 10 ns;\n  constant t2 : time := ns;\n  constant t3 : time := 2.5 us;\nend;\n")

@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  b2 : block is\n    generic (n : natural);\n    generic map (n => 4);\n    port (a : in bit);\n    port map (a => s);\n  begin\n  end block;\nend;\n")

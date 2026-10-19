@@ -21,8 +21,11 @@ import (
 func init() { lookup("lsp").Run = runLSP }
 
 // newAnalyzer returns the analyzer of the language server and of every
-// `gohard lsp <action>`. Later stages (#34, #32, #35) replace the Nop.
-var newAnalyzer = func() server.Analyzer { return server.Nop{} }
+// `gohard lsp <action>`. Later stages (#34, #35) replace the Nop;
+// formatting (#32) wraps whatever analyzer they provide.
+var newAnalyzer = func() server.Analyzer {
+	return server.WithFormatting(server.Nop{}, Version)
+}
 
 func serverOptions() server.Options {
 	return server.Options{Analyzer: newAnalyzer(), Version: Version}

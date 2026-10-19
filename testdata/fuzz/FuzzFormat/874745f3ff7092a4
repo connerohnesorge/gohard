@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture rtl of work.e is\n  signal s : bit;\nbegin\n  s <= '1';\nend architecture rtl;\n")

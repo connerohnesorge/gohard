@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  assert forall i in {0 to 3} : always (req(i) -> next ack(i));\n  assert forall k in boolean : always (k -> a);\nend;\n")

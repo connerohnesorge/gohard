@@ -1,0 +1,17 @@
+# GoHard formatter oracle (#32): budget_hang, nvc.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool nvc 1.23.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file budget_hang.vhd std=2008 sha256=bc31e3c74e76332fc2792173b32958633852331d57f06e1b0dd668521024b03e formatted=33ddf6d06a4771f95c32b43635e543e86dc8d178f0e4b164b9765a5a2abc3753 changed
+  exit original=0 formatted=0
+file budget_hang_tb.vhd std=2008 sha256=1892eda9d3982a560a20af67f74a46911823fe2fa8165366a48c2cb7b0f939bd formatted=a1bc4af07a87e945dad4cbd531a8f580414a0d6fe853831c8a772735ba2f069d changed
+  exit original=0 formatted=0
+result new=0

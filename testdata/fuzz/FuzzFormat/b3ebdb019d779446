@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  constant c : bit_vector := v(7 downto 4);\n  constant d : bit_vector := v(r'range);\nend;\n")

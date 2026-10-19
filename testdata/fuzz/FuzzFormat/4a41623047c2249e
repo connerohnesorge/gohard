@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  assert always (s = '1' and v(0) = '0');\nend;\n")

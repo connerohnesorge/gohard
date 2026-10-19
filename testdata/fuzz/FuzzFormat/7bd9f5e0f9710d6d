@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type distance is range 0 to 1e9\n    units\n      um;\n      mm = 1000 um;\n      m = 1000 mm;\n    end units distance;\nend;\n")

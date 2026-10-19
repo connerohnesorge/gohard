@@ -1,0 +1,19 @@
+# GoHard semantic-error oracle (#34, R12): corpus-postponed_attrs.txt.
+# Written by go run ./tools/oracle --update semerr; do not edit.
+# Each "run" is one analysis group of the project's own driver (a
+# testsuite.sh between cleans, a VESTS list, an NVC regression test or
+# unit-test block, a corpus design run, or a file no driver names,
+# alone under 2008): its files are analyzed in order, one command per
+# file, in a fresh work directory per tool ("dir" is the working
+# directory; the run's GHDL --std and the sha256 prefix of its sources
+# follow). Each file line is the argument, the library when not work,
+# the GHDL options, then per tool the exit code and the lines of that
+# file it reports errors on; "~" marks a line whose only errors are
+# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
+# reports an error on every line both tools report one on
+# (semerr_check.go).
+tool ghdl 6.0.0
+tool nvc 1.23.0
+run corpus:postponed_attrs:main dir=testdata/corpus/postponed_attrs std=08 sha=6ef13ef330c62917
+ postponed_attrs.vhd ghdl=0 nvc=0
+ postponed_attrs_tb.vhd ghdl=0 nvc=0

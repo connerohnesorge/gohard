@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  process is\n  begin\n    proc;\n    proc(1, b => 2);\n    work.p.proc(x);\n  end process;\nend;\n")

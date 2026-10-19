@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  process (all) is\n  begin\n  end process;\n  process (clk, rst) is\n  begin\n  end process;\nend;\n")

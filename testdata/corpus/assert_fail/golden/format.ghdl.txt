@@ -1,0 +1,17 @@
+# GoHard formatter oracle (#32): assert_fail, ghdl.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool ghdl 6.0.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file assert_fail.vhd std=2008 sha256=31509056964849297b4befefeefcfa7c409a96102b760d094bcd373f52d7cfa3 formatted=88ec6da1f7507b293ac5fbf3c22e65402917d8c8721ecdf9f2a18b7e8073f110 changed
+  exit original=0 formatted=0
+file assert_fail_tb.vhd std=2008 sha256=c9b3b64f30b68fc122429dbe407fb6a5e7b558fd9cd9db0b765d20d0a73b1abb formatted=c9b3b64f30b68fc122429dbe407fb6a5e7b558fd9cd9db0b765d20d0a73b1abb unchanged
+  exit original=0 formatted=0
+result new=0

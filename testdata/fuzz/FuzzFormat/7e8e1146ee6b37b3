@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type state is (idle, run, 'x', done);\nend;\n")

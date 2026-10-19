@@ -8,7 +8,7 @@ every pull request on Linux, macOS and Windows under plain `go test`.
 | --- | --- | --- |
 | `session/<case>/` | `TestLSPSessions` in `internal/server` | one scripted session against the server core |
 | `record/<case>/` | `TestLSPRecordReplay` in `internal/cli` | `gohard lsp --record DIR` then `gohard lsp replay DIR/<n>.jsonl`, byte for byte |
-| `<action>/<case>/` | later stages (#26) | `gohard lsp <action> --at PATH:LINE:COL` fixtures |
+| `<action>/<case>/` | `TestLSPActionFixtures` in `internal/cli` | `gohard lsp <action> --at PATH:LINE:COL` fixtures (#26) |
 
 ## `session/<case>/`
 
@@ -16,7 +16,7 @@ every pull request on Linux, macOS and Windows under plain `go test`.
 | --- | --- | --- |
 | `client.jsonl` | yes | The client messages, one JSON-RPC body per line, in arrival order. Blank lines and lines starting with `#` are skipped; each line is compacted before it is sent. |
 | `in/` | no | The project tree, placed at `/work` of a simulated Env (`internal/env/simenv`); the session's workspace folder is `file:///work`. |
-| `analyzer` | no | `nop` (the default, what `gohard lsp` ships with now) or `echo`, a test analyzer that makes the server's view visible: it publishes one hint per open document holding its version and text, hovers name the word and byte offset under the cursor, and definition finds `entity <word>` in any document of the snapshot (a cross-file query). |
+| `analyzer` | no | `nop` (the default), `format` (`server.WithFormatting` over `nop`, the formatting of `gohard lsp`, #32) or `echo`, a test analyzer that makes the server's view visible: it publishes one hint per open document holding its version and text, hovers name the word and byte offset under the cursor, and definition finds `entity <word>` in any document of the snapshot (a cross-file query). |
 | `want.jsonl` | yes | Every message the server sent, one body per line, byte for byte as written to the client (without the `Content-Length` framing). |
 | `want.exit` | yes | The session's exit code and a newline: 0 after shutdown and exit, else 1. |
 
@@ -59,6 +59,34 @@ that both runs agree and keep the invariants; the nightly
 | `definition-cross-file` | a workspace query answered from a file that is not open |
 | `lifecycle` | errors before initialize, a second initialize, invalid JSON-RPC, unknown methods, requests after shutdown |
 | `exit-without-shutdown` | exit code 1 |
+| `format-document` | whole-file formatting (#32) in a utf-16 session; formatted text gets no edits; a project file that is not open is formatted from disk; a file that does not parse and a document that is not VHDL get no edits |
+| `format-range` | range formatting with the `format.*` keys of `gohard.yaml`: edits only inside whole-line and part-line ranges, none for an empty range, the new text after an edit |
+
+## `<action>/<case>/`
+
+Each case is one `gohard lsp <action>` run in the format of
+`testdata/cli` (see `testdata/cli/README.md`): `cmd`, `in/`,
+`want.exit`, `want.stdout` and `want.stderr`, run by the same harness
+at `-p 1` and `-p 16`. The action sends its request through
+`server.RunAction`, the server's own code path, and prints the LSP
+result; positions are zero-based UTF-8.
+
+| Case | Shows |
+| --- | --- |
+| `format/whole` | `gohard lsp format`: the whole-file edits |
+| `format/clean` | a formatted file gets no edits |
+| `format/not-parsed` | a file that does not parse gets no edits |
+| `range-format/lines` | `gohard lsp range-format --at PATH:2:1 4:1`: lines 2 and 3 only, with `format.indent` and `format.keyword_case` from `gohard.yaml` |
+| `range-format/partial-line` | a range inside one line: the indentation before it is left alone |
+| `range-format/bad-end` | a range end that is not LINE:COL is a usage error (exit 2) |
+
+`gohard lsp range-format --at PATH:LINE:COL END_LINE:END_COL` formats
+the half-open range from `--at` to the end position (both one-based,
+columns in bytes).
+
+```sh
+nix develop -c go test ./internal/cli -run TestLSPActionFixtures -update
+```
 
 ## Session files
 

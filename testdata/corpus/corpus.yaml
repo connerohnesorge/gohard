@@ -4,10 +4,13 @@
 # The builder fragments (<name>/entry.yaml, regression.entry.yaml) were
 # merged here in S2a and removed; this file is the only source of truth.
 #
-# `trace_sha256` and `oracle_sha256` are written by
-# `go run ./tools/oracle --update`, which rewrites only changed hashes.
-# Until tools/oracle and the #36 canonical trace format exist they hold
-# the literal value `pending`.
+# `trace_sha256`, `oracle_sha256`, `format_oracle_sha256` and
+# `semerr_sha256` are written by `go run ./tools/oracle --update`, which
+# rewrites only changed hashes. Until the #36 canonical trace format and
+# its oracle sections exist, `trace_sha256` and `oracle_sha256` hold the
+# literal value `pending`; `format_oracle_sha256` (#32) and
+# `semerr_sha256` (#34, in each design and in the ghdl and nvc
+# regression entries) are always recorded.
 
 schema: 1
 
@@ -167,6 +170,8 @@ designs:
           --assert-level=error so both tools give the same outcome.
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: 94f4f084426baf39982f1199a3a23095a90d765a82ba68fd130a51b51e9c4704
+    semerr_sha256: d4df6cca09a6319134abeaead1e3422770b7bb5bdda0cf25b9d73d51b258b0f5
   - name: budget_hang
     standard: "2008"
     milestone: v1.0
@@ -225,6 +230,8 @@ designs:
     disagreements: []
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: fc46b6ac8d47033e318591de4c4f503ada8e77b7a4e8e2e214ee25f25b5de7e3
+    semerr_sha256: 6d3e3a22800cf15a4d2824b4fe8c452a074222dacc4a4f2e420def2eb23ccfda
   - name: force_ext
     standard: "2008"
     milestone: v1.0
@@ -288,6 +295,8 @@ designs:
     disagreements: []
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: 7c16ae3aba230fb4e90c6b22d3bb804c3e88d0cbed8b6081bce316e7b6bff792
+    semerr_sha256: e7de4cbd17dab071e18844d9ceaa585c7d119a2f68891d7b8d376f56e37c8c79
   - name: hier_generate
     standard: "2008"
     milestone: v1.0
@@ -419,6 +428,8 @@ designs:
           and 47).
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: 5f66f04782a786dc41c8bc14e422030fc76a501c7170f83dcedd5333ccf7cf07
+    semerr_sha256: 1ebb9668c01cfb682480300524dca8c74b3e07814194e8d94f2d71e855d58a42
   - name: md_resolve
     standard: "2008"
     milestone: v1.0
@@ -482,6 +493,8 @@ designs:
     disagreements: []
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: f440d6de675b9a0bbb49ee160573acdde6f381afa5a0c005ed3bd5472cb1e51a
+    semerr_sha256: 7cb0e70a4265cf1b768b3efdeedf728e8b19ac2505777bdebab064f3fdaa8f7d
   - name: mode_views
     standard: "2019"
     milestone: v1.0
@@ -566,6 +579,8 @@ designs:
           feature, so it is not a semantic disagreement about the design.
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: e634b69fd6b07941074a6155b26020f7aa012363fc00d3b4deb73a2581f608c8
+    semerr_sha256: 1eae310d6f7aef6f91a429c3c22b7551a0fe593f5a75c3390f36e6590d1f2cec
   - name: overload_ops
     standard: "2008"
     milestone: v1.0
@@ -620,6 +635,8 @@ designs:
     disagreements: []
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: ed3f37bc6b820d2b44c528384e12a9b10b96dc989ad740ce9b2430274ba6df04
+    semerr_sha256: dfa0c653f470f8a817919dc2495ea055b6606c0db317aac64819b7ae71ce613b
   - name: postponed_attrs
     standard: "2008"
     milestone: v1.0
@@ -691,6 +708,8 @@ designs:
     disagreements: []
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: 6a5fe946b5cb751d12431c39f0c18e8ed944bf6108dd579468f9d55291b24f94
+    semerr_sha256: 305c7a2f89233bc8c748d447d2e135026e3aef1426b644e5b2458f42d08591dd
   - name: prot_cond
     standard: "2019"
     milestone: v1.1
@@ -851,6 +870,8 @@ designs:
     disagreements: []
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: 08d5c45934017c8f93b2193e1d9b14ee8e9c627bb684580fd12d5848c0f28d3b
+    semerr_sha256: 1f19aa841434177d6e55fd1ca5d14b01134b1732ec27bdb4b968a6522b8208b6
   - name: psl_simple
     standard: "2008"
     milestone: v1.0
@@ -944,6 +965,8 @@ designs:
           events and times agree.
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: 3991573b856dd572670d95c0f9ef57bdf5fb94b5cfd3452818daf30a90860247
+    semerr_sha256: be3e6028c6a180170b354c14e702902d4b65d3f8b5f3502c65154a5d917be28f
   - name: standin_model
     standard: "2008"
     milestone: v1.0
@@ -1024,6 +1047,8 @@ designs:
     disagreements: []
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: c81d70aad425eac9f85f9738fe80f33b9ae95a06d6d16a6334429c9a3d810324
+    semerr_sha256: ee3ef1146246450f7960ab1f0a71721cebbccd455e8cc62491b4dbb5053a340a
   - name: textio_env
     standard: "2008"
     milestone: v1.0
@@ -1082,6 +1107,8 @@ designs:
     disagreements: []
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: 133b47f00a9a9443253709ee7f0f243bb596466257c25e280f2d02266526e34f
+    semerr_sha256: f029b9e6cd324c9922a137da89861b3c1f2ae4382753871556303c39df536f01
   - name: vhdl93_only
     standard: "1993"
     milestone: v1.0
@@ -1215,6 +1242,8 @@ designs:
           the same.
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: 6284d8838abf6dcbb4dda3b2329acbab72718b52cf1ec66a4b1355274d9eac96
+    semerr_sha256: a9535b51fc73c892d15cbd7af900c5e2471a34640bf71e5c24622d831502328e
   - name: wait_forms
     standard: "2008"
     milestone: v1.0
@@ -1283,6 +1312,8 @@ designs:
     disagreements: []
     trace_sha256: pending
     oracle_sha256: pending
+    format_oracle_sha256: 725a3af5b035375a9039c2526f2ce30547bff9db603058a65b073e8070733d66
+    semerr_sha256: 8e2581f072eaa3077b5a81168bee1724a408d8debd1a540f0d11a6753b35a8a4
 
 # Parser-regression submodules (#8), sorted by name.
 regression:
@@ -1396,6 +1427,7 @@ regression:
     license: GPL-2.0-or-later
     tag: pr
     subfolder: testsuite
+    semerr_sha256: f90a95fd9b19664ed3242f19aa25de36ab1d2a16a5161347067565eea1dea696
     expected_failures:
       - testsuite/gna/*/testsuite.sh
       - testsuite/sanity/*/testsuite.sh
@@ -1439,6 +1471,7 @@ regression:
     license: GPL-3.0-or-later
     tag: pr
     subfolder: test
+    semerr_sha256: dee3c87808c84aa72cb2544cf83f0d4c0c56296b5fc4caba51f07cb1c7937129
     expected_failures:
       - test/regress/testlist.txt
       - test/test_*.c

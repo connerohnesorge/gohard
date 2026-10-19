@@ -1,0 +1,17 @@
+# GoHard formatter oracle (#32): postponed_attrs, nvc.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool nvc 1.23.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file postponed_attrs.vhd std=2008 sha256=c168f40a20be0152b84701bdfa550c0ba4b23994dba73fb18977a9a38b3bfd34 formatted=bacaca39a7b42764b07e2aeb1d210e57cbd5809053d93968bc8088a513dab861 changed
+  exit original=0 formatted=0
+file postponed_attrs_tb.vhd std=2008 sha256=b7744f870a30761bcf062c9bfd2f00df94dd24b61ecf32bd61ec52c23b45efff formatted=1e0ac42b9e0d4839a5af662dc89363e004d9a0a7c0d0c8ebe10ae60b42780d7b changed
+  exit original=0 formatted=0
+result new=0

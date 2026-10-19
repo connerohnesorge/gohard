@@ -1,0 +1,3866 @@
+# GoHard semantic-error oracle (#34, R12): ghdl-gna.txt.
+# Written by go run ./tools/oracle --update semerr; do not edit.
+# Each "run" is one analysis group of the project's own driver (a
+# testsuite.sh between cleans, a VESTS list, an NVC regression test or
+# unit-test block, a corpus design run, or a file no driver names,
+# alone under 2008): its files are analyzed in order, one command per
+# file, in a fresh work directory per tool ("dir" is the working
+# directory; the run's GHDL --std and the sha256 prefix of its sources
+# follow). Each file line is the argument, the library when not work,
+# the GHDL options, then per tool the exit code and the lines of that
+# file it reports errors on; "~" marks a line whose only errors are
+# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
+# reports an error on every line both tools report one on
+# (semerr_check.go).
+tool ghdl 6.0.0
+tool nvc 1.23.0
+run gna/bug01#1 dir=testdata/ghdl/testsuite/gna/bug01 std=93c sha=ae4b12bbd4f71d4f
+ foo.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/bug010#1 dir=testdata/ghdl/testsuite/gna/bug010 std=93c sha=455d8589bef10fbd
+ FIFO.vhdl ghdl=0 nvc=0
+ TestFIFO.vhdl ghdl=0 nvc=0
+run gna/bug0100#1 dir=testdata/ghdl/testsuite/gna/bug0100 std=93c sha=865c0481f895e2e1
+ inst1.vhdl --force-analysis ghdl=1@6 nvc=1@6
+ notype1.vhdl --force-analysis ghdl=1@9,10 nvc=1@9
+ notype2.vhdl --force-analysis ghdl=1@5 nvc=1@5
+ nochoice1.vhdl --force-analysis ghdl=1@9,10 nvc=1@10
+ nochoice2.vhdl --force-analysis ghdl=1@10 nvc=1@10
+ choicelen.vhdl --force-analysis ghdl=1@11 nvc=1@9,11
+ noexpr.vhdl --force-analysis ghdl=1@7 nvc=1@7
+ str.vhdl --force-analysis ghdl=1@9 nvc=1@9
+ procinter.vhdl --force-analysis ghdl=1@5 nvc=1
+ emptyquote2.vhdl --force-analysis ghdl=1@12 nvc=1@12
+ bitstr.vhdl --force-analysis ghdl=1@10 nvc=1@10
+ usrattr.vhdl ghdl=1@11 nvc=1@11
+ forloop.vhdl ghdl=1@20,31,32,33,43 nvc=1@33
+ emptyquote.vhdl ghdl=1@12 nvc=1@12
+ qual.vhdl ghdl=1@9 nvc=1@9
+ proctarg.vhdl ghdl=1@7,12 nvc=1@7,12
+ libparen.vhdl ghdl=1@5 nvc=1@5
+ badrng.vhdl --force-analysis ghdl=1@2 nvc=1@2
+ attr.vhdl --force-analysis ghdl=1@5 nvc=1@5
+ attr2.vhdl --force-analysis ghdl=1@7 nvc=1@7,9
+ paren.vhdl ghdl=1@9 nvc=1@9
+ attr3.vhdl --force-analysis ghdl=1@13 nvc=1@13
+ noconst.vhdl --force-analysis ghdl=1@6 nvc=1@6
+ compon.vhdl ghdl=1@7 nvc=1@7
+ varcomp.vhdl --force-analysis ghdl=1@10,12 nvc=1@10,12
+ name4.vhdl --force-analysis ghdl=1@12 nvc=1@12
+ inst2.vhdl --force-analysis ghdl=1@6,8,9,10,11 nvc=1@6
+ arr_err1.vhdl ghdl=1@2 nvc=1@2
+ oper1.vhdl --force-analysis ghdl=1@10 nvc=1@10
+ emptyrec.vhdl --force-analysis ghdl=1@9 nvc=1@8
+ nameparen.vhdl ghdl=1@3 nvc=1@3
+ inter1.vhdl ghdl=1@2 nvc=1@2
+ inter1.vhdl --force-analysis ghdl=1@2 nvc=1@2
+ id2.vhdl ghdl=1@5 nvc=1@5,8
+ pslid1.vhdl -fpsl ghdl=1@11 nvc=1@11
+ proc1.vhdl --force-analysis -Wsensitivity ghdl=1@14,15,16 nvc=1@14
+ proc2.vhdl --force-analysis -Wsensitivity ghdl=1@15 nvc=1@15
+ proc3.vhdl --force-analysis -Wsensitivity ghdl=1@8,9,10,14 nvc=1@8,12
+ proc4.vhdl --force-analysis -Wsensitivity ghdl=1@20,21 nvc=1@21
+ extname1.vhdl ghdl=1@6 nvc=1@6
+ merge3.vhdl ghdl=1@12,14,16 nvc=1@9,12
+ alias1.vhdl --force-analysis ghdl=1@6,7 nvc=1@7
+ notype1.vhdl --force-analysis ghdl=1@9,10 nvc=1@9
+run gna/bug0100#2 dir=testdata/ghdl/testsuite/gna/bug0100 std=08 sha=98a75b825c0a900c
+ merge1.vhdl --force-analysis ghdl=1@6,7,8,10 nvc=2@6
+ merge2.vhdl --force-analysis ghdl=1@12,14,16 nvc=1@9,12
+run gna/bug0101#1 dir=testdata/ghdl/testsuite/gna/bug0101 std=93c sha=9dab9b96c7475456
+ repro1.vhdl ghdl=1@7 nvc=1@7
+run gna/bug0103#1 dir=testdata/ghdl/testsuite/gna/bug0103 std=08 sha=8185d5e2f7f0a46a
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug0104#1 dir=testdata/ghdl/testsuite/gna/bug0104 std=08 sha=6b7e7548e341d70a
+ alt2.vhdl ghdl=1@47,57 nvc=0
+ alt.vhdl ghdl=0 nvc=0
+run gna/bug0105#1 dir=testdata/ghdl/testsuite/gna/bug0105 std=93c sha=1a802ef3ef14dcdc
+ econcat1.vhdl ghdl=0 nvc=0
+ econcat2.vhdl ghdl=0 nvc=0
+run gna/bug0106#1 dir=testdata/ghdl/testsuite/gna/bug0106 std=93c sha=3af4803e3c23c84b
+ repro.vhdl ghdl=1@8 nvc=1@8
+run gna/bug0108#1 dir=testdata/ghdl/testsuite/gna/bug0108 std=93c sha=8e12198b5fea2566
+ pkg.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/bug0109#1 dir=testdata/ghdl/testsuite/gna/bug0109 std=08 sha=4b84415da4bead9a
+ repro.vhdl ghdl=0 nvc=0
+ err.vhdl ghdl=0 nvc=0
+ ok.vhdl ghdl=0 nvc=0
+run gna/bug011#1 dir=testdata/ghdl/testsuite/gna/bug011 std=93c sha=24efa1f12f00d052
+ phonybench.vhdl ghdl=0 nvc=0
+run gna/bug0110#1 dir=testdata/ghdl/testsuite/gna/bug0110 std=93c sha=654574e29f60d235
+ tb2.vhdl ghdl=1@21 nvc=0
+ tb.vhdl ghdl=1@30 nvc=0
+ tb3.vhdl ghdl=1@30,31 nvc=0
+ tb4.vhdl ghdl=1@27,28 nvc=0
+ tb5.vhdl ghdl=1@27,28 nvc=0
+run gna/bug0111#1 dir=testdata/ghdl/testsuite/gna/bug0111 std=93c sha=3f75e1e9ead7e1d5
+ err.vhdl ghdl=1@7 nvc=1@7
+run gna/bug0112#1 dir=testdata/ghdl/testsuite/gna/bug0112 std=08 sha=e155558b170f41c1
+ assert01.vhdl ghdl=0 nvc=0
+run gna/bug0115#1 dir=testdata/ghdl/testsuite/gna/bug0115 std=93c sha=5470831676e9b8d3
+ repro1.vhdl ghdl=0 nvc=0
+run gna/bug0117#1 dir=testdata/ghdl/testsuite/gna/bug0117 std=08 sha=4007af14f6f23a56
+ repro1.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+ repro5.vhdl ghdl=0 nvc=0
+ repro6.vhdl ghdl=0 nvc=0
+ repro7.vhdl ghdl=0 nvc=0
+ repro8.vhdl ghdl=0 nvc=0
+ repro12.vhdl ghdl=0 nvc=0
+ repro13.vhdl ghdl=0 nvc=0
+run gna/bug012#1 dir=testdata/ghdl/testsuite/gna/bug012 std=93c sha=6dcc23a29077eb21
+ demo.vhd ghdl=0 nvc=0
+run gna/bug0122#1 dir=testdata/ghdl/testsuite/gna/bug0122 std=93c sha=533b892c89fd0772
+ tab1.vhdl ghdl=1@3,4,5,6,7,8,9 nvc=1@3,4,5,6,7,8,9
+run gna/bug0123#1 dir=testdata/ghdl/testsuite/gna/bug0123 std=93c sha=b5a04c02c3f1e051
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug0123#2 dir=testdata/ghdl/testsuite/gna/bug0123 std=08 sha=b5a04c02c3f1e051
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug0125#1 dir=testdata/ghdl/testsuite/gna/bug0125 std=93c sha=0f0a337ab3527ca2
+ repro.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/bug0126#1 dir=testdata/ghdl/testsuite/gna/bug0126 std=93 sha=ad72c0a12bb1a549
+ repro.vhdl ghdl=1@9 nvc=1@9
+run gna/bug0128#1 dir=testdata/ghdl/testsuite/gna/bug0128 std=93c sha=8471ef21baebdae3
+ test2.vhdl ghdl=0 nvc=0
+run gna/bug0129#1 dir=testdata/ghdl/testsuite/gna/bug0129 std=08 sha=69d080fa40052216
+ mwe.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/bug0130#1 dir=testdata/ghdl/testsuite/gna/bug0130 std=08 sha=fcf6c9305b1df7f1
+ word_entity.vhdl ghdl=1@4,11~ nvc=1@4,6,11
+ word_generic_pkg.vhdl ghdl=0 nvc=0
+ word_entity.vhdl ghdl=0 nvc=0
+ word_entity1.vhdl ghdl=1@6,11 nvc=1@6,11
+run gna/bug0131#1 dir=testdata/ghdl/testsuite/gna/bug0131 std=93c sha=9c5c2167abb6a44e
+ foo.vhdl ghdl=1@18 nvc=1@18
+run gna/bug0131#2 dir=testdata/ghdl/testsuite/gna/bug0131 std=08 sha=efc65b7b85feda9e
+ foo.vhdl ghdl=0 nvc=0
+ slv01.vhdl ghdl=0 nvc=0
+ numstd01.vhdl ghdl=0 nvc=0
+run gna/bug0133#1 dir=testdata/ghdl/testsuite/gna/bug0133 std=93c sha=736314cb8a77a2b8
+ e.vhdl ghdl=0 nvc=0
+run gna/bug0134#1 dir=testdata/ghdl/testsuite/gna/bug0134 std=93c sha=517ad7e20bc5b15f
+ test_logic.vhdl ghdl=0 nvc=0
+run gna/bug0135#1 dir=testdata/ghdl/testsuite/gna/bug0135 std=93c sha=8dac15bffadb0698
+ err3_top.vhdl ghdl=1@12,20 nvc=1@20
+run gna/bug0136#1 dir=testdata/ghdl/testsuite/gna/bug0136 std=08 sha=64f9140d91df1ec3
+ repro1.vhdl ghdl=0 nvc=0
+run gna/bug0136#2 dir=testdata/ghdl/testsuite/gna/bug0136 std=93 sha=6272d85cb5f439a9
+ repro2.vhdl ghdl=0 nvc=0
+run gna/bug0137#1 dir=testdata/ghdl/testsuite/gna/bug0137 std=93c sha=01c7cc49f9bd1a30
+ enum01.vhdl ghdl=1@10 nvc=1@10
+run gna/bug0138#1 dir=testdata/ghdl/testsuite/gna/bug0138 std=93c sha=a1b0dd3b87885de5
+ repro.vhdl ghdl=1@13 nvc=1@13
+run gna/bug0139#1 dir=testdata/ghdl/testsuite/gna/bug0139 std=93c sha=6b39a466c0501947
+ repro1.vhdl ghdl=1@18 nvc=0
+ repro2.vhdl ghdl=1@18 nvc=0
+ repro3.vhdl ghdl=1@18 nvc=0
+ repro4.vhdl ghdl=1@18 nvc=0
+run gna/bug014#1 dir=testdata/ghdl/testsuite/gna/bug014 std=93c sha=c1853ed089ce3b51
+ bug.vhdl ghdl=1@11 nvc=1@11
+ bug2.vhdl ghdl=1@3 nvc=1@3
+ bug3.vhdl ghdl=1@3 nvc=1@3
+run gna/bug0140#1 dir=testdata/ghdl/testsuite/gna/bug0140 std=08 sha=78cd743cda054eb0
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/bug0141#1 dir=testdata/ghdl/testsuite/gna/bug0141 std=93c sha=d3bdb62fe9e7767a
+ LFSR_segfault.vhdl ghdl=0 nvc=0
+run gna/bug0143#1 dir=testdata/ghdl/testsuite/gna/bug0143 std=93c sha=a75a42f79f6cd294
+ t.vhdl ghdl=0 nvc=0
+run gna/bug0144#1 dir=testdata/ghdl/testsuite/gna/bug0144 std=93c sha=c25c8fbf12ad3fc2
+ badloc.vhdl ghdl=1@5 nvc=1@5
+ underscore1.vhdl ghdl=1@5 nvc=1@5
+ quote1.vhdl ghdl=1@5 nvc=1@5,6
+run gna/bug015#1 dir=testdata/ghdl/testsuite/gna/bug015 std=93c sha=e92eb935b988f8cf
+ phys.vhdl ghdl=0 nvc=0
+ phys2.vhdl ghdl=0 nvc=0
+run gna/bug016#1 dir=testdata/ghdl/testsuite/gna/bug016 std=93c sha=1e0df2193f3b8e2b
+ repro.vhdl ghdl=1@20 nvc=1@20
+ pkg.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+ pkg.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=1@7 nvc=1@7
+run gna/bug017#1 dir=testdata/ghdl/testsuite/gna/bug017 std=93c sha=d4c10d8d82777567
+ call1.vhdl ghdl=0 nvc=0
+ call2.vhdl ghdl=0 nvc=0
+ call3.vhdl ghdl=0 nvc=0
+ call4.vhdl ghdl=0 nvc=0
+ call5.vhdl ghdl=0 nvc=0
+ call6.vhdl ghdl=0 nvc=0
+ call6a.vhdl ghdl=0 nvc=0
+ call6b.vhdl ghdl=0 nvc=0
+ call7.vhdl ghdl=0 nvc=0
+ call8.vhdl ghdl=0 nvc=0
+ call9.vhdl ghdl=0 nvc=0
+ call10.vhdl ghdl=0 nvc=0
+ for1.vhdl ghdl=0 nvc=0
+ if1.vhdl ghdl=0 nvc=0
+ if2.vhdl ghdl=0 nvc=0
+ if3.vhdl ghdl=0 nvc=0
+ if4.vhdl ghdl=0 nvc=0
+ loop1.vhdl ghdl=0 nvc=0
+ loop2.vhdl ghdl=0 nvc=0
+ case1.vhdl ghdl=0 nvc=0
+ case3.vhdl ghdl=0 nvc=0
+ case4.vhdl ghdl=0 nvc=0
+ ret1.vhdl ghdl=0 nvc=0
+ wait1.vhdl ghdl=0 nvc=0
+ wait2.vhdl ghdl=0 nvc=0
+ wait3.vhdl ghdl=0 nvc=0
+run gna/bug018#1 dir=testdata/ghdl/testsuite/gna/bug018 std=93c sha=2d17a68c8f250310
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug019#1 dir=testdata/ghdl/testsuite/gna/bug019 std=93c sha=b459abeec4d7d319
+ PoC/tb/common/my_config_ML505.vhdl lib=poc ghdl=0 nvc=0
+ PoC/tb/common/my_project.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/common/utils.vhdl lib=poc ghdl=0 nvc=1@576
+ PoC/src/common/config.vhdl lib=poc ghdl=0 nvc=1@42,258,954
+ PoC/src/common/strings.vhdl lib=poc ghdl=0 nvc=1@40,41,154,195
+ PoC/src/common/vectors.vhdl lib=poc ghdl=0 nvc=1@39,40,174
+ PoC/src/common/physical.vhdl lib=poc ghdl=0 nvc=1@60,61,62,207
+ PoC/src/common/components.vhdl lib=poc ghdl=0 nvc=1@38,93
+ PoC/tb/common/simulation.v93.vhdl lib=poc ghdl=0 nvc=1@37,38,39,147
+ PoC/src/io/uart/uart.pkg.vhdl lib=poc ghdl=0 nvc=1@38,39,146
+ PoC/src/io/uart/uart_bclk.vhdl lib=poc ghdl=0 nvc=1@44,45,46,47,48,65
+ PoC/src/io/uart/uart_rx.vhdl lib=poc ghdl=0 nvc=1@52,70
+ PoC/tb/io/uart/uart_rx_tb.vhdl lib=test ghdl=0 nvc=1@37,38,39,40,41,42,49
+run gna/bug02#1 dir=testdata/ghdl/testsuite/gna/bug02 std=93c sha=5d22a60e1b4fc8b8
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/bug02#2 dir=testdata/ghdl/testsuite/gna/bug02 std=08 sha=c017a8f3ee5ce5b8
+ repro3.vhdl ghdl=0 nvc=0
+run gna/bug021#1 dir=testdata/ghdl/testsuite/gna/bug021 std=93c sha=5d81278b930d0ae3
+ sim_pkg.vhd ghdl=0 nvc=0
+ tb_cosim.vhd ghdl=1@24,30 nvc=1@30
+run gna/bug022#1 dir=testdata/ghdl/testsuite/gna/bug022 std=93c sha=79527067d7aa5175
+ test.vhdl ghdl=0 nvc=0
+run gna/bug023#1 dir=testdata/ghdl/testsuite/gna/bug023 std=93c sha=76af0805b865c7e0
+ ppkg.vhdl ghdl=0 nvc=0
+ ppkg_tb.vhdl ghdl=0 nvc=0
+ ppkg1.vhdl ghdl=0 nvc=1@3,8,9
+ ppkg1_tb.vhdl ghdl=0 nvc=1@4
+run gna/bug024#1 dir=testdata/ghdl/testsuite/gna/bug024 std=93c sha=ab479c1fc8f78f14
+ ppkg.vhdl ghdl=0 nvc=0
+ ppkg1.vhdl ghdl=1@8,9,11,16,17,22 nvc=1@3,9,16,17,22
+run gna/bug026#1 dir=testdata/ghdl/testsuite/gna/bug026 std=93c sha=3c129de41205b834
+ x.vhd ghdl=0 nvc=0
+ xb.vhd ghdl=0 nvc=1@6
+run gna/bug027#1 dir=testdata/ghdl/testsuite/gna/bug027 std=93c sha=e152f67e218c1201
+ comp.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug028#1 dir=testdata/ghdl/testsuite/gna/bug028 std=08 sha=7d1a89c6e3b959d3
+ simple.vhdl --ieee=mentor ghdl=0 nvc=0
+run gna/bug029#1 dir=testdata/ghdl/testsuite/gna/bug029 std=93c sha=cdcee09171404802
+ fft.vhdl ghdl=0 nvc=0
+ fft1.vhdl ghdl=0 nvc=0
+ fft2.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/bug03#1 dir=testdata/ghdl/testsuite/gna/bug03 std=93c sha=090df325cdb86f20
+ wor_std.vhdl ghdl=0 nvc=0
+run gna/bug030#1 dir=testdata/ghdl/testsuite/gna/bug030 std=93c sha=f17db2fe70498d79
+ reserved1.vhdl --warn-reserved ghdl=0 nvc=0
+ reserved2.vhdl --warn-reserved ghdl=0 nvc=0
+ reserved3.vhdl --warn-reserved ghdl=0 nvc=0
+run gna/bug032#1 dir=testdata/ghdl/testsuite/gna/bug032 std=93c sha=7cf726e6997e0fc0
+ allnl.vhdl ghdl=0 nvc=0
+run gna/bug033#1 dir=testdata/ghdl/testsuite/gna/bug033 std=93c sha=4724f0e3b3942129
+ simple.vhdl ghdl=0 nvc=0
+run gna/bug034#1 dir=testdata/ghdl/testsuite/gna/bug034 std=93c sha=8228e73f92c39236
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug035#1 dir=testdata/ghdl/testsuite/gna/bug035 std=93c sha=2fe07950b05a7dc3
+ my_config_ML505.vhdl lib=poc ghdl=0 nvc=0
+ my_project.vhdl lib=poc ghdl=0 nvc=0
+ utils.vhdl lib=poc ghdl=0 nvc=0
+ config.vhdl lib=poc ghdl=0 nvc=0
+ strings.vhdl lib=poc ghdl=0 nvc=0
+ vectors.vhdl lib=poc ghdl=0 nvc=0
+ physical.vhdl lib=poc ghdl=0 nvc=0
+ simulation.v93.vhdl lib=poc ghdl=0 nvc=0
+ arith_prng.vhdl lib=poc ghdl=0 nvc=0
+ arith_prng_tb.vhdl ghdl=0 nvc=0
+run gna/bug036#1 dir=testdata/ghdl/testsuite/gna/bug036 std=93c sha=c52baf20112967cf
+ phys.vhdl ghdl=1@2 nvc=0
+ phys2.vhdl ghdl=0 nvc=0
+run gna/bug037#1 dir=testdata/ghdl/testsuite/gna/bug037 std=08 sha=c209e75dfab9c487
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug037#2 dir=testdata/ghdl/testsuite/gna/bug037 std=08 sha=f0c62487772d4d4f
+ my_config_ML505.vhdl lib=poc ghdl=0 nvc=0
+ my_project.vhdl lib=poc ghdl=0 nvc=0
+ utils.vhdl lib=poc ghdl=0 nvc=0
+ config.vhdl lib=poc ghdl=0 nvc=0
+ strings.vhdl lib=poc ghdl=0 nvc=0
+ vectors.vhdl lib=poc ghdl=0 nvc=0
+ physical.vhdl lib=poc ghdl=0 nvc=0
+ sim_types.vhdl lib=poc ghdl=0 nvc=0
+ sim_protected.v08.vhdl lib=poc ghdl=0 nvc=0
+ sim_global.v08.vhdl lib=poc ghdl=0 nvc=0
+ sim_simulation.v08.vhdl lib=poc ghdl=0 nvc=0
+ arith.pkg.vhdl lib=poc ghdl=0 nvc=0
+ arith_addw.vhdl lib=poc ghdl=0 nvc=0
+ arith_addw_tb.vhdl ghdl=0 nvc=0
+run gna/bug039#1 dir=testdata/ghdl/testsuite/gna/bug039 std=93c sha=cad92a60f5c2cb97
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug04#1 dir=testdata/ghdl/testsuite/gna/bug04 std=93 sha=877476a22dcd6c24
+ std_logic_warning.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+run gna/bug040#1 dir=testdata/ghdl/testsuite/gna/bug040 std=93c sha=a4bae63ae9b85686
+ add_200.vhd ghdl=0 nvc=0
+ add_201.vhd ghdl=0 nvc=0
+ add_202.vhd ghdl=0 nvc=0
+ add_203.vhd ghdl=0 nvc=0
+ add_204.vhd ghdl=0 nvc=0
+ bit_set_mask.vhd ghdl=0 nvc=0
+ cmp_775.vhd ghdl=0 nvc=0
+ cmp_779.vhd ghdl=0 nvc=0
+ cmp_780.vhd ghdl=0 nvc=0
+ cmp_787.vhd ghdl=0 nvc=0
+ cmp_788.vhd ghdl=0 nvc=0
+ cmp_790.vhd ghdl=0 nvc=0
+ cmp_791.vhd ghdl=0 nvc=0
+ cmp_792.vhd ghdl=0 nvc=0
+ cmp_793.vhd ghdl=0 nvc=0
+ cmp_794.vhd ghdl=0 nvc=0
+ cmp_799.vhd ghdl=0 nvc=0
+ cmp_800.vhd ghdl=0 nvc=0
+ cmp_804.vhd ghdl=0 nvc=0
+ cmp_846.vhd ghdl=0 nvc=0
+ cmp_847.vhd ghdl=0 nvc=0
+ cmp_848.vhd ghdl=0 nvc=0
+ cmp_849.vhd ghdl=0 nvc=0
+ cmp_850.vhd ghdl=0 nvc=0
+ cmp_851.vhd ghdl=0 nvc=0
+ cmp_852.vhd ghdl=0 nvc=0
+ cmp_855.vhd ghdl=0 nvc=0
+ cmp_861.vhd ghdl=0 nvc=0
+ cmp_863.vhd ghdl=0 nvc=0
+ cmp_865.vhd ghdl=0 nvc=0
+ cmp_868.vhd ghdl=0 nvc=0
+ cmp_869.vhd ghdl=0 nvc=0
+ cmp_871.vhd ghdl=0 nvc=0
+ cmp_873.vhd ghdl=0 nvc=0
+ cmp_877.vhd ghdl=0 nvc=0
+ cmp_878.vhd ghdl=0 nvc=0
+ cmp_879.vhd ghdl=0 nvc=0
+ cmp_880.vhd ghdl=0 nvc=0
+ cmp_882.vhd ghdl=0 nvc=0
+ cmp_885.vhd ghdl=0 nvc=0
+ cmp_887.vhd ghdl=0 nvc=0
+ cmp_962.vhd ghdl=0 nvc=0
+ cmp_964.vhd ghdl=0 nvc=0
+ cmp_971.vhd ghdl=0 nvc=0
+ cmp_972.vhd ghdl=0 nvc=0
+ cmp_973.vhd ghdl=0 nvc=0
+ cmp_974.vhd ghdl=0 nvc=0
+ cmp_975.vhd ghdl=0 nvc=0
+ cmp_977.vhd ghdl=0 nvc=0
+ cmp_978.vhd ghdl=0 nvc=0
+ cmp_979.vhd ghdl=0 nvc=0
+ cmp_985.vhd ghdl=0 nvc=0
+ extend_mask.vhd ghdl=0 nvc=0
+ fsm_224.vhd ghdl=0 nvc=0
+ huff_make_dhuff_tb_ac_huffcode.vhd ghdl=0 nvc=0
+ huff_make_dhuff_tb_ac_huffsize.vhd ghdl=0 nvc=0
+ huff_make_dhuff_tb_dc_huffcode.vhd ghdl=0 nvc=0
+ huff_make_dhuff_tb_dc_huffsize.vhd ghdl=0 nvc=0
+ huffbuff.vhd ghdl=0 nvc=0
+ idctbuff.vhd ghdl=0 nvc=0
+ izigzag_index.vhd ghdl=0 nvc=0
+ jpegfilebuf.vhd ghdl=0 nvc=0
+ lmask.vhd ghdl=0 nvc=0
+ mul_209.vhd ghdl=0 nvc=0
+ mul_210.vhd ghdl=0 nvc=0
+ mul_213.vhd ghdl=0 nvc=0
+ mul_214.vhd ghdl=0 nvc=0
+ mul_215.vhd ghdl=0 nvc=0
+ mul_216.vhd ghdl=0 nvc=0
+ mul_222.vhd ghdl=0 nvc=0
+ muxb_784.vhd ghdl=0 nvc=0
+ outdata_comp_buf.vhd ghdl=0 nvc=0
+ outdata_comp_hpos.vhd ghdl=0 nvc=0
+ outdata_comp_vpos.vhd ghdl=0 nvc=0
+ p_jinfo_ac_dhuff_tbl_maxcode.vhd ghdl=0 nvc=0
+ p_jinfo_ac_dhuff_tbl_mincode.vhd ghdl=0 nvc=0
+ p_jinfo_ac_dhuff_tbl_ml.vhd ghdl=0 nvc=0
+ p_jinfo_ac_dhuff_tbl_valptr.vhd ghdl=0 nvc=0
+ p_jinfo_ac_xhuff_tbl_bits.vhd ghdl=0 nvc=0
+ p_jinfo_ac_xhuff_tbl_huffval.vhd ghdl=0 nvc=0
+ p_jinfo_comps_info_dc_tbl_no.vhd ghdl=0 nvc=0
+ p_jinfo_comps_info_h_samp_factor.vhd ghdl=0 nvc=0
+ p_jinfo_comps_info_id.vhd ghdl=0 nvc=0
+ p_jinfo_comps_info_quant_tbl_no.vhd ghdl=0 nvc=0
+ p_jinfo_dc_dhuff_tbl_maxcode.vhd ghdl=0 nvc=0
+ p_jinfo_dc_dhuff_tbl_mincode.vhd ghdl=0 nvc=0
+ p_jinfo_dc_dhuff_tbl_ml.vhd ghdl=0 nvc=0
+ p_jinfo_dc_dhuff_tbl_valptr.vhd ghdl=0 nvc=0
+ p_jinfo_dc_xhuff_tbl_bits.vhd ghdl=0 nvc=0
+ p_jinfo_dc_xhuff_tbl_huffval.vhd ghdl=0 nvc=0
+ p_jinfo_quant_tbl_quantval.vhd ghdl=0 nvc=0
+ quantbuff.vhd ghdl=0 nvc=0
+ rgb_buf.vhd ghdl=0 nvc=0
+ shl_211.vhd ghdl=0 nvc=0
+ shr_212.vhd ghdl=0 nvc=0
+ sub_205.vhd ghdl=0 nvc=0
+ sub_206.vhd ghdl=0 nvc=0
+ sub_207.vhd ghdl=0 nvc=0
+ sub_208.vhd ghdl=0 nvc=0
+ sub_217.vhd ghdl=0 nvc=0
+ sub_218.vhd ghdl=0 nvc=0
+ sub_219.vhd ghdl=0 nvc=0
+ sub_220.vhd ghdl=0 nvc=0
+ sub_221.vhd ghdl=0 nvc=0
+ tb.vhd ghdl=0 nvc=0
+ top.vhd ghdl=0 nvc=0
+ zigzag_index.vhd ghdl=0 nvc=0
+run gna/bug041#1 dir=testdata/ghdl/testsuite/gna/bug041 std=93c sha=a17d1319b76816bb
+ foo.vhdl ghdl=1@9 nvc=1@9
+run gna/bug042#1 dir=testdata/ghdl/testsuite/gna/bug042 std=93c sha=1ef9c9ca51afc017
+ centerconfig.vhdl ghdl=1@58,62 nvc=1@58,62
+ centerconfig_works.vhdl ghdl=0 nvc=0
+ centerconfig_generics_works.vhdl ghdl=1@63,69 nvc=1@63,69
+run gna/bug043#1 dir=testdata/ghdl/testsuite/gna/bug043 std=93c sha=8bc4297e58cec2a0
+ sha256.vhd --ieee=synopsys -fexplicit ghdl=0 nvc=0
+run gna/bug044#1 dir=testdata/ghdl/testsuite/gna/bug044 std=93 sha=7f53b9a03eceaaf9
+ aggr1.vhdl ghdl=1@7,8 nvc=1@7,8
+ aggr2.vhdl ghdl=1@10 nvc=0
+run gna/bug045#1 dir=testdata/ghdl/testsuite/gna/bug045 std=93c sha=061a99433a6ca954
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug046#1 dir=testdata/ghdl/testsuite/gna/bug046 std=93c sha=dc71e388ad2b6c23
+ bug_pkg.vhdl ghdl=0 nvc=0
+run gna/bug047#1 dir=testdata/ghdl/testsuite/gna/bug047 std=93c sha=125cd8846d247b58
+ repro_arith.vhdl ghdl=1@3,8~ nvc=0
+run gna/bug048#1 dir=testdata/ghdl/testsuite/gna/bug048 std=93c sha=ad68d2e85c916cf1
+ leftof1.vhdl ghdl=0 nvc=0
+ leftof2.vhdl ghdl=0 nvc=0
+ leftof3.vhdl ghdl=0 nvc=0
+run gna/bug049#1 dir=testdata/ghdl/testsuite/gna/bug049 std=93c sha=73f2e1cd8283eeb6
+ rng1.vhdl ghdl=0 nvc=0
+run gna/bug05#1 dir=testdata/ghdl/testsuite/gna/bug05 std=93c sha=d5084f135a15d781
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug050#1 dir=testdata/ghdl/testsuite/gna/bug050 std=93c sha=46cab1db48932235
+ tarith.vhdl ghdl=1@2 nvc=0
+ tarith.vhdl --ieee=synopsys ghdl=0 nvc=0
+ tunsigned.vhdl ghdl=1@2 nvc=0
+ tunsigned.vhdl --ieee=synopsys ghdl=0 nvc=0
+ tsigned.vhdl ghdl=1@2 nvc=0
+ tsigned.vhdl --ieee=synopsys ghdl=0 nvc=0
+ tsltextio.vhdl ghdl=1@2 nvc=0
+ tsltextio.vhdl --ieee=synopsys ghdl=0 nvc=0
+run gna/bug050#2 dir=testdata/ghdl/testsuite/gna/bug050 std=08 sha=04be4395d50ded90
+ tsltextio.vhdl ghdl=0 nvc=0
+run gna/bug051#1 dir=testdata/ghdl/testsuite/gna/bug051 std=08 sha=fde61bc946dcfe5e
+ tb1.vhdl ghdl=1@7 nvc=1@7
+ tb2.vhdl -fpsl ghdl=1@9 nvc=1@9
+ tb.vhdl ghdl=0 nvc=0
+run gna/bug052#1 dir=testdata/ghdl/testsuite/gna/bug052 std=08 sha=ef471fe0c59932d2
+ tb_simple.vhdl ghdl=0 nvc=0
+ tb_simple1.vhdl ghdl=0 nvc=0
+ tb_simple2.vhdl ghdl=0 nvc=0
+run gna/bug053#1 dir=testdata/ghdl/testsuite/gna/bug053 std=08 sha=d1234bcee88a275a
+ tb1.vhdl ghdl=1@2,8~ nvc=0
+ tb2.vhdl ghdl=0 nvc=0
+ tb3.vhdl ghdl=0 nvc=0
+run gna/bug054#1 dir=testdata/ghdl/testsuite/gna/bug054 std=08 sha=3f534ff5ac0f542f
+ gen1.vhdl ghdl=0 nvc=0
+ gen2.vhdl ghdl=0 nvc=0
+ gen3.vhdl ghdl=1@30,35,37 nvc=1@30,37
+ gen4.vhdl ghdl=0 nvc=0
+run gna/bug055#1 dir=testdata/ghdl/testsuite/gna/bug055 std=08 sha=fd0fcf1f1f01d56d
+ gen1.vhdl ghdl=0 nvc=0
+ gen2.vhdl ghdl=0 nvc=0
+ pkg1.vhdl ghdl=1@1 nvc=1@1
+ gen1-body.vhdl ghdl=0 nvc=0
+ pkg1.vhdl ghdl=0 nvc=0
+run gna/bug056#1 dir=testdata/ghdl/testsuite/gna/bug056 std=08 sha=6e74981aeb253c54
+ tb.vhdl ghdl=0 nvc=0
+ tb2.vhdl ghdl=0 nvc=0
+ tb3_err.vhdl ghdl=1@13 nvc=1@13
+ tb3.vhdl ghdl=0 nvc=0
+run gna/bug057#1 dir=testdata/ghdl/testsuite/gna/bug057 std=08 sha=1515bad6f342bdd1
+ tb.vhdl ghdl=0 nvc=0
+ tb2.vhdl ghdl=0 nvc=0
+run gna/bug058#1 dir=testdata/ghdl/testsuite/gna/bug058 std=08 sha=9d71a85e730172fd
+ tb.vhdl ghdl=0 nvc=1@1,8,21
+ tb2.vhdl ghdl=0 nvc=0
+run gna/bug059#1 dir=testdata/ghdl/testsuite/gna/bug059 std=93c sha=9024589303c77a92
+ tb.vhdl ghdl=1@8 nvc=1@8
+run gna/bug059#2 dir=testdata/ghdl/testsuite/gna/bug059 std=08 sha=33d055aed156ba8f
+ tb1.vhdl ghdl=0 nvc=1@4
+run gna/bug06#1 dir=testdata/ghdl/testsuite/gna/bug06 std=93c sha=3a6fe199961423dc
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug060#1 dir=testdata/ghdl/testsuite/gna/bug060 std=08 sha=1e6786c59d4619a0
+ corelib_List.v08.vhdl ghdl=0 nvc=0
+ corelib.v08.vhdl ghdl=0 nvc=0
+ Integer_List_tb.vhdl ghdl=0 nvc=0
+run gna/bug061#1 dir=testdata/ghdl/testsuite/gna/bug061 std=08 sha=9a6e53377f658bdd
+ dictp.vhdl ghdl=0 nvc=1@70
+ dictp08.vhdl ghdl=0 nvc=1@63
+ datastructure.vhdl ghdl=0 nvc=1@14,15,16,17,19,20,21,22,24,25,26,27,29,30,31,32,35,36,37,38,45
+ test_dict.vhdl ghdl=0 nvc=1@4
+run gna/bug063#1 dir=testdata/ghdl/testsuite/gna/bug063 std=93c sha=798b66fe5c3bfbd4
+ dff.vhdl ghdl=1@10,11,12 nvc=1@10
+run gna/bug064#1 dir=testdata/ghdl/testsuite/gna/bug064 std=08 sha=6a053c0a91093555
+ repro.vhdl ghdl=1@15 nvc=1@15
+run gna/bug065#1 dir=testdata/ghdl/testsuite/gna/bug065 std=08 sha=55279f55612abaf5
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug066#1 dir=testdata/ghdl/testsuite/gna/bug066 std=93c sha=769e2d4c0fc7b59e
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug069#1 dir=testdata/ghdl/testsuite/gna/bug069 std=93c sha=57b17ca38fa89a54
+ bug1.vhdl ghdl=1@13 nvc=1@13
+ bug2.vhdl ghdl=1@11 nvc=1@11
+ bug7.vhdl ghdl=1@11 nvc=1@11
+ bug8.vhdl ghdl=1@11 nvc=1@11
+run gna/bug07#1 dir=testdata/ghdl/testsuite/gna/bug07 std=93c sha=dbb13ebe7291ffb2
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug071#1 dir=testdata/ghdl/testsuite/gna/bug071 std=08 sha=20d57bb38f50d5a8
+ atod.vhdl ghdl=0 nvc=0
+run gna/bug072#1 dir=testdata/ghdl/testsuite/gna/bug072 std=93c sha=55d59e447bc7f6da
+ t.vhdl ghdl=1@3 nvc=1@3
+run gna/bug073#1 dir=testdata/ghdl/testsuite/gna/bug073 std=93c sha=40fcd7301f9e103c
+ adder.vhdl ghdl=0 nvc=0
+ adder_tb.vhdl ghdl=0 nvc=0
+ adder_tb2.vhdl ghdl=1@12 nvc=1@12
+run gna/bug074#1 dir=testdata/ghdl/testsuite/gna/bug074 std=93c sha=39b9d365c18ad221
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug075#1 dir=testdata/ghdl/testsuite/gna/bug075 std=93c sha=1be012fe8599cf4b
+ dff.vhdl -Wno-library ghdl=0 nvc=0
+run gna/bug077#1 dir=testdata/ghdl/testsuite/gna/bug077 std=93c sha=98a51ad35362dea9
+ repro2.vhdl ghdl=0 nvc=0
+ repro5.vhdl ghdl=0 nvc=0
+ repro6.vhdl ghdl=0 nvc=0
+run gna/bug077#2 dir=testdata/ghdl/testsuite/gna/bug077 std=08 sha=bc3816956714ce8a
+ repro.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro7.vhdl ghdl=0 nvc=0
+run gna/bug078#1 dir=testdata/ghdl/testsuite/gna/bug078 std=93c sha=2f09060f8d2316ae
+ half_adder.vhdl ghdl=0 nvc=1@69,79
+run gna/bug079#1 dir=testdata/ghdl/testsuite/gna/bug079 std=93c sha=9e133a2f22aa2fa3
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/bug08#1 dir=testdata/ghdl/testsuite/gna/bug08 std=93c sha=5ac7a01db46ee5df
+ paren1.vhdl ghdl=0 nvc=0
+ paren2.vhdl ghdl=0 nvc=0
+ paren3.vhdl ghdl=0 nvc=0
+ paren4.vhdl ghdl=0 nvc=0
+ paren5.vhdl ghdl=0 nvc=0
+ paren6.vhdl ghdl=0 nvc=0
+ paren7.vhdl ghdl=0 nvc=0
+ paren8.vhdl ghdl=0 nvc=0
+ paren9.vhdl ghdl=0 nvc=0
+ paren10.vhdl ghdl=0 nvc=1@15
+ paren11.vhdl ghdl=0 nvc=1@16
+ paren12.vhdl ghdl=0 nvc=1@16
+ paren13.vhdl ghdl=0 nvc=1@20
+run gna/bug080#1 dir=testdata/ghdl/testsuite/gna/bug080 std=93c sha=f5733d270b936b17
+ impurefunc.vhdl ghdl=1@8 nvc=1@8
+run gna/bug081#1 dir=testdata/ghdl/testsuite/gna/bug081 std=93c sha=4b717d72bc9bd0fb
+ dummy.vhdl -Werror=elaboration ghdl=1@4,7~,16,20,21,25~ nvc=1@4,7,16,25
+ elab_func.vhdl -Werror=elaboration ghdl=1@6 nvc=1@6
+ test_comp.vhdl -Werror=elaboration ghdl=0 nvc=0
+ dummy.vhdl ghdl=0 nvc=1@4,7,16,25
+run gna/bug081#2 dir=testdata/ghdl/testsuite/gna/bug081 std=08 sha=d6e841c33f58ba8c
+ elab_prot.vhdl -Werror=elaboration ghdl=1@9 nvc=1@9
+run gna/bug082#1 dir=testdata/ghdl/testsuite/gna/bug082 std=08 sha=40809621bbf9d897
+ repro.vhdl ghdl=1@6,7,8,9,10 nvc=1@6,7,8,9,10,16,17,18,19,20
+run gna/bug083#1 dir=testdata/ghdl/testsuite/gna/bug083 std=08 sha=7f554dd7615d0567
+ repro2.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug084#1 dir=testdata/ghdl/testsuite/gna/bug084 std=93c sha=bd05953a5ea10281
+ func_test3.vhdl ghdl=0 nvc=0
+ func_test1.vhdl ghdl=0 nvc=0
+ func_test2.vhdl ghdl=0 nvc=0
+ mod5.vhdl ghdl=0 nvc=0
+ mod5x.vhdl ghdl=0 nvc=0
+run gna/bug085#1 dir=testdata/ghdl/testsuite/gna/bug085 std=93c sha=a8b26766348fd195
+ foo.vhdl ghdl=0 nvc=0
+run gna/bug086#1 dir=testdata/ghdl/testsuite/gna/bug086 std=93c sha=22efd32846f390cf
+ sig.vhdl ghdl=0 nvc=0
+run gna/bug088#1 dir=testdata/ghdl/testsuite/gna/bug088 std=93c sha=eb7a88f6a8a48cb2
+ assemble.vhdl ghdl=1@22 nvc=1@22
+ assemble2.vhdl ghdl=0 nvc=0
+run gna/bug09#1 dir=testdata/ghdl/testsuite/gna/bug09 std=93c sha=d85ef3667df0f306
+ univ1.vhdl ghdl=0 nvc=1@5
+ univ2.vhdl ghdl=0 nvc=0
+run gna/bug090#1 dir=testdata/ghdl/testsuite/gna/bug090 std=93c sha=4cfe1c221b2ee269
+ bad5.vhdl ghdl=1@7 nvc=1@7
+ crash1.vhdl ghdl=1@28 nvc=0
+ crash10.vhdl ghdl=1@53,58,62,63 nvc=1@2,9,22,24,39,41,42,53
+ crash11.vhdl ghdl=1@67 nvc=1@13,22,24,39,41,42,68
+ crash12.vhdl ghdl=1@13 nvc=1@13
+ crash13.vhdl ghdl=1@75 nvc=1@13,22,24,39,41,42,75
+ crash14.vhdl ghdl=1@5,6,7,8,9,11,13,18,19,20,21,23,25,27,29,31,36,37,38,39,41,42,43,45,46,48,49,50,51 nvc=1@5,15,19
+ crash2.vhdl ghdl=1@6,7 nvc=1@6,9
+ crash3.vhdl ghdl=1@12,14,15,17,19,23,24,25,26 nvc=1@11,12,21,23,24
+ crash4.vhdl ghdl=1@6,7,8,10,12,13,22,24,26,27,28,29 nvc=1@2,6,10,13,17,20
+ crash5.vhdl ghdl=1@34 nvc=1@2,12,30,31,32,34
+ crash6.vhdl ghdl=1@65,66,67 nvc=1@2,12,30,31,32,38,39,42,65
+ crash7.vhdl ghdl=1@75 nvc=1@2,12,30,32,42,75
+ crash9.vhdl ghdl=1@43 nvc=1@2,12,30,32,42,43,44,46
+ hang1.vhdl ghdl=1@6,7,9,10,11,12,16,17,18,19,21,25,26,27,28 nvc=1@6,9
+ hang2.vhdl ghdl=1@2,4,7 nvc=1@4
+ hang3.vhdl ghdl=1@6,7 nvc=1@6
+ hang4.vhdl ghdl=1@7,8 nvc=1@7,8
+ hang5.vhdl ghdl=1@24 nvc=1@24,28
+ hang6.vhdl ghdl=1@10,11,13,14,15,16,24 nvc=1@10,12,20,22,23
+ hang7.vhdl ghdl=1@57,58,62,63,64 nvc=1@2,12,30,31,32,38,42,57,62
+ hang8.vhdl ghdl=1@53,55,56,60,61,62 nvc=1@2,9,22,24,39,41,42,53
+run gna/bug092#1 dir=testdata/ghdl/testsuite/gna/bug092 std=93c sha=51a96d7dc123bdd8
+ t.vhdl ghdl=1@5 nvc=0
+run gna/bug093#1 dir=testdata/ghdl/testsuite/gna/bug093 std=08 sha=add54483461ef1c0
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug094#1 dir=testdata/ghdl/testsuite/gna/bug094 std=93c sha=2cedc4265482d503
+ enta.vhdl ghdl=1@1,5,8~ nvc=1@1,8
+ topa.vhdl ghdl=1@9 nvc=1@9
+ topa.vhdl ghdl=1@9 nvc=1@9
+run gna/bug094#2 dir=testdata/ghdl/testsuite/gna/bug094 std=08 sha=e2d3d4667bf8a8ba
+ pkgb.vhdl -frelaxed-rules ghdl=0 nvc=0
+ entb.vhdl -frelaxed-rules ghdl=0 nvc=0
+ topb.vhdl -frelaxed-rules ghdl=0 nvc=0
+ topb.vhdl ghdl=1 nvc=0
+run gna/bug096#1 dir=testdata/ghdl/testsuite/gna/bug096 std=93c sha=91993c18f0a7adff
+ reader.vhdl ghdl=0 nvc=0
+run gna/bug097#1 dir=testdata/ghdl/testsuite/gna/bug097 std=93c sha=57bc91b0ebce7193
+ tb.vhdl ghdl=0 nvc=0
+run gna/bug098#1 dir=testdata/ghdl/testsuite/gna/bug098 std=93 sha=b2e9c8d73fbeb3a2
+ loopy.vhdl ghdl=1@20,21,22 nvc=0
+run gna/bug099#1 dir=testdata/ghdl/testsuite/gna/bug099 std=93c sha=ec799f5fa0267434
+ repro.vhdl ghdl=1@1,2,3,4,5,6,7,8 nvc=1@1
+run gna/bug14953#1 dir=testdata/ghdl/testsuite/gna/bug14953 std=93c sha=5acfff0e81e1ec3b
+ bug.vhdl ghdl=0 nvc=1@8,10
+ bug2.vhdl ghdl=0 nvc=1@10
+run gna/bug15638#1 dir=testdata/ghdl/testsuite/gna/bug15638 std=93c sha=b7d2f4e3ccc9c995
+ 15368.vhd ghdl=0 nvc=0
+run gna/bug15702#1 dir=testdata/ghdl/testsuite/gna/bug15702 std=93c sha=0dbd778d152498c6
+ example.vhd ghdl=1@46 nvc=1@46
+run gna/bug15933#1 dir=testdata/ghdl/testsuite/gna/bug15933 std=93c sha=7ef75dbc0e90db69
+ crash.vhd ghdl=1@12 nvc=1@12
+run gna/bug15966#1 dir=testdata/ghdl/testsuite/gna/bug15966 std=93c sha=4f3615dd23313e3b
+ fail.vhd ghdl=0 nvc=0
+run gna/bug15993#1 dir=testdata/ghdl/testsuite/gna/bug15993 std=93c sha=0f9dff8cf6147ed1
+ cells.vhdl ghdl=0 nvc=0
+ testbench_15993.vhdl ghdl=0 nvc=0
+ testbench.vhdl ghdl=0 nvc=0
+run gna/bug16095#1 dir=testdata/ghdl/testsuite/gna/bug16095 std=93c sha=423c1b96d0b1d21e
+ module.vhd ghdl=1@2 nvc=1@2
+run gna/bug16096#1 dir=testdata/ghdl/testsuite/gna/bug16096 std=93c sha=6d724307862fc3f6
+ module.vhd ghdl=1@25 nvc=1@25
+run gna/bug16287#1 dir=testdata/ghdl/testsuite/gna/bug16287 std=93c sha=683e75b512128baf
+ 16287.vhd ghdl=0 nvc=0
+run gna/bug16695#1 dir=testdata/ghdl/testsuite/gna/bug16695 std=93c sha=c16f5e1566af3775
+ lfsr_updown.vhd --ieee=synopsys ghdl=0 nvc=0
+ lfsr_updown_tb.vhd --ieee=synopsys ghdl=0 nvc=0
+run gna/bug16782#1 dir=testdata/ghdl/testsuite/gna/bug16782 std=93c sha=887def0c863a2a19
+ bug.vhd ghdl=0 nvc=0
+run gna/bug17127#1 dir=testdata/ghdl/testsuite/gna/bug17127 std=93c sha=21b1db119f90db8b
+ bug2.vhdl ghdl=0 nvc=0
+run gna/bug17202#1 dir=testdata/ghdl/testsuite/gna/bug17202 std=93c sha=982df0d8e6e4bd52
+ test.vhdl ghdl=0 nvc=0
+run gna/bug17203#1 dir=testdata/ghdl/testsuite/gna/bug17203 std=93c sha=e61bbaca36476cba
+ bug.vhdl ghdl=0 nvc=0
+run gna/bug17309#1 dir=testdata/ghdl/testsuite/gna/bug17309 std=93c sha=8498208e1761da8b
+ polyamplib.vhdl ghdl=0 nvc=0
+ master_testbench3.vhdl ghdl=0 nvc=0
+run gna/bug17545#1 dir=testdata/ghdl/testsuite/gna/bug17545 std=93c sha=b5b4c3e4661181e8
+ bug.vhdl ghdl=0 nvc=0
+run gna/bug17759#1 dir=testdata/ghdl/testsuite/gna/bug17759 std=93c sha=52abb043fc5d2242
+ test.vhdl ghdl=0 nvc=0
+run gna/bug18280#1 dir=testdata/ghdl/testsuite/gna/bug18280 std=93c sha=cd1623b2d38af8f5
+ alias_bug.vhd ghdl=0 nvc=0
+run gna/bug18351#1 dir=testdata/ghdl/testsuite/gna/bug18351 std=93c sha=0947cf0f4709d3aa
+ 18351.vhd ghdl=0 nvc=2
+run gna/bug18353#1 dir=testdata/ghdl/testsuite/gna/bug18353 std=93c sha=f34fd4e8698cabbe
+ TESTCASE.vhdl ghdl=0 nvc=0
+run gna/bug18359#1 dir=testdata/ghdl/testsuite/gna/bug18359 std=93c sha=7d664c015853463e
+ testcase.vhdl ghdl=0 nvc=0
+run gna/bug18360#1 dir=testdata/ghdl/testsuite/gna/bug18360 std=93c sha=645c7017f9a9ad8c
+ testcase.vhdl ghdl=1@6 nvc=1@6
+run gna/bug18361#1 dir=testdata/ghdl/testsuite/gna/bug18361 std=93c sha=58fdd0ee27384eea
+ cnt.vhdl ghdl=1@65 nvc=1@65
+run gna/bug18659#1 dir=testdata/ghdl/testsuite/gna/bug18659 std=93c sha=547b78d68db42add
+ crash.vhd ghdl=0 nvc=0
+run gna/bug18810#1 dir=testdata/ghdl/testsuite/gna/bug18810 std=93c sha=cfcd26e050803828
+ DMEM.vhd ghdl=0 nvc=0
+ OISC_SUBLEQ.vhd ghdl=0 nvc=0
+ BENCH_OISC_SUBLEQ.vhd ghdl=0 nvc=0
+run gna/bug19195#1 dir=testdata/ghdl/testsuite/gna/bug19195 std=93c sha=b59257a989dd4180
+ pkg.vhd ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run gna/bug20255#1 dir=testdata/ghdl/testsuite/gna/bug20255 std=93c sha=dc0e34571b76fc16
+ test.vhd ghdl=0 nvc=0
+ test_20255.vhd ghdl=0 nvc=0
+run gna/bug20312#1 dir=testdata/ghdl/testsuite/gna/bug20312 std=93c sha=a2771627c2b45352
+ repro.vhdl ghdl=0 nvc=0
+ arr.vhdl ghdl=0 nvc=0
+run gna/bug20549#1 dir=testdata/ghdl/testsuite/gna/bug20549 std=93c sha=dbb31424cb28563a
+ tb.vhdl ghdl=0 nvc=0
+run gna/bug20597#1 dir=testdata/ghdl/testsuite/gna/bug20597 std=93c sha=6297a1f6e66332ef
+ 20597.vhd ghdl=1@20,22 nvc=1@20
+run gna/bug20703#1 dir=testdata/ghdl/testsuite/gna/bug20703 std=93c sha=330800060b177247
+ t.vhdl ghdl=0 nvc=0
+run gna/bug20767#1 dir=testdata/ghdl/testsuite/gna/bug20767 std=93 sha=c762d1240c873d20
+ xilname.vhdl ghdl=1@10 nvc=0
+ xilname.vhdl -frelaxed-rules ghdl=0 nvc=0
+ aggr.vhdl ghdl=0 nvc=0
+run gna/bug20771#1 dir=testdata/ghdl/testsuite/gna/bug20771 std=93c sha=8158ae879f6b33f2
+ 20771.vhd ghdl=0 nvc=0
+run gna/bug21052#1 dir=testdata/ghdl/testsuite/gna/bug21052 std=93c sha=e4c9f75f300cedde
+ test.vhd ghdl=0 nvc=0
+run gna/bug21078#1 dir=testdata/ghdl/testsuite/gna/bug21078 std=93c sha=406cd109d99cfbf6
+ foo.vhdl ghdl=1@56 nvc=1@56
+run gna/bug21274#1 dir=testdata/ghdl/testsuite/gna/bug21274 std=93c sha=29e129e012d406f3
+ 21274.vhd ghdl=0 nvc=0
+run gna/bug21332#1 dir=testdata/ghdl/testsuite/gna/bug21332 std=93c sha=713943b2b19fa583
+ twoscomplement.vhdl ghdl=0 nvc=0
+run gna/bug21487#1 dir=testdata/ghdl/testsuite/gna/bug21487 std=93c sha=4778ebeb95f13788
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug21497#1 dir=testdata/ghdl/testsuite/gna/bug21497 std=93c sha=f9aa07e5b258d78b
+ repro.vhdl ghdl=0 nvc=0
+run gna/bug21500#1 dir=testdata/ghdl/testsuite/gna/bug21500 std=93c sha=066cec1e36d17622
+ resolv1.vhdl ghdl=0 nvc=0
+ resolv2.vhdl ghdl=0 nvc=0
+run gna/bug21513#1 dir=testdata/ghdl/testsuite/gna/bug21513 std=93c sha=c68d4b41d3db38bd
+ pb.vhdl ghdl=0 nvc=1@12,13
+run gna/bug22868#1 dir=testdata/ghdl/testsuite/gna/bug22868 std=93c sha=1b957f22a1227940
+ fails1.vhdl ghdl=1@27 nvc=1@27
+ fails2.vhdl ghdl=1@24 nvc=1@24
+ works.vhdl ghdl=0 nvc=0
+run gna/bug23013#1 dir=testdata/ghdl/testsuite/gna/bug23013 std=93c sha=874dc1a3bfd8992c
+ attrs.vhdl ghdl=1@14,22~ nvc=1@14
+run gna/bug23165#1 dir=testdata/ghdl/testsuite/gna/bug23165 std=93c sha=d99744458b3ad88e
+ mwe_failing/counter.vhd ghdl=0 nvc=0
+ mwe_failing/mwe.vhd ghdl=0 nvc=0
+ mwe_working/counter.vhd ghdl=0 nvc=0
+ mwe_working/mwe.vhd ghdl=0 nvc=0
+ mwe2/mwe.vhd ghdl=0 nvc=0
+run gna/bug23482#1 dir=testdata/ghdl/testsuite/gna/bug23482 std=93c sha=61a92c6b11899c1b
+ test1.vhdl ghdl=1@5 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+run gna/bug24064#1 dir=testdata/ghdl/testsuite/gna/bug24064 std=93c sha=b950a06fe89902f8
+ er_pack.vhd ghdl=0 nvc=1@344
+ pp_fir_filter.vhd ghdl=0 nvc=1@17,39,48,192,195
+run gna/bug24065#1 dir=testdata/ghdl/testsuite/gna/bug24065 std=93c sha=2bdf7a15f8699ab7
+ cic_up.vhd ghdl=0 nvc=0
+run gna/bug24324#1 dir=testdata/ghdl/testsuite/gna/bug24324 std=93c sha=a8679d75c8b02791
+ tb_thingy1.vhdl ghdl=1@17 nvc=1@17
+run gna/bug24326#1 dir=testdata/ghdl/testsuite/gna/bug24326 std=93c sha=bbc3d562e6b8c1bd
+ tb_thingy7.vhdl ghdl=1@23 nvc=1@23,24
+ tb_thingy9.vhdl ghdl=1@10 nvc=1@10
+ repro1.vhdl ghdl=1@5 nvc=1@5
+run gna/bug7186#1 dir=testdata/ghdl/testsuite/gna/bug7186 std=93c sha=f399062559e8e00b
+ bug.vhdl ghdl=1@14,21 nvc=1@21
+run gna/bug7751#1 dir=testdata/ghdl/testsuite/gna/bug7751 std=93c sha=0a0269ea732f4c78
+ 7751_tests.vhd ghdl=0 nvc=0
+ 7751_extra_tests.vhd ghdl=0 nvc=0
+run gna/deb573721#1 dir=testdata/ghdl/testsuite/gna/deb573721 std=93c sha=f7dae29f3713cd23
+ 573721_deb.vhd ghdl=1@22,24,26,28,32,34,36,38,42,44,46,48 nvc=1@22,24,26,28,32,34,36,38,42,44,46,48
+run gna/deb585748#1 dir=testdata/ghdl/testsuite/gna/deb585748 std=93c sha=9463e31173b50618
+ 585748_deb.vhd ghdl=0 nvc=0
+run gna/deb585750#1 dir=testdata/ghdl/testsuite/gna/deb585750 std=93c sha=204e57121caf9256
+ 585750_deb.vhd ghdl=0 nvc=0
+run gna/fst01#1 dir=testdata/ghdl/testsuite/gna/fst01 std=08 sha=bb26adcd813c9685
+ hier1.vhdl ghdl=0 nvc=0
+ hier2.vhdl ghdl=0 nvc=0
+ type1.vhdl ghdl=0 nvc=0
+ enum1.vhdl ghdl=0 nvc=0
+ enum2.vhdl ghdl=0 nvc=0
+ forgen1.vhdl ghdl=0 nvc=0
+ casegen1.vhdl ghdl=0 nvc=0
+ ifgen1.vhdl ghdl=0 nvc=0
+ compinst1.vhdl ghdl=0 nvc=0
+ compinst2.vhdl ghdl=0 nvc=0
+run gna/issue10#1 dir=testdata/ghdl/testsuite/gna/issue10 std=93 sha=788b0a41e1ab165f
+ test_id.vhdl ghdl=0 nvc=0
+ test_id.vhdl ghdl=0 nvc=0
+ test_attr.vhdl ghdl=1@14 nvc=1@14
+run gna/issue1015#1 dir=testdata/ghdl/testsuite/gna/issue1015 std=02 sha=3442ffad4e9d9079
+ std.vhdl ghdl=1@1 nvc=0
+run gna/issue103#1 dir=testdata/ghdl/testsuite/gna/issue103 std=93c sha=f1ccc67813042379
+ hello.vhdl -P. ghdl=0 nvc=0
+ hello.vhdl -P=. ghdl=0 nvc=0
+ hello.vhdl -P= ghdl=1 nvc=0
+ hello.vhdl -P ghdl=1 nvc=0
+run gna/issue1038#1 dir=testdata/ghdl/testsuite/gna/issue1038 std=08 sha=a9e0b1329c7f705a
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+ repro5.vhdl ghdl=0 nvc=0
+run gna/issue1051#1 dir=testdata/ghdl/testsuite/gna/issue1051 std=08 sha=4838e67a0146b427
+ repro.vhdl -frelaxed ghdl=0 nvc=0
+ repro2.vhdl -frelaxed ghdl=0 nvc=0
+ psi_common_array_pkg.vhd -frelaxed ghdl=0 nvc=0
+ psi_common_math_pkg.vhd -frelaxed ghdl=0 nvc=0
+ psi_common_logic_pkg.vhd -frelaxed ghdl=0 nvc=0
+ psi_tb_txt_util.vhd -frelaxed ghdl=0 nvc=0
+ psi_tb_compare_pkg.vhd -frelaxed ghdl=0 nvc=0
+ psi_tb_activity_pkg.vhd -frelaxed ghdl=0 nvc=0
+ psi_tb_i2c_pkg.vhd -frelaxed ghdl=0 nvc=0
+ psi_common_bit_cc.vhd -frelaxed ghdl=0 nvc=0
+ psi_common_i2c_master.vhd -frelaxed ghdl=0 nvc=0
+ psi_common_i2c_master_tb.vhd -frelaxed ghdl=0 nvc=0
+run gna/issue1055#1 dir=testdata/ghdl/testsuite/gna/issue1055 std=08 sha=74df3d5c9b5cd7b2
+ repro1.vhdl ghdl=0 nvc=1@8
+ repro2.vhdl ghdl=0 nvc=1@8
+ crash.vhdl ghdl=0 nvc=1@10
+ crash_tb.vhdl ghdl=0 nvc=1@4
+run gna/issue1057#1 dir=testdata/ghdl/testsuite/gna/issue1057 std=08 sha=a428f8874558dfb3
+ pkg.vhdl ghdl=0 nvc=0
+ pkg2.vhdl ghdl=0 nvc=1@6
+run gna/issue106#1 dir=testdata/ghdl/testsuite/gna/issue106 std=08 sha=7514d99ff8cca61f
+ ent.vhdl ghdl=1@11,12 nvc=1@11
+ ent1.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+ case1.vhdl ghdl=0 nvc=0
+run gna/issue1063#1 dir=testdata/ghdl/testsuite/gna/issue1063 std=08 sha=715101b48a94345f
+ matching.vhdl ghdl=0 nvc=0
+run gna/issue1066#1 dir=testdata/ghdl/testsuite/gna/issue1066 std=93c sha=90f68049697698c9
+ hello.vhdl -fno-color-diagnostics ghdl=1@2 nvc=1@2
+run gna/issue1067#1 dir=testdata/ghdl/testsuite/gna/issue1067 std=08 sha=b2a6054e97638ba2
+ top.vhdl ghdl=0 nvc=0
+run gna/issue107#1 dir=testdata/ghdl/testsuite/gna/issue107 std=08 sha=41ce06cd78558d0b
+ testpkg.vhdl ghdl=0 nvc=0
+ test1.vhdl ghdl=0 nvc=0
+run gna/issue1120#1 dir=testdata/ghdl/testsuite/gna/issue1120 std=08 sha=106b233a33e72487
+ repro2.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+run gna/issue1123#1 dir=testdata/ghdl/testsuite/gna/issue1123 std=93c sha=ad7ddab52b042782
+ b.vhdl ghdl=1@30 nvc=0
+ b1.vhdl ghdl=0 nvc=0
+run gna/issue1125#1 dir=testdata/ghdl/testsuite/gna/issue1125 std=08 sha=481207cb533090f0
+ etest.vhdl ghdl=0 nvc=0
+run gna/issue1128#1 dir=testdata/ghdl/testsuite/gna/issue1128 std=08 sha=8270105230bb6f07
+ test.vhdl ghdl=0 nvc=0
+run gna/issue1129#1 dir=testdata/ghdl/testsuite/gna/issue1129 std=08 sha=94f41ac1553ab604
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1129#2 dir=testdata/ghdl/testsuite/gna/issue1129 std=08 sha=184b51181db7292a
+ test.vhdl ghdl=0 nvc=0
+run gna/issue1131#1 dir=testdata/ghdl/testsuite/gna/issue1131 std=08 sha=ba66331b00b5cbb7
+ dut.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue1137#1 dir=testdata/ghdl/testsuite/gna/issue1137 std=08 sha=6df385b17987d5b3
+ testbench.vhdl ghdl=0 nvc=0
+run gna/issue1138#1 dir=testdata/ghdl/testsuite/gna/issue1138 std=08 sha=3e53dce46975b662
+ repro.vhdl ghdl=1@14 nvc=0
+ crc_pkg.vhdl ghdl=0 nvc=0
+ wbcrc_syn.vhdl ghdl=1@37,44~ nvc=0
+ repro.vhdl -frelaxed ghdl=0 nvc=0
+ crc_pkg.vhdl -frelaxed ghdl=0 nvc=0
+ wbcrc_syn.vhdl -frelaxed ghdl=0 nvc=0
+run gna/issue1145#1 dir=testdata/ghdl/testsuite/gna/issue1145 std=93c sha=c9de22f7e0efbbd8
+ tb.vhdl ghdl=0 nvc=0
+ count.vhdl ghdl=0 nvc=0
+run gna/issue1152#1 dir=testdata/ghdl/testsuite/gna/issue1152 std=08 sha=c4e8f86ba2412621
+ ent.vhdl ghdl=1@14 nvc=0
+ ent.vhdl -frelaxed ghdl=0 nvc=0
+run gna/issue1191#1 dir=testdata/ghdl/testsuite/gna/issue1191 std=08 sha=166e06659600602e
+ mux_fifo_pkg.vhd -frelaxed ghdl=0 nvc=0
+ mux_fifo.vhd -frelaxed ghdl=0 nvc=0
+ mux_fifo_tb.vhd -frelaxed ghdl=0 nvc=0
+run gna/issue1196#1 dir=testdata/ghdl/testsuite/gna/issue1196 std=93c sha=53829f7acc8f45dc
+ my_pkg.vhdl ghdl=1@7 nvc=1@7,10
+run gna/issue1201#1 dir=testdata/ghdl/testsuite/gna/issue1201 std=08 sha=334852429cd93d42
+ bug.vhdl ghdl=0 nvc=0
+run gna/issue1206#1 dir=testdata/ghdl/testsuite/gna/issue1206 std=93c sha=38806d90d59ffd87
+ hello.vhdl ghdl=0 nvc=0
+run gna/issue1206#2 dir=testdata/ghdl/testsuite/gna/issue1206 std=93c sha=38806d90d59ffd87
+ hello.vhdl ghdl=0 nvc=0
+run gna/issue1224#1 dir=testdata/ghdl/testsuite/gna/issue1224 std=08 sha=f7e55611761ae984
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue1226#1 dir=testdata/ghdl/testsuite/gna/issue1226 std=93c sha=0c0579250342a7b6
+ adder.vhdl ghdl=0 nvc=0
+run gna/issue1228#1 dir=testdata/ghdl/testsuite/gna/issue1228 std=93c sha=9c815b36ca8c63a4
+ test_load.vhdl ghdl=0 nvc=0
+run gna/issue1229#1 dir=testdata/ghdl/testsuite/gna/issue1229 std=08 sha=dc3f5202fe77af15
+ pkg.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=1@11
+run gna/issue123#1 dir=testdata/ghdl/testsuite/gna/issue123 std=93c sha=9995d0085f19e7c1
+ adder.vhdl ghdl=0 nvc=0
+run gna/issue1233#1 dir=testdata/ghdl/testsuite/gna/issue1233 std=93c sha=d4d12b972091d607
+ adder.vhdl ghdl=0 nvc=0
+run gna/issue1240#1 dir=testdata/ghdl/testsuite/gna/issue1240 std=93c sha=d599c38d229bf7c1
+ issue1.vhdl ghdl=0 nvc=0
+ issue2.vhdl ghdl=0 nvc=0
+run gna/issue1240#2 dir=testdata/ghdl/testsuite/gna/issue1240 std=93c sha=d599c38d229bf7c1
+ issue1.vhdl -Werror=runtime-error ghdl=1@11 nvc=0
+ issue2.vhdl -Werror=runtime-error ghdl=1@12 nvc=0
+run gna/issue1246#1 dir=testdata/ghdl/testsuite/gna/issue1246 std=08 sha=e6b4fdefc4478a94
+ pkg_b.vhdl ghdl=0 nvc=0
+ pkg_a.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue1249#1 dir=testdata/ghdl/testsuite/gna/issue1249 std=93c sha=2e615b2a22d4df13
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue125#1 dir=testdata/ghdl/testsuite/gna/issue125 std=93c sha=0cd47b2d06c9b971
+ bug.vhdl ghdl=0 nvc=0
+run gna/issue1252#1 dir=testdata/ghdl/testsuite/gna/issue1252 std=02 sha=74c0becf5ba470a3
+ pkg.vhdl ghdl=0 nvc=1@14,17
+run gna/issue1256#1 dir=testdata/ghdl/testsuite/gna/issue1256 std=93c sha=6cfbab71f3483329
+ enum_test.vhdl ghdl=0 nvc=0
+run gna/issue1257#1 dir=testdata/ghdl/testsuite/gna/issue1257 std=93c sha=202bca607799e318
+ repro1.vhdl -Werror=runtime-error ghdl=1@11 nvc=1@11
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue1257#2 dir=testdata/ghdl/testsuite/gna/issue1257 std=08 sha=3b0e9ee7b52bd417
+ direction_mismatch.vhd ghdl=0 nvc=0
+ tb_direction_mismatch.vhd ghdl=0 nvc=0
+run gna/issue126#1 dir=testdata/ghdl/testsuite/gna/issue126 std=08 sha=3c4f040ecbe3fd5a
+ seg_fault.vhdl ghdl=0 nvc=0
+run gna/issue1262#1 dir=testdata/ghdl/testsuite/gna/issue1262 std=08 sha=592bb07ef1e553c9
+ pkg_slv.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+ tb2.vhdl ghdl=0 nvc=1@12
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue1268#1 dir=testdata/ghdl/testsuite/gna/issue1268 std=08 sha=9f52394b19ea4673
+ mwe_pkg.vhd ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue1269#1 dir=testdata/ghdl/testsuite/gna/issue1269 std=93c sha=4f4407d09e2568d9
+ ent93.vhdl ghdl=1@14,15,16 nvc=1@14
+run gna/issue1269#2 dir=testdata/ghdl/testsuite/gna/issue1269 std=08 sha=8d43d64a6c42cb3f
+ ent.vhdl ghdl=1@14,15,16 nvc=1@14
+run gna/issue1274#1 dir=testdata/ghdl/testsuite/gna/issue1274 std=08 sha=dc2838d0d402ba4c
+ issue.vhdl ghdl=1@15 nvc=1@15
+run gna/issue1274#2 dir=testdata/ghdl/testsuite/gna/issue1274 std=93c sha=3ab3483ecafbfc2c
+ issue93.vhdl ghdl=1@12 nvc=1@12
+ repro2.vhdl ghdl=1@13 nvc=1@13
+ repro3.vhdl ghdl=1@13 nvc=1@13
+ repro4.vhdl ghdl=1@26 nvc=1@26
+run gna/issue1287#1 dir=testdata/ghdl/testsuite/gna/issue1287 std=08 sha=fcba99b7b2fe1d4b
+ myentity.vhdl ghdl=0 nvc=0
+ myentity2.vhdl ghdl=0 nvc=0
+run gna/issue1288#1 dir=testdata/ghdl/testsuite/gna/issue1288 std=93c sha=fecf84d572aa983c
+ issue.vhdl -fpsl ghdl=0 nvc=0
+run gna/issue1292#1 dir=testdata/ghdl/testsuite/gna/issue1292 std=08 sha=85f77f72f57d3e3c
+ psl_next_event_e.vhdl ghdl=0 nvc=1@84,87
+run gna/issue1295#1 dir=testdata/ghdl/testsuite/gna/issue1295 std=08 sha=8f74c29df027aceb
+ psl_next_event_a.vhdl ghdl=0 nvc=1@84,87
+run gna/issue1300#1 dir=testdata/ghdl/testsuite/gna/issue1300 std=08 sha=0b8a6c8464ea9c7d
+ wishbone_types.vhdl ghdl=0 nvc=0
+ icache.vhdl ghdl=0 nvc=0
+run gna/issue1300#2 dir=testdata/ghdl/testsuite/gna/issue1300 std=08 sha=4385af5bb52e690d
+ wishbone_types_err2.vhdl ghdl=0 nvc=0
+ icache.vhdl ghdl=0 nvc=0
+run gna/issue132#1 dir=testdata/ghdl/testsuite/gna/issue132 std=93 sha=e4c6f7404010df7e
+ repro.vhdl ghdl=1@3 nvc=0
+ repro.vhdl -C ghdl=0 nvc=0
+ repro.vhdl --mb-comments ghdl=0 nvc=0
+run gna/issue1323#1 dir=testdata/ghdl/testsuite/gna/issue1323 std=93c sha=71aa7afd9d4b739c
+ mydesign.vhdl ghdl=0 nvc=0
+run gna/issue1326#1 dir=testdata/ghdl/testsuite/gna/issue1326 std=93c sha=c67e131d5b701da9
+ mytestbench.vhdl ghdl=0 nvc=0
+run gna/issue1338#1 dir=testdata/ghdl/testsuite/gna/issue1338 std=93c sha=66d448a8ef2b2407
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1346#1 dir=testdata/ghdl/testsuite/gna/issue1346 std=08 sha=22359dddd74ac9d9
+ wb_pkg.vhd ghdl=0 nvc=0
+ wb_rst_pkg.vhd ghdl=0 nvc=0
+ memory_map_pkg.vhd ghdl=0 nvc=0
+ memory_map.vhd ghdl=1@32 nvc=1@32
+run gna/issue1347#1 dir=testdata/ghdl/testsuite/gna/issue1347 std=08 sha=8727809b70488754
+ issue.vhdl ghdl=0 nvc=1@86,89,114
+run gna/issue1354#1 dir=testdata/ghdl/testsuite/gna/issue1354 std=08 sha=85288b73696d1c22
+ mwe.vhdl ghdl=0 nvc=0
+run gna/issue1360#1 dir=testdata/ghdl/testsuite/gna/issue1360 std=08 sha=6677d92ec47baf2d
+ onehot_aggregate.vhdl ghdl=0 nvc=0
+run gna/issue1361#1 dir=testdata/ghdl/testsuite/gna/issue1361 std=93c sha=8eb820db7e20108d
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue1361#2 dir=testdata/ghdl/testsuite/gna/issue1361 std=08 sha=82c32c67007d87f9
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue1364#1 dir=testdata/ghdl/testsuite/gna/issue1364 std=93 sha=9ecefa61aba14e10
+ mwe_aggr.vhdl ghdl=1@18,33 nvc=0
+ mwe_aggr.vhdl ghdl=1@18,33 nvc=0
+ mwe_case.vhdl ghdl=0 nvc=0
+ mwe_case.vhdl ghdl=0 nvc=0
+run gna/issue1370#1 dir=testdata/ghdl/testsuite/gna/issue1370 std=93c sha=6ec251cb69cc2f9e
+ case16.vhdl ghdl=1@27 nvc=1@27
+run gna/issue1371#1 dir=testdata/ghdl/testsuite/gna/issue1371 std=93c sha=fc832da688bb1936
+ incr_psl.vhdl -fpsl ghdl=0 nvc=0
+run gna/issue1376#1 dir=testdata/ghdl/testsuite/gna/issue1376 std=08 sha=f043e27a26f66e9a
+ repro1.vhdl ghdl=0 nvc=0
+ pkg.vhdl ghdl=0 nvc=0
+ window_splitter_1D.vhdl ghdl=0 nvc=0
+run gna/issue1377#1 dir=testdata/ghdl/testsuite/gna/issue1377 std=93c sha=00b747f33ffdf63a
+ tb_issue.vhdl ghdl=0 nvc=0
+ tb_issue2.vhdl ghdl=0 nvc=0
+run gna/issue1379#1 dir=testdata/ghdl/testsuite/gna/issue1379 std=93c sha=9222f163aa02b4b6
+ bar.vhdl ghdl=0 nvc=0
+ bar0.vhdl ghdl=1@33 nvc=1@33
+ bar2.vhdl ghdl=1@10 nvc=1@10
+ bar3.vhdl ghdl=1@20 nvc=1@20
+ bar4.vhdl ghdl=0 nvc=0
+run gna/issue1381#1 dir=testdata/ghdl/testsuite/gna/issue1381 std=93c sha=2b0e1d78804e9951
+ repro.vhdl -Wunused -Werror ghdl=0 nvc=0
+ repro2.vhdl ghdl=1@27 nvc=0
+ repro3.vhdl ghdl=1@8 nvc=0
+ repro4.vhdl -Wunused -Werror ghdl=0 nvc=0
+ repro5.vhdl -Wunused -Werror ghdl=1@5 nvc=0
+ repro6.vhdl -Wunused -Werror ghdl=1@5,6 nvc=0
+run gna/issue1384#1 dir=testdata/ghdl/testsuite/gna/issue1384 std=93c sha=c82cb05cf25cd87a
+ tb_issue.vhdl ghdl=0 nvc=0
+run gna/issue1385#1 dir=testdata/ghdl/testsuite/gna/issue1385 std=93 sha=17d69c2bba094fad
+ ex1.vhdl ghdl=1@6,9~ nvc=0
+ ex1.vhdl ghdl=1@6,9~ nvc=0
+run gna/issue1386#1 dir=testdata/ghdl/testsuite/gna/issue1386 std=93c sha=111e55059296b004
+ example.vhdl ghdl=0 nvc=0
+run gna/issue1387#1 dir=testdata/ghdl/testsuite/gna/issue1387 std=08 sha=ed302b43b09b477e
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+ repro5.vhdl ghdl=0 nvc=0
+run gna/issue1389#1 dir=testdata/ghdl/testsuite/gna/issue1389 std=93c sha=2410a6a3a5cfd01c
+ mwe.vhdl ghdl=0 nvc=0
+run gna/issue1392#1 dir=testdata/ghdl/testsuite/gna/issue1392 std=93c sha=2850404103ef1a45
+ file15.vhdl ghdl=0 nvc=0
+run gna/issue14#1 dir=testdata/ghdl/testsuite/gna/issue14 std=08 sha=2281a208bb083889
+ repro.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue140#1 dir=testdata/ghdl/testsuite/gna/issue140 std=08 sha=a24ec51b802c2401
+ OSVVM_TB.vhd ghdl=1@26,27 nvc=1@27
+run gna/issue1403#1 dir=testdata/ghdl/testsuite/gna/issue1403 std=93c sha=df0e9d1593ccab64
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue1404#1 dir=testdata/ghdl/testsuite/gna/issue1404 std=93c sha=84a7c6f3f2b1c742
+ pkg.vhdl ghdl=0 nvc=0
+ types_pkg.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue1405#1 dir=testdata/ghdl/testsuite/gna/issue1405 std=08 sha=219606c6b9372026
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue141#1 dir=testdata/ghdl/testsuite/gna/issue141 std=08 sha=88fcb09af5a3eaf1
+ e.vhdl ghdl=0 nvc=0
+run gna/issue1412#1 dir=testdata/ghdl/testsuite/gna/issue1412 std=93c sha=cd98f68a8e8b3bd7
+ repro.vhdl ghdl=1@10 nvc=0
+run gna/issue1415#1 dir=testdata/ghdl/testsuite/gna/issue1415 std=08 sha=e74722fb262263cb
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1416#1 dir=testdata/ghdl/testsuite/gna/issue1416 std=08 sha=61909a8e2cb4561d
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1419#1 dir=testdata/ghdl/testsuite/gna/issue1419 std=08 sha=715fd48c7af1e975
+ repro3.vhdl -Werror ghdl=1@10 nvc=0
+ repro4.vhdl -Werror ghdl=1@7 nvc=1@7
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ model_pkg.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue1420#1 dir=testdata/ghdl/testsuite/gna/issue1420 std=08 sha=c7d6c2154e36d47b
+ repro1.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue1425#1 dir=testdata/ghdl/testsuite/gna/issue1425 std=93c sha=0e8f00accacb4264
+ counter.vhdl -Wsensitivity ghdl=0 nvc=0
+ records.vhdl -Werror=sensitivity ghdl=0 nvc=0
+ alias1.vhdl -Werror=sensitivity ghdl=0 nvc=0
+ records_in_records.vhdl -Werror=sensitivity ghdl=0 nvc=0
+ arrays.vhdl -Werror=sensitivity ghdl=0 nvc=0
+ reg_re.vhdl -Werror=sensitivity ghdl=0 nvc=0
+ reg_ev1.vhdl -Werror=sensitivity ghdl=0 nvc=0
+ reg_ev2.vhdl -Werror=sensitivity ghdl=0 nvc=0
+ reg_ev3.vhdl -Werror=sensitivity ghdl=0 nvc=0
+ reg_ev3.vhdl -Werror=sensitivity --force-analysis ghdl=0 nvc=0
+ reg_err1.vhdl -Werror=sensitivity ghdl=1@16 nvc=0
+run gna/issue1429#1 dir=testdata/ghdl/testsuite/gna/issue1429 std=08 sha=1756bf257e67ad2f
+ test.vhdl ghdl=0 nvc=0
+run gna/issue143#1 dir=testdata/ghdl/testsuite/gna/issue143 std=93c sha=de288e3fe61b0eb5
+ universal_conversion_tb.vhd ghdl=1@11 nvc=1@11
+ repro.vhdl ghdl=1@5,6 nvc=1@5,6
+run gna/issue1431#1 dir=testdata/ghdl/testsuite/gna/issue1431 std=93c sha=0194958ce1734e72
+ config_example.vhdl -fsynopsys -fexplicit ghdl=0 nvc=1@51,63,71,105,112
+run gna/issue144#1 dir=testdata/ghdl/testsuite/gna/issue144 std=93c sha=f920751f13607811
+ tb.vhdl ghdl=1@9 nvc=1@9
+run gna/issue1440#1 dir=testdata/ghdl/testsuite/gna/issue1440 std=08 sha=ae0f7310725280b0
+ tb_last_value_bug.vhdl ghdl=0 nvc=0
+ tb2.vhdl ghdl=0 nvc=0
+run gna/issue1443#1 dir=testdata/ghdl/testsuite/gna/issue1443 std=08 sha=809a775b2fc62c71
+ e.vhdl ghdl=0 nvc=0
+run gna/issue1453#1 dir=testdata/ghdl/testsuite/gna/issue1453 std=08 sha=dfd6e60350a0c97c
+ bug.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue1455#1 dir=testdata/ghdl/testsuite/gna/issue1455 std=08 sha=46524d03f5f305c7
+ pkg0.vhdl ghdl=0 nvc=0
+ pkg1.vhdl ghdl=0 nvc=0
+ pkg2.vhdl ghdl=0 nvc=0
+ pkg3.vhdl ghdl=0 nvc=0
+ pkg4.vhdl ghdl=1@4 nvc=1@4
+ pkg5.vhdl ghdl=0 nvc=0
+ pkg6.vhdl ghdl=1@4 nvc=1@4
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue1456#1 dir=testdata/ghdl/testsuite/gna/issue1456 std=93c sha=879e9db6b010af08
+ test.vhdl ghdl=1@4,8~ nvc=2
+run gna/issue1461#1 dir=testdata/ghdl/testsuite/gna/issue1461 std=02 sha=8b310e42cbeaf8d0
+ mwe.vhdl lib=mwe -frelaxed ghdl=0 nvc=0
+run gna/issue1461#2 dir=testdata/ghdl/testsuite/gna/issue1461 std=02 sha=8b310e42cbeaf8d0
+ mwe.vhdl lib=mwe ghdl=1@1,3,6~ nvc=0
+run gna/issue1469#1 dir=testdata/ghdl/testsuite/gna/issue1469 std=08 sha=aaf97a87e828cb81
+ ent.vhdl ghdl=1@11 nvc=1@11
+ ent1.vhdl ghdl=0 nvc=0
+run gna/issue147#1 dir=testdata/ghdl/testsuite/gna/issue147 std=93c sha=f4b9108a8e12fc7c
+ simple.vhdl --workdir=work1 ghdl=0 nvc=0
+run gna/issue1473#1 dir=testdata/ghdl/testsuite/gna/issue1473 std=08 sha=37b68e735e6fb213
+ test.vhdl ghdl=1@8,12 nvc=1@8
+run gna/issue1474#1 dir=testdata/ghdl/testsuite/gna/issue1474 std=08 sha=b221c0fbb42afc17
+ ent1.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+run gna/issue148#1 dir=testdata/ghdl/testsuite/gna/issue148 std=93c sha=ae41cd166034748c
+ bug_sim.vhdl ghdl=0 nvc=0
+run gna/issue1480#1 dir=testdata/ghdl/testsuite/gna/issue1480 std=08 sha=65458984f5c09f05
+ file1.vhdl ghdl=0 nvc=0
+ file2.vhdl ghdl=1@2,5,7 nvc=1@2,5
+run gna/issue1485#1 dir=testdata/ghdl/testsuite/gna/issue1485 std=93c sha=3bae662d0654ea13
+ e.vhdl ghdl=1@5 nvc=1@5,8
+run gna/issue1486#1 dir=testdata/ghdl/testsuite/gna/issue1486 std=08 sha=2ef0f7d935133fe9
+ testcasestatic.vhdl ghdl=0 nvc=0
+run gna/issue1490#1 dir=testdata/ghdl/testsuite/gna/issue1490 std=93c sha=4821c925bdbc5a0e
+ ent.vhdl ghdl=1@3 nvc=1@3
+run gna/issue1493#1 dir=testdata/ghdl/testsuite/gna/issue1493 std=08 sha=a882b8e7cf14aff4
+ test.vhdl ghdl=0 nvc=0
+run gna/issue15#1 dir=testdata/ghdl/testsuite/gna/issue15 std=08 sha=d1b0bfb4d2ec9ca3
+ to_slv_issue.vhdl ghdl=0 nvc=0
+run gna/issue150#1 dir=testdata/ghdl/testsuite/gna/issue150 std=93 sha=7696bc062d376099
+ concat2.vhdl ghdl=0 nvc=0
+run gna/issue1500#1 dir=testdata/ghdl/testsuite/gna/issue1500 std=08 sha=2cb9189a2895855f
+ test.vhdl ghdl=1@18 nvc=1@18
+run gna/issue151#1 dir=testdata/ghdl/testsuite/gna/issue151 std=93c sha=067282c705eb0cd0
+ tb.vhdl ghdl=0 nvc=1@13,16
+run gna/issue1514#1 dir=testdata/ghdl/testsuite/gna/issue1514 std=93c sha=fda0d4218d231e02
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue1515#1 dir=testdata/ghdl/testsuite/gna/issue1515 std=93c sha=ae71924541e7f51a
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue1517#1 dir=testdata/ghdl/testsuite/gna/issue1517 std=93c sha=11a8d3956cc22372
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue152#1 dir=testdata/ghdl/testsuite/gna/issue152 std=93c sha=3053b42366a86980
+ ax_wb_pli_pkg.vhdl ghdl=0 nvc=0
+ ax_wb_pli.vhdl ghdl=0 nvc=0
+run gna/issue1523#1 dir=testdata/ghdl/testsuite/gna/issue1523 std=08 sha=b1754663ed4c818d
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1527#1 dir=testdata/ghdl/testsuite/gna/issue1527 std=08 sha=8c0481368d2e8609
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue1528#1 dir=testdata/ghdl/testsuite/gna/issue1528 std=93c sha=3986de9311e377c0
+ attrs_pkg.vhdl ghdl=0 nvc=0
+ ent1.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+ ent3.vhdl ghdl=0 nvc=0
+ uattr3.vhdl ghdl=0 nvc=0
+ ent4.vhdl ghdl=0 nvc=0
+ uattr4.vhdl ghdl=1@7 nvc=0
+run gna/issue1549#1 dir=testdata/ghdl/testsuite/gna/issue1549 std=08 sha=44ada317417b3122
+ ent.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+ ent3.vhdl ghdl=0 nvc=0
+ ent4.vhdl ghdl=0 nvc=0
+ ent5.vhdl ghdl=0 nvc=0
+ ent6.vhdl ghdl=0 nvc=0
+ ent7.vhdl ghdl=0 nvc=0
+ ent8.vhdl ghdl=0 nvc=1@26
+run gna/issue155#1 dir=testdata/ghdl/testsuite/gna/issue155 std=93c sha=32c4f1af5cf734c7
+ failure.vhdl ghdl=0 nvc=0
+run gna/issue156#1 dir=testdata/ghdl/testsuite/gna/issue156 std=93c sha=e8fd7d965dc0ba6b
+ compile_error.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue158#1 dir=testdata/ghdl/testsuite/gna/issue158 std=93c sha=a8c4da02c990d3db
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1588#1 dir=testdata/ghdl/testsuite/gna/issue1588 std=93c sha=53cffe8a439a7821
+ tent.vhdl ghdl=0 nvc=0
+ libs12.vhdl ghdl=1@49,59 nvc=0
+run gna/issue1589#1 dir=testdata/ghdl/testsuite/gna/issue1589 std=08 sha=50565454da72a8c5
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue1593#1 dir=testdata/ghdl/testsuite/gna/issue1593 std=08 sha=60d3e703cdc9158c
+ element_bug.vhdl ghdl=0 nvc=0
+run gna/issue1597#1 dir=testdata/ghdl/testsuite/gna/issue1597 std=93c sha=a38c8189d4ce7c22
+ std_subs_pkg.vhdl -fsynopsys ghdl=0 nvc=0
+ proc_pkg.vhdl -fsynopsys ghdl=1@78 nvc=0
+run gna/issue160#1 dir=testdata/ghdl/testsuite/gna/issue160 std=93 sha=6858507d070ced89
+ top.vhdl ghdl=0 nvc=0
+run gna/issue160#2 dir=testdata/ghdl/testsuite/gna/issue160 std=02 sha=6858507d070ced89
+ top.vhdl ghdl=0 nvc=0
+run gna/issue160#3 dir=testdata/ghdl/testsuite/gna/issue160 std=08 sha=6858507d070ced89
+ top.vhdl ghdl=0 nvc=0
+run gna/issue1602#1 dir=testdata/ghdl/testsuite/gna/issue1602 std=93 sha=304abbf6d690a156
+ shadow.vhdl ghdl=1@14 nvc=1@14
+ repro1.vhdl ghdl=1@11 nvc=1@11
+run gna/issue1612#1 dir=testdata/ghdl/testsuite/gna/issue1612 std=93c sha=43d1a39a1fd6f0a8
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1624#1 dir=testdata/ghdl/testsuite/gna/issue1624 std=93c sha=aedfd9b20592c10f
+ buggy.vhdl ghdl=0 nvc=0
+run gna/issue1625#1 dir=testdata/ghdl/testsuite/gna/issue1625 std=08 sha=c8e05ce462a8d4fd
+ level2.vhdl ghdl=0 nvc=0
+ level1.vhdl ghdl=0 nvc=0
+ level0.vhdl ghdl=0 nvc=0
+run gna/issue163#1 dir=testdata/ghdl/testsuite/gna/issue163 std=93c sha=c6b32257435a1c3e
+ qualified_expr.vhdl ghdl=0 nvc=0
+run gna/issue1631#1 dir=testdata/ghdl/testsuite/gna/issue1631 std=93c sha=c0ccf69abdb500b2
+ bug.vhdl ghdl=1@9 nvc=1@9
+ bug2.vhdl ghdl=1@9 nvc=1@9
+ bug3.vhdl ghdl=1@6 nvc=1@6
+ bug4.vhdl ghdl=1@7 nvc=1@7
+run gna/issue1637#1 dir=testdata/ghdl/testsuite/gna/issue1637 std=08 sha=30663270aa3f3ff9
+ show_bug.vhdl ghdl=0 nvc=0
+run gna/issue1639#1 dir=testdata/ghdl/testsuite/gna/issue1639 std=93c sha=8f68e669775ed848
+ ap.vhdl ghdl=1@20 nvc=1@20
+run gna/issue1640#1 dir=testdata/ghdl/testsuite/gna/issue1640 std=93c sha=0384b468f85c004b
+ test.vhdl ghdl=0 nvc=1@3,6
+run gna/issue1646#1 dir=testdata/ghdl/testsuite/gna/issue1646 std=93c sha=b3811ed145ee08d7
+ test.vhdl ghdl=1@10 nvc=1@10
+run gna/issue1654#1 dir=testdata/ghdl/testsuite/gna/issue1654 std=08 sha=a418b2c09e03d87d
+ issue2.vhdl ghdl=0 nvc=1@74,77,109
+run gna/issue1655#1 dir=testdata/ghdl/testsuite/gna/issue1655 std=93c sha=a769d1200f8529a9
+ absenc_pkg.vhdl -fsynopsys ghdl=0 nvc=0
+ absenc_utils.vhdl -fsynopsys ghdl=0 nvc=0
+ absenc_master.vhdl -fsynopsys ghdl=0 nvc=0
+ absenc_master_endat.vhdl -fsynopsys ghdl=0 nvc=0
+ endat_tb.vhdl -fsynopsys ghdl=0 nvc=1@45
+ repro.vhdl -fsynopsys ghdl=0 nvc=1@21
+ repro1.vhdl -fsynopsys ghdl=1@24 nvc=1@24
+run gna/issue1657#1 dir=testdata/ghdl/testsuite/gna/issue1657 std=08 sha=379e84143c9cae00
+ repro.vhdl ghdl=0 nvc=0
+ test_entity.vhdl ghdl=0 nvc=0
+run gna/issue1664#1 dir=testdata/ghdl/testsuite/gna/issue1664 std=08 sha=3261a6598b4f0529
+ repro.vhdl ghdl=1@10 nvc=1@10
+ ppm.vhdl ghdl=1@74 nvc=1@74
+run gna/issue1667#1 dir=testdata/ghdl/testsuite/gna/issue1667 std=08 sha=3222322d05711890
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue167#1 dir=testdata/ghdl/testsuite/gna/issue167 std=08 sha=954aa3afbd5eb44e
+ pkg1.vhdl ghdl=0 nvc=0
+ pkg2.vhdl ghdl=0 nvc=0
+run gna/issue1672#1 dir=testdata/ghdl/testsuite/gna/issue1672 std=08 sha=d8b74e692c84571b
+ dut.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1677#1 dir=testdata/ghdl/testsuite/gna/issue1677 std=93c sha=526f51b8ab15ba2c
+ repro.vhdl -Werror ghdl=1@15 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1684#1 dir=testdata/ghdl/testsuite/gna/issue1684 std=93c sha=d5359c1cec4e6956
+ pkg.vhdl ghdl=0 nvc=0
+ ent1.vhdl ghdl=0 nvc=1@13
+run gna/issue1687#1 dir=testdata/ghdl/testsuite/gna/issue1687 std=93c sha=69290018aed1fb60
+ pkg.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=1@13
+run gna/issue1688#1 dir=testdata/ghdl/testsuite/gna/issue1688 std=08 sha=cfc1e169f0511b94
+ test2.vhdl ghdl=0 nvc=0
+run gna/issue1689#1 dir=testdata/ghdl/testsuite/gna/issue1689 std=08 sha=21aabb2dcfe1f641
+ test.vhdl ghdl=0 nvc=0
+run gna/issue1690#1 dir=testdata/ghdl/testsuite/gna/issue1690 std=08 sha=9f68fc3f8e6e9de1
+ top.vhd -fpsl ghdl=0 nvc=0
+run gna/issue1691#1 dir=testdata/ghdl/testsuite/gna/issue1691 std=08 sha=6b28c0a76e9f85ef
+ ent.vhdl ghdl=0 nvc=1@8
+run gna/issue1697#1 dir=testdata/ghdl/testsuite/gna/issue1697 std=08 sha=6f15a3870b14c1a9
+ e1.vhdl ghdl=1@5,8~ nvc=1@5
+ e2.vhdl ghdl=1@10 nvc=1@10
+run gna/issue1697#2 dir=testdata/ghdl/testsuite/gna/issue1697 std=93 sha=6f15a3870b14c1a9
+ e1.vhdl ghdl=1@5,8~ nvc=1@5
+ e2.vhdl ghdl=1@10 nvc=1@10
+run gna/issue17#1 dir=testdata/ghdl/testsuite/gna/issue17 std=08 sha=0266b45af5f8b14c
+ cond_assign_var.vhdl ghdl=0 nvc=0
+ cond_assign_sig.vhdl ghdl=0 nvc=0
+ cond_assign_proc.vhdl ghdl=0 nvc=0
+run gna/issue1700#1 dir=testdata/ghdl/testsuite/gna/issue1700 std=08 sha=963b74e2dfc56367
+ top.vhd -fpsl ghdl=1@36 nvc=1@36
+run gna/issue1704#1 dir=testdata/ghdl/testsuite/gna/issue1704 std=08 sha=2141f1d4f011475f
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue1708#1 dir=testdata/ghdl/testsuite/gna/issue1708 std=08 sha=307e9d6b45c95bac
+ tb_top.vhdl ghdl=1@32 nvc=1@32
+ ex3.vhdl ghdl=1@31 nvc=1@31
+ ex4.vhdl ghdl=1@31 nvc=1@31
+ ex1.vhdl ghdl=0 nvc=1@31
+ ex2.vhdl ghdl=0 nvc=1@31
+ ex5.vhdl ghdl=0 nvc=1@31
+run gna/issue1715#1 dir=testdata/ghdl/testsuite/gna/issue1715 std=08 sha=8d3d605a55946ee0
+ mwe.vhdl ghdl=0 nvc=0
+run gna/issue1717#1 dir=testdata/ghdl/testsuite/gna/issue1717 std=08 sha=64c9c40e48a84aed
+ package.vhdl ghdl=0 nvc=0
+run gna/issue1718#1 dir=testdata/ghdl/testsuite/gna/issue1718 std=93c sha=5aedb36feb51e5d9
+ ent.vhdl lib=my_lib ghdl=0 nvc=0
+run gna/issue1721#1 dir=testdata/ghdl/testsuite/gna/issue1721 std=93c sha=6254a0d4e4e9a9e8
+ top1.vhdl -fpsl ghdl=0 nvc=1@15
+ top2.vhdl -fpsl ghdl=1@26 nvc=1@26
+ top3.vhdl -fpsl ghdl=0 nvc=1@18
+ top4.vhdl -fpsl ghdl=1@20 nvc=1@20
+ top5.vhdl -fpsl ghdl=1@18 nvc=0
+run gna/issue1723#1 dir=testdata/ghdl/testsuite/gna/issue1723 std=08 sha=2d72d880b284f71c
+ repro.vhdl -Werror ghdl=1@13 nvc=1@13
+ repro.vhdl ghdl=0 nvc=1@13
+run gna/issue1726#1 dir=testdata/ghdl/testsuite/gna/issue1726 std=08 sha=90b221e64f50517b
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1727#1 dir=testdata/ghdl/testsuite/gna/issue1727 std=08 sha=d6a68778316a2c06
+ ent.vhdl ghdl=1@10,11 nvc=1@10,11
+run gna/issue1736#1 dir=testdata/ghdl/testsuite/gna/issue1736 std=08 sha=b118572eed323fa9
+ fifo.vhdl lib=mylib ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue1757#1 dir=testdata/ghdl/testsuite/gna/issue1757 std=93c sha=3b6370c983670d9e
+ testm.vhdl ghdl=1@38 nvc=0
+run gna/issue1757#2 dir=testdata/ghdl/testsuite/gna/issue1757 std=08 sha=3b6370c983670d9e
+ testm.vhdl ghdl=0 nvc=0
+run gna/issue1759#1 dir=testdata/ghdl/testsuite/gna/issue1759 std=93c sha=be88364b3a342e5c
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1764#1 dir=testdata/ghdl/testsuite/gna/issue1764 std=08 sha=eafe1b9ee567eda5
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1765#1 dir=testdata/ghdl/testsuite/gna/issue1765 std=93c sha=8196a6fbd75644ac
+ ent93.vhdl ghdl=0 nvc=0
+run gna/issue1765#2 dir=testdata/ghdl/testsuite/gna/issue1765 std=08 sha=15d3a9db1a880dc3
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue1768#1 dir=testdata/ghdl/testsuite/gna/issue1768 std=93c sha=d108c7e390e239fc
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue1771#1 dir=testdata/ghdl/testsuite/gna/issue1771 std=08 sha=69b125acb7394621
+ tf.vhdl -frelaxed ghdl=0 nvc=0
+ add_carry_ghdl_testbench.vhdl -frelaxed ghdl=0 nvc=0
+run gna/issue1772#1 dir=testdata/ghdl/testsuite/gna/issue1772 std=08 sha=8f9a3a3a1b528a71
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue1779#1 dir=testdata/ghdl/testsuite/gna/issue1779 std=93c sha=e797eacd670b6ae8
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue18#1 dir=testdata/ghdl/testsuite/gna/issue18 std=08 sha=6d2318357dd42e66
+ fum.vhdl ghdl=0 nvc=0
+ integer_ambig.vhdl ghdl=0 nvc=0
+run gna/issue1810#1 dir=testdata/ghdl/testsuite/gna/issue1810 std=93c sha=94fcdd3ddc87908a
+ repro.vhdl ghdl=1@5 nvc=1@5
+run gna/issue1810#2 dir=testdata/ghdl/testsuite/gna/issue1810 std=08 sha=94fcdd3ddc87908a
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1814#1 dir=testdata/ghdl/testsuite/gna/issue1814 std=08 sha=0e96721215882b18
+ ent.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run gna/issue1817#1 dir=testdata/ghdl/testsuite/gna/issue1817 std=08 sha=6c4ea6f0dc9a1e0f
+ full_adder.vhdl -fprofile-arcs -ftest-coverage -Wl,--coverage ghdl=1 nvc=0
+ full_adder_tb.vhdl -fprofile-arcs -ftest-coverage -Wl,--coverage ghdl=1 nvc=0
+run gna/issue1818#1 dir=testdata/ghdl/testsuite/gna/issue1818 std=08 sha=824a55739dc17826
+ mwe.vhdl ghdl=0 nvc=0
+run gna/issue1820#1 dir=testdata/ghdl/testsuite/gna/issue1820 std=93c sha=51a35465dbc2b1cd
+ etapa.vhdl ghdl=0 nvc=0
+ cordic.vhdl ghdl=0 nvc=0
+ desenrollado_tb.vhdl ghdl=0 nvc=0
+ cordic.vhdl ghdl=0 nvc=0
+ desenrollado_tb.vhdl ghdl=0 nvc=0
+ etapa.vhdl ghdl=0 nvc=0
+run gna/issue1824#1 dir=testdata/ghdl/testsuite/gna/issue1824 std=08 sha=a17038b08595e141
+ entity_1.vhdl ghdl=0 nvc=0
+run gna/issue1831#1 dir=testdata/ghdl/testsuite/gna/issue1831 std=08 sha=fdd36f32f95e6ee4
+ sipo.vhdl ghdl=0 nvc=0
+run gna/issue1832#1 dir=testdata/ghdl/testsuite/gna/issue1832 std=08 sha=a1db039e3f27d6b7
+ psl.vhdl -Werror ghdl=1@20 nvc=1@17,20
+ psl.vhdl ghdl=0 nvc=1@17,20
+run gna/issue1832#2 dir=testdata/ghdl/testsuite/gna/issue1832 std=08 sha=2b016c82e162acd7
+ issue.vhdl ghdl=0 nvc=1@76,79,106
+run gna/issue1833#1 dir=testdata/ghdl/testsuite/gna/issue1833 std=08 sha=f08fbb8298fd6115
+ test.vhdl ghdl=0 nvc=0
+run gna/issue1834#1 dir=testdata/ghdl/testsuite/gna/issue1834 std=93c sha=31c63f78143829ed
+ tb.vhdl -Werror ghdl=1@20,24 nvc=1@20,24
+ tb.vhdl ghdl=0 nvc=1@20,24
+run gna/issue1836#1 dir=testdata/ghdl/testsuite/gna/issue1836 std=08 sha=b413b7a9acb7c916
+ test2.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+run gna/issue1837#1 dir=testdata/ghdl/testsuite/gna/issue1837 std=93c sha=3083f0a0b06a0607
+ repro.vhdl ghdl=1@6,7 nvc=1@6
+run gna/issue1843#1 dir=testdata/ghdl/testsuite/gna/issue1843 std=08 sha=d31f7df9800732bf
+ counter.vhdl ghdl=0 nvc=0
+run gna/issue1844#1 dir=testdata/ghdl/testsuite/gna/issue1844 std=08 sha=18688c22fd84bfa2
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue1857#1 dir=testdata/ghdl/testsuite/gna/issue1857 std=08 sha=a79e182d1026102b
+ subtype_test.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue1862#1 dir=testdata/ghdl/testsuite/gna/issue1862 std=08 sha=cfe3a480f31e17b7
+ repro.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+run gna/issue1864#1 dir=testdata/ghdl/testsuite/gna/issue1864 std=08 sha=fc367c8a0a3181af
+ test.vhdl ghdl=0 nvc=0
+run gna/issue1867#1 dir=testdata/ghdl/testsuite/gna/issue1867 std=08 sha=66ff9d7b73c1ddd9
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1872#1 dir=testdata/ghdl/testsuite/gna/issue1872 std=08 sha=cce2873c7e27069b
+ match_operators.vhdl ghdl=0 nvc=0
+run gna/issue1875#1 dir=testdata/ghdl/testsuite/gna/issue1875 std=08 sha=edf0b0b45c59f1fe
+ test.vhdl -frelaxed ghdl=0 nvc=0
+run gna/issue1876#1 dir=testdata/ghdl/testsuite/gna/issue1876 std=08 sha=a2fa25a0e6e29a16
+ ent.vhdl ghdl=0 nvc=0
+ pkgent.vhdl ghdl=0 nvc=0
+run gna/issue1881#1 dir=testdata/ghdl/testsuite/gna/issue1881 std=93c sha=04cada15deb6f722
+ mcve.vhdl ghdl=0 nvc=0
+run gna/issue1883#1 dir=testdata/ghdl/testsuite/gna/issue1883 std=08 sha=aa8e8520411364a4
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1883#2 dir=testdata/ghdl/testsuite/gna/issue1883 std=02 sha=aa8e8520411364a4
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1883#3 dir=testdata/ghdl/testsuite/gna/issue1883 std=93 sha=27660be7bca64583
+ repro.vhdl ghdl=1@1 nvc=0
+ repro.vhdl -C ghdl=0 nvc=0
+run gna/issue1894#1 dir=testdata/ghdl/testsuite/gna/issue1894 std=93c sha=705ce3c92cc26de3
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1898#1 dir=testdata/ghdl/testsuite/gna/issue1898 std=08 sha=7e94810e307c24a5
+ scale.vhdl ghdl=0 nvc=0
+ scale2.vhdl ghdl=0 nvc=0
+ scale3.vhdl ghdl=0 nvc=0
+ scale4.vhdl ghdl=0 nvc=0
+run gna/issue190#1 dir=testdata/ghdl/testsuite/gna/issue190 std=08 sha=42645d3138700f52
+ e.vhdl ghdl=0 nvc=0
+run gna/issue1913#1 dir=testdata/ghdl/testsuite/gna/issue1913 std=08 sha=e8801180948335e9
+ i2c_tb.vhdl ghdl=0 nvc=0
+run gna/issue1914#1 dir=testdata/ghdl/testsuite/gna/issue1914 std=08 sha=e2f253bc1c50d52a
+ delayline1d.vhdl ghdl=0 nvc=0
+ tb_delayline1d.vhdl ghdl=0 nvc=0
+run gna/issue1914#2 dir=testdata/ghdl/testsuite/gna/issue1914 std=08 sha=5c9022df43461f7c
+ delayline.vhdl ghdl=0 nvc=0
+ tb_delayline.vhdl ghdl=0 nvc=0
+run gna/issue1919#1 dir=testdata/ghdl/testsuite/gna/issue1919 std=93c sha=6f2a7db6c16b868a
+ repro.vhdl ghdl=1@5 nvc=1@5
+ repro1.vhdl ghdl=1@5 nvc=1@5
+run gna/issue1924#1 dir=testdata/ghdl/testsuite/gna/issue1924 std=08 sha=db207c8937a3e491
+ fixed_pkg.vhdl ghdl=0 nvc=0
+ float32_pkg.vhdl ghdl=0 nvc=0
+ test_float_to_sfixed.vhdl ghdl=0 nvc=0
+run gna/issue1934#1 dir=testdata/ghdl/testsuite/gna/issue1934 std=08 sha=cdd22c888caf9c16
+ test_pkg.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue1935#1 dir=testdata/ghdl/testsuite/gna/issue1935 std=93c sha=e856a42f0a4a7b77
+ clock.vhdl ghdl=0 nvc=0
+ bwc.vhdl ghdl=0 nvc=0
+ sm_tb.vhdl ghdl=1@22,40 nvc=1@20,44,68,70
+run gna/issue1943#1 dir=testdata/ghdl/testsuite/gna/issue1943 std=08 sha=3e7726d15f65fc93
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue1953#1 dir=testdata/ghdl/testsuite/gna/issue1953 std=08 sha=72aafc44e5150404
+ myentity.vhdl ghdl=1@11 nvc=1@11
+run gna/issue1965#1 dir=testdata/ghdl/testsuite/gna/issue1965 std=08 sha=97526c6152b8a8c5
+ bar_sim.vhdl ghdl=0 nvc=0
+run gna/issue1979#1 dir=testdata/ghdl/testsuite/gna/issue1979 std=08 sha=7092528dc154dc32
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1980#1 dir=testdata/ghdl/testsuite/gna/issue1980 std=08 sha=c3a71e247ce215db
+ NamePkg.vhd lib=osvvm ghdl=0 nvc=0
+ OsvvmGlobalPkg.vhd lib=osvvm ghdl=0 nvc=0
+ TextUtilPkg.vhd lib=osvvm ghdl=0 nvc=0
+ AlertLogPkg.vhd lib=osvvm ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue199#1 dir=testdata/ghdl/testsuite/gna/issue199 std=08 sha=72c4074c0b722703
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue1992#1 dir=testdata/ghdl/testsuite/gna/issue1992 std=08 sha=e46644eee263c2a3
+ bug.vhdl ghdl=1@30 nvc=0
+run gna/issue1994#1 dir=testdata/ghdl/testsuite/gna/issue1994 std=93c sha=a752a6f4c5d95703
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue1999#1 dir=testdata/ghdl/testsuite/gna/issue1999 std=93c sha=0d2488deb157b187
+ t1_p.vhdl ghdl=0 nvc=0
+ tc.vhdl ghdl=1@22 nvc=1@22
+run gna/issue2#1 dir=testdata/ghdl/testsuite/gna/issue2 std=08 sha=9e99b57fb9120f88
+ repro.vhdl lib=test ghdl=0 nvc=0
+ repro2.vhdl lib=test ghdl=0 nvc=0
+ sortnet_OddEvenSort.vhdl lib=test ghdl=0 nvc=0
+ sortnet_OddEvenSort_tb.vhdl lib=test ghdl=0 nvc=0
+ sortnet_BitonicSort.vhdl lib=test ghdl=0 nvc=0
+ sortnet_BitonicSort_tb.vhdl lib=test ghdl=0 nvc=0
+run gna/issue20#1 dir=testdata/ghdl/testsuite/gna/issue20 std=08 sha=af53235996b99e34
+ fp_write_read_issue.vhdl ghdl=0 nvc=0
+run gna/issue2006#1 dir=testdata/ghdl/testsuite/gna/issue2006 std=08 sha=acfba805a7db245c
+ mypkg.vhdl ghdl=1@3 nvc=0
+ filpkg.vhdl ghdl=1@3 nvc=0
+run gna/issue201#1 dir=testdata/ghdl/testsuite/gna/issue201 std=08 sha=08d1980818e2220b
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue202#1 dir=testdata/ghdl/testsuite/gna/issue202 std=08 sha=a4451061f4646c1f
+ ScoreboardGenericPkg.vhd lib=osvvm ghdl=0 nvc=0
+ repro_err.vhdl ghdl=1@38 nvc=1@40
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2026#1 dir=testdata/ghdl/testsuite/gna/issue2026 std=08 sha=2973f9f818304b08
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue2026#2 dir=testdata/ghdl/testsuite/gna/issue2026 std=08 sha=c072e433238a745d
+ test_tb.vhdl ghdl=0 nvc=0
+run gna/issue2031#1 dir=testdata/ghdl/testsuite/gna/issue2031 std=93c sha=22fb5ab7241452e1
+ entity.vhdl lib=bugtests ghdl=0 nvc=0
+ testbench.vhdl lib=bugtests ghdl=1@2,11~ nvc=1@2,11
+run gna/issue2038#1 dir=testdata/ghdl/testsuite/gna/issue2038 std=08 sha=46204ea7ee3b7476
+ types_pkg.vhdl lib=modulation_lib ghdl=0 nvc=0
+ generic_stack_pkg.vhdl lib=modulation_lib ghdl=0 nvc=0
+ symbol_stack_pkg.vhdl lib=modulation_lib ghdl=0 nvc=0
+ modulator.vhdl lib=modulation_lib ghdl=0 nvc=0
+ testbench.vhdl ghdl=0 nvc=1@30,31,32,33,34
+run gna/issue204#1 dir=testdata/ghdl/testsuite/gna/issue204 std=08 sha=19a81f8d04a8645c
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2048#1 dir=testdata/ghdl/testsuite/gna/issue2048 std=93c sha=7c5b2cd9d6dc2f55
+ icache.vhdl ghdl=1@2 nvc=1@2
+ icache2.vhdl ghdl=1@2 nvc=1@2
+run gna/issue205#1 dir=testdata/ghdl/testsuite/gna/issue205 std=08 sha=4126931fdaccfbeb
+ repro1.vhdl ghdl=0 nvc=1@17,22
+run gna/issue2050#1 dir=testdata/ghdl/testsuite/gna/issue2050 std=93c sha=d1af269a3dd60efe
+ test_pkg.vhdl ghdl=0 nvc=0
+run gna/issue2051#1 dir=testdata/ghdl/testsuite/gna/issue2051 std=93c sha=712d2cd8da413a52
+ repro.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue2051#2 dir=testdata/ghdl/testsuite/gna/issue2051 std=08 sha=ac68c38fa7687425
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue2055#1 dir=testdata/ghdl/testsuite/gna/issue2055 std=08 sha=92db33d20b361968
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2065#1 dir=testdata/ghdl/testsuite/gna/issue2065 std=08 sha=95aa7bdfc1128e69
+ repro.vhdl ghdl=0 nvc=0
+ dual_port_ram.vhdl ghdl=0 nvc=0
+ fft.vhdl ghdl=0 nvc=1@98
+run gna/issue2066#1 dir=testdata/ghdl/testsuite/gna/issue2066 std=08 sha=84ccdbece5058b26
+ repro1.vhdl ghdl=0 nvc=1@7
+ aggregate_bug.vhdl ghdl=0 nvc=1@10
+run gna/issue207#1 dir=testdata/ghdl/testsuite/gna/issue207 std=93c sha=fce81165117ac8aa
+ pack.vhd ghdl=1@17,18,23,24,28~ nvc=1@17,18,23,24,28
+ pack1.vhd ghdl=1@8,10,12,14,68,69,70,71,116,117,118,119,121,122,123,124 nvc=1@116,117,118,119,121,122,123,124
+run gna/issue2070#1 dir=testdata/ghdl/testsuite/gna/issue2070 std=08 sha=8a66ca42e92fb1ce
+ crash0.vhdl ghdl=1@1 nvc=1@1
+ crash1.vhdl ghdl=1@1 nvc=0
+ crash10.vhdl ghdl=1@1 nvc=0
+ crash11.vhdl ghdl=1@1 nvc=1@1
+ crash12.vhdl ghdl=1@1 nvc=1@1
+ crash13.vhdl ghdl=1@1 nvc=1@1
+ crash14.vhdl ghdl=1@1 nvc=1@1
+ crash15.vhdl ghdl=1@1 nvc=1@1
+ crash16.vhdl ghdl=1@1 nvc=1@1
+ crash17.vhdl ghdl=1@1,2 nvc=1@1
+ crash18.vhdl ghdl=1@1 nvc=1@1
+ crash19.vhdl ghdl=1@1 nvc=1@1
+ crash2.vhdl ghdl=1@1 nvc=1@1
+ crash20.vhdl ghdl=1@2,3 nvc=1@2
+ crash21.vhdl ghdl=1@1 nvc=1@1
+ crash22.vhdl ghdl=1@1 nvc=1@1
+ crash23.vhdl ghdl=1@1,2 nvc=1@1
+ crash24.vhdl ghdl=1@1 nvc=1@1
+ crash25.vhdl ghdl=1@2 nvc=1@2
+ crash26.vhdl ghdl=1@1 nvc=1@1
+ crash27.vhdl ghdl=1@1 nvc=1@1
+ crash28.vhdl ghdl=1@1 nvc=1@1
+ crash29.vhdl ghdl=1@2,3,4~ nvc=1@2,3
+ crash3.vhdl ghdl=1@1 nvc=1@1
+ crash30.vhdl ghdl=1@2,3 nvc=1@2,3
+ crash31.vhdl ghdl=1@1 nvc=1@1
+ crash32.vhdl ghdl=1@1 nvc=1@1
+ crash33.vhdl ghdl=1@1 nvc=1@1
+ crash34.vhdl ghdl=1@1,2 nvc=1@1
+ crash35.vhdl ghdl=1@1 nvc=1@1
+ crash36.vhdl ghdl=1@1 nvc=1@1
+ crash37.vhdl ghdl=1@1,2 nvc=1@1
+ crash38.vhdl ghdl=1@3 nvc=1@3,5
+ crash39.vhdl ghdl=1@2 nvc=1@2
+ crash4.vhdl ghdl=1@2 nvc=1@2
+ crash40.vhdl ghdl=1@1 nvc=1@1
+ crash41.vhdl ghdl=1@1,2,3 nvc=1@1
+ crash42.vhdl ghdl=1@2 nvc=1@2
+ crash43.vhdl ghdl=1@2 nvc=1@2
+ crash44.vhdl ghdl=1@1 nvc=1@1
+ crash45.vhdl ghdl=1@4,7 nvc=1@4,7
+ crash46.vhdl ghdl=1@1,2 nvc=1@1
+ crash47.vhdl ghdl=1@1 nvc=1@1,2,3
+ crash48.vhdl ghdl=1@1,2,3,4,5,6 nvc=1@1,2,3,4,5,6
+ crash49.vhdl ghdl=1@3 nvc=1@3,5
+ crash5.vhdl ghdl=1@1,2 nvc=1@1
+ crash50.vhdl ghdl=1@1,2 nvc=1@1
+ crash51.vhdl ghdl=1@1 nvc=1@1
+ crash52.vhdl ghdl=1@3,4,5 nvc=1@3,4,5
+ crash53.vhdl ghdl=1@3,6,7 nvc=1@3,6,7
+ crash54.vhdl ghdl=1@3,4,5 nvc=1@3,4,5
+ crash55.vhdl ghdl=1@1,2 nvc=1@1
+ crash6.vhdl ghdl=1@2,3 nvc=1@2
+ crash7.vhdl ghdl=1@1 nvc=1@1
+ crash8.vhdl ghdl=1@1 nvc=1@1
+ crash9.vhdl ghdl=1@1,2 nvc=1@1
+run gna/issue2071#1 dir=testdata/ghdl/testsuite/gna/issue2071 std=08 sha=fbf68ca0493b1c16
+ repro.vhdl ghdl=0 nvc=0
+ tst.vhdl ghdl=0 nvc=0
+run gna/issue2076#1 dir=testdata/ghdl/testsuite/gna/issue2076 std=08 sha=a9c31ca81818f90c
+ gcrash-1a.vhdl ghdl=1@3 nvc=1@3
+ gcrash-6a.vhdl ghdl=1@9 nvc=1@9
+ gcrash-9a.vhdl ghdl=1@2 nvc=1@2
+run gna/issue209#1 dir=testdata/ghdl/testsuite/gna/issue209 std=93c sha=b03c17bf6760377e
+ util.vhdl ghdl=0 nvc=0
+ main.vhdl ghdl=1@12 nvc=1@12
+ main2.vhdl ghdl=0 nvc=0
+run gna/issue2091#1 dir=testdata/ghdl/testsuite/gna/issue2091 std=08 sha=3760e5ef89fc2c9a
+ log.vhdl ghdl=0 nvc=1@18,28
+ test.vhdl ghdl=0 nvc=1@6,11
+run gna/issue2097#1 dir=testdata/ghdl/testsuite/gna/issue2097 std=08 sha=3d12ac2ebad7759e
+ my_fixed_pkg.vhdl ghdl=0 nvc=0
+ tb_fixed1.vhdl ghdl=0 nvc=0
+ tb_fixed2.vhdl ghdl=0 nvc=0
+ tb_fixed3.vhdl ghdl=1@34 nvc=1@34
+run gna/issue2098#1 dir=testdata/ghdl/testsuite/gna/issue2098 std=08 sha=f0b37650cc25c0a1
+ test-orig.vhdl -Werror=elaboration ghdl=1@27,48~,126,131~ nvc=1@27,48,102,126,131
+ test2.vhdl -Werror=elaboration ghdl=0 nvc=0
+run gna/issue2098#2 dir=testdata/ghdl/testsuite/gna/issue2098 std=08 sha=a4d333b8683e9990
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2100#1 dir=testdata/ghdl/testsuite/gna/issue2100 std=08 sha=594f7e5210d9518b
+ ent.vhdl ghdl=1@15 nvc=1@15
+run gna/issue2101#1 dir=testdata/ghdl/testsuite/gna/issue2101 std=93c sha=5a4bc264133eda1d
+ ent.vhdl ghdl=1@16 nvc=1@16
+run gna/issue2103#1 dir=testdata/ghdl/testsuite/gna/issue2103 std=93 sha=904bd435a752ecff
+ repro.vhdl ghdl=1@6 nvc=1@6
+ repro2.vhdl ghdl=1@5 nvc=1@2
+ repro3.vhdl ghdl=1@9 nvc=0
+ repro4.vhdl ghdl=1@12 nvc=0
+ repro5.vhdl ghdl=1@9 nvc=0
+ pkg_logic_misc.vhdl ghdl=0 nvc=1@6
+ pkg_math_utils.vhdl ghdl=0 nvc=0
+ pkg_math_signed.vhdl ghdl=1@68,74,95,99 nvc=1@27,53
+run gna/issue2104#1 dir=testdata/ghdl/testsuite/gna/issue2104 std=93c sha=ee1e6856a7333718
+ e.vhdl ghdl=0 nvc=0
+ e2.vhdl ghdl=0 nvc=0
+ e2b.vhdl ghdl=0 nvc=0
+ e2c.vhdl ghdl=0 nvc=0
+ e2d.vhdl ghdl=0 nvc=0
+ e3.vhdl ghdl=0 nvc=0
+run gna/issue2110#1 dir=testdata/ghdl/testsuite/gna/issue2110 std=08 sha=74df5d077e084b63
+ conf1.vhdl ghdl=1@1,2,3 nvc=1@1,2
+ psl1.vhdl ghdl=1@1 nvc=1@1
+ psl2.vhdl ghdl=1@1 nvc=1@1
+ retid.vhdl ghdl=1@1 nvc=1@1
+run gna/issue2112#1 dir=testdata/ghdl/testsuite/gna/issue2112 std=08 sha=f362786357520c62
+ abc.vhdl ghdl=0 nvc=0
+ abc_tb.vhdl ghdl=0 nvc=0
+ abc_tb1.vhdl ghdl=0 nvc=0
+ abc_tb2.vhdl ghdl=0 nvc=0
+ abc_tb3.vhdl ghdl=0 nvc=0
+run gna/issue2115#1 dir=testdata/ghdl/testsuite/gna/issue2115 std=08 sha=d9b4ea434b4d2256
+ ent.vhdl ghdl=0 nvc=0
+ tst08.vhdl ghdl=0 nvc=0
+run gna/issue2115#2 dir=testdata/ghdl/testsuite/gna/issue2115 std=93 sha=0f306f3e97cd9df2
+ tst93.vhdl ghdl=0 nvc=0
+run gna/issue2116#1 dir=testdata/ghdl/testsuite/gna/issue2116 std=08 sha=193260ddd0a14e07
+ func4_0.vhdl ghdl=0 nvc=0
+ func4_1.vhdl ghdl=0 nvc=0
+ aspect01.vhdl ghdl=1@6 nvc=1@6
+ aspect02.vhdl ghdl=1@6 nvc=1@6
+ aspect03.vhdl ghdl=1@6 nvc=1@6
+ attr1.vhdl ghdl=1@2 nvc=1@2,3,4
+ attr10.vhdl ghdl=1@1,2 nvc=1@1,2
+ attr11.vhdl ghdl=1@3,4 nvc=1@3,4
+ attr12.vhdl ghdl=1@5 nvc=1@5
+ attr13.vhdl ghdl=1@1 nvc=1@1,2,3
+ attr14.vhdl ghdl=1@2,3 nvc=1@2,3,4,5,6
+ attr15.vhdl ghdl=1@5 nvc=1@2,3,4,5
+ attr16.vhdl ghdl=1@1 nvc=1@1,2,3
+ attr17.vhdl ghdl=1@2,3 nvc=1@2,3,4,5
+ attr18.vhdl ghdl=1@2,3 nvc=1@2,3,4,5,6,7
+ attr19.vhdl ghdl=1@2 nvc=1@2
+ attr2.vhdl ghdl=1@2 nvc=1@2
+ attr20.vhdl ghdl=1@2 nvc=1@2,3,4
+ attr21.vhdl ghdl=1@5 nvc=1@5
+ attr22.vhdl ghdl=1@6 nvc=1@6
+ attr23.vhdl ghdl=1@2,3 nvc=1@2,3,4,5,6
+ attr24.vhdl ghdl=1@1 nvc=1@1,2
+ attr25.vhdl ghdl=1@6 nvc=1@6
+ attr26.vhdl ghdl=1@1 nvc=1@1,2,3
+ attr3.vhdl ghdl=1@5 nvc=1@5,6
+ attr4.vhdl ghdl=1@2 nvc=1@2,4
+ attr5.vhdl ghdl=1@5 nvc=1@2,3,4,5
+ attr6.vhdl ghdl=1@2,3 nvc=1@2,3,4,5,6
+ attr7.vhdl ghdl=1@2 nvc=1@2,4
+ attr8.vhdl ghdl=1@1,2 nvc=1@1,2
+ attr9.vhdl ghdl=1@6 nvc=1@6
+ cons01.vhdl ghdl=1@2,3 nvc=1@2,3,4,5
+ cons02.vhdl ghdl=1@2 nvc=1@2
+ cons03.vhdl ghdl=1@3,4 nvc=1@3,4
+ err01.vhdl ghdl=1@7,10,11,12,14,17,18,20,24,25,26,27,28,29,31,33,34,35,36,38,39,40,41,42,45,46,47,48,49 nvc=1@7,10,14,17,21,25,26,28,39,40,41,46,47,48,49
+ eval1.vhdl ghdl=1@3,8,10 nvc=1@3,8,10
+ eval2.vhdl ghdl=1@2 nvc=1@2,3,4
+ func1.vhdl ghdl=1@3,4~ nvc=1@3,4
+ func2.vhdl ghdl=1@14,15,19,22,27~ nvc=1@14,15,19,27
+ func3.vhdl ghdl=1@2,3 nvc=1@2,3
+ func4.vhdl ghdl=1@10,11,12,13,15,16,17,31 nvc=1@10,11,12,15,16,31
+ func5.vhdl ghdl=1@5 nvc=1@5
+ func6.vhdl ghdl=1@2 nvc=1@2
+ func7.vhdl ghdl=1@2,3 nvc=1@2,3
+ name01.vhdl ghdl=1@1 nvc=1@1,3,4
+ name02.vhdl ghdl=1@7,10,11,12,14,17,18,20,24,25,26,27,28,29,31,33,34,35,36,38,39,40,41,42,45,46,47,48,49 nvc=1@7,10,14,17,21,25,26,28,39,40,41,46,47,48,49
+ pkg1.vhdl ghdl=1@6 nvc=1@6
+ pkg10.vhdl ghdl=1@4,7,8~ nvc=1@4,5,7
+ pkg11.vhdl ghdl=1@6,7~ nvc=1@6
+ pkg12.vhdl ghdl=1@3 nvc=1@3,4
+ pkg13.vhdl ghdl=1@3 nvc=1@3,4
+ pkg14.vhdl ghdl=1@3,4~ nvc=1@3
+ pkg15.vhdl ghdl=1@6,7~ nvc=1@6,7,8
+ pkg2.vhdl ghdl=1@8,9~ nvc=1@8
+ pkg3.vhdl ghdl=1@4,5,6~ nvc=1@4,5,6
+ pkg4.vhdl ghdl=1@3 nvc=1@3
+ pkg5.vhdl ghdl=1@7,8~ nvc=1@7
+ pkg6.vhdl ghdl=1@4,7,8~ nvc=1@4,5,7
+ pkg7.vhdl ghdl=1@4,5~ nvc=1@4,6
+ pkg8.vhdl ghdl=1@3 nvc=1@3
+ pkg9.vhdl ghdl=1@7 nvc=1@7
+ psl01.vhdl ghdl=1@6 nvc=1@6
+ psl02.vhdl ghdl=1@5 nvc=1@5
+ psl03.vhdl ghdl=1@6 nvc=1@6
+ psl04.vhdl ghdl=1@6 nvc=1@6
+ sign01.vhdl ghdl=1@5,6 nvc=1@5,6
+ unit01.vhdl ghdl=1@3 nvc=1@3
+ unit02.vhdl ghdl=1@3 nvc=1@3
+ unit03.vhdl ghdl=1@3 nvc=1@3
+run gna/issue2117#1 dir=testdata/ghdl/testsuite/gna/issue2117 std=93c sha=b8cc94eda48c2717
+ bug.vhdl ghdl=1@8 nvc=1@8
+run gna/issue2118#1 dir=testdata/ghdl/testsuite/gna/issue2118 std=08 sha=6d675317f72056cd
+ top.vhdl ghdl=0 nvc=0
+run gna/issue212#1 dir=testdata/ghdl/testsuite/gna/issue212 std=93c sha=05b2cdb740174551
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2131#1 dir=testdata/ghdl/testsuite/gna/issue2131 std=08 sha=421390ccd84a932c
+ array_of_string_elements.vhdl ghdl=0 nvc=1@7
+run gna/issue2134#1 dir=testdata/ghdl/testsuite/gna/issue2134 std=08 sha=23a882a6ac8309d6
+ repro1.vhdl ghdl=0 nvc=0
+ attribute_on_shared_variable.vhdl ghdl=0 nvc=0
+run gna/issue2136#1 dir=testdata/ghdl/testsuite/gna/issue2136 std=08 sha=56f2d057ea5189fd
+ repro1.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2138#1 dir=testdata/ghdl/testsuite/gna/issue2138 std=08 sha=4d4aa52fddd54ef9
+ variable_assignment_with_when.vhdl ghdl=0 nvc=0
+run gna/issue2141#1 dir=testdata/ghdl/testsuite/gna/issue2141 std=08 sha=88166802b21b9495
+ test.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+ test3.vhdl ghdl=0 nvc=1@12
+run gna/issue2147#1 dir=testdata/ghdl/testsuite/gna/issue2147 std=93c sha=2b4ac8a1133ab265
+ e.vhdl ghdl=1@12 nvc=1@12
+ e2.vhdl ghdl=0 nvc=0
+run gna/issue2148#1 dir=testdata/ghdl/testsuite/gna/issue2148 std=93c sha=c45c0a5923470fa7
+ unused.vhdl -Werror=unused ghdl=1@6 nvc=0
+ e.vhdl -Werror=unused ghdl=0 nvc=0
+ e1.vhdl -Werror=unused ghdl=1@9 nvc=0
+ e2.vhdl -Werror=unused ghdl=1@9 nvc=0
+run gna/issue2150#1 dir=testdata/ghdl/testsuite/gna/issue2150 std=08 sha=c677b7195d8dccee
+ e.vhdl -Werror=no-wait ghdl=0 nvc=0
+ e1.vhdl -Werror=no-wait ghdl=0 nvc=0
+ e2.vhdl -Werror=no-wait ghdl=0 nvc=0
+ e3.vhdl -Werror=no-wait ghdl=0 nvc=0
+ e4.vhdl -Werror=no-wait ghdl=1@5 nvc=0
+run gna/issue2152#1 dir=testdata/ghdl/testsuite/gna/issue2152 std=93c sha=9fdad1809925e58e
+ e.vhdl ghdl=0 nvc=0
+ e1.vhdl ghdl=0 nvc=0
+ e2.vhdl ghdl=0 nvc=0
+run gna/issue2153#1 dir=testdata/ghdl/testsuite/gna/issue2153 std=08 sha=62f63ab1641fea06
+ issue.vhdl ghdl=0 nvc=1@69,75,106
+run gna/issue2155#1 dir=testdata/ghdl/testsuite/gna/issue2155 std=08 sha=9c085809cfca64b7
+ closely_related_arrays.vhdl ghdl=0 nvc=0
+ e.vhdl ghdl=0 nvc=0
+run gna/issue2156#1 dir=testdata/ghdl/testsuite/gna/issue2156 std=08 sha=e2a5e77f5cb88a24
+ timing_pkg.vhdl ghdl=0 nvc=0
+ tb_to_string_overloading.vhdl ghdl=1@13 nvc=0
+run gna/issue2156#2 dir=testdata/ghdl/testsuite/gna/issue2156 std=08 sha=7aca2bc3e4aa05ff
+ timing_pkg2.vhdl ghdl=0 nvc=0
+ tb_to_string_overloading.vhdl ghdl=1@13 nvc=1@13
+run gna/issue2157#1 dir=testdata/ghdl/testsuite/gna/issue2157 std=08 sha=89324e98c7c4841a
+ issue.vhdl ghdl=0 nvc=1@127,137,141,166
+run gna/issue216#1 dir=testdata/ghdl/testsuite/gna/issue216 std=08 sha=d376c7bd256e790a
+ test.vhdl ghdl=0 nvc=1@25
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue2162#1 dir=testdata/ghdl/testsuite/gna/issue2162 std=08 sha=db3225fcf2df298d
+ tb_systolic.vhdl ghdl=1@9 nvc=1@9
+run gna/issue2163#1 dir=testdata/ghdl/testsuite/gna/issue2163 std=08 sha=cbea32c28b9459b4
+ pkg2.vhdl ghdl=1@22 nvc=1@22
+ pkg1.vhdl ghdl=0 nvc=0
+ pkg3.vhdl ghdl=0 nvc=0
+run gna/issue2164#1 dir=testdata/ghdl/testsuite/gna/issue2164 std=93c sha=8e5ecd8446437c4d
+ e.vhdl ghdl=0 nvc=0
+run gna/issue2165#1 dir=testdata/ghdl/testsuite/gna/issue2165 std=93 sha=9959a0da574f63fb
+ e.vhdl ghdl=1@7 nvc=1@7
+ e.vhdl ghdl=1@7 nvc=1@7
+run gna/issue2166#1 dir=testdata/ghdl/testsuite/gna/issue2166 std=08 sha=3ea047cfc3737f72
+ repro1.vhdl -frelaxed ghdl=0 nvc=0
+ repro3.vhdl -frelaxed ghdl=0 nvc=0
+ repro2.vhdl -frelaxed ghdl=0 nvc=0
+ tb3.vhdl -frelaxed ghdl=0 nvc=0
+ repro4.vhdl -frelaxed ghdl=0 nvc=1@20
+ mempkgreproducer4.vhdl -frelaxed ghdl=0 nvc=0
+ tb2.vhdl -frelaxed ghdl=1@1,3,5,17,22~ nvc=1@1
+ tb.vhdl -frelaxed ghdl=1@4,5,10~ nvc=1@4
+run gna/issue2174#1 dir=testdata/ghdl/testsuite/gna/issue2174 std=93c sha=b9770d71de663cf5
+ test.vhdl ghdl=1@12,17~ nvc=1@12,17
+ t1.vhdl ghdl=0 nvc=0
+ t2.vhdl ghdl=0 nvc=0
+ t3.vhdl ghdl=0 nvc=0
+run gna/issue2175#1 dir=testdata/ghdl/testsuite/gna/issue2175 std=08 sha=533b46a6f2456e47
+ pkg.vhdl ghdl=0 nvc=0
+ tb2.vhdl ghdl=0 nvc=0
+ tb3.vhdl ghdl=0 nvc=0
+ tb4.vhdl ghdl=0 nvc=0
+run gna/issue2179#1 dir=testdata/ghdl/testsuite/gna/issue2179 std=08 sha=163bba68e3d352a3
+ e.vhdl ghdl=1@20,26~ nvc=1@20
+ e.vhdl -frelaxed ghdl=0 nvc=0
+run gna/issue2185#1 dir=testdata/ghdl/testsuite/gna/issue2185 std=08 sha=2e013a6fdae5b522
+ burst_ctrl.vhd ghdl=0 nvc=0
+ avm_master.vhd ghdl=0 nvc=0
+ avm_pause.vhd ghdl=0 nvc=0
+ avm_master_general.vhd ghdl=0 nvc=0
+ avm_arbit.vhd ghdl=0 nvc=0
+ avm_memory.vhd ghdl=0 nvc=0
+ tb_avm_arbit.vhd ghdl=0 nvc=0
+run gna/issue2189#1 dir=testdata/ghdl/testsuite/gna/issue2189 std=08 sha=969a57d32b447d4c
+ bug02.vhdl ghdl=0 nvc=0
+run gna/issue2190#1 dir=testdata/ghdl/testsuite/gna/issue2190 std=08 sha=3e2f3d84c4db40e6
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2193#1 dir=testdata/ghdl/testsuite/gna/issue2193 std=08 sha=c06bfb729df56bce
+ demo2.vhdl ghdl=0 nvc=0
+ demo.vhdl ghdl=0 nvc=0
+run gna/issue2196#1 dir=testdata/ghdl/testsuite/gna/issue2196 std=08 sha=c809c57b667fc395
+ def_err2.vhdl ghdl=1@34 nvc=1@32,34
+run gna/issue2198#1 dir=testdata/ghdl/testsuite/gna/issue2198 std=93c sha=8ebdb2a5147ba960
+ moon.vhdl ghdl=1@30,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49 nvc=1@30,32,35,37,39,41,43,45,47,49
+run gna/issue2202#1 dir=testdata/ghdl/testsuite/gna/issue2202 std=93c sha=7f4fef66e12e9671
+ repro.vhdl ghdl=1@26 nvc=1@26
+run gna/issue2212#1 dir=testdata/ghdl/testsuite/gna/issue2212 std=08 sha=b2e9b4f3df68e7a3
+ minimal.vhdl ghdl=0 nvc=0
+run gna/issue2215#1 dir=testdata/ghdl/testsuite/gna/issue2215 std=08 sha=ed6c5d1f7cc02dc1
+ e.vhdl ghdl=0 nvc=0
+run gna/issue2216#1 dir=testdata/ghdl/testsuite/gna/issue2216 std=08 sha=8b0e7728546644ab
+ pkg.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2217#1 dir=testdata/ghdl/testsuite/gna/issue2217 std=08 sha=072d7fdd6fd5c219
+ test1.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2218#1 dir=testdata/ghdl/testsuite/gna/issue2218 std=08 sha=b0ee3bfd8ba98872
+ test2.vhdl ghdl=1@9 nvc=1@9
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2223#1 dir=testdata/ghdl/testsuite/gna/issue2223 std=08 sha=e4efc7014b70df46
+ repro6.vhdl ghdl=0 nvc=0
+ repro7.vhdl ghdl=0 nvc=0
+run gna/issue223#1 dir=testdata/ghdl/testsuite/gna/issue223 std=93c sha=c3feea3c104361bf
+ repro.vhdl --ieee=synopsys ghdl=0 nvc=0
+run gna/issue2235#1 dir=testdata/ghdl/testsuite/gna/issue2235 std=08 sha=890bab8ca0452b66
+ test1.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+run gna/issue2238#1 dir=testdata/ghdl/testsuite/gna/issue2238 std=93c sha=11c1830acda8c3d9
+ port_map2.vhdl ghdl=0 nvc=0
+run gna/issue2239#1 dir=testdata/ghdl/testsuite/gna/issue2239 std=93c sha=bd801bda050e92c7
+ ent.vhdl ghdl=1@20 nvc=1@20
+run gna/issue2244#1 dir=testdata/ghdl/testsuite/gna/issue2244 std=08 sha=bb4f2d7c3020de0b
+ mve.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue225#1 dir=testdata/ghdl/testsuite/gna/issue225 std=93c sha=f37ddf9c189cd878
+ repro.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2250#1 dir=testdata/ghdl/testsuite/gna/issue2250 std=08 sha=25ae33689c7de3a2
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2264#1 dir=testdata/ghdl/testsuite/gna/issue2264 std=08 sha=387247848c268a07
+ repro1.vhdl ghdl=1@29 nvc=1@29
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2267#1 dir=testdata/ghdl/testsuite/gna/issue2267 std=08 sha=c7e803ccd78e343d
+ ent.vhdl ghdl=1@6 nvc=1@6
+run gna/issue2269#1 dir=testdata/ghdl/testsuite/gna/issue2269 std=08 sha=a0a097390935dece
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue227#1 dir=testdata/ghdl/testsuite/gna/issue227 std=08 sha=101bd82bb2c4624a
+ repro.vhdl ghdl=0 nvc=0
+ test.vhdl --ieee=synopsys ghdl=0 nvc=0
+run gna/issue2276#1 dir=testdata/ghdl/testsuite/gna/issue2276 std=08 sha=fdca840e923a1601
+ mwe.vhdl ghdl=0 nvc=0
+run gna/issue2277#1 dir=testdata/ghdl/testsuite/gna/issue2277 std=93c sha=a260cad475104293
+ ent.vhdl ghdl=1@29 nvc=1@29
+run gna/issue2277#2 dir=testdata/ghdl/testsuite/gna/issue2277 std=08 sha=a260cad475104293
+ ent.vhdl ghdl=0 nvc=1@29
+run gna/issue228#1 dir=testdata/ghdl/testsuite/gna/issue228 std=93c sha=ed355c46cbf79189
+ tb.vhdl -fpsl ghdl=0 nvc=0
+run gna/issue2288#1 dir=testdata/ghdl/testsuite/gna/issue2288 std=08 sha=7a0110f1abda4d1a
+ tb_minimal.vhdl ghdl=0 nvc=0
+run gna/issue2299#1 dir=testdata/ghdl/testsuite/gna/issue2299 std=08 sha=7b59c227bcb70e3b
+ tb_dct8.vhdl ghdl=0 nvc=0
+ tb_dct.vhdl ghdl=0 nvc=0
+run gna/issue2303#1 dir=testdata/ghdl/testsuite/gna/issue2303 std=08 sha=4dfc4866cacdee70
+ ent.vhdl ghdl=0 nvc=1@6
+run gna/issue2306#1 dir=testdata/ghdl/testsuite/gna/issue2306 std=08 sha=b5e28fc89d9bb75d
+ delay.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2307#1 dir=testdata/ghdl/testsuite/gna/issue2307 std=08 sha=8583f4a69cb93422
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2323#1 dir=testdata/ghdl/testsuite/gna/issue2323 std=93c sha=b48c22dee3cfc458
+ test_ip.vhdl ghdl=0 nvc=1@16
+ st1.vhdl ghdl=0 nvc=1@5
+ st2.vhdl ghdl=0 nvc=1@5
+run gna/issue2323#2 dir=testdata/ghdl/testsuite/gna/issue2323 std=08 sha=ae9301a6d836b4f7
+ st3.vhdl ghdl=0 nvc=1@7
+ st4.vhdl ghdl=0 nvc=1@7
+run gna/issue2326#1 dir=testdata/ghdl/testsuite/gna/issue2326 std=08 sha=917421d647b60f11
+ generic_package.vhdl ghdl=0 nvc=0
+run gna/issue233#1 dir=testdata/ghdl/testsuite/gna/issue233 std=08 sha=fcc9217fa4688062
+ test.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2333#1 dir=testdata/ghdl/testsuite/gna/issue2333 std=93c sha=ea227d2cfdd8ee4a
+ empty.vhdl lib=bugtests ghdl=0 nvc=0
+run gna/issue2336#1 dir=testdata/ghdl/testsuite/gna/issue2336 std=08 sha=dc8b656de3b8dc1d
+ test_issue_ok.vhdl ghdl=0 nvc=1@78,81,121
+run gna/issue2336#2 dir=testdata/ghdl/testsuite/gna/issue2336 std=08 sha=5d153b7d8ebd6c21
+ test_issue_err1.vhdl ghdl=0 nvc=1@78,81,121
+run gna/issue2337#1 dir=testdata/ghdl/testsuite/gna/issue2337 std=08 sha=67e516454804c95f
+ repro_tb.vhdl ghdl=0 nvc=0
+ repro2_tb.vhdl ghdl=0 nvc=0
+run gna/issue2344#1 dir=testdata/ghdl/testsuite/gna/issue2344 std=08 sha=da490105aebe38de
+ ent1.vhdl ghdl=0 nvc=0
+run gna/issue2346#1 dir=testdata/ghdl/testsuite/gna/issue2346 std=08 sha=022dbf57ae8da54c
+ aggr.vhdl ghdl=0 nvc=0
+ aggr4.vhdl ghdl=0 nvc=0
+run gna/issue2346#2 dir=testdata/ghdl/testsuite/gna/issue2346 std=08 sha=bd343a179d9a3946
+ aggr2.vhdl ghdl=0 nvc=0
+ aggr3.vhdl ghdl=0 nvc=0
+run gna/issue2349#1 dir=testdata/ghdl/testsuite/gna/issue2349 std=93c sha=9d070a17c0a0ba9e
+ a.vhdl ghdl=0 nvc=0
+ b.vhdl ghdl=0 nvc=0
+run gna/issue2349#2 dir=testdata/ghdl/testsuite/gna/issue2349 std=93c sha=ea5fdbe4449db557
+ b.vhdl ghdl=1@1 nvc=1@1
+run gna/issue235#1 dir=testdata/ghdl/testsuite/gna/issue235 std=08 sha=6ea89fffd5a5b974
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2350#1 dir=testdata/ghdl/testsuite/gna/issue2350 std=08 sha=c52fc4954066ef96
+ test.vhdl ghdl=0 nvc=0
+ test.vhdl -Werror=runtime-error ghdl=1@17 nvc=0
+ test2.vhdl -Werror=runtime-error ghdl=1@17 nvc=0
+ test3.vhdl -Werror=runtime-error ghdl=1@17 nvc=1@17
+ test4.vhdl -Werror=runtime-error ghdl=1@10 nvc=1@10
+ test5.vhdl -Werror=runtime-error ghdl=1@18 nvc=0
+ test6.vhdl -Werror=runtime-error ghdl=1@13 nvc=1@13
+ test7.vhdl -Werror=runtime-error ghdl=1@12 nvc=1@12
+run gna/issue2353#1 dir=testdata/ghdl/testsuite/gna/issue2353 std=08 sha=4a9808488a68e5f5
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue2353#2 dir=testdata/ghdl/testsuite/gna/issue2353 std=08 sha=25a0096628cd0d5a
+ pkg_a.vhdl ghdl=0 nvc=0
+ pkg_b.vhdl ghdl=1@5,28,40~ nvc=1@5
+ atest_tb.vhdl ghdl=1@4,13~ nvc=1@4,13,17,23
+run gna/issue2356#1 dir=testdata/ghdl/testsuite/gna/issue2356 std=08 sha=b88b3262cd021e3f
+ repro_tb.vhdl ghdl=0 nvc=0
+run gna/issue2357#1 dir=testdata/ghdl/testsuite/gna/issue2357 std=93c sha=4a0b8cc66e0996f8
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue2365#1 dir=testdata/ghdl/testsuite/gna/issue2365 std=08 sha=ff677e88bc589661
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2368#1 dir=testdata/ghdl/testsuite/gna/issue2368 std=08 sha=578d9a2a04070d3a
+ matchent1.vhdl ghdl=0 nvc=0
+ matchent2.vhdl ghdl=0 nvc=0
+run gna/issue237#1 dir=testdata/ghdl/testsuite/gna/issue237 std=93c sha=ecd32399f1900b18
+ test_array.vhdl ghdl=0 nvc=0
+run gna/issue238#1 dir=testdata/ghdl/testsuite/gna/issue238 std=08 sha=d1d3c0f6a69e7b2a
+ cst.vhdl ghdl=0 nvc=0
+ pkg.vhdl ghdl=0 nvc=0
+ var1.vhdl ghdl=0 nvc=0
+ var2.vhdl ghdl=0 nvc=0
+ var3.vhdl ghdl=0 nvc=0
+ var4.vhdl ghdl=0 nvc=0
+ assign1.vhdl ghdl=0 nvc=0
+ proc1.vhdl ghdl=0 nvc=0
+ sig1.vhdl ghdl=0 nvc=0
+ call1.vhdl ghdl=0 nvc=0
+ call2.vhdl ghdl=0 nvc=0
+ call3.vhdl ghdl=0 nvc=0
+ call4.vhdl ghdl=0 nvc=0
+ call5.vhdl ghdl=0 nvc=0
+run gna/issue2381#1 dir=testdata/ghdl/testsuite/gna/issue2381 std=08 sha=925314405b40eb00
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2382#1 dir=testdata/ghdl/testsuite/gna/issue2382 std=08 sha=e29083c17bc248da
+ top.vhdl ghdl=0 nvc=0
+run gna/issue2383#1 dir=testdata/ghdl/testsuite/gna/issue2383 std=08 sha=e7a1a5c240abbf39
+ top.vhdl ghdl=0 nvc=0
+run gna/issue2393#1 dir=testdata/ghdl/testsuite/gna/issue2393 std=08 sha=00519c3c17f4763e
+ cast_enum1.vhdl ghdl=0 nvc=0
+run gna/issue2395#1 dir=testdata/ghdl/testsuite/gna/issue2395 std=08 sha=9adb55fc4515af01
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2396#1 dir=testdata/ghdl/testsuite/gna/issue2396 std=08 sha=c3c1dc613ca2c165
+ repro_warn1.vhdl -Whide ghdl=0 nvc=0
+ frequency.vhdl ghdl=0 nvc=1@28,29,30,49,51,53,56,64
+ tb_freq.vhdl ghdl=0 nvc=1@1,7,9
+run gna/issue24#1 dir=testdata/ghdl/testsuite/gna/issue24 std=08 sha=29b9e8b2d4017d7d
+ crash.vhdl ghdl=0 nvc=1@55
+run gna/issue2402#1 dir=testdata/ghdl/testsuite/gna/issue2402 std=08 sha=e19083b5c1dead68
+ repro.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue2407#1 dir=testdata/ghdl/testsuite/gna/issue2407 std=08 sha=873d52466528db26
+ shift_register.vhdl ghdl=0 nvc=0
+ shift_register_tb.vhdl ghdl=0 nvc=0
+run gna/issue241#1 dir=testdata/ghdl/testsuite/gna/issue241 std=08 sha=9ab615b7f994f1ca
+ test.vhdl ghdl=0 nvc=0
+ rec.vhdl ghdl=0 nvc=0
+ arr.vhdl ghdl=0 nvc=0
+run gna/issue2410#1 dir=testdata/ghdl/testsuite/gna/issue2410 std=08 sha=ccfb107f7843c530
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2417#1 dir=testdata/ghdl/testsuite/gna/issue2417 std=08 sha=968deb50781b3ecd
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+ repro5.vhdl ghdl=0 nvc=0
+ repro6.vhdl ghdl=0 nvc=0
+ repro7.vhdl ghdl=0 nvc=0
+run gna/issue242#1 dir=testdata/ghdl/testsuite/gna/issue242 std=08 sha=dadd60d45704aa50
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2421#1 dir=testdata/ghdl/testsuite/gna/issue2421 std=93 sha=04cd730a57e087da
+ top.vhdl ghdl=1@12,24~ nvc=1@12
+ top.vhdl ghdl=1@12,24~ nvc=1@12
+run gna/issue2421#2 dir=testdata/ghdl/testsuite/gna/issue2421 std=08 sha=100343304e992546
+ top.vhdl ghdl=1@12,24~ nvc=1@12
+run gna/issue2421#3 dir=testdata/ghdl/testsuite/gna/issue2421 std=08 sha=100343304e992546
+ top.vhdl -frelaxed ghdl=0 nvc=0
+run gna/issue2422#1 dir=testdata/ghdl/testsuite/gna/issue2422 std=93 sha=ea31452f8506fa8e
+ aggr_repro1.vhdl ghdl=0 nvc=0
+ aggr_repro3.vhdl ghdl=0 nvc=0
+ aggr_repro4.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=1@31 nvc=0
+ top3.vhdl ghdl=1@33 nvc=0
+ aggr_repro2.vhdl ghdl=1@13,24~ nvc=1@13
+ top.vhdl ghdl=1@31 nvc=0
+ top4.vhdl ghdl=1@28,38~ nvc=0
+run gna/issue2424#1 dir=testdata/ghdl/testsuite/gna/issue2424 std=08 sha=c01d131feea8073e
+ ent.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+run gna/issue2425#1 dir=testdata/ghdl/testsuite/gna/issue2425 std=08 sha=a9fcd149fa542140
+ pkg.vhdl ghdl=0 nvc=0
+run gna/issue2427#1 dir=testdata/ghdl/testsuite/gna/issue2427 std=93 sha=f64a8d4da1b76a33
+ pkg.vhdl ghdl=1@7,8 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro3b.vhdl ghdl=1@8 nvc=1@8
+ pkg.vhdl ghdl=1@7,8 nvc=0
+ ent.vhdl ghdl=1@4,7,8 nvc=0
+ repro3b.vhdl ghdl=1@8 nvc=1@8
+run gna/issue2427#2 dir=testdata/ghdl/testsuite/gna/issue2427 std=08 sha=7a15c2bd714ebb91
+ ent2.vhdl ghdl=0 nvc=1@11,18,21,25,30,34
+ repro3b.vhdl ghdl=0 nvc=1@8
+ repro3.vhdl ghdl=1@2,9 nvc=0
+ repro3.vhdl -frelaxed ghdl=0 nvc=0
+run gna/issue2429#1 dir=testdata/ghdl/testsuite/gna/issue2429 std=08 sha=8fe2747a0039d36b
+ repro1.vhdl ghdl=0 nvc=0
+ my_entity.vhdl ghdl=0 nvc=0
+run gna/issue243#1 dir=testdata/ghdl/testsuite/gna/issue243 std=93c sha=84bb9447a328ac36
+ test.vhdl ghdl=1@17,18,21~ nvc=1@17,18,21
+run gna/issue243#2 dir=testdata/ghdl/testsuite/gna/issue243 std=08 sha=84bb9447a328ac36
+ test.vhdl ghdl=1@17,18,21~ nvc=1@17,18,21
+run gna/issue2430#1 dir=testdata/ghdl/testsuite/gna/issue2430 std=08 sha=6553344b91b15d2c
+ my_entity.vhdl ghdl=0 nvc=0
+run gna/issue2432#1 dir=testdata/ghdl/testsuite/gna/issue2432 std=08 sha=a91558f23bce73b7
+ test_tb.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue2433#1 dir=testdata/ghdl/testsuite/gna/issue2433 std=93c sha=d74dd0d4fd4a63c3
+ dummy.vhdl ghdl=0 nvc=0
+run gna/issue2435#1 dir=testdata/ghdl/testsuite/gna/issue2435 std=08 sha=c99561bca837f58a
+ my_pkg.vhdl ghdl=0 nvc=0
+ my_tb.vhdl ghdl=0 nvc=0
+run gna/issue2437#1 dir=testdata/ghdl/testsuite/gna/issue2437 std=08 sha=4df62e7e6ca196eb
+ tapped_delay_line.vhdl ghdl=0 nvc=0
+run gna/issue244#1 dir=testdata/ghdl/testsuite/gna/issue244 std=08 sha=06e287911d3f1de2
+ test.vhdl --ieee=synopsys ghdl=0 nvc=0
+run gna/issue2440#1 dir=testdata/ghdl/testsuite/gna/issue2440 std=08 sha=83dd8d9876cfce52
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2441#1 dir=testdata/ghdl/testsuite/gna/issue2441 std=93c sha=fcb46cd375f82574
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2445#1 dir=testdata/ghdl/testsuite/gna/issue2445 std=08 sha=60bf5d17ca9751e4
+ lfsr.vhdl ghdl=0 nvc=0
+ blk.vhdl ghdl=0 nvc=0
+run gna/issue2447#1 dir=testdata/ghdl/testsuite/gna/issue2447 std=93c sha=732f4045953a6a9e
+ ent.vhdl ghdl=1@8 nvc=2
+run gna/issue2448#1 dir=testdata/ghdl/testsuite/gna/issue2448 std=08 sha=351a10ddd9317fb6
+ debouncer.vhdl ghdl=0 nvc=0
+ debouncer_no_vunit_not_ok_tb.vhdl ghdl=0 nvc=0
+run gna/issue2452#1 dir=testdata/ghdl/testsuite/gna/issue2452 std=08 sha=f5b430d6608b3e40
+ foo.vhdl ghdl=0 nvc=0
+ tb_foo.vhdl ghdl=0 nvc=0
+ foo2.vhdl ghdl=0 nvc=0
+ foo3.vhdl ghdl=0 nvc=0
+run gna/issue2454#1 dir=testdata/ghdl/testsuite/gna/issue2454 std=08 sha=e2574e9ec4b7398a
+ bug_test.vhdl ghdl=0 nvc=0
+run gna/issue2455#1 dir=testdata/ghdl/testsuite/gna/issue2455 std=93c sha=3dd519ac974e32cf
+ test_case.vhdl ghdl=1@25,27 nvc=1@25
+run gna/issue2458#1 dir=testdata/ghdl/testsuite/gna/issue2458 std=08 sha=7e087c383693a33a
+ test2.vhdl ghdl=0 nvc=0
+ test3.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2459#1 dir=testdata/ghdl/testsuite/gna/issue2459 std=93c sha=cadf0b07b92e7900
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2463#1 dir=testdata/ghdl/testsuite/gna/issue2463 std=08 sha=cc5ce63450b8ed36
+ test1.vhdl ghdl=1@18 nvc=1@18
+ test2.vhdl ghdl=1@18 nvc=1@18
+ test3.vhdl ghdl=0 nvc=0
+run gna/issue2465#1 dir=testdata/ghdl/testsuite/gna/issue2465 std=93 sha=398d50f143b49de4
+ visibility8a.vhdl ghdl=1@16 nvc=1@16
+ visibility8b.vhdl ghdl=1@16 nvc=1@16
+ visibility8c.vhdl ghdl=1@17 nvc=1@17
+ visibility8d.vhdl ghdl=0 nvc=1@15
+ visibility8e.vhdl ghdl=1@15 nvc=1@15
+ visibility8f.vhdl ghdl=1@15 nvc=1@15
+ visibility8f2.vhdl ghdl=0 nvc=0
+ visibility8f3.vhdl ghdl=0 nvc=0
+ visibility8g.vhdl ghdl=1@15 nvc=1@15
+run gna/issue2466#1 dir=testdata/ghdl/testsuite/gna/issue2466 std=93 sha=b8f95745e9751d28
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue2466#2 dir=testdata/ghdl/testsuite/gna/issue2466 std=08 sha=bb7b54cd824f5f8a
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ t1.vhdl ghdl=1@8 nvc=1@8
+ t2.vhdl ghdl=0 nvc=0
+ t3.vhdl ghdl=1@8 nvc=1@8
+ t4.vhdl ghdl=1@8 nvc=1@8
+run gna/issue2470#1 dir=testdata/ghdl/testsuite/gna/issue2470 std=08 sha=ab6e415729325564
+ min_gen_pkg_tb_e.vhdl ghdl=0 nvc=0
+run gna/issue2470#2 dir=testdata/ghdl/testsuite/gna/issue2470 std=08 sha=259575dd00c15b70
+ min_gen_pkg_tb_e2.vhdl ghdl=0 nvc=0
+run gna/issue2471#1 dir=testdata/ghdl/testsuite/gna/issue2471 std=08 sha=212f1300ca57c4df
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2473#1 dir=testdata/ghdl/testsuite/gna/issue2473 std=93c sha=82c61c0543db0d08
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue2476#1 dir=testdata/ghdl/testsuite/gna/issue2476 std=93c sha=43e29f12c93b8146
+ bug3.vhdl ghdl=0 nvc=0
+run gna/issue2476#2 dir=testdata/ghdl/testsuite/gna/issue2476 std=93c sha=6dd5ac7608557e3e
+ bug2.vhdl ghdl=0 nvc=0
+run gna/issue2476#3 dir=testdata/ghdl/testsuite/gna/issue2476 std=93c sha=e62efd308c902d3d
+ bug.vhdl ghdl=0 nvc=0
+run gna/issue2477#1 dir=testdata/ghdl/testsuite/gna/issue2477 std=08 sha=5f905a8ff22ea896
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+ repro5.vhdl ghdl=0 nvc=0
+run gna/issue2480#1 dir=testdata/ghdl/testsuite/gna/issue2480 std=93c sha=a23cad1aa2a5da19
+ foo.vhdl ghdl=0 nvc=0
+run gna/issue2481#1 dir=testdata/ghdl/testsuite/gna/issue2481 std=08 sha=8a2b904221dbd429
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2486#1 dir=testdata/ghdl/testsuite/gna/issue2486 std=08 sha=5e40b1feb000affa
+ bug.vhdl ghdl=0 nvc=0
+ bug2.vhdl ghdl=0 nvc=0
+ bug3.vhdl ghdl=0 nvc=0
+run gna/issue2488#1 dir=testdata/ghdl/testsuite/gna/issue2488 std=08 sha=df3375acdc517a74
+ compa_pkg.vhdl ghdl=0 nvc=0
+ compa.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2489#1 dir=testdata/ghdl/testsuite/gna/issue2489 std=08 sha=494109b4f824a385
+ ent.vhdl ghdl=0 nvc=0
+ ent.vhdl -Werror ghdl=1@15 nvc=0
+run gna/issue2494#1 dir=testdata/ghdl/testsuite/gna/issue2494 std=08 sha=bcdc870fbd6688eb
+ compa_pkg.vhdl ghdl=0 nvc=0
+ compa.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2497#1 dir=testdata/ghdl/testsuite/gna/issue2497 std=93c sha=4dc5f76a95de406f
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue2498#1 dir=testdata/ghdl/testsuite/gna/issue2498 std=08 sha=ccb135f764ec0896
+ i2c_tb.vhdl ghdl=0 nvc=0
+run gna/issue25#1 dir=testdata/ghdl/testsuite/gna/issue25 std=93c sha=1858401705a45666
+ 1_SecondaryUnit.vhdl ghdl=1@35,47,52~ nvc=1@35,47,52
+ 2_SecondaryUnit.vhdl ghdl=0 nvc=0
+run gna/issue2500#1 dir=testdata/ghdl/testsuite/gna/issue2500 std=93c sha=34143082d63c6edc
+ ent.vhdl -fpsl ghdl=1@23 nvc=0
+run gna/issue2502#1 dir=testdata/ghdl/testsuite/gna/issue2502 std=93c sha=6faead67b33a4a17
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue2505#1 dir=testdata/ghdl/testsuite/gna/issue2505 std=08 sha=7b3dd85c15592950
+ top_tb.vhdl ghdl=0 nvc=0
+run gna/issue2506#1 dir=testdata/ghdl/testsuite/gna/issue2506 std=08 sha=f10609ff8b6c01ce
+ repro1.vhdl ghdl=0 nvc=1@10
+ A.vhdl ghdl=0 nvc=0
+ B_pkg.vhdl ghdl=0 nvc=1@14
+ B.vhdl ghdl=0 nvc=1@5,11
+ C.vhdl ghdl=0 nvc=1@19
+run gna/issue2507#1 dir=testdata/ghdl/testsuite/gna/issue2507 std=08 sha=7b20cd0f09acc48e
+ test.vhdl -Werror ghdl=0 nvc=0
+run gna/issue2508#1 dir=testdata/ghdl/testsuite/gna/issue2508 std=08 sha=a803112a4fd289d4
+ top.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2509#1 dir=testdata/ghdl/testsuite/gna/issue2509 std=93c sha=4a234506de28b727
+ repro1_1.vhdl ghdl=0 nvc=0
+ repro1_2.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue2510#1 dir=testdata/ghdl/testsuite/gna/issue2510 std=08 sha=12dcb05d235c3238
+ repro1.vhdl ghdl=0 nvc=1@21,26,41,46
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue2516#1 dir=testdata/ghdl/testsuite/gna/issue2516 std=08 sha=db2c77f212c47279
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2519#1 dir=testdata/ghdl/testsuite/gna/issue2519 std=08 sha=b0393c4ba6b57d18
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2525#1 dir=testdata/ghdl/testsuite/gna/issue2525 std=08 sha=c18c1fbfe7b819b5
+ ent2.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2526#1 dir=testdata/ghdl/testsuite/gna/issue2526 std=08 sha=47b7bf029fbf5c3f
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2528#1 dir=testdata/ghdl/testsuite/gna/issue2528 std=08 sha=78ec9ff4f56584f8
+ test1.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+run gna/issue253#1 dir=testdata/ghdl/testsuite/gna/issue253 std=08 sha=37751bfb132a8824
+ e.vhdl ghdl=0 nvc=0
+ e2.vhdl ghdl=0 nvc=0
+run gna/issue2531#1 dir=testdata/ghdl/testsuite/gna/issue2531 std=93c sha=d4382a373dc68f25
+ repro.vhdl ghdl=1@7,8,9 nvc=1@7,8,9
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue2536#1 dir=testdata/ghdl/testsuite/gna/issue2536 std=08 sha=6116620b4fba7722
+ bug.vhdl ghdl=0 nvc=0
+run gna/issue2538#1 dir=testdata/ghdl/testsuite/gna/issue2538 std=08 sha=03822a4ac9383e64
+ th.vhdl ghdl=0 nvc=0
+ tb2.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2539#1 dir=testdata/ghdl/testsuite/gna/issue2539 std=08 sha=5bf71fefb2daa9a9
+ test1.vhdl ghdl=0 nvc=0
+run gna/issue254#1 dir=testdata/ghdl/testsuite/gna/issue254 std=93c sha=6655cce6d263b038
+ e.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue2540#1 dir=testdata/ghdl/testsuite/gna/issue2540 std=08 sha=f05c8fcb5126f083
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2541#1 dir=testdata/ghdl/testsuite/gna/issue2541 std=08 sha=5756d23548f2c6d4
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2542#1 dir=testdata/ghdl/testsuite/gna/issue2542 std=08 sha=be3111498e12f9c8
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2544#1 dir=testdata/ghdl/testsuite/gna/issue2544 std=08 sha=4eab95dedd7bd6a5
+ generic_fixed_delay.vhdl ghdl=0 nvc=0
+ tb-crash.vhdl ghdl=1@15,20,38,43 nvc=1@13,15,38,43
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2546#1 dir=testdata/ghdl/testsuite/gna/issue2546 std=08 sha=a9fa3617326cd24a
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2547#1 dir=testdata/ghdl/testsuite/gna/issue2547 std=08 sha=d9a1ab339ebe376b
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2549#1 dir=testdata/ghdl/testsuite/gna/issue2549 std=08 sha=8ca97afa98ee6d8f
+ pkg_types.vhd ghdl=0 nvc=0
+ pkg_foo_public.vhd ghdl=0 nvc=0
+ foo.vhd ghdl=0 nvc=0
+ tb_foo.vhd ghdl=0 nvc=0
+run gna/issue2550#1 dir=testdata/ghdl/testsuite/gna/issue2550 std=08 sha=fd5a7277640ebef5
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue2552#1 dir=testdata/ghdl/testsuite/gna/issue2552 std=93c sha=64415af8a6358943
+ repro1.vhdl ghdl=1@24 nvc=1@24
+run gna/issue2554#1 dir=testdata/ghdl/testsuite/gna/issue2554 std=08 sha=379f9616c0e8fec6
+ test1.vhdl ghdl=0 nvc=0
+run gna/issue2556#1 dir=testdata/ghdl/testsuite/gna/issue2556 std=08 sha=63482b67dec636b3
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2558#1 dir=testdata/ghdl/testsuite/gna/issue2558 std=08 sha=20a6f504278f02a9
+ test.vhdl ghdl=0 nvc=0
+run gna/issue256#1 dir=testdata/ghdl/testsuite/gna/issue256 std=93c sha=bc273a381a8ecb73
+ testcase.vhd ghdl=0 nvc=0
+ testcase_testbench.vhd ghdl=0 nvc=0
+ testcase2.vhd ghdl=0 nvc=0
+ testcase2_testbench.vhd ghdl=0 nvc=0
+ testcase3.vhd ghdl=0 nvc=0
+run gna/issue2561#1 dir=testdata/ghdl/testsuite/gna/issue2561 std=08 sha=04e87047a855192d
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue2561#2 dir=testdata/ghdl/testsuite/gna/issue2561 std=08 sha=bb808aee3d42c514
+ bug.vhdl ghdl=0 nvc=0
+run gna/issue2562#1 dir=testdata/ghdl/testsuite/gna/issue2562 std=08 sha=e65e426dcc5b64af
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue2562#2 dir=testdata/ghdl/testsuite/gna/issue2562 std=08 sha=9f07a12617c2e09a
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue2562#3 dir=testdata/ghdl/testsuite/gna/issue2562 std=08 sha=d0ceac0efe87c61b
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2564#1 dir=testdata/ghdl/testsuite/gna/issue2564 std=08 sha=c0b40e787b5aac81
+ mwe.vhdl ghdl=0 nvc=0
+run gna/issue2566#1 dir=testdata/ghdl/testsuite/gna/issue2566 std=08 sha=4f3eb4d71a6968fb
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2567#1 dir=testdata/ghdl/testsuite/gna/issue2567 std=93c sha=dad13d63136157db
+ e.vhdl -Werror ghdl=1@11 nvc=0
+ e2.vhdl -Werror ghdl=1@12 nvc=1@12
+ e3.vhdl -Werror ghdl=1@12 nvc=1@12
+ e4.vhdl -Werror ghdl=1@12 nvc=0
+ e5.vhdl -Werror ghdl=1@13 nvc=0
+ e6.vhdl -Werror ghdl=1@12 nvc=1@12
+run gna/issue2569#1 dir=testdata/ghdl/testsuite/gna/issue2569 std=08 sha=5b8bb8fd631fa7d2
+ pkg.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run gna/issue257#1 dir=testdata/ghdl/testsuite/gna/issue257 std=08 sha=9b76453a92df17ab
+ minimum_tb.vhdl ghdl=0 nvc=0
+ minimum_tb2.vhdl ghdl=0 nvc=0
+run gna/issue2570#1 dir=testdata/ghdl/testsuite/gna/issue2570 std=08 sha=f8956345408c8bf9
+ test.vhdl ghdl=0 nvc=1@15
+run gna/issue2571#1 dir=testdata/ghdl/testsuite/gna/issue2571 std=08 sha=6b4749909969e040
+ test1.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+ test3.vhdl ghdl=0 nvc=0
+run gna/issue2572#1 dir=testdata/ghdl/testsuite/gna/issue2572 std=08 sha=22f164f84f6f091e
+ fft_types.vhdl ghdl=0 nvc=0
+ fft.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2573#1 dir=testdata/ghdl/testsuite/gna/issue2573 std=93c sha=807f9935acb7d8cc
+ pipeline.vhdl ghdl=1@64,65,66,67,68,69,70,71,72,73,74,75,76,77 nvc=1@64,68,72,77
+run gna/issue2575#1 dir=testdata/ghdl/testsuite/gna/issue2575 std=93c sha=05e87ef506fa9e54
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2579#1 dir=testdata/ghdl/testsuite/gna/issue2579 std=08 sha=3e9e43359ac9c92f
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2579#2 dir=testdata/ghdl/testsuite/gna/issue2579 std=08 sha=daf7d2a822663ba6
+ test.vhdl ghdl=0 nvc=0
+run gna/issue258#1 dir=testdata/ghdl/testsuite/gna/issue258 std=93c sha=5bb1688fe68b4219
+ range_tb1.vhdl ghdl=0 nvc=1@13
+ range_tb.vhdl ghdl=0 nvc=1@13
+run gna/issue2580#1 dir=testdata/ghdl/testsuite/gna/issue2580 std=08 sha=9eac070af1c44d4a
+ test_pkg.vhdl ghdl=0 nvc=0
+ test1.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+ streamtb.vhdl ghdl=0 nvc=0
+run gna/issue2581#1 dir=testdata/ghdl/testsuite/gna/issue2581 std=08 sha=867f2a55c9d0fd3c
+ aggr.vhdl ghdl=0 nvc=0
+ aggr2.vhdl ghdl=0 nvc=0
+run gna/issue2584#1 dir=testdata/ghdl/testsuite/gna/issue2584 std=08 sha=62f2b301cd55d7a7
+ streamtb.vhdl ghdl=0 nvc=0
+run gna/issue2586#1 dir=testdata/ghdl/testsuite/gna/issue2586 std=08 sha=44c00675623efdec
+ crashes.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+run gna/issue2587#1 dir=testdata/ghdl/testsuite/gna/issue2587 std=93c sha=236911cba3fae55d
+ tb1.vhdl ghdl=1@14 nvc=1@14
+ tb2.vhdl ghdl=1@14 nvc=1@14
+ tb3.vhdl ghdl=1@14 nvc=1@14
+run gna/issue259#1 dir=testdata/ghdl/testsuite/gna/issue259 std=08 sha=03456b896a5cb756
+ testcase_ce.vhdl ghdl=0 nvc=0
+run gna/issue2590#1 dir=testdata/ghdl/testsuite/gna/issue2590 std=08 sha=0af8213acb0f3b8f
+ test2.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2592#1 dir=testdata/ghdl/testsuite/gna/issue2592 std=08 sha=8328e3ef4ac30a67
+ bug2a.vhdl ghdl=0 nvc=0
+run gna/issue2593#1 dir=testdata/ghdl/testsuite/gna/issue2593 std=08 sha=3107997a886fb71b
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2594#1 dir=testdata/ghdl/testsuite/gna/issue2594 std=08 sha=12662c80fd686e03
+ test.vhdl ghdl=0 nvc=0
+ tb2.vhdl ghdl=0 nvc=0
+run gna/issue2597#1 dir=testdata/ghdl/testsuite/gna/issue2597 std=08 sha=f9fc9fc021696cb7
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2598#1 dir=testdata/ghdl/testsuite/gna/issue2598 std=08 sha=de766328ab2658a5
+ test_rec.vhdl -Werror=sensitivity ghdl=0 nvc=0
+ test.vhdl -Werror=sensitivity ghdl=1@30,32,42,45,48,55,65 nvc=0
+run gna/issue26#1 dir=testdata/ghdl/testsuite/gna/issue26 std=93c sha=91172fd9507d558f
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2607#1 dir=testdata/ghdl/testsuite/gna/issue2607 std=08 sha=7d678d49013d112a
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue261#1 dir=testdata/ghdl/testsuite/gna/issue261 std=08 sha=796fd84c064c9b48
+ e.vhdl ghdl=1@14 nvc=1@14,15,19,20,23,24
+ e1.vhdl ghdl=0 nvc=1@15,19,20,23,24
+run gna/issue2611#1 dir=testdata/ghdl/testsuite/gna/issue2611 std=08 sha=fbe157c03a8cb097
+ err1.vhdl ghdl=1@10 nvc=1@10
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2613#1 dir=testdata/ghdl/testsuite/gna/issue2613 std=08 sha=b57acd5dcd8aa70f
+ mre.vhdl ghdl=1@10 nvc=1@10
+run gna/issue2614#1 dir=testdata/ghdl/testsuite/gna/issue2614 std=08 sha=927c5435a47f658b
+ recursive_xor.vhdl ghdl=0 nvc=0
+ recursive_xor_tb.vhdl ghdl=0 nvc=0
+run gna/issue2618#1 dir=testdata/ghdl/testsuite/gna/issue2618 std=93c sha=76d19f7b9d635a65
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue262#1 dir=testdata/ghdl/testsuite/gna/issue262 std=08 sha=fb1d0a47454575b7
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2620#1 dir=testdata/ghdl/testsuite/gna/issue2620 std=08 sha=789a4ea823e5ca98
+ casetb.vhdl ghdl=0 nvc=0
+run gna/issue2621#1 dir=testdata/ghdl/testsuite/gna/issue2621 std=93c sha=5728a5965808ba9d
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2624#1 dir=testdata/ghdl/testsuite/gna/issue2624 std=08 sha=fe25460ad955886a
+ bug.vhdl ghdl=0 nvc=0
+ testbench.vhdl ghdl=0 nvc=0
+run gna/issue2626#1 dir=testdata/ghdl/testsuite/gna/issue2626 std=08 sha=d7792c645cba92f3
+ src/Example_Design/duplicator.vhd ghdl=0 nvc=0
+ src/Example_Design/hexifier.vhd ghdl=0 nvc=0
+ src/Example_Design/serializer.vhd ghdl=0 nvc=0
+ src/Example_Design/merginator.vhd ghdl=0 nvc=0
+ src/SDCard/sdcard_globals.vhd ghdl=0 nvc=0
+ src/SDCard/sdcard_cmd.vhd ghdl=0 nvc=0
+ src/Example_Design/sdcard_cmd_logger.vhd ghdl=0 nvc=0
+ src/SDCard/sdcard_dat.vhd ghdl=0 nvc=0
+ src/SDCard/sdcard_ctrl.vhd ghdl=0 nvc=0
+ src/SDCard/sdcard_wrapper.vhd ghdl=0 nvc=0
+ sim/sdcard_sim.vhd ghdl=0 nvc=0
+ sim/tb_sdcard.vhd ghdl=0 nvc=0
+run gna/issue263#1 dir=testdata/ghdl/testsuite/gna/issue263 std=08 sha=0965baca9c9e931d
+ mac.vhdl ghdl=0 nvc=0
+ mac_test.vhdl ghdl=1@21,22,29 nvc=1@21,22,29
+run gna/issue2630#1 dir=testdata/ghdl/testsuite/gna/issue2630 std=08 sha=1dde861ccd8d3e9e
+ ext_name.vhdl ghdl=0 nvc=0
+run gna/issue2631#1 dir=testdata/ghdl/testsuite/gna/issue2631 std=08 sha=ca4d6f4678373cc2
+ protocol_pkg.vhd ghdl=0 nvc=0
+ node.vhd ghdl=0 nvc=0
+ top.vhd ghdl=0 nvc=0
+ tb.vhd ghdl=0 nvc=0
+run gna/issue264#1 dir=testdata/ghdl/testsuite/gna/issue264 std=93c sha=61e19788514aacee
+ ex1_top.vhdl ghdl=1@3,22 nvc=1@22
+run gna/issue2645#1 dir=testdata/ghdl/testsuite/gna/issue2645 std=93c sha=ae7b27c37ca514ae
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2645#2 dir=testdata/ghdl/testsuite/gna/issue2645 std=08 sha=ae7b27c37ca514ae
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2646#1 dir=testdata/ghdl/testsuite/gna/issue2646 std=08 sha=703b6c7c90549766
+ ex1.vhdl ghdl=0 nvc=0
+ ex2.vhdl ghdl=0 nvc=0
+ ex3.vhdl ghdl=0 nvc=0
+run gna/issue265#1 dir=testdata/ghdl/testsuite/gna/issue265 std=93c sha=e0bc94794e5cbd38
+ ex1_entity.vhdl ghdl=0 nvc=0
+ ex1_top.vhdl ghdl=0 nvc=0
+run gna/issue2650#1 dir=testdata/ghdl/testsuite/gna/issue2650 std=08 sha=b2a28f92fb3f1d2e
+ testbench.vhdl ghdl=1@12 nvc=0
+ testbench.vhdl -frelaxed ghdl=0 nvc=0
+run gna/issue2651#1 dir=testdata/ghdl/testsuite/gna/issue2651 std=08 sha=420550c92af001db
+ test_others.vhdl ghdl=0 nvc=0
+run gna/issue2652#1 dir=testdata/ghdl/testsuite/gna/issue2652 std=08 sha=87b83cb002e7bd6d
+ func.vhdl ghdl=0 nvc=0
+run gna/issue2654#1 dir=testdata/ghdl/testsuite/gna/issue2654 std=93c sha=155ee8e3cad77d0e
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2656#1 dir=testdata/ghdl/testsuite/gna/issue2656 std=93c sha=9580f4ebcae6b3de
+ repro.vhdl ghdl=1@15 nvc=1@15
+run gna/issue2657#1 dir=testdata/ghdl/testsuite/gna/issue2657 std=08 sha=307e3d7cd4335491
+ tb.vhdl ghdl=0 nvc=0
+ tb2.vhdl ghdl=0 nvc=0
+run gna/issue2666#1 dir=testdata/ghdl/testsuite/gna/issue2666 std=93c sha=2cd3206a9ca7af72
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2669#1 dir=testdata/ghdl/testsuite/gna/issue2669 std=08 sha=90c91b4d3b8b1e34
+ foo.vhdl ghdl=0 nvc=0
+ ex_sync.vhdl ghdl=0 nvc=0
+ ex_async.vhdl ghdl=0 nvc=0
+run gna/issue2670#1 dir=testdata/ghdl/testsuite/gna/issue2670 std=93c sha=d3cddadce6b71792
+ repro1.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2676#1 dir=testdata/ghdl/testsuite/gna/issue2676 std=08 sha=c7cca87b3b25c2b4
+ testcase.vhdl ghdl=0 nvc=0
+run gna/issue268#1 dir=testdata/ghdl/testsuite/gna/issue268 std=93c sha=a134a8e7ae592ebe
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2684#1 dir=testdata/ghdl/testsuite/gna/issue2684 std=08 sha=a213c4886a3edad2
+ foo.vhdl ghdl=0 nvc=1@13
+run gna/issue2686#1 dir=testdata/ghdl/testsuite/gna/issue2686 std=08 sha=a6de6b4708b555d8
+ test.vhdl ghdl=0 nvc=0
+ tst_rec.vhdl ghdl=1@14 nvc=1@14
+ tst_arr.vhdl ghdl=1@12 nvc=1@12
+run gna/issue2687#1 dir=testdata/ghdl/testsuite/gna/issue2687 std=93c sha=22f2e13248613f8e
+ test.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+run gna/issue2690#1 dir=testdata/ghdl/testsuite/gna/issue2690 std=08 sha=4d4cad71fb463f33
+ bug_tb.vhdl ghdl=0 nvc=0
+run gna/issue2690#2 dir=testdata/ghdl/testsuite/gna/issue2690 std=08 sha=4fda7b5a92913d11
+ bug_tb3.vhdl ghdl=0 nvc=0
+run gna/issue2690#3 dir=testdata/ghdl/testsuite/gna/issue2690 std=08 sha=d13f5d55846726b7
+ bug_tb4.vhdl ghdl=0 nvc=0
+run gna/issue2690#4 dir=testdata/ghdl/testsuite/gna/issue2690 std=08 sha=20fd8a103d5eb688
+ bug_tb5.vhdl ghdl=0 nvc=0
+run gna/issue2691#1 dir=testdata/ghdl/testsuite/gna/issue2691 std=08 sha=d01825628c9c5e77
+ synchro.vhdl lib=colibri ghdl=0 nvc=0
+ synchro_tb1.vhdl ghdl=0 nvc=0
+run gna/issue2693#1 dir=testdata/ghdl/testsuite/gna/issue2693 std=08 sha=d43111b6addff587
+ testbench.vhdl ghdl=0 nvc=1@11,15,16,17,21,55,56
+run gna/issue2696#1 dir=testdata/ghdl/testsuite/gna/issue2696 std=08 sha=62609a4fc614c635
+ type_pkg.vhdl ghdl=0 nvc=1@16
+run gna/issue2696#2 dir=testdata/ghdl/testsuite/gna/issue2696 std=08 sha=2418684dc9bcf311
+ type_pkg2.vhdl ghdl=0 nvc=0
+run gna/issue2702#1 dir=testdata/ghdl/testsuite/gna/issue2702 std=08 sha=021e1b2937605ae2
+ repro1.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run gna/issue2706#1 dir=testdata/ghdl/testsuite/gna/issue2706 std=93c sha=2a9fbbe3b6f0f311
+ tb1.vhdl ghdl=0 nvc=0
+ tb3.vhdl ghdl=0 nvc=0
+run gna/issue2709#1 dir=testdata/ghdl/testsuite/gna/issue2709 std=08 sha=95f4ba1ac3e232ff
+ top.vhdl ghdl=1@4,65,68 nvc=1@64,68,69,70
+ top2.vhdl ghdl=1@4,65,68 nvc=1@64,68,69,70
+run gna/issue2716#1 dir=testdata/ghdl/testsuite/gna/issue2716 std=08 sha=924d04ffe76e0f2f
+ sync_generic.vhdl ghdl=0 nvc=0
+ bug_tb.vhdl ghdl=0 nvc=0
+run gna/issue2720#1 dir=testdata/ghdl/testsuite/gna/issue2720 std=08 sha=0d72d8edf5f503c3
+ timer.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2722#1 dir=testdata/ghdl/testsuite/gna/issue2722 std=08 sha=b3f994968d34ff8e
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2725#1 dir=testdata/ghdl/testsuite/gna/issue2725 std=08 sha=57e40de3cd6429e8
+ mwe.vhdl ghdl=0 nvc=0
+run gna/issue2727#1 dir=testdata/ghdl/testsuite/gna/issue2727 std=08 sha=48d123813b2c957c
+ RandomPkg.vhdl ghdl=0 nvc=0
+ tb_bug.vhdl ghdl=0 nvc=0
+run gna/issue273#1 dir=testdata/ghdl/testsuite/gna/issue273 std=08 sha=9220cfa013b10796
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2734#1 dir=testdata/ghdl/testsuite/gna/issue2734 std=93c sha=c474c3482a99ed65
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2735#1 dir=testdata/ghdl/testsuite/gna/issue2735 std=08 sha=390d5575ca596cbd
+ mwe.vhdl ghdl=0 nvc=1@12
+run gna/issue2736#1 dir=testdata/ghdl/testsuite/gna/issue2736 std=08 sha=bb17c8f2547b466d
+ mwe.vhdl ghdl=0 nvc=0
+run gna/issue2736#2 dir=testdata/ghdl/testsuite/gna/issue2736 std=08 sha=a756c1031c212b0d
+ mwe2.vhdl ghdl=0 nvc=0
+run gna/issue2736#3 dir=testdata/ghdl/testsuite/gna/issue2736 std=08 sha=e5e8b98e2b05e994
+ mwe3.vhdl ghdl=0 nvc=0
+run gna/issue2736#4 dir=testdata/ghdl/testsuite/gna/issue2736 std=08 sha=df5d6adf9fb3cb5c
+ mwe4.vhdl ghdl=1@18,22~,42~ nvc=1@18,22,48
+run gna/issue2737#1 dir=testdata/ghdl/testsuite/gna/issue2737 std=08 sha=36fc8fda96df603d
+ ent.vhdl ghdl=0 nvc=1@15,17
+run gna/issue2739#1 dir=testdata/ghdl/testsuite/gna/issue2739 std=08 sha=cea6e96df86be9b1
+ mwe.vhdl ghdl=1@13 nvc=1@31
+run gna/issue2744#1 dir=testdata/ghdl/testsuite/gna/issue2744 std=08 sha=f9abb5c766e0f891
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue2749#1 dir=testdata/ghdl/testsuite/gna/issue2749 std=08 sha=075b159c45fc031d
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2764#1 dir=testdata/ghdl/testsuite/gna/issue2764 std=93c sha=441ae6f1c0272f63
+ tb.vhdl ghdl=0 nvc=1@29
+run gna/issue2765#1 dir=testdata/ghdl/testsuite/gna/issue2765 std=93c sha=bab63588732880a7
+ top.vhdl ghdl=0 nvc=0
+run gna/issue2768#1 dir=testdata/ghdl/testsuite/gna/issue2768 std=08 sha=226d76eab31ce34e
+ bad_inter.vhdl --force-analysis ghdl=1@1,2,3 nvc=1@1,2,3
+ bad_inter2.vhdl --force-analysis ghdl=1@3 nvc=1@3
+ bad_inter3.vhdl --force-analysis ghdl=1@3 nvc=1@3
+ many_parent.vhdl --force-analysis ghdl=1@1 nvc=1@1
+ missing_id.vhdl --force-analysis ghdl=1@1 nvc=1@1
+run gna/issue2773#1 dir=testdata/ghdl/testsuite/gna/issue2773 std=93c sha=16dcd4e2b16028b5
+ repro1.vhdl ghdl=1@1,2,3,4,6,7,8,9,11,12,14,16,17,18 nvc=1@1
+ repro2.vhdl ghdl=1@3,4,5,6,7 nvc=1@3,5
+run gna/issue2778#1 dir=testdata/ghdl/testsuite/gna/issue2778 std=08 sha=1ddde3f8803118c1
+ bug.vhdl ghdl=0 nvc=0
+ bug.vhdl -frelaxed ghdl=0 nvc=0
+run gna/issue278#1 dir=testdata/ghdl/testsuite/gna/issue278 std=93c sha=146a45d581742123
+ ram_lut.vhdl ghdl=1@194 nvc=1@194
+run gna/issue2780#1 dir=testdata/ghdl/testsuite/gna/issue2780 std=93c sha=9dacec42558d6080
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2781#1 dir=testdata/ghdl/testsuite/gna/issue2781 std=08 sha=b69d50398c2c1346
+ repro.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue2784#1 dir=testdata/ghdl/testsuite/gna/issue2784 std=08 sha=b992797231d3f4fa
+ tb-orig.vhdl ghdl=0 nvc=0
+run gna/issue2788#1 dir=testdata/ghdl/testsuite/gna/issue2788 std=08 sha=9c9c022cefb21cfa
+ mem.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2789#1 dir=testdata/ghdl/testsuite/gna/issue2789 std=08 sha=14fcf357c4c91f23
+ pkg2.vhdl ghdl=0 nvc=0
+ top2.vhdl ghdl=0 nvc=1@10,13,17
+ pkg.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=1@13,19,23
+run gna/issue2790#1 dir=testdata/ghdl/testsuite/gna/issue2790 std=08 sha=63cce5c5a31b0f6b
+ mini_repro1.vhdl ghdl=0 nvc=0
+run gna/issue2791#1 dir=testdata/ghdl/testsuite/gna/issue2791 std=08 sha=8fcc8b674add4ec1
+ repro1.vhdl ghdl=0 nvc=0
+ mbox.vhdl ghdl=0 nvc=0
+run gna/issue2792#1 dir=testdata/ghdl/testsuite/gna/issue2792 std=08 sha=11d25cf19e97fd99
+ mem_tb.vhdl ghdl=0 nvc=0
+ mem_tb2.vhdl ghdl=0 nvc=0
+run gna/issue2822#1 dir=testdata/ghdl/testsuite/gna/issue2822 std=93c sha=601485cf2f1f6aee
+ a.vhdl ghdl=0 nvc=0
+ c.vhdl ghdl=0 nvc=0
+ e.vhdl ghdl=0 nvc=0
+run gna/issue2828#1 dir=testdata/ghdl/testsuite/gna/issue2828 std=08 sha=a9dd70856ed65316
+ a.vhdl ghdl=0 nvc=0
+run gna/issue2832#1 dir=testdata/ghdl/testsuite/gna/issue2832 std=93c sha=770ddab191397827
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2835#1 dir=testdata/ghdl/testsuite/gna/issue2835 std=93c sha=7dab2435b5e0f267
+ attr.vhdl ghdl=1@10 nvc=1@10
+run gna/issue2836#1 dir=testdata/ghdl/testsuite/gna/issue2836 std=93c sha=a34dcf6fc2f7f0f0
+ attr.vhdl ghdl=1@10 nvc=1@10
+run gna/issue2837#1 dir=testdata/ghdl/testsuite/gna/issue2837 std=93c sha=d7ec58d2dfa16e31
+ attr2.vhdl ghdl=1@10 nvc=1@10
+run gna/issue2851#1 dir=testdata/ghdl/testsuite/gna/issue2851 std=93c sha=b1de29f92220f750
+ circuit.vhdl ghdl=0 nvc=0
+run gna/issue2853#1 dir=testdata/ghdl/testsuite/gna/issue2853 std=08 sha=4c4d7fd3ef49e691
+ mwe1.vhdl ghdl=0 nvc=1@12
+ mwe2.vhdl ghdl=0 nvc=1@18
+ acc1.vhdl ghdl=0 nvc=0
+ acc2.vhdl ghdl=0 nvc=0
+run gna/issue2854#1 dir=testdata/ghdl/testsuite/gna/issue2854 std=93c sha=7a5a6e4fb19b96d3
+ mwe.vhdl ghdl=0 nvc=0
+ mwe1.vhdl ghdl=0 nvc=0
+ mwe2.vhdl ghdl=0 nvc=0
+run gna/issue2859#1 dir=testdata/ghdl/testsuite/gna/issue2859 std=08 sha=1d0ca6d495a4711e
+ mwe.vhdl ghdl=0 nvc=0
+ mwe1.vhdl ghdl=0 nvc=0
+run gna/issue2866#1 dir=testdata/ghdl/testsuite/gna/issue2866 std=08 sha=59e4c0f2375d0cde
+ modules.vhdl ghdl=0 nvc=0
+run gna/issue2867#1 dir=testdata/ghdl/testsuite/gna/issue2867 std=08 sha=92ed9f1be780d068
+ force_tb.vhdl ghdl=0 nvc=0
+run gna/issue2871#1 dir=testdata/ghdl/testsuite/gna/issue2871 std=93c sha=d96c7c47f75c5735
+ example.vhdl ghdl=0 nvc=0
+run gna/issue2875#1 dir=testdata/ghdl/testsuite/gna/issue2875 std=93c sha=6953a84b6c47b615
+ repro.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue2888#1 dir=testdata/ghdl/testsuite/gna/issue2888 std=08 sha=6b0dbc7fa92d49d9
+ test_realmin.vhdl ghdl=0 nvc=0
+run gna/issue290#1 dir=testdata/ghdl/testsuite/gna/issue290 std=08 sha=385022f37c6adafb
+ TbNamesPkg.vhd ghdl=0 nvc=0
+ TbNames.vhd ghdl=0 nvc=1@43
+run gna/issue2909#1 dir=testdata/ghdl/testsuite/gna/issue2909 std=08 sha=540ddaad4c4bd6e7
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2922#1 dir=testdata/ghdl/testsuite/gna/issue2922 std=08 sha=e24e41319a40d127
+ repro1.vhdl ghdl=0 nvc=0
+ bit_select_sim.vhdl ghdl=0 nvc=0
+run gna/issue2927#1 dir=testdata/ghdl/testsuite/gna/issue2927 std=08 sha=3bab44757fe0a8fd
+ reproducer.vhdl ghdl=0 nvc=0
+ tb_reproducer.vhdl ghdl=0 nvc=0
+run gna/issue2928#1 dir=testdata/ghdl/testsuite/gna/issue2928 std=08 sha=ba3452b130ec5b4c
+ reproducer.vhdl ghdl=0 nvc=0
+ tb_reproducer.vhdl ghdl=0 nvc=0
+ tb_second.vhdl ghdl=0 nvc=0
+run gna/issue2929#1 dir=testdata/ghdl/testsuite/gna/issue2929 std=93 sha=808e4b9b98ef7900
+ bit_select.vhdl ghdl=0 nvc=0
+run gna/issue2929#2 dir=testdata/ghdl/testsuite/gna/issue2929 std=08 sha=808e4b9b98ef7900
+ bit_select.vhdl ghdl=0 nvc=0
+run gna/issue293#1 dir=testdata/ghdl/testsuite/gna/issue293 std=08 sha=68f8e6d29ccda130
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2944#1 dir=testdata/ghdl/testsuite/gna/issue2944 std=08 sha=607825da7116bd27
+ reproducer.vhdl ghdl=0 nvc=0
+run gna/issue2946#1 dir=testdata/ghdl/testsuite/gna/issue2946 std=08 sha=d32fbc071ab96152
+ jcsr.vhdl ghdl=0 nvc=0
+run gna/issue295#1 dir=testdata/ghdl/testsuite/gna/issue295 std=08 sha=70d0a3294a20ca55
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue2953#1 dir=testdata/ghdl/testsuite/gna/issue2953 std=08 sha=958c8b1cf69f0f5f
+ test.vhdl ghdl=0 nvc=0
+run gna/issue2960#1 dir=testdata/ghdl/testsuite/gna/issue2960 std=93c sha=c31bbb042d3b3eda
+ e.vhdl ghdl=0 nvc=0
+ e2.vhdl ghdl=0 nvc=1@14
+run gna/issue2967#1 dir=testdata/ghdl/testsuite/gna/issue2967 std=08 sha=43ea76d1b79e148c
+ reproducer.vhdl ghdl=0 nvc=0
+run gna/issue2969#1 dir=testdata/ghdl/testsuite/gna/issue2969 std=08 sha=c9d8a1e2ba55f375
+ test1.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue2981#1 dir=testdata/ghdl/testsuite/gna/issue2981 std=08 sha=c916f60a90a241db
+ tb3.vhdl ghdl=0 nvc=0
+ tb2.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue2982#1 dir=testdata/ghdl/testsuite/gna/issue2982 std=08 sha=007744015872a104
+ nfmac.vhdl ghdl=0 nvc=0
+ caseg.vhdl ghdl=0 nvc=0
+run gna/issue30#1 dir=testdata/ghdl/testsuite/gna/issue30 std=93c sha=9415d903b6128415
+ definitions.vhdl --ieee=synopsys ghdl=0 nvc=0
+ alu.vhdl --ieee=synopsys ghdl=0 nvc=0
+ basicblocks.vhdl --ieee=synopsys ghdl=0 nvc=0
+ tb-alu.vhdl --ieee=synopsys ghdl=0 nvc=0
+run gna/issue300#1 dir=testdata/ghdl/testsuite/gna/issue300 std=93c sha=360e8401e652edcc
+ test_bench.vhdl ghdl=0 nvc=0
+run gna/issue3001#1 dir=testdata/ghdl/testsuite/gna/issue3001 std=08 sha=304bde5fd8b9c0e5
+ tt0_tb.vhdl ghdl=0 nvc=0
+run gna/issue3002#1 dir=testdata/ghdl/testsuite/gna/issue3002 std=08 sha=248d4ea7b9aab0c1
+ top_concat_16k.vhdl ghdl=0 nvc=0
+run gna/issue3005#1 dir=testdata/ghdl/testsuite/gna/issue3005 std=08 sha=1a48db5d49d1c28c
+ f.vhdl ghdl=0 nvc=0
+run gna/issue3007#1 dir=testdata/ghdl/testsuite/gna/issue3007 std=08 sha=e95fa220deb92be0
+ mwe.vhdl ghdl=0 nvc=0
+ mwe_sig.vhdl ghdl=0 nvc=0
+ mwe_var.vhdl ghdl=0 nvc=0
+run gna/issue301#1 dir=testdata/ghdl/testsuite/gna/issue301 std=93c sha=37640d03b5e0b2b2
+ repro.vhdl ghdl=0 nvc=0
+ packages/pkg_helper.vhd lib=dec_viterbi ghdl=0 nvc=0
+ packages/pkg_param.vhd lib=dec_viterbi ghdl=0 nvc=0
+ packages/pkg_param_derived.vhd lib=dec_viterbi ghdl=0 nvc=0
+ packages/pkg_types.vhd lib=dec_viterbi ghdl=0 nvc=0
+ packages/pkg_components.vhd lib=dec_viterbi ghdl=0 nvc=0
+ packages/pkg_trellis.vhd lib=dec_viterbi ghdl=0 nvc=0
+ src/generic_sp_ram.vhd lib=dec_viterbi ghdl=0 nvc=0
+ src/axi4s_buffer.vhd lib=dec_viterbi ghdl=0 nvc=0
+ src/branch_distance.vhd lib=dec_viterbi ghdl=0 nvc=0
+ src/traceback.vhd lib=dec_viterbi ghdl=0 nvc=0
+ src/acs.vhd lib=dec_viterbi ghdl=0 nvc=0
+ src/ram_ctrl.vhd lib=dec_viterbi ghdl=0 nvc=0
+ src/reorder.vhd lib=dec_viterbi ghdl=0 nvc=0
+ src/recursion.vhd lib=dec_viterbi ghdl=0 nvc=0
+ src/dec_viterbi.vhd lib=dec_viterbi ghdl=0 nvc=0
+run gna/issue3010#1 dir=testdata/ghdl/testsuite/gna/issue3010 std=08 sha=27337595fe6fa674
+ demo1.vhdl ghdl=0 nvc=0
+ demo_tb.vhdl ghdl=0 nvc=0
+ demo2.vhdl ghdl=0 nvc=1@13
+run gna/issue3011#1 dir=testdata/ghdl/testsuite/gna/issue3011 std=08 sha=ee46e0b252cded88
+ toto.vhdl ghdl=0 nvc=0
+run gna/issue3014#1 dir=testdata/ghdl/testsuite/gna/issue3014 std=93c sha=aacbffd577a681dc
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue3020#1 dir=testdata/ghdl/testsuite/gna/issue3020 std=08 sha=22505a4183b0cd05
+ gt.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue3021#1 dir=testdata/ghdl/testsuite/gna/issue3021 std=08 sha=ca386f54ea4f8281
+ test.vhdl ghdl=1@32 nvc=1@32
+run gna/issue3028#1 dir=testdata/ghdl/testsuite/gna/issue3028 std=08 sha=2b480778171ceca0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue3030#1 dir=testdata/ghdl/testsuite/gna/issue3030 std=08 sha=13c8eb7b39c4303f
+ mwe.vhdl ghdl=0 nvc=0
+run gna/issue3034#1 dir=testdata/ghdl/testsuite/gna/issue3034 std=08 sha=164e8bf35cd9b4ec
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue3044#1 dir=testdata/ghdl/testsuite/gna/issue3044 std=08 sha=40f3fb30c5de27ec
+ test_pkg.vhdl ghdl=0 nvc=0
+ test_tb.vhdl ghdl=0 nvc=0
+run gna/issue3045#1 dir=testdata/ghdl/testsuite/gna/issue3045 std=08 sha=c1055cd88928a9de
+ a.vhdl ghdl=0 nvc=0
+run gna/issue3046#1 dir=testdata/ghdl/testsuite/gna/issue3046 std=08 sha=a8902414c3e1da1d
+ a.vhdl ghdl=0 nvc=0
+run gna/issue3046#2 dir=testdata/ghdl/testsuite/gna/issue3046 std=08 sha=d13cf10d979a8c64
+ b.vhdl ghdl=0 nvc=0
+run gna/issue3046#3 dir=testdata/ghdl/testsuite/gna/issue3046 std=08 sha=2b0757e7330d8eba
+ c.vhdl ghdl=0 nvc=0
+run gna/issue3046#4 dir=testdata/ghdl/testsuite/gna/issue3046 std=08 sha=aaeb32e95edecb63
+ d.vhdl ghdl=0 nvc=0
+run gna/issue3046#5 dir=testdata/ghdl/testsuite/gna/issue3046 std=08 sha=24f88e297e91ba94
+ e.vhdl ghdl=0 nvc=0
+run gna/issue3046#6 dir=testdata/ghdl/testsuite/gna/issue3046 std=08 sha=9ec7947f5b1429a8
+ e.vhdl --force-analysis ghdl=0 nvc=0
+ rec_aggr.vhdl ghdl=0 nvc=1@16
+ rec_assoc.vhdl ghdl=0 nvc=0
+ recmat_aggr.vhdl ghdl=0 nvc=1@15
+ recmat_assoc.vhdl ghdl=0 nvc=0
+ recrec_assoc.vhdl ghdl=0 nvc=0
+run gna/issue3050#1 dir=testdata/ghdl/testsuite/gna/issue3050 std=93c sha=65752658463f4263
+ top.vhdl ghdl=0 nvc=1@19
+run gna/issue3052#1 dir=testdata/ghdl/testsuite/gna/issue3052 std=08 sha=b4c2a91a7b58ae0c
+ a.vhdl ghdl=0 nvc=0
+run gna/issue3055#1 dir=testdata/ghdl/testsuite/gna/issue3055 std=08 sha=90e25b68897aa8bc
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue3056#1 dir=testdata/ghdl/testsuite/gna/issue3056 std=08 sha=7650109c24e9921b
+ top.vhdl ghdl=0 nvc=0
+run gna/issue3057#1 dir=testdata/ghdl/testsuite/gna/issue3057 std=93c sha=b65e10d244758ceb
+ attr.vhdl ghdl=0 nvc=0
+run gna/issue3072#1 dir=testdata/ghdl/testsuite/gna/issue3072 std=08 sha=a1ae7adbce5ec98f
+ test.vhdl ghdl=1@15 nvc=0
+ test1.vhdl ghdl=1@15 nvc=0
+ test2.vhdl ghdl=1@15 nvc=0
+ test2b.vhdl ghdl=1@15 nvc=0
+run gna/issue3075#1 dir=testdata/ghdl/testsuite/gna/issue3075 std=93c sha=f995559c5d21adf6
+ a.vhdl ghdl=0 nvc=1@17
+run gna/issue3077#1 dir=testdata/ghdl/testsuite/gna/issue3077 std=08 sha=bacc535939d8d70d
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue3079#1 dir=testdata/ghdl/testsuite/gna/issue3079 std=08 sha=20e88df3d6f2e7e3
+ a.vhdl ghdl=0 nvc=0
+ d.vhdl ghdl=0 nvc=0
+run gna/issue3086#1 dir=testdata/ghdl/testsuite/gna/issue3086 std=93c sha=4303c6aeff8c82d2
+ test2.vhdl ghdl=0 nvc=0
+run gna/issue309#1 dir=testdata/ghdl/testsuite/gna/issue309 std=93c sha=bf8f8f7c8b6ecd30
+ tb.vhdl ghdl=1@1 nvc=0
+run gna/issue3090#1 dir=testdata/ghdl/testsuite/gna/issue3090 std=08 sha=d5feb63390422cf5
+ tb.vhdl ghdl=0 nvc=0
+ tb_proc.vhdl ghdl=0 nvc=0
+run gna/issue3091#1 dir=testdata/ghdl/testsuite/gna/issue3091 std=08 sha=3e1a484af9b6d086
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue3098#1 dir=testdata/ghdl/testsuite/gna/issue3098 std=08 sha=7e89d7534c13a9f7
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue310#1 dir=testdata/ghdl/testsuite/gna/issue310 std=08 sha=7ee01a936d624caa
+ b.vhdl ghdl=0 nvc=0
+ bb.vhdl ghdl=0 nvc=0
+ bbb.vhdl ghdl=0 nvc=0
+run gna/issue3102#1 dir=testdata/ghdl/testsuite/gna/issue3102 std=08 sha=afe66bc07af8ace5
+ DAC_package.vhdl ghdl=0 nvc=0
+ DAC_test.vhdl ghdl=0 nvc=0
+run gna/issue3103#1 dir=testdata/ghdl/testsuite/gna/issue3103 std=08 sha=7279c412130581cf
+ a.vhdl ghdl=0 nvc=1@32,33
+run gna/issue3103#2 dir=testdata/ghdl/testsuite/gna/issue3103 std=08 sha=3db1fe38949c58d4
+ a2.vhdl ghdl=0 nvc=1@32,33
+run gna/issue3103#3 dir=testdata/ghdl/testsuite/gna/issue3103 std=08 sha=2fc19b380a6384d1
+ b.vhdl ghdl=0 nvc=0
+run gna/issue3104#1 dir=testdata/ghdl/testsuite/gna/issue3104 std=08 sha=850637a970431a8e
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue3109#1 dir=testdata/ghdl/testsuite/gna/issue3109 std=93c sha=e3ea45b57f44c88d
+ file1.vhdl ghdl=0 nvc=0
+ file2.vhdl ghdl=0 nvc=1@13
+run gna/issue3110#1 dir=testdata/ghdl/testsuite/gna/issue3110 std=08 sha=d3552526642956a6
+ issue2.vhdl ghdl=0 nvc=0
+ issue.vhdl ghdl=0 nvc=0
+run gna/issue3117#1 dir=testdata/ghdl/testsuite/gna/issue3117 std=93c sha=571d02497d3a95da
+ repro2.vhdl ghdl=1@39,40 nvc=1@39,40
+run gna/issue312#1 dir=testdata/ghdl/testsuite/gna/issue312 std=08 sha=a2eb1fb47190c22e
+ test.vhdl ghdl=1@14,15,16,17,18,19,20 nvc=1@8,13,14
+run gna/issue3123#1 dir=testdata/ghdl/testsuite/gna/issue3123 std=93c sha=1f07d4a848e92f76
+ t18_Timer.vhdl ghdl=0 nvc=0
+ t18_TimerTb.vhdl ghdl=0 nvc=0
+run gna/issue3124#1 dir=testdata/ghdl/testsuite/gna/issue3124 std=08 sha=55b66e42a059af8e
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue3130#1 dir=testdata/ghdl/testsuite/gna/issue3130 std=08 sha=973922a6b04f840b
+ repro_err.vhdl ghdl=1@11 nvc=1@11
+ tb.vhdl ghdl=0 nvc=1@34
+run gna/issue3132#1 dir=testdata/ghdl/testsuite/gna/issue3132 std=93c sha=6f32ea968e7a494d
+ repro.vhdl ghdl=1@3,44 nvc=0
+run gna/issue3133#1 dir=testdata/ghdl/testsuite/gna/issue3133 std=19 sha=9c2da023f1a30176
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue3134#1 dir=testdata/ghdl/testsuite/gna/issue3134 std=08 sha=a7e9ef53f1db5fe0
+ rams_init_file.vhdl ghdl=0 nvc=0
+ rams_init_file_tb.vhdl ghdl=0 nvc=0
+run gna/issue3138#1 dir=testdata/ghdl/testsuite/gna/issue3138 std=08 sha=5dd66e3578bde6f9
+ pkg.vhdl ghdl=0 nvc=0
+run gna/issue314#1 dir=testdata/ghdl/testsuite/gna/issue314 std=93c sha=8337a393d64fca9b
+ t1.vhdl ghdl=1@2 nvc=1@2
+ t1.vhdl -ftabstop=4 ghdl=1@2 nvc=1@2
+ t1.vhdl -fcaret-diagnostics -ftabstop=4 ghdl=1@2 nvc=1@2
+ t1.vhdl -fcaret-diagnostics ghdl=1@2 nvc=1@2
+ t1.vhdl -ftabstop=0 ghdl=1 nvc=1@2
+ t1.vhdl -ftabstop=140 ghdl=1 nvc=1@2
+ t1.vhdl -ftabstop=aa ghdl=1 nvc=1@2
+run gna/issue3143#1 dir=testdata/ghdl/testsuite/gna/issue3143 std=08 sha=a4fae67e9cb83d0c
+ mwe.vhdl ghdl=0 nvc=0
+ mwe3.vhdl ghdl=0 nvc=0
+run gna/issue3145#1 dir=testdata/ghdl/testsuite/gna/issue3145 std=08 sha=5fa14de541fbb3dc
+ ace.vhdl ghdl=0 nvc=0
+run gna/issue3146#1 dir=testdata/ghdl/testsuite/gna/issue3146 std=08 sha=4a52c9b14f2294bc
+ test.vhdl ghdl=0 nvc=0
+run gna/issue316#1 dir=testdata/ghdl/testsuite/gna/issue316 std=08 sha=51d94b6c80cf4893
+ gen_pkg.vhdl ghdl=1@10,12 nvc=1@10,12
+run gna/issue3164#1 dir=testdata/ghdl/testsuite/gna/issue3164 std=08 sha=9894271ce39ad337
+ repl.vhdl ghdl=0 nvc=0
+run gna/issue3167#1 dir=testdata/ghdl/testsuite/gna/issue3167 std=08 sha=a067fbc497098844
+ test_pkg.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+run gna/issue317#1 dir=testdata/ghdl/testsuite/gna/issue317 std=08 sha=43bbd0e30f2511b0
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+ repro5.vhdl ghdl=0 nvc=0
+ repro6.vhdl ghdl=0 nvc=0
+ OSVVM/NamePkg.vhd lib=osvvm ghdl=0 nvc=0
+ OSVVM/OsvvmGlobalPkg.vhd lib=osvvm ghdl=0 nvc=0
+ OSVVM/TranscriptPkg.vhd lib=osvvm ghdl=0 nvc=0
+ OSVVM/TextUtilPkg.vhd lib=osvvm ghdl=0 nvc=0
+ OSVVM/AlertLogPkg.vhd lib=osvvm ghdl=0 nvc=0
+ OSVVM/RandomBasePkg.vhd lib=osvvm ghdl=0 nvc=0
+ OSVVM/SortListPkg_int.vhd lib=osvvm ghdl=0 nvc=0
+ OSVVM/RandomPkg.vhd lib=osvvm ghdl=0 nvc=0
+ OSVVM/ScoreboardGenericPkg.vhd lib=osvvm ghdl=0 nvc=0
+ my_config.vhdl lib=poc ghdl=0 nvc=0
+ my_project.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/common/utils.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/common/config.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/common/math.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/common/strings.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/common/physical.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/common/vectors.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/common/protected.v08.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/common/fileio.v08.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/common/components.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/sim/sim_types.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/sim/sim_protected.v08.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/sim/sim_global.v08.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/sim/sim_simulation.v08.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/sim/sim_waveform.vhdl lib=poc ghdl=0 nvc=0
+ PoC/src/sort/sortnet/sortnet_BitonicSort.vhdl lib=poc ghdl=0 nvc=0
+ PoC/tb/common/config_tb.vhdl lib=test ghdl=0 nvc=0
+ PoC/tb/sort/sortnet/sortnet_tb.pkg.vhdl lib=test ghdl=0 nvc=0
+ PoC/tb/sort/sortnet/sortnet_BitonicSort_tb.vhdl lib=test ghdl=0 nvc=0
+run gna/issue3172#1 dir=testdata/ghdl/testsuite/gna/issue3172 std=19 sha=692a7353a712cee1
+ axis_pkg.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue3173#1 dir=testdata/ghdl/testsuite/gna/issue3173 std=19 sha=7b87dafaf8eee9f6
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue3176#1 dir=testdata/ghdl/testsuite/gna/issue3176 std=19 sha=caf182118fc92ee1
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue3177#1 dir=testdata/ghdl/testsuite/gna/issue3177 std=08 sha=fe665166c64978fb
+ blk1.vhdl ghdl=0 nvc=0
+ blk2.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue3179#1 dir=testdata/ghdl/testsuite/gna/issue3179 std=19 sha=67d8e4c77b83bccd
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue3181#1 dir=testdata/ghdl/testsuite/gna/issue3181 std=08 sha=d3d1578da6356b4c
+ t64.vhdl ghdl=0 nvc=0
+run gna/issue3181#2 dir=testdata/ghdl/testsuite/gna/issue3181 std=08 sha=8e79e39d9d7fe93a
+ sim.vhdl ghdl=0 nvc=0
+run gna/issue3183#1 dir=testdata/ghdl/testsuite/gna/issue3183 std=19 sha=df7b51535f302fb4
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue3187#1 dir=testdata/ghdl/testsuite/gna/issue3187 std=93c sha=fb427d2ec44bbf35
+ test.vhdl ghdl=0 nvc=0
+run gna/issue3192#1 dir=testdata/ghdl/testsuite/gna/issue3192 std=08 sha=7fa2f7989d4dd6fe
+ example.vhdl ghdl=0 nvc=0
+run gna/issue320#1 dir=testdata/ghdl/testsuite/gna/issue320 std=93c sha=7300094deab71ba5
+ fuu.vhdl ghdl=0 nvc=0
+run gna/issue321#1 dir=testdata/ghdl/testsuite/gna/issue321 std=93c sha=6601bd8e30d27d97
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue326#1 dir=testdata/ghdl/testsuite/gna/issue326 std=08 sha=8ee96655489d7773
+ foo.vhdl ghdl=0 nvc=0
+ bar.vhdl ghdl=0 nvc=0
+run gna/issue328#1 dir=testdata/ghdl/testsuite/gna/issue328 std=93c sha=8ca5ec459686369c
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ t3.vhdl ghdl=0 nvc=0
+ t3b.vhdl ghdl=0 nvc=0
+ t4.vhdl ghdl=0 nvc=0
+ t6.vhdl ghdl=0 nvc=0
+run gna/issue332#1 dir=testdata/ghdl/testsuite/gna/issue332 std=08 sha=ddc8e32f93d825da
+ ilos_sim_pkg.vhd -fexplicit -frelaxed-rules --mb-comments --warn-binding --ieee=synopsys ghdl=0 nvc=0
+ irqc_pif_pkg.vhd -fexplicit -frelaxed-rules --mb-comments --warn-binding --ieee=synopsys ghdl=0 nvc=0
+ irqc_pif.vhd -fexplicit -frelaxed-rules --mb-comments --warn-binding --ieee=synopsys ghdl=0 nvc=0
+ irqc_tb.vhd -fexplicit -frelaxed-rules --mb-comments --warn-binding --ieee=synopsys ghdl=0 nvc=0
+ repro_rec.vhdl -fexplicit -frelaxed-rules --mb-comments --warn-binding --ieee=synopsys ghdl=0 nvc=0
+run gna/issue333#1 dir=testdata/ghdl/testsuite/gna/issue333 std=93c sha=14c46465d424ff23
+ repro.vhdl ghdl=0 nvc=0
+ time_test.vhdl ghdl=0 nvc=0
+run gna/issue339#1 dir=testdata/ghdl/testsuite/gna/issue339 std=08 sha=c38df748d912036f
+ test_pkg.vhdl -frelaxed ghdl=0 nvc=0
+ test_bench.vhdl -frelaxed ghdl=0 nvc=0
+run gna/issue349#1 dir=testdata/ghdl/testsuite/gna/issue349 std=08 sha=e954ed4c62190619
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue351#1 dir=testdata/ghdl/testsuite/gna/issue351 std=93c sha=3e09016fec93a2e8
+ mypkg.vhdl ghdl=1@6 nvc=1@6
+run gna/issue356#1 dir=testdata/ghdl/testsuite/gna/issue356 std=08 sha=485f0b6eefa9ce1f
+ mux4.vhdl ghdl=0 nvc=0
+run gna/issue361#1 dir=testdata/ghdl/testsuite/gna/issue361 std=08 sha=cb0bd8eb26354693
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue367#1 dir=testdata/ghdl/testsuite/gna/issue367 std=93c sha=4d151cb1d5e00e1b
+ e.vhdl ghdl=1@3,4 nvc=1@3,4
+run gna/issue368#1 dir=testdata/ghdl/testsuite/gna/issue368 std=93c sha=be4572ecdb8ed3dd
+ bug.vhdl ghdl=0 nvc=0
+run gna/issue369#1 dir=testdata/ghdl/testsuite/gna/issue369 std=93c sha=86e0f353f9776d87
+ e.vhdl ghdl=0 nvc=1@12,13,14
+run gna/issue370#1 dir=testdata/ghdl/testsuite/gna/issue370 std=08 sha=7cca2780126f51f1
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue371#1 dir=testdata/ghdl/testsuite/gna/issue371 std=93c sha=6f410c8cb61fbc9c
+ test_string.vhdl ghdl=0 nvc=0
+run gna/issue372#1 dir=testdata/ghdl/testsuite/gna/issue372 std=93c sha=7651cf92a59fc65a
+ dummy.vhdl ghdl=0 nvc=0
+run gna/issue373#1 dir=testdata/ghdl/testsuite/gna/issue373 std=93c sha=8f216c130a0e9a8f
+ e.vhdl ghdl=1@3,17,18 nvc=1@17,18
+run gna/issue374#1 dir=testdata/ghdl/testsuite/gna/issue374 std=93c sha=b46f9bed65a20a70
+ bug.vhdl ghdl=1@13 nvc=1@13
+run gna/issue375#1 dir=testdata/ghdl/testsuite/gna/issue375 std=08 sha=3818afb8585009cb
+ cond_assign_proc.vhdl ghdl=0 nvc=0
+run gna/issue376#1 dir=testdata/ghdl/testsuite/gna/issue376 std=08 sha=620a28838f435786
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ util.vhdl lib=nuand ghdl=0 nvc=0
+ fx3_model_unmodified.vhdl ghdl=0 nvc=0
+run gna/issue379#1 dir=testdata/ghdl/testsuite/gna/issue379 std=93c sha=92eda03983ab3f8f
+ e.vhdl ghdl=1@25 nvc=1@25
+run gna/issue38#1 dir=testdata/ghdl/testsuite/gna/issue38 std=93c sha=72aece0f5a7d5713
+ bugreport_aliasprotected.vhdl ghdl=1@68,77 nvc=1@68,73,74
+run gna/issue38#2 dir=testdata/ghdl/testsuite/gna/issue38 std=08 sha=72aece0f5a7d5713
+ bugreport_aliasprotected.vhdl ghdl=0 nvc=0
+run gna/issue381#1 dir=testdata/ghdl/testsuite/gna/issue381 std=08 sha=1f6b70e35ecd252b
+ test.vhdl ghdl=1@13 nvc=1@13
+run gna/issue382#1 dir=testdata/ghdl/testsuite/gna/issue382 std=93c sha=937e501652951794
+ demo.vhd ghdl=0 nvc=0
+ tb_demo.vhd ghdl=0 nvc=0
+run gna/issue384#1 dir=testdata/ghdl/testsuite/gna/issue384 std=93c sha=8e334d6904f95492
+ yy.vhdl ghdl=0 nvc=0
+run gna/issue387#1 dir=testdata/ghdl/testsuite/gna/issue387 std=93c sha=cccf9712a11fb9cb
+ bug.vhdl ghdl=1@2 nvc=1@2
+run gna/issue388#1 dir=testdata/ghdl/testsuite/gna/issue388 std=93c sha=1b751bf669f581dc
+ e.vhdl ghdl=1@4 nvc=0
+run gna/issue389#1 dir=testdata/ghdl/testsuite/gna/issue389 std=93c sha=ddcfdbfaec851f59
+ e.vhdl ghdl=1@5 nvc=1@5
+run gna/issue392#1 dir=testdata/ghdl/testsuite/gna/issue392 std=93c sha=247f8ba30fbf5334
+ e.vhdl ghdl=0 nvc=0
+run gna/issue394#1 dir=testdata/ghdl/testsuite/gna/issue394 std=93c sha=d6009c6ef3a4d3f6
+ bug.vhdl ghdl=0 nvc=0
+run gna/issue395#1 dir=testdata/ghdl/testsuite/gna/issue395 std=93c sha=a2a3fa324f555e0c
+ e.vhdl ghdl=1@7 nvc=1@7
+ e1.vhdl ghdl=1@6 nvc=1@6
+run gna/issue397#1 dir=testdata/ghdl/testsuite/gna/issue397 std=93c sha=0a7b0db9fa45b4dc
+ e.vhdl ghdl=0 nvc=0
+run gna/issue40#1 dir=testdata/ghdl/testsuite/gna/issue40 std=93 sha=f1f8cd4e798b2193
+ test.vhdl ghdl=1@33 nvc=1@33
+ test2.vhdl ghdl=1@33 nvc=0
+run gna/issue400#1 dir=testdata/ghdl/testsuite/gna/issue400 std=08 sha=4a657af2f3ba8896
+ e.vhdl ghdl=0 nvc=1@15
+run gna/issue406#1 dir=testdata/ghdl/testsuite/gna/issue406 std=08 sha=1100c10724a7eeb2
+ queuep.vhdl lib=libvhdl ghdl=0 nvc=0
+ queuet.vhdl ghdl=0 nvc=0
+run gna/issue407#1 dir=testdata/ghdl/testsuite/gna/issue407 std=08 sha=8e1caea6ca959a4b
+ test.vhdl ghdl=0 nvc=0
+ test1.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+run gna/issue413#1 dir=testdata/ghdl/testsuite/gna/issue413 std=93c sha=fcef0da876709b79
+ e.vhdl ghdl=1@21 nvc=1@21,23
+run gna/issue418#1 dir=testdata/ghdl/testsuite/gna/issue418 std=08 sha=50455ca66659356e
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ tc749.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+run gna/issue419#1 dir=testdata/ghdl/testsuite/gna/issue419 std=93c sha=be397a766553cfab
+ bug.vhdl ghdl=1@10 nvc=1@2,3,5,6
+ bug3.vhdl ghdl=1@25 nvc=1@25
+ bug2.vhdl ghdl=0 nvc=0
+run gna/issue42#1 dir=testdata/ghdl/testsuite/gna/issue42 std=93c sha=36b2b4b06128ad79
+ bugreport_attribute.vhdl ghdl=1@72 nvc=1@64,69,72,81
+run gna/issue424#1 dir=testdata/ghdl/testsuite/gna/issue424 std=93c sha=ca5fe9d7da39ff54
+ subBlock.vhd ghdl=0 nvc=0
+ testCaseGood.vhd ghdl=0 nvc=0
+ testCaseCrash.vhd ghdl=0 nvc=0
+run gna/issue43#1 dir=testdata/ghdl/testsuite/gna/issue43 std=93c sha=38406e72617cf326
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue439#1 dir=testdata/ghdl/testsuite/gna/issue439 std=08 sha=3acd4aa02089c154
+ e.vhdl ghdl=0 nvc=0
+run gna/issue44#1 dir=testdata/ghdl/testsuite/gna/issue44 std=93c sha=236d3bf3ad51157e
+ loopfilter.vhdl ghdl=0 nvc=0
+ dffregister.vhdl ghdl=0 nvc=0
+ costasloop.vhdl ghdl=0 nvc=0
+ q_one_dot_fp_multiplier.vhdl ghdl=0 nvc=0
+run gna/issue440#1 dir=testdata/ghdl/testsuite/gna/issue440 std=08 sha=5dcd4fb6b08db558
+ e3.vhdl ghdl=0 nvc=0
+ e2.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+ e.vhdl ghdl=0 nvc=0
+run gna/issue441#1 dir=testdata/ghdl/testsuite/gna/issue441 std=08 sha=4e6cf9a90a5b9f78
+ e.vhdl ghdl=1@8 nvc=1@8
+run gna/issue447#1 dir=testdata/ghdl/testsuite/gna/issue447 std=93 sha=5942dafba83aba02
+ my_entity.vhdl ghdl=0 nvc=0
+run gna/issue449#1 dir=testdata/ghdl/testsuite/gna/issue449 std=93c sha=1dd923e302c9ee8b
+ repro1.vhdl ghdl=0 nvc=1@17
+ repro2.vhdl ghdl=1@12,19 nvc=0
+run gna/issue45#1 dir=testdata/ghdl/testsuite/gna/issue45 std=08 sha=4ece20dde3ede51d
+ test1.vhdl -fpsl ghdl=0 nvc=1@48,51,54
+ test2.vhdl -fpsl ghdl=0 nvc=2@26
+ endpoint_eval_err.vhdl -fpsl ghdl=1@56 nvc=1@51,56
+ endpoint_eval.vhdl -fpsl ghdl=0 nvc=2@51
+run gna/issue450#1 dir=testdata/ghdl/testsuite/gna/issue450 std=93c sha=5ed313c79b74673a
+ disptree.vhdl ghdl=0 nvc=0
+run gna/issue451#1 dir=testdata/ghdl/testsuite/gna/issue451 std=08 sha=1a8f895527d62806
+ e.vhdl ghdl=0 nvc=1@6,11
+run gna/issue456#1 dir=testdata/ghdl/testsuite/gna/issue456 std=93c sha=94522b8559ca6a98
+ pkg.vhdl ghdl=0 nvc=0
+run gna/issue458#1 dir=testdata/ghdl/testsuite/gna/issue458 std=93c sha=8889a8acb070d1c1
+ e.vhdl ghdl=0 nvc=0
+run gna/issue459#1 dir=testdata/ghdl/testsuite/gna/issue459 std=08 sha=9bb04b325d7fb3b5
+ e4.vhdl ghdl=0 nvc=0
+ e3.vhdl ghdl=0 nvc=0
+ e2.vhdl ghdl=0 nvc=0
+ e1.vhdl ghdl=0 nvc=0
+ e.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue461#1 dir=testdata/ghdl/testsuite/gna/issue461 std=08 sha=41c497f356f45e43
+ test.vhdl ghdl=0 nvc=0
+run gna/issue465#1 dir=testdata/ghdl/testsuite/gna/issue465 std=93c sha=348df381ba663d89
+ e.vhdl ghdl=0 nvc=1@9,10,11,12
+run gna/issue467#1 dir=testdata/ghdl/testsuite/gna/issue467 std=08 sha=ffa5d3482624441b
+ eu_tb.vhdl ghdl=0 nvc=0
+run gna/issue470#1 dir=testdata/ghdl/testsuite/gna/issue470 std=08 sha=edd7b03bc1d3c62b
+ e.vhdl ghdl=1@4 nvc=1@4
+run gna/issue471#1 dir=testdata/ghdl/testsuite/gna/issue471 std=93c sha=11f5093d78991d9e
+ a.vhdl ghdl=1@1,6 nvc=1@1
+ b.vhdl ghdl=1@1,6 nvc=1@1
+ p1.vhdl ghdl=1@1 nvc=1@1
+run gna/issue472#1 dir=testdata/ghdl/testsuite/gna/issue472 std=93c sha=c063c72590b2ebc0
+ test.vhdl ghdl=1@13 nvc=1@13
+run gna/issue473#1 dir=testdata/ghdl/testsuite/gna/issue473 std=08 sha=fdd9f5ab21f9d671
+ tbmem.vhdl ghdl=0 nvc=0
+run gna/issue476/repro#1 dir=testdata/ghdl/testsuite/gna/issue476/repro std=08 sha=82d239c1e8db9f47
+ pixel_pkg.vhd ghdl=0 nvc=0
+ pixel_column_pkg.vhd ghdl=0 nvc=0
+ pixel_matrix_pkg.vhd ghdl=0 nvc=0
+ test_op1.vhd ghdl=0 nvc=0
+run gna/issue476/repro2#1 dir=testdata/ghdl/testsuite/gna/issue476/repro2 std=08 sha=9e22dbe7b864208c
+ pixel_pkg.vhd ghdl=0 nvc=0
+ pixel_column_pkg.vhd ghdl=0 nvc=0
+ test_op1.vhd ghdl=0 nvc=0
+run gna/issue476#1 dir=testdata/ghdl/testsuite/gna/issue476 std=08 sha=3922a99acb520f52
+ pixel_pkg.vhd ghdl=0 nvc=0
+ pixel_column_pkg.vhd ghdl=0 nvc=0
+ pixel_matrix_pkg.vhd ghdl=0 nvc=0
+ test_op.vhd ghdl=0 nvc=0
+run gna/issue478#1 dir=testdata/ghdl/testsuite/gna/issue478 std=93c sha=cb02210791ac8633
+ repro.vhdl ghdl=1@18 nvc=1@18
+ repro2.vhdl ghdl=1@8 nvc=1@8
+ repro3.vhdl ghdl=1@8 nvc=1@8
+ repro4.vhdl ghdl=1@8 nvc=1@8
+run gna/issue50#1 dir=testdata/ghdl/testsuite/gna/issue50 std=93c sha=c6fe96f1982ea88f
+ vector.d/pkg_tb.vhd ghdl=0 nvc=0
+ vector.d/add_118.vhd ghdl=0 nvc=0
+ vector.d/add_134.vhd ghdl=0 nvc=0
+ vector.d/add_170.vhd ghdl=0 nvc=0
+ vector.d/add_171.vhd ghdl=0 nvc=0
+ vector.d/add_188.vhd ghdl=0 nvc=0
+ vector.d/add_214.vhd ghdl=0 nvc=0
+ vector.d/add_220.vhd ghdl=0 nvc=0
+ vector.d/assert_uut.vhd ghdl=0 nvc=0
+ vector.d/cmp_111.vhd ghdl=0 nvc=0
+ vector.d/cmp_112.vhd ghdl=0 nvc=0
+ vector.d/cmp_113.vhd ghdl=0 nvc=0
+ vector.d/cmp_114.vhd ghdl=0 nvc=0
+ vector.d/cmp_115.vhd ghdl=0 nvc=0
+ vector.d/cmp_119.vhd ghdl=0 nvc=0
+ vector.d/cmp_126.vhd ghdl=0 nvc=0
+ vector.d/cmp_127.vhd ghdl=0 nvc=0
+ vector.d/cmp_128.vhd ghdl=0 nvc=0
+ vector.d/cmp_129.vhd ghdl=0 nvc=0
+ vector.d/cmp_130.vhd ghdl=0 nvc=0
+ vector.d/cmp_131.vhd ghdl=0 nvc=0
+ vector.d/cmp_132.vhd ghdl=0 nvc=0
+ vector.d/cmp_133.vhd ghdl=0 nvc=0
+ vector.d/cmp_135.vhd ghdl=0 nvc=0
+ vector.d/cmp_136.vhd ghdl=0 nvc=0
+ vector.d/cmp_137.vhd ghdl=0 nvc=0
+ vector.d/cmp_138.vhd ghdl=0 nvc=0
+ vector.d/cmp_139.vhd ghdl=0 nvc=0
+ vector.d/cmp_140.vhd ghdl=0 nvc=0
+ vector.d/cmp_141.vhd ghdl=0 nvc=0
+ vector.d/cmp_142.vhd ghdl=0 nvc=0
+ vector.d/cmp_146.vhd ghdl=0 nvc=0
+ vector.d/cmp_148.vhd ghdl=0 nvc=0
+ vector.d/cmp_150.vhd ghdl=0 nvc=0
+ vector.d/cmp_152.vhd ghdl=0 nvc=0
+ vector.d/cmp_154.vhd ghdl=0 nvc=0
+ vector.d/cmp_156.vhd ghdl=0 nvc=0
+ vector.d/cmp_158.vhd ghdl=0 nvc=0
+ vector.d/cmp_160.vhd ghdl=0 nvc=0
+ vector.d/cmp_174.vhd ghdl=0 nvc=0
+ vector.d/cmp_176.vhd ghdl=0 nvc=0
+ vector.d/cmp_178.vhd ghdl=0 nvc=0
+ vector.d/cmp_180.vhd ghdl=0 nvc=0
+ vector.d/cmp_183.vhd ghdl=0 nvc=0
+ vector.d/cmp_185.vhd ghdl=0 nvc=0
+ vector.d/cmp_187.vhd ghdl=0 nvc=0
+ vector.d/cmp_191.vhd ghdl=0 nvc=0
+ vector.d/cmp_193.vhd ghdl=0 nvc=0
+ vector.d/cmp_195.vhd ghdl=0 nvc=0
+ vector.d/cmp_198.vhd ghdl=0 nvc=0
+ vector.d/cmp_200.vhd ghdl=0 nvc=0
+ vector.d/cmp_202.vhd ghdl=0 nvc=0
+ vector.d/cmp_204.vhd ghdl=0 nvc=0
+ vector.d/cmp_215.vhd ghdl=0 nvc=0
+ vector.d/cmp_216.vhd ghdl=0 nvc=0
+ vector.d/cmp_217.vhd ghdl=0 nvc=0
+ vector.d/cmp_218.vhd ghdl=0 nvc=0
+ vector.d/cmp_221.vhd ghdl=0 nvc=0
+ vector.d/fsm.vhd ghdl=0 nvc=0
+ vector.d/fsm_15.vhd ghdl=0 nvc=0
+ vector.d/muxb_117.vhd ghdl=0 nvc=0
+ vector.d/muxb_120.vhd ghdl=0 nvc=0
+ vector.d/muxb_121.vhd ghdl=0 nvc=0
+ vector.d/muxb_123.vhd ghdl=0 nvc=0
+ vector.d/muxb_124.vhd ghdl=0 nvc=0
+ vector.d/muxb_219.vhd ghdl=0 nvc=0
+ vector.d/prog.vhd ghdl=0 nvc=0
+ vector.d/sub_125.vhd ghdl=0 nvc=0
+ vector.d/sub_145.vhd ghdl=0 nvc=0
+ vector.d/sub_189.vhd ghdl=0 nvc=0
+ vector.d/sync_ram.vhd ghdl=0 nvc=0
+ vector.d/v_split0.vhd ghdl=0 nvc=0
+ vector.d/v_split1.vhd ghdl=0 nvc=0
+ vector.d/v_split2.vhd ghdl=0 nvc=0
+ vector.d/v_split3.vhd ghdl=0 nvc=0
+ vector.d/v_split4.vhd ghdl=0 nvc=0
+ vector.d/v_split5.vhd ghdl=0 nvc=0
+ vector.d/v_split6.vhd ghdl=0 nvc=0
+ vector.d/v_split7.vhd ghdl=0 nvc=0
+ vector.d/w_split0.vhd ghdl=0 nvc=0
+ vector.d/w_split1.vhd ghdl=0 nvc=0
+ vector.d/w_split2.vhd ghdl=0 nvc=0
+ vector.d/w_split3.vhd ghdl=0 nvc=0
+ vector.d/w_split4.vhd ghdl=0 nvc=0
+ vector.d/w_split5.vhd ghdl=0 nvc=0
+ vector.d/w_split6.vhd ghdl=0 nvc=0
+ vector.d/w_split7.vhd ghdl=0 nvc=0
+ vector.d/top.vhd ghdl=0 nvc=0
+ vector.d/cp3_test.vhd ghdl=0 nvc=0
+ vector.d/tb.vhd ghdl=0 nvc=0
+run gna/issue516#1 dir=testdata/ghdl/testsuite/gna/issue516 std=08 sha=c4c938295dc04348
+ reflection.vhdl ghdl=1@6,9 nvc=1@6,9
+run gna/issue521#1 dir=testdata/ghdl/testsuite/gna/issue521 std=93c sha=0892bf4371356cf1
+ pkg.vhdl lib=ieee ghdl=0 nvc=0
+ tieee.vhdl ghdl=0 nvc=0
+ tieee2.vhdl ghdl=1@2 nvc=1@2
+run gna/issue522#1 dir=testdata/ghdl/testsuite/gna/issue522 std=93c sha=6612bfca9c6a2c7a
+ shifter.vhdl ghdl=0 nvc=0
+ shifter_tb.vhdl ghdl=0 nvc=0
+run gna/issue524#1 dir=testdata/ghdl/testsuite/gna/issue524 std=08 sha=5692aa1c1a43e95f
+ spi2apb.vhdl ghdl=1@58,65 nvc=1@58,65
+ cond.vhdl ghdl=0 nvc=0
+run gna/issue525#1 dir=testdata/ghdl/testsuite/gna/issue525 std=93c sha=502dc9d3c679d491
+ counter_illegal_attribute.vhd ghdl=1@37 nvc=1@37
+ repro1.vhdl ghdl=0 nvc=0
+ repro1.vhdl -frelaxed-rules ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue529#1 dir=testdata/ghdl/testsuite/gna/issue529 std=08 sha=ab206e6fea57990c
+ impure1.vhdl ghdl=0 nvc=0
+ impure2.vhdl ghdl=0 nvc=0
+run gna/issue530#1 dir=testdata/ghdl/testsuite/gna/issue530 std=93c sha=60126ab4daaf88e0
+ sample_slice_ports.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue531#1 dir=testdata/ghdl/testsuite/gna/issue531 std=93c sha=553d5f21cf3b70e3
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue535#1 dir=testdata/ghdl/testsuite/gna/issue535 std=08 sha=bb5fd27ec58dbe05
+ bug.vhdl ghdl=0 nvc=0
+run gna/issue542#1 dir=testdata/ghdl/testsuite/gna/issue542 std=93 sha=e4e463cdc725ddd2
+ write.vhd ghdl=0 nvc=0
+ wrapper.vhd ghdl=1@9,17,29 nvc=1@17,29
+ nest.vhdl ghdl=1@2,7 nvc=1@7
+run gna/issue542#2 dir=testdata/ghdl/testsuite/gna/issue542 std=02 sha=1ed5bda212eeea00
+ nest.vhdl ghdl=0 nvc=1@7
+run gna/issue542#3 dir=testdata/ghdl/testsuite/gna/issue542 std=08 sha=e4e463cdc725ddd2
+ write.vhd ghdl=0 nvc=0
+ wrapper.vhd ghdl=1@9,17,29 nvc=1@17,29
+ nest.vhdl ghdl=1@2,7 nvc=1@7
+run gna/issue543#1 dir=testdata/ghdl/testsuite/gna/issue543 std=08 sha=a73246c8786b5160
+ ent.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue544#1 dir=testdata/ghdl/testsuite/gna/issue544 std=08 sha=5bfd306f26501477
+ e.vhdl ghdl=0 nvc=0
+run gna/issue546#1 dir=testdata/ghdl/testsuite/gna/issue546 std=08 sha=7a865a1e06e031da
+ test-bug.vhdl ghdl=0 nvc=0
+run gna/issue547#1 dir=testdata/ghdl/testsuite/gna/issue547 std=08 sha=a0c5580b0051f3cb
+ ghdl-bug.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue548#1 dir=testdata/ghdl/testsuite/gna/issue548 std=08 sha=209efff8470ed307
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue552#1 dir=testdata/ghdl/testsuite/gna/issue552 std=93c sha=2935dfd6093b2889
+ strings_test.vhdl ghdl=0 nvc=0
+run gna/issue553#1 dir=testdata/ghdl/testsuite/gna/issue553 std=93c sha=ee9f6d9b28fd44aa
+ repro.vhdl ghdl=1@12,15 nvc=1@15
+run gna/issue558#1 dir=testdata/ghdl/testsuite/gna/issue558 std=93c sha=56c071378a8e42cb
+ repro.vhdl ghdl=1@10,14 nvc=1@10,14
+run gna/issue559#1 dir=testdata/ghdl/testsuite/gna/issue559 std=93c sha=9cf4d9de10bff824
+ dut.vhdl ghdl=0 nvc=0
+run gna/issue560#1 dir=testdata/ghdl/testsuite/gna/issue560 std=93c sha=249d3bc0c02d92e6
+ reproducer.vhdl ghdl=1@55,56 nvc=0
+ reproducer2.vhdl ghdl=1@55 nvc=0
+ reproducer3.vhdl ghdl=1@56 nvc=0
+ reproducer_ok.vhdl ghdl=0 nvc=0
+run gna/issue561#1 dir=testdata/ghdl/testsuite/gna/issue561 std=08 sha=6a854a00efbf6e0c
+ wishbone_pkg-2008.vhd ghdl=0 nvc=0
+ wb_demux.vhd ghdl=0 nvc=0
+ wb_demux_tb.vhd ghdl=0 nvc=0
+run gna/issue563#1 dir=testdata/ghdl/testsuite/gna/issue563 std=93c sha=89265c4c28ffe5ec
+ repro.vhdl ghdl=1@44 nvc=1@44
+ repro2.vhdl ghdl=1@2 nvc=1@2
+ counter.vhdl ghdl=0 nvc=0
+ tb_counter.vhdl ghdl=1@23,42,45 nvc=1@23,25,26,27,28,40,42,43,45
+run gna/issue578#1 dir=testdata/ghdl/testsuite/gna/issue578 std=93c sha=f9cfd9f002ba5bed
+ crash2.vhdl ghdl=0 nvc=0
+ generics.vhdl ghdl=0 nvc=0
+run gna/issue584#1 dir=testdata/ghdl/testsuite/gna/issue584 std=08 sha=b971365a97a76b0f
+ LinkedListPkg.vhd ghdl=0 nvc=0
+ Test_LinkedListPkg.vhd ghdl=0 nvc=0
+run gna/issue586#1 dir=testdata/ghdl/testsuite/gna/issue586 std=08 sha=eac5aee83eb7a5ce
+ bug_pkg.vhdl ghdl=0 nvc=0
+ bug.vhdl ghdl=0 nvc=0
+run gna/issue586#2 dir=testdata/ghdl/testsuite/gna/issue586 std=02 sha=eac5aee83eb7a5ce
+ bug_pkg.vhdl ghdl=0 nvc=0
+ bug.vhdl ghdl=1@4 nvc=1@4
+run gna/issue598#1 dir=testdata/ghdl/testsuite/gna/issue598 std=08 sha=cc462ba43b5a80e0
+ tb.vhd ghdl=0 nvc=0
+run gna/issue606#1 dir=testdata/ghdl/testsuite/gna/issue606 std=93c sha=07483389a8404b4f
+ repro1a.vhdl ghdl=0 nvc=0
+ repro1b.vhdl ghdl=0 nvc=0
+run gna/issue609#1 dir=testdata/ghdl/testsuite/gna/issue609 std=08 sha=aed5a5540878f412
+ test.vhd ghdl=1@20 nvc=1@20
+run gna/issue610#1 dir=testdata/ghdl/testsuite/gna/issue610 std=08 sha=225c51cb80ba6aa2
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue610#2 dir=testdata/ghdl/testsuite/gna/issue610 std=93c sha=6d8b3ceea85abf48
+ repro2.vhdl -frelaxed-rules ghdl=0 nvc=0
+ repro3.vhdl -frelaxed-rules ghdl=0 nvc=0
+ repro4.vhdl -frelaxed-rules ghdl=0 nvc=0
+run gna/issue613#1 dir=testdata/ghdl/testsuite/gna/issue613 std=93c sha=dd23020ca45ef05e
+ ent.vhdl ghdl=0 nvc=0
+ t3.vhdl ghdl=0 nvc=0
+ t1.vhdl ghdl=0 nvc=0
+ t2.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+ t3.vhdl ghdl=0 nvc=0
+ t87.vhdl ghdl=0 nvc=0
+run gna/issue615#1 dir=testdata/ghdl/testsuite/gna/issue615 std=08 sha=d81687d0b96751b1
+ repr.vhdl ghdl=0 nvc=0
+run gna/issue616#1 dir=testdata/ghdl/testsuite/gna/issue616 std=93c sha=dd993240979b463b
+ mwe.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue618#1 dir=testdata/ghdl/testsuite/gna/issue618 std=08 sha=b661a9c7d31d7fa1
+ e.vhdl ghdl=0 nvc=0
+ e1.vhdl ghdl=0 nvc=1@7
+run gna/issue620#1 dir=testdata/ghdl/testsuite/gna/issue620 std=08 sha=99b1dd1af7e46ce2
+ type_declaration_pkg.vhd ghdl=0 nvc=0
+ type_user_pkg.vhd ghdl=0 nvc=0
+ test_tb.vhd ghdl=0 nvc=1@8,12
+run gna/issue621#1 dir=testdata/ghdl/testsuite/gna/issue621 std=93c sha=78333165ee8c298e
+ ent.vhdl ghdl=1@6 nvc=1@6
+ ent2.vhdl ghdl=1@9 nvc=1@9
+run gna/issue623#1 dir=testdata/ghdl/testsuite/gna/issue623 std=08 sha=b26bd2d6f110994c
+ crash.vhdl ghdl=1@3,6,8,10,12,13 nvc=1@3,9,14
+run gna/issue626#1 dir=testdata/ghdl/testsuite/gna/issue626 std=93c sha=10302a89105ab4f7
+ repro.vhdl ghdl=0 nvc=0
+ top.vhdl ghdl=0 nvc=0
+run gna/issue627#1 dir=testdata/ghdl/testsuite/gna/issue627 std=93c sha=cd1703ec5dec7965
+ ent.vhdl ghdl=1@2 nvc=1@2
+run gna/issue630#1 dir=testdata/ghdl/testsuite/gna/issue630 std=93c sha=cc5f799ba4a43f48
+ e.vhdl ghdl=1@8 nvc=1@8
+run gna/issue631#1 dir=testdata/ghdl/testsuite/gna/issue631 std=93c sha=d4d36243645a0070
+ e.vhdl ghdl=1@8 nvc=1@8
+run gna/issue632#1 dir=testdata/ghdl/testsuite/gna/issue632 std=08 sha=12970342581303a6
+ bug.vhdl ghdl=1@137,141 nvc=1@137
+run gna/issue634#1 dir=testdata/ghdl/testsuite/gna/issue634 std=93c sha=9931fbce90c8db9c
+ top.vhdl ghdl=0 nvc=0
+run gna/issue635#1 dir=testdata/ghdl/testsuite/gna/issue635 std=08 sha=516d515e065545d4
+ tb.vhdl ghdl=0 nvc=0
+ ram.vhdl ghdl=0 nvc=0
+ fsm.vhdl ghdl=0 nvc=0
+run gna/issue636#1 dir=testdata/ghdl/testsuite/gna/issue636 std=93c sha=b20180054a04a966
+ e.vhdl ghdl=1@4 nvc=1@4
+run gna/issue637#1 dir=testdata/ghdl/testsuite/gna/issue637 std=08 sha=a415e4f28b5f50b8
+ example.vhdl ghdl=0 nvc=1
+run gna/issue641#1 dir=testdata/ghdl/testsuite/gna/issue641 std=08 sha=53abc0093e6b6d37
+ ent.vhdl ghdl=0 nvc=0
+ repro1.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+run gna/issue641#2 dir=testdata/ghdl/testsuite/gna/issue641 std=08 sha=36c1963e79954d9c
+ test_1a_unsigned_port/TestPkg.vhd ghdl=0 nvc=0
+ test_1a_unsigned_port/Test.vhd ghdl=0 nvc=0
+ test_1a_unsigned_port/TbTest.vhd ghdl=0 nvc=0
+run gna/issue641#3 dir=testdata/ghdl/testsuite/gna/issue641 std=08 sha=14982397424e6b0b
+ test_1b_unsigned_alias/TestPkg.vhd ghdl=0 nvc=0
+ test_1b_unsigned_alias/Test.vhd ghdl=0 nvc=0
+ test_1b_unsigned_alias/TbTest.vhd ghdl=0 nvc=0
+run gna/issue641#4 dir=testdata/ghdl/testsuite/gna/issue641 std=08 sha=5fcc4e16bdb3c139
+ test_2a_record_subtype/TestPkg.vhd ghdl=0 nvc=0
+ test_2a_record_subtype/Test.vhd ghdl=0 nvc=0
+ test_2a_record_subtype/TbTest.vhd ghdl=0 nvc=0
+run gna/issue641#5 dir=testdata/ghdl/testsuite/gna/issue641 std=08 sha=2676c71d7a1108f3
+ test_2b_record_subtype_alias/TestPkg.vhd ghdl=0 nvc=0
+ test_2b_record_subtype_alias/Test.vhd ghdl=0 nvc=0
+ test_2b_record_subtype_alias/TbTest.vhd ghdl=0 nvc=0
+run gna/issue641#6 dir=testdata/ghdl/testsuite/gna/issue641 std=08 sha=1c63d45cbcac24de
+ test_2c_record_range_alias/TestPkg.vhd ghdl=0 nvc=0
+ test_2c_record_range_alias/Test.vhd ghdl=0 nvc=0
+ test_2c_record_range_alias/TbTest.vhd ghdl=0 nvc=0
+run gna/issue641#7 dir=testdata/ghdl/testsuite/gna/issue641 std=08 sha=bccfdd90e5a44f1c
+ test_2d_record_subtype_length_decl/TestPkg.vhd ghdl=0 nvc=0
+ test_2d_record_subtype_length_decl/Test.vhd ghdl=0 nvc=0
+ test_2d_record_subtype_length_decl/TbTest.vhd ghdl=0 nvc=0
+run gna/issue641#8 dir=testdata/ghdl/testsuite/gna/issue641 std=08 sha=3de48532910ed47d
+ test_2e_record_simple_alias/TestPkg.vhd ghdl=0 nvc=0
+ test_2e_record_simple_alias/Test.vhd ghdl=0 nvc=0
+ test_2e_record_simple_alias/TbTest.vhd ghdl=0 nvc=0
+run gna/issue641#9 dir=testdata/ghdl/testsuite/gna/issue641 std=08 sha=bb0e10ae7eddfe9b
+ test_2f_record_constrained_alias/TestPkg.vhd ghdl=0 nvc=0
+ test_2f_record_constrained_alias/Test.vhd ghdl=0 nvc=0
+ test_2f_record_constrained_alias/TbTest.vhd ghdl=0 nvc=0
+run gna/issue641#10 dir=testdata/ghdl/testsuite/gna/issue641 std=08 sha=94cb0582f38f1a1e
+ test_2g_record_alias_port/TestPkg.vhd ghdl=0 nvc=0
+ test_2g_record_alias_port/Test.vhd ghdl=0 nvc=0
+ test_2g_record_alias_port/TbTest.vhd ghdl=0 nvc=0
+run gna/issue642#1 dir=testdata/ghdl/testsuite/gna/issue642 std=08 sha=6faaffc611021ec7
+ repro.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue643#1 dir=testdata/ghdl/testsuite/gna/issue643 std=08 sha=271f14976acede6c
+ repro.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue645#1 dir=testdata/ghdl/testsuite/gna/issue645 std=08 sha=eb76f1217445596a
+ foo.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue646#1 dir=testdata/ghdl/testsuite/gna/issue646 std=08 sha=75847a9741fcd82f
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+ repro3.vhdl ghdl=0 nvc=0
+ repro4.vhdl ghdl=0 nvc=0
+run gna/issue648#1 dir=testdata/ghdl/testsuite/gna/issue648 std=93c sha=0144f9cb673c1103
+ ice.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue652#1 dir=testdata/ghdl/testsuite/gna/issue652 std=93c sha=e5d0502d89a4313a
+ ent.vhdl lib=clock --warn-hide ghdl=1@26,31 nvc=1@26,31
+ lib_alias.vhdl ghdl=0 nvc=1@5,6,7
+run gna/issue654#1 dir=testdata/ghdl/testsuite/gna/issue654 std=93c sha=0a364de6690c8fee
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue660#1 dir=testdata/ghdl/testsuite/gna/issue660 std=93c sha=c01cd60d778e642b
+ testent.vhdl ghdl=0 nvc=0
+run gna/issue663#1 dir=testdata/ghdl/testsuite/gna/issue663 std=93c sha=1e90d39237bfc05b
+ ent.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue664#1 dir=testdata/ghdl/testsuite/gna/issue664 std=08 sha=480b08e1ee448022
+ tb_pkg.vhdl ghdl=0 nvc=0
+ numeric_system_pkg.vhdl ghdl=0 nvc=0
+ reset_synchronizer.vhdl ghdl=0 nvc=0
+ quire_accumulator.vhdl ghdl=0 nvc=0
+ quire_accumulator_tb.vhdl ghdl=0 nvc=0
+run gna/issue666#1 dir=testdata/ghdl/testsuite/gna/issue666 std=93c sha=48fc565242613aec
+ tb.vhdl ghdl=0 nvc=0
+ tb2.vhdl ghdl=0 nvc=0
+run gna/issue668#1 dir=testdata/ghdl/testsuite/gna/issue668 std=08 sha=41b7f4a4435d22f4
+ wb_demux_tb.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/issue67#1 dir=testdata/ghdl/testsuite/gna/issue67 std=93c sha=f8c9f362aa268a8c
+ nullacc.vhdl ghdl=0 nvc=0
+ fileerr.vhdl ghdl=0 nvc=0
+run gna/issue672#1 dir=testdata/ghdl/testsuite/gna/issue672 std=93c sha=ac3f8a18a3454970
+ SQR.vhd ghdl=0 nvc=0
+ SQRTb.vhd ghdl=0 nvc=0
+run gna/issue676#1 dir=testdata/ghdl/testsuite/gna/issue676 std=08 sha=9f0285b5149c8d63
+ adder.vhdl ghdl=0 nvc=0
+run gna/issue679#1 dir=testdata/ghdl/testsuite/gna/issue679 std=93c sha=f4fa083cfce8d9c8
+ repro.vhdl -fpsl ghdl=0 nvc=0
+run gna/issue683#1 dir=testdata/ghdl/testsuite/gna/issue683 std=93c sha=6bc04a01c4bdee97
+ repro.vhdl ghdl=0 nvc=0
+ repro64.vhdl ghdl=0 nvc=0
+run gna/issue685#1 dir=testdata/ghdl/testsuite/gna/issue685 std=08 sha=0768d33ae3aa38a1
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue689#1 dir=testdata/ghdl/testsuite/gna/issue689 std=08 sha=d8653913a9a91a30
+ example.vhdl ghdl=0 nvc=0
+run gna/issue69#1 dir=testdata/ghdl/testsuite/gna/issue69 std=93c sha=2e0bb8d1e0d3e5ef
+ mylib.vhdl lib=mylib --workdir=mylib/v93 ghdl=0 nvc=0
+ mytest.vhdl ghdl=0 nvc=0
+run gna/issue691#1 dir=testdata/ghdl/testsuite/gna/issue691 std=93c sha=73f12d0cec37ad31
+ tb.vhdl ghdl=1@11 nvc=1@11
+run gna/issue692#1 dir=testdata/ghdl/testsuite/gna/issue692 std=93c sha=2b132ddafb7094a7
+ ent.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue694#1 dir=testdata/ghdl/testsuite/gna/issue694 std=08 sha=611268ece015be41
+ mixer_pkg.vhdl ghdl=0 nvc=0
+ mixer.vhdl ghdl=0 nvc=0
+ mixer_tb.vhdl ghdl=0 nvc=0
+run gna/issue695#1 dir=testdata/ghdl/testsuite/gna/issue695 std=08 sha=2fb60caaa6f0c9fb
+ mux.vhdl ghdl=0 nvc=0
+run gna/issue697#1 dir=testdata/ghdl/testsuite/gna/issue697 std=08 sha=1cc97ab6c838396e
+ test.vhdl ghdl=1@22 nvc=1@22
+ test2.vhdl ghdl=0 nvc=0
+run gna/issue705#1 dir=testdata/ghdl/testsuite/gna/issue705 std=93c sha=d1ef444418109284
+ bug.vhdl ghdl=0 nvc=0
+ bug2.vhdl ghdl=1@18 nvc=1@18
+run gna/issue707#1 dir=testdata/ghdl/testsuite/gna/issue707 std=08 sha=1fefe5708bfa67e0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue708#1 dir=testdata/ghdl/testsuite/gna/issue708 std=93c sha=860937d214c3e653
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue71#1 dir=testdata/ghdl/testsuite/gna/issue71 std=93c sha=0bde48fabffafa37
+ repro1.vhdl ghdl=0 nvc=0
+run gna/issue710#1 dir=testdata/ghdl/testsuite/gna/issue710 std=93c sha=7f2acd4ce37f567c
+ ent1.vhdl ghdl=0 nvc=0
+run gna/issue710#2 dir=testdata/ghdl/testsuite/gna/issue710 std=93c sha=3ef028fc0efb6996
+ ent2.vhdl ghdl=0 nvc=0
+run gna/issue713#1 dir=testdata/ghdl/testsuite/gna/issue713 std=93c sha=9b17ad04e839cc27
+ repro2.vhdl ghdl=0 nvc=0
+ e.vhdl ghdl=0 nvc=0
+run gna/issue713#2 dir=testdata/ghdl/testsuite/gna/issue713 std=93c sha=830047bcc164513a
+ sim_types_pkg.vhd ghdl=0 nvc=0
+ dma_controller_tb.vhd ghdl=0 nvc=0
+run gna/issue715#1 dir=testdata/ghdl/testsuite/gna/issue715 std=08 sha=4280e9f398c09866
+ LRAM.vhdl ghdl=0 nvc=0
+run gna/issue717#1 dir=testdata/ghdl/testsuite/gna/issue717 std=08 sha=a1c94fb602a4e77b
+ matching_case.vhdl ghdl=0 nvc=0
+run gna/issue718#1 dir=testdata/ghdl/testsuite/gna/issue718 std=08 sha=ce2eb220d0c0e33f
+ bug_repro.vhdl ghdl=0 nvc=0
+run gna/issue719#1 dir=testdata/ghdl/testsuite/gna/issue719 std=93c sha=d7627ac5b4940bb8
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue72#1 dir=testdata/ghdl/testsuite/gna/issue72 std=93c sha=de58be258acdf952
+ issue_pkg.vhdl ghdl=0 nvc=0
+ issue.vhdl ghdl=0 nvc=1@24
+ fixed.vhdl ghdl=0 nvc=0
+run gna/issue72#2 dir=testdata/ghdl/testsuite/gna/issue72 std=08 sha=3f2835610d5570e5
+ issue_pkg.vhdl ghdl=0 nvc=0
+ issue.vhdl ghdl=0 nvc=0
+run gna/issue726#1 dir=testdata/ghdl/testsuite/gna/issue726 std=08 sha=aa2042cf538d5cde
+ ea-GenericMux.vhdl ghdl=0 nvc=0
+ tbMux2.vhdl ghdl=0 nvc=0
+ tbMux.vhdl ghdl=0 nvc=0
+run gna/issue729#1 dir=testdata/ghdl/testsuite/gna/issue729 std=93c sha=105215773e391d40
+ ent.vhdl -Werror ghdl=0 nvc=0
+ ent.vhdl -Werror -Wothers ghdl=1@12 nvc=0
+ whide.vhdl -Werror ghdl=1@8 nvc=0
+ whide.vhdl -Werror -Wno-hide ghdl=0 nvc=0
+run gna/issue73#1 dir=testdata/ghdl/testsuite/gna/issue73 std=93c sha=21b73536b726ef5e
+ x.vhdl ghdl=0 nvc=1@25
+run gna/issue731#1 dir=testdata/ghdl/testsuite/gna/issue731 std=08 sha=7d21b4e62286d837
+ adder.vhdl ghdl=0 nvc=0
+ tbadder.vhdl ghdl=0 nvc=0
+run gna/issue734#1 dir=testdata/ghdl/testsuite/gna/issue734 std=93c sha=cac8aabc097e7859
+ test.vhdl ghdl=1@10 nvc=1@10
+run gna/issue735#1 dir=testdata/ghdl/testsuite/gna/issue735 std=08 sha=79d65552fb69197e
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue736#1 dir=testdata/ghdl/testsuite/gna/issue736 std=08 sha=7370c2206012393a
+ simple_fsm.vhdl ghdl=0 nvc=0
+ tb_simple_fsm.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue737#1 dir=testdata/ghdl/testsuite/gna/issue737 std=08 sha=07aeb61ff02d3b51
+ ent.vhdl ghdl=0 nvc=0
+ ent1.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=0 nvc=0
+ ent3.vhdl ghdl=0 nvc=0
+ ent4.vhdl ghdl=0 nvc=0
+run gna/issue747#1 dir=testdata/ghdl/testsuite/gna/issue747 std=93c sha=7fdc258be4282b38
+ fa.vhdl ghdl=0 nvc=0
+ fa_tb.vhdl ghdl=1@35,36,37,38,42,45 nvc=1@35,36,37,38,42,45
+run gna/issue756#1 dir=testdata/ghdl/testsuite/gna/issue756 std=08 sha=d802fc83c57255ac
+ test_entity.vhdl ghdl=0 nvc=0
+ test_entity1.vhdl ghdl=0 nvc=0
+run gna/issue772#1 dir=testdata/ghdl/testsuite/gna/issue772 std=93c sha=37e529ee50099565
+ ent.vhdl -fpsl ghdl=0 nvc=1@33,36
+run gna/issue776#1 dir=testdata/ghdl/testsuite/gna/issue776 std=93c sha=ad2d39caf8a4f94f
+ main.vhdl ghdl=0 nvc=0
+ my_top.vhdl ghdl=0 nvc=0
+run gna/issue780#1 dir=testdata/ghdl/testsuite/gna/issue780 std=08 sha=b35708302d73e726
+ pkg.vhdl ghdl=0 nvc=0
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue786#1 dir=testdata/ghdl/testsuite/gna/issue786 std=08 sha=85288e60e3b5d89c
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue787#1 dir=testdata/ghdl/testsuite/gna/issue787 std=93c sha=e52176fbe0e8ac0b
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue788#1 dir=testdata/ghdl/testsuite/gna/issue788 std=08 sha=98908c9871410fde
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue791#1 dir=testdata/ghdl/testsuite/gna/issue791 std=08 sha=f62aa22d8e78db37
+ memory_pkg.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+run gna/issue792#1 dir=testdata/ghdl/testsuite/gna/issue792 std=93c sha=1f452c634fc78162
+ dut.vhdl ghdl=1@15 nvc=1@15
+run gna/issue792#2 dir=testdata/ghdl/testsuite/gna/issue792 std=08 sha=1f452c634fc78162
+ dut.vhdl ghdl=1@15 nvc=1@15
+run gna/issue794#1 dir=testdata/ghdl/testsuite/gna/issue794 std=02 sha=7cfce7bbb27b9569
+ example.vhdl -Wdelayed-checks ghdl=0 nvc=0
+run gna/issue795#1 dir=testdata/ghdl/testsuite/gna/issue795 std=93c sha=0392e4eb6879bb81
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue795#2 dir=testdata/ghdl/testsuite/gna/issue795 std=02 sha=b00ee15840fc40dd
+ file_reader_pkg.vhdl ghdl=0 nvc=0
+ ex.vhdl ghdl=0 nvc=0
+ tb_ex.vhdl ghdl=0 nvc=0
+run gna/issue797#1 dir=testdata/ghdl/testsuite/gna/issue797 std=93c sha=5d100b9345279da8
+ repro.vhdl ghdl=0 nvc=0
+ pkg_c.vhdl ghdl=0 nvc=0
+run gna/issue803#1 dir=testdata/ghdl/testsuite/gna/issue803 std=93c sha=7ade94274646f9e0
+ tb.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue807#1 dir=testdata/ghdl/testsuite/gna/issue807 std=93c sha=ee259b9b64ce9a5f
+ repropoc.vhdl ghdl=0 nvc=0
+ reproct.vhdl ghdl=0 nvc=0
+run gna/issue807#2 dir=testdata/ghdl/testsuite/gna/issue807 std=08 sha=67c75f9aa9ba3fb5
+ test.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue810#1 dir=testdata/ghdl/testsuite/gna/issue810 std=93c sha=58d061fb92470075
+ repro.vhdl ghdl=1@5 nvc=0
+ nullrng.vhdl ghdl=1@3 nvc=0
+ nullrng2.vhdl -Werror ghdl=1@3 nvc=0
+ nullrng2.vhdl ghdl=0 nvc=0
+run gna/issue813#1 dir=testdata/ghdl/testsuite/gna/issue813 std=08 sha=3e3458610e8319f2
+ mwe.vhdl ghdl=0 nvc=0
+run gna/issue816#1 dir=testdata/ghdl/testsuite/gna/issue816 std=08 sha=d63329f16b3ed4d9
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue817#1 dir=testdata/ghdl/testsuite/gna/issue817 std=08 sha=45ddf19428a364b1
+ repro1.vhdl -frelaxed ghdl=1@10 nvc=1@10
+run gna/issue818#1 dir=testdata/ghdl/testsuite/gna/issue818 std=08 sha=b8bf8bfc630c8b7f
+ tc1.vhdl ghdl=0 nvc=0
+ tc2.vhdl ghdl=0 nvc=0
+ tc3.vhdl ghdl=1@13 nvc=1@13
+ tc4.vhdl ghdl=1@13 nvc=1@13
+ tc5.vhdl ghdl=1@13 nvc=1@13
+ tc6.vhdl ghdl=0 nvc=0
+ tc7.vhdl ghdl=1@13 nvc=1@13
+ tc8.vhdl ghdl=1@13 nvc=1@13
+ tc9.vhdl ghdl=1@13 nvc=1@13
+ tc10.vhdl ghdl=1@13 nvc=1@13
+ tc11.vhdl ghdl=1@13 nvc=1@13
+ tc12.vhdl ghdl=1@13 nvc=1@13
+ tc13.vhdl ghdl=1@13 nvc=1@13
+ tc14.vhdl ghdl=0 nvc=0
+ tc15.vhdl ghdl=1@13 nvc=1@13
+ tc16.vhdl ghdl=1@13 nvc=1@13
+ tc17.vhdl ghdl=0 nvc=0
+run gna/issue821#1 dir=testdata/ghdl/testsuite/gna/issue821 std=08 sha=d3ab726d5a475fd2
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue828#1 dir=testdata/ghdl/testsuite/gna/issue828 std=08 sha=285ab59ef1371b01
+ test.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+run gna/issue830#1 dir=testdata/ghdl/testsuite/gna/issue830 std=08 sha=9da55c404a691d76
+ r.vhdl ghdl=0 nvc=0
+run gna/issue838#1 dir=testdata/ghdl/testsuite/gna/issue838 std=08 sha=c1d85ef2a8b5face
+ top.vhdl ghdl=1@39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55 nvc=0
+ top.vhdl -frelaxed-rules ghdl=0 nvc=0
+run gna/issue852#1 dir=testdata/ghdl/testsuite/gna/issue852 std=08 sha=fcdd76037f9ed0af
+ repro1.vhdl ghdl=0 nvc=0
+ recordofrecord_tb.vhdl ghdl=0 nvc=0
+run gna/issue857#1 dir=testdata/ghdl/testsuite/gna/issue857 std=08 sha=78323a4433f68b59
+ test.vhdl ghdl=0 nvc=0
+run gna/issue860#1 dir=testdata/ghdl/testsuite/gna/issue860 std=08 sha=6b47a941d8f8b0ad
+ testit.vhdl ghdl=1@6,7,18,19,39~ nvc=1@18,19
+run gna/issue864#1 dir=testdata/ghdl/testsuite/gna/issue864 std=93c sha=86d97b891e36b776
+ mwe.vhdl ghdl=1@37 nvc=1@37
+run gna/issue864#2 dir=testdata/ghdl/testsuite/gna/issue864 std=93c sha=97c498a53aeadff4
+ mwe2.vhdl ghdl=1@37 nvc=1@37
+run gna/issue869#1 dir=testdata/ghdl/testsuite/gna/issue869 std=93c sha=4c91a903f7d8c21f
+ alu.vhdl ghdl=1@19 nvc=1@19
+run gna/issue873#1 dir=testdata/ghdl/testsuite/gna/issue873 std=93c sha=d2be44b36d4807ed
+ tb.vhdl ghdl=1@37 nvc=1@37
+run gna/issue874#1 dir=testdata/ghdl/testsuite/gna/issue874 std=08 sha=eef6684affd1f064
+ crash.vhdl ghdl=0 nvc=0
+run gna/issue875#1 dir=testdata/ghdl/testsuite/gna/issue875 std=93c sha=0d3e81e541d0c40d
+ test.vhdl ghdl=1@21,58,62,82,84 nvc=1@19,41,58,62,72,76
+run gna/issue877#1 dir=testdata/ghdl/testsuite/gna/issue877 std=93c sha=e2333f228b958a58
+ aa2.vhdl ghdl=0 nvc=0
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue880#1 dir=testdata/ghdl/testsuite/gna/issue880 std=93c sha=7478d882c6fae648
+ psl.vhdl -fpsl ghdl=0 nvc=0
+run gna/issue880#2 dir=testdata/ghdl/testsuite/gna/issue880 std=08 sha=7478d882c6fae648
+ psl.vhdl -fpsl ghdl=0 nvc=0
+run gna/issue881#1 dir=testdata/ghdl/testsuite/gna/issue881 std=93c sha=13b2afc8508ce854
+ t87.vhdl ghdl=0 nvc=0
+ t87io.vhdl ghdl=0 nvc=0
+run gna/issue885#1 dir=testdata/ghdl/testsuite/gna/issue885 std=08 sha=769a2de5ab45349b
+ a.vhdl ghdl=0 nvc=0
+run gna/issue886#1 dir=testdata/ghdl/testsuite/gna/issue886 std=93c sha=5ef63dde1f55425c
+ ent.vhdl ghdl=1@52,53,54 nvc=1@52,66
+ repro.vhdl ghdl=1@6 nvc=1@6
+ repro.vhdl --force-analysis ghdl=1@6 nvc=1@6
+ repro2.vhdl ghdl=1@6 nvc=1@6
+ repro3.vhdl ghdl=1@7 nvc=1@7
+run gna/issue887#1 dir=testdata/ghdl/testsuite/gna/issue887 std=08 sha=79d5c6eae524d896
+ test2.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+run gna/issue899#1 dir=testdata/ghdl/testsuite/gna/issue899 std=08 sha=a8728acd777c0e78
+ testing.vhdl ghdl=0 nvc=0
+run gna/issue9#1 dir=testdata/ghdl/testsuite/gna/issue9 std=93c sha=a91fc06fc8b2191b
+ repro.vhdl ghdl=1@7 nvc=0
+ repro2.vhdl ghdl=1@6,7,8 nvc=0
+run gna/issue912#1 dir=testdata/ghdl/testsuite/gna/issue912 std=00 sha=e0c5bea19c85f118
+ mwe_entity.vhdl ghdl=0 nvc=0
+ mwe_tb.vhdl ghdl=0 nvc=0
+ mwe_entity.vhdl ghdl=0 nvc=0
+ mwe_tb.vhdl ghdl=0 nvc=0
+ mwe_entity.vhdl ghdl=0 nvc=0
+ mwe_tb.vhdl ghdl=0 nvc=0
+run gna/issue913#1 dir=testdata/ghdl/testsuite/gna/issue913 std=08 sha=dda8c8618aff6bd1
+ apackage.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+run gna/issue916#1 dir=testdata/ghdl/testsuite/gna/issue916 std=08 sha=432b91fb0d1c9ac9
+ dut.vhdl -frelaxed ghdl=0 nvc=1@22
+run gna/issue917#1 dir=testdata/ghdl/testsuite/gna/issue917 std=08 sha=c5ab8328ee3d01c5
+ dut.vhdl ghdl=0 nvc=0
+run gna/issue918#1 dir=testdata/ghdl/testsuite/gna/issue918 std=93c sha=67241e22d9cb1e34
+ ent.vhdl ghdl=0 nvc=0
+run gna/issue922#1 dir=testdata/ghdl/testsuite/gna/issue922 std=08 sha=380553d8c222f2e3
+ dut.vhdl ghdl=0 nvc=0
+run gna/issue961#1 dir=testdata/ghdl/testsuite/gna/issue961 std=08 sha=24a3dac0684edd94
+ tb.vhdl ghdl=0 nvc=0
+run gna/issue98#1 dir=testdata/ghdl/testsuite/gna/issue98 std=93c sha=3d53d678ba57d980
+ test_load.vhdl ghdl=0 nvc=0
+run gna/issue983#1 dir=testdata/ghdl/testsuite/gna/issue983 std=08 sha=54b8c5cd15423af5
+ test.vhdl ghdl=0 nvc=1@24,27
+run gna/issue984#1 dir=testdata/ghdl/testsuite/gna/issue984 std=93c sha=addc42be3c8b4f73
+ types_pkg.vhd ghdl=0 nvc=0
+ const_pkg.vhd ghdl=0 nvc=0
+ tester.vhd ghdl=0 nvc=0
+ generic_check.vhd ghdl=0 nvc=0
+ tester_conf.vhd ghdl=0 nvc=0
+run gna/issue99#1 dir=testdata/ghdl/testsuite/gna/issue99 std=08 sha=168143fbd3504ede
+ repro.vhdl ghdl=0 nvc=0
+ test.vhdl ghdl=0 nvc=0
+run gna/lsp27#1 dir=testdata/ghdl/testsuite/gna/lsp27 std=02 sha=6c0c470236503705
+ mwe.vhdl -Wunused -Werror ghdl=0 nvc=0
+run gna/perf02-long#1 dir=testdata/ghdl/testsuite/gna/perf02-long std=93c sha=a626e42287ad4fa0
+ add_142.vhd ghdl=0 nvc=0
+ add_153.vhd ghdl=0 nvc=0
+ add_154.vhd ghdl=0 nvc=0
+ add_155.vhd ghdl=0 nvc=0
+ add_159.vhd ghdl=0 nvc=0
+ cmp_662.vhd ghdl=0 nvc=0
+ cmp_673.vhd ghdl=0 nvc=0
+ cmp_694.vhd ghdl=0 nvc=0
+ cmp_700.vhd ghdl=0 nvc=0
+ compressed.vhd ghdl=0 nvc=0
+ decis_levl.vhd ghdl=0 nvc=0
+ fsm_163.vhd ghdl=0 nvc=0
+ ilb_table.vhd ghdl=0 nvc=0
+ mul_145.vhd ghdl=0 nvc=0
+ mul_146.vhd ghdl=0 nvc=0
+ mul_148.vhd ghdl=0 nvc=0
+ mul_149.vhd ghdl=0 nvc=0
+ mul_156.vhd ghdl=0 nvc=0
+ mul_161.vhd ghdl=0 nvc=0
+ qq2_code2_table.vhd ghdl=0 nvc=0
+ qq4_code4_table.vhd ghdl=0 nvc=0
+ qq6_code6_table.vhd ghdl=0 nvc=0
+ quant26bt_neg.vhd ghdl=0 nvc=0
+ quant26bt_pos.vhd ghdl=0 nvc=0
+ result.vhd ghdl=0 nvc=0
+ shr_141.vhd ghdl=0 nvc=0
+ sub_143.vhd ghdl=0 nvc=0
+ sub_144.vhd ghdl=0 nvc=0
+ sub_147.vhd ghdl=0 nvc=0
+ sub_160.vhd ghdl=0 nvc=0
+ tb.vhd ghdl=0 nvc=0
+ test_data.vhd ghdl=0 nvc=0
+ top.vhd ghdl=0 nvc=0
+ wh_code_table.vhd ghdl=0 nvc=0
+ wl_code_table.vhd ghdl=0 nvc=0
+run gna/sr2553#1 dir=testdata/ghdl/testsuite/gna/sr2553 std=93c sha=337ed0e2e3137837
+ 2553.vhd ghdl=1@40 nvc=1@40
+run gna/sr2655#1 dir=testdata/ghdl/testsuite/gna/sr2655 std=93c sha=be613403c4a33f37
+ bug.vhdl ghdl=0 nvc=0
+run gna/sr2676#1 dir=testdata/ghdl/testsuite/gna/sr2676 std=93c sha=17c52f2547044bb9
+ reset_types.vhdl ghdl=0 nvc=0
+ reset.vhdl ghdl=0 nvc=0
+ reset-rtl.vhdl ghdl=0 nvc=0
+ reset-test.vhdl ghdl=0 nvc=0
+run gna/sr2737#1 dir=testdata/ghdl/testsuite/gna/sr2737 std=93c sha=9826519072b80bd2
+ testit.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+ bit_vector_rol_ror.vhdl ghdl=0 nvc=0
+run gna/sr2903#1 dir=testdata/ghdl/testsuite/gna/sr2903 std=93c sha=45b066857d802520
+ boundcheck.vhdl ghdl=0 nvc=0
+run gna/sr2940#1 dir=testdata/ghdl/testsuite/gna/sr2940 std=93c sha=87baacd29e317462
+ Prim.vhd ghdl=0 nvc=0
+ GCD.vhd ghdl=1@73,75,132~ nvc=1@73,75,162,163
+run gna/sr3028#1 dir=testdata/ghdl/testsuite/gna/sr3028 std=93c sha=6054c5313c5dd253
+ vc.vhdl -Werror=runtime-error ghdl=1@2 nvc=1@2
+run gna/sr3060#1 dir=testdata/ghdl/testsuite/gna/sr3060 std=93c sha=dce23d78a568febc
+ integer_class.vhdl ghdl=1@56,57 nvc=1@18
+run gna/ticket101#1 dir=testdata/ghdl/testsuite/gna/ticket101 std=93c sha=dd61d9fd3376f485
+ junk2.vhdl ghdl=0 nvc=0
+ junk2.vhdl ghdl=0 nvc=0
+run gna/ticket101#2 dir=testdata/ghdl/testsuite/gna/ticket101 std=02 sha=cf39b799f5f0f2f5
+ junk2.vhdl -frelaxed-rules ghdl=0 nvc=0
+run gna/ticket104#1 dir=testdata/ghdl/testsuite/gna/ticket104 std=93c sha=15f1de3b28071475
+ bug_tb.vhd ghdl=0 nvc=1@35
+run gna/ticket109#1 dir=testdata/ghdl/testsuite/gna/ticket109 std=08 sha=488d4a1fa7a1d3f9
+ t.vhdl ghdl=0 nvc=0
+run gna/ticket11#1 dir=testdata/ghdl/testsuite/gna/ticket11 std=93c sha=5912016c9fb144f1
+ signalevents.vhdl ghdl=0 nvc=0
+ tb2.vhdl ghdl=0 nvc=0
+ tb3.vhdl ghdl=0 nvc=0
+run gna/ticket14#1 dir=testdata/ghdl/testsuite/gna/ticket14 std=93c sha=f81d0cb76acd91ab
+ test_case.vhd ghdl=0 nvc=0
+ scrambler_tb.vhd ghdl=0 nvc=0
+run gna/ticket15#1 dir=testdata/ghdl/testsuite/gna/ticket15 std=93c sha=5af89f01aa37627d
+ assignment_to_aggregate.vhdl ghdl=1@11 nvc=1@11
+run gna/ticket18#1 dir=testdata/ghdl/testsuite/gna/ticket18 std=02 sha=4cea1e862ba4f8b0
+ psl_test_error.vhd -fpsl ghdl=0 nvc=0
+ psl_test_working.vhd -fpsl ghdl=0 nvc=0
+run gna/ticket19#1 dir=testdata/ghdl/testsuite/gna/ticket19 std=02 sha=63f0c6c6a6c90a7c
+ psl_test_cover.vhd -fpsl ghdl=0 nvc=0
+ psl_test_cover2.vhd -fpsl ghdl=0 nvc=0
+ psl_test_cover3.vhd -fpsl ghdl=0 nvc=0
+run gna/ticket20#1 dir=testdata/ghdl/testsuite/gna/ticket20 std=93c sha=7cc8960bdee3a594
+ morten1.vhdl ghdl=0 nvc=0
+ morten2.vhdl ghdl=1@18,21 nvc=1@18
+run gna/ticket24#1 dir=testdata/ghdl/testsuite/gna/ticket24 std=93c sha=5be1c4e06388d707
+ psl.vhdl -fpsl ghdl=0 nvc=0
+run gna/ticket24#2 dir=testdata/ghdl/testsuite/gna/ticket24 std=08 sha=5be1c4e06388d707
+ psl.vhdl -fpsl ghdl=0 nvc=0
+run gna/ticket26#1 dir=testdata/ghdl/testsuite/gna/ticket26 std=02 sha=27f7a7962642ab14
+ psl_test_named_statement.vhd -fpsl ghdl=0 nvc=0
+run gna/ticket29#1 dir=testdata/ghdl/testsuite/gna/ticket29 std=93c sha=d26fb5bda62848a4
+ debugtools.vhdl ghdl=0 nvc=0
+ iomapper.vhdl ghdl=0 nvc=0
+run gna/ticket31#1 dir=testdata/ghdl/testsuite/gna/ticket31 std=93c sha=921a7f6237a1c5cb
+ top_phystest_simple.vhdl ghdl=0 nvc=1@16
+ tb2.vhdl ghdl=0 nvc=0
+run gna/ticket32#1 dir=testdata/ghdl/testsuite/gna/ticket32 std=93c sha=7be76e46d0690072
+ repro.vhdl ghdl=0 nvc=0
+run gna/ticket32#2 dir=testdata/ghdl/testsuite/gna/ticket32 std=93c sha=c55298de1942dbfb
+ muxcy.vhdl lib=unisim ghdl=0 nvc=0
+ simulation.vhdl lib=poc ghdl=0 nvc=0
+ arith_prefix_and.vhdl lib=poc ghdl=0 nvc=0
+ arith_prefix_and_tb.vhdl lib=test ghdl=0 nvc=0
+run gna/ticket35#1 dir=testdata/ghdl/testsuite/gna/ticket35 std=93c sha=810d20cdfad2c3d3
+ ascii7.vhdl ghdl=0 nvc=0
+ latin1.vhdl ghdl=0 nvc=0
+ utf8.vhdl ghdl=1@1 nvc=1@1
+ utf16be.vhdl ghdl=1@1 nvc=1@1
+ utf16le.vhdl ghdl=1@1 nvc=1@1
+run gna/ticket37#1 dir=testdata/ghdl/testsuite/gna/ticket37 std=93c sha=eea1997ef926e9c6
+ dispgen.vhdl ghdl=0 nvc=0
+ genint.vhdl ghdl=0 nvc=0
+ genchar.vhdl ghdl=0 nvc=0
+ genbool.vhdl ghdl=0 nvc=0
+ genlogic.vhdl ghdl=0 nvc=0
+run gna/ticket38#1 dir=testdata/ghdl/testsuite/gna/ticket38 std=93c sha=7e8146dd0c7e9b7d
+ associate.vhdl ghdl=0 nvc=0
+run gna/ticket39#1 dir=testdata/ghdl/testsuite/gna/ticket39 std=93c sha=6f2a8d7566a89cb5
+ test.vhd ghdl=0 nvc=0
+run gna/ticket40#1 dir=testdata/ghdl/testsuite/gna/ticket40 std=93c sha=5037517b90d8f6dd
+ generic_when.vhdl ghdl=1@19 nvc=1@19
+run gna/ticket41#1 dir=testdata/ghdl/testsuite/gna/ticket41 std=93c sha=52ec61597ad25210
+ bug.vhdl ghdl=0 nvc=0
+ bug1.vhdl ghdl=1@6,7 nvc=1@7
+run gna/ticket43#1 dir=testdata/ghdl/testsuite/gna/ticket43 std=02 sha=698836c5402d51e7
+ file1.vhd ghdl=0 nvc=0
+ file2.vhd ghdl=0 nvc=0
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket44#1 dir=testdata/ghdl/testsuite/gna/ticket44 std=02 sha=f2ffac15633f8434
+ file1.vhd ghdl=0 nvc=0
+ file2.vhd ghdl=0 nvc=0
+run gna/ticket46#1 dir=testdata/ghdl/testsuite/gna/ticket46 std=02 sha=8af55ad01ad7ecae
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket46#2 dir=testdata/ghdl/testsuite/gna/ticket46 std=08 sha=8af55ad01ad7ecae
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket47#1 dir=testdata/ghdl/testsuite/gna/ticket47 std=93c sha=6dcde0c89763338d
+ ent.vhdl ghdl=0 nvc=0
+run gna/ticket49#1 dir=testdata/ghdl/testsuite/gna/ticket49 std=93c sha=5afaf4d2f80a35c6
+ bug.vhdl ghdl=0 nvc=1@20
+run gna/ticket50#1 dir=testdata/ghdl/testsuite/gna/ticket50 std=08 sha=460533ce4e02c978
+ ent.vhdl ghdl=0 nvc=0
+ ent2.vhdl ghdl=1@5,9,20 nvc=1@20
+run gna/ticket51#1 dir=testdata/ghdl/testsuite/gna/ticket51 std=93c sha=32be7be17f9a6107
+ ent.vhdl ghdl=0 nvc=0
+run gna/ticket52#1 dir=testdata/ghdl/testsuite/gna/ticket52 std=93c sha=9b209986dd0285ef
+ file.vhdl ghdl=1@10 nvc=1@10
+run gna/ticket52#2 dir=testdata/ghdl/testsuite/gna/ticket52 std=08 sha=9b209986dd0285ef
+ file.vhdl ghdl=0 nvc=0
+run gna/ticket53#1 dir=testdata/ghdl/testsuite/gna/ticket53 std=08 sha=54407fc1f29ad55f
+ decl1.vhdl ghdl=0 nvc=0
+ ent1.vhdl ghdl=0 nvc=0
+run gna/ticket54#1 dir=testdata/ghdl/testsuite/gna/ticket54 std=93c sha=7667c49f807b89d8
+ test.vhdl ghdl=0 nvc=0
+run gna/ticket55#1 dir=testdata/ghdl/testsuite/gna/ticket55 std=93c sha=8bf51dbfd703ac58
+ bug.vhdl ghdl=0 nvc=0
+ bug1.vhdl ghdl=1@4 nvc=1@4
+ bug2.vhdl ghdl=1@5 nvc=1@5
+ bug3.vhdl ghdl=1@5 nvc=1@5
+run gna/ticket56#1 dir=testdata/ghdl/testsuite/gna/ticket56 std=93c sha=40ac7b327260aee4
+ bug.vhdl ghdl=1@11 nvc=1@11
+run gna/ticket57#1 dir=testdata/ghdl/testsuite/gna/ticket57 std=93c sha=56e75fcd584745d1
+ test.vhdl ghdl=0 nvc=1@9
+ test.vhdl ghdl=0 nvc=1@9
+ test.vhdl -frelaxed-rules ghdl=0 nvc=0
+run gna/ticket58#1 dir=testdata/ghdl/testsuite/gna/ticket58 std=08 sha=ceff2493d90d566c
+ bug.vhdl lib=lib ghdl=0 nvc=0
+run gna/ticket59#1 dir=testdata/ghdl/testsuite/gna/ticket59 std=93c sha=726b191f841f75fc
+ bug.vhdl ghdl=0 nvc=1@35,36
+run gna/ticket61#1 dir=testdata/ghdl/testsuite/gna/ticket61 std=08 sha=fad097b40e4fbfff
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket62#1 dir=testdata/ghdl/testsuite/gna/ticket62 std=93c sha=6c0d2fdb3489e935
+ repro.vhdl ghdl=0 nvc=0
+run gna/ticket62#2 dir=testdata/ghdl/testsuite/gna/ticket62 std=08 sha=c857c94457f40240
+ repro.vhdl ghdl=1@5 nvc=1@5
+ repro.vhdl -frelaxed-rules ghdl=0 nvc=0
+run gna/ticket63#1 dir=testdata/ghdl/testsuite/gna/ticket63 std=93c sha=265c734b5daf922b
+ bug.vhdl ghdl=1@11 nvc=1@11
+run gna/ticket64#1 dir=testdata/ghdl/testsuite/gna/ticket64 std=08 sha=0d61deca7d0ab54b
+ file.vhdl ghdl=0 nvc=0
+ bug2.vhdl ghdl=0 nvc=0
+run gna/ticket65#1 dir=testdata/ghdl/testsuite/gna/ticket65 std=93c sha=bd29f4c01151f77b
+ bug.vhdl ghdl=0 nvc=0
+ bug1.vhdl ghdl=0 nvc=0
+ bug2.vhdl ghdl=0 nvc=0
+run gna/ticket66#1 dir=testdata/ghdl/testsuite/gna/ticket66 std=93c sha=65fe3ca725c6be72
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket66#2 dir=testdata/ghdl/testsuite/gna/ticket66 std=08 sha=65fe3ca725c6be72
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket67#1 dir=testdata/ghdl/testsuite/gna/ticket67 std=08 sha=74cb34cdc1c84f81
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket68#1 dir=testdata/ghdl/testsuite/gna/ticket68 std=93c sha=0282d07a03057406
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket69#1 dir=testdata/ghdl/testsuite/gna/ticket69 std=93c sha=bccdd28a428f0b52
+ bug.vhdl ghdl=0 nvc=0
+ repro.vhdl ghdl=0 nvc=0
+ bug2.vhdl ghdl=1@10 nvc=1@10
+run gna/ticket70#1 dir=testdata/ghdl/testsuite/gna/ticket70 std=93c sha=20a536b09efeb53c
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket71#1 dir=testdata/ghdl/testsuite/gna/ticket71 std=93c sha=97c1f5ffe178bfb2
+ bug.vhdl ghdl=1@21,24~,39~ nvc=1@21,24,42
+run gna/ticket71#2 dir=testdata/ghdl/testsuite/gna/ticket71 std=08 sha=97c1f5ffe178bfb2
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket73#1 dir=testdata/ghdl/testsuite/gna/ticket73 std=93c sha=3e5a56a25793f1d1
+ bug.vhdl ghdl=0 nvc=1@14
+run gna/ticket74#1 dir=testdata/ghdl/testsuite/gna/ticket74 std=93c sha=41863e261c4b5084
+ bug.vhdl ghdl=0 nvc=1@12
+run gna/ticket75#1 dir=testdata/ghdl/testsuite/gna/ticket75 std=93c sha=f753e6b637cb5a67
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket76#1 dir=testdata/ghdl/testsuite/gna/ticket76 std=08 sha=bfeaaa4ec76f3a0f
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket78#1 dir=testdata/ghdl/testsuite/gna/ticket78 std=08 sha=b3c03b931c5c64c3
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket79#1 dir=testdata/ghdl/testsuite/gna/ticket79 std=93c sha=8284a50708d0ecb5
+ file.vhdl ghdl=1@17 nvc=1@17,22
+run gna/ticket81#1 dir=testdata/ghdl/testsuite/gna/ticket81 std=93c sha=2475061804eefd8e
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/ticket81#2 dir=testdata/ghdl/testsuite/gna/ticket81 std=08 sha=82f3e0b80af7d377
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket83#1 dir=testdata/ghdl/testsuite/gna/ticket83 std=93c sha=cb79a8259b13497c
+ bug.vhdl ghdl=1@10 nvc=0
+run gna/ticket84#1 dir=testdata/ghdl/testsuite/gna/ticket84 std=93c sha=b1ebf75320bd13bd
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket86#1 dir=testdata/ghdl/testsuite/gna/ticket86 std=08 sha=d9e98d464773637b
+ bug.vhdl ghdl=0 nvc=0
+run gna/ticket87#1 dir=testdata/ghdl/testsuite/gna/ticket87/dir1 std=93c sha=da44903a3e3013eb
+ ../hello.vhdl ghdl=0 nvc=0
+run gna/ticket88#1 dir=testdata/ghdl/testsuite/gna/ticket88 std=93c sha=e81e886a37da8d77
+ bug.vhdl ghdl=1@8 nvc=1@8
+run gna/ticket89#1 dir=testdata/ghdl/testsuite/gna/ticket89 std=93c sha=a54850433d09e859
+ repro.vhdl ghdl=0 nvc=0
+ repro2.vhdl ghdl=0 nvc=0
+run gna/ticket89#2 dir=testdata/ghdl/testsuite/gna/ticket89 std=93c sha=66033b66368f471c
+ x_ieee_proposed/src/std_logic_1164_additions.vhdl lib=ieee_proposed ghdl=0 nvc=0
+ x_ieee_proposed/src/standard_additions_c.vhdl lib=ieee_proposed ghdl=0 nvc=0
+ x_ieee_proposed/src/standard_textio_additions_c.vhdl lib=ieee_proposed ghdl=0 nvc=0
+ project/src93/types_pkg.vhd lib=bitvis_util ghdl=0 nvc=0
+ project/src93/adaptations_pkg.vhd lib=bitvis_util ghdl=0 nvc=0
+ project/src93/string_methods_pkg.vhd lib=bitvis_util ghdl=0 nvc=0
+ project/src93/vhdl_version_layer_pkg.vhd lib=bitvis_util ghdl=0 nvc=0
+ project/src93/license_open_pkg.vhd lib=bitvis_util ghdl=0 nvc=0
+ project/src93/methods_pkg.vhd lib=bitvis_util ghdl=0 nvc=1@95,105,136,275,286,297,310,324,338,351,362,373,384,395,408,422,436,449,460,471,482,495,508,521,534,546,559,571,583,595,607,619,631,643,655,667,679,769,781,793,805,817,829,842,854,868,882,896,908,921,934,947,960,973,986,996,1005,1015,1026,1053,1272
+ project/src93/bfm_common_pkg.vhd lib=bitvis_util ghdl=0 nvc=1@33,115
+ project/tb/partial_test_tb.vhd lib=bitvis_util ghdl=0 nvc=1@36,37,48
+run gna/ticket9#1 dir=testdata/ghdl/testsuite/gna/ticket9 std=93c sha=7e794c2615c8202c
+ index_range_test_A.vhd ghdl=0 nvc=0
+ index_range_test_B.vhd ghdl=0 nvc=0
+run gna/ticket90#1 dir=testdata/ghdl/testsuite/gna/ticket90 std=93c sha=3249acddcac81877
+ test.vhdl ghdl=0 nvc=0
+run gna/ticket90#2 dir=testdata/ghdl/testsuite/gna/ticket90 std=08 sha=78f3b45b8897c09b
+ test.vhdl ghdl=0 nvc=0
+ test2.vhdl ghdl=0 nvc=0
+run gna/ticket92#1 dir=testdata/ghdl/testsuite/gna/ticket92 std=08 sha=439409714d6ce1dd
+ cover_report2.vhd -fpsl ghdl=0 nvc=0
+ cover_report.vhd -fpsl ghdl=1@56 nvc=1@56
+ cover_report3.vhd -fpsl ghdl=1@50 nvc=1@50
+ cover_report1.vhd -fpsl ghdl=0 nvc=0
+run gna/ticket93#1 dir=testdata/ghdl/testsuite/gna/ticket93 std=93c sha=66241d3bd3dd0f92
+ test.vhd ghdl=0 nvc=0
+run gna/ticket94#1 dir=testdata/ghdl/testsuite/gna/ticket94 std=93c sha=eedfa52875dcd3a6
+ asrc.vhd lib=alib ghdl=0 nvc=0
+ tb.vhd ghdl=0 nvc=0
+ tb1.vhd ghdl=0 nvc=0
+ apkg.vhd lib=alib ghdl=0 nvc=0
+ tb2.vhd ghdl=0 nvc=0
+ tb3.vhd ghdl=0 nvc=0
+ tb4.vhd ghdl=0 nvc=0
+run gna/ticket94#2 dir=testdata/ghdl/testsuite/gna/ticket94 std=93 sha=736cec44d01660b9
+ asrc.vhd lib=alib ghdl=0 nvc=0
+ apkg.vhd lib=alib ghdl=0 nvc=0
+ tb3.vhd ghdl=0 nvc=0
+run gna/ticket95#1 dir=testdata/ghdl/testsuite/gna/ticket95 std=93c sha=ec60fceb1d6c0538
+ pkg.vhd ghdl=0 nvc=0
+run gna/ticket96#1 dir=testdata/ghdl/testsuite/gna/ticket96 std=08 sha=1b6e116e4f18856e
+ ent.vhd ghdl=0 nvc=0
+run gna/ticket97#1 dir=testdata/ghdl/testsuite/gna/ticket97 std=93c sha=750e090de10bea7f
+ bug.vhdl ghdl=1@16 nvc=1@16
+run gna/ticket98#1 dir=testdata/ghdl/testsuite/gna/ticket98 std=93c sha=66f9d6955f4b0e81
+ junk1.vhd ghdl=1@17,25 nvc=1@25
+ junk1ok.vhd ghdl=0 nvc=0
+run gna/ticket98#2 dir=testdata/ghdl/testsuite/gna/ticket98 std=08 sha=55488e421aa7be14
+ junk1.vhd ghdl=0 nvc=0

@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  assert always {a[*2]; b[*1 to 3]; c[*1 to inf]};\nend;\n")

@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("entity e is\n  generic (n : natural := 4);\n  port (a : in bit; b : out bit);\n  constant k : natural := n;\nbegin\n  assert n > 0 report \"n\" severity failure;\nend entity e;\n")

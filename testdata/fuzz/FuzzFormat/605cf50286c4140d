@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("entity e is\n  generic (type t is <>);\nend;\n")

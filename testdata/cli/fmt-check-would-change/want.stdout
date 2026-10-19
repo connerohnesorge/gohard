@@ -1,0 +1,4 @@
+a.vhd:1:1: error[format/would-change]: file is not formatted; run gohard fmt
+sub/c.vhd:4:1: error[format/would-change]: file is not formatted; run gohard fmt
+sub/d.vhd:9:1: error[format/would-change]: file is not formatted; run gohard fmt
+summary: 3 errors, 0 warnings, 0 hints, 4 files

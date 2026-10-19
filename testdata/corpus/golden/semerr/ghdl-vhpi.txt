@@ -1,0 +1,26 @@
+# GoHard semantic-error oracle (#34, R12): ghdl-vhpi.txt.
+# Written by go run ./tools/oracle --update semerr; do not edit.
+# Each "run" is one analysis group of the project's own driver (a
+# testsuite.sh between cleans, a VESTS list, an NVC regression test or
+# unit-test block, a corpus design run, or a file no driver names,
+# alone under 2008): its files are analyzed in order, one command per
+# file, in a fresh work directory per tool ("dir" is the working
+# directory; the run's GHDL --std and the sha256 prefix of its sources
+# follow). Each file line is the argument, the library when not work,
+# the GHDL options, then per tool the exit code and the lines of that
+# file it reports errors on; "~" marks a line whose only errors are
+# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
+# reports an error on every line both tools report one on
+# (semerr_check.go).
+tool ghdl 6.0.0
+tool nvc 1.23.0
+run vhpi/001load_lib#1 dir=testdata/ghdl/testsuite/vhpi/001load_lib std=93c sha=503e9f4994ea944c
+ mydesign.vhdl ghdl=0 nvc=0
+run vhpi/002load_entrypoint#1 dir=testdata/ghdl/testsuite/vhpi/002load_entrypoint std=93c sha=b1a931badd0fe4b1
+ mydesign.vhdl ghdl=0 nvc=0
+run vhpi/003load_multi_lib#1 dir=testdata/ghdl/testsuite/vhpi/003load_multi_lib std=93c sha=0c9b3e48082984c8
+ mydesign.vhdl ghdl=0 nvc=0
+run vhpi/004trace_stdout#1 dir=testdata/ghdl/testsuite/vhpi/004trace_stdout std=93c sha=ab1cc0884c0c0c5e
+ mydesign.vhdl ghdl=0 nvc=0
+run vhpi/005trace_file#1 dir=testdata/ghdl/testsuite/vhpi/005trace_file std=93c sha=3401b4c66970f957
+ mydesign.vhdl ghdl=0 nvc=0

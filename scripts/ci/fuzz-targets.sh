@@ -6,8 +6,6 @@
 # testdata/fuzz/<Target>/ that the #30 targets replay themselves;
 # "local" is <package>/testdata/fuzz/<Target>/, which Go replays
 # automatically, for helper targets that do not read the root corpus.
-# Later stages append (root):
-#   FuzzFormat    ./internal/format     (#32)
 # Elaboration and simulation are not fuzz targets until the corpus
 # passes.
 #
@@ -16,7 +14,9 @@
 . "$(dirname "$0")/lib.sh"
 
 TARGETS=(
+	"FuzzAnalyze ./internal/sema local"
 	"FuzzConfig ./internal/config root"
+	"FuzzFormat ./internal/format root"
 	"FuzzIndex ./internal/span local"
 	"FuzzLSPReplay ./internal/server root"
 	"FuzzParse ./internal/parser root"

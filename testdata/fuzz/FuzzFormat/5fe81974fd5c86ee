@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type small is range 0 to 255;\n  type down is range 10 downto 0;\n  type prob is range 0.0 to 1.0;\n  type same is range small'range;\nend;\n")

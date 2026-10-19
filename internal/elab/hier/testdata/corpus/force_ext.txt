@@ -1,0 +1,3 @@
+force_ext_tb entity work.force_ext_tb(tb)
+  force_ext_tb.dut entity work.force_ext(rtl)
+  force_ext_tb.chk block

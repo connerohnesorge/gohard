@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  a1 : assert always (req -> next ack) report \"no ack\" severity error;\nend;\n")

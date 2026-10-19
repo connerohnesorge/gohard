@@ -1,0 +1,1 @@
+gohard lsp format --at top.vhd:1:1

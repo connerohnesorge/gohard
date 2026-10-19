@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "status": "problems",
+  "exit": 1,
+  "summary": {
+    "errors": 3,
+    "warnings": 0,
+    "hints": 0,
+    "files": 2
+  },
+  "diagnostics": [
+    {
+      "path": "top.vhd",
+      "line": 9,
+      "col": 32,
+      "end_line": 9,
+      "end_col": 33,
+      "severity": "error",
+      "code": "sema/ambiguous-overload",
+      "message": "ambiguous =: \"=\" [length, length return BOOLEAN] from units_si; \"=\" [length, length return BOOLEAN] from units_us",
+      "related": [
+        {
+          "path": "units.vhd",
+          "line": 4,
+          "col": 8,
+          "end_line": 4,
+          "end_col": 14,
+          "message": "candidate \"=\" [length, length return BOOLEAN] from units_si, predefined for the type declared here"
+        },
+        {
+          "path": "units.vhd",
+          "line": 10,
+          "col": 8,
+          "end_line": 10,
+          "end_col": 14,
+          "message": "candidate \"=\" [length, length return BOOLEAN] from units_us, predefined for the type declared here"
+        }
+      ]
+    },
+    {
+      "path": "top.vhd",
+      "line": 11,
+      "col": 29,
+      "end_line": 11,
+      "end_col": 34,
+      "severity": "error",
+      "code": "sema/ambiguous-overload",
+      "message": "ambiguous scale: scale [INTEGER return INTEGER] from units_si; scale [INTEGER return INTEGER] from units_us",
+      "related": [
+        {
+          "path": "units.vhd",
+          "line": 5,
+          "col": 12,
+          "end_line": 5,
+          "end_col": 17,
+          "message": "candidate scale [INTEGER return INTEGER] from units_si"
+        },
+        {
+          "path": "units.vhd",
+          "line": 11,
+          "col": 12,
+          "end_line": 11,
+          "end_col": 17,
+          "message": "candidate scale [INTEGER return INTEGER] from units_us"
+        }
+      ]
+    },
+    {
+      "path": "top.vhd",
+      "line": 17,
+      "col": 5,
+      "end_line": 17,
+      "end_col": 8,
+      "severity": "error",
+      "code": "sema/ambiguous-overload",
+      "message": "ambiguous log: log [INTEGER] from units_si; log [INTEGER] from units_us",
+      "related": [
+        {
+          "path": "units.vhd",
+          "line": 6,
+          "col": 13,
+          "end_line": 6,
+          "end_col": 16,
+          "message": "candidate log [INTEGER] from units_si"
+        },
+        {
+          "path": "units.vhd",
+          "line": 12,
+          "col": 13,
+          "end_line": 12,
+          "end_col": 16,
+          "message": "candidate log [INTEGER] from units_us"
+        }
+      ]
+    }
+  ],
+  "incomplete": []
+}

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "gohard",
+          "version": "0.0.0-dev",
+          "informationUri": "https://github.com/connerohnesorge/gohard",
+          "rules": [
+            {
+              "id": "config/range",
+              "shortDescription": {
+                "text": "a number outside the key's range"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            }
+          ]
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": false,
+          "exitCode": 2,
+          "toolExecutionNotifications": [
+            {
+              "level": "error",
+              "message": {
+                "text": "format.max_line_length must be at least 40, not 10"
+              },
+              "descriptor": {
+                "id": "config/range"
+              },
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "gohard.yaml"
+                    },
+                    "region": {
+                      "startLine": 2,
+                      "startColumn": 20
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "config/range",
+          "level": "error",
+          "message": {
+            "text": "format.max_line_length must be at least 40, not 10"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "gohard.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "startColumn": 20
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    }
+  ]
+}

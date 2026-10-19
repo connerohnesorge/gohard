@@ -132,7 +132,7 @@ func missingSubmodule(dir, submodule string, err error) error {
 }
 
 // regressionSources returns the sources of set ("pr" or "nightly"):
-// the bundled IEEE packages under internal/stdlib (once they exist),
+// the bundled std/ieee packages under internal/stdlib,
 // the 14 corpus designs, and the regression entries of the set.
 func regressionSources(t *testing.T, set string) []*regSource {
 	t.Helper()
@@ -140,9 +140,16 @@ func regressionSources(t *testing.T, set string) []*regSource {
 	var out []*regSource
 	stdlib := filepath.Join(repoRoot, "internal", "stdlib")
 	if fi, err := os.Stat(stdlib); err == nil && fi.IsDir() {
+		// Every bundled file must parse with no syntax error under
+		// both 2008 and 2019 (#33): the bundled 2019 text serves every
+		// standard's view.
+		why := "bundled std/ieee (#33)"
 		out = append(out, &regSource{name: "stdlib",
 			dir: "internal/stdlib", exp: map[string]*expectation{},
-			unlisted: &expectation{anyStd: true}})
+			unlisted: &expectation{runs: []run{
+				{opts: Options{Standard: token.Std2008}, why: why},
+				{opts: Options{Standard: token.Std2019}, why: why},
+			}}})
 	}
 	out = append(out, corpusSource(t, m))
 	for _, e := range m.Regression {
@@ -590,14 +597,15 @@ func checkSource(t *testing.T, s *regSource) (regTally, []regFailure) {
 }
 
 // TestParserRegression is the parser-regression runner (#31, #30): it
-// round-trips every .vhd/.vhdl file of the bundled IEEE packages (once
-// internal/stdlib exists), the 14 corpus designs and the regression
-// entries tagged pr in corpus.yaml (with -regression=nightly, also
-// those tagged nightly), and requires zero syntax errors for every file
-// the upstream project expects to analyse (corpus.yaml "Expected-
-// failure extraction"): files on the GHDL/NVC expected-failure lists
-// must only round-trip and not crash. A missing submodule fails with
-// the git submodule update --init hint; nothing is skipped.
+// round-trips every .vhd/.vhdl file of the bundled std/ieee packages
+// (internal/stdlib, each under 2008 and 2019), the 14 corpus designs
+// and the regression entries tagged pr in corpus.yaml (with
+// -regression=nightly, also those tagged nightly), and requires zero
+// syntax errors for every file the upstream project expects to
+// analyse (corpus.yaml "Expected-failure extraction"): files on the
+// GHDL/NVC expected-failure lists must only round-trip and not crash.
+// A missing submodule fails with the git submodule update --init hint;
+// nothing is skipped.
 //
 // Without -regression (plain go test) the gate only logs its failure
 // count, so the package stays green while the grammar is incomplete;

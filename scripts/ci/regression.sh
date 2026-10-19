@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # shellcheck source-path=SCRIPTDIR
 # Parser-regression set (#30, #31). Usage: regression.sh pr|nightly.
-# "pr" checks the bundled IEEE packages (internal/stdlib, once it
-# exists), the 14 corpus designs and every submodule tagged pr in
+# "pr" checks the bundled std/ieee packages (internal/stdlib, under
+# both 2008 and 2019), the 14 corpus designs and every submodule tagged pr in
 # testdata/corpus/corpus.yaml; "nightly" adds the submodules tagged
 # nightly. Every .vhd/.vhdl file must round-trip byte for byte, and
 # every file the upstream project expects to analyse (not on its

@@ -1,0 +1,1 @@
+gohard lsp range-format --at top.vhd:7:8 7:11

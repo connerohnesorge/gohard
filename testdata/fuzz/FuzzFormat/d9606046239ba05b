@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("entity e is\nend entity e;\npackage p is\nend package p;\n")

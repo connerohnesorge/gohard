@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  p1 : postponed process (clk) is\n    variable v : integer;\n  begin\n    v := 0;\n  end postponed process p1;\nend;\n")

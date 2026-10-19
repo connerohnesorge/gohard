@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- test: std=2008 psl.comments kind=PSLAssert\narchitecture a of e is\nbegin\n  -- psl default clock is rising_edge(clk);\n  -- psl assert always (req -> next ack);\n  -- psl assert always (a ->\n  --   next b);\nend;\n")

@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("entity e is\n  port (\n    a : in bit;\n    b : out bit;\n  );\nend;\n")

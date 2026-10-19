@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  procedure q parameter (a : integer);\n  procedure r (a : integer; b : bit);\nend;\n")

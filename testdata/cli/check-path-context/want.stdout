@@ -1,0 +1,2 @@
+rtl/top.vhd:8:21: error[sema/undefined]: nope is not declared
+summary: 1 errors, 0 warnings, 0 hints, 1 files

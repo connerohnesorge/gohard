@@ -1,0 +1,14 @@
+{"jsonrpc":"2.0","id":1,"result":{"capabilities":{"documentFormattingProvider":true,"documentRangeFormattingProvider":true,"positionEncoding":"utf-16","textDocumentSync":{"change":2,"openClose":true,"save":{"includeText":false}},"workspace":{"workspaceFolders":{"supported":true}}},"serverInfo":{"name":"gohard","version":"0.0.0-test"}}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":0,"id":1}}
+{"jsonrpc":"2.0","id":2,"result":[{"range":{"start":{"line":1,"character":0},"end":{"line":1,"character":6}},"newText":"entity"},{"range":{"start":{"line":1,"character":11},"end":{"line":1,"character":13}},"newText":"is"},{"range":{"start":{"line":2,"character":0},"end":{"line":2,"character":0}},"newText":"  "},{"range":{"start":{"line":2,"character":6},"end":{"line":2,"character":6}},"newText":" "},{"range":{"start":{"line":2,"character":7},"end":{"line":2,"character":7}},"newText":" "},{"range":{"start":{"line":3,"character":4},"end":{"line":3,"character":5}},"newText":""},{"range":{"start":{"line":4,"character":0},"end":{"line":4,"character":3}},"newText":"end"},{"range":{"start":{"line":4,"character":4},"end":{"line":4,"character":10}},"newText":"entity"},{"range":{"start":{"line":6,"character":0},"end":{"line":8,"character":0}},"newText":""},{"range":{"start":{"line":10,"character":2},"end":{"line":10,"character":6}},"newText":""},{"range":{"start":{"line":10,"character":7},"end":{"line":10,"character":7}},"newText":" "},{"range":{"start":{"line":10,"character":9},"end":{"line":10,"character":9}},"newText":" "},{"range":{"start":{"line":10,"character":11},"end":{"line":10,"character":14}},"newText":""},{"range":{"start":{"line":11,"character":4},"end":{"line":11,"character":4}},"newText":"\n"}]}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":2,"id":2}}
+{"jsonrpc":"2.0","id":3,"result":[]}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":3,"id":3}}
+{"jsonrpc":"2.0","id":4,"result":[{"range":{"start":{"line":0,"character":7},"end":{"line":0,"character":8}},"newText":""},{"range":{"start":{"line":1,"character":0},"end":{"line":1,"character":4}},"newText":""}]}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":3,"id":4}}
+{"jsonrpc":"2.0","id":5,"result":[]}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":4,"id":5}}
+{"jsonrpc":"2.0","id":6,"result":[]}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":5,"id":6}}
+{"jsonrpc":"2.0","id":99,"result":null}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":5,"id":99}}

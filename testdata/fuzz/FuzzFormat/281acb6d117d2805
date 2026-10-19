@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  assert s = '1' report \"s low\" severity warning;\n  c1 : postponed assert t = '0';\nend;\n")

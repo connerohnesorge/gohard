@@ -1,0 +1,23 @@
+# GoHard semantic-error oracle (#34, R12): corpus-vhdl93_only.txt.
+# Written by go run ./tools/oracle --update semerr; do not edit.
+# Each "run" is one analysis group of the project's own driver (a
+# testsuite.sh between cleans, a VESTS list, an NVC regression test or
+# unit-test block, a corpus design run, or a file no driver names,
+# alone under 2008): its files are analyzed in order, one command per
+# file, in a fresh work directory per tool ("dir" is the working
+# directory; the run's GHDL --std and the sha256 prefix of its sources
+# follow). Each file line is the argument, the library when not work,
+# the GHDL options, then per tool the exit code and the lines of that
+# file it reports errors on; "~" marks a line whose only errors are
+# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
+# reports an error on every line both tools report one on
+# (semerr_check.go).
+tool ghdl 6.0.0
+tool nvc 1.23.0
+run corpus:vhdl93_only:main dir=testdata/corpus/vhdl93_only std=93 sha=60b147a3cd46c3cd
+ vhdl93_only.vhd ghdl=0 nvc=0
+ vhdl93_only_tb.vhd ghdl=0 nvc=0
+run corpus:vhdl93_only:std_2002 dir=testdata/corpus/vhdl93_only std=02 sha=53fcd021dc05a1dc
+ vhdl93_only.vhd ghdl=1@19,24,25,26,28,29,31,32 nvc=1@19,25,27,31
+run corpus:vhdl93_only:std_2008 dir=testdata/corpus/vhdl93_only std=08 sha=53fcd021dc05a1dc
+ vhdl93_only.vhd ghdl=1@12,13,14,19,22,24,26,28,29,31,32 nvc=1@12,18,19,22,31

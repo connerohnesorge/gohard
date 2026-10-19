@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type counter is protected\n    procedure inc;\n    impure function get return natural;\n  end protected counter;\nend;\n")

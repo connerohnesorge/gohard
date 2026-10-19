@@ -25,7 +25,8 @@
 //     and select statements (#30). The single-threaded server core
 //     receives with [Conn.Next], which waits for a message, a wake-up
 //     channel (a timer from the Clock door) or cancellation, so the
-//     core itself never needs a select. [Conn.Send] never blocks on
+//     core itself never needs a select. Input that has arrived always
+//     comes before a wake-up (see [Readier]). [Conn.Send] never blocks on
 //     I/O: messages go into an unbounded queue drained by the writer,
 //     so a client that writes while not reading cannot deadlock the
 //     server.

@@ -1,0 +1,3 @@
+# A library folder outside the project root (a vendor library): its
+# units resolve, its own files are not checked or counted.
+gohard check

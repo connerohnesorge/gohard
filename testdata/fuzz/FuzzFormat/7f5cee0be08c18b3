@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  function id generic (type t) parameter (x : t) return t;\n  procedure swap generic (type t) (a, b : inout t);\nend;\n")

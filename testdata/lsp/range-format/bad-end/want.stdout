@@ -1,0 +1,2 @@
+gohard: error[cli/usage]: gohard lsp range-format: the range end must be LINE:COL with a line and column of at least 1, not "4"; run 'gohard help' for usage
+summary: 1 errors, 0 warnings, 0 hints, 0 files

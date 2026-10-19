@@ -1,0 +1,3 @@
+core.vhd:1:8: hint[sema/opaque-allowed]: work.core is encrypted IP, allowed by allow_opaque
+top.vhd:2:14: warning[sema/unchecked-unit]: work.top(rtl) was not checked: it depends on opaque unit work.core
+summary: 0 errors, 1 warnings, 1 hints, 2 files

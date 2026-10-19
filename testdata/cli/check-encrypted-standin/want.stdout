@@ -1,0 +1,3 @@
+core.vhd:1:8: hint[sema/opaque-allowed]: work.core is encrypted IP, allowed by allow_opaque
+  models/core_model.vhd:2:8: note: units using work.core are checked against its stand-in in models/core_model.vhd (simulation.models)
+summary: 0 errors, 0 warnings, 1 hints, 3 files

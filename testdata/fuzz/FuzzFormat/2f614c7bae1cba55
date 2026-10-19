@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package body p is\n  function f (x : integer) return integer is\n  begin\n    return 1 when x > 0 else 0;\n  end function;\n  procedure q (x : integer) is\n  begin\n    return when x = 0;\n  end procedure;\nend;\n")

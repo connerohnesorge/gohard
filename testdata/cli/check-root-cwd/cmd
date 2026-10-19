@@ -1,0 +1,3 @@
+# Neither gohard.yaml nor .git above: the root is the current
+# directory, so ../outer.vhd (which does not parse) is not discovered.
+gohard check

@@ -1,0 +1,2 @@
+vhdl93_only_tb entity work.vhdl93_only_tb(sim)
+  vhdl93_only_tb.dut entity work.vhdl93_only(rtl)

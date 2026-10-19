@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- test: std=2002 kind=none\npackage p is\n  signal default : bit;\nend;\n")

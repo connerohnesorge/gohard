@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  alias s is << signal .tb.dut.s : bit >>;\n  alias c is << constant .tb.k : integer >>;\n  alias v is << variable .tb.p.v : integer >>;\nend;\n")

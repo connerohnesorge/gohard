@@ -1,0 +1,18 @@
+# Whole-file formatting (#32) on a utf-16 session: positions of the edits
+# count UTF-16 code units (the comment holds é and 😀, a surrogate pair).
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":null,"rootUri":"file:///work","capabilities":{"general":{"positionEncodings":["utf-16"]}}}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///work/top.vhd","languageId":"vhdl","version":1,"text":"-- é😀 top\nENTITY top IS\nport(a:in bit;\n     b : out bit);\nEND ENTITY;\n\n\n\narchitecture rtl of top is\nbegin\n      b<=a;   \nend;"}}}
+{"jsonrpc":"2.0","id":2,"method":"textDocument/formatting","params":{"textDocument":{"uri":"file:///work/top.vhd"},"options":{"tabSize":2,"insertSpaces":true}}}
+# Applying the edits gives a formatted file: formatting it again gives no edits.
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///work/top.vhd","version":2},"contentChanges":[{"text":"-- é😀 top\nentity top is\n  port (a : in bit;\n    b : out bit);\nend entity;\n\narchitecture rtl of top is\nbegin\n  b <= a;\nend;\n"}]}}
+{"jsonrpc":"2.0","id":3,"method":"textDocument/formatting","params":{"textDocument":{"uri":"file:///work/top.vhd"},"options":{"tabSize":2,"insertSpaces":true}}}
+# A project file that is not open is formatted from disk.
+{"jsonrpc":"2.0","id":4,"method":"textDocument/formatting","params":{"textDocument":{"uri":"file:///work/other.vhd"},"options":{"tabSize":2,"insertSpaces":true}}}
+# A file that does not parse and a document that is not VHDL get no edits.
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///work/broken.vhd","languageId":"vhdl","version":1,"text":"entity   broken is\n  port (\n"}}}
+{"jsonrpc":"2.0","id":5,"method":"textDocument/formatting","params":{"textDocument":{"uri":"file:///work/broken.vhd"},"options":{"tabSize":2,"insertSpaces":true}}}
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///work/notes.txt","languageId":"plaintext","version":1,"text":"entity   x is end;\n"}}}
+{"jsonrpc":"2.0","id":6,"method":"textDocument/formatting","params":{"textDocument":{"uri":"file:///work/notes.txt"},"options":{"tabSize":2,"insertSpaces":true}}}
+{"jsonrpc":"2.0","id":99,"method":"shutdown"}
+{"jsonrpc":"2.0","method":"exit"}

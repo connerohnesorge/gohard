@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type int_file is file of integer;\nend;\n")

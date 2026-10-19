@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package body p is\n  type counter is protected body\n    variable n : natural := 0;\n    procedure inc is\n    begin\n      n := n + 1;\n    end procedure;\n  end protected body counter;\nend;\n")

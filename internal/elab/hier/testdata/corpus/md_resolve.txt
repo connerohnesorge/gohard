@@ -1,0 +1,2 @@
+md_resolve_tb entity work.md_resolve_tb(tb)
+  md_resolve_tb.dut entity work.md_resolve(rtl)

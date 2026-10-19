@@ -1,0 +1,3 @@
+# top is checked against the stand-in, so mapping a port the stand-in
+# lacks is an error.
+gohard check

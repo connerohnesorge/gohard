@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\n  sequence req_ack (boolean r, q) is {r; q};\nbegin\n  cover {req_ack(a, b); c};\nend;\n")

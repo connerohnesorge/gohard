@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("context work.c1, work.c2;\nentity e is\nend;\n")

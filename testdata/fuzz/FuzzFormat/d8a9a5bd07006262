@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\nbegin\n  u : entity work.f port map (a => s, to_bit(b) => t, c(0) => u(1), d);\nend;\n")

@@ -1,0 +1,3 @@
+# big.vhd is over the 10 MB limit, so it is not parsed: fmt --check
+# must fail on it (format/not-parsed, exit 1), not report it clean.
+size big.vhd 10000001

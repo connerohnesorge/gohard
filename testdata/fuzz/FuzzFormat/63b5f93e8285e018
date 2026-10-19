@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("architecture a of e is\n  group g1 : pair (s1, s2);\nbegin\nend;\n")

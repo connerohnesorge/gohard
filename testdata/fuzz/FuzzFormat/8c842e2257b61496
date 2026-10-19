@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type int_ptr is access integer;\n  type vec_ptr is access bit_vector(0 to 7);\nend;\n")

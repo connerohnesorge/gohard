@@ -1,0 +1,2 @@
+gohard.yaml:2:17: error[config/enum]: format.keyword_case must be one of "lower", "upper" or "preserve", not shout
+summary: 1 errors, 0 warnings, 0 hints, 0 files

@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- A file with two design units and a trailing comment.\nentity e is\nend entity e;\n\narchitecture a of e is\nbegin\nend architecture a;\n-- end of file\n")

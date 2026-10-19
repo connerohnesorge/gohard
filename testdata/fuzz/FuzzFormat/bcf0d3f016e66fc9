@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("package p is\n  type fifo is protected\n    generic (depth : natural := 8);\n    procedure push (x : integer);\n  end protected fifo;\nend;\n")

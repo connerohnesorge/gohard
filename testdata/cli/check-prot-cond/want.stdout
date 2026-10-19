@@ -1,0 +1,12 @@
+prot_cond.vhd:7:14: error[unsupported/construct]: shared-variable ports of protected type is not supported yet (planned for v1.1)
+prot_cond_pkg.vhd:48:5: error[unsupported/construct]: conditional return ... when is not supported yet (planned for v1.1)
+prot_cond_tb.vhd:6:9: error[unsupported/construct]: std.reflection is not supported yet (planned for v1.1)
+prot_cond_tb.vhd:31:14: error[unsupported/construct]: inferred constraints is not supported yet (planned for v1.1)
+prot_cond_tb.vhd:33:31: error[unsupported/construct]: 64-bit integers is not supported yet (planned for v1.1)
+prot_cond_tb.vhd:67:12: error[unsupported/construct]: std.env VHDL_VERSION and TOOL_* functions is not supported yet (planned for v1.1)
+prot_cond_tb.vhd:71:12: error[unsupported/construct]: std.env GETENV is not supported yet (planned for v1.1)
+prot_cond_tb.vhd:73:12: error[unsupported/construct]: std.env FILE_NAME/FILE_PATH/FILE_LINE is not supported yet (planned for v1.1)
+prot_cond_tb.vhd:84:18: error[unsupported/construct]: generic maps on subprogram calls is not supported yet (planned for v1.1)
+prot_cond_tb.vhd:91:12: error[unsupported/construct]: 'IMAGE for composite types is not supported yet (planned for v1.1)
+prot_cond_tb.vhd:98:12: error[unsupported/construct]: std.env assert/PSL counter-and-format API is not supported yet (planned for v1.1)
+summary: 11 errors, 0 warnings, 0 hints, 3 files

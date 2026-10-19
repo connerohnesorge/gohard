@@ -202,6 +202,12 @@ func NewScript(chunks ...[]byte) *Script {
 	return &Script{chunks: slices.Clone(chunks)}
 }
 
+// Ready reports true: a Script never waits, the whole script has
+// arrived when it is made. jsonrpc2.Conn therefore delivers all of it
+// before the server core runs a step, so a simulated session's output
+// depends only on the script (P1).
+func (s *Script) Ready() bool { return true }
+
 // Read implements io.Reader.
 func (s *Script) Read(p []byte) (int, error) {
 	s.mu.Lock()
