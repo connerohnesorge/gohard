@@ -237,6 +237,9 @@ func (d *decoder) bool() bool {
 	}
 	v := d.buf[d.off]
 	d.off++
+	if v > 1 {
+		d.fail() // the encoder writes 0 or 1
+	}
 	return v != 0
 }
 

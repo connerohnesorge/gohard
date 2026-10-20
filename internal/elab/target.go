@@ -35,11 +35,9 @@ func (d *Design) Target(in *hier.Instance, e *sema.Expr, ix Indexer,
 
 func (d *Design) part(in *hier.Instance, e *sema.Expr, ix Indexer,
 ) (sim.SigID, int, eval.Value, error) {
-	if e == nil {
-		return 0, 0, eval.Value{}, ErrNotSignal
-	}
-	switch e.Kind {
-	case sema.ExprName:
+	return partFrom(e, ix, func(e *sema.Expr) (sim.SigID, int,
+		eval.Value, error,
+	) {
 		x := e.Decl
 		if x == nil {
 			return 0, 0, eval.Value{}, ErrNotSignal
@@ -49,8 +47,22 @@ func (d *Design) part(in *hier.Instance, e *sema.Expr, ix Indexer,
 			return 0, 0, eval.Value{}, ErrNotSignal
 		}
 		return id, 0, d.Model.Signals[id].Init, nil
+	})
+}
+
+// partFrom resolves the indexed, sliced and selected name e to its
+// first leaf and shape; name resolves the innermost simple name.
+func partFrom(e *sema.Expr, ix Indexer,
+	name func(*sema.Expr) (sim.SigID, int, eval.Value, error),
+) (sim.SigID, int, eval.Value, error) {
+	if e == nil {
+		return 0, 0, eval.Value{}, ErrNotSignal
+	}
+	switch e.Kind {
+	case sema.ExprName:
+		return name(e)
 	case sema.ExprIndex:
-		id, first, shape, err := d.part(in, e.Prefix, ix)
+		id, first, shape, err := partFrom(e.Prefix, ix, name)
 		if err != nil {
 			return 0, 0, eval.Value{}, err
 		}
@@ -71,12 +83,12 @@ func (d *Design) part(in *hier.Instance, e *sema.Expr, ix Indexer,
 			}
 			lin = lin*r.Len() + r.Offset(v.I)
 		}
-		for _, el := range shape.E[:lin] {
-			first += leaves(el)
+		if lin > 0 {
+			first += int(lin) * leaves(shape.E[0])
 		}
 		return id, first, shape.E[lin], nil
 	case sema.ExprSlice:
-		id, first, shape, err := d.part(in, e.Prefix, ix)
+		id, first, shape, err := partFrom(e.Prefix, ix, name)
 		if err != nil {
 			return 0, 0, eval.Value{}, err
 		}
@@ -100,8 +112,8 @@ func (d *Design) part(in *hier.Instance, e *sema.Expr, ix Indexer,
 			return 0, 0, eval.Value{}, eval.SliceError(r, ar)
 		}
 		lo := ar.Offset(r.Left)
-		for _, el := range shape.E[:lo] {
-			first += leaves(el)
+		if lo > 0 {
+			first += int(lo) * leaves(shape.E[0])
 		}
 		out.E = shape.E[lo : lo+r.Len()]
 		if out.T != nil && out.T.Bounds != nil {
@@ -109,7 +121,7 @@ func (d *Design) part(in *hier.Instance, e *sema.Expr, ix Indexer,
 		}
 		return id, first, out, nil
 	case sema.ExprSelect:
-		id, first, shape, err := d.part(in, e.Prefix, ix)
+		id, first, shape, err := partFrom(e.Prefix, ix, name)
 		if err != nil {
 			return 0, 0, eval.Value{}, err
 		}
@@ -159,6 +171,14 @@ func isLeaf(v eval.Value) bool {
 func leaves(v eval.Value) int {
 	if isLeaf(v) {
 		return 1
+	}
+	if v.T != nil && v.T.Kind == eval.KindArray {
+		// Every element of an array has the element subtype, so the
+		// same number of leaves.
+		if len(v.E) == 0 {
+			return 0
+		}
+		return len(v.E) * leaves(v.E[0])
 	}
 	n := 0
 	for _, e := range v.E {

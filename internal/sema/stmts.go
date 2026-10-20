@@ -283,6 +283,7 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 			continue
 		}
 		var convType *Type
+		var part *Expr
 		if fn := item.Formal(); !fn.IsZero() {
 			tok := leftmostToken(fn.Node)
 			key := TokenKey(tok)
@@ -320,7 +321,9 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 			if conv {
 				a.conversionName(fn.Node, f)
 			} else if fn.Kind() != cst.KindSimpleName {
-				a.lenientFormal(fn.Node)
+				if part = a.formalPart(fn.Node, f); part == nil {
+					a.lenientFormal(fn.Node)
+				}
 				if f != nil {
 					a.formalStatic(fn.Node) // staticrules.go
 				}
@@ -336,7 +339,7 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 		if convType != nil && !a.conversionSyntax(item.Actual().Node) {
 			want = convType // T(formal) => actual: the actual is a T
 		}
-		as := Association{Formal: f, Node: item.Node}
+		as := Association{Formal: f, Node: item.Node, Part: part}
 		v := item.Actual()
 		if v.IsZero() || v.Kind() == cst.KindOpenExpr {
 			out = append(out, as)
@@ -365,6 +368,70 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 		out = append(out, as)
 	}
 	return out
+}
+
+// formalPart types the formal designator fn of a subelement
+// association of formal f (LRM 6.5.7.1): an indexed, sliced or
+// selected name of f, nested to any depth. It returns nil when fn has
+// another shape or f is not an object.
+func (a *analyzer) formalPart(fn cst.Node, f *Decl) *Expr {
+	if f == nil || !f.Kind.IsObject() {
+		return nil
+	}
+	saved := a.quiet
+	a.quiet = true // assocrules.go and formalStatic report problems
+	defer func() { a.quiet = saved }()
+	var walk func(n cst.Node) *Expr
+	walk = func(n cst.Node) *Expr {
+		switch n.Kind() {
+		case cst.KindSimpleName:
+			if TokenKey(n.FirstToken()) != f.Name {
+				return nil
+			}
+			return &Expr{Kind: ExprName, Node: n, Decl: f,
+				Type: orUnknown(f.Type)}
+		case cst.KindCallOrIndexName:
+			c := cst.CallOrIndexName{Node: n}
+			v := walk(c.Prefix().Node)
+			if v == nil {
+				return nil
+			}
+			return a.index(n, v, c.Args())
+		case cst.KindSliceName:
+			s := cst.SliceName{Node: n}
+			v := walk(s.Prefix().Node)
+			if v == nil {
+				return nil
+			}
+			b := v.Type.Base()
+			if b == nil || b.Class != TypeArray || b.Dims() != 1 {
+				return nil
+			}
+			rc := a.discreteRange(sliceRange(s), firstIndex(b))
+			st := NewSubtype(v.Type)
+			st.IndexCons = []*RangeCons{rc}
+			return &Expr{Kind: ExprSlice, Node: n, Prefix: v, Range: rc,
+				Type: st}
+		case cst.KindSelectedName:
+			s := cst.SelectedName{Node: n}
+			v := walk(s.Prefix().Node)
+			if v == nil {
+				return nil
+			}
+			suf := s.Suffix()
+			r := a.selectInValue(v, suf, TokenKey(suf), RefRead)
+			if r.unknown || r.expr == nil || r.expr.Kind != ExprSelect {
+				return nil
+			}
+			return r.expr
+		}
+		return nil
+	}
+	e := walk(fn)
+	if e == nil || e.Kind == ExprName || e.Type.Unknown() {
+		return nil
+	}
+	return e
 }
 
 // conversionFormal returns the formal named by fn when fn is a

@@ -165,7 +165,7 @@ func candidate(cands []string, name string) (string, bool) {
 }
 
 // simTask is a run in slices: slice 1 elaborates (simrun.Start), each
-// later slice runs simrun.Slice kernel cycles. The kernel is mutable,
+// later slice i runs simrun.SliceAt(i) kernel cycles. The kernel is mutable,
 // so the task keeps it in shared state tagged with the number of
 // slices it ran; a continuation that finds the state at another
 // position (a forked server State resuming an older continuation)
@@ -188,12 +188,12 @@ func (t simTask) Run(int) server.Slice[server.SimResult] {
 	if t.pos == 0 || sh.r == nil || sh.pos != t.pos {
 		sh = &simShared{r: simrun.Start(t.opts), pos: 1}
 		for sh.pos < t.pos {
-			sh.r.Step(simrun.Slice)
+			sh.r.Step(simrun.SliceAt(sh.pos))
 			sh.pos++
 		}
 	}
 	if t.pos > 0 {
-		sh.r.Step(simrun.Slice)
+		sh.r.Step(simrun.SliceAt(sh.pos))
 		sh.pos++
 	}
 	if sh.r.Done() {

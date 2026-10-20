@@ -64,4 +64,9 @@ type Association struct {
 	Formal *Decl
 	Actual *Expr
 	Node   cst.Node
+	// Part is the formal designator of a subelement association
+	// (LRM 6.5.7.1: port(3) => s, port(7 downto 4) => t, port.f => u):
+	// an indexed, sliced or selected name whose innermost prefix is an
+	// ExprName of Formal. Nil when the whole formal is associated.
+	Part *Expr
 }

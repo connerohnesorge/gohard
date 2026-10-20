@@ -29,6 +29,14 @@ func leaves(v eval.Value) int {
 	if isLeaf(v) {
 		return 1
 	}
+	if v.T != nil && v.T.Kind == eval.KindArray {
+		// Every element of an array has the element subtype, so the
+		// same number of leaves.
+		if len(v.E) == 0 {
+			return 0
+		}
+		return len(v.E) * leaves(v.E[0])
+	}
 	n := 0
 	for _, e := range v.E {
 		n += leaves(e)
@@ -62,6 +70,13 @@ func rebuild(tmpl eval.Value, flat []eval.Value) (eval.Value, int) {
 func leafAt(tmpl eval.Value, i int) (eval.Value, bool) {
 	if isLeaf(tmpl) {
 		return tmpl, i == 0
+	}
+	if tmpl.T != nil && tmpl.T.Kind == eval.KindArray && len(tmpl.E) > 0 {
+		n := leaves(tmpl.E[0]) // the same for every element
+		if i < 0 || n == 0 || i/n >= len(tmpl.E) {
+			return eval.Value{}, false
+		}
+		return leafAt(tmpl.E[i/n], i%n)
 	}
 	for _, e := range tmpl.E {
 		n := leaves(e)

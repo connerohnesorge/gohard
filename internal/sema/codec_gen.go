@@ -17,7 +17,7 @@ import (
 )
 
 // codecSchema is the hash of the code below.
-const codecSchema = "bdece0e9580382ac2a9bec42954d9cc608d09fd81aefd204917d7f1e67b7b217"
+const codecSchema = "fae1f19402625ce264e5bf5be4a30c2755627cb07b11c68dcd9f2bf8edb826b5"
 
 // encTables and decTables hold one table per pointer type.
 type encTables struct {
@@ -1980,12 +1980,14 @@ func (e *encoder) s_Association(v *Association) {
 	e.p_Decl(v.Formal)
 	e.p_Expr(v.Actual)
 	e.node(v.Node)
+	e.p_Expr(v.Part)
 }
 
 func (d *decoder) s_Association(v *Association) {
 	v.Formal = d.p_Decl()
 	v.Actual = d.p_Expr()
 	v.Node = d.node()
+	v.Part = d.p_Expr()
 }
 
 func (e *encoder) s_Alt(v *Alt) {

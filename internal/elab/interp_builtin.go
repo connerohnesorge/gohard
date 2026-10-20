@@ -411,7 +411,7 @@ func (m *machine) fileObject(d *sema.Decl) (slot, error) {
 				" must be read_mode, write_mode or append_mode")
 		}
 	}
-	name, err := m.literalName(d, nameNode.Text())
+	name, err := m.literalName(d, nameNode)
 	if err != nil {
 		return slot{}, err
 	}
@@ -431,12 +431,20 @@ func (m *machine) fileObject(d *sema.Decl) (slot, error) {
 	return s, nil
 }
 
-// literalName returns the value of the logical name text of a file
-// declaration: a string literal or the name of a string constant.
-func (m *machine) literalName(d *sema.Decl, text string) (string, error) {
-	text = strings.TrimSpace(text)
-	if len(text) >= 2 && text[0] == '"' && text[len(text)-1] == '"' {
+// literalName returns the value of the logical name n of a file
+// declaration: a string expression (LRM 6.4.2.5).
+func (m *machine) literalName(d *sema.Decl, n cst.Node) (string, error) {
+	text := strings.TrimSpace(n.Text())
+	if len(text) >= 2 && text[0] == '"' && text[len(text)-1] == '"' &&
+		n.Kind() == cst.KindLiteralExpr {
 		return strings.ReplaceAll(text[1:len(text)-1], `""`, `"`), nil
+	}
+	if e := m.w.prog.expr(d.File, n); e != nil {
+		v, err := m.ev.Eval(e, m.b)
+		if err != nil {
+			return "", err
+		}
+		return stringOf(v), nil
 	}
 	if f := d.File; f != nil {
 		key := sema.Key(strings.ToLower(text))

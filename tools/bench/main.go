@@ -220,6 +220,14 @@ func (d *driver) measure(p Project) (result, error) {
 	}
 	r.Notes = append(r.Notes, r.Warm.Notes...)
 	if p.Testbench != "" {
+		// The warm saves left the target edited on disk (and the
+		// edits may not analyze): the runs start from a fresh copy.
+		if !p.SimOnly {
+			dir = filepath.Join(tmp, p.Name+"-sim")
+			if _, err := p.Build(d.repo, dir); err != nil {
+				return r, err
+			}
+		}
 		d.quiet()
 		for range d.sims {
 			out, _, err := d.spawn("sim", dir, p, 1, d.seed)

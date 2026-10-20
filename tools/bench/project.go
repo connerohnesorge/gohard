@@ -48,24 +48,56 @@ var Projects = []Project{
 			{"testdata/neorv32/sim", "sim"},
 			{"testdata/libs/osvvm", "osvvm"},
 		},
-		// OSVVM's deprecated copies redeclare units; the template has
-		// build-script placeholders (osvvm.pro compiles neither).
-		Skip: []string{"rtl/verilog", "osvvm/deprecated",
-			"osvvm/OsvvmSettingsPkg_template.vhd"},
-		Config:    "libraries:\n  neorv32: [rtl, sim]\n  osvvm: [osvvm]\n",
+		// OSVVM as osvvm.pro compiles it for VHDL-2008 under GHDL: the
+		// deprecated/*_c stand-ins of the VHDL-2019 packages instead of
+		// the 2019 files, the default coverage API, no demos and no
+		// template (it has build-script placeholders).
+		Skip: append([]string{"rtl/verilog", "osvvm/demo",
+			"osvvm/OsvvmSettingsPkg_template.vhd"}, osvvm2008Skip...),
+		// The time budget bounds the run: the dual-core processor
+		// simulates about a microsecond in a few seconds.
+		Config: "libraries:\n  neorv32: [rtl, sim]\n  osvvm: [osvvm]\n" +
+			"simulation:\n  time_budget: \"1 us\"\n",
 		Target:    "rtl/core/neorv32_cpu_control.vhd",
 		Testbench: "neorv32_tb", TestbenchFile: "sim/neorv32_tb.vhd",
 	},
 	{
 		// A testbench that runs until the step budget stops it, so
-		// the kernel reports progress (the large project's testbench
-		// does not run while the project has errors).
+		// the kernel reports progress.
 		Name:      "sim",
 		Copies:    [][2]string{{"testdata/corpus/budget_hang", "."}},
 		Target:    "budget_hang.vhd",
 		Testbench: "budget_hang_tb", TestbenchFile: "budget_hang_tb.vhd",
 		SimOnly: true,
 	},
+}
+
+// osvvm2008Skip are the OSVVM files osvvm.pro does not compile for
+// VHDL-2008 under GHDL (it picks one of each alternative).
+var osvvm2008Skip = []string{
+	// VHDL-2019 only: osvvm.pro compiles deprecated/*_c instead.
+	"osvvm/LanguageSupport2019Pkg.vhd", "osvvm/FileLinePathPkg.vhd",
+	"osvvm/AssertApiPkg.vhd", "osvvm/DynamicVectorGenericPkg.vhd",
+	"osvvm/DynamicVectorPkg_instances.vhd", "osvvm/RandomPkg2019.vhd",
+	// Other simulators' coverage APIs and the optional MemoryPkgIs01
+	// (each redeclares a unit).
+	"osvvm/CoverageVendorApiPkg_Aldec.vhd",
+	"osvvm/CoverageVendorApiPkg_NVC.vhd", "osvvm/MemoryPkgIs01.vhd",
+	// Alternatives for other tools and older versions.
+	"osvvm/deprecated/ClockResetPkg_2024_05.vhd",
+	"osvvm/deprecated/CoveragePkg_xilinx.vhd",
+	"osvvm/deprecated/MemoryGenericPkg_xilinx.vhd",
+	"osvvm/deprecated/MemoryPkg_c.vhd",
+	"osvvm/deprecated/MemoryPkg_orig_c.vhd",
+	"osvvm/deprecated/ScoreboardGenericPkg_pure.vhd",
+	"osvvm/deprecated/ScoreboardPkg_int_c.vhd",
+	"osvvm/deprecated/ScoreboardPkg_IntV_c.vhd",
+	"osvvm/deprecated/ScoreboardPkg_signed_c.vhd",
+	"osvvm/deprecated/ScoreboardPkg_slv_c.vhd",
+	"osvvm/deprecated/ScoreboardPkg_unsigned_c.vhd",
+	"osvvm/deprecated/SetGetBoundedPkg_Instances.vhd",
+	"osvvm/deprecated/TbUtilPkg_xilinx.vhd",
+	"osvvm/deprecated/TextUtilPkg_xilinx.vhd",
 }
 
 func projectByName(name string) (Project, bool) {

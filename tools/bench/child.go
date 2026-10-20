@@ -231,6 +231,17 @@ func (c *client) simProgress(a childArgs, out childOut) (childOut,
 	if _, _, err := c.firstDiagnostics(5 * time.Minute); err != nil {
 		return out, err
 	}
+	if a.cpuprofile != "" {
+		f, err := os.Create(a.cpuprofile)
+		if err != nil {
+			return out, err
+		}
+		if err := pprof.StartCPUProfile(f); err != nil {
+			return out, err
+		}
+		defer f.Close()
+		defer pprof.StopCPUProfile()
+	}
 	id := c.next + 1
 	c.next = id
 	t0 := time.Now()
@@ -281,6 +292,9 @@ func (c *client) simProgress(a childArgs, out childOut) (childOut,
 	if method(m.m) == "" {
 		out.Notes = append(out.Notes, "the run finished before any "+
 			"kernel progress: its response counts")
+		if e := m.m["error"]; e != nil {
+			out.Notes = append(out.Notes, "the run failed: "+string(e))
+		}
 	}
 	out.SimBegin = append(out.SimBegin, begin)
 	if elab >= 0 {

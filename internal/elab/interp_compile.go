@@ -140,7 +140,21 @@ func (pc *progCache) expr(f *sema.File, n cst.Node) *sema.Expr {
 		}
 		pc.index[f] = idx
 	}
-	return idx[keyOf(n)]
+	for range 16 {
+		if e := idx[keyOf(n)]; e != nil {
+			return e
+		}
+		// A parenthesized expression is the expression it encloses
+		// (LRM 9.1): sema types the inner node.
+		if n.Kind() != cst.KindParenExpr {
+			return nil
+		}
+		n = cst.ParenExpr{Node: n}.Inner().Node
+		if n.IsZero() {
+			return nil
+		}
+	}
+	return nil
 }
 
 // errNoExpr reports syntax the typed tree has no expression for.

@@ -230,6 +230,13 @@ func (k *Kernel) buildNets() error {
 	ss := k.m.Signals
 	k.sigs = make([]sigState, len(ss))
 	state := make([]uint8, len(ss)) // 0 new, 1 visiting, 2 done
+	owned := 0
+	for i := range ss {
+		if !ss[i].Collapsed {
+			owned += leaves(ss[i].Init)
+		}
+	}
+	k.nets = slices.Grow(k.nets, owned) // no regrowth of a large net table
 	var build func(i int) error
 	build = func(i int) error {
 		switch state[i] {
@@ -242,7 +249,33 @@ func (k *Kernel) buildNets() error {
 		s := &ss[i]
 		n := leaves(s.Init)
 		st := &k.sigs[i]
-		if s.Collapsed {
+		if s.Collapsed && s.Pieces != nil {
+			st.nets = make([]int32, 0, n)
+			for _, pc := range s.Pieces {
+				if int(pc.Sig) < 0 || int(pc.Sig) >= len(ss) {
+					return fmt.Errorf("sim: signal %s: bad actual",
+						s.Path)
+				}
+				if err := build(int(pc.Sig)); err != nil {
+					return err
+				}
+				of := k.sigs[pc.Sig].nets
+				hi := pc.First + pc.N
+				if pc.N < 0 {
+					hi = len(of)
+				}
+				if pc.First < 0 || hi > len(of) || hi < pc.First {
+					return fmt.Errorf("sim: signal %s: elements %d..%d "+
+						"outside %s", s.Path, pc.First, hi-1,
+						ss[pc.Sig].Path)
+				}
+				st.nets = append(st.nets, of[pc.First:hi]...)
+			}
+			if len(st.nets) != n {
+				return fmt.Errorf("sim: signal %s: pieces give %d of %d "+
+					"elements", s.Path, len(st.nets), n)
+			}
+		} else if s.Collapsed {
 			if int(s.Of) < 0 || int(s.Of) >= len(ss) {
 				return fmt.Errorf("sim: signal %s: bad actual", s.Path)
 			}

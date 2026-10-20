@@ -80,6 +80,11 @@ type Signal struct {
 	Collapsed bool
 	Of        SigID
 	Offset    int
+	// Pieces, when non-nil on a Collapsed signal, put its elements
+	// onto the concatenation of these parts of other signals instead
+	// (a port associated subelement by subelement, LRM 6.5.7.1); Of
+	// and Offset then name the first piece.
+	Pieces []Target
 	// Implicit, Prefix and Delay describe an implicit signal; Delay is
 	// T in femtoseconds. Implicit signals are not traced.
 	Implicit ImplicitKind

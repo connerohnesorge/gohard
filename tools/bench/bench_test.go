@@ -2,12 +2,17 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"math"
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
 	"time"
+
+	"github.com/connerohnesorge/gohard/internal/cli"
+	"github.com/connerohnesorge/gohard/internal/env/realenv"
 )
 
 const sample = `library ieee;
@@ -200,6 +205,29 @@ func TestProjects(t *testing.T) {
 		if Keystrokes(text, 1, 2) == nil || Names(text, 1, 2) == nil {
 			t.Errorf("%s: target has no edit lines or names", p.Name)
 		}
+	}
+}
+
+// The large project is the files GHDL compiles for NEORV32's
+// testbench with OSVVM, so it analyzes with no error: its testbench
+// is the first-simulation-progress measure.
+func TestLargeProjectChecks(t *testing.T) {
+	if testing.Short() {
+		t.Skip("analyzes NEORV32 and OSVVM")
+	}
+	p, _ := projectByName("large")
+	dir := t.TempDir()
+	if _, err := p.Build("../..", dir); err != nil {
+		t.Fatal(err)
+	}
+	var stdout, stderr bytes.Buffer
+	e := realenv.New(realenv.Options{Stdout: &stdout, Stderr: &stderr,
+		Dir: dir})
+	code := cli.Run(context.Background(), e, []string{"check"})
+	if code != 0 || !strings.Contains(stdout.String(),
+		"summary: 0 errors") {
+		t.Errorf("gohard check: exit %d\n%s%s", code, stdout.String(),
+			stderr.String())
 	}
 }
 

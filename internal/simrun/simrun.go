@@ -34,6 +34,21 @@ var DefaultCode CodeFunc = elab.Interpret
 // Slice is the number of kernel cycles between cancellation checks.
 const Slice = 256
 
+// SliceAt is the number of kernel cycles of the editor's slice i
+// (1-based): 1, 2, 4, ... up to Slice. The first simulated-time report
+// then follows the first cycle (the initialization of a large design
+// takes most of a slice's time); it depends on i only, so a rebuilt
+// run reaches every position in the same cycles.
+func SliceAt(i int) int {
+	if i < 1 {
+		i = 1
+	}
+	if i > 9 {
+		return Slice
+	}
+	return min(Slice, 1<<(i-1))
+}
+
 // Options configure Run.
 type Options struct {
 	Result *sema.Result

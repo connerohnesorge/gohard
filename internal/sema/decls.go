@@ -354,7 +354,9 @@ func (a *analyzer) fileDecl(fd cst.FileDecl) {
 		a.expr(kind, a.stdType("file_open_kind"))
 	}
 	if !name.IsZero() {
-		a.expr(name, a.stdType("string"))
+		// The logical name is any string expression (LRM 6.4.2.5),
+		// evaluated when the declaration is elaborated.
+		a.u.Exprs = append(a.u.Exprs, a.expr(name, a.stdType("string")))
 	}
 	done()
 	for tok := range fd.Names().Names() {
