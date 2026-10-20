@@ -1,0 +1,3 @@
+# An unmapped vendor library that no project folder declares gets one
+# fix per install the `gohard libs detect` search finds (#1, #34).
+gohard lsp codeaction --at top.vhd:1:9

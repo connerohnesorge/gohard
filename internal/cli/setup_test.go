@@ -44,6 +44,10 @@ type setup struct {
 	// viewers, when set, replaces env.Executor with a simulated one
 	// whose PATH holds exactly these programs (Open waveform, #36).
 	viewers *[]string
+	// hostOS and hostRoot, when set, make `gohard libs detect` search
+	// a host of that OS whose file-system root is the folder hostRoot
+	// (libs.WithHost, #1).
+	hostOS, hostRoot string
 	// restore lists paths chmod made unreadable; restorePerms makes
 	// them readable again after the run.
 	restore []string
@@ -167,6 +171,11 @@ func applySetup(t tb, dir, work string) setup {
 				bad()
 			}
 			st.rand = &v
+		case f[0] == "libs-host" && len(f) == 3:
+			st.hostOS, st.hostRoot = f[1], at(f[2])
+			if err := os.MkdirAll(st.hostRoot, 0o755); err != nil {
+				t.Fatal(err)
+			}
 		case f[0] == "viewers":
 			vs := slices.Clone(f[1:])
 			st.viewers = &vs

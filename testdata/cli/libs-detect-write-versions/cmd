@@ -1,0 +1,2 @@
+# Two Vivado versions: --write lists them, writes nothing and exits 2.
+gohard libs detect --write

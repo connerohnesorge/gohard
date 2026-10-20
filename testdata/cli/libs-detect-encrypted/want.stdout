@@ -1,0 +1,6 @@
+libraries:
+  # Xilinx Vivado 2023.2 at /opt/Xilinx/Vivado/2023.2 (found via the usual install folder)
+  unisim: ['/opt/Xilinx/Vivado/2023.2/data/vhdl/src/unisims']
+  unimacro: ['/opt/Xilinx/Vivado/2023.2/data/vhdl/src/unimacro']
+  # not mapped: secureip at /opt/Xilinx/Vivado/2023.2/data/secureip is IEEE 1735 encrypted IP
+allow_opaque: [unisim.pcie_core]

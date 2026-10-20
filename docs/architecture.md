@@ -64,6 +64,7 @@ Env, maps SIGINT/SIGTERM to 130/143, and calls `cli.Run`.
 | 4 | `internal/stdlib` | vendored IEEE-P1076 `1076-2019` `std`/`ieee`, per-standard views, integrity hashes, prebuilt | #33 |
 | 4 | `internal/workspace` | file discovery, library mapping, snapshots | #34 |
 | 5 | `internal/sema` | scopes, names, types, overloads, static evaluation (shared evaluator) | #34 |
+| 4 | `internal/libs` | `gohard libs detect`: the read-only search of vendor installs (Vivado, Quartus, Diamond), vendor variables, `PATH` and GHDL library indexes through `env.FS`/`Getenv`; the `gohard.yaml` edits shared with the "library not found" quick fix | #1 |
 | 5 | `internal/resolve` | queries over sema results: definition, references, hover data | #34 |
 | 6 | `internal/elab` | lowers a resolved design to a compact model; instance paths like `tb.dut.u0` | #35 |
 | 6 | `internal/sim` | single-threaded discrete-event kernel ordered by (time, delta, process sequence) | #35 |
@@ -244,6 +245,7 @@ keeps its letter case.
 | `testdata/seeds/<pkg>/` | committed generator failures and LSP sessions, replayed by `go test` | #29 |
 | `testdata/libs/` | pinned real libraries (OSVVM, UVVM, VUnit, regression sources) as submodules | #1, #8 |
 | `testdata/stubs/` | CI-only vendor stub packages | #1 |
+| `testdata/libsguide/` | the `docs/libraries.md` examples as projects CI checks | #1 |
 
 `-update` refreshes goldens. CI (#30) runs build, vet, test, `gofmt`,
 `golines -m 80`, generated-file sync, `detlint`, fuzz-corpus replay and

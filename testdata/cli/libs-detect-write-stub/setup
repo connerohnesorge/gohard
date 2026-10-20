@@ -1,0 +1,4 @@
+libs-host linux sys
+env HOME=/home/u
+env PATH=/usr/bin:/bin
+cwd sys/home/u/proj

@@ -14,6 +14,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/elab/hier"
 	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/internal/libs"
 	"github.com/connerohnesorge/gohard/internal/parser"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/server"
@@ -30,6 +31,22 @@ type Options struct {
 	// only how fast a slice finishes, never a result.
 	Jobs  env.Jobs
 	Limit int
+	// Probe, when set, observes each analysis (the #19 latency
+	// benchmark): sema's phases, plus "parse" as an analysis starts,
+	// "hierarchy" before the elaboration checks and "analyzed" once
+	// the diagnostics are grouped. It never changes a result.
+	Probe *sema.Probe
+	// Libraries is the host the "library not found" quick fix
+	// searches for vendor libraries like `gohard libs detect` (#1); a
+	// nil FS turns that search off.
+	Libraries libs.Host
+}
+
+// phase reports the start of an analysis phase to the probe.
+func (a *Analyzer) phase(name string) {
+	if pr := a.opts.Probe; pr != nil && pr.Phase != nil {
+		pr.Phase(name)
+	}
 }
 
 // Analyzer is the server.Analyzer of `gohard lsp`. Methods it does not
@@ -110,6 +127,7 @@ func (a *Analyzer) Analysis(snap *server.Snapshot,
 ) server.Task[*Analysis] {
 	return server.TaskFunc[*Analysis](func(budget int,
 	) server.Slice[*Analysis] {
+		a.phase("parse")
 		p := a.plan(snap, budget)
 		return server.Slice[*Analysis]{Next: p.parse(0),
 			Report: p.report(0)}
@@ -301,7 +319,7 @@ func (p *plan) analyze() *Analysis {
 		return r.at(p.snap)
 	}
 	an := &Analysis{Snap: p.snap, key: p.key,
-		uriOf: map[string]string{}}
+		uriOf: map[string]string{}, libs: p.a.opts.Libraries}
 	for _, s := range p.srcs {
 		an.uriOf[s.path] = s.doc.URI
 	}
@@ -309,7 +327,8 @@ func (p *plan) analyze() *Analysis {
 	ds = append(ds, p.snap.Discovery...)
 	if len(p.srcs) > 0 {
 		in := sema.Input{Config: p.cfg, ToolVersion: p.a.opts.ToolVersion,
-			Jobs: p.a.opts.Jobs, Limit: p.a.opts.Limit}
+			Jobs: p.a.opts.Jobs, Limit: p.a.opts.Limit,
+			Probe: p.a.opts.Probe}
 		for i, s := range p.srcs {
 			t := p.trees[i]
 			if t == nil { // the trees came from a stored analysis
@@ -320,9 +339,11 @@ func (p *plan) analyze() *Analysis {
 		}
 		an.Result = sema.Analyze(in)
 		ds = append(ds, an.Result.Diagnostics...)
+		p.a.phase("hierarchy")
 		ds = append(ds, hier.Build(an.Result, hier.Options{}).Diagnostics...)
 	}
 	an.Diagnostics = group(an, diag.Normalize(ds))
+	p.a.phase("analyzed")
 	for i, s := range p.srcs {
 		if f, ok := an.Result.File(s.path); ok && p.trees[i] == nil {
 			p.trees[i] = f.Parse

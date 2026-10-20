@@ -65,7 +65,7 @@ Triggers: daily schedule and manual dispatch (input `fuzztime`, default
 | Every corpus design at 64 seeds | `corpus-seeds.sh` (`SEEDS=64`, the default): `TestCorpus -corpus.seeds=64 -corpus.require-sim`, then `go run ./tools/oracle trace tree golden` | wired; fails while the sequential interpreter is missing |
 | Full parser-regression list (`pr` and `nightly` submodules) | `regression.sh nightly` | placeholder; later #31 |
 | Replay every LSP session in `testdata/seeds/` | `lsp-seeds.sh` | wired (`TestSeeds`, `TestLSPReplaySeeds`) |
-| Benchmarks (#19, #22), recorded, never failing | `bench.sh` | wired; runs every `Benchmark*` that exists, uploads `bench.txt` |
+| Benchmarks (#19, #22), recorded, never failing | `bench.sh` | wired; runs every `Benchmark*` that exists and the #19 latency benchmark (`tools/bench`), uploads `bench.txt` |
 
 Crash pull requests: `fuzz.sh` moves the input Go wrote to
 `<pkg>/testdata/fuzz/<Target>/<id>` to the repo-root

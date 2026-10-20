@@ -1,0 +1,5 @@
+standard: "2019"
+libraries:
+  # Xilinx Vivado 2024.1 at /opt/Xilinx/Vivado/2024.1 (gohard libs detect)
+  unisim: ['/opt/Xilinx/Vivado/2024.1/data/vhdl/src/unisims']
+  unimacro: ['/opt/Xilinx/Vivado/2024.1/data/vhdl/src/unimacro']

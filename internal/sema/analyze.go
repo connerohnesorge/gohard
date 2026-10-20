@@ -47,6 +47,27 @@ type Input struct {
 	// language server cancels stale analyses this way, P7). A result
 	// is never partial.
 	Stop func() bool
+	// Probe, when set, observes the phases of the analysis (the #19
+	// latency benchmark). It never changes the result.
+	Probe *Probe
+}
+
+// Probe observes an analysis without changing it: Phase is called as
+// each phase starts ("units": names, types and overloads of every
+// unit; "cross-file": the checks across units and files; "static":
+// static evaluation; "done": the result is built), and Overload as
+// each outermost overload resolution starts, returning the function
+// called when it ends. Overload is called from the job runner's
+// workers, so it must be safe for concurrent use. Either may be nil.
+type Probe struct {
+	Phase    func(name string)
+	Overload func() (end func())
+}
+
+func (s *session) phase(name string) {
+	if s.probe != nil && s.probe.Phase != nil {
+		s.probe.Phase(name)
+	}
 }
 
 // Result is the analyzed workspace: every file, unit, declaration and
@@ -167,6 +188,7 @@ func Analyze(in Input) *Result {
 		std: std, cfg: in.Config, jobs: jobs, limit: in.Limit,
 		files: files, base: Bundle(), steps: cmp.Or(in.Steps,
 			int64(eval.EditorSteps)), stop: in.Stop,
+		probe: in.Probe,
 	}
 	if s.stopped() {
 		return nil
@@ -210,11 +232,13 @@ type session struct {
 	dups     []duplicate
 	cycles   [][]*Unit
 	// tags are the bundled first-standard tags (bundle session only).
-	tags map[tagKey]token.Standard
-	stop func() bool
+	tags  map[tagKey]token.Standard
+	stop  func() bool
+	probe *Probe
 }
 
 func (s *session) run() *Result {
+	s.phase("units")
 	for _, f := range s.files {
 		f.Units = scanFile(f)
 		s.units = append(s.units, f.Units...)
@@ -235,13 +259,16 @@ func (s *session) run() *Result {
 	if !s.analyzeUnits() {
 		return nil
 	}
-	s.resolveLate()         // libs.go
-	s.missingBodies()       // units.go
-	s.configurationRules()  // config.go
-	s.calledBeforeBody()    // units.go
-	s.libraryDiagnostics()  // libs.go
-	s.opaqueUnits()         // unsupported.go
+	s.phase("cross-file")
+	s.resolveLate()        // libs.go
+	s.missingBodies()      // units.go
+	s.configurationRules() // config.go
+	s.calledBeforeBody()   // units.go
+	s.libraryDiagnostics() // libs.go
+	s.opaqueUnits()        // unsupported.go
+	s.phase("static")
 	inc := s.staticChecks() // static.go
+	s.phase("done")
 	return s.result(inc)
 }
 

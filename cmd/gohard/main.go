@@ -7,6 +7,8 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"runtime/debug"
+	"strings"
 	"syscall"
 	"time"
 
@@ -40,6 +42,7 @@ func main() {
 			os.Exit(intr.Exit)
 		}
 	}()
+	cli.Version = version(cli.Version)
 	os.Exit(cli.Run(ctx, realenv.New(realenv.Options{}), os.Args[1:]))
 }
 
@@ -48,4 +51,18 @@ func interrupt(s os.Signal) env.Interrupt {
 		return env.SIGTERM
 	}
 	return env.SIGINT
+}
+
+// version returns the release version: the -ldflags value when set (the
+// goreleaser and Nix builds), else the module version recorded by
+// `go install ...@vX.Y.Z` without its leading "v", else def.
+func version(def string) string {
+	if def != "0.0.0-dev" {
+		return def
+	}
+	bi, ok := debug.ReadBuildInfo()
+	if !ok || bi.Main.Version == "" || bi.Main.Version == "(devel)" {
+		return def
+	}
+	return strings.TrimPrefix(bi.Main.Version, "v")
 }

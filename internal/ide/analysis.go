@@ -2,6 +2,7 @@ package ide
 
 import (
 	"github.com/connerohnesorge/gohard/internal/cst"
+	"github.com/connerohnesorge/gohard/internal/libs"
 	"github.com/connerohnesorge/gohard/internal/resolve"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/server"
@@ -19,6 +20,9 @@ type Analysis struct {
 
 	key   string
 	uriOf map[string]string // sema path -> URI
+	// libs is the host the "library not found" quick fix searches
+	// (Options.Libraries).
+	libs libs.Host
 }
 
 // at returns the analysis for another snapshot of the same content.

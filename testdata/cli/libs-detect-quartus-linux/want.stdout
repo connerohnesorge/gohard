@@ -1,0 +1,4 @@
+libraries:
+  # Intel Quartus 23.1std at /home/u/intelFPGA_lite/23.1std/quartus (found via the usual install folder)
+  altera_mf: ['/home/u/intelFPGA_lite/23.1std/quartus/eda/sim_lib']
+  # not mapped: altera_mf at /home/u/intelFPGA_lite/23.1std/modelsim_ase/altera/vhdl/altera_mf is precompiled for ModelSim/Questa

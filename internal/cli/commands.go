@@ -103,7 +103,12 @@ var commands = []Command{
 		Summary: "find vendor libraries and print gohard.yaml lines",
 		Subs:    []string{"detect"},
 		Flags: []Flag{
-			formatFlag,
+			{
+				Name: "version", Kind: Strings,
+				Value: "[TOOL=]VERSION",
+				Usage: "pick the version of a tool installed more " +
+					"than once (vivado, quartus, diamond)",
+			},
 			{
 				Name: "write", Kind: Bool,
 				Usage: "add the detected lines to gohard.yaml",

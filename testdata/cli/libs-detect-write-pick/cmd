@@ -1,0 +1,2 @@
+# --version picks one of two Vivado versions; --write adds its lines.
+gohard libs detect --write --version vivado=2024.1

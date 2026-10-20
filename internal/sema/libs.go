@@ -70,9 +70,32 @@ func (f LibraryFix) related(c config.Config) diag.Related {
 // LibraryFixAt returns the quick fix for the unmapped library name at
 // byte offset off of the file at path.
 func (r *Result) LibraryFixAt(p string, off int) (LibraryFix, bool) {
+	u, t, ok := r.unmappedAt(p, off)
+	if !ok {
+		return LibraryFix{}, false
+	}
+	return libraryFix(r.Files, u, TokenKey(t), t.Text())
+}
+
+// UnmappedLibraryAt returns the name, as written, of the unmapped
+// library at byte offset off of the file at path, for the quick fix
+// that searches vendor installs (`gohard libs detect`, #1).
+func (r *Result) UnmappedLibraryAt(p string, off int) (string, bool) {
+	_, t, ok := r.unmappedAt(p, off)
+	if !ok {
+		return "", false
+	}
+	return t.Text(), true
+}
+
+// unmappedAt returns the unit and the library-clause name token of the
+// unmapped library at off.
+func (r *Result) unmappedAt(p string, off int) (*Unit, cst.Token,
+	bool,
+) {
 	f, ok := r.File(p)
 	if !ok || f.Bundled {
-		return LibraryFix{}, false
+		return nil, cst.Token{}, false
 	}
 	for _, u := range f.Units {
 		sp := u.Node.Span()
@@ -88,15 +111,15 @@ func (r *Result) LibraryFixAt(p string, off int) (LibraryFix, bool) {
 			d, ok := u.Context.Libs[k]
 			if !ok || !d.Implicit || t.Parent().Kind() !=
 				cst.KindSimpleName {
-				return LibraryFix{}, false
+				return nil, cst.Token{}, false
 			}
 			if _, mapped := r.libs[k]; mapped {
-				return LibraryFix{}, false
+				return nil, cst.Token{}, false
 			}
-			return libraryFix(r.Files, u, k, t.Text())
+			return u, t, true
 		}
 	}
-	return LibraryFix{}, false
+	return nil, cst.Token{}, false
 }
 
 // libraryFix searches the project files for the folder that declares

@@ -7,6 +7,7 @@ import (
 
 	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/internal/libs"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/server"
 	"github.com/connerohnesorge/gohard/internal/token"
@@ -57,9 +58,7 @@ func (an *Analysis) QuickFixes(uri string, r server.Span,
 			var as []server.CodeAction
 			switch d.Code {
 			case diag.LibraryUnmapped:
-				if a, ok := an.mapLibrary(path, s); ok {
-					as = append(as, a)
-				}
+				as = an.mapLibrary(path, s)
 			case diag.SemaUndefined:
 				as = an.addUse(path, uri, doc.Text(), s, e)
 			}
@@ -74,99 +73,54 @@ func (an *Analysis) QuickFixes(uri string, r server.Span,
 	return out
 }
 
-// mapLibrary is the fix of the unmapped library named at off.
-func (an *Analysis) mapLibrary(path string, off int,
-) (server.CodeAction, bool) {
-	fix, ok := an.Result.LibraryFixAt(path, off)
-	if !ok {
-		return server.CodeAction{}, false
-	}
+// mapLibrary is the fix of the unmapped library named at off: the
+// project folder sema proposes, else every install of the library
+// that the search of `gohard libs detect` finds (#1), one action each.
+func (an *Analysis) mapLibrary(path string, off int) []server.CodeAction {
 	cfg, present := an.Snap.ConfigDocument()
 	if cfg == nil {
-		return server.CodeAction{}, false
+		return nil
 	}
 	var text []byte
 	if present {
 		text = cfg.Text()
 	}
-	ed, ok := LibrariesEdit(text, fix.Entry)
-	if !ok {
-		return server.CodeAction{}, false
+	action := func(title, entry string, preferred bool,
+	) []server.CodeAction {
+		ed, ok := LibrariesEdit(text, entry)
+		if !ok {
+			return nil
+		}
+		return []server.CodeAction{{Title: title, Kind: "quickfix",
+			Preferred: preferred, Edits: []server.FileEdit{{
+				URI: cfg.URI, Edits: []server.Edit{ed}}}}}
 	}
-	return server.CodeAction{
-		Title: "Map library " + fix.Library + " to " + fix.Folder +
-			" in gohard.yaml",
-		Kind: "quickfix", Preferred: true,
-		Edits: []server.FileEdit{{URI: cfg.URI,
-			Edits: []server.Edit{ed}}},
-	}, true
+	if fix, ok := an.Result.LibraryFixAt(path, off); ok {
+		return action("Map library "+fix.Library+" to "+fix.Folder+
+			" in gohard.yaml", fix.Entry, true)
+	}
+	name, ok := an.Result.UnmappedLibraryAt(path, off)
+	if !ok || an.libs.FS == nil {
+		return nil
+	}
+	cands := libs.Find(an.libs, an.Snap.Root, name)
+	var out []server.CodeAction
+	for _, c := range cands {
+		out = append(out, action("Map library "+name+" to "+
+			c.Install.Label()+" in gohard.yaml", name+": ["+
+			libs.Quote(c.Library.Folder)+"]", len(cands) == 1)...)
+	}
+	return out
 }
 
 // LibrariesEdit returns the edit of the gohard.yaml text that adds
-// entry ("lib: [folder]") under the top-level libraries key: a new
-// line right after a block-style key (indented like its first entry),
-// `{}` replaced by a block, or a new libraries block at the end when
-// the key is missing. ok is false for a non-empty flow mapping, which
-// the fix does not rewrite.
+// entry ("lib: [folder]") under the top-level libraries key, the edit
+// `gohard libs detect --write` makes (libs.LibrariesEdit). ok is false
+// for a non-empty flow mapping, which the fix does not rewrite.
 func LibrariesEdit(text []byte, entry string) (server.Edit, bool) {
-	lines := strings.SplitAfter(string(text), "\n")
-	off := 0
-	for i, l := range lines {
-		body := strings.TrimRight(l, "\r\n")
-		rest, ok := strings.CutPrefix(body, "libraries")
-		if !ok {
-			off += len(l)
-			continue
-		}
-		rest = strings.TrimLeft(rest, " \t")
-		if !strings.HasPrefix(rest, ":") {
-			off += len(l)
-			continue
-		}
-		val := strings.TrimSpace(stripComment(rest[1:]))
-		indent := "  "
-		for _, n := range lines[i+1:] {
-			t := strings.TrimLeft(n, " \t")
-			if t == "" || t == "\n" || t == "\r\n" ||
-				strings.HasPrefix(t, "#") {
-				continue
-			}
-			if w := len(n) - len(t); w > 0 {
-				indent = n[:w]
-			}
-			break
-		}
-		switch val {
-		case "":
-			if len(body) == len(l) { // the last line, no newline
-				return server.Edit{Span: server.Span{Start: off + len(l),
-					End: off + len(l)}, NewText: "\n" + indent + entry +
-					"\n"}, true
-			}
-			at := off + len(l)
-			return server.Edit{Span: server.Span{Start: at, End: at},
-				NewText: indent + entry + "\n"}, true
-		case "{}":
-			colon := off + strings.Index(l, ":")
-			return server.Edit{Span: server.Span{Start: colon + 1,
-				End: off + len(body)},
-				NewText: "\n  " + entry}, true
-		}
-		return server.Edit{}, false
-	}
-	nl := ""
-	if len(text) > 0 && text[len(text)-1] != '\n' {
-		nl = "\n"
-	}
-	return server.Edit{Span: server.Span{Start: len(text),
-		End: len(text)}, NewText: nl + "libraries:\n  " + entry + "\n"}, true
-}
-
-func stripComment(s string) string {
-	if i := strings.Index(s, "#"); i >= 0 {
-		return s[:i]
-	}
-	return s
+	e, ok := libs.LibrariesEdit(text, entry)
+	return server.Edit{Span: server.Span{Start: e.Start, End: e.End},
+		NewText: e.NewText}, ok
 }
 
 // usePackage is a package that declares a name.

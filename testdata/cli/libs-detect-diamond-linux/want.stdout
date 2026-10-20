@@ -1,0 +1,4 @@
+libraries:
+  # Lattice Diamond 3.13 at /usr/local/diamond/3.13 (found via the usual install folder)
+  ecp5u: ['/usr/local/diamond/3.13/cae_library/simulation/vhdl/ecp5u/src']
+  machxo2: ['/usr/local/diamond/3.13/cae_library/simulation/vhdl/machxo2/src']

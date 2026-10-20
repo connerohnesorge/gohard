@@ -1,0 +1,1 @@
+gohard: warning[libs/unreadable]: altera_mf at /opt/gone/sim_lib is a GHDL library whose VHDL sources are missing and cannot be read

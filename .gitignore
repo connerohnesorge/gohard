@@ -3,3 +3,4 @@ result
 /.go/
 /.gohard/
 *.test
+dist

@@ -1,0 +1,4 @@
+libraries:
+  # Lattice Diamond 3.13 at /opt/lscc/diamond/3.13 (found via diamondc on PATH)
+  ecp5u: ['/opt/lscc/diamond/3.13/cae_library/simulation/vhdl/ecp5u/src']
+  machxo2: ['/opt/lscc/diamond/3.13/cae_library/simulation/vhdl/machxo2/src']

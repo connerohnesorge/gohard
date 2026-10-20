@@ -190,6 +190,16 @@ func (c *countWriter) Write(p []byte) (int, error) {
 }
 
 func TestNotImplemented(t *testing.T) {
+	// Every shipped command is built, so the dispatcher path for a
+	// command without Run is checked with libs' Run taken away.
+	libs := lookup("libs")
+	run := libs.Run
+	libs.Run = nil
+	libs.Flags = append(libs.Flags, formatFlag)
+	defer func() {
+		libs.Run = run
+		libs.Flags = libs.Flags[:len(libs.Flags)-1]
+	}()
 	e, out, _ := newEnv(t)
 	code := Run(context.Background(), e,
 		[]string{"libs", "detect", "--format", "json"})

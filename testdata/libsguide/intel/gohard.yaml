@@ -1,0 +1,2 @@
+libraries:
+  altera_mf: [../../stubs/intel/altera_mf]

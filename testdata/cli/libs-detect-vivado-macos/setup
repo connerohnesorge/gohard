@@ -1,0 +1,3 @@
+libs-host darwin sys
+env HOME=/Users/u
+env PATH=/usr/bin:/bin

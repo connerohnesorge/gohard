@@ -1,0 +1,4 @@
+libraries:
+  # Intel Quartus 21.1 at /Volumes/fpga/intelFPGA/21.1/quartus (found via QUARTUS_ROOTDIR)
+  altera_mf: ['/Volumes/fpga/intelFPGA/21.1/quartus/eda/sim_lib']
+  # not mapped: altera_mf at /Volumes/fpga/intelFPGA/21.1/modelsim_ase/altera/vhdl/altera_mf is precompiled for ModelSim/Questa

@@ -1,0 +1,8 @@
+libraries:
+  # Xilinx Vivado 2023.2 at /opt/Xilinx/Vivado/2023.2 (found via the usual install folder)
+  unisim: ['/opt/Xilinx/Vivado/2023.2/data/vhdl/src/unisims']
+  unimacro: ['/opt/Xilinx/Vivado/2023.2/data/vhdl/src/unimacro']
+  # GHDL library index at build/unifast-obj08.cf (found via the project)
+  # not mapped: unifast at testdata/stubs/xilinx/unisims is a GoHard CI stub (testdata/stubs), never a substitute for the vendor files
+  # GHDL library index at build/xpm-obj08.cf (found via the project)
+  # not mapped: xpm at vendor-copy/unimacro is a GoHard CI stub (testdata/stubs), never a substitute for the vendor files

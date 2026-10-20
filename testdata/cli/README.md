@@ -31,6 +31,7 @@ trees, and must match the committed files.
 | `mkdir PATH` | Creates a directory, for example `.git`, which git cannot store. |
 | `cwd PATH` | Runs the command from PATH instead of the temp dir. |
 | `env NAME=VALUE` | Overrides an environment variable seen through the Env. |
+| `libs-host OS DIR` | `gohard libs detect` and the "library not found" quick fix search a host of OS (`linux`, `darwin` or `windows`) whose file-system root is the folder DIR: host path `/opt/Xilinx` is read at `DIR/opt/Xilinx` and `C:\Xilinx` at `DIR/C/Xilinx` (`libs.WithHost`, #1). Output shows host paths, so the case gives the same bytes on every OS. |
 | `rand STATE` | Replaces the Env's random source with `env.SplitMix64{State: STATE}`, so `--seed random` picks the same seed every run. |
 | `viewers [NAME...]` | Replaces the Env's Executor with a simulated one whose `PATH` holds exactly the named programs (none when no name is given), for Open waveform (#36). |
 | `requires interpreter` | Skips the case while no sequential interpreter is registered (`simrun.DefaultCode` is nil); the case's want files are created with `-update` once it is. |

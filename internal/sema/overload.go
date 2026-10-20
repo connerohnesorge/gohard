@@ -287,6 +287,11 @@ func match(d *Decl, acts []actual, want *Type, proc bool) candidate {
 func (a *analyzer) choose(name string, cands []*Decl, acts []actual,
 	want *Type, proc bool,
 ) (*Overload, *candidate) {
+	if pr := a.s.probe; pr != nil && pr.Overload != nil && a.choosing == 0 {
+		defer pr.Overload()()
+	}
+	a.choosing++
+	defer func() { a.choosing-- }()
 	o := &Overload{Name: name}
 	var all []candidate
 	best := 0

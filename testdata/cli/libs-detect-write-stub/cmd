@@ -1,0 +1,2 @@
+# --write maps the Vivado install and never the stub copies the GHDL indexes point at.
+gohard libs detect --write

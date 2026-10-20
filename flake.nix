@@ -7,13 +7,41 @@
   };
 
   outputs = {
+    self,
     nixpkgs,
     flake-utils,
     ...
   }:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
+      version = "1.0.0";
+      gohard = (pkgs.buildGoModule.override {go = pkgs.go_1_27;}) {
+        pname = "gohard";
+        inherit version;
+        # Only the module sources; testdata submodules are not needed.
+        src = pkgs.lib.cleanSource ./.;
+        subPackages = ["cmd/gohard"];
+        vendorHash = "sha256-xmx6COnpMZapnb+73e7LBg4rf7VrDv+Pf3okwfUk5AQ=";
+        env.CGO_ENABLED = "0";
+        ldflags = [
+          "-s"
+          "-w"
+          "-X github.com/connerohnesorge/gohard/internal/cli.Version=${version}"
+        ];
+        doCheck = false;
+        meta = {
+          description = "VHDL language server with a built-in simulator";
+          homepage = "https://github.com/connerohnesorge/gohard";
+          mainProgram = "gohard";
+        };
+      };
     in {
+      packages.default = gohard;
+      packages.gohard = gohard;
+      apps.default = {
+        type = "app";
+        program = "${gohard}/bin/gohard";
+      };
       devShells.default = pkgs.mkShell {
         packages = with pkgs; [
           go_1_27

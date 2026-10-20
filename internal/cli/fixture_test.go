@@ -17,6 +17,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/cli"
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/env/realenv"
+	"github.com/connerohnesorge/gohard/internal/libs"
 	"github.com/connerohnesorge/gohard/internal/stdlib"
 )
 
@@ -171,6 +172,9 @@ func runOnce(t tb, dir string, args []string,
 	bundle := filepath.Join(cache, "gohard", "bundle", stdlib.CacheKey())
 	defer unlockTree(bundle)
 	st.wrap(&e, cancel)
+	if st.hostOS != "" {
+		ctx = libs.WithHost(ctx, st.hostOS, st.hostRoot)
+	}
 	for _, p := range st.tamper {
 		ctx = stdlib.WithTamper(ctx, p)
 	}

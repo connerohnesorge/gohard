@@ -1,0 +1,52 @@
+# Release build for gohard (#38). Run by .github/workflows/release.yml on
+# v* tags; locally: nix run nixpkgs#goreleaser -- release --snapshot --clean
+version: 2
+
+project_name: gohard
+
+builds:
+  - id: gohard
+    main: ./cmd/gohard
+    binary: gohard
+    env:
+      - CGO_ENABLED=0
+      - GOTOOLCHAIN=local
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/connerohnesorge/gohard/internal/cli.Version={{.Version}}
+    # Reproducible: file times come from the commit, not the clock.
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: gohard
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md
+      - docs/editors.md
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-snapshot"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+release:
+  github:
+    owner: connerohnesorge
+    name: gohard

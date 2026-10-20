@@ -1,0 +1,4 @@
+libs-host windows sys
+env USERPROFILE=C:\Users\u
+env PATH=C:\Windows\system32
+env XILINX_VIVADO=C:\Xilinx\Vivado\2024.1

@@ -31,6 +31,8 @@ type analyzer struct {
 	sensitized bool
 	// inPSL counts the PSL expressions being analyzed (psl.go).
 	inPSL int
+	// choosing counts the overload resolutions running (Probe).
+	choosing int
 	// instSubst maps the generic types of the instance whose maps are
 	// being analyzed to their actual subtypes (typerules.go).
 	instSubst map[*Type]*Type

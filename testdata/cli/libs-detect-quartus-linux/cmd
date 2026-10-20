@@ -1,0 +1,2 @@
+# Quartus in ~/intelFPGA_lite; the ModelSim library is precompiled.
+gohard libs detect

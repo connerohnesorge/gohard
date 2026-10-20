@@ -1,0 +1,3 @@
+libs-host darwin sys
+env HOME=/Users/u
+env PATH=/usr/bin:/opt/lscc/diamond/3.13/bin/lin64

@@ -1,0 +1,5 @@
+v 4
+file "/home/u/src/unisims/" "unisim_VCOMP.vhd" "0000" "20261020000000.000":
+  package vcomponents at 1( 0) + 0 on 4;
+file / "/home/u/src/unisims/primitive/BUFG.vhd" "0000" "20261020000000.000":
+  entity bufg at 1( 0) + 0 on 4;

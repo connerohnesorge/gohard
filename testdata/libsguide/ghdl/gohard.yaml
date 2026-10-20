@@ -1,0 +1,3 @@
+# The unisim sources GHDL compiled (see ghdl/unisim/v08/unisim-obj08.cf).
+libraries:
+  unisim: [../../stubs/xilinx/unisims]

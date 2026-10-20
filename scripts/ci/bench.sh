@@ -6,7 +6,8 @@
 # numbers in $BENCH_OUT (default bench.txt in the repo root) and the
 # job summary. Never fails the job: benchmark numbers are recorded, not
 # gated. Later stages only add Benchmark* functions; this script picks
-# them up.
+# them up. The #19 latency report (tools/bench) goes to $BENCH_OUT.19.md
+# and the raw samples to $BENCH_OUT.19.json.
 . "$(dirname "$0")/lib.sh"
 set +e
 
@@ -49,6 +50,23 @@ done | tee -a "$out"
 rm -rf "$prof"
 endgroup
 
+# The #19 latency benchmark: keystroke-to-diagnostics per check, cold
+# and warm, the derived tiers and the #25 gates, through the real
+# server and a scripted LSP client (tools/bench). Recorded only.
+group "go run ./tools/bench (latency, #19)"
+# Build into a temp dir: "$out.bench19" is a bare name when $out is
+# relative, and bash would then look it up on PATH (exit 127).
+b19dir=$(mktemp -d)
+go build -o "$b19dir/bench" ./tools/bench &&
+	"$b19dir/bench" -repo . -warm "${BENCH19_WARM:-60}" \
+		-cold "${BENCH19_COLD:-20}" -sim "${BENCH19_SIM:-20}" \
+		-out "$out.19.md" -json "$out.19.json"
+b19=$?
+rm -rf "$b19dir"
+cat "$out.19.md" 2>/dev/null
+cat "$out.19.md" >>"$out" 2>/dev/null
+endgroup
+
 n=$(grep -c '^Benchmark' "$out")
 {
 	echo "### Benchmarks"
@@ -61,6 +79,12 @@ n=$(grep -c '^Benchmark' "$out")
 		echo '```'
 	fi
 } | while IFS= read -r line; do summary "$line"; done
+if [ -f "$out.19.md" ]; then
+	while IFS= read -r line; do summary "$line"; done <"$out.19.md"
+fi
+if [ "$b19" -ne 0 ]; then
+	notice "tools/bench exited $b19; recorded, not failing"
+fi
 if [ "$status" -ne 0 ]; then
 	notice "go test -bench exited $status; recorded, not failing"
 fi

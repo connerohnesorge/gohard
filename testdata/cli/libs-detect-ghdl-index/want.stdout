@@ -1,0 +1,5 @@
+libraries:
+  # GHDL library index at /usr/local/lib/ghdl/vendors/intel/altera_mf/v93/altera_mf-obj93.cf (found via GHDL_PREFIX)
+  # not mapped: altera_mf at /opt/gone/sim_lib is a GHDL library whose VHDL sources are missing
+  # GHDL library index at /usr/local/lib/ghdl/vendors/xilinx-vivado/unisim/v08/unisim-obj08.cf (found via GHDL_PREFIX)
+  unisim: ['/home/u/src/unisims']

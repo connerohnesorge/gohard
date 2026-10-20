@@ -1,0 +1,2 @@
+libraries:
+  uvvm_util: [../../libs/uvvm/uvvm_util/src]

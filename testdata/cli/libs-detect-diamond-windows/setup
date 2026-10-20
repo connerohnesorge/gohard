@@ -1,0 +1,4 @@
+libs-host windows sys
+env USERPROFILE=C:\Users\u
+env PATH=C:\Windows\system32
+env FOUNDRY=C:\lscc\diamond\3.12\ispfpga

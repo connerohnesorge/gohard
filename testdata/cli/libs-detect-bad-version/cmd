@@ -1,0 +1,2 @@
+# --version that matches no install is a usage error.
+gohard libs detect --version 1999.1

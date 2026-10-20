@@ -1,0 +1,4 @@
+libraries:
+  # Lattice Diamond 3.12 at C:\lscc\diamond\3.12 (found via FOUNDRY)
+  ecp5u: ['C:\lscc\diamond\3.12\cae_library\simulation\vhdl\ecp5u\src']
+  machxo2: ['C:\lscc\diamond\3.12\cae_library\simulation\vhdl\machxo2\src']

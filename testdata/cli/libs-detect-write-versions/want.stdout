@@ -1,0 +1,7 @@
+# Xilinx Vivado: several versions found (2023.2, 2024.1); pick one with --version vivado=VERSION
+#   Xilinx Vivado 2023.2 at /opt/Xilinx/Vivado/2023.2 (found via the usual install folder)
+#     unisim: ['/opt/Xilinx/Vivado/2023.2/data/vhdl/src/unisims']
+#     unimacro: ['/opt/Xilinx/Vivado/2023.2/data/vhdl/src/unimacro']
+#   Xilinx Vivado 2024.1 at /opt/Xilinx/Vivado/2024.1 (found via the usual install folder)
+#     unisim: ['/opt/Xilinx/Vivado/2024.1/data/vhdl/src/unisims']
+#     unimacro: ['/opt/Xilinx/Vivado/2024.1/data/vhdl/src/unimacro']

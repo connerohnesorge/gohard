@@ -1,0 +1,2 @@
+libraries:
+  ecp5u: [../../stubs/lattice/ecp5u]

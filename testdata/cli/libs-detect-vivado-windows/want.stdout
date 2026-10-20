@@ -1,0 +1,5 @@
+libraries:
+  # Xilinx Vivado 2024.1 at C:\Xilinx\Vivado\2024.1 (found via XILINX_VIVADO)
+  unisim: ['C:\Xilinx\Vivado\2024.1\data\vhdl\src\unisims']
+  unimacro: ['C:\Xilinx\Vivado\2024.1\data\vhdl\src\unimacro']
+  # not mapped: secureip at C:\Xilinx\Vivado\2024.1\data\secureip is IEEE 1735 encrypted IP

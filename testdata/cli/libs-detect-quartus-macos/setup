@@ -1,0 +1,4 @@
+libs-host darwin sys
+env HOME=/Users/u
+env PATH=/usr/bin:/bin
+env QUARTUS_ROOTDIR=/Volumes/fpga/intelFPGA/21.1/quartus

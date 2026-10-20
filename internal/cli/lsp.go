@@ -33,7 +33,7 @@ var newAnalyzer = func(inv *Invocation) (server.Analyzer,
 	server.Simulator,
 ) {
 	an := ide.New(ide.Options{ToolVersion: Version, Jobs: inv.Env.Jobs,
-		Limit: inv.Jobs})
+		Limit: inv.Jobs, Libraries: libsHost(inv)})
 	return server.WithFormatting(an, Version), an
 }
 

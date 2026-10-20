@@ -1,0 +1,2 @@
+libraries:
+  vunit_lib: [../../libs/vunit/vunit/vhdl]

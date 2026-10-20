@@ -13,8 +13,15 @@ v2 (#3).
 Install `gohard` on your `PATH` first. Use any of these:
 
 * `go install github.com/connerohnesorge/gohard/cmd/gohard@latest`
-* a release binary
-* `nix build` (the flake's `packages.default`)
+  (Go 1.27 or newer; the binary lands in `$(go env GOPATH)/bin`)
+* a release binary from the GitHub Releases page: one archive per
+  OS (linux, darwin, windows) and arch (amd64, arm64), checked with
+  `sha256sum -c checksums.txt --ignore-missing`
+* Nix: `nix profile install github:connerohnesorge/gohard`, or
+  `nix run github:connerohnesorge/gohard -- version`, or `nix build`
+  in a checkout (the flake's `packages.default`, at `./result/bin`)
+
+Check it with `gohard version`.
 
 ## Neovim
 

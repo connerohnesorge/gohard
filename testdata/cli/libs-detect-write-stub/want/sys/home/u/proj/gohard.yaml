@@ -1,0 +1,5 @@
+libraries:
+  # Xilinx Vivado 2023.2 at /opt/Xilinx/Vivado/2023.2 (gohard libs detect)
+  unisim: ['/opt/Xilinx/Vivado/2023.2/data/vhdl/src/unisims']
+  unimacro: ['/opt/Xilinx/Vivado/2023.2/data/vhdl/src/unimacro']
+  ip: [ip]

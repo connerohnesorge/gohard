@@ -1,0 +1,3 @@
+libraries:
+  unisim: [../../stubs/xilinx/unisims]
+  unimacro: [../../stubs/xilinx/unimacro]
