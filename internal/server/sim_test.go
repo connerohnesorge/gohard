@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
@@ -493,7 +494,7 @@ func TestOpenWaveformAfterRun(t *testing.T) {
 		}
 	}
 	if count(h.log, "start tb") != 1 || len(opens) != 2 ||
-		opens[0] != "/work/.gohard/traces/tb-0.trace" ||
+		opens[0] != filepath.FromSlash("/work/.gohard/traces/tb-0.trace") ||
 		opens[1] != opens[0] {
 		t.Fatalf("runs %v, opens %v", h.log, opens)
 	}

@@ -250,7 +250,8 @@ func simBundleFaults(vars map[string]string, files map[string][]byte,
 }
 
 func TestBundleFileURIsSim(t *testing.T) {
-	sim := simBundle(map[string]string{"HOME": "/home/sim"}, nil)
+	sim := simBundle(map[string]string{"HOME": "/home/sim",
+		"LocalAppData": "/home/sim/AppData/Local"}, nil)
 	checkBundleSession(t, sim.Env(), "/work", func(n string) (fs.FileInfo,
 		[]byte, error,
 	) {
