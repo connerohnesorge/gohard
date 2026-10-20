@@ -9,8 +9,9 @@
 # follow). Each file line is the argument, the library when not work,
 # the GHDL options, then per tool the exit code and the lines of that
 # file it reports errors on; "~" marks a line whose only errors are
-# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
-# reports an error on every line both tools report one on
+# cascades (GHDL's "<unit> was not analysed", NVC's "... was analysed
+# with errors"). tools/oracle checks that GoHard reports an error on
+# every line both tools report one on, cascades aside
 # (semerr_check.go).
 tool ghdl 6.0.0
 tool nvc 1.23.0

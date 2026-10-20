@@ -50,11 +50,14 @@ func (a *analyzer) declItem(n cst.Node) {
 	case cst.KindAliasDecl:
 		a.aliasDecl(cst.AliasDecl{Node: n})
 	case cst.KindAttributeDecl:
+		a.packageBodyAttr(n) // forms.go
 		ad := cst.AttributeDecl{Node: n}
 		d := a.newDecl(DeclAttribute, ad.Name(), n)
 		d.Type = a.typeMark(ad.TypeMark().Node)
+		a.attrDeclType(ad.TypeMark().Node, d) // names.go
 		a.declare(d)
 	case cst.KindAttributeSpec:
+		a.packageBodyAttr(n) // forms.go
 		a.attributeSpec(cst.AttributeSpec{Node: n})
 	case cst.KindComponentDecl:
 		a.componentDecl(cst.ComponentDecl{Node: n})
@@ -62,10 +65,12 @@ func (a *analyzer) declItem(n cst.Node) {
 		cs := cst.ConfigurationSpec{Node: n}
 		comp := a.componentSpec(cs.Spec())
 		a.bindingIndication(cs.Binding(), comp)
+		a.configSpecRules(cs, comp) // config.go
 	case cst.KindDisconnectionSpec:
 		ds := cst.DisconnectionSpec{Node: n}
 		for s := range ds.Signals() {
-			a.resolveName(s.Node, RefRead, nil)
+			a.disconnectRules(s.Node, a.resolveName(s.Node, RefRead,
+				nil)) // config.go
 		}
 		a.expr(disconnectAfter(ds), a.stdType("time"))
 	case cst.KindGroupTemplateDecl:
@@ -114,6 +119,7 @@ func (a *analyzer) interfaceList(l cst.InterfaceList, k DeclKind,
 		if item.Inactive() {
 			continue
 		}
+		a.genericOnly(item.Node, k) // typerules.go
 		switch item.Kind() {
 		case cst.KindInterfaceObjectDecl:
 			out = append(out, a.interfaceObject(
@@ -131,7 +137,7 @@ func (a *analyzer) interfaceList(l cst.InterfaceList, k DeclKind,
 			if d != nil {
 				a.declare(d)
 				if def := is.Default().Name(); !def.IsZero() {
-					a.lenientName(def.Node)
+					a.subprogramDefault(def.Node, d) // names.go
 				}
 				out = append(out, d)
 			}
@@ -142,8 +148,10 @@ func (a *analyzer) interfaceList(l cst.InterfaceList, k DeclKind,
 			if len(r.decls) == 1 {
 				d.Target = r.decls[0].Denotes()
 				d.Region = d.Target.Region
+				a.packageInstRules(ip.Package().Node, d.Target, false)
 			}
 			a.genericMap(ip.GenericMap().List(), d.Region)
+			a.defaultMap(ip.GenericMap().List(), d.Target) // typerules.go
 			a.declare(d)
 			out = append(out, d)
 		}
@@ -227,6 +235,7 @@ func (a *analyzer) interfaceObject(io cst.InterfaceObjectDecl,
 	if v := initValue(io.Node); !v.IsZero() {
 		def = a.expr(v.Node, t)
 	}
+	a.interfaceRules(io, k, class, mode, t, def != nil) // objrules.go
 	var out []*Decl
 	for tok := range io.Names().Names() {
 		d := a.newDecl(k, tok, io.Node)
@@ -250,18 +259,23 @@ func (a *analyzer) objectDecl(n cst.Node, k DeclKind,
 	if !value.IsZero() {
 		v = a.expr(value.Node, t)
 		a.u.Exprs = append(a.u.Exprs, v)
+		a.deferredUse(v, 0) // forms.go
 	}
 	done()
+	a.objectDeclRules(si, k, t)     // objrules.go
+	a.protectedElaborated(si, k, t) // typecheck.go
 	if k == DeclSharedVariable && a.std >= token.Std2002 && !a.quiet &&
-		!t.Unknown() && t.Base().Class != TypeProtected &&
-		t.Base().Class != TypeGeneric {
+		!a.s.cfg.Lenient && !t.Unknown() &&
+		t.Base().Class != TypeProtected && t.Base().Class != TypeGeneric {
 		// LRM 6.4.2.4: from VHDL-2002 on a shared variable is of a
-		// protected type.
+		// protected type. Lenient mode (#28) keeps the VHDL-93 rule,
+		// as GHDL's -frelaxed and NVC's --relaxed do.
 		a.semaError(si.Span(), "the type of a shared variable must "+
 			"be a protected type, not "+t.Name())
 	}
 	if value.IsZero() && (k == DeclSignal || k == DeclVariable) &&
-		!a.quiet && notFullyConstrained(t, 0) {
+		!a.quiet && (notFullyConstrained(t, 0) ||
+		a.instanceUnconstrained(si, t)) { // typerules.go
 		// LRM 6.4.2.3, 6.4.2.4: an object's subtype is fully
 		// constrained (VHDL-2019 may infer it from an initial value).
 		a.semaError(si.Span(), "a "+k.String()+" cannot be of the "+
@@ -333,6 +347,8 @@ func (a *analyzer) linkDeferred(d *Decl) {
 func (a *analyzer) fileDecl(fd cst.FileDecl) {
 	done := a.selfScope(fd.Names())
 	t := a.subtypeIndication(fd.Subtype())
+	a.fileDeclRules(fd.Subtype(), t) // objrules.go
+	a.pureFile(fd.Node)              // purity.go
 	kind, name := fileOpen(fd.OpenInfo())
 	if !kind.IsZero() {
 		a.expr(kind, a.stdType("file_open_kind"))
@@ -352,6 +368,7 @@ func (a *analyzer) fileDecl(fd cst.FileDecl) {
 func (a *analyzer) aliasDecl(ad cst.AliasDecl) {
 	d := a.newDecl(DeclAlias, ad.Designator(), ad.Node)
 	d.sigAlias = !ad.Signature().IsZero()
+	defer a.aliasSelfScope(ad)()
 	var t *Type
 	if si := ad.Subtype(); !si.IsZero() {
 		t = a.subtypeIndication(si)
@@ -373,6 +390,8 @@ func (a *analyzer) aliasDecl(ad cst.AliasDecl) {
 		// selected record element is an object name, LRM 6.6.2).
 		d.Value = r.expr
 		d.Type = t
+		a.aliasSubtype(ad, t, r.expr) // typecheck.go
+		a.aliasRules(ad, r.expr)      // staticrules.go
 		if d.Type == nil || notFullyConstrained(t, 0) &&
 			SameBase(t, r.expr.Type) &&
 			!notFullyConstrained(r.expr.Type, 0) {
@@ -388,9 +407,14 @@ func (a *analyzer) aliasDecl(ad cst.AliasDecl) {
 			}
 		}
 	case len(r.decls) > 0:
+		if !aliasesObject(r.decls) {
+			a.aliasRules(ad, nil) // staticrules.go
+		}
+		a.aliasSignature(ad, r.decls) // typerules.go
 		pick := r.decls
 		if sig := ad.Signature(); !sig.IsZero() {
 			pick = a.matchSignature(r.decls, sig) // overload.go
+			a.signatureMatched(sig, r, pick)      // names.go
 		}
 		if len(pick) >= 1 {
 			// Without a signature an alias of an overloaded name takes
@@ -403,6 +427,8 @@ func (a *analyzer) aliasDecl(ad cst.AliasDecl) {
 			a.ref(r.tok, pick[0], RefRead)
 		}
 	case r.typ != nil:
+		a.aliasRules(ad, nil)
+		a.aliasTypeName(target.Node) // typerules.go
 		d.Type = r.typ
 	}
 	a.declare(d)
@@ -467,6 +493,7 @@ func (a *analyzer) attributeSpec(as cst.AttributeSpec) {
 		et := ed.Tag()
 		k := TokenKey(et)
 		if k == "" || k == "others" || k == "all" {
+			a.attrOthers(k, attr) // names.go
 			continue
 		}
 		var named *Decl
@@ -476,6 +503,7 @@ func (a *analyzer) attributeSpec(as cst.AttributeSpec) {
 			named = a.u.Decl
 		}
 		a.ref(et, named, RefRead)
+		a.attrEntity(as.Entities(), ed, named, attr) // names.go
 		if attr != nil && named != nil && named == a.u.Decl &&
 			a.u.Kind.Primary() {
 			a.u.unitAttrs = append(a.u.unitAttrs, attr)
@@ -538,6 +566,7 @@ func (a *analyzer) subprogramSpec(spec cst.Node, kind DeclKind) *Decl {
 	}
 	if !ret.IsZero() {
 		d.Type = a.typeMark(ret.TypeMark().Node)
+		a.resultRules(ret, d.Type) // objrules.go
 		a.returnIdentifier(ret, d.Type)
 	}
 	a.pop()
@@ -583,6 +612,7 @@ func (a *analyzer) subprogramBody(sb cst.SubprogramBody) {
 	d.Node = sb.Node
 	if spec := a.findSpec(d); spec != nil {
 		d.Spec = spec
+		a.duplicateBody(d, spec) // scope.go
 		a.conforms(spec, sb.Spec().Node, d)
 		a.u.Refs = append(a.u.Refs, Ref{File: a.f, Span: d.Span,
 			Decl: spec, Kind: RefBody})
@@ -606,6 +636,7 @@ func (a *analyzer) subprogramBody(sb cst.SubprogramBody) {
 	a.declareSeqLabels(sb.Stmts().Node)
 	a.declarativePart(sb.Decls().Node)
 	d.Seq = a.sequentialStatements(sb.Stmts().Node)
+	a.purityRules(d) // purity.go
 	end := sb.End()
 	if tok := end.Name(); !tok.IsZero() && !tok.Missing() {
 		if TokenKey(tok) == d.Name {
@@ -630,7 +661,8 @@ func (a *analyzer) conforms(spec *Decl, body cst.Node, d *Decl) {
 	if sd, ok := cst.As[cst.SubprogramDecl](sn); ok {
 		sn = sd.Spec().Node
 	}
-	x, y := conformTokens(sn), conformTokens(body)
+	lenient := a.s.cfg.Lenient
+	x, y := conformTokens(sn, lenient), conformTokens(body, lenient)
 	if slices.Equal(x, y) {
 		return
 	}
@@ -645,11 +677,16 @@ func (a *analyzer) conforms(spec *Decl, body cst.Node, d *Decl) {
 
 // conformTokens is the normalized lexical element sequence of a
 // subprogram specification.
-func conformTokens(n cst.Node) []string {
-	// An interface constant that names no mode may add or omit the
-	// class (GHDL and NVC accept `a : bit` against `constant a : bit`).
+func conformTokens(n cst.Node, lenient bool) []string {
+	// LRM 4.10 allows no other variation, but lenient analysis lets an
+	// interface constant that names no mode add or omit the class
+	// (GHDL -frelaxed and NVC --relaxed accept `a : bit` against
+	// `constant a : bit`).
 	drop := map[int]bool{}
 	for io := range n.Descendants() {
+		if !lenient {
+			break
+		}
 		x, ok := cst.As[cst.InterfaceObjectDecl](io)
 		if !ok || !x.Mode().IsZero() ||
 			x.Class().Kind() != token.KwConstant {
@@ -723,12 +760,17 @@ func (a *analyzer) subprogramInst(si cst.SubprogramInstantiation) {
 	}
 	if len(pick) >= 1 {
 		g := pick[0].Denotes()
+		a.subprogramInstRules(si, g) // pkginst.go
 		d.Target, d.Type, d.Params = g, g.Type, g.Params
 		if g.Kind.IsSubprogram() {
 			d.Kind = g.Kind
 		}
 		a.ref(r.tok, g, RefRead)
 		as := a.assocMap(si.GenericMap().List(), g.Region, DeclGeneric)
+		a.instSubst = nil
+		if g.Kind.IsSubprogram() {
+			a.missingGenerics(as, g.Region, si.Node)
+		}
 		instanceProfile(d, as)
 	} else {
 		a.genericMap(si.GenericMap().List(), nil)
@@ -784,6 +826,7 @@ func (a *analyzer) pslDecl(n cst.Node) {
 			}
 			continue
 		}
+		a.sequenceBody(n, c) // psl.go
 		a.psl(c)
 	}
 	a.pop()

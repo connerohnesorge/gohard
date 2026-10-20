@@ -176,7 +176,8 @@ func (s *session) linkDeps() {
 				deps = append(deps, d)
 			}
 		}
-		for _, r := range u.uses {
+		for _, r := range append(slices.Clone(u.uses),
+			s.inheritedRefs(u)...) { // units.go
 			l, ok := s.library(u, r.lib)
 			if !ok {
 				continue

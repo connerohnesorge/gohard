@@ -39,8 +39,11 @@ func globallyStatic(e *Expr, depth int) (static, known bool) {
 		case DeclEnumLiteral, DeclUnit, DeclGeneric, DeclGenerateParam:
 			return true, true
 		case DeclConstant:
-			if d.Value == nil {
-				return true, true // deferred: static by its full value
+			if d.Value == nil || !inDynamicRegion(d) {
+				// LRM 9.4.3 b: a constant (a deferred one too) outside
+				// a subprogram or process is globally static, whatever
+				// its value expression.
+				return true, true
 			}
 			return globallyStatic(d.Value, depth+1)
 		case DeclSignal, DeclPort, DeclVariable, DeclSharedVariable,
@@ -124,9 +127,17 @@ func locallyStatic(e *Expr, depth int, std token.Standard,
 		switch d.Kind {
 		case DeclEnumLiteral:
 			return true, true
+		case DeclUnit:
+			return false, true // like a physical literal (see above)
 		case DeclConstant:
 			if d.Value == nil {
 				return false, true // deferred
+			}
+			if s, k := localSubtype(d.Type, std); k && !s &&
+				d.Type.Constraints() != nil {
+				// LRM 9.4.2 b: a constant of a constrained array
+				// subtype that is not locally static is not.
+				return false, true
 			}
 			return locallyStatic(d.Value, depth+1, std)
 		case DeclSignal, DeclPort, DeclVariable, DeclSharedVariable,
@@ -191,4 +202,15 @@ func locallyStatic(e *Expr, depth int, std token.Standard,
 func ieeeFunction(d *Decl) bool {
 	return d.Kind == DeclFunction && d.File != nil && d.File.Bundled &&
 		d.File.Library == "ieee"
+}
+
+// inDynamicRegion reports whether d is declared in a subprogram or a
+// process, whose constants are elaborated anew each time.
+func inDynamicRegion(d *Decl) bool {
+	for r := d.Parent; r != nil; r = r.Parent {
+		if r.Kind == RegionSubprogram || r.Kind == RegionProcess {
+			return true
+		}
+	}
+	return false
 }

@@ -148,6 +148,7 @@ by `path`) so tools rewrite the file deterministically.
 | `format_oracle_sha256` | hex | Formatter oracle (#32): hash over `golden/format.ghdl.txt` and `golden/format.nvc.txt` (see "Formatter oracle" below). Never `pending`; written by `tools/oracle` on the line after `oracle_sha256`. |
 | `semerr_sha256` | hex | Semantic-error oracle (#34): hash over `testdata/corpus/golden/semerr/corpus-<name>.txt` (see "Semantic-error oracle" below). Written by `tools/oracle` on the line after `format_oracle_sha256`. |
 | `semerr_follows` | list | Optional. Recorded semantic-error disagreements GoHard decides (see "Semantic-error oracle"). |
+| `semerr_decisions` | list | Optional. Recorded lines where GoHard decides against both tools, with the LRM section (see "Semantic-error oracle"). |
 
 Every hash field is the lower-case hex sha256 over the field's golden
 files in name order, each fed as its name (relative to `golden/`), a
@@ -241,7 +242,7 @@ before pinning.
 | `license` | SPDX licence expression for the parsed `subfolder` (ids, `LicenseRef-*`, `AND`/`OR`/`WITH`). When files under the subfolder carry other terms (GRLIB vendor files), or the tree has no licence file so the licence is read from headers, the expression must name the extra terms with a `LicenseRef-*` term. |
 | `tag` | `pr` (parsed on every pull request) or `nightly` (only in the nightly full run). PR: the GHDL `testsuite/` (incl. VESTS) and NVC `test/` folders. Nightly: everything. |
 | `subfolder` | Folder inside the submodule that is parsed (checked out alone for `pr` entries); `.` for the whole tree. |
-| `expected_failures` | List of paths or globs, relative to the submodule, of every upstream file that carries the project's own expected-failure data (for GHDL the `testsuite.sh` scripts of `gna/` and `sanity/` plus both VESTS `non_compliant.exp` lists; for NVC `test/regress/testlist.txt` and every `test/test_*.c`). How each kind is read is written as a comment above the entries in `corpus.yaml`. `[]` if every file must parse. |
+| `expected_failures` | List of paths or globs, relative to the submodule, of every upstream file that carries the project's own expected-failure data (for GHDL the `testsuite.sh` scripts of `gna/` and `sanity/` plus both VESTS `non_compliant.exp` lists; for NVC `test/regress/testlist.txt` and every `test/test_*.c`). How each kind is read is written as a comment above the entries in `corpus.yaml`. A `.vhd`/`.vhdl` path or glob names source files that are not VHDL (preprocessor templates, documentation snippets) or are invalid upstream: they may fail, and a one-line comment above each such entry gives the reason. `[]` if every file must parse. |
 
 The bundled IEEE packages in `internal/stdlib/` and the 14 corpus designs
 are always part of the PR set and need no entry. gohard-old is not used.
@@ -410,3 +411,12 @@ directory or the entry's subfolder), `line`, `follows` (`ghdl` or
 `nvc`), `lrm` (the IEEE 1076 section) and `notes`. The check then
 requires GoHard to report an error on that line exactly when the
 followed tool does.
+
+Where both tools agree and GoHard, for a reason in the LRM, does not,
+the line is a `semerr_decisions` item of the entry: `path`, `line`,
+`gohard` (`none` on a line both tools reject that GoHard accepts, or
+`error` on a line of a file both tools accept that GoHard rejects;
+line `0` records every error of the file), `lrm` and `notes`. The
+check fails on a GoHard error in a file both tools accept that no item
+records, and on an item GoHard no longer matches, so neither a gap
+nor a false error is ever waived silently; `gaps.txt` stays empty.

@@ -52,8 +52,8 @@ begin
   l: entity work.leaf generic map (W => n);
 end;
 entity p is end;
-architecture a of p is begin u: entity work.q; end;
 entity q is end;
+architecture a of p is begin u: entity work.q; end;
 architecture a of q is begin u: entity work.p; end;
 `})
 	h := Build(r, Options{MaxDepth: 8})

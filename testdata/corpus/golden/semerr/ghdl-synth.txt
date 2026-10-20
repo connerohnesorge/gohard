@@ -9,8 +9,9 @@
 # follow). Each file line is the argument, the library when not work,
 # the GHDL options, then per tool the exit code and the lines of that
 # file it reports errors on; "~" marks a line whose only errors are
-# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
-# reports an error on every line both tools report one on
+# cascades (GHDL's "<unit> was not analysed", NVC's "... was analysed
+# with errors"). tools/oracle checks that GoHard reports an error on
+# every line both tools report one on, cascades aside
 # (semerr_check.go).
 tool ghdl 6.0.0
 tool nvc 1.23.0
@@ -804,15 +805,15 @@ run synth/gen01#2 dir=testdata/ghdl/testsuite/synth/gen01 std=08 sha=bb03fbed359
  pkg03.vhdl ghdl=0 nvc=0
  pkg04.vhdl ghdl=0 nvc=0
 run synth/iassoc01#1 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=94ada099993905d0
- iassoc01.vhdl ghdl=1@1,4,8~,18~ nvc=1@1,8,20
+ iassoc01.vhdl ghdl=1@1,4,8~,18~ nvc=1@1,8~,20~
  tb_iassoc01.vhdl ghdl=1@12 nvc=1@12
  pkg.vhdl ghdl=0 nvc=0
 run synth/iassoc01#2 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=c559d96fc6aeefe3
- iassoc02.vhdl ghdl=1@1,5,8~,19~ nvc=1@1,8,21
+ iassoc02.vhdl ghdl=1@1,5,8~,19~ nvc=1@1,8~,21~
  tb_iassoc02.vhdl ghdl=1@12 nvc=1@12
  pkg.vhdl ghdl=0 nvc=0
 run synth/iassoc01#3 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=d0657e7a6f6655ed
- iassoc03.vhdl ghdl=1@1,4,8~,26~ nvc=1@1,8,28
+ iassoc03.vhdl ghdl=1@1,4,8~,26~ nvc=1@1,8~,28~
  tb_iassoc03.vhdl ghdl=1@12 nvc=1@12
  pkg.vhdl ghdl=0 nvc=0
 run synth/iassoc01#4 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=1ab02ea708d0e593
@@ -820,11 +821,11 @@ run synth/iassoc01#4 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=1ab0
  tb_iassoc04.vhdl ghdl=0 nvc=0
  pkg.vhdl ghdl=0 nvc=0
 run synth/iassoc01#5 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=6e7f6182ef5abda2
- iassoc11.vhdl ghdl=1@1,4,8~,18,20~ nvc=1@1,8,18
+ iassoc11.vhdl ghdl=1@1,4,8~,18,20~ nvc=1@1,8~,18
  tb_iassoc11.vhdl ghdl=1@12 nvc=1@12
  pkg.vhdl ghdl=0 nvc=0
 run synth/iassoc01#6 dir=testdata/ghdl/testsuite/synth/iassoc01 std=93c sha=3e058cb99785685a
- iassoc12.vhdl ghdl=1@1,5,8~,19,21~ nvc=1@1,8,19
+ iassoc12.vhdl ghdl=1@1,5,8~,19,21~ nvc=1@1,8~,19
  tb_iassoc12.vhdl ghdl=1@12 nvc=1@12
  pkg.vhdl ghdl=0 nvc=0
 run synth/if01#1 dir=testdata/ghdl/testsuite/synth/if01 std=93c sha=d29e52934594cdda
@@ -905,7 +906,7 @@ run synth/issue1033#1 dir=testdata/ghdl/testsuite/synth/issue1033 std=93c sha=32
  ent.vhdl ghdl=0 nvc=0
  entcos.vhdl ghdl=0 nvc=0
 run synth/issue1034#1 dir=testdata/ghdl/testsuite/synth/issue1034 std=93c sha=1f6829c9f78b6536
- ent.vhdl ghdl=1@1,8,12~ nvc=1@1,12
+ ent.vhdl ghdl=1@1,8,12~ nvc=1@1,12~
  tb_ent.vhdl ghdl=1@10 nvc=1@10
  p.vhdl ghdl=0 nvc=0
 run synth/issue1035#1 dir=testdata/ghdl/testsuite/synth/issue1035 std=08 sha=0f7a15210ec73aab
@@ -1046,7 +1047,7 @@ run synth/issue1117#2 dir=testdata/ghdl/testsuite/synth/issue1117 std=93c sha=04
  ent.vhdl ghdl=0 nvc=0
  tb_ent.vhdl ghdl=0 nvc=0
 run synth/issue1122#1 dir=testdata/ghdl/testsuite/synth/issue1122 std=93c sha=ee482f60139e77c1
- mult.vhd ghdl=1@4,10,11,14~ nvc=1@4,14
+ mult.vhd ghdl=1@4,10,11,14~ nvc=1@4,14~
  mult_pkg.vhd ghdl=0 nvc=0
  mult_pkg.vhd ghdl=0 nvc=0
 run synth/issue1122#2 dir=testdata/ghdl/testsuite/synth/issue1122 std=93c sha=8c0f13996e63da41
@@ -1530,20 +1531,20 @@ run synth/issue1658#1 dir=testdata/ghdl/testsuite/synth/issue1658 std=08 sha=21d
 run synth/issue1665#1 dir=testdata/ghdl/testsuite/synth/issue1665 std=08 sha=a3b62cebd67bae42
  test.vhdl ghdl=0 nvc=0
 run synth/issue1675#1 dir=testdata/ghdl/testsuite/synth/issue1675 std=93c sha=b387578308110578
- accum.vhdl ghdl=1@5,10,14~ nvc=1@5,14
+ accum.vhdl ghdl=1@5,10,14~ nvc=1@5,14~
  tb_accum.vhdl ghdl=1@7,11,14 nvc=1@7
  pkg.vhdl ghdl=0 nvc=0
 run synth/issue1675#2 dir=testdata/ghdl/testsuite/synth/issue1675 std=93c sha=242f3c52f51f0f1d
- accumwr.vhdl ghdl=1@5,15~ nvc=1@5,15
+ accumwr.vhdl ghdl=1@5,15~ nvc=1@5,15~
  tb_accumwr.vhdl ghdl=1@7,15 nvc=1@7
  pkg.vhdl ghdl=0 nvc=0
  accum.vhdl ghdl=0 nvc=0
 run synth/issue1675#3 dir=testdata/ghdl/testsuite/synth/issue1675 std=93c sha=535969491740d6b7
- patgen.vhdl ghdl=1@5,11,14~ nvc=1@5,14
+ patgen.vhdl ghdl=1@5,11,14~ nvc=1@5,14~
  tb_patgen.vhdl ghdl=1@7,12,14 nvc=1@7
  pkg.vhdl ghdl=0 nvc=0
 run synth/issue1675#4 dir=testdata/ghdl/testsuite/synth/issue1675 std=93c sha=983cc4f099e3d6d9
- patacc.vhdl ghdl=1@5,14~ nvc=1@5,14
+ patacc.vhdl ghdl=1@5,14~ nvc=1@5,14~
  tb_patacc.vhdl ghdl=1@7,14 nvc=1@7
  pkg.vhdl ghdl=0 nvc=0
  patgen.vhdl ghdl=0 nvc=0
@@ -1853,7 +1854,7 @@ run synth/issue2177#1 dir=testdata/ghdl/testsuite/synth/issue2177 std=93c sha=9f
  vlm5030_gl.vhd ghdl=0 nvc=0
 run synth/issue2187#1 dir=testdata/ghdl/testsuite/synth/issue2187 std=93c sha=d239c14a80e27636
  rawfile_pkg.vhd ghdl=0 nvc=1@130,151,172,202,259,316
- rom16.vhd ghdl=0 nvc=1@6,18
+ rom16.vhd ghdl=0 nvc=1@6,18~
 run synth/issue2204#1 dir=testdata/ghdl/testsuite/synth/issue2204 std=93c sha=7e27c19468d959fd
  crash.vhdl -fpsl ghdl=0 nvc=0
  crash2.vhdl -fpsl ghdl=0 nvc=0
@@ -1974,12 +1975,12 @@ run synth/issue2456#1 dir=testdata/ghdl/testsuite/synth/issue2456 std=08 sha=b7f
 run synth/issue2461#1 dir=testdata/ghdl/testsuite/synth/issue2461 std=08 sha=ab2dda813e7cdff8
  repro3.vhdl ghdl=0 nvc=0
  repro4.vhdl ghdl=0 nvc=0
- knn.vhdl ghdl=1@5,18,19,20,26~ nvc=1@5,26
- argmin.vhdl ghdl=1@5,16,17,22~ nvc=1@5,22
- distancias.vhdl ghdl=1@5,16,17,18,23~ nvc=1@5,23
- insere.vhdl ghdl=1@2,12,15,20~ nvc=1@2,20
- moda.vhdl ghdl=1@2,13,19~ nvc=1@2,19
- norm.vhdl ghdl=1@5,16,17,18,19,24,28,29,30,31,34,36,41,45,46,47,55,56,63,64,65,70,71,74,77 nvc=1@5,24
+ knn.vhdl ghdl=1@5,18,19,20,26~ nvc=1@5,26~
+ argmin.vhdl ghdl=1@5,16,17,22~ nvc=1@5,22~
+ distancias.vhdl ghdl=1@5,16,17,18,23~ nvc=1@5,23~
+ insere.vhdl ghdl=1@2,12,15,20~ nvc=1@2,20~
+ moda.vhdl ghdl=1@2,13,19~ nvc=1@2,19~
+ norm.vhdl ghdl=1@5,16,17,18,19,24,28,29,30,31,34,36,41,45,46,47,55,56,63,64,65,70,71,74,77 nvc=1@5,24~
  pacote_aux.vhdl ghdl=0 nvc=0
  top.vhdl ghdl=1@22 nvc=1@22
 run synth/issue2467#1 dir=testdata/ghdl/testsuite/synth/issue2467 std=93c sha=53475f95094801a9
@@ -2151,7 +2152,7 @@ run synth/issue2912#1 dir=testdata/ghdl/testsuite/synth/issue2912 std=93c sha=21
 run synth/issue2914#1 dir=testdata/ghdl/testsuite/synth/issue2914 std=08 sha=33709029940b894d
  module.vhdl ghdl=0 nvc=0
 run synth/issue2930#1 dir=testdata/ghdl/testsuite/synth/issue2930 std=93c sha=fa040fe9571a25da
- rom1.vhdl ghdl=1@4,11~ nvc=1@4,11
+ rom1.vhdl ghdl=1@4,11~ nvc=1@4,11~
  tb_rom1.vhdl ghdl=1@7,13,18,19,21 nvc=1@7
  mem_pkg.vhdl ghdl=0 nvc=0
 run synth/issue2930#2 dir=testdata/ghdl/testsuite/synth/issue2930 std=93c sha=971b327f0eb521c1
@@ -2240,8 +2241,8 @@ run synth/issue3087#1 dir=testdata/ghdl/testsuite/synth/issue3087 std=08 sha=29a
 run synth/issue3094#1 dir=testdata/ghdl/testsuite/synth/issue3094 std=93c sha=4180d8c363de237a
  entityA.vhdl ghdl=0 nvc=0
  entityB.vhdl ghdl=0 nvc=0
- wrapperA.vhdl ghdl=1@4,13~ nvc=1@4,13
- wrapperB.vhdl ghdl=1@4,13~ nvc=1@4,13
+ wrapperA.vhdl ghdl=1@4,13~ nvc=1@4,13~
+ wrapperB.vhdl ghdl=1@4,13~ nvc=1@4,13~
  top.vhdl ghdl=1@11,13 nvc=1@11,13
  entityA.vhdl ghdl=0 nvc=0
 run synth/issue3095#1 dir=testdata/ghdl/testsuite/synth/issue3095 std=93c sha=136d79e61966237d
@@ -2443,7 +2444,7 @@ run synth/lib01#1 dir=testdata/ghdl/testsuite/synth/lib01 std=93c sha=7e5a9b8e12
  and3.vhdl ghdl=0 nvc=0
  tb_and3.vhdl ghdl=0 nvc=0
 run synth/lib01#2 dir=testdata/ghdl/testsuite/synth/lib01 std=93c sha=d890fd25dc9d1130
- and3.vhdl ghdl=1@3,10~ nvc=1@3,10
+ and3.vhdl ghdl=1@3,10~ nvc=1@3,10~
  and2.vhdl ghdl=0 nvc=0
  and2.vhdl lib=mylib ghdl=0 nvc=0
  tb_and3.vhdl ghdl=1@12 nvc=1@12
@@ -2874,7 +2875,7 @@ run synth/range01#1 dir=testdata/ghdl/testsuite/synth/range01 std=93c sha=dc2282
  revrng01.vhdl ghdl=0 nvc=0
  tb_revrng01.vhdl ghdl=0 nvc=0
 run synth/rec01#1 dir=testdata/ghdl/testsuite/synth/rec01 std=93c sha=5e70ba0fd2ebaa1e
- rec01.vhdl ghdl=1@3,6,12~ nvc=1@3,12
+ rec01.vhdl ghdl=1@3,6,12~ nvc=1@3,12~
  tb_rec01.vhdl ghdl=1@6,9,14 nvc=1@6
  pkg_rec01.vhdl ghdl=0 nvc=0
 run synth/ret01#1 dir=testdata/ghdl/testsuite/synth/ret01 std=93c sha=b9565bc69d58d5a0

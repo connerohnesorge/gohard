@@ -229,7 +229,7 @@ func (a *analyzer) missingUnit(l *Library, k Key, tok cst.Token) {
 	a.u.missing = append(a.u.missing, unitRef{lib: l.Name, unit: k,
 		node: tok.Parent()})
 	a.report(tok.Span(), diag.New(diag.LibraryMissingUnit,
-		string(l.Name), tok.Text(), a.scanned(l)))
+		string(l.Name), tok.Text(), a.scanned(l)+a.notYet(l, k)))
 }
 
 // scanned describes where a library's units come from, for

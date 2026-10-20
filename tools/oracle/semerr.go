@@ -47,15 +47,17 @@ var semerrSection = &section{
 // beyond manifest.
 type semManifest struct {
 	Designs []struct {
-		Name    string   `yaml:"name"`
-		Follows []follow `yaml:"semerr_follows"`
+		Name      string     `yaml:"name"`
+		Follows   []follow   `yaml:"semerr_follows"`
+		Decisions []decision `yaml:"semerr_decisions"`
 	} `yaml:"designs"`
 	Regression []struct {
-		Name      string   `yaml:"name"`
-		Path      string   `yaml:"path"`
-		Tag       string   `yaml:"tag"`
-		Subfolder string   `yaml:"subfolder"`
-		Follows   []follow `yaml:"semerr_follows"`
+		Name      string     `yaml:"name"`
+		Path      string     `yaml:"path"`
+		Tag       string     `yaml:"tag"`
+		Subfolder string     `yaml:"subfolder"`
+		Follows   []follow   `yaml:"semerr_follows"`
+		Decisions []decision `yaml:"semerr_decisions"`
 	} `yaml:"regression"`
 }
 
@@ -73,11 +75,29 @@ type follow struct {
 	Notes   string `yaml:"notes"`
 }
 
+// decision is one recorded decision (`semerr_decisions` in a design or
+// regression entry) on a line of file Path where GHDL and NVC agree
+// and GoHard, for the reason given by the LRM section, does not:
+// GoHard "none" on a line both tools report an error on (the rule is
+// one GoHard leaves to elaboration, or the tools' error is a
+// limitation of theirs), or GoHard "error" on a line of a file both
+// tools accept (an error GoHard reports before anything runs that the
+// tools report only at elaboration or run time). The check requires
+// GoHard's result to stay the recorded one.
+type decision struct {
+	Path   string `yaml:"path"`
+	Line   int    `yaml:"line"`
+	GoHard string `yaml:"gohard"`
+	LRM    string `yaml:"lrm"`
+	Notes  string `yaml:"notes"`
+}
+
 // semTarget is the pure plan of one semerr target.
 type semTarget struct {
-	ref     entryRef
-	plan    *semPlan
-	follows map[string]follow // repo path + ":" + line
+	ref       entryRef
+	plan      *semPlan
+	follows   map[string]follow   // repo path + ":" + line
+	decisions map[string]decision // repo path + ":" + line
 }
 
 // semTargets returns the semerr targets: every corpus design, then the
@@ -98,10 +118,11 @@ func semTargetsOf(x *ctx) ([]*semTarget, error) {
 		}
 		t := &semTarget{ref: entryRef{List: "designs", Name: d.Name,
 			Field: fieldSemerr, After: fieldFormat}, plan: p,
-			follows: map[string]follow{}}
+			follows: map[string]follow{}, decisions: map[string]decision{}}
 		for _, e := range sm.Designs {
 			if e.Name == d.Name {
 				addFollows(t, d.dir(), e.Follows)
+				addDecisions(t, d.dir(), e.Decisions)
 			}
 		}
 		out = append(out, t)
@@ -130,8 +151,9 @@ func semTargetsOf(x *ctx) ([]*semTarget, error) {
 		}
 		t := &semTarget{ref: entryRef{List: "regression", Name: e.Name,
 			Field: fieldSemerr, After: "subfolder"}, plan: p,
-			follows: map[string]follow{}}
+			follows: map[string]follow{}, decisions: map[string]decision{}}
 		addFollows(t, dir, e.Follows)
+		addDecisions(t, dir, e.Decisions)
 		out = append(out, t)
 	}
 	for _, t := range out {
@@ -144,6 +166,12 @@ func semTargetsOf(x *ctx) ([]*semTarget, error) {
 func addFollows(t *semTarget, dir string, fs []follow) {
 	for _, f := range fs {
 		t.follows[path.Join(dir, f.Path)+":"+strconv.Itoa(f.Line)] = f
+	}
+}
+
+func addDecisions(t *semTarget, dir string, ds []decision) {
+	for _, d := range ds {
+		t.decisions[path.Join(dir, d.Path)+":"+strconv.Itoa(d.Line)] = d
 	}
 }
 
@@ -223,16 +251,19 @@ func runSum(root string, r *semRun) (string, error) {
 
 // toolResult is one tool's analysis of one file: the exit code, the
 // sorted lines of the file it reports errors on, and the subset of
-// those lines whose only errors are cascades (GHDL's "<unit> was not
-// analysed": the unit failed because of an error elsewhere).
+// those lines whose only errors are cascades (the unit named failed
+// because of an error elsewhere: GHDL's "<unit> was not analysed",
+// NVC's "design unit depends on <unit> which was analysed with errors"
+// and "design unit <unit> was analysed with errors").
 type toolResult struct {
 	Exit    int
 	Lines   []int
 	Cascade []int
 }
 
-// cascadeMsg matches GHDL's cascade errors.
-var cascadeMsg = regexp.MustCompile(`was not analysed$`)
+// cascadeMsg matches GHDL's and NVC's cascade errors.
+var cascadeMsg = regexp.MustCompile(
+	`was not analysed$|was analysed with errors$`)
 
 // String is the compact form: exit code, then "@" and the lines, a
 // cascade line marked with "~".
@@ -286,8 +317,9 @@ const semerrHeader = `# GoHard semantic-error oracle (#34, R12): %s.
 # follow). Each file line is the argument, the library when not work,
 # the GHDL options, then per tool the exit code and the lines of that
 # file it reports errors on; "~" marks a line whose only errors are
-# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
-# reports an error on every line both tools report one on
+# cascades (GHDL's "<unit> was not analysed", NVC's "... was analysed
+# with errors"). tools/oracle checks that GoHard reports an error on
+# every line both tools report one on, cascades aside
 # (semerr_check.go).
 `
 

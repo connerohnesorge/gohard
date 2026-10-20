@@ -42,7 +42,8 @@
 //     list only shrinks). Hash: semerr_sha256 in each design and in
 //     the ghdl and nvc regression entries. See semerr_check.go for
 //     the rules (dependency closure, cascades, syntax recovery,
-//     opaque units, semerr_follows).
+//     opaque units, semerr_follows, semerr_decisions: a GoHard error
+//     in a file both tools accept fails unless recorded).
 //
 //   - trace (#36, #8): GHDL (--vcd) and NVC (--wave --format=vcd
 //     --dump-arrays) run the main run of each design with a trace

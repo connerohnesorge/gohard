@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"maps"
 	"path"
 	"regexp"
 	"runtime/debug"
@@ -24,9 +25,11 @@ import (
 // clean in both tools: a unit a tool rejected is missing for it, and
 // its errors on dependents (a cascade) say nothing about the file. A
 // recorded disagreement (semerr_follows) adds the line with the side
-// GoHard follows. Known gaps are listed in gaps.txt; the check fails on
-// a gap not listed and on a listed gap GoHard has closed, so the list
-// only shrinks.
+// GoHard follows. A recorded decision (semerr_decisions) takes an
+// agreed line GoHard does not report out of the check, and every
+// GoHard error in a file both tools accept must be one. Known gaps are
+// listed in gaps.txt; the check fails on a gap not listed and on a
+// listed gap GoHard has closed, so the list only shrinks.
 
 // semGapsName is the known-gap list in semerrDir. It is not a golden
 // file: GoHard's results decide it, and
@@ -43,10 +46,10 @@ type semStats struct {
 	// GHDLFiles and NVCFiles count analyses with an error line.
 	GHDLFiles, NVCFiles int
 	// Agree counts lines both tools report. Of those, Cascade are
-	// GHDL cascades, Excluded are in files whose closure is not clean,
-	// Opaque in files GoHard reports as opaque, AfterSyntax after
-	// GoHard's first syntax error; Gated are the lines checked, and
-	// Hits those GoHard reports an error on.
+	// cascades of either tool, Excluded are in files whose closure is
+	// not clean, Opaque in files GoHard reports as opaque, AfterSyntax
+	// after GoHard's first syntax error; Gated are the lines checked,
+	// and Hits those GoHard reports an error on.
 	// Vendor are in files that use a vendor package GoHard does not
 	// bundle (vendorUnit).
 	Agree, Cascade, Excluded, Opaque, AfterSyntax, Gated, Hits int
@@ -54,15 +57,24 @@ type semStats struct {
 	// GHDLOnly and NVCOnly count lines only one tool reports (in
 	// gated files); Followed the recorded ones.
 	GHDLOnly, NVCOnly, Followed int
-	// With semCountFalse: CleanFiles counts the checked analyses both
-	// tools accept, FalseFiles those GoHard reports an error in.
-	CleanFiles, FalseFiles int
+	// Decided counts the agreed lines a semerr_decisions entry
+	// records GoHard does not report (not in Gated).
+	Decided int
+	// CleanFiles counts the checked analyses both tools accept,
+	// FalseFiles those GoHard reports an error in; FalseDecided the
+	// errors there a semerr_decisions entry records.
+	CleanFiles, FalseFiles, FalseDecided int
 }
 
-// semCountFalse makes the check also analyze the files both tools
-// accept and count GoHard's errors there (TestSemerrGaps
-// -semerr-false); the gate itself never needs it.
+// semCountFalse makes the check also list GoHard's errors in the files
+// both tools accept that a semerr_decisions entry records
+// (TestSemerrGaps -semerr-false); the unrecorded ones always fail it.
 var semCountFalse bool
+
+// semOneSided, when set (TestSemerrGaps -semerr-onesided), makes the
+// check list GoHard's errors on lines only one tool reports that no
+// semerr_follows entry records, as candidates for a recorded decision.
+var semOneSided bool
 
 // semDebugPath, when set (TestSemerrGaps -semerr-debug), makes the
 // check log the analysis inputs and every diagnostic of that file.
@@ -84,6 +96,8 @@ func (s *semStats) add(o semStats) {
 	s.GHDLOnly += o.GHDLOnly
 	s.NVCOnly += o.NVCOnly
 	s.Followed += o.Followed
+	s.Decided += o.Decided
+	s.FalseDecided += o.FalseDecided
 	s.CleanFiles += o.CleanFiles
 	s.FalseFiles += o.FalseFiles
 }
@@ -110,8 +124,9 @@ func (s semStats) String() string {
 		s.GHDLOnly,
 		s.NVCOnly,
 		s.Followed,
-	) + fmt.Sprintf(" clean=%d gohard-errors-in"+
-		"-clean=%d", s.CleanFiles, s.FalseFiles)
+	) + fmt.Sprintf(" decided=%d clean=%d gohard-errors-in"+
+		"-clean=%d decided-in-clean=%d", s.Decided, s.CleanFiles,
+		s.FalseFiles, s.FalseDecided)
 }
 
 // semResults collects the stats and the gaps of every checked golden
@@ -122,6 +137,8 @@ var semResults = struct {
 	gaps  map[string][]string
 	false []string
 	debug []string
+	// oneSided collects runOutcome.oneSided (semOneSided).
+	oneSided []string
 }{stats: map[string]semStats{}, gaps: map[string][]string{}}
 
 // readGaps returns the known gaps of the golden file names, by name.
@@ -172,7 +189,8 @@ func checkSemerr(x *ctx, t target, golden []goldenFile) []string {
 		}
 		outs := make([]runOutcome, len(runs))
 		parallel(len(runs), semJobs(), func(i int) {
-			outs[i] = evalRun(x.root, runs[i], rec.runs[i], st.follows)
+			outs[i] = evalRun(x.root, runs[i], rec.runs[i], st.follows,
+				st.decisions)
 		})
 		var (
 			stats  semStats
@@ -191,6 +209,8 @@ func checkSemerr(x *ctx, t target, golden []goldenFile) []string {
 		semResults.gaps[g.Name] = gaps
 		for _, o := range outs {
 			semResults.false = append(semResults.false, o.false...)
+			semResults.oneSided = append(semResults.oneSided,
+				o.oneSided...)
 		}
 		semResults.Unlock()
 		var unlisted, closed []string
@@ -272,14 +292,20 @@ func stalePlan(root string, runs []*semRun, rec *semRecorded) string {
 // runOutcome is the check of one run.
 type runOutcome struct {
 	stats semStats
-	false []string // with semCountFalse: first GoHard error per file
-	gaps  []string // "<run id> <path>:<line>", sorted
-	probs []string
+	// false lists GoHard's errors in files both tools accept, as
+	// "path:line: message": the unrecorded ones, and with
+	// semCountFalse the recorded ones too
+	false []string
+	// with semOneSided: "<path>:<line> <side> <message>" per GoHard
+	// error on a line only <side> reports, unrecorded
+	oneSided []string
+	gaps     []string // "<run id> <path>:<line>", sorted
+	probs    []string
 }
 
 // evalRun checks one recorded run against GoHard.
 func evalRun(root string, r *semRun, rec recRun,
-	follows map[string]follow) runOutcome {
+	follows map[string]follow, decided map[string]decision) runOutcome {
 	o := runOutcome{stats: semStats{Runs: 1, Files: len(r.Files)}}
 	texts := make([][]byte, len(r.Files))
 	for i, f := range r.Files {
@@ -305,7 +331,7 @@ func evalRun(root string, r *semRun, rec recRun,
 		}
 		all := intersect(g.Lines, n.Lines)
 		o.stats.Agree += len(all)
-		agreed := minusInts(all, g.Cascade)
+		agreed := minusInts(minusInts(all, g.Cascade), n.Cascade)
 		o.stats.Cascade += len(all) - len(agreed)
 		closure := idx.closure(i)
 		clean := true
@@ -334,8 +360,8 @@ func evalRun(root string, r *semRun, rec recRun,
 			}
 		}
 		bothClean := g.Exit == 0 && n.Exit == 0
-		if len(agreed) == 0 && len(fl) == 0 &&
-			!(semCountFalse && bothClean) {
+		oneSide := semOneSided && len(ghdlOnly)+len(nvcOnly) > 0
+		if len(agreed) == 0 && len(fl) == 0 && !bothClean && !oneSide {
 			continue
 		}
 		gh, err := gohardErrorLines(r, texts, closure, i)
@@ -348,14 +374,23 @@ func evalRun(root string, r *semRun, rec recRun,
 			o.stats.Opaque += len(agreed)
 			continue
 		}
-		if semCountFalse && bothClean {
-			o.stats.CleanFiles++
-			if len(gh.errs) > 0 {
-				o.stats.FalseFiles++
-				o.false = append(o.false, gh.first)
-			}
+		if bothClean {
+			o.cleanFile(r, f.Path, gh, decided)
 		}
 		for _, l := range agreed {
+			key := f.Path + ":" + strconv.Itoa(l)
+			if d, ok := decided[key]; ok {
+				o.stats.Decided++
+				if d.GoHard != "none" || gh.errs[l] {
+					o.probs = append(o.probs, fmt.Sprintf("run %s: %s: "+
+						"GHDL and NVC report an error, the recorded "+
+						"decision (LRM %s) says GoHard reports %q, and "+
+						"GoHard reports %s error: fix sema or the "+
+						"semerr_decisions entry", r.ID, key, d.LRM,
+						d.GoHard, an(gh.errs[l])))
+				}
+				continue
+			}
 			switch {
 			case gh.syntax > 0 && l > gh.syntax:
 				o.stats.AfterSyntax++
@@ -367,6 +402,10 @@ func evalRun(root string, r *semRun, rec recRun,
 				o.gaps = append(o.gaps, fmt.Sprintf("%s %s:%d", r.ID,
 					f.Path, l))
 			}
+		}
+		if oneSide {
+			o.oneSided = append(o.oneSided, oneSided(f.Path, gh,
+				ghdlOnly, nvcOnly, follows)...)
 		}
 		for _, e := range fl {
 			o.stats.Followed++
@@ -395,6 +434,71 @@ func evalRun(root string, r *semRun, rec recRun,
 	slices.Sort(o.gaps)
 	o.gaps = slices.Compact(o.gaps)
 	return o
+}
+
+// cleanFile checks GoHard's errors in path, a file both tools accept:
+// each starts on a line with a recorded "error" decision (line 0
+// records every error of the file), and every such decision of the
+// file still holds.
+func (o *runOutcome) cleanFile(r *semRun, path string, gh gohardFile,
+	decided map[string]decision) {
+	o.stats.CleanFiles++
+	if len(gh.starts) > 0 {
+		o.stats.FalseFiles++
+	}
+	for _, l := range slices.Sorted(maps.Keys(gh.starts)) {
+		key := path + ":" + strconv.Itoa(l)
+		d, ok := decided[key]
+		if !ok {
+			d, ok = decided[path+":0"] // the whole file
+		}
+		if ok && d.GoHard == "error" {
+			o.stats.FalseDecided++
+			if semCountFalse {
+				o.false = append(o.false, key+": "+gh.msgs[l]+
+					" (recorded, LRM "+d.LRM+")")
+			}
+			continue
+		}
+		o.false = append(o.false, key+": "+gh.msgs[l])
+		o.probs = append(o.probs, fmt.Sprintf("run %s: %s: GoHard "+
+			"reports %s in a file GHDL and NVC accept: fix sema or "+
+			"record a semerr_decisions entry", r.ID, key, gh.msgs[l]))
+	}
+	for _, key := range slices.Sorted(maps.Keys(decided)) {
+		d := decided[key]
+		p, l, _ := strings.Cut(key, ":")
+		if p != path || d.GoHard != "error" {
+			continue
+		}
+		if n, _ := strconv.Atoi(l); !gh.starts[n] && (n != 0 ||
+			len(gh.starts) == 0) {
+			o.probs = append(o.probs, fmt.Sprintf("run %s: %s: the "+
+				"recorded decision (LRM %s) says GoHard reports an "+
+				"error, and it reports none: fix sema or the "+
+				"semerr_decisions entry", r.ID, key, d.LRM))
+		}
+	}
+}
+
+// oneSided lists GoHard's errors on the lines of path only one tool
+// reports (ghdlOnly, nvcOnly) that follows does not record.
+func oneSided(path string, gh gohardFile, ghdlOnly, nvcOnly []int,
+	follows map[string]follow) []string {
+	var out []string
+	for side, ls := range map[string][]int{"ghdl": ghdlOnly,
+		"nvc": nvcOnly} {
+		for _, l := range ls {
+			if _, ok := follows[path+":"+strconv.Itoa(l)]; ok ||
+				!gh.errs[l] {
+				continue
+			}
+			out = append(out, fmt.Sprintf("%s:%d %s %s", path, l, side,
+				gh.msgs[l]))
+		}
+	}
+	slices.Sort(out)
+	return out
 }
 
 func an(b bool) string {
@@ -445,6 +549,10 @@ type gohardFile struct {
 	syntax int
 	// first is the first error as "path:line: code: message".
 	first string
+	// msgs are the first error message on each line.
+	msgs map[int]string
+	// starts are the first lines of the errors.
+	starts map[int]bool
 	// opaque: GoHard reports a tool problem in the file (an
 	// unsupported construct or encrypted IP, exit 2), which makes its
 	// units opaque instead of checked (#20, R3).
@@ -468,6 +576,7 @@ func gohardErrorLines(r *semRun, texts [][]byte, closure []int,
 	cfg := config.Defaults()
 	cfg.Standard = r.Std.String()
 	cfg.PSL.Comments = r.Files[i].psl()
+	cfg.Lenient = r.Files[i].relaxed()
 	cfg.Defines = r.Defines
 	own := virtualPath(r.Files[i])
 	at := map[string]int{} // virtual path -> latest index
@@ -506,7 +615,8 @@ func gohardErrorLines(r *semRun, texts [][]byte, closure []int,
 	if semDebugPath != "" && r.Files[i].Path == semDebugPath {
 		semDebug(r, cfg, srcs, res)
 	}
-	out.errs = map[int]bool{}
+	out.errs, out.msgs = map[int]bool{}, map[int]string{}
+	out.starts = map[int]bool{}
 	for _, d := range res.Diagnostics {
 		if d.Severity != diag.Error || d.Path != own {
 			continue
@@ -522,12 +632,16 @@ func gohardErrorLines(r *semRun, texts [][]byte, closure []int,
 			(out.syntax == 0 || d.Line < out.syntax) {
 			out.syntax = d.Line
 		}
+		out.starts[d.Line] = true
 		end := d.EndLine
 		if end < d.Line || end-d.Line >= maxSpan {
 			end = d.Line
 		}
 		for l := d.Line; l <= end; l++ {
 			out.errs[l] = true
+			if _, ok := out.msgs[l]; !ok {
+				out.msgs[l] = string(d.Code) + ": " + d.Message
+			}
 		}
 	}
 	return out, ""
@@ -567,6 +681,10 @@ var (
 	semNoise   = regexp.MustCompile(`--[^\n]*|"[^"\n]*"`)
 	semPrimary = regexp.MustCompile(`\b(?:entity|package|configuration|` +
 		`context)\s+([a-z][a-z0-9_]*)\s+is\b`)
+	// semConfig is a configuration declaration, a primary unit named
+	// before its entity.
+	semConfig = regexp.MustCompile(`\bconfiguration\s+([a-z][a-z0-9_]*)` +
+		`\s+of\s+[a-z][a-z0-9_]*\s+is\b`)
 	semBody = regexp.MustCompile(`\bpackage\s+body\s+([a-z][a-z0-9_]*)` +
 		`\s+is\b`)
 	semArch = regexp.MustCompile(`\barchitecture\s+([a-z][a-z0-9_]*)` +
@@ -586,6 +704,10 @@ func newUnitIndex(texts [][]byte, libs []string) *unitIndex {
 		slices.Sort(ws)
 		x.words[i] = slices.Compact(ws)
 		for _, m := range semPrimary.FindAllStringSubmatch(s, -1) {
+			x.defs[i] = append(x.defs[i], unitDef{name: m[1],
+				primary: true})
+		}
+		for _, m := range semConfig.FindAllStringSubmatch(s, -1) {
 			x.defs[i] = append(x.defs[i], unitDef{name: m[1],
 				primary: true})
 		}

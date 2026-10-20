@@ -38,7 +38,7 @@ architecture a of e is
     wait for 1 ns;
   end;
 begin
-  process (ok)
+  process (all)
     variable v : integer;
   begin
     wait;
@@ -275,9 +275,9 @@ end;
 
 // TestConformance: a subprogram body repeats its declaration's
 // specification lexically (LRM 4.10): other parameter names, an added
-// or dropped mode, or a class dropped next to a mode do not conform;
-// letter case, and the class constant of a parameter without a mode,
-// do not matter.
+// or dropped mode, or a class added or dropped do not conform; letter
+// case does not matter (the class constant of a parameter without a
+// mode only under lenient analysis: TestLenientConformance).
 func TestConformance(t *testing.T) {
 	src := `package p is
   function f1 (a : bit) return bit;
@@ -301,6 +301,7 @@ end;
 		"p.vhd:10:12: sema/error: the body of f1 does not conform to " +
 			"its declaration at line 2",
 		"p.vhd:11:12: sema/error: the body of f2 does not conform",
+		"p.vhd:12:12: sema/error: the body of f3 does not conform",
 		"p.vhd:13:13: sema/error: the body of p1 does not conform",
 		"p.vhd:14:13: sema/error: the body of p2 does not conform",
 	}

@@ -28,6 +28,8 @@ func (a *analyzer) syntaxChecks(root cst.Node) {
 			continue
 		}
 		a.othersLast(n)
+		a.lexRules(n)  // lexrules.go
+		a.formRules(n) // forms.go
 		if n.Kind() == cst.KindInterfaceList && emptyList(n) {
 			a.semaError(n.Span(), "an interface list cannot be empty")
 		}

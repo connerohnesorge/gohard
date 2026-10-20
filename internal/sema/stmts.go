@@ -38,17 +38,21 @@ func (a *analyzer) concStmt(st cst.Node) *Stmt {
 		a.assertion(s.Condition(), r, sv)
 	case cst.KindConcurrentSimpleSignalAssign:
 		s := cst.ConcurrentSimpleSignalAssign{Node: st}
+		a.guardVisible(st) // stmtrules.go
 		t := a.target(s.Target())
 		a.delay(s.Delay())
 		a.waveform(s.Waveform(), t)
 	case cst.KindConcurrentConditionalSignalAssign:
 		s := cst.ConcurrentConditionalSignalAssign{Node: st}
+		a.guardVisible(st)
 		t := a.target(s.Target())
 		a.delay(s.Delay())
 		a.whenBranches(s.Waveforms().Branches(), t)
 	case cst.KindConcurrentSelectedSignalAssign:
 		s := cst.ConcurrentSelectedSignalAssign{Node: st}
+		a.guardVisible(st)
 		sel := a.typed(s.Selector().Node, nil)
+		a.caseStatic(sel) // staticrules.go
 		t := a.target(s.Target())
 		a.delay(s.Delay())
 		alts := a.selectBranches(s.Waveforms().Branches(), t, sel.Type)
@@ -66,6 +70,7 @@ func (a *analyzer) concStmt(st cst.Node) *Stmt {
 			var alt Alt
 			if c := br.Condition(); !c.IsZero() {
 				alt.Cond = a.condition(c.Node)
+				a.generateCondition(alt.Cond) // staticrules.go
 			}
 			a.generateBody(br.Node, br.AltLabel(), br.Body(), s.Label,
 				&alt)
@@ -112,9 +117,13 @@ func (a *analyzer) blockStmt(b cst.BlockStmt, s *Stmt) {
 	}
 	h := b.Header()
 	a.interfaceList(h.Generics().List(), DeclGeneric)
-	s.Generics = a.assocMap(h.GenericMap().List(), a.cur, DeclGeneric)
+	s.Generics = a.outerActuals(h.GenericMap().List(), DeclGeneric)
 	a.interfaceList(h.Ports().List(), DeclPort)
-	s.Ports = a.assocMap(h.PortMap().List(), a.cur, DeclPort)
+	s.Ports = a.outerActuals(h.PortMap().List(), DeclPort)
+	if !h.PortMap().IsZero() || !h.GenericMap().IsZero() {
+		a.mapRules(s.Generics, a.cur, DeclGeneric, b.Node) // assocrules.go
+		a.mapRules(s.Ports, a.cur, DeclPort, b.Node)
+	}
 	a.declareLabels(b.Stmts().Node)
 	a.declarativePart(b.Decls().Node)
 	s.Body = a.concurrentStatements(b.Stmts().Node)
@@ -124,9 +133,10 @@ func (a *analyzer) blockStmt(b cst.BlockStmt, s *Stmt) {
 
 func (a *analyzer) processStmt(p cst.ProcessStmt, s *Stmt) {
 	lbl := s.Label
+	parent := a.cur
 	s.Region = a.push(RegionProcess, lbl, p.Node)
 	for n := range p.Sensitivity().Names() {
-		a.typed(n.Node, nil)
+		a.sensitivityName(a.typed(n.Node, nil), n.Node) // staticrules.go
 	}
 	savedSens := a.sensitized
 	a.sensitized = !p.Sensitivity().IsZero()
@@ -134,6 +144,7 @@ func (a *analyzer) processStmt(p cst.ProcessStmt, s *Stmt) {
 	a.declareSeqLabels(p.Stmts().Node)
 	a.declarativePart(p.Decls().Node)
 	s.Seq = a.sequentialStatements(p.Stmts().Node)
+	a.passiveProcess(parent, s.Seq) // stmtrules.go
 	a.endClause(p.End(), lbl)
 	a.pop()
 }
@@ -142,8 +153,11 @@ func (a *analyzer) forGenerate(g cst.ForGenerateStmt, s *Stmt) {
 	lbl := s.Label
 	s.Region = a.push(RegionGenerate, lbl, g.Node)
 	ps := g.Param()
+	a.rangeForm(ps.Node) // forms.go
 	rc := a.discreteRange(ps.Range().Node, nil)
 	a.discrete(rc)
+	a.generateRange(rc) // staticrules.go
+	a.rangeOverflow(rc)
 	s.Range = rc
 	d := a.newDecl(DeclGenerateParam, ps.Name(), ps.Node)
 	s.Param = d
@@ -191,6 +205,7 @@ func (a *analyzer) instantiation(ci cst.ComponentInstantiationStmt,
 	name := iu.Name().Node
 	var region *Region
 	r := a.resolveName(name, RefRead, nil)
+	a.unitName(iu.Node, name, r) // indexrules.go
 	switch {
 	case !iu.Node.Token(token.KwEntity, 0).IsZero():
 		if len(r.decls) == 1 {
@@ -220,7 +235,8 @@ func (a *analyzer) instantiation(ci cst.ComponentInstantiationStmt,
 	default:
 		if len(r.decls) == 1 {
 			d := r.decls[0].Denotes()
-			if d.Kind == DeclComponent || d.Kind == DeclEntity {
+			if d.Kind == DeclComponent ||
+				d.Kind == DeclEntity && a.entityAsComponent() {
 				region = d.Region
 				if d.Kind == DeclComponent {
 					s.Component = d
@@ -235,6 +251,9 @@ func (a *analyzer) instantiation(ci cst.ComponentInstantiationStmt,
 	s.Generics = a.assocMap(ci.GenericMap().List(), region, DeclGeneric)
 	a.missingGenerics(s.Generics, region, ci.Node)
 	s.Ports = a.assocMap(ci.PortMap().List(), region, DeclPort)
+	a.instSubst = nil
+	a.mapRules(s.Generics, region, DeclGeneric, ci.Node) // assocrules.go
+	a.mapRules(s.Ports, region, DeclPort, ci.Node)
 }
 
 // assocMap analyzes a generic or port map against the interface
@@ -245,6 +264,9 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 ) []Association {
 	var out []Association
 	var formals []*Decl
+	if k == DeclGeneric {
+		a.instSubst = nil // a new instance's generic map
+	}
 	if region != nil {
 		for _, d := range region.Decls {
 			if d.Kind == k || (k == DeclGeneric && isGenericKind(d.Kind)) {
@@ -255,6 +277,12 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 	i := 0
 	for item := range l.Items() {
 		var f *Decl
+		if fn := item.Formal(); !fn.IsZero() && !a.formalForm(fn.Node) {
+			i++ // assocrules.go reported it
+			out = append(out, Association{Node: item.Node})
+			continue
+		}
+		var convType *Type
 		if fn := item.Formal(); !fn.IsZero() {
 			tok := leftmostToken(fn.Node)
 			key := TokenKey(tok)
@@ -265,6 +293,10 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 				}
 			}
 			conv := false
+			if cf, ctok, ct, ok := a.typeConvFormal(fn.Node,
+				formals); ok { // typerules.go
+				f, tok, conv, convType = cf, ctok, true, ct
+			}
 			if f == nil {
 				// conversion(formal) => actual (LRM 6.5.7.1): the
 				// formal is the single argument of a function call or
@@ -289,6 +321,9 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 				a.conversionName(fn.Node, f)
 			} else if fn.Kind() != cst.KindSimpleName {
 				a.lenientFormal(fn.Node)
+				if f != nil {
+					a.formalStatic(fn.Node) // staticrules.go
+				}
 			}
 		} else if i < len(formals) {
 			f = formals[i]
@@ -296,7 +331,10 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 		i++
 		var want *Type
 		if f != nil {
-			want = formalType(item.Formal().Node, f)
+			want = a.substGeneric(formalType(item.Formal().Node, f))
+		}
+		if convType != nil && !a.conversionSyntax(item.Actual().Node) {
+			want = convType // T(formal) => actual: the actual is a T
 		}
 		as := Association{Formal: f, Node: item.Node}
 		v := item.Actual()
@@ -315,6 +353,10 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 		a.mapActual, a.quiet = saved, savedQ
 		if f != nil && f.Kind.IsObject() {
 			a.expect(e, want, v.Node)
+		}
+		a.recordGenericActual(f, e) // typerules.go
+		if k == DeclPort && f != nil {
+			a.unconstrainedConversion(e, want, v.Node) // typerules.go
 		}
 		as.Actual = e
 		if k == DeclPort && fnSimple(item.Formal().Node) {
@@ -429,6 +471,9 @@ func (a *analyzer) nonObjectActual(v cst.Node, f *Decl) bool {
 			!isPackageKind(r.decls[0].Denotes().Kind)) && !a.quiet {
 			a.semaError(v.Span(), a.text(v)+" is not a package")
 		}
+		if len(r.decls) == 1 {
+			a.packageActual(r.decls[0].Denotes()) // typerules.go
+		}
 		return true
 	case f != nil && f.Kind == DeclGenericSubprogram:
 		r := a.resolveName(v, RefRead, nil)
@@ -448,6 +493,7 @@ func (a *analyzer) nonObjectActual(v cst.Node, f *Decl) bool {
 			}
 			a.refOverload(r.tok, o, RefRead)
 		}
+		a.subprogramActual(v, r) // names.go
 		return true
 	case f == nil && isName:
 		saved := a.quiet
@@ -519,7 +565,7 @@ func (a *analyzer) missingGenerics(as []Association, region *Region,
 		given[x.Formal] = true
 	}
 	for _, d := range region.Decls {
-		if d.Kind == DeclGeneric && d.Value == nil && !given[d] {
+		if needsActual(d) && !given[d] { // typerules.go
 			a.semaError(at.FirstToken().Span(), "generic "+d.Text+
 				" of "+ownerText(region)+" has no default and no actual")
 		}
@@ -545,7 +591,13 @@ func (a *analyzer) targetExpr(t cst.Target) *Expr {
 		nm := a.resolveName(n, RefWrite, nil)
 		e := a.value(nm, n, nil)
 		if !a.typeMarkValue(e, n) {
-			a.targetClass(e, n, t.Node.Parent().Kind())
+			a.targetClass(e, n, t.Node.Parent())
+			a.derefRead(e)     // objrules.go
+			a.targetForm(e, n) // targetrules.go
+			a.ambiguousDeref(n)
+			if isSignalAssign(t.Node.Parent()) {
+				a.outsideProcessSignal(e, n)
+			}
 		}
 		a.u.Exprs = append(a.u.Exprs, e)
 		a.viewWrite(e, n) // modeview.go
@@ -558,6 +610,7 @@ func (a *analyzer) targetExpr(t cst.Target) *Expr {
 	e := a.typed(n, nil)
 	a.mapActual = saved
 	if n.Kind() == cst.KindAggregate {
+		a.aggregateTarget(e, 0, t.Node.Parent()) // staticrules.go
 		// The value decides an aggregate target's type (LRM 10.6.2.1):
 		// it must be composite.
 		return &Expr{Kind: e.Kind, Node: e.Node, Type: anyComposite,
@@ -569,11 +622,14 @@ func (a *analyzer) targetExpr(t cst.Target) *Expr {
 // targetClass reports an assignment target that is not an object of
 // the statement's class (LRM 10.5, 10.6): a variable assignment writes
 // a variable, a signal assignment a signal, and neither writes an
-// interface object of mode in. stmt is the assignment's node kind.
-func (a *analyzer) targetClass(e *Expr, n cst.Node, stmt cst.Kind) {
+// interface object of mode in, except that a force or release of mode
+// in (the default for such a target) is legal (LRM 10.5.2.1). st is
+// the assignment statement.
+func (a *analyzer) targetClass(e *Expr, n cst.Node, st cst.Node) {
 	if a.quiet {
 		return
 	}
+	stmt := st.Kind()
 	d := actualObject(e)
 	if d == nil || d.Mode == ModeView {
 		return
@@ -594,16 +650,41 @@ func (a *analyzer) targetClass(e *Expr, n cst.Node, stmt cst.Kind) {
 	}
 	have := objectClass(d)
 	switch {
+	case have == "" && (d.Kind == DeclUnit || d.Kind == DeclEnumLiteral):
+		// LRM 10.5, 10.6: a target names an object.
+		a.semaError(n.Span(), d.Kind.String()+" "+d.Text+" is not a "+
+			want+" and cannot be the target of a "+want+" assignment")
 	case have == "":
 		return
 	case have != want:
 		a.semaError(n.Span(), d.Kind.String()+" "+d.Text+" is not a "+
 			want+" and cannot be the target of a "+want+" assignment")
+	case d.Mode == ModeLinkage && d.Kind == DeclPort:
+		// LRM 6.5.2: a linkage port is updated only as an actual.
+		a.semaError(n.Span(), "port "+d.Text+" has mode linkage and "+
+			"cannot be assigned")
 	case d.Mode == ModeIn && (d.Kind == DeclPort ||
-		d.Kind == DeclParameter):
+		d.Kind == DeclParameter) && !forceIn(st):
 		a.semaError(n.Span(), d.Kind.String()+" "+d.Text+" has mode "+
 			"in and cannot be assigned")
 	}
+}
+
+// forceIn reports whether st is a force or release assignment whose
+// force mode is in, explicitly or by default: LRM 10.5.2.1 makes in the
+// default force mode of a port or signal parameter of mode in, and only
+// force mode out is an error for such a target.
+func forceIn(st cst.Node) bool {
+	var m cst.Token
+	switch st.Kind() {
+	case cst.KindForceAssignStmt:
+		m = cst.ForceAssignStmt{Node: st}.Mode()
+	case cst.KindReleaseAssignStmt:
+		m = cst.ReleaseAssignStmt{Node: st}.Mode()
+	default:
+		return false
+	}
+	return m.IsZero() || m.Kind() == token.KwIn
 }
 
 // objectClass is the object class of declaration d for assignments:
@@ -658,7 +739,15 @@ func (a *analyzer) waveform(w cst.Waveform, t *Type) {
 			at := a.typed(af.Node, a.stdType("time"))
 			// LRM 10.5.2.1: the times of a waveform's elements
 			// increase.
-			if n, ok := staticTime(at); ok {
+			n, ok := staticTime(at)
+			if !ok && physOverflow(at, 0) && !a.quiet {
+				// LRM 5.2.4.1: a physical literal is a value of its
+				// type, whose range TIME's 64 bits of fs bound.
+				a.semaError(af.Span(), "the physical literal "+
+					a.text(af.Node)+" exceeds the range of TIME")
+				n, ok = math.MaxInt64, true
+			}
+			if ok {
 				if lastKnown && n <= last && !a.quiet {
 					a.semaError(af.Span(), "a waveform element's time "+
 						"must be greater than the previous element's")
@@ -711,6 +800,25 @@ func physValue(e *Expr, depth int) (int64, bool) {
 	return v * f, true
 }
 
+// physOverflow reports whether the physical literal e is too large
+// for 64 bits in its type's primary unit.
+func physOverflow(e *Expr, depth int) bool {
+	if e == nil || depth > 16 || e.Kind != ExprPhysical ||
+		e.Decl == nil || e.Decl.Kind != DeclUnit || e.Lit.IsZero() {
+		return false
+	}
+	f := int64(1)
+	if u := e.Decl; u.Value != nil {
+		n, ok := physValue(u.Value, depth+1)
+		if !ok {
+			return false
+		}
+		f = n
+	}
+	v, ok := ParseInteger(e.Lit.Text())
+	return ok && f > 0 && (v > math.MaxInt64/f || v < math.MinInt64/f)
+}
+
 // whenValue types the value of a conditional or selected branch: a
 // waveform or an expression.
 // It returns the typed expression, nil for a waveform or unaffected.
@@ -750,6 +858,8 @@ func (a *analyzer) whenBranches(brs func(func(cst.WhenBranch) bool),
 // selectCoverage checks the choices of a selected assignment st
 // (not a matching select?) like a case statement's.
 func (a *analyzer) selectCoverage(st cst.Node, sel *Expr, alts []SeqAlt) {
+	matching := !st.Token(token.Question, 0).IsZero()
+	a.caseSelector(sel, matching) // typecheck.go
 	if !st.Token(token.Question, 0).IsZero() {
 		return
 	}
@@ -844,6 +954,7 @@ func (a *analyzer) procedureCall(n cst.Node) *Expr {
 	case len(p.decls) > 0 && p.decls[0].Overloadable():
 		e := a.call(n, p, args, nil, true)
 		a.u.Exprs = append(a.u.Exprs, e)
+		a.exprRules(e) // callrules.go
 		return e
 	case p.unknown:
 		a.lenientArgs(args)
@@ -880,7 +991,7 @@ func (a *analyzer) seqStmt(st cst.Node) *SeqStmt {
 		a.waitAllowed(st)
 		w := cst.WaitStmt{Node: st}
 		for n := range w.Sensitivity().List().Names() {
-			a.typed(n.Node, nil)
+			a.sensitivityName(a.typed(n.Node, nil), n.Node)
 		}
 		if c := w.Condition().Condition(); !c.IsZero() {
 			q.Cond = a.condition(c.Node)
@@ -913,6 +1024,7 @@ func (a *analyzer) seqStmt(st cst.Node) *SeqStmt {
 		q.Kind = SeqSignal
 		s := cst.SelectedSignalAssignStmt{Node: st}
 		sel := a.typed(s.Selector().Node, nil)
+		a.caseStatic(sel)
 		q.Target = a.targetExpr(s.Target())
 		a.delay(s.Delay())
 		alts := a.selectBranches(s.Waveforms().Branches(),
@@ -950,6 +1062,7 @@ func (a *analyzer) seqStmt(st cst.Node) *SeqStmt {
 		q.Kind = SeqSelVarAssign
 		s := cst.SelectedVariableAssignStmt{Node: st}
 		q.Selector = a.typed(s.Selector().Node, nil)
+		a.caseStatic(q.Selector)
 		q.Target = a.targetExpr(s.Target())
 		q.Alts = a.selectBranches(s.Values().Branches(), q.Target.Type,
 			q.Selector.Type)
@@ -975,6 +1088,8 @@ func (a *analyzer) seqStmt(st cst.Node) *SeqStmt {
 		s := cst.CaseStmt{Node: st}
 		q.Matching = !s.Matching().IsZero()
 		q.Selector = a.typed(s.Selector().Node, nil)
+		a.caseSelector(q.Selector, q.Matching) // typecheck.go
+		a.caseStatic(q.Selector)               // staticrules.go
 		for alt := range s.Alternatives() {
 			var sa SeqAlt
 			sa.Choices, sa.Others = a.choices(alt.Choices(),
@@ -1009,6 +1124,7 @@ func (a *analyzer) seqStmt(st cst.Node) *SeqStmt {
 	case cst.KindReturnStmt:
 		q.Kind = SeqReturn
 		s := cst.ReturnStmt{Node: st}
+		a.returnForm(st, a.fn, !s.Value().IsZero()) // forms.go
 		if a.fn == nil && !a.quiet {
 			// LRM 10.13: return is a statement of subprogram bodies.
 			a.semaError(st.Token(token.KwReturn, 0).Span(), "a return "+
@@ -1053,11 +1169,14 @@ func (a *analyzer) loopStmt(l cst.LoopStmt, q *SeqStmt) {
 		q.Cond = a.condition(cst.WhileScheme{Node: sc}.Condition().Node)
 	case cst.KindForScheme:
 		ps := cst.ForScheme{Node: sc}.Param()
+		a.rangeForm(ps.Node) // forms.go
 		rc := a.discreteRange(ps.Range().Node, nil)
 		a.discrete(rc)
+		a.rangeOverflow(rc) // staticrules.go
 		q.Range = rc
 		d := a.newDecl(DeclLoopParam, ps.Name(), ps.Node)
 		q.Param = d
+		d.paramRange = rc
 		d.Class = ClassConstant
 		if rc != nil {
 			d.Type = rc.Type
@@ -1217,6 +1336,9 @@ func (a *analyzer) bindingIndication(b cst.BindingIndication,
 				break
 			}
 		}
+		if arch.IsZero() { // entity lib.e(arch): a token of the aspect
+			arch = b.Entity().Node.TokenIn(nameTokens, 0)
+		}
 		r := a.resolveName(n, RefRead, nil)
 		if len(r.decls) == 1 {
 			d := r.decls[0].Denotes()
@@ -1246,7 +1368,10 @@ func (a *analyzer) bindingIndication(b cst.BindingIndication,
 		a.quietActuals = true
 		defer func() { a.quietActuals = saved }()
 	}
-	a.assocMap(b.GenericMap().List(), region, DeclGeneric)
+	gs := a.assocMap(b.GenericMap().List(), region, DeclGeneric)
+	if !b.GenericMap().IsZero() {
+		a.bindingGenerics(gs, region, b.Entity().Node) // assocrules.go
+	}
 	a.assocMap(b.PortMap().List(), region, DeclPort)
 }
 
@@ -1262,6 +1387,7 @@ func (a *analyzer) vunit(lu cst.Node) {
 			for n := range (cst.PSLHierarchicalName{Node: c}).Names() {
 				a.lenientName(n.Node)
 			}
+			a.vunitArch(c) // psl.go
 		case c.Kind() == cst.KindPSLInheritSpec:
 			for n := range (cst.PSLInheritSpec{Node: c}).Names() {
 				a.lenientName(n.Node)

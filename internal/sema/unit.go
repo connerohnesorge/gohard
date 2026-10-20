@@ -29,6 +29,11 @@ type analyzer struct {
 	// 10.2, 10.11, 10.12, 11.3); a subprogram body resets both.
 	loops      []*Decl
 	sensitized bool
+	// inPSL counts the PSL expressions being analyzed (psl.go).
+	inPSL int
+	// instSubst maps the generic types of the instance whose maps are
+	// being analyzed to their actual subtypes (typerules.go).
+	instSubst map[*Type]*Type
 	// asg is the assignment statement being analyzed (assign.go).
 	asg *Assign
 	// typeDef is set while analyzing the range of an integer, floating
@@ -43,6 +48,9 @@ type analyzer struct {
 	// declaring are the names of the object, file or subtype
 	// declaration being analyzed (LRM 12.3).
 	declaring map[Key]bool
+	// attrSpecs are the (attribute, named entity) pairs given a value
+	// by an attribute specification so far (LRM 7.2).
+	attrSpecs map[[2]*Decl]bool
 	// mapActual is set while typing a port or generic map actual or
 	// an aggregate target, which associate or write their objects
 	// rather than read them.
@@ -116,14 +124,16 @@ func (a *analyzer) declareIn(r *Region, d *Decl) {
 		return
 	}
 	d.Parent = r
+	hidden := false
 	if d.Spec == nil && !d.Implicit {
 		olds := r.Lookup(d.Name)
+		own := len(olds)
 		if ext := extendedRegion(r); ext != nil {
 			// An architecture extends its entity's declarative region,
 			// a package body its package's (LRM 12.1).
 			olds = append(slices.Clip(olds), ext.Lookup(d.Name)...)
 		}
-		for _, old := range olds {
+		for i, old := range olds {
 			if old.Implicit || old == d || !homographs(old, d) {
 				continue
 			}
@@ -131,16 +141,30 @@ func (a *analyzer) declareIn(r *Region, d *Decl) {
 				old.Type.Class == TypeIncomplete {
 				continue
 			}
-			l, _ := old.File.Lines.LineCol(old.Span.Start)
-			a.report(d.Span, diag.New(diag.SemaError,
-				d.Text+" is already declared in this region (line "+
+			// The later of the two in the text is the redeclaration:
+			// a statement label is declared before the declarations
+			// that precede it (LRM 12.3).
+			first, again := old, d
+			if old.File == d.File && old.Span.Start > d.Span.Start {
+				first, again = d, old
+			}
+			// A redeclaration of an item of the extended region (an
+			// entity's port redeclared in its architecture) does not
+			// hide the item: the region is one, and names keep
+			// denoting the first declaration, as in GHDL and NVC.
+			hidden = i >= own && again == d
+			l, _ := first.File.Lines.LineCol(first.Span.Start)
+			a.report(again.Span, diag.New(diag.SemaError,
+				again.Text+" is already declared in this region (line "+
 					strconv.Itoa(l)+")").WithRelated(diag.Related{
-				Path: old.Path(), Line: l, Col: col(old),
-				Message: "first declaration of " + old.Text}))
+				Path: first.Path(), Line: l, Col: col(first),
+				Message: "first declaration of " + first.Text}))
 			break
 		}
 	}
-	r.add(d)
+	if !hidden {
+		r.add(d)
+	}
 	a.u.Decls = append(a.u.Decls, d)
 }
 
@@ -388,6 +412,11 @@ func (a *analyzer) useName(n cst.Node) {
 			use.All, use.Library = true, p.lib
 		case len(p.decls) == 1 && p.decls[0].Denotes().Region != nil &&
 			isPackageKind(p.decls[0].Denotes().Kind):
+			if a.uninstantiatedUse(p.decls[0].Denotes(),
+				sel.Prefix().Node) { // pkginst.go
+				a.brokenUse(use)
+				return
+			}
 			use.All, use.Region = true, p.decls[0].Denotes().Region
 		case p.unknown:
 			a.brokenUse(use)
@@ -567,11 +596,16 @@ func (a *analyzer) packageInst(p cst.PackageInstantiation) *Decl {
 	if len(r.decls) == 1 && r.decls[0].Denotes().Kind == DeclPackage {
 		d.Target = r.decls[0].Denotes()
 		d.Region = d.Target.Region
+		a.packageInstRules(p.Package().Node, d.Target, true) // pkginst.go
 	} else if !r.unknown && len(r.decls) > 0 {
 		a.semaError(p.Package().Span(), a.text(p.Package().Node)+
 			" is not an uninstantiated package")
 	}
-	a.genericMap(p.GenericMap().List(), d.Region)
+	as := a.assocMap(p.GenericMap().List(), d.Region, DeclGeneric)
+	d.instTypes, a.instSubst = a.instSubst, nil
+	if d.Target != nil {
+		a.missingGenerics(as, d.Region, p.Node)
+	}
 	return d
 }
 

@@ -255,6 +255,8 @@ func entrySource(e regEntry) (*regSource, error) {
 		nvc    []nvcRef
 		read   = map[string]bool{}
 		isGHDL bool
+		// lists: an upstream expected-failure list was read.
+		lists bool
 	)
 	for _, pat := range e.ExpectedFailures {
 		matches, err := filepath.Glob(filepath.Join(module,
@@ -272,6 +274,9 @@ func entrySource(e regEntry) (*regSource, error) {
 				return nil, err
 			}
 			read[p] = true
+			if ext := path.Ext(p); ext != ".vhd" && ext != ".vhdl" {
+				lists = true
+			}
 			switch {
 			case path.Base(p) == "testsuite.sh":
 				isGHDL = true
@@ -299,11 +304,21 @@ func entrySource(e regEntry) (*regSource, error) {
 					return nil, err
 				}
 				nvc = append(nvc, refs...)
+			case path.Ext(p) == ".vhd" || path.Ext(p) == ".vhdl":
+				// A source file named directly is not VHDL (a
+				// preprocessor template, a documentation snippet) or
+				// is invalid upstream: it may fail. The reason is the
+				// comment above the entry in corpus.yaml.
+				s.get(path.Join(s.dir, p)).mayFail = true
 			default:
 				return nil, fmt.Errorf("expected_failures: no reader "+
 					"for %s", p)
 			}
 		}
+	}
+	if !lists {
+		// Only source files are listed: every other file must parse.
+		s.unlisted = &expectation{anyStd: true}
 	}
 	if isGHDL {
 		// Files GHDL must analyse are also named by the scripts that

@@ -151,8 +151,12 @@ var typingCases = []typingCase{
   constant k4 : unsigned(7 downto 0) := unsigned(s1);
   constant k5 : integer := integer(m1);
   constant k6 : my_int := my_int(k5);
-  constant k7 : signed(7 downto 0) := signed(unsigned'(x"0F"));
-  constant k8 : unsigned(3 downto 0) := unsigned("0101");`},
+  constant k7 : signed(7 downto 0) := signed(unsigned'(x"0F"));`},
+	// The operand is a complete context (LRM 9.3.6), as GHDL and NVC
+	// read it: a string literal's type cannot come from it.
+	{name: "conversion of a string literal", decls: `
+  constant k8 : unsigned(3 downto 0) := unsigned("0101"); --!`,
+		want: "sema/error", text: "operand of a type conversion"},
 	{name: "conversion to an enumeration", decls: `
   constant k : color := color(3); --!`, want: "sema/error",
 		text: "not closely related"},

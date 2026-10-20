@@ -1,6 +1,9 @@
 package sema
 
 import (
+	"strconv"
+
+	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/token"
 )
 
@@ -185,7 +188,9 @@ func lookup(r *Region, f *File, off int, k Key,
 			keep = append(keep, p)
 		}
 	}
-	keep = ruleB(keep)
+	if std >= token.Std2008 { // rule b is VHDL-2008's (typecheck.go)
+		keep = ruleB(keep)
+	}
 	if len(keep) > 1 {
 		for _, p := range keep {
 			if !p.Overloadable() { // rule c
@@ -367,4 +372,26 @@ func visibleNames(r *Region, f *File, off int,
 		out = append(out, lookup(r, f, off, k, std).Decls...)
 	}
 	return out
+}
+
+// duplicateBody reports the body d of the subprogram declared by spec
+// when the current region already has a body of it: a subprogram has
+// one body (LRM 4.3; the second is an illegal homograph, 12.3).
+func (a *analyzer) duplicateBody(d, spec *Decl) {
+	if a.quiet {
+		return
+	}
+	for _, x := range a.cur.Decls {
+		if x == d || x.Spec != spec || x.Kind != d.Kind ||
+			x.File == nil {
+			continue
+		}
+		l, _ := x.File.Lines.LineCol(x.Span.Start)
+		a.report(d.Span, diag.New(diag.SemaError,
+			"the body of "+d.Text+" is already defined (line "+
+				strconv.Itoa(l)+")").WithRelated(diag.Related{
+			Path: x.Path(), Line: l, Col: col(x),
+			Message: "first body of " + x.Text}))
+		return
+	}
 }

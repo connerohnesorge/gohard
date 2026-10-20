@@ -363,3 +363,23 @@ func TestGHDLRelaxedDefault(t *testing.T) {
 		}
 	}
 }
+
+// TestDirectExpectedFailure: a .vhd/.vhdl path in expected_failures
+// (a preprocessor template, a documentation snippet) marks that file
+// "may fail", and every other file of a source with no upstream list
+// must still parse.
+func TestDirectExpectedFailure(t *testing.T) {
+	s, err := entrySource(regEntry{Name: "nvc", Path: "testdata/nvc",
+		Tag: "pr", Subfolder: "test",
+		ExpectedFailures: []string{"test/regress/access1.vhd"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if e := s.exp["testdata/nvc/test/regress/access1.vhd"]; e == nil ||
+		!e.mayFail {
+		t.Errorf("listed file: %+v", e)
+	}
+	if s.unlisted == nil || !s.unlisted.anyStd {
+		t.Errorf("unlisted: %+v", s.unlisted)
+	}
+}

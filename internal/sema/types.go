@@ -60,6 +60,7 @@ type pending struct {
 func (a *analyzer) expr(n cst.Node, want *Type) *Expr {
 	e := a.operand(n, want)
 	a.settle(e, want)
+	a.rangeValue(e, n, want) // typecheck.go
 	if !want.Unknown() && want.Base().Class != TypeGeneric &&
 		a.typeMarkValue(e, n) {
 		// Generic type actuals have a generic want.
@@ -78,6 +79,9 @@ func (a *analyzer) checkReads(e *Expr, depth int) {
 	}
 	switch e.Kind {
 	case ExprName, ExprIndex, ExprSlice, ExprSelect:
+		if a.paramRead(e) { // objrules.go
+			return
+		}
 		if d := actualObject(e); d != nil && d.Kind == DeclPort {
 			switch {
 			case d.Mode == ModeLinkage:
@@ -179,6 +183,7 @@ func (a *analyzer) typed(n cst.Node, want *Type) *Expr {
 	if !a.mapActual {
 		a.checkReads(e, 0)
 	}
+	a.exprRules(e) // callrules.go
 	if !n.IsZero() {
 		a.u.Exprs = append(a.u.Exprs, e)
 	}
@@ -197,6 +202,9 @@ func (a *analyzer) operand(n cst.Node, want *Type) *Expr {
 		cst.KindCharacterName, cst.KindSelectedName,
 		cst.KindCallOrIndexName, cst.KindSliceName,
 		cst.KindAttributeName, cst.KindExternalName:
+		if e, ok := a.pslBuiltin(n, want); ok { // psl.go
+			return e
+		}
 		nm := a.resolveName(n, RefRead, want)
 		return a.valueOperand(nm, n, want)
 	case cst.KindLiteralExpr:
@@ -306,6 +314,9 @@ func (a *analyzer) settle(e *Expr, t *Type) {
 		return
 	}
 	p := e.pend
+	if a.contextless(e, t) { // literals.go
+		return
+	}
 	e.pend = nil
 	switch p.kind {
 	case pendChar, pendName:
@@ -343,13 +354,18 @@ func (a *analyzer) settle(e *Expr, t *Type) {
 		default:
 			if bt := commonType(fit); bt != nil {
 				e.Type = bt
+				a.ambiguousValue(e, o, t) // typecheck.go
 			}
 		}
 		a.refOverload(p.tok, o, kind)
 	case pendString:
 		if !t.Unknown() {
 			e.Type = t
+			if a.stringMismatch(e, t) { // literals.go
+				return
+			}
 			a.literalLength(e, t)
+			a.stringChars(e, t) // names.go
 		}
 	case pendNull:
 		if !t.Unknown() {
@@ -479,6 +495,7 @@ func (a *analyzer) physical(p cst.PhysicalLiteral) *Expr {
 			break
 		}
 	}
+	a.physicalUnit(p.Unit().Node, nm, e)
 	return e
 }
 
@@ -510,7 +527,10 @@ func (a *analyzer) conversion(n cst.Node, t *Type,
 	for item := range args.Items() {
 		if count == 0 {
 			x = a.operand(item.Actual().Node, nil)
-			if x.pend != nil {
+			if a.typeMarkValue(x, item.Actual().Node) {
+				x.Type = UnknownType
+			} else if a.contextOperand(x) { // typecheck.go
+			} else if x.pend != nil {
 				if s, _ := fit(x, t); s > 0 {
 					a.settle(x, t)
 				} else {
@@ -565,6 +585,9 @@ func closelyRelated(from, to *Type, std token.Standard) bool {
 		if std >= token.Std2008 {
 			return closelyRelated(fe, te, std)
 		}
+		if !indexesRelated(f, t, std) { // typecheck.go
+			return false
+		}
 		return fe.Unknown() || te.Unknown() || fe.Base() == te.Base() ||
 			fe.Base().Class == TypeGeneric ||
 			te.Base().Class == TypeGeneric
@@ -583,8 +606,12 @@ func (a *analyzer) allocator(al cst.Allocator, want *Type) *Expr {
 		x := a.expr(op.Node, nil)
 		made = x.Type
 		args = append(args, x)
+		if x.Kind == ExprTypeMark {
+			bad = a.openAllocation(op.Node, made) // typecheck.go
+		}
 	} else {
 		made = a.subtypeIndication(al.Subtype())
+		bad = a.openAllocation(al.Subtype().Node, made) // typecheck.go
 	}
 	t := UnknownType
 	if !want.Unknown() && want.Base().Class == TypeAccess {
@@ -612,6 +639,10 @@ func (a *analyzer) aggregate(n cst.Node, want *Type) *Expr {
 	b := want.Base()
 	pos := 0
 	var row *Type
+	var covered []bool // the record elements given so far
+	if b != nil && b.Class == TypeRecord {
+		covered = make([]bool, len(b.Fields))
+	}
 	for as := range (cst.Aggregate{Node: n}).Associations() {
 		choices := as.Choices()
 		var vt, slice *Type
@@ -622,6 +653,7 @@ func (a *analyzer) aggregate(n cst.Node, want *Type) *Expr {
 			if positional {
 				if pos < len(b.Fields) {
 					vt = want.FieldType(b.Fields[pos])
+					covered[pos] = true
 				}
 				pos++
 			}
@@ -630,6 +662,9 @@ func (a *analyzer) aggregate(n cst.Node, want *Type) *Expr {
 				assoc.Choices = append(assoc.Choices, ce)
 				if ce.Kind == ExprOthers {
 					assoc.Others = true
+					ft = a.recordOthers(c.Node, want, covered)
+				} else if ce.Decl != nil && ce.Decl.Pos < len(covered) {
+					covered[ce.Decl.Pos] = true
 				}
 				if vt == nil {
 					vt = ft
@@ -652,7 +687,8 @@ func (a *analyzer) aggregate(n cst.Node, want *Type) *Expr {
 				assoc.Choices = append(assoc.Choices, ce)
 				if ce.Kind == ExprOthers {
 					assoc.Others = true
-					if unconstrainedArray(want) && !a.quiet {
+					if unconstrainedArray(want) && !a.quiet &&
+						!(a.s.cfg.Lenient && assignedToObject(n)) {
 						a.semaError(c.Node.Span(), "others needs an "+
 							"index range from the context, and "+
 							want.Name()+" is unconstrained")
@@ -690,11 +726,14 @@ func (a *analyzer) aggregate(n cst.Node, want *Type) *Expr {
 		}
 		e.Assocs = append(e.Assocs, assoc)
 	}
+	a.positionalAfterOthers(e) // typecheck.go
 	if b != nil && b.Class == TypeArray {
 		a.singleDynamicChoice(e)
 		a.mixedAssociations(e)
 		a.aggregateShape(e, want) // aggshape.go
+		a.elementLengths(e, want) // typerules.go
 	}
+	a.aggregateMismatch(e, want) // literals.go
 	return e
 }
 
@@ -827,6 +866,15 @@ func (a *analyzer) recordChoice(c cst.Node, want *Type) (*Expr, *Type) {
 			a.semaError(tok.Span(), b.Name()+" has no element "+
 				tok.Text())
 		}
+	case cst.KindErrorNode:
+	default:
+		// LRM 9.3.3.2: a record aggregate's choice is an element
+		// simple name or others.
+		a.expr(c, nil)
+		if !a.quiet {
+			a.semaError(c.Span(), "a choice of a record aggregate is "+
+				"an element name or others, not "+a.text(c))
+		}
 	}
 	return unknownExpr(c), nil
 }
@@ -844,6 +892,7 @@ func (a *analyzer) arrayChoice(c cst.Node, idx *Type) *Expr {
 	}
 	e := a.operand(c, idx)
 	if e.Kind == ExprTypeMark {
+		a.rangeMismatch(c, e.Type, idx) // typecheck.go
 		return &Expr{Kind: ExprRange, Node: c, Type: e.Type,
 			Range: &RangeCons{Node: c, Attr: e, Type: e.Type}}
 	}
@@ -880,6 +929,9 @@ func (a *analyzer) discreteRange(n cst.Node, want *Type) *RangeCons {
 			a.expect(l, t, re.Low().Node)
 			a.expect(r, t, re.High().Node)
 		}
+		if !typeDef {
+			a.rangeMismatch(n, t, want) // typecheck.go
+		}
 		dir := eval.To
 		if re.Direction().Kind() == token.KwDownto {
 			dir = eval.Downto
@@ -887,6 +939,7 @@ func (a *analyzer) discreteRange(n cst.Node, want *Type) *RangeCons {
 		return &RangeCons{Node: n, Left: l, Right: r, Dir: dir, Type: t}
 	case cst.KindSubtypeIndication:
 		t := a.subtypeIndication(cst.SubtypeIndication{Node: n})
+		a.rangeMismatch(n, t, want) // typecheck.go
 		return &RangeCons{Node: n, Type: t,
 			Attr: &Expr{Kind: ExprTypeMark, Node: n, Type: t}}
 	case cst.KindOpenExpr, 0:
@@ -899,8 +952,10 @@ func (a *analyzer) discreteRange(n cst.Node, want *Type) *RangeCons {
 		nm := a.resolveName(n, RefRead, want)
 		switch {
 		case nm.rng != nil:
+			a.rangeMismatch(n, nm.rng.Type, want) // typecheck.go
 			return nm.rng
 		case nm.typ != nil:
+			a.rangeMismatch(n, nm.typ, want) // typecheck.go
 			return &RangeCons{Node: n, Type: nm.typ,
 				Attr: &Expr{Kind: ExprTypeMark, Node: n, Type: nm.typ}}
 		case nm.unknown:
@@ -1028,8 +1083,9 @@ func boundTypes(e *Expr) []*Type {
 	return out
 }
 
-// rangeType is the type of a range's bounds (LRM 5.3.2.2): a bound's
-// own type, else the expected type, and INTEGER for universal integer
+// rangeType is the type of a range's bounds (LRM 5.3.2.2): the base
+// type of a bound's own type (a range defines its own subtype, so
+// 0 to N with N POSITIVE is an INTEGER range, LRM 5.2.1), else the expected type, and INTEGER for universal integer
 // bounds (for loops, generate parameters, index constraints).
 func (a *analyzer) rangeType(l, r *Expr, want *Type) *Type {
 	known := func(e *Expr) bool {
@@ -1037,9 +1093,9 @@ func (a *analyzer) rangeType(l, r *Expr, want *Type) *Type {
 	}
 	switch {
 	case known(l):
-		return l.Type
+		return l.Type.Base()
 	case known(r):
-		return r.Type
+		return r.Type.Base()
 	case !want.Unknown():
 		return want
 	}
@@ -1065,6 +1121,7 @@ func (a *analyzer) condition(n cst.Node) *Expr {
 		a.settle(e, boolean)
 	}
 	a.u.Exprs = append(a.u.Exprs, e)
+	a.conditionReads(e) // objrules.go
 	if e.Type.Unknown() || boolean == nil ||
 		e.Type.Base() == boolean.Base() {
 		return e
@@ -1111,6 +1168,10 @@ func fits(have, want *Type) bool {
 // psl walks a PSL property, sequence or directive operand for names.
 func (a *analyzer) psl(n cst.Node) {
 	for c := range n.Nodes() {
+		if c.Kind() == cst.KindPSLBuiltinCall {
+			a.pslBuiltinCall(c) // psl.go
+			continue
+		}
 		if (cst.Expr{}).Accepts(c.Kind()) &&
 			c.Kind() != cst.KindPSLUnion &&
 			c.Kind() != cst.KindPSLValueSet {
@@ -1119,4 +1180,5 @@ func (a *analyzer) psl(n cst.Node) {
 		}
 		a.psl(c)
 	}
+	a.pslForm(n) // psl.go
 }

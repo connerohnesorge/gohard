@@ -169,6 +169,9 @@ type candidate struct {
 	near    int // see Candidate.Near
 	reason  string
 	formals []*Decl // the formal of each actual
+	// generic counts actuals that fit a formal of a generic type
+	// only weakly (the actual is not of that type itself).
+	generic int
 }
 
 // match maps the actuals to the formals of d and scores the fit.
@@ -225,6 +228,10 @@ func match(d *Decl, acts []actual, want *Type, proc bool) candidate {
 		if s == 0 {
 			c.reason = "argument " + strconv.Itoa(i+1) + " " + why
 			return c
+		}
+		if s == 1 && partType(ac.fpart, p.Type).Base().Class ==
+			TypeGeneric {
+			c.generic++
 		}
 		score += s
 		c.near++
@@ -303,6 +310,7 @@ func (a *analyzer) choose(name string, cands []*Decl, acts []actual,
 			top = append(top, &all[i])
 		}
 	}
+	top = concreteFirst(top)
 	if len(top) == 1 || sameDenotationC(top) {
 		o.Chosen = top[0].d
 		return o, top[0]
@@ -315,8 +323,9 @@ func (a *analyzer) choose(name string, cands []*Decl, acts []actual,
 			explicit = append(explicit, c)
 		}
 	}
-	if len(explicit) == 1 && (hidesRest(explicit[0], top) ||
-		!want.Unknown() || !resultsDiffer(top)) {
+	if len(explicit) == 1 && !a.useHomographs(explicit[0], top) &&
+		(hidesRest(explicit[0], top) ||
+			!want.Unknown() || !resultsDiffer(top)) {
 		o.Chosen = explicit[0].d
 		return o, explicit[0]
 	}
@@ -414,6 +423,7 @@ func (a *analyzer) operator(n cst.Node, op cst.Token,
 	for i, x := range operands {
 		acts[i] = actual{e: a.operand(x, nil), node: x}
 		a.typeMarkValue(acts[i].e, x)
+		a.rangeOperand(acts[i].e, x) // typerules.go
 	}
 	if len(operands) == 1 && a.std < token.Std2008 &&
 		isLogical(op.Kind()) {
@@ -469,6 +479,7 @@ func (a *analyzer) call(n cst.Node, nm named, args cst.AssociationList,
 		}
 		acts = append(acts, ac)
 	}
+	a.positionalAfterNamed(acts) // typecheck.go
 	if len(acts) == 0 && !proc {
 		// A value: an enumeration literal or a parameterless function
 		// whose type the context may decide.
@@ -517,6 +528,7 @@ func (a *analyzer) call(n cst.Node, nm named, args cst.AssociationList,
 			return e
 		}
 	}
+	a.unknownFormals(nm.decls, acts) // callrules.go
 	return a.finishCall(n, nm.tok, nm.tok.Text(), nm.decls, acts, want,
 		proc, nm.expr, false)
 }
@@ -1220,6 +1232,10 @@ func (a *analyzer) actualMode(f, d *Decl, ac actual, class string) {
 			d.Kind == DeclParameter) {
 			a.semaError(sp, what+" cannot be "+d.Kind.String()+" "+
 				d.Text+", which has mode in")
+			return
+		}
+		if class == "signal" {
+			a.outsideProcessSignal(ac.e, ac.node) // targetrules.go
 		}
 		return
 	}
@@ -1228,4 +1244,22 @@ func (a *analyzer) actualMode(f, d *Decl, ac actual, class string) {
 		a.semaError(sp, what+" cannot be port "+d.Text+", which has "+
 			"mode out and cannot be read before VHDL-2008")
 	}
+}
+
+// concreteFirst drops the candidates that fit only because a formal is
+// of a generic type when another candidate fits without that. A
+// generic type is a distinct type (LRM 6.5.3), so inside its
+// uninstantiated unit no other value is of it, and a concrete overload
+// is the only legal interpretation.
+func concreteFirst(top []*candidate) []*candidate {
+	var kept []*candidate
+	for _, c := range top {
+		if c.generic == 0 {
+			kept = append(kept, c)
+		}
+	}
+	if len(kept) == 0 || len(kept) == len(top) {
+		return top
+	}
+	return kept
 }

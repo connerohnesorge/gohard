@@ -19,6 +19,10 @@ var semFalse = flag.Bool("semerr-false", false,
 var debugPath = flag.String("semerr-debug", "",
 	"TestSemerrGaps logs the analysis of this repository path")
 
+var oneSidedFlag = flag.Bool("semerr-onesided", false,
+	"TestSemerrGaps also lists GoHard errors on lines only one tool "+
+		"reports that no semerr_follows entry records")
+
 var updateGaps = flag.Bool("update-gaps", false,
 	"rewrite "+semerrDir+"/"+semGapsName+" from the current GoHard "+
 		"results (TestSemerrGaps)")
@@ -36,7 +40,10 @@ func TestSemerrGaps(t *testing.T) {
 	root := repoRoot(t)
 	semCountFalse = *semFalse
 	semDebugPath = *debugPath
-	defer func() { semCountFalse, semDebugPath = false, "" }()
+	semOneSided = *oneSidedFlag
+	defer func() {
+		semCountFalse, semDebugPath, semOneSided = false, "", false
+	}()
 	probs, err := doCheck(root, []*section{semerrSection}, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -63,6 +70,12 @@ func TestSemerrGaps(t *testing.T) {
 		slices.Sort(semResults.false)
 		for _, f := range semResults.false {
 			t.Logf("gohard error in a clean file: %s", f)
+		}
+	}
+	if *oneSidedFlag {
+		slices.Sort(semResults.oneSided)
+		for _, f := range slices.Compact(semResults.oneSided) {
+			t.Logf("unrecorded one-sided GoHard error: %s", f)
 		}
 	}
 	if *updateGaps {
@@ -94,7 +107,8 @@ const gapsHeader = `# Known gaps of the semantic-error oracle (#34, tools/oracle
 
 // semFake stands in for GHDL and NVC in the semerr tests: GHDL reports
 // an error on every line holding "--E" or "--G", NVC on every line
-// holding "--E" or "--N".
+// holding "--E" or "--N". On a line holding "--C" GHDL reports an
+// error and NVC a cascade (a unit it depends on has errors).
 func semFake() *toolset {
 	fake := func(nvc bool) func(string, []string) (string, int) {
 		return func(dir string, args []string) (string, int) {
@@ -110,13 +124,19 @@ func semFake() *toolset {
 			var out strings.Builder
 			for i, l := range strings.Split(string(b), "\n") {
 				if !strings.Contains(l, "--E") &&
-					!strings.Contains(l, mine) {
+					!strings.Contains(l, mine) &&
+					!strings.Contains(l, "--C") {
 					continue
 				}
-				if nvc {
+				switch {
+				case nvc && strings.Contains(l, "--C"):
+					fmt.Fprintf(&out, "** Error: design unit depends on "+
+						"WORK.P which was analysed with errors\n"+
+						"    > %s:%d\n", file, i+1)
+				case nvc:
 					fmt.Fprintf(&out, "** Error: marked\n    > %s:%d\n",
 						file, i+1)
-				} else {
+				default:
 					fmt.Fprintf(&out, "%s:%d:1:error: marked\n", file, i+1)
 				}
 			}
@@ -267,6 +287,33 @@ func TestSemerrCascade(t *testing.T) {
 	}
 }
 
+// TestSemerrNVCCascade: a line where NVC reports only a cascade (a
+// unit of the same file failed) is not checked, as GHDL's cascades.
+func TestSemerrNVCCascade(t *testing.T) {
+	b := strings.Replace(bClean, "0;", "0; --C", 1)
+	root := semRepo(t, pkgClean, useP, b)
+	semUpdate(t, root)
+	if probs := semCheck(t, root); len(probs) > 0 {
+		t.Fatalf("an NVC cascade is checked: %q", probs)
+	}
+	g := readFile(t, root, semerrDir+"/corpus-demo.txt")
+	if !strings.Contains(g, "~") {
+		t.Fatalf("no cascade mark recorded:\n%s", g)
+	}
+	for _, m := range []string{
+		"design unit depends on WORK.P which was analysed with errors",
+		"design unit WORK.LOG was analysed with errors",
+		"entity \"e\" was not analysed",
+	} {
+		if !cascadeMsg.MatchString(m) {
+			t.Errorf("%q is not a cascade", m)
+		}
+	}
+	if cascadeMsg.MatchString(`unit "p" not found in library "work"`) {
+		t.Error("a missing unit is a cascade")
+	}
+}
+
 // TestSemerrFollows: a recorded disagreement makes GoHard follow the
 // named side on that line.
 func TestSemerrFollows(t *testing.T) {
@@ -411,6 +458,22 @@ func TestClosureLibraries(t *testing.T) {
 	}
 }
 
+// TestClosureConfiguration: a configuration is a primary unit its
+// users depend on, though its name is followed by "of entity".
+func TestClosureConfiguration(t *testing.T) {
+	texts := [][]byte{
+		[]byte("entity e is end; architecture a of e is begin end;"), // 0
+		[]byte("configuration Conf_E of e is for a end for; end;"),   // 1
+		[]byte("configuration top of t is for x\n" +
+			"for u : c use configuration work.conf_e; end for;\n" +
+			"end for; end;"), // 2
+	}
+	x := newUnitIndex(texts, nil)
+	if got := x.closure(2); !slices.Equal(got, []int{0, 1}) {
+		t.Errorf("closure(2) = %v, want [0 1]", got)
+	}
+}
+
 // TestToolResult: the compact result form round-trips.
 func TestToolResult(t *testing.T) {
 	for _, s := range []string{"0", "1", "-1", "1@3", "1@3,10,200"} {
@@ -478,5 +541,68 @@ func TestSemPlanDeterministic(t *testing.T) {
 				t.Errorf("%s: %s is in no run", st.ref.Name, f)
 			}
 		}
+	}
+}
+
+// TestSemerrDecisions: a GoHard error in a file both tools accept
+// fails the check unless a semerr_decisions entry records it (gohard:
+// error, by line or, with line 0, for the whole file); an agreed line
+// GoHard does not report is no gap when an entry records it (gohard:
+// none); an entry GoHard no longer matches fails.
+func TestSemerrDecisions(t *testing.T) {
+	setMan := func(root, entries string) {
+		man := readFile(t, root, manifestPath)
+		if i := strings.Index(man, "    semerr_decisions:\n"); i >= 0 {
+			j := strings.Index(man, "    trace_sha256:")
+			man = man[:i] + man[j:]
+		}
+		if entries != "" {
+			man = strings.Replace(man, "    trace_sha256:",
+				"    semerr_decisions:\n"+entries+"    trace_sha256:", 1)
+		}
+		write(t, filepath.Join(root, filepath.FromSlash(manifestPath)),
+			man)
+	}
+	entry := func(line int, gohard string) string {
+		return fmt.Sprintf("      - path: b.vhd\n        line: %d\n"+
+			"        gohard: %s\n        lrm: \"14.4.1\"\n", line, gohard)
+	}
+	// GoHard alone rejects line 3 of b.vhd.
+	b := strings.Replace(bClean, ":= 0;", ":= nope;", 1)
+	root := semRepo(t, pkgClean, useP, b)
+	semUpdate(t, root)
+	probs := semCheck(t, root)
+	if len(probs) != 1 || !strings.Contains(probs[0],
+		"b.vhd:3: GoHard reports sema/undefined") {
+		t.Fatalf("unrecorded clean-file error: %q", probs)
+	}
+	for _, e := range []string{entry(3, "error"), entry(0, "error")} {
+		setMan(root, e)
+		if probs := semCheck(t, root); len(probs) > 0 {
+			t.Fatalf("recorded clean-file error %q: %q", e, probs)
+		}
+	}
+	setMan(root, entry(3, "error")+entry(4, "error"))
+	if probs := semCheck(t, root); len(probs) != 1 ||
+		!strings.Contains(probs[0], "b.vhd:4: the recorded decision") {
+		t.Fatalf("stale clean-file decision: %q", probs)
+	}
+	// Both tools reject line 3 of a clean b.vhd, which GoHard accepts.
+	root = semRepo(t, pkgClean, useP,
+		strings.Replace(bClean, "0;", "0; --E", 1))
+	semUpdate(t, root)
+	probs = semCheck(t, root)
+	if len(probs) != 1 || !strings.Contains(probs[0], "b.vhd:3, GoHard "+
+		"does not") {
+		t.Fatalf("unrecorded gap: %q", probs)
+	}
+	setMan(root, entry(3, "none"))
+	if probs := semCheck(t, root); len(probs) > 0 {
+		t.Fatalf("recorded gap: %q", probs)
+	}
+	setMan(root, entry(3, "error"))
+	if probs := semCheck(t, root); len(probs) != 1 ||
+		!strings.Contains(probs[0], "says GoHard reports \"error\"") {
+		t.Fatalf("decision that does not match: %q", probs)
 	}
 }

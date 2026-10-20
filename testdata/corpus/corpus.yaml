@@ -172,7 +172,7 @@ designs:
     trace_sha256: bf68151e0b8890502a387f6adfa5e545025e88442c86050a220fe342566ba104
     oracle_sha256: 15a127bdfd151f6c5732db18348ccdacb4fc69fdf0e35277beeee7787abd51d3
     format_oracle_sha256: 94f4f084426baf39982f1199a3a23095a90d765a82ba68fd130a51b51e9c4704
-    semerr_sha256: d4df6cca09a6319134abeaead1e3422770b7bb5bdda0cf25b9d73d51b258b0f5
+    semerr_sha256: 450128ae11d7afbf4ea5eca7f512cfd819682c4d2e75eb4b71b31cf7dc66afa3
   - name: budget_hang
     standard: "2008"
     milestone: v1.0
@@ -232,7 +232,7 @@ designs:
     trace_sha256: 5fc63ea977c275242a412664f55f7b2242ed0e22da9ffc158f7c75027c839967
     oracle_sha256: 26480e5448a1ab41c592b920393aa66c3ea604405f400416fe733f19c230fb67
     format_oracle_sha256: fc46b6ac8d47033e318591de4c4f503ada8e77b7a4e8e2e214ee25f25b5de7e3
-    semerr_sha256: 6d3e3a22800cf15a4d2824b4fe8c452a074222dacc4a4f2e420def2eb23ccfda
+    semerr_sha256: baed22dcaf5c6903f30507da87a21d7e5815a7d74116a9027717a4c86094ddc9
   - name: force_ext
     standard: "2008"
     milestone: v1.0
@@ -297,7 +297,7 @@ designs:
     trace_sha256: bceac1c4817b55b561c3c1be261fb9c94efc5e1cb248af8aa6342b9cc6d9e7a1
     oracle_sha256: d6d54594d33b03d28a0db0d05c0dc07e1a7fca28ef23f643ab814cc2844b391d
     format_oracle_sha256: 7c16ae3aba230fb4e90c6b22d3bb804c3e88d0cbed8b6081bce316e7b6bff792
-    semerr_sha256: e7de4cbd17dab071e18844d9ceaa585c7d119a2f68891d7b8d376f56e37c8c79
+    semerr_sha256: 6b8cf8314f1f818ee756eb77ae1e3569eb087fbb5a48ce28b995cba8238e26ed
   - name: hier_generate
     standard: "2008"
     milestone: v1.0
@@ -448,7 +448,7 @@ designs:
     trace_sha256: b9fccb27e80186b8b57efeac3f0465d106b7f07502a0d9f548cfea80ef5391a1
     oracle_sha256: 1ff432450a84071ebb022389d1dad741a12f54c7881fabbac5ffb27404ab00f2
     format_oracle_sha256: 5f66f04782a786dc41c8bc14e422030fc76a501c7170f83dcedd5333ccf7cf07
-    semerr_sha256: 1ebb9668c01cfb682480300524dca8c74b3e07814194e8d94f2d71e855d58a42
+    semerr_sha256: 8664b532660e9eab5e9d79f020caf1180444e32e9e909989fc6d2f19f1113c34
   - name: md_resolve
     standard: "2008"
     milestone: v1.0
@@ -513,7 +513,7 @@ designs:
     trace_sha256: f0a8020759e95bc1d59245984585d48c5f3bd663002848baed4dbdac02bcea35
     oracle_sha256: 844a9a6fe16894d3fd01497587f361e34c954cb9ba411aa071dd47ef64f324e1
     format_oracle_sha256: f440d6de675b9a0bbb49ee160573acdde6f381afa5a0c005ed3bd5472cb1e51a
-    semerr_sha256: 7cb0e70a4265cf1b768b3efdeedf728e8b19ac2505777bdebab064f3fdaa8f7d
+    semerr_sha256: e8bf6422b3a4ffe267b063475bfa268e2b9bad976d88a0c4023f846d5d57a935
   - name: mode_views
     standard: "2019"
     milestone: v1.0
@@ -599,7 +599,7 @@ designs:
     trace_sha256: 1544791b18a1e94730f3417fae0950e9c4d4682e45ac056094b4b71da2a87001
     oracle_sha256: 901f95aae64fe22e966e78ba21e7bc3a9ab8d4b5ad017afa24671f0bc16a1c62
     format_oracle_sha256: e634b69fd6b07941074a6155b26020f7aa012363fc00d3b4deb73a2581f608c8
-    semerr_sha256: 1eae310d6f7aef6f91a429c3c22b7551a0fe593f5a75c3390f36e6590d1f2cec
+    semerr_sha256: d1e487de6593b603e4612367a1a5bc15d7181b63a60561abd20b3b4d26e0b6ab
   - name: overload_ops
     standard: "2008"
     milestone: v1.0
@@ -655,7 +655,7 @@ designs:
     trace_sha256: f06e87618258599b4b99ca9d3deba7927e92d76f23011d3d92b40a9e6f6c412e
     oracle_sha256: 41e86cacce0d1ed7270db36737ea615f0ad5a5eb717d743fb308ae80d32f667e
     format_oracle_sha256: ed3f37bc6b820d2b44c528384e12a9b10b96dc989ad740ce9b2430274ba6df04
-    semerr_sha256: dfa0c653f470f8a817919dc2495ea055b6606c0db317aac64819b7ae71ce613b
+    semerr_sha256: 21bb2e141169b7ecae0ceb83ad59058ef337c482e4f425d065cedf5d3c33d019
   - name: postponed_attrs
     standard: "2008"
     milestone: v1.0
@@ -749,7 +749,7 @@ designs:
     trace_sha256: c17eb3e01883750ea8aed51a91c5174d2d21fc10d82ff440b075c9f7d21c4fbe
     oracle_sha256: 600b1a1b4acde3b2fcd3b4ed974e8cdc39a2c3ea1d355de4e5a245c7419007d4
     format_oracle_sha256: 6a5fe946b5cb751d12431c39f0c18e8ed944bf6108dd579468f9d55291b24f94
-    semerr_sha256: 305c7a2f89233bc8c748d447d2e135026e3aef1426b644e5b2458f42d08591dd
+    semerr_sha256: a327b2b0a368d449dc553f8ab9d8e571ad0de088966ddda61edc19f7412f45f0
   - name: prot_cond
     standard: "2019"
     milestone: v1.1
@@ -911,7 +911,7 @@ designs:
     trace_sha256: pending
     oracle_sha256: 11b484709e5c9656f3ce83f87777efbdc5040b5417f8eda14a14cb2b3b48d6cf
     format_oracle_sha256: 08d5c45934017c8f93b2193e1d9b14ee8e9c627bb684580fd12d5848c0f28d3b
-    semerr_sha256: 1f19aa841434177d6e55fd1ca5d14b01134b1732ec27bdb4b968a6522b8208b6
+    semerr_sha256: 6c3d1fbac9cf9232749e5afacb9710f2841965daae69d091c6b2eb21aaf3906b
   - name: psl_simple
     standard: "2008"
     milestone: v1.0
@@ -1006,7 +1006,7 @@ designs:
     trace_sha256: 7342ad0283712ae02428137b9b030adaf6b2c4111d8e90a8a774a433001b215d
     oracle_sha256: ef9811e748022662bde89003654d0e5fe152ef95b68a8f983f38e98f68c5202d
     format_oracle_sha256: 3991573b856dd572670d95c0f9ef57bdf5fb94b5cfd3452818daf30a90860247
-    semerr_sha256: be3e6028c6a180170b354c14e702902d4b65d3f8b5f3502c65154a5d917be28f
+    semerr_sha256: c7a7bb9b018f0a0908a2929afe55ededada06ec2db9e214691643d0aae7b4b96
   - name: standin_model
     standard: "2008"
     milestone: v1.0
@@ -1090,7 +1090,7 @@ designs:
     trace_sha256: 0822cc1204a3e43e5668a8d9d8f154f7d09dd00dbd590dc8ae7f19dbd5c4ded6
     oracle_sha256: 8bef736395f22d8d1bdb452bfee165a023fae84566b5a38711e720f70ec26121
     format_oracle_sha256: c81d70aad425eac9f85f9738fe80f33b9ae95a06d6d16a6334429c9a3d810324
-    semerr_sha256: ee3ef1146246450f7960ab1f0a71721cebbccd455e8cc62491b4dbb5053a340a
+    semerr_sha256: c8efd659c6d0354bb321c84bd04241feb553b79154b4067105eb0b5c6a9c81d1
   - name: textio_env
     standard: "2008"
     milestone: v1.0
@@ -1150,7 +1150,7 @@ designs:
     trace_sha256: b79e1f6c9d284526fa3297101197ecdd80987f6daf6fcf43a311ff5c7ac1f583
     oracle_sha256: afaef1be5d71488477320d6182421897f081308f401741528bd7228887a7d7df
     format_oracle_sha256: 133b47f00a9a9443253709ee7f0f243bb596466257c25e280f2d02266526e34f
-    semerr_sha256: f029b9e6cd324c9922a137da89861b3c1f2ae4382753871556303c39df536f01
+    semerr_sha256: b9ce64adba7b081647a2a76dcae5cd5b0be04561371209035ed85f182d2c8b77
   - name: vhdl93_only
     standard: "1993"
     milestone: v1.0
@@ -1285,7 +1285,7 @@ designs:
     trace_sha256: 9a27748985d1e257ed1e8f90e11b892a4cb188cc8fc5d1fe5616a8e31212d7d7
     oracle_sha256: b72ab12235d9ebd527cc3e272a93040093b7d681ec2f6f4f277bf62c72974dd1
     format_oracle_sha256: 6284d8838abf6dcbb4dda3b2329acbab72718b52cf1ec66a4b1355274d9eac96
-    semerr_sha256: a9535b51fc73c892d15cbd7af900c5e2471a34640bf71e5c24622d831502328e
+    semerr_sha256: 8a8630a94d04f85053f6532bc3b085bd8f5b6ddca36c64b4621cf5217f06c4ec
   - name: wait_forms
     standard: "2008"
     milestone: v1.0
@@ -1355,7 +1355,7 @@ designs:
     trace_sha256: d466a389d48a9f6d0321d336f27b4a5c93e5bbb4bce5b55079ddacf69e682d79
     oracle_sha256: e65f232d4c5f950d169fd1aaf52e953c85420ab7a7252aba2d34ccc8326e55ff
     format_oracle_sha256: 725a3af5b035375a9039c2526f2ce30547bff9db603058a65b073e8070733d66
-    semerr_sha256: 8e2581f072eaa3077b5a81168bee1724a408d8debd1a540f0d11a6753b35a8a4
+    semerr_sha256: 9e1ff0853f80b27ec28bdad462a5dfaaa54b17225524cf58952e6b900f5cfe1f
 
 # Parser-regression submodules (#8), sorted by name.
 regression:
@@ -1452,7 +1452,9 @@ regression:
   #   gate a listed file is "may fail"; line numbers feed the sema oracle.
   #
   # All other entries: the projects keep no expected-failure list; every
-  # VHDL file is expected to parse (`expected_failures: []`). Semantic
+  # VHDL file is expected to parse (`expected_failures: []`), except the
+  # .vhd/.vhdl paths or globs listed directly, each under a comment with
+  # its reason (templates, documentation snippets, upstream typos). Semantic
   # checks need the project's own compile order (open-logic compile_order.txt, OSVVM
   # osvvm.pro, PoC PoC.pro, UVVM <lib>/script/compile_order.txt,
   # VUnit vunit/vhdl/*, NEORV32 rtl/file_list_*.f, SURF ruckus.tcl,
@@ -1469,7 +1471,544 @@ regression:
     license: GPL-2.0-or-later
     tag: pr
     subfolder: testsuite
-    semerr_sha256: f90a95fd9b19664ed3242f19aa25de36ab1d2a16a5161347067565eea1dea696
+    semerr_sha256: bce7851cbad4628084594f8b9399d917d63a8ded7e935b193c6ac2bedf4fb5b6
+    semerr_decisions:
+      - path: gna/issue1257/direction_mismatch.vhd
+        line: 31
+        gohard: error
+        lrm: "9.4.3, 10.6.2.1"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: gna/issue2116/func4_0.vhdl
+        line: 5
+        gohard: error
+        lrm: "9.4.3, 9.2.8"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: gna/issue2960/e.vhdl
+        line: 19
+        gohard: error
+        lrm: "9.4.3, 5.2.3.1"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: gna/issue333/repro.vhdl
+        line: 9
+        gohard: error
+        lrm: "9.4.3, 5.2.3.1"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: gna/issue333/repro.vhdl
+        line: 11
+        gohard: error
+        lrm: "9.4.3, 5.2.3.1"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: gna/issue333/time_test.vhdl
+        line: 8
+        gohard: error
+        lrm: "9.4.3, 5.2.3.1"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: gna/ticket31/tb2.vhdl
+        line: 9
+        gohard: error
+        lrm: "9.4.3, 9.3.6"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: synth/issue2063/array_index_crash.vhdl
+        line: 30
+        gohard: error
+        lrm: "9.4.3, 8.4"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: synth/loop01/loop03.vhdl
+        line: 26
+        gohard: error
+        lrm: "9.4.3, 8.4"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: gna/ticket89/x_ieee_proposed/src/std_logic_1164_additions.vhdl
+        line: 0
+        gohard: error
+        lrm: "12.3, 16.7"
+        notes: "GoHard bundles the VHDL-2008 ieee library for every standard (#33); there STD_LOGIC_VECTOR is a subtype of STD_ULOGIC_VECTOR (LRM-2008 16.7), so the 1993 overloads for both are homographs, which GHDL's and NVC's 1993 ieee keep apart (every error of the file)"
+      - path: vests/vhdl-93/ashenden/compliant/util_pk_test.vhd
+        line: 38
+        gohard: error
+        lrm: "12.3, 16.7"
+        notes: "GoHard bundles the VHDL-2008 ieee library for every standard (#33); there STD_LOGIC_VECTOR is a subtype of STD_ULOGIC_VECTOR (LRM-2008 16.7), so the 1993 overloads for both are homographs, which GHDL's and NVC's 1993 ieee keep apart"
+      - path: vests/vhdl-93/ashenden/compliant/util_pk_test.vhd
+        line: 82
+        gohard: error
+        lrm: "12.3, 4.10, 16.7"
+        notes: "GoHard bundles the VHDL-2008 ieee library for every standard (#33); there STD_LOGIC_VECTOR is a subtype of STD_ULOGIC_VECTOR (LRM-2008 16.7), so the 1993 overloads for both are homographs, which GHDL's and NVC's 1993 ieee keep apart (the body conforms to the homograph)"
+      - path: vests/vhdl-93/ashenden/compliant/ch_20_ch_20_10.vhd
+        line: 45
+        gohard: none
+        lrm: "14.4.1, 16.2.1"
+        notes: "an architecture with the FOREIGN attribute is legal VHDL whose elaboration is implementation-defined; GHDL says it is not yet handled and NVC crashes, a tool limitation, not an LRM error"
+      - path: vests/vhdl-ams/ashenden/compliant/attributes-and-groups/inline_10.vhd
+        line: 38
+        gohard: none
+        lrm: "14.4.1, 16.2.1"
+        notes: "an architecture with the FOREIGN attribute is legal VHDL whose elaboration is implementation-defined; GHDL says it is not yet handled and NVC crashes, a tool limitation, not an LRM error"
+      - path: vests/vhdl-93/billowitch/disputed/tc882.vhd
+        line: 92
+        gohard: none
+        lrm: "3.4.3, 12.3"
+        notes: "a disputed VESTS test: the entity aspect names an entity of the library; GoHard resolves it there and does not make the architecture's component declarations visible inside the block configuration, so it does not see the component that hides the entity"
+      - path: vests/vhdl-ams/ashenden/compliant/aliases/tb_function_plus.vhd
+        line: 34
+        gohard: none
+        lrm: "12.4, 13.1"
+        notes: "the use clause of line 26 names a unit missing from the run, which GoHard reports there; GoHard does not report the operators and literals that unit may declare (LRM 12.4: what a missing unit would make visible is unknown)"
+      - path: vests/vhdl-ams/ashenden/compliant/aliases/tb_function_plus.vhd
+        line: 36
+        gohard: none
+        lrm: "12.4, 13.1"
+        notes: "the use clause of line 26 names a unit missing from the run, which GoHard reports there; GoHard does not report the operators and literals that unit may declare (LRM 12.4: what a missing unit would make visible is unknown)"
+      - path: vests/vhdl-ams/ashenden/compliant/aliases/tb_function_plus.vhd
+        line: 38
+        gohard: none
+        lrm: "12.4, 13.1"
+        notes: "the use clause of line 26 names a unit missing from the run, which GoHard reports there; GoHard does not report the operators and literals that unit may declare (LRM 12.4: what a missing unit would make visible is unknown)"
+      - path: vests/vhdl-ams/ashenden/compliant/packages/tb_bit_vector_signed_arithmetic.vhd
+        line: 32
+        gohard: none
+        lrm: "12.4, 13.1"
+        notes: "the use clause of line 26 names a unit missing from the run, which GoHard reports there; GoHard does not report the operators and literals that unit may declare (LRM 12.4: what a missing unit would make visible is unknown)"
+      - path: vests/vhdl-ams/ashenden/compliant/packages/tb_bit_vector_signed_arithmetic.vhd
+        line: 34
+        gohard: none
+        lrm: "12.4, 13.1"
+        notes: "the use clause of line 26 names a unit missing from the run, which GoHard reports there; GoHard does not report the operators and literals that unit may declare (LRM 12.4: what a missing unit would make visible is unknown)"
+      - path: vests/vhdl-ams/ashenden/compliant/packages/tb_bit_vector_signed_arithmetic.vhd
+        line: 36
+        gohard: none
+        lrm: "12.4, 13.1"
+        notes: "the use clause of line 26 names a unit missing from the run, which GoHard reports there; GoHard does not report the operators and literals that unit may declare (LRM 12.4: what a missing unit would make visible is unknown)"
+      - path: vests/vhdl-ams/ashenden/compliant/packages/tb_bit_vector_signed_arithmetic.vhd
+        line: 38
+        gohard: none
+        lrm: "12.4, 13.1"
+        notes: "the use clause of line 26 names a unit missing from the run, which GoHard reports there; GoHard does not report the operators and literals that unit may declare (LRM 12.4: what a missing unit would make visible is unknown)"
+      - path: vests/vhdl-ams/ashenden/compliant/packages/tb_bit_vector_signed_arithmetic.vhd
+        line: 40
+        gohard: none
+        lrm: "12.4, 13.1"
+        notes: "the use clause of line 26 names a unit missing from the run, which GoHard reports there; GoHard does not report the operators and literals that unit may declare (LRM 12.4: what a missing unit would make visible is unknown)"
+      - path: vests/vhdl-ams/ashenden/compliant/packages/tb_bit_vector_signed_arithmetic.vhd
+        line: 42
+        gohard: none
+        lrm: "12.4, 13.1"
+        notes: "the use clause of line 26 names a unit missing from the run, which GoHard reports there; GoHard does not report the operators and literals that unit may declare (LRM 12.4: what a missing unit would make visible is unknown)"
+      - path: gna/issue10/test_attr.vhdl
+        line: 14
+        gohard: none
+        lrm: "16.2.3, 8.1, 9.4.2"
+        notes: "t_tuple'attr'range: the prefix of 'RANGE is appropriate for an array object (a user attribute's value is a constant), and the range is locally static; GHDL rejects the prefix unless -frelaxed, NVC calls the range not static"
+      - path: gna/issue1832/psl.vhdl
+        line: 20
+        gohard: none
+        lrm: "IEEE 1850 5.1, 6.1.1.1"
+        notes: "an unclocked PSL directive is defined by IEEE 1850 (the True clock); GHDL and NVC do not support it (NVC: sorry, unclocked properties are not supported)"
+      - path: synth/issue662/psl_fell_err1.vhdl
+        line: 14
+        gohard: none
+        lrm: "IEEE 1850 5.1, 5.2.3.3"
+        notes: "fell in an unclocked directive is defined by IEEE 1850 (the True clock); both tools reject unclocked directives as unsupported"
+      - path: gna/issue2264/repro1.vhdl
+        line: 29
+        gohard: none
+        lrm: "4.9"
+        notes: "each package instance declares its own types (LRM 4.9), so the two instances' MY_REC differ; GoHard shares the uninstantiated package's declarations among its instances and leaves the distinction to elaboration"
+      - path: gna/issue521/tieee2.vhdl
+        line: 2
+        gohard: none
+        lrm: "13.2"
+        notes: "the run analyzes a unit into a library named ieee; GoHard's bundled ieee (#33) stays visible beside such a project library (library mapping is implementation-defined, LRM 13.2), while GHDL and NVC replace the whole library"
+    semerr_follows:
+      - path: gna/bug18351/PROBLEM.vhdl
+        line: 11
+        follows: ghdl
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: gna/issue2103/repro2.vhdl
+        line: 2
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: gna/issue312/test.vhdl
+        line: 8
+        follows: nvc
+        lrm: "12.4"
+        notes: "a use clause cannot name an uninstantiated package"
+      - path: gna/issue419/bug.vhdl
+        line: 2
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: gna/issue419/bug.vhdl
+        line: 3
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: gna/issue419/bug.vhdl
+        line: 5
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: gna/issue419/bug.vhdl
+        line: 6
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: vests/vhdl-93/ashenden/compliant/ch_11_fg_11_09.vhd
+        line: 57
+        follows: nvc
+        lrm: "7.3.2.2"
+        notes: "the architecture an entity aspect names must exist"
+      - path: vests/vhdl-93/ashenden/compliant/ch_11_fg_11_09.vhd
+        line: 63
+        follows: nvc
+        lrm: "7.3.2.2"
+        notes: "the architecture an entity aspect names must exist"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 417
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 418
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 419
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 420
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 422
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 423
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 424
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 425
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 427
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 428
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 429
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 430
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 436
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 437
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 438
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 439
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 441
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 442
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 443
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc517.vhd
+        line: 444
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 417
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 418
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 419
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 420
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 422
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 423
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 424
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 425
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 427
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 428
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 429
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 430
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 436
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 437
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 438
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 439
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 441
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 442
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 443
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc520.vhd
+        line: 444
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 417
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 418
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 419
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 420
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 422
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 423
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 424
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 425
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 427
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 428
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 429
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 430
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 436
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 437
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 438
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 439
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 441
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 442
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 443
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/compliant/tc521.vhd
+        line: 444
+        follows: nvc
+        lrm: "14.4.1"
+        notes: "a function called while a declarative item is elaborated needs its body elaborated first"
+      - path: vests/vhdl-93/billowitch/disputed/tc1779.vhd
+        line: 53
+        follows: nvc
+        lrm: "7.3.2.2"
+        notes: "the architecture an entity aspect names must exist"
+      - path: vests/vhdl-93/billowitch/disputed/tc996.vhd
+        line: 185
+        follows: nvc
+        lrm: "7.3.2.2"
+        notes: "the architecture an entity aspect names must exist"
+      - path: vests/vhdl-93/billowitch/non_compliant/analyzer_failure/tc367.vhd
+        line: 38
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: vests/vhdl-93/billowitch/non_compliant/analyzer_failure/tc383.vhd
+        line: 38
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: vests/vhdl-93/billowitch/non_compliant/analyzer_failure/tc783.vhd
+        line: 54
+        follows: nvc
+        lrm: "7.3.1"
+        notes: "configuration specification instance rules"
+      - path: vests/vhdl-93/billowitch/non_compliant/analyzer_failure/tc841.vhd
+        line: 73
+        follows: nvc
+        lrm: "7.3.2.2"
+        notes: "the architecture an entity aspect names must exist"
+      - path: vests/vhdl-93/billowitch/non_compliant/analyzer_failure/tc989.vhd
+        line: 32
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: vests/vhdl-ams/ashenden/compliant/packages/inline_02.vhd
+        line: 26
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: vests/vhdl-ams/ashenden/compliant/packages/inline_02.vhd
+        line: 29
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
     expected_failures:
       - testsuite/gna/*/testsuite.sh
       - testsuite/sanity/*/testsuite.sh
@@ -1495,7 +2034,11 @@ regression:
     license: GPL-2.0-only AND LicenseRef-GRLIB-third-party
     tag: nightly
     subfolder: lib
-    expected_failures: []
+    expected_failures:
+      # GRLIB xconfig templates (*.in.vhd): fragments with CONFIG_* macros
+      # that tkconfig substitutes into config.vhd; not VHDL on their own.
+      - lib/*/*/*.in.vhd
+      - lib/*/*/*/*.in.vhd
   # NEORV32 v1.13.6. Licence file LICENSE.
   - name: neorv32
     path: testdata/neorv32
@@ -1513,7 +2056,719 @@ regression:
     license: GPL-3.0-or-later
     tag: pr
     subfolder: test
-    semerr_sha256: dee3c87808c84aa72cb2544cf83f0d4c0c56296b5fc4caba51f07cb1c7937129
+    semerr_sha256: efac7f157cae552da99c4063185174c38ab7cf28220b112fe92521b286dc9551
+    semerr_decisions:
+      - path: bounds/issue477a.vhd
+        line: 23
+        gohard: error
+        lrm: "9.4.3, 5.2.3.1"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: elab/bounds14.vhd
+        line: 11
+        gohard: error
+        lrm: "9.4.3, 6.5.7.1"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: elab/issue539.vhd
+        line: 23
+        gohard: error
+        lrm: "9.4.3, 6.5.7.1"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: elab/link1.vhd
+        line: 2
+        gohard: error
+        lrm: "9.4.3, 9.2.7"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: regress/bounds17.vhd
+        line: 14
+        gohard: error
+        lrm: "9.4.3, 6.5.7.1"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: regress/bounds40.vhd
+        line: 15
+        gohard: error
+        lrm: "9.4.3, 6.5.7.1"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: regress/bounds41.vhd
+        line: 15
+        gohard: error
+        lrm: "9.4.3, 6.5.7.1"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: regress/issue1394.vhd
+        line: 19
+        gohard: error
+        lrm: "9.4.3, 5.2.3.1"
+        notes: "the value is globally static, so GoHard evaluates it before anything runs (#34) and reports the error that GHDL and NVC report only at elaboration or simulation (their test scripts expect that failure)"
+      - path: charset/utf8.vhd
+        line: 3
+        gohard: none
+        lrm: "15.4.2, 15.2"
+        notes: "GoHard reads sources as UTF-8 (#20), so the identifier is Åxyzß, whose letters are ISO 8859-1 letters of a basic identifier; GHDL and NVC read the bytes as ISO 8859-1 and find a control character"
+      - path: psl/clock1.vhd
+        line: 9
+        gohard: none
+        lrm: "IEEE 1850 5.1, 6.1.1.1"
+        notes: "an unclocked PSL directive is defined by IEEE 1850 (the True clock); GHDL and NVC do not support it"
+      - path: psl/clock1.vhd
+        line: 11
+        gohard: none
+        lrm: "IEEE 1850 6.1.1.1"
+        notes: "a clock on a subproperty is legal PSL; GHDL and NVC support clocks only at the outermost level"
+      - path: sem/attr.vhd
+        line: 167
+        gohard: none
+        lrm: "16.2.3, 8.1, 14.4.1"
+        notes: "func(4)'range: a function call returning an array is appropriate for an array object (the NVC test marks it OK); NVC reports the call before the function body is elaborated, which GoHard leaves to elaboration for a body in another declarative part, and GHDL needs -frelaxed"
+    semerr_follows:
+      - path: bounds/bounds.vhd
+        line: 14
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: bounds/bounds.vhd
+        line: 15
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: bounds/bounds.vhd
+        line: 16
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: bounds/bounds.vhd
+        line: 17
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: bounds/bounds.vhd
+        line: 18
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: bounds/bounds.vhd
+        line: 22
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: bounds/bounds.vhd
+        line: 114
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: bounds/bounds.vhd
+        line: 151
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: bounds/bounds.vhd
+        line: 196
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: dump/vhdl2.vhd
+        line: 10
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: eopt/arrayref1.vhd
+        line: 5
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: eopt/slice1.vhd
+        line: 5
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/alias.vhd
+        line: 6
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/alias.vhd
+        line: 7
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/alias.vhd
+        line: 9
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/alias.vhd
+        line: 10
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/conc.vhd
+        line: 8
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/conc.vhd
+        line: 9
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/config.vhd
+        line: 85
+        follows: nvc
+        lrm: "7.3.2.1"
+        notes: "a configuration specification binding needs an entity aspect"
+      - path: parse/expr.vhd
+        line: 12
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/func.vhd
+        line: 3
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/func.vhd
+        line: 5
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/func.vhd
+        line: 9
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/implicit.vhd
+        line: 3
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/issue1090.vhd
+        line: 4
+        follows: nvc
+        lrm: "13.5"
+        notes: "the library holds the earlier unit p1 while its replacement is analyzed"
+      - path: parse/issue1090.vhd
+        line: 10
+        follows: nvc
+        lrm: "13.5"
+        notes: "the library holds the earlier unit p1 while its replacement is analyzed"
+      - path: parse/loc.vhd
+        line: 4
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 5
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 7
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 8
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 13
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 16
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 17
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 60
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 62
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 63
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 68
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 71
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 72
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 165
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 268
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 269
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 318
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 319
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 328
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 336
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 337
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 338
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names.vhd
+        line: 339
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names2.vhd
+        line: 14
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names2.vhd
+        line: 15
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names2.vhd
+        line: 17
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names3.vhd
+        line: 29
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names3.vhd
+        line: 30
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names3.vhd
+        line: 31
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/names3.vhd
+        line: 48
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/osvvm6.vhd
+        line: 28
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/osvvm6.vhd
+        line: 29
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/osvvm6.vhd
+        line: 30
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/protected.vhd
+        line: 36
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/protected2.vhd
+        line: 7
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/protected2.vhd
+        line: 8
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/protected2.vhd
+        line: 25
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/protected2.vhd
+        line: 26
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/protected2.vhd
+        line: 27
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/seq.vhd
+        line: 43
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/seq.vhd
+        line: 131
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/seq.vhd
+        line: 132
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/types.vhd
+        line: 24
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/vhdl2008.vhd
+        line: 37
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/vhdl2008.vhd
+        line: 78
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/vhdl2008.vhd
+        line: 79
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: parse/vhdl2008.vhd
+        line: 279
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ambiguous.vhd
+        line: 91
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ambiguous.vhd
+        line: 145
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ambiguous.vhd
+        line: 161
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ambiguous.vhd
+        line: 162
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ambiguous.vhd
+        line: 163
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ambiguous.vhd
+        line: 165
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ambiguous.vhd
+        line: 166
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ambiguous.vhd
+        line: 167
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ambiguous.vhd
+        line: 178
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ambiguous.vhd
+        line: 184
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ambiguous.vhd
+        line: 212
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/array.vhd
+        line: 478
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/attr.vhd
+        line: 164
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/attr.vhd
+        line: 306
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/attr.vhd
+        line: 313
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/attr.vhd
+        line: 314
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/entity.vhd
+        line: 23
+        follows: nvc
+        lrm: "7.3.2.2"
+        notes: "the architecture an entity aspect names must exist"
+      - path: sem/func.vhd
+        line: 5
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/func.vhd
+        line: 27
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/func.vhd
+        line: 124
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/func.vhd
+        line: 166
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/func.vhd
+        line: 336
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/func.vhd
+        line: 338
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/func.vhd
+        line: 345
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/func.vhd
+        line: 346
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/func.vhd
+        line: 347
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/func.vhd
+        line: 348
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/generics.vhd
+        line: 87
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/gensub.vhd
+        line: 20
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/gentype.vhd
+        line: 46
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/gentype.vhd
+        line: 47
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/gentype.vhd
+        line: 49
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/gentype.vhd
+        line: 50
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/gentype.vhd
+        line: 52
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/issue356.vhd
+        line: 7
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/lcs2016_45a.vhd
+        line: 170
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/lcs2016_45a.vhd
+        line: 171
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/lcs2016_45a.vhd
+        line: 172
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/lcs2016_45a.vhd
+        line: 173
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/lcs2016_45a.vhd
+        line: 174
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/osvvm1.vhd
+        line: 16
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/osvvm3.vhd
+        line: 12
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ports.vhd
+        line: 263
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ports.vhd
+        line: 264
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ports.vhd
+        line: 265
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ports.vhd
+        line: 266
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ports.vhd
+        line: 360
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/ports.vhd
+        line: 361
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/procedure.vhd
+        line: 99
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/procedure.vhd
+        line: 100
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/protected.vhd
+        line: 154
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/seq.vhd
+        line: 252
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/seq.vhd
+        line: 261
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/signal.vhd
+        line: 74
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/signal.vhd
+        line: 79
+        follows: nvc
+        lrm: "7.4"
+        notes: "a disconnection specification names guarded signals"
+      - path: sem/signal.vhd
+        line: 104
+        follows: nvc
+        lrm: "4.3, 4.8"
+        notes: "a subprogram declaration needs its body in the same declarative part, or in the package body (GHDL leaves it to elaboration)"
+      - path: sem/spec1.vhd
+        line: 42
+        follows: ghdl
+        lrm: "7.3.1"
+        notes: "configuration specification instance rules"
     expected_failures:
       - test/regress/testlist.txt
       - test/test_*.c
@@ -1527,7 +2782,9 @@ regression:
     license: LicenseRef-PSI-HDL-Library-1.0
     tag: nightly
     subfolder: .
-    expected_failures: []
+    expected_failures:
+      # Documentation snippet: a bare process statement with no design unit.
+      - doc/axi/slave/RbExample.vhd
   # OSVVM utility library 2026.09. Licence file LICENSE.md.
   - name: osvvm
     path: testdata/libs/osvvm
@@ -1536,7 +2793,9 @@ regression:
     license: Apache-2.0
     tag: nightly
     subfolder: .
-    expected_failures: []
+    expected_failures:
+      # Template with ${...} placeholders the OSVVM build scripts substitute.
+      - OsvvmSettingsPkg_template.vhd
   # PoC v3.0.0. VLSI-EDA/PoC is archived and points to VHDL/PoC. Licence
   # file LICENSE.md.
   - name: poc
@@ -1546,7 +2805,9 @@ regression:
     license: Apache-2.0
     tag: nightly
     subfolder: .
-    expected_failures: []
+    expected_failures:
+      # Upstream typo at 80:18 "std.env.finish;.stop;"; GHDL rejects it too.
+      - tb/bus/axi4lite/UART/axi4lite_UART_receive_burst.vhdl
   # SURF v2.76.0. Licence file LICENSE.txt: SLAC 3-clause BSD with the
   # "Enhancements" grant, i.e. the SPDX BSD-3-Clause-LBNL text.
   - name: surf

@@ -9,8 +9,9 @@
 # follow). Each file line is the argument, the library when not work,
 # the GHDL options, then per tool the exit code and the lines of that
 # file it reports errors on; "~" marks a line whose only errors are
-# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
-# reports an error on every line both tools report one on
+# cascades (GHDL's "<unit> was not analysed", NVC's "... was analysed
+# with errors"). tools/oracle checks that GoHard reports an error on
+# every line both tools report one on, cascades aside
 # (semerr_check.go).
 tool ghdl 6.0.0
 tool nvc 1.23.0
@@ -212,11 +213,11 @@ run unit:test_elab:test_issue175:1993 dir=testdata/nvc/test std=93 sha=0af5475d6
 run unit:test_elab:test_issue184:1993 dir=testdata/nvc/test std=93 sha=b1deee376ff85642
  elab/issue184.vhd ghdl=0 nvc=0
 run unit:test_elab:test_libbind2:1993 dir=testdata/nvc/test std=93 sha=7fe25df8ee58fbd0
- elab/libbind2.vhd ghdl=1@12,17~ nvc=1@12,17
+ elab/libbind2.vhd ghdl=1@12,17~ nvc=1@12,17~
 run unit:test_elab:test_toplevel2:1993 dir=testdata/nvc/test std=93 sha=00895fccf8fb451d
  elab/toplevel2.vhd ghdl=0 nvc=0
 run unit:test_elab:test_libbind3:1993 dir=testdata/nvc/test std=93 sha=891a5ada9a552616
- elab/libbind3.vhd ghdl=1@27,32~ nvc=1@27,32
+ elab/libbind3.vhd ghdl=1@27,32~ nvc=1@27,32~
 run unit:test_elab:test_jcore1:1993 dir=testdata/nvc/test std=93 sha=8a1c1839a461c3d6
  elab/jcore1.vhd ghdl=0 nvc=0
 run unit:test_elab:test_eval1:1993 dir=testdata/nvc/test std=93 sha=a2e7673581300583
@@ -856,7 +857,7 @@ run unit:test_parse:test_expr:1993 dir=testdata/nvc/test std=93 sha=3f57ee4649e0
 run unit:test_parse:test_error:1993 dir=testdata/nvc/test std=93 sha=54939b876eadd02e
  parse/error.vhd ghdl=1@7,11,17,23,27,34,36 nvc=1@7,11,17,23,27,34,35,36,46,49,52,55,61,64,69
 run unit:test_parse:test_config:1993 dir=testdata/nvc/test std=93 sha=cfa6567c28f615fd
- parse/config.vhd ghdl=1@29,38~,45,52,55,64,68,72,81~ nvc=1@29,38,45,52,55,85
+ parse/config.vhd ghdl=1@29,38~,45,52,55,64,68,72,81~ nvc=1@29,38~,45,52,55,85
 run unit:test_parse:test_protected:2002 dir=testdata/nvc/test std=02 sha=bbcedb3d32116f3d
  parse/protected.vhd ghdl=1@9,39 nvc=1@36
 run unit:test_parse:test_empty:1993 dir=testdata/nvc/test std=93 sha=4e31cc88e1170ac1
@@ -906,13 +907,13 @@ run unit:test_parse:test_group:1993 dir=testdata/nvc/test std=93 sha=db8a82eb48f
 run unit:test_parse:test_alias2:1993 dir=testdata/nvc/test std=93 sha=fc1f39083cfec638
  parse/alias2.vhd ghdl=0 nvc=0
 run unit:test_parse:test_badprimary:1993 dir=testdata/nvc/test std=93 sha=50336e42195621b0
- parse/badprimary.vhd ghdl=1@17~,26 nvc=1@17,26
+ parse/badprimary.vhd ghdl=1@17~,26 nvc=1@17,26~
 run unit:test_parse:test_error3:1993 dir=testdata/nvc/test std=93 sha=d7a776c2515b5c52
  parse/error3.vhd ghdl=1@15,43 nvc=1@15,26
 run unit:test_parse:test_protected2:2008 dir=testdata/nvc/test std=08 sha=ede094d9f4f24677
  parse/protected2.vhd ghdl=1@37,42 nvc=1@7,8,25,26,27
 run unit:test_parse:test_error4:1993 dir=testdata/nvc/test std=93 sha=6cb073cde13d0262
- parse/error4.vhd ghdl=1@2,8~ nvc=1@2,8
+ parse/error4.vhd ghdl=1@2,8~ nvc=1@2,8~
 run unit:test_parse:test_tc1012:1993 dir=testdata/nvc/test std=93 sha=245a77d8e169088c
  parse/tc1012.vhd ghdl=0 nvc=0
 run unit:test_parse:test_issue443:1993 dir=testdata/nvc/test std=93 sha=ec93ad154aff1658
@@ -924,7 +925,7 @@ run unit:test_parse:test_vunit6:2008 dir=testdata/nvc/test std=08 sha=1c36044852
 run unit:test_parse:test_external:2008 dir=testdata/nvc/test std=08 sha=bf504176b70394d2
  parse/external.vhd ghdl=0 nvc=0
 run unit:test_parse:test_error5:1993 dir=testdata/nvc/test std=93 sha=790ea08bbce46154
- parse/error5.vhd ghdl=1@2,4,7~ nvc=1@2,7
+ parse/error5.vhd ghdl=1@2,4,7~ nvc=1@2,7~
 run unit:test_parse:test_vunit7:1993 dir=testdata/nvc/test std=93 sha=fdf38458fb431067
  parse/vunit7.vhd ghdl=1@23 nvc=1@23
 run unit:test_parse:test_error6:2008 dir=testdata/nvc/test std=08 sha=492ca3ce82673d99
@@ -940,7 +941,7 @@ run unit:test_parse:test_issue461a:1993 dir=testdata/nvc/test std=93 sha=45f910f
 run unit:test_parse:test_issue461b:2008 dir=testdata/nvc/test std=08 sha=45f910f3b0feab0e
  parse/issue461.vhd ghdl=0 nvc=0
 run unit:test_parse:test_error7:1993 dir=testdata/nvc/test std=93 sha=c0516e5cdbd1a7db
- parse/error7.vhd ghdl=1@18 nvc=1@4,7,11,17
+ parse/error7.vhd ghdl=1@18 nvc=1@4,7~,11~,17
 run unit:test_parse:test_error8:2002 dir=testdata/nvc/test std=02 sha=b74cee4403998370
  parse/error8.vhd ghdl=1@33 nvc=1@33
 run unit:test_parse:test_vunit8:1993 dir=testdata/nvc/test std=93 sha=7c83a7ae3e4ea367
@@ -984,7 +985,7 @@ run unit:test_parse:test_issue539:2008 dir=testdata/nvc/test std=08 sha=67c6bd22
 run unit:test_parse:test_issue568:2008 dir=testdata/nvc/test std=08 sha=29b4913ebd622c80
  parse/issue568.vhd ghdl=0 nvc=0
 run unit:test_parse:test_issue569:1993 dir=testdata/nvc/test std=93 sha=555af6f8b19b8b03
- parse/issue569.vhd ghdl=1@11,16~ nvc=1@11,16
+ parse/issue569.vhd ghdl=1@11,16~ nvc=1@11,16~
 run unit:test_parse:test_osvvm7:2008 dir=testdata/nvc/test std=08 sha=3ee3e9b471a1b9b6
  parse/osvvm7.vhd ghdl=0 nvc=0
 run unit:test_parse:test_issue580:2008 dir=testdata/nvc/test std=08 sha=cff55f0dc2d69bc0
@@ -1006,11 +1007,11 @@ run unit:test_parse:test_issue644:2008 dir=testdata/nvc/test std=08 sha=c9d0dcb7
 run unit:test_parse:test_issue653:2008 dir=testdata/nvc/test std=08 sha=55d293c6cea3c47c
  parse/issue653.vhd ghdl=0 nvc=0
 run unit:test_parse:test_issue654:2008 dir=testdata/nvc/test std=08 sha=4fff2d521fb3597a
- parse/issue654.vhd ghdl=2 nvc=1@22,23,30,37,40
+ parse/issue654.vhd ghdl=2 nvc=1@22,23,30,37~,40
 run unit:test_parse:test_issue687:1993 dir=testdata/nvc/test std=93 sha=f28227fcb8e18408
  parse/issue687.vhd ghdl=1@11 nvc=1@11
 run unit:test_parse:test_issue688:1993 dir=testdata/nvc/test std=93 sha=a0313781ecb2e20a
- parse/issue688.vhd ghdl=1@9,10,15~ nvc=1@9,15
+ parse/issue688.vhd ghdl=1@9,10,15~ nvc=1@9,15~
 run unit:test_parse:test_issue686:2008 dir=testdata/nvc/test std=08 sha=8de7341daf7f3e2d
  parse/issue686.vhd ghdl=0 nvc=1@15
 run unit:test_parse:test_interface:2019 dir=testdata/nvc/test std=19 sha=05289bf00b4fda20
@@ -1066,7 +1067,7 @@ run unit:test_parse:test_issue870:1993 dir=testdata/nvc/test std=93 sha=69d38ff4
 run unit:test_parse:test_aggregate:2008 dir=testdata/nvc/test std=08 sha=666baedc8bb533c9
  parse/aggregate.vhd ghdl=1@8,11 nvc=0
 run unit:test_parse:test_issue875:1993 dir=testdata/nvc/test std=93 sha=3d13592ed333e1ff
- parse/issue875.vhd ghdl=1@6,9~ nvc=1@6,9
+ parse/issue875.vhd ghdl=1@6,9~ nvc=1@6,9~
 run unit:test_parse:test_error11:2008 dir=testdata/nvc/test std=08 sha=12b7c064c5763d3f
  parse/error11.vhd ghdl=1@26 nvc=1@26
 run unit:test_parse:test_error12:2008 dir=testdata/nvc/test std=08 sha=b8d9c80dee82937b
@@ -1238,7 +1239,7 @@ run unit:test_sem:test_std:1993 dir=testdata/nvc/test std=93 sha=9c416dccc037618
 run unit:test_sem:test_wait:1993 dir=testdata/nvc/test std=93 sha=852a7577e79d3479
  sem/wait.vhd ghdl=1@17,26,35,43,51,53,66,69 nvc=1@17,26,35,43,51,53,66,69
 run unit:test_sem:test_func:1993 dir=testdata/nvc/test std=93 sha=f23559ed0683d901
- sem/func.vhd ghdl=1@29 nvc=1@5,19,23,25,27,29,36,39,51,114,115,124,146,161,166,180,181,182,239,245,271,288,293,294,297,303,310,317,324,331,336,338,342,345,346,347,348,366
+ sem/func.vhd ghdl=1@29 nvc=1@5,19,23,25,27,29,36,39~,51,114,115,124,146,161,166,180,181,182,239,245,271,288,293,294,297,303,310,317,324,331,336,338,342,345,346,347,348,366
 run unit:test_sem:test_array:1993 dir=testdata/nvc/test std=93 sha=e2e9f851302dab0e
  sem/array.vhd ghdl=1@26,33,39,46,55,57,65,88,89,98,102,111,119,120,121,130,207,214,215,232,233,234,241,246,252,269,270,272,277,279,285,295,302,320,322,343,365,366,373,379,399,400,401,403,404,424,436,442,446,471,480,488,489,497 nvc=1@27,33,39,46,55,57,65,88,89,98,102,111,119,120,121,130,207,215,232,233,234,241,252,269,270,272,277,279,285,295,343,365,366,379,391,392,399,400,401,403,404,424,436,442,446,478,480,488,489,497
 run unit:test_sem:test_assert:1993 dir=testdata/nvc/test std=93 sha=6bf91faa4bedf66c
@@ -1250,7 +1251,7 @@ run unit:test_sem:test_seq:1993 dir=testdata/nvc/test std=93 sha=a7cd3babc942285
 run unit:test_sem:test_conc:1993 dir=testdata/nvc/test std=93 sha=b8dc705534b5bb01
  sem/conc.vhd ghdl=1@12,16,18,26,28,29,32 nvc=1@12,16,18,26,29,32
 run unit:test_sem:test_procedure:1993 dir=testdata/nvc/test std=93 sha=3793f2adb7aa7184
- sem/procedure.vhd ghdl=1@5,98,227 nvc=1@5,12,28,45,63,64,83,84,90,91,92,93,98,99,100,142,148,157,162,167,172,180,183,193,201,207,224,227
+ sem/procedure.vhd ghdl=1@5,98,227 nvc=1@5,12~,28,45,63,64,83,84,90,91,92,93,98,99,100,142,148,157,162,167,172,180,183,193,201,207,224,227
 run unit:test_sem:test_concat:1993 dir=testdata/nvc/test std=93 sha=59328cd55c6dff22
  sem/concat.vhd ghdl=1@24,26 nvc=1@24,26
 run unit:test_sem:test_conv:1993 dir=testdata/nvc/test std=93 sha=5573add786afc1e8
@@ -1260,11 +1261,11 @@ run unit:test_sem:test_attr:1993 dir=testdata/nvc/test std=93 sha=39a9256fe4fe0c
 run unit:test_sem:test_generate:1993 dir=testdata/nvc/test std=93 sha=c87871c3f3eb3d6b
  sem/generate.vhd ghdl=1@15,26,45,48 nvc=1@15,26,45,48
 run unit:test_sem:test_record:1993 dir=testdata/nvc/test std=93 sha=385c59ccd8f00ec4
- sem/record.vhd ghdl=1@9,13,28,33~ nvc=1@9,13,28,33,109,122,151,153,155,182
+ sem/record.vhd ghdl=1@9,13,28,33~ nvc=1@9,13,28,33~,109,122,151,153,155,182
 run unit:test_sem:test_file:1993 dir=testdata/nvc/test std=93 sha=d81510d29e326c09
- sem/file.vhd ghdl=2@6,8,12,16,20,28,30,46,47,48,49,60,62 nvc=1@6,8,12,16,20,28,30,46,47,48,49,60,62,66
+ sem/file.vhd ghdl=2@6,8,12,16,20,28,30,46,47,48,49,60,62 nvc=1@6,8,12,16,20,28,30,46,47,48,49,60,62,66~
 run unit:test_sem:test_access:2002 dir=testdata/nvc/test std=02 sha=7b2aaf1629da2da5
- sem/access.vhd ghdl=1@38 nvc=1@5,24,33,34,36,37,38,39,43,50,54,55,56,76,78,84,90,97,105,125,127
+ sem/access.vhd ghdl=1@38 nvc=1@5,24~,33,34,36,37,38,39,43,50,54,55,56,76,78,84,90,97,105,125,127
 run unit:test_sem:test_real:1993 dir=testdata/nvc/test std=93 sha=e35b831cbd387c0b
  sem/real.vhd ghdl=1@16,25,38,39,40 nvc=1@16,25,38,39,52
 run unit:test_sem:test_entity:1993 dir=testdata/nvc/test std=93 sha=8b165ba65b1f13d2
@@ -1294,7 +1295,7 @@ run unit:test_sem:test_config:1993 dir=testdata/nvc/test std=93 sha=c9d50cd19179
 run unit:test_sem:test_protected:2002 dir=testdata/nvc/test std=02 sha=25a0561272bac231
  sem/protected.vhd ghdl=1@13,16,19,22,25,28,47,52,56,58,64,77,118,119,124,126,158~ nvc=1@7,8,9,13,19,22,25,47,50,52,56,58,64,118,119,124,126,135,150,154
 run unit:test_sem:test_protected2:2002 dir=testdata/nvc/test std=02 sha=20af980c04b18edb
- sem/protected2.vhd ghdl=1@5,8~,13,18~ nvc=1@5,8,13,18
+ sem/protected2.vhd ghdl=1@5,8~,13,18~ nvc=1@5,8~,13~,18~
 run unit:test_sem:test_alias:1993 dir=testdata/nvc/test std=93 sha=1408b7dfbf6d23ca
  sem/alias.vhd ghdl=1@68 nvc=1@10,12,22,23,24,25,32,40,41,42,43,50,68,81,83,88,89,114
 run unit:test_sem:test_issue102:1993 dir=testdata/nvc/test std=93 sha=b601f7a7c523b4ba
@@ -1458,7 +1459,7 @@ run unit:test_sem:test_tc792:1993 dir=testdata/nvc/test std=93 sha=48a760a7ce21f
 run unit:test_sem:test_vhdl2008:2008 dir=testdata/nvc/test std=08 sha=390c4a2e787663a9
  sem/vhdl2008.vhd ghdl=1@109 nvc=1@13,14,31,40,41,49,59,70,86,102,109
 run unit:test_sem:test_genpack:2008 dir=testdata/nvc/test std=08 sha=32cb145ad77e018b
- sem/genpack.vhd ghdl=1@45,46,47,48,63~,77,82,87,90,93,96,99,112,117,121,124 nvc=1@45,46,47,48,77,82,91,94,96,99
+ sem/genpack.vhd ghdl=1@45,46,47,48,63~,77,82,87,90,93,96,99,112,117,121,124 nvc=1@45,46,47,48,77,82,91,94,96~,99
 run unit:test_sem:test_gentype:2008 dir=testdata/nvc/test std=08 sha=1a2a6156c9c1a44b
  sem/gentype.vhd ghdl=2@10 nvc=1@10,46,47,49,50,52,66,72,80,81,83,84,90,93,95,96
 run unit:test_sem:test_record2008:2008 dir=testdata/nvc/test std=08 sha=324bb0ac6510e251
@@ -1478,7 +1479,7 @@ run unit:test_sem:test_generics2008:2008 dir=testdata/nvc/test std=08 sha=e8d5f9
 run unit:test_sem:test_osvvm5:2008 dir=testdata/nvc/test std=08 sha=4d0f655a38d9c850
  sem/osvvm5.vhd ghdl=1@48 nvc=1@48
 run unit:test_sem:test_issue465:2008 dir=testdata/nvc/test std=08 sha=767b9b2c8bccb207
- sem/issue465.vhd ghdl=1@1,8~ nvc=1@1,8
+ sem/issue465.vhd ghdl=1@1,8~ nvc=1@1,8~
 run unit:test_sem:test_gensub:2008 dir=testdata/nvc/test std=08 sha=f973cb2a57d6c04a
  sem/gensub.vhd ghdl=2@19,21,24,31,42 nvc=1@20,21,23,24,42,44,50,57,69,75,93,94
 run unit:test_sem:test_issue482:2008 dir=testdata/nvc/test std=08 sha=f4f7931fe62e51ed
@@ -1510,7 +1511,7 @@ run unit:test_sem:test_lcs2016_45a:2019 dir=testdata/nvc/test std=19 sha=24c253e
 run unit:test_sem:test_lcs2016_18:2019 dir=testdata/nvc/test std=19 sha=6e93f8ed02950883
  sem/lcs2016_18.vhd ghdl=1@22,23,24,25,28,29 nvc=1@7,8,15,23,24,25,26,29,38,40,41
 run unit:test_sem:test_issue713:2008 dir=testdata/nvc/test std=08 sha=a0c966c1beb51d1c
- sem/issue713.vhd ghdl=1@17,22 nvc=1@13,17
+ sem/issue713.vhd ghdl=1@17,22 nvc=1@13~,17
 run unit:test_sem:test_lcs2016_41:2019 dir=testdata/nvc/test std=19 sha=41e7c1e50d7223f4
  sem/lcs2016_41.vhd ghdl=1@4,10,11,12,18,19,20,21,22,25,26,27,28 nvc=1@20,21,25,27
 run unit:test_sem:test_lcs2016_14a:2019 dir=testdata/nvc/test std=19 sha=96307462904b3aed
@@ -1552,7 +1553,7 @@ run unit:test_sem:test_incomplete:2002 dir=testdata/nvc/test std=02 sha=e88b3949
 run unit:test_sem:test_issue884:2008 dir=testdata/nvc/test std=08 sha=b1fa65d8c715fcd6
  sem/issue884.vhd ghdl=2 nvc=1@7
 run unit:test_sem:test_genpack5:2008 dir=testdata/nvc/test std=08 sha=b101e96e0673306c
- sem/genpack5.vhd ghdl=1@56,67,69,71,78 nvc=1@51,69
+ sem/genpack5.vhd ghdl=1@56,67,69,71,78 nvc=1@51~,69
 run unit:test_sem:test_issue945:1993 dir=testdata/nvc/test std=93 sha=0aa044e57dd1f379
  sem/issue945.vhd ghdl=1@29,51,58 nvc=1@51,58
 run unit:test_sem:test_issue958:1993 dir=testdata/nvc/test std=93 sha=e0dd478a902be135

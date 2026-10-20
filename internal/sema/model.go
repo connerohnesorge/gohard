@@ -135,6 +135,9 @@ type Unit struct {
 	// specifications give the unit itself (`attribute A of e :
 	// entity is ...`), for lib.e'A where A is not visible (names.go).
 	unitAttrs []*Decl
+	// othersAttrs are the attributes an attribute specification of
+	// the unit gives with the entity name list others or all.
+	othersAttrs []*Decl
 }
 
 // Label returns "lib.name" or, for secondary units, "lib.of(name)" /
@@ -344,6 +347,16 @@ type Decl struct {
 	// subprogram or literal, so it is overloadable even when its target
 	// did not resolve.
 	sigAlias bool
+	// instTypes maps, for a package instance, the generic types of
+	// the uninstantiated package to their actual subtypes
+	// (typerules.go).
+	instTypes map[*Type]*Type
+	// paramRange is the discrete range of a loop parameter, whose
+	// subtype it is (LRM 10.10; coverage.go).
+	paramRange *RangeCons
+	// attrs are the attributes an attribute specification of its own
+	// unit gives the declaration (names.go).
+	attrs []*Decl
 }
 
 // Overloadable reports whether d may be overloaded: subprograms,
@@ -537,7 +550,7 @@ func (l *Library) UnitFrom(k Key, from *Unit) (*Unit, bool) {
 		}
 		u = old
 	}
-	return u, true
+	return l.seenFrom(u, from) // units.go
 }
 
 // Secondary returns the architectures of entity k (or the body of

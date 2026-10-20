@@ -6,6 +6,7 @@ package sema
 // resolution itself is overload.go's, expression typing types.go's.
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 
@@ -98,9 +99,11 @@ func (a *analyzer) simpleName(tok cst.Token, kind RefKind) named {
 	if k == "" {
 		return unknownNamed()
 	}
-	if a.declaring[k] && a.directlyDeclared(k) {
+	if a.declaring[k] && a.directlyDeclared(k) && !a.s.cfg.Lenient {
 		// LRM 12.3: a declaration is not visible within itself, and it
-		// already hides an outer homograph there.
+		// already hides an outer homograph there. Lenient analysis
+		// (GHDL -frelaxed, NVC --relaxed) lets the outer homograph be
+		// seen there instead.
 		if !a.quiet {
 			a.semaError(tok.Span(), tok.Text()+" is used in its own "+
 				"declaration")
@@ -211,7 +214,14 @@ func (a *analyzer) selectedName(sel cst.SelectedName, kind RefKind,
 	switch {
 	case p.lib != nil:
 		if suffix.Kind() == token.KwAll {
-			return unknownNamed() // only in use clauses
+			// L.all only ends a use clause (LRM 12.4), which
+			// useName resolves without coming here.
+			if !a.quiet {
+				a.semaError(sel.Span(), a.text(sel.Node)+" denotes "+
+					"no named entity: library "+p.tok.Text()+
+					" cannot be selected by all here")
+			}
+			return unknownNamed()
 		}
 		u := a.libUnit(p.lib, sk, suffix)
 		if u == nil {
@@ -227,6 +237,14 @@ func (a *analyzer) selectedName(sel cst.SelectedName, kind RefKind,
 	case p.expr != nil:
 		return a.selectInValue(p.expr, suffix, sk, kind)
 	case p.typ != nil:
+		// LRM 8.3: the prefix of an expanded name denotes a library,
+		// a design unit or an enclosing construct, and that of a
+		// selected element an object or function call; a type mark
+		// is neither.
+		if !a.quiet && !p.typ.Unknown() {
+			a.semaError(sel.Span(), "type "+a.text(sel.Prefix().Node)+
+				" cannot be the prefix of a selected name")
+		}
 		return unknownNamed()
 	case a.enclosing(p.decls) != nil:
 		// f.x with f an enclosing subprogram is an expanded name
@@ -247,11 +265,29 @@ func (a *analyzer) selectedName(sel cst.SelectedName, kind RefKind,
 		return a.selectInValue(v, suffix, sk, kind)
 	case len(p.decls) == 1:
 		x := p.decls[0].Denotes()
+		if a.uninstantiatedPrefix(x, sel) { // pkginst.go
+			return unknownNamed()
+		}
 		r := x.Region
+		if x.Kind == DeclLabel {
+			// LRM 8.3: an expanded name whose prefix denotes a
+			// statement is only allowed within that statement.
+			in := a.within(x)
+			if in == nil {
+				if !a.quiet {
+					a.semaError(sel.Span(), "the expanded name "+
+						a.text(sel.Node)+" is only allowed within "+
+						x.Text)
+				}
+				return unknownNamed()
+			}
+			r = in
+		}
 		if r == nil && x.Kind == DeclPackageBody && x.Spec != nil {
 			r = x.Spec.Region
 		}
 		if r == nil {
+			a.attrDeclPrefix(p, sel.Prefix().Node, "selected")
 			return unknownNamed()
 		}
 		ds := lookupIn(r, sk, a.std)
@@ -264,7 +300,148 @@ func (a *analyzer) selectedName(sel cst.SelectedName, kind RefKind,
 		}
 		return a.denote(ds, suffix, kind)
 	}
+	a.attrDeclPrefix(p, sel.Prefix().Node, "selected")
 	return unknownNamed()
+}
+
+// signatureMatched reports the signature sig of an alias that matches
+// none of the subprograms and literals r names (LRM 4.5.3, 6.6.3).
+func (a *analyzer) signatureMatched(sig cst.Signature, r named,
+	pick []*Decl,
+) {
+	if a.quiet || len(pick) > 0 || r.unknown || len(r.decls) == 0 ||
+		!r.decls[0].Overloadable() {
+		return
+	}
+	a.semaError(sig.Span(), "no visible subprogram or enumeration "+
+		"literal "+r.tok.Text()+" matches the signature "+a.text(sig.Node))
+}
+
+// subprogramDefault resolves the default `is name` of the interface
+// subprogram g: name denotes a visible subprogram that conforms to g's
+// profile (LRM 6.5.4, 6.5.6.2). A profile with a generic or unknown
+// type is not matched.
+func (a *analyzer) subprogramDefault(n cst.Node, g *Decl) {
+	r := a.resolveName(n, RefRead, nil)
+	if a.quiet || r.unknown {
+		return
+	}
+	if len(r.decls) == 0 || !r.decls[0].Overloadable() {
+		a.semaError(n.Span(), a.text(n)+" is not a subprogram")
+		return
+	}
+	var want []*Type
+	for _, p := range profileParams(g) {
+		want = append(want, p.Type)
+	}
+	rt := resultType(g)
+	for _, t := range append(slices.Clip(want), rt) {
+		if t != nil && (t.Unknown() || t.Base().Class == TypeGeneric) {
+			return
+		}
+	}
+	for _, d := range r.decls {
+		x := d.Denotes()
+		if x.Kind == DeclEnumLiteral {
+			continue
+		}
+		ps := profileParams(x)
+		xr := resultType(x)
+		if len(ps) != len(want) || (xr == nil) != (rt == nil) ||
+			(rt != nil && !SameBase(xr, rt) && !xr.Unknown()) {
+			continue
+		}
+		ok := true
+		for i, p := range ps {
+			if !SameBase(p.Type, want[i]) && !p.Type.Unknown() {
+				ok = false
+			}
+		}
+		if ok {
+			a.ref(r.tok, d, RefRead)
+			return
+		}
+	}
+	a.semaError(n.Span(), "no visible subprogram "+a.text(n)+
+		" matches the profile of "+g.Text)
+}
+
+// subprogramActual reports the actual v (resolved to r) of a generic
+// subprogram that names no subprogram (LRM 6.5.7.2).
+func (a *analyzer) subprogramActual(v cst.Node, r named) {
+	if a.quiet || r.unknown || !(cst.Name{}).Accepts(v.Kind()) ||
+		len(r.decls) > 0 && r.decls[0].Overloadable() {
+		return
+	}
+	a.semaError(v.Span(), a.text(v)+" is not a subprogram: a generic "+
+		"subprogram is associated with a subprogram")
+}
+
+// entityAsComponent reports whether a component instantiation may
+// name an entity: the instantiated unit of LRM 11.7.1 names a
+// component unless the reserved word entity precedes it, and only
+// lenient analysis accepts an entity there.
+func (a *analyzer) entityAsComponent() bool { return a.s.cfg.Lenient }
+
+// stringChars reports a character of the string literal e, of the
+// array type t, whose character literal of t's element type is not
+// visible where e is written (LRM 9.3.2).
+func (a *analyzer) stringChars(e *Expr, t *Type) {
+	lit := e.Lit
+	if a.quiet || e.illTyped || a.u.File.Bundled ||
+		lit.Kind() != token.StringLiteral || len(lit.Text()) < 2 {
+		return
+	}
+	elem := t.Base().Elem
+	if elem == nil || elem.Base().Class != TypeEnum {
+		return
+	}
+	body := strings.ReplaceAll(lit.Text()[1:len(lit.Text())-1], `""`,
+		`"`)
+	var seen [256]bool
+	for i := range len(body) {
+		c := body[i]
+		if seen[c] {
+			continue
+		}
+		seen[c] = true
+		k := Key([]byte{'\'', c, '\''})
+		ok := false
+		for _, d := range a.lookup(k).Decls {
+			if x := d.Denotes(); x.Kind == DeclEnumLiteral &&
+				SameBase(x.Type, elem) {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			a.semaError(lit.Span(), "character "+string(k)+" of type "+
+				elem.Name()+" is not visible here")
+			return
+		}
+	}
+}
+
+// within returns the region around the current one that the statement
+// labeled x opens, or nil when the current region is outside it.
+func (a *analyzer) within(x *Decl) *Region {
+	for r := a.cur; r != nil; r = r.Parent {
+		if r.Owner == x || (x.Region != nil && r == x.Region) {
+			return r
+		}
+	}
+	return nil
+}
+
+// attrDeclPrefix reports a prefix naming an attribute declaration: an
+// attribute name is only the designator of an attribute name or
+// specification (LRM 6.7, 8.6), not a value to index or select.
+func (a *analyzer) attrDeclPrefix(p named, n cst.Node, how string) {
+	if a.quiet || len(p.decls) != 1 ||
+		p.decls[0].Denotes().Kind != DeclAttribute {
+		return
+	}
+	a.semaError(n.Span(), "attribute "+a.text(n)+" cannot be "+how)
 }
 
 // enclosing returns the overloadable declaration of ds whose region
@@ -390,12 +567,25 @@ func (a *analyzer) callOrIndex(c cst.CallOrIndexName, kind RefKind,
 	case p.unknown:
 		a.lenientArgs(args)
 		return unknownNamed()
+	case p.lib != nil:
+		// LRM 8.1: a library name is only the prefix of an expanded
+		// name; it denotes no value to index or slice.
+		a.lenientArgs(args)
+		if !a.quiet {
+			a.semaError(c.Span(), "library "+p.tok.Text()+
+				" cannot be indexed or sliced")
+		}
+		return unknownNamed()
 	case p.typ != nil:
 		if allRanges(args) {
 			return named{typ: a.indexSubtype(p.typ, args)}
 		}
 		return named{expr: a.conversion(c.Node, p.typ, args)}
 	case len(p.decls) > 0 && p.decls[0].Overloadable():
+		if a.ambiguousSlice(p.decls, args, c.Node) { // indexrules.go
+			a.lenientArgs(args)
+			return unknownNamed()
+		}
 		if z := a.indexedResult(p.decls, args, want); z != nil {
 			o := &Overload{Name: p.tok.Text(), Chosen: z}
 			for _, d := range p.decls {
@@ -409,9 +599,12 @@ func (a *analyzer) callOrIndex(c cst.CallOrIndexName, kind RefKind,
 		}
 		return named{expr: a.call(c.Node, p, args, want, false)}
 	case p.expr != nil:
+		a.conversionPrefix(pn, p.expr) // indexrules.go
 		return named{expr: a.index(c.Node, p.expr, args)}
 	}
 	a.lenientArgs(args)
+	a.attrDeclPrefix(p, pn, "indexed")
+	a.notIndexable(p, c.Node, "indexed") // indexrules.go
 	return unknownNamed()
 }
 
@@ -648,10 +841,21 @@ func (a *analyzer) sliceDirection(rc *RangeCons, t *Type) {
 		return
 	}
 	cons := t.Constraints()
-	if cons == nil || cons[0] == nil || cons[0].Attr != nil ||
-		cons[0].Left == nil || cons[0].Dir == rc.Dir {
+	if cons == nil || cons[0] == nil {
 		return
 	}
+	idx := cons[0]
+	if idx.Attr != nil && idx.Attr.Kind == ExprTypeMark {
+		// An index constraint by a subtype (aray1(idx)) runs as the
+		// subtype's range does.
+		if sr := idx.Type.ScalarRange(); sr != nil && sr.Attr == nil {
+			idx = sr
+		}
+	}
+	if idx.Attr != nil || idx.Left == nil || idx.Dir == rc.Dir {
+		return
+	}
+	cons = []*RangeCons{idx}
 	if l, ok := literalInt(rc.Left); ok {
 		if r, ok := literalInt(rc.Right); ok &&
 			(rc.Dir == eval.To && l > r || rc.Dir == eval.Downto && l < r) {
@@ -708,9 +912,21 @@ func (a *analyzer) sliceName(s cst.SliceName, kind RefKind) named {
 	p := a.resolveName(s.Prefix().Node, kind, nil)
 	var v *Expr
 	switch {
+	case p.lib != nil:
+		a.discreteRange(sliceRange(s), nil)
+		if !a.quiet {
+			a.semaError(s.Span(), "library "+p.tok.Text()+
+				" cannot be indexed or sliced")
+		}
+		return unknownNamed()
 	case p.expr != nil:
+		a.conversionPrefix(s.Prefix().Node, p.expr) // indexrules.go
 		v = p.expr
 	case len(p.decls) > 0 && p.decls[0].Overloadable():
+		if a.ambiguousSliced(p.decls, s.Node) { // indexrules.go
+			a.discreteRange(sliceRange(s), nil)
+			return unknownNamed()
+		}
 		v = a.value(p, s.Prefix().Node, nil)
 	case p.typ != nil:
 		// T(range) as a subtype is a CallOrIndexName; a slice of a
@@ -719,6 +935,7 @@ func (a *analyzer) sliceName(s cst.SliceName, kind RefKind) named {
 		return named{typ: p.typ}
 	default:
 		a.discreteRange(sliceRange(s), nil)
+		a.notIndexable(p, s.Node, "sliced") // indexrules.go
 		return unknownNamed()
 	}
 	a.settleIndexed(v)
@@ -784,6 +1001,15 @@ var predefinedAttrs = map[Key]attrClass{
 	"reflect": attrValue, "record": attrType, "signal": attrSignal,
 }
 
+// attrSince is the standard that first predefines each attribute of
+// predefinedAttrs not in VHDL-1993.
+var attrSince = map[Key]token.Standard{
+	"subtype": token.Std2008, "element": token.Std2008,
+	"designated_subtype": token.Std2019, "index": token.Std2019,
+	"converse": token.Std2019, "reflect": token.Std2019,
+	"record": token.Std2019, "signal": token.Std2019,
+}
+
 // attributeName resolves prefix'designator[(arg)].
 func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 ) named {
@@ -798,10 +1024,15 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 			p.decls = pick[:1]
 		}
 	}
-	if dk == "converse" {
+	class, predef := predefinedAttrs[dk]
+	if s, ok := attrSince[dk]; ok && a.std < s {
+		// Not yet predefined in this standard: a user-defined
+		// attribute of that name (LRM 16.2 of the standard).
+		predef = false
+	}
+	if dk == "converse" && predef {
 		return a.converse(an, p)
 	}
-	class, predef := predefinedAttrs[dk]
 	if !predef {
 		return a.userAttribute(an, p, dtok)
 	}
@@ -824,6 +1055,16 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		pt = pt.Base().Designated
 		pv = &Expr{Kind: ExprDeref, Node: pv.Node, Prefix: pv, Type: pt}
 	}
+	if a.attrPrefix(dtok, class, p, pv, pt, pn) {
+		if !argNode.IsZero() {
+			a.expr(argNode, nil)
+		}
+		if class == attrRange {
+			return named{rng: &RangeCons{Node: an.Node,
+				Type: UnknownType}, unknown: true}
+		}
+		return unknownNamed()
+	}
 	e := &Expr{Kind: ExprAttr, Node: an.Node, Attr: dk, Prefix: pv,
 		Type: UnknownType}
 	if pt != nil && pv == nil {
@@ -842,7 +1083,13 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		if len(e.Args) != 1 || !isArray || a.quiet {
 			return
 		}
-		if n, ok := literalInt(e.Args[0]); ok &&
+		if st, known := locallyStatic(e.Args[0], 0, a.std); known &&
+			!st && !e.Args[0].illTyped {
+			a.semaError(argNode.Span(), "the dimension of '"+
+				dtok.Text()+" must be locally static")
+			return
+		}
+		if n, ok := choiceValue(e.Args[0]); ok &&
 			(n < 1 || n > int64(pt.Dims())) {
 			a.semaError(argNode.Span(), "dimension "+
 				strconv.FormatInt(n, 10)+" of '"+dtok.Text()+" is not "+
@@ -862,32 +1109,24 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		}
 		return named{rng: rc, expr: e}
 	case attrType:
-		arg(UniversalInteger)
-		switch {
-		case pt == nil || pt.Unknown():
-			return named{typ: UnknownType}
-		case dk == "base":
-			return named{typ: pt.Base()}
-		case dk == "element" && pv != nil &&
-			notFullyConstrained(pt.ElemType(), 0):
-			return named{typ: runTime(orUnknown(pt.ElemType()))}
-		case dk == "element":
-			return named{typ: orUnknown(pt.ElemType())}
-		case dk == "designated_subtype":
-			return named{typ: orUnknown(pt.Base().Designated)}
-		case dk == "index":
-			return named{typ: orUnknown(nthIndex(pt.Base(), e.Args))}
-		case pv != nil && notFullyConstrained(pt, 0):
-			// obj'SUBTYPE of an unconstrained interface object: its
-			// constraint is the actual's, known at run time.
-			return named{typ: runTime(pt)}
+		if dk == "subtype" || dk == "element" {
+			// T'SUBTYPE(X) and T'ELEMENT(X) are type conversions:
+			// the attribute denotes a subtype, usable as a type mark
+			// (LRM 16.2, 9.3.6).
+			t := a.typeAttr(dk, pt, pv, nil)
+			if argNode.IsZero() {
+				return named{typ: t}
+			}
+			return named{expr: a.conversion1(an.Node, t, argNode)}
 		}
-		return named{typ: pt}
+		arg(UniversalInteger)
+		return named{typ: a.typeAttr(dk, pt, pv, e.Args)}
 	case attrName:
 		e.Type = orUnknown(a.stdType("string"))
 		return named{expr: e}
 	case attrSignal:
 		a.signalPrefix(dtok, pv)
+		a.implicitOfParam(dtok, string(dk), pv) // targetrules.go
 		switch dk {
 		case "delayed", "stable", "quiet":
 			arg(a.stdType("time"))
@@ -947,6 +1186,7 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 			e.Type = UniversalInteger
 		case "val":
 			arg(nil)
+			a.valParam(e.Args, argNode)
 			e.Type = orUnknown(pt).Base()
 		default:
 			arg(pt)
@@ -980,6 +1220,322 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 	return named{expr: e}
 }
 
+// attrPrefix reports a predefined attribute whose prefix is of the
+// wrong kind (LRM 16.2) and returns whether it did:
+//   - 'BASE takes a type or subtype, not an object;
+//   - 'IMAGE, 'VALUE, 'POS, ... take a scalar type (16.2.2);
+//   - the array attributes 'LEFT, 'LENGTH, 'RANGE, ... of an object
+//     take an array object, and of a type a scalar type ('LENGTH and
+//     'RANGE: an array type) or a constrained array type (16.2.3);
+//   - a named entity that is neither a type nor an object (an entity,
+//     an architecture, a label) has none of them.
+//
+// Unknown, generic and incomplete types are not judged.
+func (a *analyzer) attrPrefix(dtok cst.Token, class attrClass, p named,
+	pv *Expr, pt *Type, pn cst.Node,
+) bool {
+	if a.quiet || p.unknown || p.rng != nil {
+		return false
+	}
+	dk := TokenKey(dtok)
+	bad := func(want string) bool {
+		a.semaError(pn.Span(), "the prefix of '"+dtok.Text()+
+			" must be "+want+", not "+a.text(pn))
+		return true
+	}
+	array := class == attrRange || (class == attrValue && dk != "reflect")
+	if class == attrName && len(p.decls) == 0 {
+		// LRM 16.2.5: the prefix denotes a named entity, which a
+		// subelement, slice, call or attribute result is not.
+		return bad("a named entity")
+	}
+	if class == attrSignal && pv == nil &&
+		(pt != nil || len(p.decls) == 1) {
+		// LRM 16.2.4: the prefix is a static signal name.
+		return bad("a signal")
+	}
+	if pv == nil && pt == nil {
+		if !array || len(p.decls) != 1 || p.decls[0].Overloadable() {
+			return false
+		}
+		switch p.decls[0].Denotes().Kind {
+		case DeclEntity, DeclArchitecture, DeclPackage, DeclLabel,
+			DeclComponent, DeclConfiguration, DeclAttribute:
+			return bad("an array object or a type")
+		}
+		return false
+	}
+	if pt.Unknown() {
+		return false
+	}
+	switch c := pt.Base().Class; {
+	case c == TypeIncomplete && pv == nil:
+		// LRM 5.4.2: before its full declaration an incomplete type
+		// may only be the designated type of an access type.
+		return bad("a fully declared type")
+	case c == TypeGeneric || c == TypeIncomplete || c == TypeUnknown:
+		return false
+	case dk == "base" && pv != nil:
+		return bad("a type or subtype")
+	case class == attrFunction && pv == nil && !pt.IsScalar():
+		return bad("a scalar type")
+	case !array:
+		return false
+	case pv != nil:
+		if c != TypeArray && !(class == attrValue && pt.IsScalar()) {
+			// A scalar object is reported by the caller.
+			return bad("an array object")
+		}
+	case c == TypeArray:
+		if pt.Constraints() == nil && !pt.isDynamic() {
+			return bad("a constrained array type")
+		}
+	case c == TypeRecord || c == TypeAccess || c == TypeFile ||
+		c == TypeProtected:
+		return bad("an array or scalar type")
+	case (dk == "length" || class == attrRange) && a.std < token.Std2019:
+		return bad("an array type")
+	}
+	return false
+}
+
+// valParam reports a T'VAL parameter that is not of an integer type
+// (LRM 16.2.2).
+func (a *analyzer) valParam(args []*Expr, n cst.Node) {
+	if a.quiet || len(args) != 1 || args[0].Type.Unknown() ||
+		args[0].Type.Base().Class == TypeInteger {
+		return
+	}
+	a.semaError(n.Span(), "the parameter of 'VAL must be of an integer "+
+		"type, not "+args[0].Type.Name())
+}
+
+// typeAttr is the subtype a type attribute ('BASE, 'ELEMENT, 'SUBTYPE,
+// 'INDEX, 'DESIGNATED_SUBTYPE) of the prefix type pt denotes; pv is
+// the prefix object, if any, and args the dimension argument.
+func (a *analyzer) typeAttr(dk Key, pt *Type, pv *Expr, args []*Expr,
+) *Type {
+	switch {
+	case pt == nil || pt.Unknown():
+		return UnknownType
+	case dk == "base":
+		return pt.Base()
+	case dk == "element" && (pv != nil || pt.isDynamic()) &&
+		notFullyConstrained(pt.ElemType(), 0):
+		// The element subtype of an object (or of an object's
+		// subtype) takes its constraint from the object.
+		return runTime(orUnknown(pt.ElemType()))
+	case dk == "element":
+		return orUnknown(pt.ElemType())
+	case dk == "designated_subtype":
+		return orUnknown(pt.Base().Designated)
+	case dk == "index":
+		return orUnknown(nthIndex(pt.Base(), args))
+	case pv != nil && notFullyConstrained(pt, 0):
+		// obj'SUBTYPE of an unconstrained interface object: its
+		// constraint is the actual's, known at run time.
+		return runTime(pt)
+	}
+	return pt
+}
+
+// conversion1 types T(x), a type conversion of the single operand x.
+func (a *analyzer) conversion1(n cst.Node, t *Type, x cst.Node) *Expr {
+	v := a.operand(x, nil)
+	if v.pend != nil {
+		if s, _ := fit(v, t); s > 0 {
+			a.settle(v, t)
+		} else {
+			a.settle(v, nil)
+		}
+	}
+	e := &Expr{Kind: ExprConversion, Node: n, Type: t, Args: []*Expr{v}}
+	if !a.quiet && !v.illTyped && !closelyRelated(v.Type, t, a.std) {
+		v.illTyped, e.illTyped = true, true
+		a.semaError(v.Node.Span(), "cannot convert "+v.Type.Name()+
+			" to "+t.Name()+": the types are not closely related")
+	}
+	return e
+}
+
+// aliasSelfScope marks the designator of an object or type alias as
+// being declared while its target is resolved (LRM 12.3: the alias
+// hides an outer homograph from its start and is not visible in
+// itself). An alias with a signature is overloadable and hides only a
+// homograph of its own profile, so it is left alone.
+func (a *analyzer) aliasSelfScope(ad cst.AliasDecl) func() {
+	if !ad.Signature().IsZero() ||
+		ad.Designator().Kind() != token.Identifier &&
+			ad.Designator().Kind() != token.ExtendedIdentifier {
+		return func() {}
+	}
+	return a.selfScopeTokens(ad.Designator())
+}
+
+// attrDeclType reports an attribute declaration whose type is an
+// access, file or protected type or a composite type with an access
+// subelement (LRM 6.7).
+func (a *analyzer) attrDeclType(n cst.Node, d *Decl) {
+	t := d.Type
+	if a.quiet || a.u.File.Bundled || t.Unknown() {
+		return
+	}
+	what := ""
+	switch {
+	case t.Base().Class == TypeFile:
+		what = "a file type"
+	case t.Base().Class == TypeProtected:
+		what = "a protected type"
+	case accessPart(t) == "access":
+		what = "an access type"
+	case accessPart(t) == "subelement":
+		what = "a type with a subelement of an access type"
+	default:
+		return
+	}
+	a.semaError(n.Span(), "the type of attribute "+d.Text+
+		" cannot be "+what+": "+t.Name())
+}
+
+// attrOnce records that the attribute specification of attr names d
+// through ed, reporting a second one (LRM 7.2: a named entity gets a
+// value of an attribute from one specification).
+func (a *analyzer) attrOnce(ed cst.EntityDesignator, d, attr *Decl) {
+	et := ed.Tag()
+	if d != nil && attr != nil && ed.Signature().IsZero() &&
+		(!d.Overloadable() || len(a.lookup(TokenKey(et)).Decls) == 1) {
+		// LRM 7.2: a named entity is given a value of an attribute by
+		// at most one specification.
+		k := [2]*Decl{attr, d}
+		if a.attrSpecs[k] {
+			a.semaError(et.Span(), d.Text+" already has a value of "+
+				"attribute "+attr.Text)
+			return
+		}
+		if a.attrSpecs == nil {
+			a.attrSpecs = map[[2]*Decl]bool{}
+		}
+		a.attrSpecs[k] = true
+		if d.Unit == a.u {
+			d.attrs = append(d.attrs, attr)
+		}
+	}
+}
+
+// attrOthers records attr as given by an attribute specification for
+// others or all (k), which may name any entity of the unit.
+func (a *analyzer) attrOthers(k Key, attr *Decl) {
+	if attr != nil && (k == "others" || k == "all") {
+		a.u.othersAttrs = append(a.u.othersAttrs, attr)
+	}
+}
+
+// unspecified reports P'A where P names an object of another, already
+// analyzed design unit that no attribute specification gives a value
+// of the user-defined attribute A (LRM 7.2, 8.6: the attribute name
+// denotes the value the specification gives). Objects of the unit
+// being analyzed are not judged: their specification may follow.
+func (a *analyzer) unspecified(p named, n cst.Node, attr *Decl) bool {
+	if a.quiet || len(p.decls) != 1 {
+		return false
+	}
+	d := p.decls[0]
+	if !d.Kind.IsObject() || d.Unit == nil || d.Unit == a.u ||
+		d.Unit.File == nil || d.Unit.File.Bundled ||
+		slices.Contains(d.attrs, attr) ||
+		slices.Contains(d.Unit.othersAttrs, attr) ||
+		a.attrSpecs[[2]*Decl{attr, d}] {
+		return false
+	}
+	a.semaError(n.Span(), d.Text+" has no value of attribute "+
+		attr.Text+": no attribute specification gives it one")
+	return true
+}
+
+// attrClasses are the entity classes of an attribute specification
+// whose named entities attrEntity checks: the object, type and
+// subtype classes (LRM 7.2).
+var attrClasses = []struct {
+	tok  token.Kind
+	name string
+}{
+	{token.KwSignal, "signal"}, {token.KwVariable, "variable"},
+	{token.KwConstant, "constant"}, {token.KwType, "type"},
+	{token.KwSubtype, "subtype"},
+}
+
+// attrEntity checks the entity designator ed of an attribute
+// specification of attr naming d (nil if nothing visible has its name):
+// d gets a value of attr only once (attrOnce), and d agrees with the
+// entity class of es (LRM 7.2): an object, type or subtype named must
+// be declared, and be of that class. Labels, which may be
+// declared after the specification, and the other classes are not
+// checked; neither is an alias, whose class is its object's.
+func (a *analyzer) attrEntity(es cst.EntitySpecification,
+	ed cst.EntityDesignator, d, attr *Decl,
+) {
+	et := ed.Tag()
+	if a.quiet {
+		return
+	}
+	if et.Kind() == token.StringLiteral ||
+		et.Kind() == token.CharacterLiteral {
+		return
+	}
+	class := ""
+	for _, c := range attrClasses {
+		if !es.Node.Token(c.tok, 0).IsZero() {
+			class = c.name
+		}
+	}
+	if class == "" {
+		a.attrOnce(ed, d, attr)
+		return
+	}
+	if d == nil {
+		a.undefined(et)
+		return
+	}
+	got := ""
+	switch d.Kind {
+	case DeclSignal, DeclPort:
+		got = "signal"
+	case DeclVariable, DeclSharedVariable:
+		got = "variable"
+	case DeclConstant, DeclGeneric:
+		got = "constant"
+	case DeclType:
+		got = "type"
+	case DeclSubtype:
+		got = "subtype"
+	case DeclParameter:
+		switch d.Class {
+		case ClassSignal:
+			got = "signal"
+		case ClassVariable:
+			got = "variable"
+		case ClassConstant:
+			got = "constant"
+		}
+	}
+	if got != "" && got != class {
+		a.semaError(et.Span(), d.Kind.String()+" "+d.Text+
+			" is not of class '"+class+"'")
+		return
+	}
+	a.attrOnce(ed, d, attr)
+}
+
+// physicalUnit reports the unit name of a physical literal that
+// denotes something other than a unit of a physical type (LRM 5.2.4,
+// 9.3.2): e.Decl is unset then.
+func (a *analyzer) physicalUnit(n cst.Node, nm named, e *Expr) {
+	if a.quiet || e.Decl != nil || nm.unknown {
+		return
+	}
+	a.semaError(n.Span(), a.text(n)+" is not a physical unit")
+}
+
 // signalPrefix reports a signal attribute ('EVENT, 'STABLE, ...) whose
 // prefix is an object of another class (LRM 16.2.4); a prefix whose
 // object is unknown (an external name, a dereference, an attribute
@@ -989,6 +1545,16 @@ func (a *analyzer) signalPrefix(dtok cst.Token, pv *Expr) {
 		return
 	}
 	d := actualObject(pv)
+	dk := TokenKey(dtok)
+	if d != nil && (dk == "driving" || dk == "driving_value") &&
+		(d.Kind == DeclPort || d.Kind == DeclParameter &&
+			d.Class == ClassSignal) && d.Mode == ModeIn {
+		// LRM 16.2.4: a port prefix of 'DRIVING or 'DRIVING_VALUE has
+		// mode out, inout or buffer.
+		a.semaError(pv.Node.Span(), "the prefix of '"+dtok.Text()+
+			" must not be "+d.Text+", of mode in")
+		return
+	}
 	if d == nil || !d.Kind.IsObject() || d.Class == ClassSignal ||
 		d.Kind == DeclSignal || d.Kind == DeclPort {
 		return
@@ -1002,6 +1568,12 @@ func (a *analyzer) userAttribute(an cst.AttributeName, p named,
 	dtok cst.Token,
 ) named {
 	argNode := attrArg(an)
+	if a.userPrefix(p, an.Prefix().Node) {
+		if !argNode.IsZero() {
+			a.expr(argNode, nil)
+		}
+		return unknownNamed()
+	}
 	r := a.lookup(TokenKey(dtok))
 	if len(p.decls) == 1 && len(r.Decls) == 0 {
 		// lib.e'A of a design unit whose attribute A is not visible
@@ -1020,6 +1592,7 @@ func (a *analyzer) userAttribute(an cst.AttributeName, p named,
 	for _, d := range r.Decls {
 		if d.Denotes().Kind == DeclAttribute {
 			a.ref(dtok, d, RefRead)
+			a.unspecified(p, an.Node, d.Denotes())
 			v := &Expr{Kind: ExprAttr, Node: an.Node,
 				Attr: TokenKey(dtok), Prefix: p.expr, Decl: d,
 				Type: orUnknown(d.Denotes().Type)}
@@ -1038,6 +1611,36 @@ func (a *analyzer) userAttribute(an cst.AttributeName, p named,
 	return unknownNamed()
 }
 
+// userPrefix reports the prefix of a user-defined attribute name that
+// does not denote a named entity (LRM 8.6, 7.2), and returns whether
+// it did: a subelement, slice or function call of an object, or an
+// attribute (no entity class takes attributes of an attribute).
+func (a *analyzer) userPrefix(p named, n cst.Node) bool {
+	if a.quiet || p.unknown {
+		return false
+	}
+	if p.expr != nil {
+		switch p.expr.Kind {
+		case ExprIndex, ExprSlice, ExprSelect, ExprCall:
+			if len(p.decls) == 0 || p.expr.Kind != ExprSelect ||
+				p.decls[0].Denotes().Kind == DeclElement {
+				a.semaError(n.Span(), "the prefix of a user-defined "+
+					"attribute must be a named entity, not "+
+					"the subelement, slice or call "+a.text(n))
+				return true
+			}
+		}
+		return false
+	}
+	if len(p.decls) == 1 && p.decls[0].Denotes().Kind == DeclAttribute {
+		a.semaError(n.Span(), "the prefix of a user-defined attribute "+
+			"must be a named entity with attributes, not attribute "+
+			a.text(n))
+		return true
+	}
+	return false
+}
+
 // attrIndex types P'A(X) for a user-defined attribute A: the name
 // P'A denotes the attribute's value, and (X) indexes it (LRM 8.4,
 // 8.6) when that value is a one-dimensional array.
@@ -1045,6 +1648,7 @@ func (a *analyzer) attrIndex(n cst.Node, v *Expr, x cst.Node) *Expr {
 	b := v.Type.Base()
 	if v.Type.Unknown() || b == nil || b.Class != TypeArray ||
 		b.Dims() != 1 {
+		a.attrNotArray(n, v) // indexrules.go
 		a.expr(x, nil)
 		return &Expr{Kind: ExprAttr, Node: n, Attr: v.Attr,
 			Prefix: v.Prefix, Decl: v.Decl, Type: UnknownType}

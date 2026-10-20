@@ -4,6 +4,7 @@ import (
 	"slices"
 
 	"github.com/connerohnesorge/gohard/internal/cst"
+	"github.com/connerohnesorge/gohard/internal/token"
 )
 
 // This file builds the type representation from type and subtype
@@ -93,6 +94,7 @@ func (a *analyzer) typeDecl(td cst.TypeDecl) {
 			t.Units = append(t.Units, ud)
 			a.declare(ud)
 		}
+		a.physicalDef(pd, t) // typecheck.go
 		a.endClause(pd.End(), d)
 		a.predefined(t, d)
 	case cst.KindUnboundedArrayDef:
@@ -112,6 +114,7 @@ func (a *analyzer) typeDecl(td cst.TypeDecl) {
 		ad := cst.ConstrainedArrayDef{Node: def}
 		base := &Type{Class: TypeArray}
 		sub := &Type{Class: TypeArray, base: base}
+		a.rangeForm(ad.Constraint().Node) // forms.go
 		for dr := range ad.Constraint().Ranges() {
 			rc := a.discreteRange(dr.Node, nil)
 			idx := UnknownType
@@ -166,6 +169,8 @@ func (a *analyzer) typeDecl(td cst.TypeDecl) {
 		t.Designated = a.subtypeIndication(
 			cst.AccessTypeDef{Node: def}.Subtype())
 		a.inAccess = was
+		a.designated(t.Designated,
+			cst.AccessTypeDef{Node: def}.Subtype().Node) // typecheck.go
 		a.declare(d)
 		a.predefined(t, d)
 	case cst.KindFileTypeDef:
@@ -187,6 +192,7 @@ func (a *analyzer) typeDecl(td cst.TypeDecl) {
 		a.genericMap(h.GenericMap().List(), nil)
 		a.declarativePart(pd.Decls().Node)
 		a.pop()
+		a.methodTypes(t.Members) // typecheck.go
 		a.endClause(pd.End(), d)
 	default:
 		// VHDL-2019 protected type instantiations and incomplete type
@@ -209,6 +215,7 @@ func (a *analyzer) noFileElement(t *Type, n cst.Node) {
 		a.semaError(n.Span(), "an element of a composite type cannot be "+
 			"of file type "+t.Name())
 	}
+	a.openElement(t, n) // typecheck.go
 }
 
 // fileContent checks the type of a file type's values (LRM 5.5.1): not
@@ -294,6 +301,7 @@ func (a *analyzer) protectedBody(tok cst.Token, pb cst.ProtectedTypeBody) {
 		}
 	} else {
 		a.ref(tok, spec, RefBody)
+		a.secondBody(tok, spec) // typecheck.go
 	}
 	r := a.push(RegionProtectedBody, spec, pb.Node)
 	if spec != nil {
@@ -343,6 +351,15 @@ func (a *analyzer) implementationDefined(n cst.Node) bool {
 
 // rangeConstraint types the range of a range constraint against want.
 func (a *analyzer) rangeConstraint(n cst.Node, want *Type) *RangeCons {
+	switch n.Kind() {
+	case cst.KindRangeExpr, cst.KindAttributeName, cst.KindErrorNode, 0:
+	default:
+		// LRM 5.2.1: range ::= range_attribute_name | simple_expression
+		// direction simple_expression; (a to b) is an aggregate.
+		if !a.quiet {
+			a.semaError(n.Span(), a.text(n)+" is not a range")
+		}
+	}
 	return a.discreteRange(n, want)
 }
 
@@ -372,6 +389,9 @@ func (a *analyzer) subtypeDecl(sd cst.SubtypeDecl) {
 // anonymous subtype.
 func (a *analyzer) subtypeIndication(si cst.SubtypeIndication) *Type {
 	if si.IsZero() {
+		return UnknownType
+	}
+	if si.TypeMark().IsZero() && a.notTypeMark(si) { // typecheck.go
 		return UnknownType
 	}
 	base := a.typeMark(si.TypeMark().Node)
@@ -421,14 +441,21 @@ func (a *analyzer) typeMark(n cst.Node) *Type {
 // constraint applies a constraint to the subtype st of base.
 func (a *analyzer) constraint(c cst.Node, st, base *Type) {
 	base = orUnknown(base)
+	if !a.constraintFits(c, base) { // typecheck.go
+		return
+	}
 	switch c.Kind() {
 	case cst.KindRangeConstraint:
-		st.Range = a.rangeConstraint(
-			cst.RangeConstraint{Node: c}.Range().Node, base)
+		rn := cst.RangeConstraint{Node: c}.Range().Node
+		if rn.IsZero() {
+			rn = childAfter(c, token.KwRange) // not a range: reported
+		}
+		st.Range = a.rangeConstraint(rn, base)
 	case cst.KindArrayConstraint:
 		ac := cst.ArrayConstraint{Node: c}
 		idx := base.Base().Index
 		a.reconstrained(ac, base)
+		a.rangeForm(c) // forms.go
 		i := 0
 		for dr := range ac.Ranges() {
 			var want *Type
@@ -485,7 +512,13 @@ func (a *analyzer) constraint(c cst.Node, st, base *Type) {
 // index ranges are already all constrained (LRM 5.3.2.2, 6.3); open
 // keeps the existing ranges.
 func (a *analyzer) reconstrained(ac cst.ArrayConstraint, base *Type) {
-	if a.quiet || base.Unknown() || base.Base().Class != TypeArray {
+	if a.quiet || base.Unknown() {
+		return
+	}
+	if b := base.Base(); b.Class == TypeAccess && !b.Designated.Unknown() {
+		base = b.Designated // the constraint is the designated's
+	}
+	if base.Base().Class != TypeArray {
 		return
 	}
 	cons := base.Constraints()
@@ -509,7 +542,11 @@ func (a *analyzer) resolution(n cst.Node, t *Type) *Resolution {
 		fn := cst.ResolutionFunction{Node: n}.Function()
 		r := a.resolveName(fn.Node, RefRead, nil)
 		res := &Resolution{Node: n}
+		res.Func = a.resolutionFunc(r.decls, t, fn.Node) // typerules.go
 		for _, d := range r.decls {
+			if res.Func != nil {
+				break
+			}
 			if d.Denotes().Kind == DeclFunction &&
 				len(d.Denotes().Params) == 1 {
 				res.Func = d

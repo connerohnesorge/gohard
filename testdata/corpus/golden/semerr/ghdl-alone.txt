@@ -9,8 +9,9 @@
 # follow). Each file line is the argument, the library when not work,
 # the GHDL options, then per tool the exit code and the lines of that
 # file it reports errors on; "~" marks a line whose only errors are
-# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
-# reports an error on every line both tools report one on
+# cascades (GHDL's "<unit> was not analysed", NVC's "... was analysed
+# with errors"). tools/oracle checks that GoHard reports an error on
+# every line both tools report one on, cascades aside
 # (semerr_check.go).
 tool ghdl 6.0.0
 tool nvc 1.23.0
@@ -73,7 +74,7 @@ run alone:gna/bug019/PoC/src/io/uart/uart_tx.vhdl dir=testdata/ghdl/testsuite/gn
 run alone:gna/bug019/PoC/tb/common/config_tb.vhdl dir=testdata/ghdl/testsuite/gna/bug019/PoC/tb/common std=08 sha=32ab585c77f34ea5
  config_tb.vhdl ghdl=1@37,38,39,40,49,50,51,52,53,54,56,57,60,61,62,63,64,65,66,67,68,73 nvc=1@37
 run alone:gna/bug019/PoC/tb/common/my_config_ML605.vhdl dir=testdata/ghdl/testsuite/gna/bug019/PoC/tb/common std=08 sha=6726412e0bfb2071
- my_config_ML605.vhdl ghdl=1@35,48~ nvc=1@35,48
+ my_config_ML605.vhdl ghdl=1@35,48~ nvc=1@35,48~
 run alone:gna/bug019/PoC/tb/common/simulation.v08.vhdl dir=testdata/ghdl/testsuite/gna/bug019/PoC/tb/common std=08 sha=8b6420ee3e0ee29d
  simulation.v08.vhdl ghdl=1@36,37,38,39,44,45,46,47,49,50,51,52,104,116,121,126,131,136,141,152,153,155,156,157,158,159,160,162,169~ nvc=1@36
 run alone:gna/bug019/PoC/tb/common/strings_tb.vhdl dir=testdata/ghdl/testsuite/gna/bug019/PoC/tb/common std=08 sha=b24bf3f1ac2dadc3
@@ -101,7 +102,7 @@ run alone:gna/bug055/tb-behav.vhdl dir=testdata/ghdl/testsuite/gna/bug055 std=08
 run alone:gna/bug055/tb.vhdl dir=testdata/ghdl/testsuite/gna/bug055 std=08 sha=8c224381a1407c8d
  tb.vhdl ghdl=0 nvc=0
 run alone:gna/bug058/tb1.vhdl dir=testdata/ghdl/testsuite/gna/bug058 std=08 sha=8c18259f12bfbd07
- tb1.vhdl ghdl=0 nvc=1@1,3,8,20
+ tb1.vhdl ghdl=0 nvc=1@1,3,8~,20~
 run alone:gna/bug062/ex.vhdl dir=testdata/ghdl/testsuite/gna/bug062 std=08 sha=6cfd36cb212ea8a4
  ex.vhdl ghdl=0 nvc=0
 run alone:gna/bug077/proc01.vhdl dir=testdata/ghdl/testsuite/gna/bug077 std=08 sha=4646b5304333e1b6
@@ -137,7 +138,7 @@ run alone:gna/issue1137/utestbench.vhdl dir=testdata/ghdl/testsuite/gna/issue113
 run alone:gna/issue1224/tb93.vhdl dir=testdata/ghdl/testsuite/gna/issue1224 std=08 sha=f2b06dada8c10e32
  tb93.vhdl ghdl=0 nvc=0
 run alone:gna/issue1252/tb.vhdl dir=testdata/ghdl/testsuite/gna/issue1252 std=08 sha=32b44c6e958731f4
- tb.vhdl ghdl=1@1,6~ nvc=1@1,6
+ tb.vhdl ghdl=1@1,6~ nvc=1@1,6~
 run alone:gna/issue136/arch.vhdl dir=testdata/ghdl/testsuite/gna/issue136 std=08 sha=55bd7f2e1a38d88c
  arch.vhdl ghdl=1@1~ nvc=1@1
 run alone:gna/issue136/ent.vhdl dir=testdata/ghdl/testsuite/gna/issue136 std=08 sha=acc1884bc2b5ba28
@@ -165,13 +166,13 @@ run alone:gna/issue1455/tb1.vhdl dir=testdata/ghdl/testsuite/gna/issue1455 std=0
 run alone:gna/issue1597/repro.vhdl dir=testdata/ghdl/testsuite/gna/issue1597 std=08 sha=ee18eab90946502e
  repro.vhdl ghdl=1@10 nvc=0
 run alone:gna/issue1597/test.vhdl dir=testdata/ghdl/testsuite/gna/issue1597 std=08 sha=9fb9496a73b9e6aa
- test.vhdl ghdl=1@14,15,16,22~ nvc=1@15,16,22
+ test.vhdl ghdl=1@14,15,16,22~ nvc=1@15,16,22~
 run alone:gna/issue1612/exposep.vhdl dir=testdata/ghdl/testsuite/gna/issue1612 std=08 sha=f91b7cdea17a7cc7
  exposep.vhdl ghdl=0 nvc=0
 run alone:gna/issue1623/tb.vhd dir=testdata/ghdl/testsuite/gna/issue1623 std=08 sha=9dfb8a689c42e679
  tb.vhd ghdl=0 nvc=0
 run alone:gna/issue1654/issue.vhdl dir=testdata/ghdl/testsuite/gna/issue1654 std=08 sha=3dddadcd34f91184
- issue.vhdl ghdl=0 nvc=1@74,77,107
+ issue.vhdl ghdl=0 nvc=1@74,77,107~
 run alone:gna/issue1664/repro2.vhdl dir=testdata/ghdl/testsuite/gna/issue1664 std=08 sha=4bf1cd98bd596f23
  repro2.vhdl ghdl=1@8 nvc=1@8
 run alone:gna/issue1664/repro3.vhdl dir=testdata/ghdl/testsuite/gna/issue1664 std=08 sha=f6e797db73c8e896
@@ -179,7 +180,7 @@ run alone:gna/issue1664/repro3.vhdl dir=testdata/ghdl/testsuite/gna/issue1664 st
 run alone:gna/issue1677/ent.vhdl dir=testdata/ghdl/testsuite/gna/issue1677 std=08 sha=ffb6854b2127e425
  ent.vhdl ghdl=0 nvc=0
 run alone:gna/issue1684/ent2.vhdl dir=testdata/ghdl/testsuite/gna/issue1684 std=08 sha=b7bc5394274cf5a3
- ent2.vhdl ghdl=1@1,8~ nvc=1@1,8
+ ent2.vhdl ghdl=1@1,8~ nvc=1@1,8~
 run alone:gna/issue1684/repro.vhdl dir=testdata/ghdl/testsuite/gna/issue1684 std=08 sha=7c085ceaf53dd8ee
  repro.vhdl ghdl=0 nvc=1@18
 run alone:gna/issue1688/test1.vhdl dir=testdata/ghdl/testsuite/gna/issue1688 std=08 sha=d92c42444ff68e4e
@@ -233,11 +234,11 @@ run alone:gna/issue1897/wb_master_BFM_v1_0.vhd dir=testdata/ghdl/testsuite/gna/i
 run alone:gna/issue1908/ini_pkg.vhdl dir=testdata/ghdl/testsuite/gna/issue1908 std=08 sha=daf148f8b147a792
  ini_pkg.vhdl ghdl=0 nvc=0
 run alone:gna/issue1908/map_synchro.vhdl dir=testdata/ghdl/testsuite/gna/issue1908 std=08 sha=f3e2d68655fc65e9
- map_synchro.vhdl ghdl=1@9,25,33,40~ nvc=1@9,40
+ map_synchro.vhdl ghdl=1@9,25,33,40~ nvc=1@9,40~
 run alone:gna/issue1908/sr_synchronizer.vhdl dir=testdata/ghdl/testsuite/gna/issue1908 std=08 sha=97408b279595da2e
  sr_synchronizer.vhdl ghdl=0 nvc=0
 run alone:gna/issue1908/test_9_tb.vhdl dir=testdata/ghdl/testsuite/gna/issue1908 std=08 sha=fb84f071ed65fb08
- test_9_tb.vhdl ghdl=1@13,24~ nvc=1@13,24
+ test_9_tb.vhdl ghdl=1@13,24~ nvc=1@13,24~
 run alone:gna/issue191/repro.vhdl dir=testdata/ghdl/testsuite/gna/issue191 std=08 sha=0b4fc76e4c1130e6
  repro.vhdl ghdl=0 nvc=0
 run alone:gna/issue1914/tb_delayline-orig.vhdl dir=testdata/ghdl/testsuite/gna/issue1914 std=08 sha=991f9a11d187e9a2
@@ -251,13 +252,13 @@ run alone:gna/issue2070/crash23_1.vhdl dir=testdata/ghdl/testsuite/gna/issue2070
 run alone:gna/issue2070/crash29_1.vhdl dir=testdata/ghdl/testsuite/gna/issue2070 std=08 sha=ff700c0b596164c0
  crash29_1.vhdl ghdl=1@2,3 nvc=1@2,3
 run alone:gna/issue2070/crash29_2.vhdl dir=testdata/ghdl/testsuite/gna/issue2070 std=08 sha=fd977a7e6d308763
- crash29_2.vhdl ghdl=1@2,4~,11,12,15~,25~ nvc=1@2,4,11,12,15,16,20
+ crash29_2.vhdl ghdl=1@2,4~,11,12,15~,25~ nvc=1@2,4~,11,12,15,16,20
 run alone:gna/issue2070/crash38_1.vhdl dir=testdata/ghdl/testsuite/gna/issue2070 std=08 sha=3b2bc1bc8ee4a2ae
  crash38_1.vhdl ghdl=0 nvc=1@7
 run alone:gna/issue2070/crash45_1.vhdl dir=testdata/ghdl/testsuite/gna/issue2070 std=08 sha=363b7b38ce92cf14
  crash45_1.vhdl ghdl=1@12 nvc=1@12
 run alone:gna/issue2070/crash47_1.vhdl dir=testdata/ghdl/testsuite/gna/issue2070 std=08 sha=6f572472b1ef2a20
- crash47_1.vhdl ghdl=1@3,6~ nvc=1@3,6,7,15,16
+ crash47_1.vhdl ghdl=1@3,6~ nvc=1@3,6~,7,15,16
 run alone:gna/issue2071/repro2.vhdl dir=testdata/ghdl/testsuite/gna/issue2071 std=08 sha=b8820b43b94c857c
  repro2.vhdl ghdl=0 nvc=0
 run alone:gna/issue2097/tb_fixed.vhdl dir=testdata/ghdl/testsuite/gna/issue2097 std=08 sha=af2659b2ee0dd928
@@ -267,7 +268,7 @@ run alone:gna/issue2116/func3_1.vhdl dir=testdata/ghdl/testsuite/gna/issue2116 s
 run alone:gna/issue2116/sign02.vhdl dir=testdata/ghdl/testsuite/gna/issue2116 std=08 sha=3e495db519139764
  sign02.vhdl ghdl=1@6 nvc=1@6
 run alone:gna/issue2155/err.vhdl dir=testdata/ghdl/testsuite/gna/issue2155 std=08 sha=2c70ab20de9e999a
- err.vhdl ghdl=1@1,6~ nvc=1@1,6
+ err.vhdl ghdl=1@1,6~ nvc=1@1,6~
 run alone:gna/issue2157/repro.vhdl dir=testdata/ghdl/testsuite/gna/issue2157 std=08 sha=42dbbd0d669fa02a
  repro.vhdl ghdl=0 nvc=1@15,18
 run alone:gna/issue2157/repro2.vhdl dir=testdata/ghdl/testsuite/gna/issue2157 std=08 sha=9cc4b22d9008b551
@@ -323,7 +324,7 @@ run alone:gna/issue2336/crash.vhdl dir=testdata/ghdl/testsuite/gna/issue2336 std
 run alone:gna/issue2336/repro.vhdl dir=testdata/ghdl/testsuite/gna/issue2336 std=08 sha=7acd10362213b2ed
  repro.vhdl ghdl=0 nvc=1@10,16
 run alone:gna/issue2336/test_issue.vhdl dir=testdata/ghdl/testsuite/gna/issue2336 std=08 sha=aeb70a129ec0c2cc
- test_issue.vhdl ghdl=0 nvc=1@78,81,121
+ test_issue.vhdl ghdl=0 nvc=1@78,81,121~
 run alone:gna/issue2346/aggr1.vhdl dir=testdata/ghdl/testsuite/gna/issue2346 std=08 sha=8cd125cb6ce6d609
  aggr1.vhdl ghdl=0 nvc=0
 run alone:gna/issue2349/c.vhdl dir=testdata/ghdl/testsuite/gna/issue2349 std=08 sha=f9e925743e39552e
@@ -353,9 +354,9 @@ run alone:gna/issue2454/repro1.vhdl dir=testdata/ghdl/testsuite/gna/issue2454 st
 run alone:gna/issue2459/ent.vhdl dir=testdata/ghdl/testsuite/gna/issue2459 std=08 sha=57f74b6c38341ff6
  ent.vhdl ghdl=1@9 nvc=1@9
 run alone:gna/issue2460/test_ghdl.vhdl dir=testdata/ghdl/testsuite/gna/issue2460 std=08 sha=01d1718e8a15b9a2
- test_ghdl.vhdl ghdl=1@3,8~ nvc=1@3,8
+ test_ghdl.vhdl ghdl=1@3,8~ nvc=1@3,8~
 run alone:gna/issue2462/ent.vhdl dir=testdata/ghdl/testsuite/gna/issue2462 std=08 sha=c7b60c0417a725b6
- ent.vhdl ghdl=1@2,8,14,19~ nvc=1@2,8,14,19
+ ent.vhdl ghdl=1@2,8,14,19~ nvc=1@2,8~,14~,19~
 run alone:gna/issue2465/visibility8.vhdl dir=testdata/ghdl/testsuite/gna/issue2465 std=08 sha=1ad7497b2781a862
  visibility8.vhdl ghdl=1@9,16,21,22,24,25,26 nvc=1@9,16,21,22,23,24,25,26
 run alone:gna/issue2477/repro1.vhdl dir=testdata/ghdl/testsuite/gna/issue2477 std=08 sha=fb97b84d03e22da7
@@ -375,7 +376,7 @@ run alone:gna/issue2570/test1.vhdl dir=testdata/ghdl/testsuite/gna/issue2570 std
 run alone:gna/issue2570/test2.vhdl dir=testdata/ghdl/testsuite/gna/issue2570 std=08 sha=2811fef1c430d3bb
  test2.vhdl ghdl=0 nvc=1@15
 run alone:gna/issue2572/tb2.vhdl dir=testdata/ghdl/testsuite/gna/issue2572 std=08 sha=6d7ecc76895d2674
- tb2.vhdl ghdl=1@4,9~ nvc=1@4,9,37
+ tb2.vhdl ghdl=1@4,9~ nvc=1@4,9~,37
 run alone:gna/issue258/length_tb1.vhdl dir=testdata/ghdl/testsuite/gna/issue258 std=08 sha=2f62358c415026be
  length_tb1.vhdl ghdl=0 nvc=1@12
 run alone:gna/issue2592/bug2.vhdl dir=testdata/ghdl/testsuite/gna/issue2592 std=08 sha=4ff97ca52dd586b6
@@ -391,11 +392,11 @@ run alone:gna/issue2666/ent2.vhdl dir=testdata/ghdl/testsuite/gna/issue2666 std=
 run alone:gna/issue2673/past_ent.vhdl dir=testdata/ghdl/testsuite/gna/issue2673 std=08 sha=1deedaf519e4b7e1
  past_ent.vhdl ghdl=0 nvc=0
 run alone:gna/issue2690/bug_tb1.vhdl dir=testdata/ghdl/testsuite/gna/issue2690 std=08 sha=875c5607b725900f
- bug_tb1.vhdl ghdl=1@45,52~ nvc=1@45,46,52
+ bug_tb1.vhdl ghdl=1@45,52~ nvc=1@45,46,52~
 run alone:gna/issue2691/synchro_tb.vhdl dir=testdata/ghdl/testsuite/gna/issue2691 std=08 sha=d375ad7c104b43c4
  synchro_tb.vhdl ghdl=1@20,22,23,25,26,41~ nvc=1@20,22
 run alone:gna/issue2693/testbench1.vhdl dir=testdata/ghdl/testsuite/gna/issue2693 std=08 sha=39f5c95327301d13
- testbench1.vhdl ghdl=0 nvc=1@11,15,16,17,21,53,54
+ testbench1.vhdl ghdl=0 nvc=1@11,15,16,17,21~,53~,54
 run alone:gna/issue2706/tb2.vhdl dir=testdata/ghdl/testsuite/gna/issue2706 std=08 sha=c85592a89d952246
  tb2.vhdl ghdl=0 nvc=0
 run alone:gna/issue2727/tb_bug_orig.vhdl dir=testdata/ghdl/testsuite/gna/issue2727 std=08 sha=12c8b7cc70d36570
@@ -445,7 +446,7 @@ run alone:gna/issue3020/gt0.vhdl dir=testdata/ghdl/testsuite/gna/issue3020 std=0
 run alone:gna/issue3020/gt2.vhdl dir=testdata/ghdl/testsuite/gna/issue3020 std=08 sha=28ca452e26e8652e
  gt2.vhdl ghdl=0 nvc=0
 run alone:gna/issue3020/tb2.vhdl dir=testdata/ghdl/testsuite/gna/issue3020 std=08 sha=5248808101e7bf6c
- tb2.vhdl ghdl=1@1,6~ nvc=1@1,6
+ tb2.vhdl ghdl=1@1,6~ nvc=1@1,6~
 run alone:gna/issue3052/b.vhdl dir=testdata/ghdl/testsuite/gna/issue3052 std=08 sha=dbd64f64e9a446ee
  b.vhdl ghdl=0 nvc=0
 run alone:gna/issue3057/attr2.vhdl dir=testdata/ghdl/testsuite/gna/issue3057 std=08 sha=7fa10fa734312496
@@ -479,7 +480,7 @@ run alone:gna/issue332/repro_rec2.vhdl dir=testdata/ghdl/testsuite/gna/issue332 
 run alone:gna/issue349/ResolutionPkg.vhd dir=testdata/ghdl/testsuite/gna/issue349 std=08 sha=3e9680b4bf3d9b10
  ResolutionPkg.vhd ghdl=0 nvc=0
 run alone:gna/issue349/resolution-tb.vhdl dir=testdata/ghdl/testsuite/gna/issue349 std=08 sha=43f8964fa97b42df
- resolution-tb.vhdl ghdl=1@2,7~ nvc=1@2,7
+ resolution-tb.vhdl ghdl=1@2,7~ nvc=1@2,7~
 run alone:gna/issue376/fx3_model_modified.vhdl dir=testdata/ghdl/testsuite/gna/issue376 std=08 sha=cb3723418f51e8c5
  fx3_model_modified.vhdl ghdl=1@27,28,45~,211~ nvc=1@27
 run alone:gna/issue376/repro_pkg.vhdl dir=testdata/ghdl/testsuite/gna/issue376 std=08 sha=1299f51fbd413819
@@ -509,9 +510,9 @@ run alone:gna/issue467/AbstractMmPkg.vhd dir=testdata/ghdl/testsuite/gna/issue46
 run alone:gna/issue467/axi_master.vhd dir=testdata/ghdl/testsuite/gna/issue467 std=08 sha=cf38efda78acf947
  axi_master.vhd ghdl=1@22,23,24,26,64,68~ nvc=1@22
 run alone:gna/issue467/testbench.vhdl dir=testdata/ghdl/testsuite/gna/issue467 std=08 sha=5736a479761c7689
- testbench.vhdl ghdl=1@5,10~ nvc=1@5,10
+ testbench.vhdl ghdl=1@5,10~ nvc=1@5,10~
 run alone:gna/issue467/testbench2.vhdl dir=testdata/ghdl/testsuite/gna/issue467 std=08 sha=d79545dd98ca58af
- testbench2.vhdl ghdl=1@5,10~ nvc=1@5,10
+ testbench2.vhdl ghdl=1@5,10~ nvc=1@5,10~
 run alone:gna/issue473/repro.vhdl dir=testdata/ghdl/testsuite/gna/issue473 std=08 sha=c78c06f5f605304d
  repro.vhdl ghdl=0 nvc=0
 run alone:gna/issue473/repro2.vhdl dir=testdata/ghdl/testsuite/gna/issue473 std=08 sha=e74fc262a5a1b8af
@@ -521,7 +522,7 @@ run alone:gna/issue474/t.vhdl dir=testdata/ghdl/testsuite/gna/issue474 std=08 sh
 run alone:gna/issue476/repro/test_op.vhd dir=testdata/ghdl/testsuite/gna/issue476/repro std=08 sha=1beba7c32672c09a
  test_op.vhd ghdl=1@19,25,33,43,47 nvc=1@19,25,33,43,47
 run alone:gna/issue476/repro2/pixel_matrix_pkg.vhd dir=testdata/ghdl/testsuite/gna/issue476/repro2 std=08 sha=35d6ba9a4a03783c
- pixel_matrix_pkg.vhd ghdl=1@5,13,15,17,25~ nvc=1@5,25
+ pixel_matrix_pkg.vhd ghdl=1@5,13,15,17,25~ nvc=1@5,25~
 run alone:gna/issue476/repro2/test_op.vhd dir=testdata/ghdl/testsuite/gna/issue476/repro2 std=08 sha=90dfdae423e8f523
  test_op.vhd ghdl=1@19,25,33,43,47 nvc=1@19,25,33,43,47
 run alone:gna/issue50/idct.d/add_163.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=015d05b29c8dec90
@@ -647,7 +648,7 @@ run alone:gna/issue50/idct.d/add_601.vhd dir=testdata/ghdl/testsuite/gna/issue50
 run alone:gna/issue50/idct.d/add_602.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=6fbe551bf1883a6f
  add_602.vhd ghdl=0 nvc=0
 run alone:gna/issue50/idct.d/assert_uut.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=e7bf2b8254f43c2c
- assert_uut.vhd ghdl=1@7,13,17,21,28~ nvc=1@7,28
+ assert_uut.vhd ghdl=1@7,13,17,21,28~ nvc=1@7,28~
 run alone:gna/issue50/idct.d/cmp_164.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=b21a5e965391df5c
  cmp_164.vhd ghdl=0 nvc=0
 run alone:gna/issue50/idct.d/cmp_202.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=40ef4b937fae755e
@@ -685,9 +686,9 @@ run alone:gna/issue50/idct.d/cmp_412.vhd dir=testdata/ghdl/testsuite/gna/issue50
 run alone:gna/issue50/idct.d/cmp_413.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=1f3054eb03a6ac41
  cmp_413.vhd ghdl=0 nvc=0
 run alone:gna/issue50/idct.d/cp3_test.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=4bf4c3b68bac5703
- cp3_test.vhd ghdl=1@6,17~ nvc=1@6,17
+ cp3_test.vhd ghdl=1@6,17~ nvc=1@6,17~
 run alone:gna/issue50/idct.d/fsm.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=a927e6a287ed1bd7
- fsm.vhd ghdl=1@7,14,25,26,28,38~ nvc=1@7,38
+ fsm.vhd ghdl=1@7,14,25,26,28,38~ nvc=1@7,38~
 run alone:gna/issue50/idct.d/fsm_23.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=e982a938902c35c7
  fsm_23.vhd ghdl=0 nvc=0
 run alone:gna/issue50/idct.d/input_split0.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=77ffee63374496a6
@@ -849,7 +850,7 @@ run alone:gna/issue50/idct.d/output_split7.vhd dir=testdata/ghdl/testsuite/gna/i
 run alone:gna/issue50/idct.d/pkg_tb.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=83eb1e08b6701fd7
  pkg_tb.vhd ghdl=0 nvc=0
 run alone:gna/issue50/idct.d/prog.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=3ff14e5d9f51208d
- prog.vhd ghdl=1@6,13,17~ nvc=1@6,17
+ prog.vhd ghdl=1@6,13,17~ nvc=1@6,17~
 run alone:gna/issue50/idct.d/sub_157.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=02baa5fc745211fc
  sub_157.vhd ghdl=0 nvc=0
 run alone:gna/issue50/idct.d/sub_159.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=ccae641b0b95a31b
@@ -965,7 +966,7 @@ run alone:gna/issue50/idct.d/sub_599.vhd dir=testdata/ghdl/testsuite/gna/issue50
 run alone:gna/issue50/idct.d/sync_ram.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=3873bc2344fbfd7a
  sync_ram.vhd ghdl=0 nvc=0
 run alone:gna/issue50/idct.d/tb.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=a0d8f5ebab357282
- tb.vhd ghdl=1@6,11~ nvc=1@6,11
+ tb.vhd ghdl=1@6,11~ nvc=1@6,11~
 run alone:gna/issue50/idct.d/top.vhd dir=testdata/ghdl/testsuite/gna/issue50/idct.d std=08 sha=3442386dae165df2
  top.vhd ghdl=0 nvc=0
 run alone:gna/issue520/alias.vhdl dir=testdata/ghdl/testsuite/gna/issue520 std=08 sha=ffcbe9ab831e6914
@@ -983,7 +984,7 @@ run alone:gna/issue553/stimulus_response.vhd dir=testdata/ghdl/testsuite/gna/iss
 run alone:gna/issue616/repro2.vhdl dir=testdata/ghdl/testsuite/gna/issue616 std=08 sha=6ce445b2029141ea
  repro2.vhdl ghdl=0 nvc=0
 run alone:gna/issue664/numeric_system_pkg-orig.vhdl dir=testdata/ghdl/testsuite/gna/issue664 std=08 sha=79598acad7cac185
- numeric_system_pkg-orig.vhdl ghdl=0 nvc=1@62,63,64,65,66,67,182,317,326,335,344,353,362,396
+ numeric_system_pkg-orig.vhdl ghdl=0 nvc=1@62,63,64,65,66,67,182~,317~,326~,335~,344~,353~,362~,396~
 run alone:gna/issue676/inc2.vhdl dir=testdata/ghdl/testsuite/gna/issue676 std=08 sha=cc5425ba64ddd9b1
  inc2.vhdl ghdl=0 nvc=0
 run alone:gna/issue687/ent.vhdl dir=testdata/ghdl/testsuite/gna/issue687 std=08 sha=547074eababc6113
@@ -1005,11 +1006,11 @@ run alone:gna/issue777/a.vhdl dir=testdata/ghdl/testsuite/gna/issue777 std=08 sh
 run alone:gna/issue777/tb.vhdl dir=testdata/ghdl/testsuite/gna/issue777 std=08 sha=2e906ecc64cbedea
  tb.vhdl ghdl=1@9 nvc=1@9
 run alone:gna/issue779/tvm_pkg.vhdl dir=testdata/ghdl/testsuite/gna/issue779 std=08 sha=169d31d9106c2f51
- tvm_pkg.vhdl ghdl=1@56 nvc=1@4,56,64
+ tvm_pkg.vhdl ghdl=1@56 nvc=1@4,56,64~
 run alone:gna/issue795/repro2.vhdl dir=testdata/ghdl/testsuite/gna/issue795 std=08 sha=f2db523794603e9b
  repro2.vhdl ghdl=0 nvc=0
 run alone:gna/issue797/tb.vhdl dir=testdata/ghdl/testsuite/gna/issue797 std=08 sha=c4d9266f7de83346
- tb.vhdl ghdl=1@1,6~ nvc=1@1,6
+ tb.vhdl ghdl=1@1,6~ nvc=1@1,6~
 run alone:gna/issue810/my_time_pkg.vhdl dir=testdata/ghdl/testsuite/gna/issue810 std=08 sha=9350be69a743a88f
  my_time_pkg.vhdl ghdl=1@3 nvc=0
 run alone:gna/issue816/test.vhdl dir=testdata/ghdl/testsuite/gna/issue816 std=08 sha=79fe2d6e63320cf8
@@ -1057,15 +1058,15 @@ run alone:gna/ticket77/bug4.vhdl dir=testdata/ghdl/testsuite/gna/ticket77 std=08
 run alone:gna/ticket89/x_ieee_proposed/src/env_c.vhdl dir=testdata/ghdl/testsuite/gna/ticket89/x_ieee_proposed/src std=08 sha=8c54c45ebe60a0f1
  env_c.vhdl ghdl=1@9,10 nvc=1@9
 run alone:pyunit/Current.vhdl dir=testdata/ghdl/testsuite/pyunit std=08 sha=47ec9994ccf0672c
- Current.vhdl ghdl=1@8,12,14,15,20,23~,244,245,246,247,251,258,262,263,270,274,275,276,277,278,279,280,283~,295~ nvc=1@8,12,14,15,20,23,27,32,44,64,82,110,125,126,129,130,244,245
+ Current.vhdl ghdl=1@8,12,14,15,20,23~,244,245,246,247,251,258,262,263,270,274,275,276,277,278,279,280,283~,295~ nvc=1@8,12,14,15,20,23~,27,32,44,64,82,110,125,126,129,130,244,245
 run alone:pyunit/dom/examples/SimpleEntity.vhdl dir=testdata/ghdl/testsuite/pyunit/dom/examples std=08 sha=a6d5e8a6399ec2ce
- SimpleEntity.vhdl ghdl=1@9,25,38~ nvc=1@9,38
+ SimpleEntity.vhdl ghdl=1@9,25,38~ nvc=1@9,38~
 run alone:pyunit/dom/examples/SimplePackage.vhdl dir=testdata/ghdl/testsuite/pyunit/dom/examples std=08 sha=ce11fa81d9f794f2
  SimplePackage.vhdl ghdl=0 nvc=0
 run alone:pyunit/dom/examples/StopWatch/Counter.vhdl dir=testdata/ghdl/testsuite/pyunit/dom/examples/StopWatch std=08 sha=65cbe446a7f51de2
- Counter.vhdl ghdl=1@10,16,29~ nvc=1@10,29
+ Counter.vhdl ghdl=1@10,16,29~ nvc=1@10,29~
 run alone:pyunit/dom/examples/StopWatch/Debouncer.vhdl dir=testdata/ghdl/testsuite/pyunit/dom/examples/StopWatch std=08 sha=5ef95580b31c49a5
- Debouncer.vhdl ghdl=1@10,29~ nvc=1@10,29
+ Debouncer.vhdl ghdl=1@10,29~ nvc=1@10,29~
 run alone:pyunit/dom/examples/StopWatch/StopWatch.ctx.vhdl dir=testdata/ghdl/testsuite/pyunit/dom/examples/StopWatch std=08 sha=65e30247b9f57852
  StopWatch.ctx.vhdl ghdl=1@7,8,10 nvc=1@7
 run alone:pyunit/dom/examples/StopWatch/StopWatch.pkg.vhdl dir=testdata/ghdl/testsuite/pyunit/dom/examples/StopWatch std=08 sha=273c6a5a56e29360
@@ -1081,9 +1082,9 @@ run alone:pyunit/dom/examples/StopWatch/seg7_Display.cfg.vhdl dir=testdata/ghdl/
 run alone:pyunit/dom/examples/StopWatch/seg7_Display.vhdl dir=testdata/ghdl/testsuite/pyunit/dom/examples/StopWatch std=08 sha=9688ce3199a874f7
  seg7_Display.vhdl ghdl=1@10,11,13,25,34~ nvc=1@10
 run alone:pyunit/dom/examples/StopWatch/seg7_Encoder.vhdl dir=testdata/ghdl/testsuite/pyunit/dom/examples/StopWatch std=08 sha=9372583b707a408b
- seg7_Encoder.vhdl ghdl=1@6,12,13,15,20~ nvc=1@6,20
+ seg7_Encoder.vhdl ghdl=1@6,12,13,15,20~ nvc=1@6,20~
 run alone:pyunit/dom/examples/StopWatch/sync_Bits.vhdl dir=testdata/ghdl/testsuite/pyunit/dom/examples/StopWatch std=08 sha=058690599d88328b
- sync_Bits.vhdl ghdl=1@41,60,62,63,68~ nvc=1@41,60,68
+ sync_Bits.vhdl ghdl=1@41,60,62,63,68~ nvc=1@41,60,68~
 run alone:pyunit/dom/examples/StopWatch/toplevel.Display.vhdl dir=testdata/ghdl/testsuite/pyunit/dom/examples/StopWatch std=08 sha=7aadfabdb8e77847
  toplevel.Display.vhdl ghdl=1@10,11,13,31~ nvc=1@10
 run alone:pyunit/dom/examples/StopWatch/toplevel.Encoder.vhdl dir=testdata/ghdl/testsuite/pyunit/dom/examples/StopWatch std=08 sha=b25a4ef92bacac45
@@ -1259,13 +1260,13 @@ run alone:synth/issue1069/tdp_ram_single.vhdl dir=testdata/ghdl/testsuite/synth/
 run alone:synth/issue1069/tdp_ram_single2.vhdl dir=testdata/ghdl/testsuite/synth/issue1069 std=08 sha=b67d91d33b625831
  tdp_ram_single2.vhdl ghdl=1@53 nvc=1@53
 run alone:synth/issue1076/ent3.vhdl dir=testdata/ghdl/testsuite/synth/issue1076 std=08 sha=07fa5fe549f85f37
- ent3.vhdl ghdl=1@5,18~,49~,61~ nvc=1@5,18
+ ent3.vhdl ghdl=1@5,18~,49~,61~ nvc=1@5,18~
 run alone:synth/issue1082/ent.vhdl dir=testdata/ghdl/testsuite/synth/issue1082 std=08 sha=2f704cfcd6278198
  ent.vhdl ghdl=0 nvc=0
 run alone:synth/issue1090/bootrom.vhdl dir=testdata/ghdl/testsuite/synth/issue1090 std=08 sha=4cc4ebbd2f83523c
  bootrom.vhdl ghdl=0 nvc=0
 run alone:synth/issue1090/simple_ram-orig.vhdl dir=testdata/ghdl/testsuite/synth/issue1090 std=08 sha=1aa2c3f40815f63f
- simple_ram-orig.vhdl ghdl=1@6,26~ nvc=1@6,26
+ simple_ram-orig.vhdl ghdl=1@6,26~ nvc=1@6,26~
 run alone:synth/issue1100/test.vhdl dir=testdata/ghdl/testsuite/synth/issue1100 std=08 sha=ec2fc387fbec3398
  test.vhdl ghdl=0 nvc=0
 run alone:synth/issue1109/ent-orig.vhdl dir=testdata/ghdl/testsuite/synth/issue1109 std=08 sha=7f6f8ae51d2351cb
@@ -1341,7 +1342,7 @@ run alone:synth/issue2042/ent.vhdl dir=testdata/ghdl/testsuite/synth/issue2042 s
 run alone:synth/issue2042/ent1.vhdl dir=testdata/ghdl/testsuite/synth/issue2042 std=08 sha=e20d6e163f66be9f
  ent1.vhdl ghdl=0 nvc=0
 run alone:synth/issue2062/fxt.vhdl dir=testdata/ghdl/testsuite/synth/issue2062 std=08 sha=6ceb82a33a9cf25f
- fxt.vhdl ghdl=1@5,9,12~ nvc=1@5,12
+ fxt.vhdl ghdl=1@5,9,12~ nvc=1@5,12~
 run alone:synth/issue2125/a2.vhdl dir=testdata/ghdl/testsuite/synth/issue2125 std=08 sha=8a4d09daf0eff4db
  a2.vhdl ghdl=0 nvc=0
 run alone:synth/issue2125/a3.vhdl dir=testdata/ghdl/testsuite/synth/issue2125 std=08 sha=e30ca4754f7bef54
@@ -1353,7 +1354,7 @@ run alone:synth/issue2169/bug.vhdl dir=testdata/ghdl/testsuite/synth/issue2169 s
 run alone:synth/issue2169/tb.vhdl dir=testdata/ghdl/testsuite/synth/issue2169 std=08 sha=2133d1e7e4f097d9
  tb.vhdl ghdl=1@14 nvc=1@14
 run alone:synth/issue2187/rom32.vhd dir=testdata/ghdl/testsuite/synth/issue2187 std=08 sha=2ed24b84181cd167
- rom32.vhd ghdl=1@6,18~ nvc=1@6,18
+ rom32.vhd ghdl=1@6,18~ nvc=1@6,18~
 run alone:synth/issue2234/repro.vhdl dir=testdata/ghdl/testsuite/synth/issue2234 std=08 sha=7f1e8fbaca9f01f4
  repro.vhdl ghdl=0 nvc=0
 run alone:synth/issue2237/implicit_wide4.vhdl dir=testdata/ghdl/testsuite/synth/issue2237 std=08 sha=4e14836368145309
@@ -1485,7 +1486,7 @@ run alone:synth/issue2746/repro1.vhdl dir=testdata/ghdl/testsuite/synth/issue274
 run alone:synth/issue2746/repro1a.vhdl dir=testdata/ghdl/testsuite/synth/issue2746 std=08 sha=6b2cd95e180ade98
  repro1a.vhdl ghdl=0 nvc=0
 run alone:synth/issue2766/demo.vhdl dir=testdata/ghdl/testsuite/synth/issue2766 std=08 sha=f4c35bc1fa0e2e3a
- demo.vhdl ghdl=1@3,13~ nvc=1@3,13
+ demo.vhdl ghdl=1@3,13~ nvc=1@3,13~
 run alone:synth/issue2962/top.vhd dir=testdata/ghdl/testsuite/synth/issue2962 std=08 sha=2761a038ea26bd99
  top.vhd ghdl=0 nvc=0
 run alone:synth/issue2962/top2.vhd dir=testdata/ghdl/testsuite/synth/issue2962 std=08 sha=b994708222f542c0
@@ -1503,7 +1504,7 @@ run alone:synth/issue3063/crc.vhdl dir=testdata/ghdl/testsuite/synth/issue3063 s
 run alone:synth/issue3063/repro3.vhdl dir=testdata/ghdl/testsuite/synth/issue3063 std=08 sha=e4fc59497086fa80
  repro3.vhdl ghdl=0 nvc=0
 run alone:synth/issue3096/repro-latch.vhdl dir=testdata/ghdl/testsuite/synth/issue3096 std=08 sha=a236f45d24109112
- repro-latch.vhdl ghdl=1@4,13,14,19~ nvc=1@4,19
+ repro-latch.vhdl ghdl=1@4,13,14,19~ nvc=1@4,19~
 run alone:synth/issue3121/top2.vhdl dir=testdata/ghdl/testsuite/synth/issue3121 std=08 sha=3f5446ccf55804c4
  top2.vhdl ghdl=0 nvc=0
 run alone:synth/issue3129/unstatic_loop.vhdl dir=testdata/ghdl/testsuite/synth/issue3129 std=08 sha=fe4da79599ec68b1
@@ -1515,7 +1516,7 @@ run alone:synth/issue3184/lru_reproducer.vhd dir=testdata/ghdl/testsuite/synth/i
 run alone:synth/issue412/generic_pkg.vhdl dir=testdata/ghdl/testsuite/synth/issue412 std=08 sha=9785505b9c1fb0a4
  generic_pkg.vhdl ghdl=1@8,9,10,11,12,13,14,15,17,23,24,25,26,27,28,29,30,36,38,39,40,42 nvc=1@6,8,14,23,29,42
 run alone:synth/issue412/generic_sfifo-orig.vhdl dir=testdata/ghdl/testsuite/synth/issue412 std=08 sha=29d4194d2bbd8836
- generic_sfifo-orig.vhdl ghdl=1@10 nvc=1@10,23
+ generic_sfifo-orig.vhdl ghdl=1@10 nvc=1@10,23~
 run alone:synth/issue937/ent.vhdl dir=testdata/ghdl/testsuite/synth/issue937 std=08 sha=42fb7152e23a3bfd
  ent.vhdl ghdl=0 nvc=0
 run alone:synth/issue938/ent.vhdl dir=testdata/ghdl/testsuite/synth/issue938 std=08 sha=deaa2e19332fd31b
@@ -1551,7 +1552,7 @@ run alone:synth/synth111/rams_sdp_3d.vhd dir=testdata/ghdl/testsuite/synth/synth
 run alone:synth/synth14/repro.vhdl dir=testdata/ghdl/testsuite/synth/synth14 std=08 sha=9f5ac43f522dbb4c
  repro.vhdl ghdl=0 nvc=0
 run alone:synth/synth179/test.vhdl dir=testdata/ghdl/testsuite/synth/synth179 std=08 sha=fa7f7013d5ffbdb1
- test.vhdl ghdl=1@6,20~ nvc=1@6,20
+ test.vhdl ghdl=1@6,20~ nvc=1@6,20~
 run alone:synth/synth34/module.vhdl dir=testdata/ghdl/testsuite/synth/synth34 std=08 sha=a39e8e56e328e5d6
  module.vhdl ghdl=1@14 nvc=1@14
 run alone:synth/synth34/submodule.vhdl dir=testdata/ghdl/testsuite/synth/synth34 std=08 sha=1b04dbb91773634d
@@ -1589,7 +1590,7 @@ run alone:vests/vhdl-93/ashenden/compliant/ch_13_fg_13_08.vhd dir=testdata/ghdl/
 run alone:vests/vhdl-93/ashenden/compliant/ch_13_fg_13_09.vhd dir=testdata/ghdl/testsuite/vests/vhdl-93/ashenden/compliant std=08 sha=da558ba8896fae6a
  ch_13_fg_13_09.vhd ghdl=1@38,41,46 nvc=1@38,41,46
 run alone:vests/vhdl-93/ashenden/compliant/ch_14_fg_14_05.vhd dir=testdata/ghdl/testsuite/vests/vhdl-93/ashenden/compliant std=08 sha=a9ab794d13530a62
- ch_14_fg_14_05.vhd ghdl=0 nvc=1@78,118
+ ch_14_fg_14_05.vhd ghdl=0 nvc=1@78,118~
 run alone:vests/vhdl-93/ashenden/compliant/ch_14_fg_14_13.vhd dir=testdata/ghdl/testsuite/vests/vhdl-93/ashenden/compliant std=08 sha=767799bc499be514
  ch_14_fg_14_13.vhd ghdl=1@55,57~,106~ nvc=1@55
 run alone:vests/vhdl-93/ashenden/compliant/ch_17_ch_17_06.vhd dir=testdata/ghdl/testsuite/vests/vhdl-93/ashenden/compliant std=08 sha=9f9e65ec9e342a20
@@ -1699,7 +1700,7 @@ run alone:vests/vhdl-93/billowitch/disputed/tc59.vhd dir=testdata/ghdl/testsuite
 run alone:vests/vhdl-93/billowitch/disputed/tc737.vhd dir=testdata/ghdl/testsuite/vests/vhdl-93/billowitch/disputed std=08 sha=f8661a7937102060
  tc737.vhd ghdl=0 nvc=1@88
 run alone:vests/vhdl-93/billowitch/disputed/tc758.vhd dir=testdata/ghdl/testsuite/vests/vhdl-93/billowitch/disputed std=08 sha=4461ee9838ed54c2
- tc758.vhd ghdl=1@89,91,92,93,108,110,111,112,118~ nvc=1@89,91,92,93,108,110,111,112,118
+ tc758.vhd ghdl=1@89,91,92,93,108,110,111,112,118~ nvc=1@89,91,92,93,108,110,111,112,118~
 run alone:vests/vhdl-93/billowitch/disputed/tc814.vhd dir=testdata/ghdl/testsuite/vests/vhdl-93/billowitch/disputed std=08 sha=8c9b576279ea5452
  tc814.vhd ghdl=0 nvc=0
 run alone:vests/vhdl-93/billowitch/disputed/tc816.vhd dir=testdata/ghdl/testsuite/vests/vhdl-93/billowitch/disputed std=08 sha=919fde2c8c3b85f1
@@ -1861,25 +1862,25 @@ run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS1_Mixed_Sig/tb_a2d_d2a.vhd dir
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/DC_Motor.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=c5094065b3ce1f8b
  DC_Motor.vhd ghdl=1@30,31,38,39,41,43,44 nvc=1@20
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/gain.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=69c6f338edb706a0
- gain.vhd ghdl=1@22,23,31 nvc=1@22,28,31
+ gain.vhd ghdl=1@22,23,31 nvc=1@22,28~,31
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/gain_e.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=349c50fc3a88669c
  gain_e.vhd ghdl=1@24,25,32,33,35,37 nvc=1@20
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/gear_rv_r.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=8f5f66d4438b319b
  gear_rv_r.vhd ghdl=1@25,26,33,34,36,38,39 nvc=1@20
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/lead_lag.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=9f7324337420dce2
- lead_lag.vhd ghdl=1@26,27,39 nvc=1@26,32,39
+ lead_lag.vhd ghdl=1@26,27,39 nvc=1@26,32~,39
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/lead_lag_diff.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=6eb1dbc74ad32b4b
- lead_lag_diff.vhd ghdl=1@24,25,48 nvc=1@24,30,48
+ lead_lag_diff.vhd ghdl=1@24,25,48 nvc=1@24,30~,48
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/lead_lag_ztf.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=70bddf8f94bc6f15
- lead_lag_ztf.vhd ghdl=1@30,31,44 nvc=1@30,37,44
+ lead_lag_ztf.vhd ghdl=1@30,31,44 nvc=1@30,37~,44
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/limiter.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=ffb867374363eb5c
- limiter.vhd ghdl=1@23,24,33,34,36,38,41 nvc=1@23,29,33,41
+ limiter.vhd ghdl=1@23,24,33,34,36,38,41 nvc=1@23,29~,33,41
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/lpf_1.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=18eae280a0654102
- lpf_1.vhd ghdl=1@23,24,41 nvc=1@23,31,41
+ lpf_1.vhd ghdl=1@23,24,41 nvc=1@23,31~,41
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/stop_r.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=5ecab7a7a9335fff
  stop_r.vhd ghdl=1@27,34,35,37,39,41,42,44,46,49 nvc=1@20
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/sum2.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=b96febec103809cc
- sum2.vhd ghdl=1@22,23,31 nvc=1@22,28,31
+ sum2.vhd ghdl=1@22,23,31 nvc=1@22,28~,31
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/tb_CS2_Mech_Domain.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=81353bfb0f4b3c38
  tb_CS2_Mech_Domain.vhd ghdl=1@27,28,32,33,34,36,37,49,50,55,56,58,59,85,86,90,91,93,94,95,96,97,98,99,100,114,115,119,120,121,122,123,124,126,128,130,145,146,147 nvc=1@21
 run alone:vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech/tb_CS2_S_Domain.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/AMS_CS2_Mixed_Tech std=08 sha=c36c1d15af9e5271
@@ -1981,7 +1982,7 @@ run alone:vests/vhdl-ams/ashenden/compliant/access-types/stimulus_types-1.vhd di
 run alone:vests/vhdl-ams/ashenden/compliant/access-types/tb_bounded_buffer_adt.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/access-types std=08 sha=1a9532b6405acb68
  tb_bounded_buffer_adt.vhd ghdl=1@29,31,33,36,38,41,42,44,46,49,50,52,54,57,59,60,62,64,67,68,70,72,75,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95 nvc=1@29,31,33,36,38,41,42,44,46,49,50,52,54,57,59,60,62,64,67,68,70,72,75,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95
 run alone:vests/vhdl-ams/ashenden/compliant/access-types/test_bench-1.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/access-types std=08 sha=35ce95fe9b13f09b
- test_bench-1.vhd ghdl=1@26,28,41,44,47,73,87~,176~ nvc=1@26,28,87,90,106,133,135,141,178,183,192
+ test_bench-1.vhd ghdl=1@26,28,41,44,47,73,87~,176~ nvc=1@26,28,87~,90,106,133,135,141,178,183,192~
 run alone:vests/vhdl-ams/ashenden/compliant/aliases/DMA_controller.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/aliases std=08 sha=42ff21e306605fe7
  DMA_controller.vhd ghdl=1@31,37,38,43 nvc=1@31,37
 run alone:vests/vhdl-ams/ashenden/compliant/aliases/DMA_controller_types_and_utilities.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/aliases std=08 sha=75f385aae408e853
@@ -2061,7 +2062,7 @@ run alone:vests/vhdl-ams/ashenden/compliant/analog-modeling/inline_14a.vhd dir=t
 run alone:vests/vhdl-ams/ashenden/compliant/analog-modeling/inline_15a.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/analog-modeling std=08 sha=54699efd359344b9
  inline_15a.vhd ghdl=1@33,34,38,40 nvc=1@20
 run alone:vests/vhdl-ams/ashenden/compliant/analog-modeling/inline_16a.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/analog-modeling std=08 sha=80fcd60cc5d3eeb5
- inline_16a.vhd ghdl=1@22,23,25,28,30,31,33,40,41,45,54,55,56,80,81,82,83,84,85,89 nvc=1@22,23,30,31,41,49,54,55,63,69,76,80
+ inline_16a.vhd ghdl=1@22,23,25,28,30,31,33,40,41,45,54,55,56,80,81,82,83,84,85,89 nvc=1@22,23,30,31,41,49~,54,55,63~,69~,76~,80
 run alone:vests/vhdl-ams/ashenden/compliant/analog-modeling/inline_17a.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/analog-modeling std=08 sha=8bc742196c06163e
  inline_17a.vhd ghdl=1@25,27,52,53,55,57,71,72,73,75,77 nvc=1@22
 run alone:vests/vhdl-ams/ashenden/compliant/analog-modeling/inline_18a.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/analog-modeling std=08 sha=6e0df055d2ca80a4
@@ -2113,7 +2114,7 @@ run alone:vests/vhdl-ams/ashenden/compliant/analog-modeling/tb_comparator-1.vhd 
 run alone:vests/vhdl-ams/ashenden/compliant/analog-modeling/tb_comparator.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/analog-modeling std=08 sha=d592aeff39aa63f6
  tb_comparator.vhd ghdl=1@30,31,32 nvc=1@22
 run alone:vests/vhdl-ams/ashenden/compliant/analog-modeling/tb_control_system.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/analog-modeling std=08 sha=4cf2c19ef6fda95f
- tb_control_system.vhd ghdl=1@28,29,30 nvc=1@20,25,28
+ tb_control_system.vhd ghdl=1@28,29,30 nvc=1@20,25~,28
 run alone:vests/vhdl-ams/ashenden/compliant/analog-modeling/tb_diode.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/analog-modeling std=08 sha=e3b7b9c690699016
  tb_diode.vhd ghdl=1@31,32,33,34 nvc=1@22
 run alone:vests/vhdl-ams/ashenden/compliant/analog-modeling/tb_inv_integrator.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/analog-modeling std=08 sha=12c7e0519216f30c
@@ -2163,9 +2164,9 @@ run alone:vests/vhdl-ams/ashenden/compliant/attributes-and-groups/flipflop.vhd d
 run alone:vests/vhdl-ams/ashenden/compliant/attributes-and-groups/gate_components.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/attributes-and-groups std=08 sha=2004bba1bf634539
  gate_components.vhd ghdl=1@34,38,39,46,47 nvc=1@34
 run alone:vests/vhdl-ams/ashenden/compliant/attributes-and-groups/inline_01.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/attributes-and-groups std=08 sha=3ad59bab95ab2971
- inline_01.vhd ghdl=1@30,40~ nvc=1@30,40
+ inline_01.vhd ghdl=1@30,40~ nvc=1@30,40~
 run alone:vests/vhdl-ams/ashenden/compliant/attributes-and-groups/inline_02.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/attributes-and-groups std=08 sha=4489f6874d6d69c8
- inline_02.vhd ghdl=1@20,26~ nvc=1@20,26
+ inline_02.vhd ghdl=1@20,26~ nvc=1@20,26~
 run alone:vests/vhdl-ams/ashenden/compliant/attributes-and-groups/inline_03.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/attributes-and-groups std=08 sha=590c77aead27867d
  inline_03.vhd ghdl=0 nvc=1@92,94,96
 run alone:vests/vhdl-ams/ashenden/compliant/attributes-and-groups/inline_04.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/attributes-and-groups std=08 sha=dc676c4c6d2ab23b
@@ -2197,11 +2198,11 @@ run alone:vests/vhdl-ams/ashenden/compliant/attributes-and-groups/top.vhd dir=te
 run alone:vests/vhdl-ams/ashenden/compliant/attributes-and-groups/voltage_defs.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/attributes-and-groups std=08 sha=e15a2231ab3d0830
  voltage_defs.vhd ghdl=0 nvc=0
 run alone:vests/vhdl-ams/ashenden/compliant/components-and-configs/automotive_valve.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/components-and-configs std=08 sha=47cce13a3ddf8b7f
- automotive_valve.vhd ghdl=1@23,24 nvc=1@20,23,30
+ automotive_valve.vhd ghdl=1@23,24 nvc=1@20,23,30~
 run alone:vests/vhdl-ams/ashenden/compliant/components-and-configs/automotive_valve_defs.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/components-and-configs std=08 sha=451ac9b1bb3d237e
  automotive_valve_defs.vhd ghdl=1@25,28,33,35,36,38 nvc=1@20
 run alone:vests/vhdl-ams/ashenden/compliant/components-and-configs/brake_system.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/components-and-configs std=08 sha=dd079f375445be14
- brake_system.vhd ghdl=1@38,39,42 nvc=1@22,31,38
+ brake_system.vhd ghdl=1@38,39,42 nvc=1@22,31~,38
 run alone:vests/vhdl-ams/ashenden/compliant/components-and-configs/computer_structure.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/components-and-configs std=08 sha=70d55d6e8926cfb1
  computer_structure.vhd ghdl=1@20~ nvc=1@20,22
 run alone:vests/vhdl-ams/ashenden/compliant/components-and-configs/computer_system.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/components-and-configs std=08 sha=25156cbedcbc424f
@@ -2221,7 +2222,7 @@ run alone:vests/vhdl-ams/ashenden/compliant/components-and-configs/inline_04a.vh
 run alone:vests/vhdl-ams/ashenden/compliant/components-and-configs/inline_05.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/components-and-configs std=08 sha=65055075b474e015
  inline_05.vhd ghdl=1@67 nvc=1@67
 run alone:vests/vhdl-ams/ashenden/compliant/components-and-configs/interlock_control.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/components-and-configs std=08 sha=ee33276ce0d9bfa8
- interlock_control.vhd ghdl=1@63,71~ nvc=1@63,71
+ interlock_control.vhd ghdl=1@63,71~ nvc=1@63,71~
 run alone:vests/vhdl-ams/ashenden/compliant/components-and-configs/interlock_control_with_estimates.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/components-and-configs std=08 sha=35b7932d5dc053e7
  interlock_control_with_estimates.vhd ghdl=1@20~,32~ nvc=1@20,22,32,34,37
 run alone:vests/vhdl-ams/ashenden/compliant/components-and-configs/intermediate.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/components-and-configs std=08 sha=de881c6295dc355f
@@ -2415,7 +2416,7 @@ run alone:vests/vhdl-ams/ashenden/compliant/digital-modeling/rom.vhd dir=testdat
 run alone:vests/vhdl-ams/ashenden/compliant/digital-modeling/scheduler.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/digital-modeling std=08 sha=88e7d0474e42e187
  scheduler.vhd ghdl=0 nvc=0
 run alone:vests/vhdl-ams/ashenden/compliant/digital-modeling/tb_S_R_flipflop-1.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/digital-modeling std=08 sha=774f020331795414
- tb_S_R_flipflop-1.vhd ghdl=1@20~,37~ nvc=1@20,24,25,27,44
+ tb_S_R_flipflop-1.vhd ghdl=1@20~,37~ nvc=1@20,24,25,27,44~
 run alone:vests/vhdl-ams/ashenden/compliant/digital-modeling/tb_S_R_flipflop.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/digital-modeling std=08 sha=ca3f2d08b5efe561
  tb_S_R_flipflop.vhd ghdl=1@31 nvc=1@31
 run alone:vests/vhdl-ams/ashenden/compliant/digital-modeling/tb_and2.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/digital-modeling std=08 sha=b2a083f3f54cf84c
@@ -2433,7 +2434,7 @@ run alone:vests/vhdl-ams/ashenden/compliant/digital-modeling/tb_mux2.vhd dir=tes
 run alone:vests/vhdl-ams/ashenden/compliant/digital-modeling/tb_reg4.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/digital-modeling std=08 sha=592472aa6e5de4a8
  tb_reg4.vhd ghdl=1@31 nvc=1@31
 run alone:vests/vhdl-ams/ashenden/compliant/digital-modeling/tb_rom.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/digital-modeling std=08 sha=41e760859f6be8e5
- tb_rom.vhd ghdl=1@20~,29~ nvc=1@20,37
+ tb_rom.vhd ghdl=1@20~,29~ nvc=1@20,37~
 run alone:vests/vhdl-ams/ashenden/compliant/digital-modeling/zmux-1.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/digital-modeling std=08 sha=814ee70a06fba3e1
  zmux-1.vhd ghdl=1@24,79 nvc=1@24
 run alone:vests/vhdl-ams/ashenden/compliant/digital-modeling/zmux.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/digital-modeling std=08 sha=78d00539b72220af
@@ -2637,9 +2638,9 @@ run alone:vests/vhdl-ams/ashenden/compliant/guards-and-blocks/tb_latch.vhd dir=t
 run alone:vests/vhdl-ams/ashenden/compliant/guards-and-blocks/tb_sensor.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/guards-and-blocks std=08 sha=5336edb239f7c3f5
  tb_sensor.vhd ghdl=1@34,35,36,37 nvc=1@24
 run alone:vests/vhdl-ams/ashenden/compliant/guards-and-blocks/tb_tri_state_reg.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/guards-and-blocks std=08 sha=6b0b5b732bf1010b
- tb_tri_state_reg.vhd ghdl=1@20,26~ nvc=1@20,26
+ tb_tri_state_reg.vhd ghdl=1@20,26~ nvc=1@20,26~
 run alone:vests/vhdl-ams/ashenden/compliant/guards-and-blocks/tri_state_reg.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/guards-and-blocks std=08 sha=148afe701ff03df2
- tri_state_reg.vhd ghdl=1@20,25,26,36~ nvc=1@20,36
+ tri_state_reg.vhd ghdl=1@20,25,26,36~ nvc=1@20,36~
 run alone:vests/vhdl-ams/ashenden/compliant/misc-topics/SR_flipflop.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/misc-topics std=08 sha=44c3bbfac2f55ddf
  SR_flipflop.vhd ghdl=0 nvc=0
 run alone:vests/vhdl-ams/ashenden/compliant/misc-topics/count2-1.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/misc-topics std=08 sha=66f4b0a35a745463
@@ -2659,11 +2660,11 @@ run alone:vests/vhdl-ams/ashenden/compliant/misc-topics/tb_SR_flipflop.vhd dir=t
 run alone:vests/vhdl-ams/ashenden/compliant/misc-topics/tb_count2.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/misc-topics std=08 sha=172ab82473d1717e
  tb_count2.vhd ghdl=1@30 nvc=1@30
 run alone:vests/vhdl-ams/ashenden/compliant/misc-topics/tb_limit_checker.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/misc-topics std=08 sha=07eae3cc4b3e86aa
- tb_limit_checker.vhd ghdl=1@21,27~ nvc=1@21,27
+ tb_limit_checker.vhd ghdl=1@21,27~ nvc=1@21,27~
 run alone:vests/vhdl-ams/ashenden/compliant/misc-topics/test_bench.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/misc-topics std=08 sha=ccda87d71b557b3c
  test_bench.vhd ghdl=0 nvc=0
 run alone:vests/vhdl-ams/ashenden/compliant/packages/address_decoder.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/packages std=08 sha=f3512b6479c52efb
- address_decoder.vhd ghdl=1@21,22,28~ nvc=1@21,22,28
+ address_decoder.vhd ghdl=1@21,22,28~ nvc=1@21,22,28~
 run alone:vests/vhdl-ams/ashenden/compliant/packages/analog_output_interface.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/packages std=08 sha=227535c795a72df1
  analog_output_interface.vhd ghdl=1@29,41,42 nvc=1@24
 run alone:vests/vhdl-ams/ashenden/compliant/packages/bit_vector_signed_arithmetic.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/packages std=08 sha=823bf2067d182880
@@ -2711,7 +2712,7 @@ run alone:vests/vhdl-ams/ashenden/compliant/resolution/MVL4.vhd dir=testdata/ghd
 run alone:vests/vhdl-ams/ashenden/compliant/resolution/bus_based_system.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/resolution std=08 sha=6d56d5d596adfb61
  bus_based_system.vhd ghdl=0 nvc=1@52,58
 run alone:vests/vhdl-ams/ashenden/compliant/resolution/computer_system.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/resolution std=08 sha=82804c5bc123a1e9
- computer_system.vhd ghdl=1@20,23,25,32~,41,44,46,53~,65,68,72~,84~ nvc=1@20,32,41,53,65,72,86,88,89,94,97,103
+ computer_system.vhd ghdl=1@20,23,25,32~,41,44,46,53~,65,68,72~,84~ nvc=1@20,32~,41,53~,65,72~,86,88,89,94~,97,103
 run alone:vests/vhdl-ams/ashenden/compliant/resolution/inline_01.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/resolution std=08 sha=0d2996fb2f8a2bdb
  inline_01.vhd ghdl=0 nvc=0
 run alone:vests/vhdl-ams/ashenden/compliant/resolution/inline_02.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/resolution std=08 sha=ae4642ca3caa84e0
@@ -2719,7 +2720,7 @@ run alone:vests/vhdl-ams/ashenden/compliant/resolution/inline_02.vhd dir=testdat
 run alone:vests/vhdl-ams/ashenden/compliant/resolution/inline_03.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/resolution std=08 sha=f00b86222fa67858
  inline_03.vhd ghdl=0 nvc=0
 run alone:vests/vhdl-ams/ashenden/compliant/resolution/memory_system.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/resolution std=08 sha=47c274156966cfd4
- memory_system.vhd ghdl=1@20,23,24,25,29~,36,39,40,41,45~,54,61~ nvc=1@20,29,36,45,54,61
+ memory_system.vhd ghdl=1@20,23,24,25,29~,36,39,40,41,45~,54,61~ nvc=1@20,29~,36,45~,54,61~
 run alone:vests/vhdl-ams/ashenden/compliant/resolution/misc_logic.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/resolution std=08 sha=3603fe45d1d3233b
  misc_logic.vhd ghdl=1@29,33,34,35,40,43 nvc=1@29
 run alone:vests/vhdl-ams/ashenden/compliant/resolution/resolve_tri_state_logic.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/resolution std=08 sha=3bb0cbb862d43b86
@@ -2731,7 +2732,7 @@ run alone:vests/vhdl-ams/ashenden/compliant/resolution/synchronize.vhd dir=testd
 run alone:vests/vhdl-ams/ashenden/compliant/resolution/synchronized_module.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/resolution std=08 sha=fbaf2165487b12bf
  synchronized_module.vhd ghdl=1@29,42,46,48,57,60,62 nvc=1@29,42,46,48,57,60,62
 run alone:vests/vhdl-ams/ashenden/compliant/resolution/tri_state_buffer.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/resolution std=08 sha=e98965c5543f7320
- tri_state_buffer.vhd ghdl=1@20,23,28~ nvc=1@20,28
+ tri_state_buffer.vhd ghdl=1@20,23,28~ nvc=1@20,28~
 run alone:vests/vhdl-ams/ashenden/compliant/resolution/words.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/resolution std=08 sha=6257d17c13d3abb2
  words.vhd ghdl=0 nvc=0
 run alone:vests/vhdl-ams/ashenden/compliant/scalar-data/ent.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/scalar-data std=08 sha=5274b85c9d20e7df
@@ -2899,7 +2900,7 @@ run alone:vests/vhdl-ams/ashenden/compliant/subprograms/v_source.vhd dir=testdat
 run alone:vests/vhdl-ams/ashenden/compliant/util/clock_duty.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/util std=08 sha=6e01a58a94bf6279
  clock_duty.vhd ghdl=0 nvc=0
 run alone:vests/vhdl-ams/ashenden/compliant/util/gain.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/util std=08 sha=f0328c670e632ba2
- gain.vhd ghdl=1@22,23,28 nvc=1@22,26,28
+ gain.vhd ghdl=1@22,23,28 nvc=1@22,26~,28
 run alone:vests/vhdl-ams/ashenden/compliant/util/resistor.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/util std=08 sha=a93c09506cd64d8d
  resistor.vhd ghdl=1@23,27,28,29,30 nvc=1@20
 run alone:vests/vhdl-ams/ashenden/compliant/util/src_constant.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/util std=08 sha=af69dcd51a25cb67
@@ -2909,9 +2910,9 @@ run alone:vests/vhdl-ams/ashenden/compliant/util/src_pulse.vhd dir=testdata/ghdl
 run alone:vests/vhdl-ams/ashenden/compliant/util/src_sine.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/util std=08 sha=231474d4222a8193
  src_sine.vhd ghdl=1@33,41,43,45,48,50,51,53 nvc=1@21
 run alone:vests/vhdl-ams/ashenden/compliant/util/stimulus_generators.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/util std=08 sha=0e427b5bf5c1fcbb
- stimulus_generators.vhd ghdl=1@30,37~ nvc=1@30,37
+ stimulus_generators.vhd ghdl=1@30,37~ nvc=1@30,37~
 run alone:vests/vhdl-ams/ashenden/compliant/util/sum2.vhd dir=testdata/ghdl/testsuite/vests/vhdl-ams/ashenden/compliant/util std=08 sha=5e41a83740325429
- sum2.vhd ghdl=1@22,23,28 nvc=1@22,26,28
+ sum2.vhd ghdl=1@22,23,28 nvc=1@22,26~,28
 run alone:vpi/vpi009/deposit_bug-simple.vhd dir=testdata/ghdl/testsuite/vpi/vpi009 std=08 sha=233ba9bd3ec178f1
  deposit_bug-simple.vhd ghdl=0 nvc=0
 run alone:vpi/vpi009/deposit_bug.vhdl dir=testdata/ghdl/testsuite/vpi/vpi009 std=08 sha=c4021c783d6880da

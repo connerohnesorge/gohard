@@ -9,8 +9,9 @@
 # follow). Each file line is the argument, the library when not work,
 # the GHDL options, then per tool the exit code and the lines of that
 # file it reports errors on; "~" marks a line whose only errors are
-# cascades ("<unit> was not analysed"). tools/oracle checks that GoHard
-# reports an error on every line both tools report one on
+# cascades (GHDL's "<unit> was not analysed", NVC's "... was analysed
+# with errors"). tools/oracle checks that GoHard reports an error on
+# every line both tools report one on, cascades aside
 # (semerr_check.go).
 tool ghdl 6.0.0
 tool nvc 1.23.0
@@ -392,14 +393,14 @@ run vests:vests/vhdl-93/ashenden/compliant/compliant.exp dir=testdata/ghdl/tests
  ch_13_fg_13_25.vhd lib=project_lib -Werror=runtime-error ghdl=0 nvc=0
  ch_13_fg_13_25.vhd -Werror=runtime-error ghdl=0 nvc=0
  ch_13_fg_13_26.vhd -Werror=runtime-error ghdl=0 nvc=1@32
- ch_14_ch_14_01.vhd -Werror=runtime-error ghdl=0 nvc=1@81,96,126
+ ch_14_ch_14_01.vhd -Werror=runtime-error ghdl=0 nvc=1@81,96,126~
  ch_14_fg_14_01.vhd lib=cell_lib -Werror=runtime-error ghdl=0 nvc=0
  ch_14_fg_14_01.vhd -Werror=runtime-error ghdl=0 nvc=0
  ch_14_fg_14_02.vhd -Werror=runtime-error ghdl=0 nvc=0
  ch_14_fg_14_04.vhd -Werror=runtime-error ghdl=0 nvc=0
  ch_14_fg_14_04.vhd lib=chip_lib -Werror=runtime-error ghdl=0 nvc=0
  ch_14_fg_14_06.vhd -Werror=runtime-error ghdl=0 nvc=0
- ch_14_fg_14_08.vhd -Werror=runtime-error ghdl=0 nvc=1@70,78,106
+ ch_14_fg_14_08.vhd -Werror=runtime-error ghdl=0 nvc=1@70,78,106~
  ch_14_fg_14_09.vhd -Werror=runtime-error ghdl=0 nvc=0
  ch_14_fg_14_10.vhd -Werror=runtime-error ghdl=0 nvc=1@35,44
  ch_14_fg_14_11.vhd -Werror=runtime-error ghdl=0 nvc=0
@@ -550,7 +551,7 @@ run vests:vests/vhdl-93/ashenden/compliant/compliant.exp dir=testdata/ghdl/tests
  ch_21_ch_21_01.vhd -Werror=runtime-error ghdl=0 nvc=0
  ch_21_ch_21_02.vhd -Werror=runtime-error ghdl=0 nvc=0
  ch_21_ch_21_03.vhd -Werror=runtime-error ghdl=0 nvc=0
- ch_21_fg_21_01.vhd -Werror=runtime-error ghdl=0 nvc=1@77,83,101
+ ch_21_fg_21_01.vhd -Werror=runtime-error ghdl=0 nvc=1@77,83,101~
  ch_21_fg_21_02.vhd -Werror=runtime-error ghdl=0 nvc=0
  ch_21_fg_21_03.vhd -Werror=runtime-error ghdl=0 nvc=0
  ch_21_fg_21_04.vhd -Werror=runtime-error ghdl=0 nvc=0
@@ -2238,9 +2239,9 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc89.vhd -Werror=runtime-error ghdl=1@47,48 nvc=1@47,48
  tc92.vhd -Werror=runtime-error ghdl=1@38 nvc=1@38
  tc93.vhd -Werror=runtime-error ghdl=1@42,43,44 nvc=1@42,43,44
- tc94.vhd -Werror=runtime-error ghdl=1@37,40~ nvc=1@37,40
- tc95.vhd -Werror=runtime-error ghdl=1@41,44~ nvc=1@41,44
- tc96.vhd -Werror=runtime-error ghdl=1@32,35~ nvc=1@32,35
+ tc94.vhd -Werror=runtime-error ghdl=1@37,40~ nvc=1@37,40~
+ tc95.vhd -Werror=runtime-error ghdl=1@41,44~ nvc=1@41,44~
+ tc96.vhd -Werror=runtime-error ghdl=1@32,35~ nvc=1@32,35~
  tc97.vhd -Werror=runtime-error ghdl=1@41 nvc=1@41
  tc101.vhd -Werror=runtime-error ghdl=1@32 nvc=1@41
  tc102.vhd -Werror=runtime-error ghdl=1@32 nvc=1@41
@@ -2258,9 +2259,9 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc123.vhd -Werror=runtime-error ghdl=1@32 nvc=1@42
  tc124.vhd -Werror=runtime-error ghdl=1@32 nvc=1@42
  tc125.vhd -Werror=runtime-error ghdl=1@32 nvc=1@42
- tc126.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,36
- tc127.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,37
- tc128.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,37
+ tc126.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,36~
+ tc127.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,37~
+ tc128.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,37~
  tc129.vhd -Werror=runtime-error ghdl=1@36 nvc=1@36
  tc130.vhd -Werror=runtime-error ghdl=1@36 nvc=1@36
  tc132.vhd -Werror=runtime-error ghdl=1@53 nvc=1@53
@@ -2271,7 +2272,7 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc145.vhd -Werror=runtime-error ghdl=1@33,62 nvc=1@62
  tc151.vhd -Werror=runtime-error ghdl=1@49,52,54,57 nvc=1@52,54,57
  tc152.vhd -Werror=runtime-error ghdl=1@49,57 nvc=1@57
- tc153.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,35,43,47
+ tc153.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,35~,43~,47~
  tc155.vhd -Werror=runtime-error ghdl=1@32,53 nvc=1@53
  tc156.vhd -Werror=runtime-error ghdl=1@60,70 nvc=1@70
  tc159.vhd -Werror=runtime-error ghdl=1@53 nvc=1@53
@@ -2324,7 +2325,7 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc249.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
  tc250.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
  tc252.vhd -Werror=runtime-error ghdl=1@36 nvc=1@36
- tc253.vhd -Werror=runtime-error ghdl=1@34,37~ nvc=1@34,37
+ tc253.vhd -Werror=runtime-error ghdl=1@34,37~ nvc=1@34,37~
  tc257.vhd -Werror=runtime-error ghdl=1@36 nvc=1@36
  tc266.vhd -Werror=runtime-error ghdl=1@35,36,39,40,41,42,43,44,45,46,47,53,54,56 nvc=1@36
  tc267.vhd -Werror=runtime-error ghdl=1@37,39,40,41,42,43,44,45,46,47,53,54,56 nvc=1@37
@@ -2359,7 +2360,7 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc332.vhd -Werror=runtime-error ghdl=1@36 nvc=1@36
  tc336.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
  tc338.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35,42,43
- tc340.vhd -Werror=runtime-error ghdl=1@35,36,44~ nvc=1@35,36,44
+ tc340.vhd -Werror=runtime-error ghdl=1@35,36,44~ nvc=1@35,36,44~
  tc342.vhd -Werror=runtime-error ghdl=1@40,41,44 nvc=1@40,41,44
  tc345.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
  tc348.vhd -Werror=runtime-error ghdl=1@53 nvc=1@53
@@ -2414,21 +2415,21 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc553.vhd -Werror=runtime-error ghdl=1@39 nvc=1@38
  tc714.vhd -Werror=runtime-error ghdl=1@33,35,44,46 nvc=1@33,46
  tc718.vhd -Werror=runtime-error ghdl=1@31,32 nvc=1@31,46
- tc721.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,37
- tc722.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,35
- tc723.vhd -Werror=runtime-error ghdl=1@33,34 nvc=1@33,36
- tc724.vhd -Werror=runtime-error ghdl=1@33,34,36 nvc=1@33,38
- tc725.vhd -Werror=runtime-error ghdl=1@34 nvc=1@34,38
+ tc721.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,37~
+ tc722.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,35~
+ tc723.vhd -Werror=runtime-error ghdl=1@33,34 nvc=1@33,36~
+ tc724.vhd -Werror=runtime-error ghdl=1@33,34,36 nvc=1@33,38~
+ tc725.vhd -Werror=runtime-error ghdl=1@34 nvc=1@34,38~
  tc726.vhd -Werror=runtime-error ghdl=1@32 nvc=1@33,46
- tc727.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,36
- tc728.vhd -Werror=runtime-error ghdl=1@33,34 nvc=1@33,36
- tc729.vhd -Werror=runtime-error ghdl=1@32,33,34 nvc=1@32,36
- tc730.vhd -Werror=runtime-error ghdl=1@34 nvc=1@34,38
+ tc727.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,36~
+ tc728.vhd -Werror=runtime-error ghdl=1@33,34 nvc=1@33,36~
+ tc729.vhd -Werror=runtime-error ghdl=1@32,33,34 nvc=1@32,36~
+ tc730.vhd -Werror=runtime-error ghdl=1@34 nvc=1@34,38~
  tc732.vhd -Werror=runtime-error ghdl=1@33 nvc=1@34,47
  tc733.vhd -Werror=runtime-error ghdl=1@65,66 nvc=1@65,66,75
- tc734.vhd -Werror=runtime-error ghdl=1@34,35 nvc=1@34,35,42,73
- tc735.vhd -Werror=runtime-error ghdl=1@39,47~,62~ nvc=1@39,47,71,79,87
- tc736.vhd -Werror=runtime-error ghdl=1@53,62~,76~ nvc=1@53,62,81,94
+ tc734.vhd -Werror=runtime-error ghdl=1@34,35 nvc=1@34,35,42~,73~
+ tc735.vhd -Werror=runtime-error ghdl=1@39,47~,62~ nvc=1@39,47~,71,79~,87
+ tc736.vhd -Werror=runtime-error ghdl=1@53,62~,76~ nvc=1@53,62~,81,94~
  tc764.vhd -Werror=runtime-error ghdl=1@48 nvc=1@48
  tc766.vhd -Werror=runtime-error ghdl=1@58 nvc=1@58
  tc767.vhd -Werror=runtime-error ghdl=1@55 nvc=1@55
@@ -2438,25 +2439,25 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc773.vhd -Werror=runtime-error ghdl=1@55 nvc=1@55
  tc774.vhd -Werror=runtime-error ghdl=1@55 nvc=1@55
  tc775.vhd -Werror=runtime-error ghdl=1@55 nvc=1@55
- tc783.vhd -Werror=runtime-error ghdl=1@36 nvc=1@36,38,54,56,57,58,59,60
+ tc783.vhd -Werror=runtime-error ghdl=1@36 nvc=1@36,38,54~,56,57,58,59,60
  tc785.vhd -Werror=runtime-error ghdl=1@31,32,36 nvc=1@32,34
  tc786.vhd -Werror=runtime-error ghdl=1@35,36 nvc=1@35,36
- tc787.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,35
+ tc787.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,35~
  tc788.vhd -Werror=runtime-error ghdl=1@32,34 nvc=1@32,34
- tc789.vhd -Werror=runtime-error ghdl=1@32 nvc=1@36
+ tc789.vhd -Werror=runtime-error ghdl=1@32 nvc=1@36~
  tc790.vhd -Werror=runtime-error ghdl=1@31,32,35 nvc=1@32,35
- tc793.vhd -Werror=runtime-error ghdl=1@36,40~ nvc=1@36,40
- tc794.vhd -Werror=runtime-error ghdl=1@33,34 nvc=1@33,37
- tc795.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc796.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc797.vhd -Werror=runtime-error ghdl=1@34,37~ nvc=1@34,37
+ tc793.vhd -Werror=runtime-error ghdl=1@36,40~ nvc=1@36,40~
+ tc794.vhd -Werror=runtime-error ghdl=1@33,34 nvc=1@33,37~
+ tc795.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc796.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc797.vhd -Werror=runtime-error ghdl=1@34,37~ nvc=1@34,37~
  tc798.vhd -Werror=runtime-error ghdl=1@34,39,40 nvc=1@34,39
  tc799.vhd -Werror=runtime-error ghdl=1@34,38 nvc=1@34,38
  tc800.vhd -Werror=runtime-error ghdl=1@34,35 nvc=1@34,35
- tc801.vhd -Werror=runtime-error ghdl=1@34 nvc=1@34,37
- tc802.vhd -Werror=runtime-error ghdl=1@34 nvc=1@34,37
- tc803.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc804.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
+ tc801.vhd -Werror=runtime-error ghdl=1@34 nvc=1@34,37~
+ tc802.vhd -Werror=runtime-error ghdl=1@34 nvc=1@34,37~
+ tc803.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc804.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
  tc808.vhd -Werror=runtime-error ghdl=1@36 nvc=1@36,42,43
  tc809.vhd -Werror=runtime-error ghdl=1@36,40,46,47,49 nvc=1@36
  tc810.vhd -Werror=runtime-error ghdl=1@37,42,43,45 nvc=1@37,42,43
@@ -2488,12 +2489,12 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc847.vhd -Werror=runtime-error ghdl=1@75 nvc=1@75
  tc848.vhd -Werror=runtime-error ghdl=1@66,69 nvc=1@66,69
  tc875.vhd -Werror=runtime-error ghdl=1@60 nvc=1@60
- tc899.vhd -Werror=runtime-error ghdl=1@57,68~ nvc=1@57,64,68
- tc901.vhd -Werror=runtime-error ghdl=1@43 nvc=1@32,36,43
- tc903.vhd -Werror=runtime-error ghdl=1@45 nvc=1@33,38,45
- tc904.vhd -Werror=runtime-error ghdl=1@43 nvc=1@32,36,43
- tc905.vhd -Werror=runtime-error ghdl=1@43 nvc=1@32,36,43
- tc906.vhd -Werror=runtime-error ghdl=1@46 nvc=1@32,39,46
+ tc899.vhd -Werror=runtime-error ghdl=1@57,68~ nvc=1@57,64,68~
+ tc901.vhd -Werror=runtime-error ghdl=1@43 nvc=1@32,36~,43
+ tc903.vhd -Werror=runtime-error ghdl=1@45 nvc=1@33,38~,45
+ tc904.vhd -Werror=runtime-error ghdl=1@43 nvc=1@32,36~,43
+ tc905.vhd -Werror=runtime-error ghdl=1@43 nvc=1@32,36~,43
+ tc906.vhd -Werror=runtime-error ghdl=1@46 nvc=1@32,39~,46
  tc907.vhd -Werror=runtime-error ghdl=1@45,54~ nvc=1@45
  tc908.vhd -Werror=runtime-error ghdl=1@45,54~ nvc=1@45,58
  tc909.vhd -Werror=runtime-error ghdl=1@43 nvc=1@43
@@ -2501,7 +2502,7 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc928.vhd -Werror=runtime-error ghdl=1@47 nvc=0
  tc929.vhd -Werror=runtime-error ghdl=1@40 nvc=1@40
  tc937.vhd -Werror=runtime-error ghdl=1@54 nvc=1@54
- tc939.vhd -Werror=runtime-error ghdl=1@38,40,43,47~ nvc=1@40,43,47
+ tc939.vhd -Werror=runtime-error ghdl=1@38,40,43,47~ nvc=1@40,43,47~
  tc941.vhd -Werror=runtime-error ghdl=1@39 nvc=1@39
  tc944.vhd -Werror=runtime-error ghdl=1@38 nvc=1@38
  tc946.vhd -Werror=runtime-error ghdl=1@43 nvc=1@43
@@ -2544,7 +2545,7 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc1005.vhd -Werror=runtime-error ghdl=1@43 nvc=1@43
  tc1006.vhd -Werror=runtime-error ghdl=1@43 nvc=1@43
  tc1007.vhd -Werror=runtime-error ghdl=1@43 nvc=1@43
- tc1008.vhd -Werror=runtime-error ghdl=1@35,39~ nvc=1@35,39
+ tc1008.vhd -Werror=runtime-error ghdl=1@35,39~ nvc=1@35,39~
  tc1014.vhd -Werror=runtime-error ghdl=1@38,40 nvc=1@38,40
  tc1015.vhd -Werror=runtime-error ghdl=1@52 nvc=1@43,52
  tc1016.vhd -Werror=runtime-error ghdl=1@48 nvc=1@48
@@ -2735,7 +2736,7 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc1378.vhd -Werror=runtime-error ghdl=1@46 nvc=1@46
  tc1379.vhd -Werror=runtime-error ghdl=1@47 nvc=1@47
  tc1380.vhd -Werror=runtime-error ghdl=1@41 nvc=1@41
- tc1381.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,35,39
+ tc1381.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,35~,39~
  tc1382.vhd -Werror=runtime-error ghdl=1@41 nvc=1@41
  tc1383.vhd -Werror=runtime-error ghdl=1@41 nvc=1@41
  tc1384.vhd -Werror=runtime-error ghdl=1@42 nvc=1@42
@@ -2847,8 +2848,8 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc1615.vhd -Werror=runtime-error ghdl=1@37 nvc=1@38,47,48
  tc1616.vhd -Werror=runtime-error ghdl=1@46 nvc=1@41,46
  tc1618.vhd -Werror=runtime-error ghdl=1@38 nvc=1@38
- tc1620.vhd -Werror=runtime-error ghdl=1@31,32,33 nvc=1@32,35
- tc1621.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
+ tc1620.vhd -Werror=runtime-error ghdl=1@31,32,33 nvc=1@32,35~
+ tc1621.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
  tc1622.vhd -Werror=runtime-error ghdl=1@35,36,44 nvc=1@35
  tc1623.vhd -Werror=runtime-error ghdl=1@37 nvc=1@37
  tc1624.vhd -Werror=runtime-error ghdl=1@31,32,33 nvc=1@32
@@ -3243,7 +3244,7 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc2413.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
  tc2414.vhd -Werror=runtime-error ghdl=1@40 nvc=1@40
  tc2416.vhd -Werror=runtime-error ghdl=1@44 nvc=1@44
- tc2418.vhd -Werror=runtime-error ghdl=1@52 nvc=1@38,41,52,53
+ tc2418.vhd -Werror=runtime-error ghdl=1@52 nvc=1@38,41~,52,53
  tc2419.vhd -Werror=runtime-error ghdl=1@33,46 nvc=1@46
  tc2420.vhd -Werror=runtime-error ghdl=1@45,48 nvc=1@48
  tc2422.vhd -Werror=runtime-error ghdl=1@47 nvc=1@47
@@ -3269,7 +3270,7 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc2470.vhd -Werror=runtime-error ghdl=1@49 nvc=1@49
  tc2473.vhd -Werror=runtime-error ghdl=1@45 nvc=1@45
  tc2476.vhd -Werror=runtime-error ghdl=1@40,47 nvc=1@47
- tc2482.vhd -Werror=runtime-error ghdl=1@51 nvc=1@33,36,51
+ tc2482.vhd -Werror=runtime-error ghdl=1@51 nvc=1@33,36~,51
  tc2488.vhd -Werror=runtime-error ghdl=1@45 nvc=1@45
  tc2489.vhd -Werror=runtime-error ghdl=1@50 nvc=1@50
  tc2490.vhd -Werror=runtime-error ghdl=1@51 nvc=1@51
@@ -3312,9 +3313,9 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc2561.vhd -Werror=runtime-error ghdl=1@46 nvc=0
  tc2571.vhd -Werror=runtime-error ghdl=1@39,42 nvc=1@39,42
  tc2574.vhd -Werror=runtime-error ghdl=1@35 nvc=0
- tc2576.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,37
+ tc2576.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,37~
  tc2577.vhd -Werror=runtime-error ghdl=1@36 nvc=1@36
- tc2579.vhd -Werror=runtime-error ghdl=1@34,42 nvc=1@34,40,42
+ tc2579.vhd -Werror=runtime-error ghdl=1@34,42 nvc=1@34,40~,42
  tc2580.vhd -Werror=runtime-error ghdl=1@38 nvc=1@38,40
  tc2581.vhd -Werror=runtime-error ghdl=1@38 nvc=1@38
  tc2582.vhd -Werror=runtime-error ghdl=1@38 nvc=1@38
@@ -3409,30 +3410,30 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc2673.vhd -Werror=runtime-error ghdl=1@38 nvc=1@38
  tc2674.vhd -Werror=runtime-error ghdl=1@38 nvc=1@38
  tc2678.vhd -Werror=runtime-error ghdl=1@35,37 nvc=1@37
- tc2680.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc2681.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc2682.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc2683.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc2684.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
+ tc2680.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc2681.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc2682.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc2683.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc2684.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
  tc2685.vhd -Werror=runtime-error ghdl=1@33 nvc=0
- tc2686.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc2687.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc2688.vhd -Werror=runtime-error ghdl=1@32,35~ nvc=1@32,35
- tc2689.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc2691.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
+ tc2686.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc2687.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc2688.vhd -Werror=runtime-error ghdl=1@32,35~ nvc=1@32,35~
+ tc2689.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc2691.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
  tc2692.vhd -Werror=runtime-error ghdl=1@33 nvc=1@34,47
- tc2693.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc2694.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc2695.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
- tc2696.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
+ tc2693.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc2694.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc2695.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
+ tc2696.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
  tc2706.vhd -Werror=runtime-error ghdl=1@40 nvc=1@40
  tc2714.vhd -Werror=runtime-error ghdl=1@39 nvc=1@39
  tc2715.vhd -Werror=runtime-error ghdl=1@40 nvc=1@40
  tc2716.vhd -Werror=runtime-error ghdl=1@40 nvc=1@40
  tc2717.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
- tc2720.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
+ tc2720.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
  tc2721.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
- tc2723.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36
+ tc2723.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,36~
  tc2727.vhd -Werror=runtime-error ghdl=1@40 nvc=1@40
  tc2728.vhd -Werror=runtime-error ghdl=1@40 nvc=1@40
  tc2729.vhd -Werror=runtime-error ghdl=1@40 nvc=1@40
@@ -3546,16 +3547,16 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc2869.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
  tc2871.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35,42,43
  tc2872.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
- tc2873.vhd -Werror=runtime-error ghdl=1@33,34 nvc=1@33,39
- tc2875.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,39
+ tc2873.vhd -Werror=runtime-error ghdl=1@33,34 nvc=1@33,39~
+ tc2875.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,39~
  tc2877.vhd -Werror=runtime-error ghdl=1@33,34 nvc=1@33,44
- tc2878.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,38
- tc2884.vhd -Werror=runtime-error ghdl=1@35,39~ nvc=1@35,39
- tc2885.vhd -Werror=runtime-error ghdl=1@35,40~ nvc=1@35,40
+ tc2878.vhd -Werror=runtime-error ghdl=1@33 nvc=1@33,38~
+ tc2884.vhd -Werror=runtime-error ghdl=1@35,39~ nvc=1@35,39~
+ tc2885.vhd -Werror=runtime-error ghdl=1@35,40~ nvc=1@35,40~
  tc2886.vhd -Werror=runtime-error ghdl=1@38,46,52 nvc=1@38,46,52
  tc2887.vhd -Werror=runtime-error ghdl=1@38,46,52,53 nvc=1@38,46,52,53
  tc2888.vhd -Werror=runtime-error ghdl=1@38,42 nvc=1@38,42
- tc2889.vhd -Werror=runtime-error ghdl=1@35,39~ nvc=1@35,39
+ tc2889.vhd -Werror=runtime-error ghdl=1@35,39~ nvc=1@35,39~
  tc2890.vhd -Werror=runtime-error ghdl=1@38,42 nvc=1@38,42
  tc2891.vhd -Werror=runtime-error ghdl=1@38,47,54,55 nvc=1@38,47,54,55
  tc2892.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
@@ -3601,8 +3602,8 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc2940.vhd -Werror=runtime-error ghdl=1@31,35~ nvc=0
  tc2941.vhd -Werror=runtime-error ghdl=1@36,44~ nvc=1@36
  tc2942.vhd -Werror=runtime-error ghdl=1@36,44~ nvc=1@36
- tc2943.vhd -Werror=runtime-error ghdl=1@34,40~ nvc=1@34,40
- tc2944.vhd -Werror=runtime-error ghdl=1@35,41~ nvc=1@35,41
+ tc2943.vhd -Werror=runtime-error ghdl=1@34,40~ nvc=1@34,40~
+ tc2944.vhd -Werror=runtime-error ghdl=1@35,41~ nvc=1@35,41~
  tc2946.vhd -Werror=runtime-error ghdl=1@38 nvc=1@38
  tc2947.vhd -Werror=runtime-error ghdl=1@43 nvc=1@43
  tc2953.vhd -Werror=runtime-error ghdl=1@38 nvc=1@38
@@ -3611,7 +3612,7 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc2957.vhd -Werror=runtime-error ghdl=1@40,41,43 nvc=1@40,56
  tc2958.vhd -Werror=runtime-error ghdl=1@40 nvc=1@41,58
  tc2963.vhd -Werror=runtime-error ghdl=1@43,49,55,61,67,73,79,85,90 nvc=1@43,90,103,104,105,106,107,108,109,110
- tc2965.vhd -Werror=runtime-error ghdl=1@59 nvc=1@33,36,59,60
+ tc2965.vhd -Werror=runtime-error ghdl=1@59 nvc=1@33,36~,59,60
  tc2970.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
  tc2971.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
  tc2983.vhd -Werror=runtime-error ghdl=1@33,35 nvc=1@33,38
@@ -3639,20 +3640,20 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc3012.vhd -Werror=runtime-error ghdl=1@37,45~ nvc=1@37
  tc3013.vhd -Werror=runtime-error ghdl=1@34,36 nvc=1@34
  tc3014.vhd -Werror=runtime-error ghdl=1@44,48 nvc=1@51
- tc3015.vhd -Werror=runtime-error ghdl=1@31,32,34 nvc=1@32,36
+ tc3015.vhd -Werror=runtime-error ghdl=1@31,32,34 nvc=1@32,36~
  tc3017.vhd -Werror=runtime-error ghdl=1@34,35,38,42,43,46 nvc=1@31
  tc3019.vhd -Werror=runtime-error ghdl=1@31~,38~ nvc=1@31
  tc3020.vhd -Werror=runtime-error ghdl=1@31 nvc=1@31
- tc3021.vhd -Werror=runtime-error ghdl=1@31 nvc=1@31,37
- tc3025.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,34,38,46
+ tc3021.vhd -Werror=runtime-error ghdl=1@31 nvc=1@31,37~
+ tc3025.vhd -Werror=runtime-error ghdl=1@32 nvc=1@32,34~,38~,46~
  tc3026.vhd -Werror=runtime-error ghdl=1@36 nvc=1@36
  tc3027.vhd -Werror=runtime-error ghdl=1@35 nvc=1@35
- tc3028.vhd -Werror=runtime-error ghdl=1@31,38~ nvc=1@31,38
+ tc3028.vhd -Werror=runtime-error ghdl=1@31,38~ nvc=1@31,38~
  tc3030.vhd -Werror=runtime-error ghdl=1@31~,37~ nvc=1@31
  tc3031.vhd -Werror=runtime-error ghdl=1@31~ nvc=1@31
  tc3058.vhd -Werror=runtime-error ghdl=1@36 nvc=1@36
  tc3064.vhd -Werror=runtime-error ghdl=1@44 nvc=1@44,55,57
- tc3088.vhd -Werror=runtime-error ghdl=1@35,38~ nvc=1@35,38
+ tc3088.vhd -Werror=runtime-error ghdl=1@35,38~ nvc=1@35,38~
  tc3089.vhd -Werror=runtime-error ghdl=1@37 nvc=1@37
  tc3091.vhd -Werror=runtime-error ghdl=1@37 nvc=1@37,44,45
  tc3092.vhd -Werror=runtime-error ghdl=1@37 nvc=1@38,44,45
@@ -3663,7 +3664,7 @@ run vests:vests/vhdl-93/billowitch/non_compliant/analyzer_failure/non_compliant.
  tc3097.vhd -Werror=runtime-error ghdl=1@37 nvc=1@37
  tc3098.vhd -Werror=runtime-error ghdl=1@39,41 nvc=1@41
  tc3103.vhd -Werror=runtime-error ghdl=1@38,39 nvc=0
- tc3104.vhd -Werror=runtime-error ghdl=1@34,38~ nvc=1@34,38
+ tc3104.vhd -Werror=runtime-error ghdl=1@34,38~ nvc=1@34,38~
  tc3105.vhd -Werror=runtime-error ghdl=1@38 nvc=1@38
  tc3106.vhd -Werror=runtime-error ghdl=1@45 nvc=0
  tc3107.vhd -Werror=runtime-error ghdl=1@42 nvc=0

@@ -219,6 +219,7 @@ func (s *session) run() *Result {
 		f.Units = scanFile(f)
 		s.units = append(s.units, f.Units...)
 		s.diags = append(s.diags, f.Parse.Diagnostics(f.Path)...)
+		s.diags = append(s.diags, directiveRules(f, s.std)...) // lexrules.go
 	}
 	offset := 0
 	if s.base != nil {
@@ -235,6 +236,9 @@ func (s *session) run() *Result {
 		return nil
 	}
 	s.resolveLate()         // libs.go
+	s.missingBodies()       // units.go
+	s.configurationRules()  // config.go
+	s.calledBeforeBody()    // units.go
 	s.libraryDiagnostics()  // libs.go
 	s.opaqueUnits()         // unsupported.go
 	inc := s.staticChecks() // static.go

@@ -195,6 +195,7 @@ func FuzzLSPReplay(f *testing.F) {
 		if len(sess.Messages) > 200 {
 			return
 		}
+		totalAnalyzers(sess.Messages)
 		file, err := sess.Marshal()
 		if err != nil {
 			return
@@ -219,6 +220,33 @@ func FuzzLSPReplay(f *testing.F) {
 		}()
 		replaySeed(t, file, "fuzz")
 	})
+}
+
+// fuzzAnalyzers are the analyzers a fuzzed session can name.
+var fuzzAnalyzers = []string{"", "echo", "format", "nop"}
+
+// totalAnalyzers makes the fuzzer's decoding of analyzer entries
+// total: an {"$gohard":"analyzer"} line naming an analyzer the harness
+// does not know is rewritten in place to name a known one, picked
+// from the bytes of the unknown name, so every input replays with a
+// valid analyzer instead of failing the harness.
+func totalAnalyzers(msgs []json.RawMessage) {
+	for i, line := range msgs {
+		name, err := server.SessionAnalyzer(repro.Session{
+			Messages: []json.RawMessage{line}})
+		if err != nil || name == "" {
+			continue
+		}
+		if _, ok := analyzerNamed(name); ok {
+			continue
+		}
+		sum := 0
+		for _, c := range []byte(name) {
+			sum += int(c)
+		}
+		msgs[i] = server.AnalyzerLine(
+			fuzzAnalyzers[sum%len(fuzzAnalyzers)])
+	}
 }
 
 // readCorpusFile decodes a one-argument []byte corpus file.

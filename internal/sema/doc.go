@@ -68,6 +68,11 @@
 //     of their port-map actuals.
 //   - types.go: expression typing (operand/expr/settle, literals,
 //     aggregates, ranges, conditions, expect for sema/type-mismatch).
+//   - typecheck.go: the typing rules types.go, typedecl.go and
+//     overload.go hook in (#34): literal and aggregate contexts,
+//     conversion operands, range and constraint types, case
+//     expressions, record others, protected types and their methods,
+//     VHDL-93 use-visible homographs.
 //   - overload.go: overload resolution (fit, match, choose, finishCall;
 //     the Overload result with candidates and reasons; Signature).
 //   - libs.go: library diagnostics (library/unmapped with quick-fix

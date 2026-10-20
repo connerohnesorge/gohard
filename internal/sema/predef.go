@@ -97,6 +97,12 @@ func (a *analyzer) declareOp(o opSpec, d *Decl, t *Type) *Decl {
 	if !o.name.IsOperator() {
 		f.Text = o.name.Upper()
 	}
+	if a.inStandard && d.First > f.First {
+		// A std.standard type of a later standard (BOOLEAN_VECTOR,
+		// INTEGER_VECTOR: VHDL-2008) has no subtype an older view
+		// keeps, so its operations are as new as it is.
+		f.First = d.First
+	}
 	for i, pt := range o.params {
 		name := "anonymous"
 		switch {
