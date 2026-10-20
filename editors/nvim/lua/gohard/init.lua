@@ -136,6 +136,9 @@ end
 --- setup starts gohard for every buffer of a configured filetype.
 ---@param opts? gohard.Options
 function M.setup(opts)
+  if not require('gohard.compat').check() then
+    return
+  end
   M.options = vim.tbl_deep_extend('force', vim.deepcopy(M.defaults),
     opts or {})
   require('gohard.commands').create()

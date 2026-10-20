@@ -5,4 +5,7 @@ if vim.g.loaded_gohard then
   return
 end
 vim.g.loaded_gohard = 1
+if not require('gohard.compat').check() then
+  return
+end
 require('gohard.commands').create()

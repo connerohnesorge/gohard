@@ -25,8 +25,10 @@ Check it with `gohard version`.
 
 ## Neovim
 
-The plugin is in `editors/nvim/` and needs Neovim 0.10 or later. It
-does three things:
+The plugin is in `editors/nvim/` and needs Neovim 0.10 or later. CI
+runs its end-to-end test on 0.10.4 and on the current Neovim. On an
+older Neovim the plugin loads nothing and reports the version it
+needs. It does three things:
 
 * starts `gohard lsp` for VHDL buffers
 * shows the simulation code lens

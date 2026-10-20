@@ -10,6 +10,8 @@
 
 local M = {}
 
+local compat = require('gohard.compat')
+
 local function gohard()
   return require('gohard')
 end
@@ -40,7 +42,7 @@ function M.lenses(bufnr)
   if not client then
     return {}, nil
   end
-  local res = client:request_sync('textDocument/codeLens', {
+  local res = compat.request_sync(client, 'textDocument/codeLens', {
     textDocument = vim.lsp.util.make_text_document_params(bufnr),
   }, 10000, bufnr)
   if not res or res.err or not res.result then
@@ -48,8 +50,10 @@ function M.lenses(bufnr)
   end
   local out = {}
   for _, l in ipairs(res.result) do
-    if not l.command and client:supports_method('codeLens/resolve') then
-      local r = client:request_sync('codeLens/resolve', l, 10000, bufnr)
+    if not l.command and
+        compat.supports_method(client, 'codeLens/resolve', bufnr) then
+      local r = compat.request_sync(client, 'codeLens/resolve', l, 10000,
+        bufnr)
       l = r and r.result or l
     end
     table.insert(out, l)
@@ -123,7 +127,7 @@ function M.execute(client, bufnr, cmd, on_result)
     end
     return
   end
-  client:exec_cmd(cmd, { bufnr = bufnr }, function(err, result, ctx)
+  compat.exec_cmd(client, cmd, { bufnr = bufnr }, function(err, result, ctx)
     if err then
       notify(err.message or tostring(err), vim.log.levels.ERROR)
     end

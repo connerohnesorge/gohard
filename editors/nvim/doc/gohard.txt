@@ -2,6 +2,8 @@
 
 SETUP                                                   *gohard-setup*
 
+Needs Neovim 0.10 or later; older versions get an error and no setup.
+
     require('gohard').setup({ cmd = { 'gohard', 'lsp' } })
 
 Options (all optional): `cmd`, `filetypes` ({ 'vhdl' }), `root_markers`

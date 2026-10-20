@@ -93,13 +93,24 @@ jobs:
       - name: go test -race
         run: bash scripts/ci/race.sh
 
-  # The headless Neovim end-to-end test (#38). Neovim comes from the
-  # flake's dev shell, the same one used locally. The Helix stdio test,
-  # the liveness workload and FuzzLSPReplay run in `check` (go test).
+  # The headless Neovim end-to-end test (#38) on the oldest supported
+  # Neovim (0.10.4, #41) and the current one. The current Neovim comes
+  # from the flake's dev shell, the same one used locally; 0.10.4 from
+  # a nixpkgs commit pinned by hash (the last before 0.11.0), put ahead
+  # of it on PATH. The Helix stdio test, the liveness workload and
+  # FuzzLSPReplay run in `check` (go test).
   editors:
-    name: neovim (ubuntu-latest)
+    name: neovim ${{ matrix.nvim }} (ubuntu-latest)
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nvim: '0.10.4'
+            nixpkgs: 4024d3c5e719281489a894872137b04304cebcac
+          - nvim: current
+            nixpkgs: ''
     defaults:
       run:
         shell: bash
@@ -115,7 +126,14 @@ jobs:
       - name: Headless Neovim end-to-end test
         env:
           GOHARD_MEMCAP: '0'
-        run: nix develop -c bash scripts/ci/nvim.sh
+          NIXPKGS_REV: ${{ matrix.nixpkgs }}
+        run: |
+          if [ -n "$NIXPKGS_REV" ]; then
+            nix develop -c nix shell "github:NixOS/nixpkgs/$NIXPKGS_REV#neovim" \
+              -c bash scripts/ci/nvim.sh
+          else
+            nix develop -c bash scripts/ci/nvim.sh
+          fi
 
   install:
     name: go install (ubuntu-latest)

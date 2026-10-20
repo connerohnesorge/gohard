@@ -34,6 +34,7 @@ end
 
 local gohard = require('gohard')
 local commands = require('gohard.commands')
+local compat = require('gohard.compat')
 gohard.setup({ cmd = { bin, 'lsp' } })
 
 --- open edits path and waits for an initialized gohard client.
@@ -152,8 +153,8 @@ local function testbench(name, want_exit)
   -- lens) from the server; the plugin has no viewer setting (#36).
   local p = vim.lsp.util.make_range_params(0, 'utf-8')
   p.context = { diagnostics = {} }
-  local acts = client:request_sync('textDocument/codeAction', p, 20000,
-    buf)
+  local acts = compat.request_sync(client, 'textDocument/codeAction', p,
+    20000, buf)
   local titles = {}
   for _, a in ipairs(acts and acts.result or {}) do
     table.insert(titles, a.title)
@@ -202,7 +203,7 @@ local function at(buf, line, col)
 end
 
 local function request(client, buf, method, params)
-  local r = client:request_sync(method, params, 20000, buf)
+  local r = compat.request_sync(client, method, params, 20000, buf)
   if not r then
     return nil, 'timeout'
   end
@@ -382,7 +383,7 @@ end)
 check(ok, 'the test ran to the end%s', ok and '' or (': ' .. tostring(e)))
 
 for _, c in ipairs(vim.lsp.get_clients({ name = 'gohard' })) do
-  c:stop()
+  compat.stop(c)
 end
 wait(5000, function()
   return #vim.lsp.get_clients({ name = 'gohard' }) == 0
