@@ -29,6 +29,8 @@ trees, and must match the committed files.
 | `mkdir PATH` | Creates a directory, for example `.git`, which git cannot store. |
 | `cwd PATH` | Runs the command from PATH instead of the temp dir. |
 | `env NAME=VALUE` | Overrides an environment variable seen through the Env. |
+| `rand STATE` | Replaces the Env's random source with `env.SplitMix64{State: STATE}`, so `--seed random` picks the same seed every run. |
+| `requires interpreter` | Skips the case while no sequential interpreter is registered (`simrun.DefaultCode` is nil); the case's want files are created with `-update` once it is. |
 | `stdout broken` | Standard output fails every write, like a closed pipe (`env.ErrBrokenPipe`): the run keeps its exit code. |
 | `stdout full` | Standard output fails every write, like a full disk: the run logs `cli/output-failed` and exits 2. |
 | `tamper-stdlib PATH` | The bundled std/ieee file PATH (as `ieee/numeric_std.vhdl`) fails its integrity check, through the `stdlib.WithTamper` context hook (#33): the run reports `stdlib/integrity` and exits 2. |

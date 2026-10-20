@@ -26,6 +26,9 @@ type File struct {
 	Lines   *span.Index
 	// Units are the design units of the file in source order.
 	Units []*Unit
+	// PSL holds the typed VHDL expressions inside the file's PSL code
+	// (booleans, clocks), by node span; see File.PSLExpr (psl.go).
+	PSL map[cst.Range]*Expr
 }
 
 // Root returns the red root of the file's tree.
@@ -119,13 +122,19 @@ type Unit struct {
 	// in its library; it is analyzed but not visible to other units.
 	Duplicate bool
 
-	uses  []unitRef         // syntactic library-unit references
-	diags []diag.Diagnostic // the unit job's diagnostics
+	uses []unitRef // syntactic library-unit references
+	// allLibs are the libraries of the unit's use clauses L.all.
+	allLibs []Key
+	diags   []diag.Diagnostic // the unit job's diagnostics
 	// missing records lib.unit names that did not resolve, for
 	// library/missing-unit (libs.go).
 	missing []unitRef
 	// late are architecture references resolved after every unit.
 	late []lateRef
+	// unitAttrs are the attributes the unit's attribute
+	// specifications give the unit itself (`attribute A of e :
+	// entity is ...`), for lib.e'A where A is not visible (names.go).
+	unitAttrs []*Decl
 }
 
 // Label returns "lib.name" or, for secondary units, "lib.of(name)" /
@@ -496,6 +505,9 @@ type Library struct {
 	units     map[Key]*Unit   // primary units
 	secondary map[Key][]*Unit // by primary unit name, sorted by Index
 	order     []*Unit         // every unit in canonical order
+	// replaced maps a primary unit to the earlier unit of its file it
+	// replaced (library.go, replace).
+	replaced map[*Unit]*Unit
 }
 
 // Unit returns the primary unit named k.
@@ -505,6 +517,27 @@ func (l *Library) Unit(k Key) (*Unit, bool) {
 	}
 	u, ok := l.units[k]
 	return u, ok
+}
+
+// UnitFrom returns the primary unit named k as unit from sees it: the
+// visible unit, or, for a unit of the same design file before the unit
+// that replaced it there, the earlier one (LRM 13.5: units of a file
+// are analyzed in textual order).
+func (l *Library) UnitFrom(k Key, from *Unit) (*Unit, bool) {
+	u, ok := l.Unit(k)
+	if !ok || from == nil || from.File == nil || from.Node.IsZero() {
+		return u, ok
+	}
+	at := from.Node.Span().Start
+	for u.File == from.File && !u.Node.IsZero() &&
+		u.Node.Span().Start > at {
+		old, ok := l.replaced[u]
+		if !ok {
+			break
+		}
+		u = old
+	}
+	return u, true
 }
 
 // Secondary returns the architectures of entity k (or the body of

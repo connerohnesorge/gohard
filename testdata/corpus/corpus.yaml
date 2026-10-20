@@ -6,9 +6,10 @@
 #
 # `trace_sha256`, `oracle_sha256`, `format_oracle_sha256` and
 # `semerr_sha256` are written by `go run ./tools/oracle --update`, which
-# rewrites only changed hashes. Until the #36 canonical trace format and
-# its oracle sections exist, `trace_sha256` and `oracle_sha256` hold the
-# literal value `pending`; `format_oracle_sha256` (#32) and
+# rewrites only changed hashes. `oracle_sha256` covers the GHDL/NVC trace
+# and --disp-tree recordings (or the hand-checked hierarchy);
+# `trace_sha256` holds the literal value `pending` until the sequential
+# interpreter writes golden/trace.txt; `format_oracle_sha256` (#32) and
 # `semerr_sha256` (#34, in each design and in the ghdl and nvc
 # regression entries) are always recorded.
 
@@ -168,8 +169,8 @@ designs:
           GoHard's default simulation.stop_level (error) and #20's exit 1 for
           severity error match NVC's default; the recorded GHDL command adds
           --assert-level=error so both tools give the same outcome.
-    trace_sha256: pending
-    oracle_sha256: pending
+    trace_sha256: bf68151e0b8890502a387f6adfa5e545025e88442c86050a220fe342566ba104
+    oracle_sha256: 15a127bdfd151f6c5732db18348ccdacb4fc69fdf0e35277beeee7787abd51d3
     format_oracle_sha256: 94f4f084426baf39982f1199a3a23095a90d765a82ba68fd130a51b51e9c4704
     semerr_sha256: d4df6cca09a6319134abeaead1e3422770b7bb5bdda0cf25b9d73d51b258b0f5
   - name: budget_hang
@@ -191,7 +192,7 @@ designs:
       messages:
         - severity: error
           code: sim/budget-exceeded
-          text: time_budget
+          text: time budget of 1 ms
           time: 1 ms
     features: []
     invariants: [seed_independent, variant_stable, hits_budget]
@@ -228,8 +229,8 @@ designs:
         Stops silently at --stop-time with exit 0; also checked with
         --stop-time=10ms (exit 0, about 0.4 s of run time).
     disagreements: []
-    trace_sha256: pending
-    oracle_sha256: pending
+    trace_sha256: 5fc63ea977c275242a412664f55f7b2242ed0e22da9ffc158f7c75027c839967
+    oracle_sha256: 26480e5448a1ab41c592b920393aa66c3ea604405f400416fe733f19c230fb67
     format_oracle_sha256: fc46b6ac8d47033e318591de4c4f503ada8e77b7a4e8e2e214ee25f25b5de7e3
     semerr_sha256: 6d3e3a22800cf15a4d2824b4fe8c452a074222dacc4a4f2e420def2eb23ccfda
   - name: force_ext
@@ -293,8 +294,8 @@ designs:
         Same outcome as GHDL. NVC prints a note for FINISH; it is not a
         design message.
     disagreements: []
-    trace_sha256: pending
-    oracle_sha256: pending
+    trace_sha256: bceac1c4817b55b561c3c1be261fb9c94efc5e1cb248af8aa6342b9cc6d9e7a1
+    oracle_sha256: d6d54594d33b03d28a0db0d05c0dc07e1a7fca28ef23f643ab814cc2844b391d
     format_oracle_sha256: 7c16ae3aba230fb4e90c6b22d3bb804c3e88d0cbed8b6081bce316e7b6bff792
     semerr_sha256: e7de4cbd17dab071e18844d9ceaa585c7d119a2f68891d7b8d376f56e37c8c79
   - name: hier_generate
@@ -354,7 +355,25 @@ designs:
       messages:
         - "** Note: 50ns+0: FINISH called"
       notes: same outcome as GHDL
-    disagreements: []
+    disagreements:
+      - topic: lane input port a in the VCD dump (trace oracle)
+        ghdl: >-
+          dumps lanes(i).u.a with the lane's own width W = BASE + i and
+          the slice din(HI downto LO) as its value
+        nvc: >-
+          dumps every lanes(i).u.a as the whole 14-bit din, the value of
+          the actual rather than of the sliced port
+        follows: ghdl
+        lrm: 6.5.6.3
+        notes: >-
+          A port associated with a slice has the subtype of the formal;
+          the self-checks pass under both tools, only NVC's VCD writer
+          differs. The trace section compares these ports with GHDL only.
+        signals:
+          - hier_generate_tb.dut.lanes(0).u.a
+          - hier_generate_tb.dut.lanes(1).u.a
+          - hier_generate_tb.dut.lanes(2).u.a
+          - hier_generate_tb.dut.lanes(3).u.a
     variants:
       - name: width_err
         standard: "2008"
@@ -426,8 +445,8 @@ designs:
           #20's table fixes the wording; it must name the instance path.
           Both messages point at hier_generate_width_err.vhd:31 (columns 22
           and 47).
-    trace_sha256: pending
-    oracle_sha256: pending
+    trace_sha256: b9fccb27e80186b8b57efeac3f0465d106b7f07502a0d9f548cfea80ef5391a1
+    oracle_sha256: 1ff432450a84071ebb022389d1dad741a12f54c7881fabbac5ffb27404ab00f2
     format_oracle_sha256: 5f66f04782a786dc41c8bc14e422030fc76a501c7170f83dcedd5333ccf7cf07
     semerr_sha256: 1ebb9668c01cfb682480300524dca8c74b3e07814194e8d94f2d71e855d58a42
   - name: md_resolve
@@ -491,8 +510,8 @@ designs:
         design message. Unlike GHDL, NVC exits 1 when a severity-error
         assertion fired earlier in the run.
     disagreements: []
-    trace_sha256: pending
-    oracle_sha256: pending
+    trace_sha256: f0a8020759e95bc1d59245984585d48c5f3bd663002848baed4dbdac02bcea35
+    oracle_sha256: 844a9a6fe16894d3fd01497587f361e34c954cb9ba411aa071dd47ef64f324e1
     format_oracle_sha256: f440d6de675b9a0bbb49ee160573acdde6f381afa5a0c005ed3bd5472cb1e51a
     semerr_sha256: 7cb0e70a4265cf1b768b3efdeedf728e8b19ac2505777bdebab064f3fdaa8f7d
   - name: mode_views
@@ -577,8 +596,8 @@ designs:
           IEEE 1076-2019 conditional analysis tool directives (section
           number not verified against the LRM text). GHDL 6.0.0 lacks the
           feature, so it is not a semantic disagreement about the design.
-    trace_sha256: pending
-    oracle_sha256: pending
+    trace_sha256: 1544791b18a1e94730f3417fae0950e9c4d4682e45ac056094b4b71da2a87001
+    oracle_sha256: 901f95aae64fe22e966e78ba21e7bc3a9ab8d4b5ad017afa24671f0bc16a1c62
     format_oracle_sha256: e634b69fd6b07941074a6155b26020f7aa012363fc00d3b4deb73a2581f608c8
     semerr_sha256: 1eae310d6f7aef6f91a429c3c22b7551a0fe593f5a75c3390f36e6590d1f2cec
   - name: overload_ops
@@ -633,8 +652,8 @@ designs:
         name (work.ow_wrap."+") and by result type ("-" returning word_t vs
         integer, chosen by the assignment target).
     disagreements: []
-    trace_sha256: pending
-    oracle_sha256: pending
+    trace_sha256: f06e87618258599b4b99ca9d3deba7927e92d76f23011d3d92b40a9e6f6c412e
+    oracle_sha256: 41e86cacce0d1ed7270db36737ea615f0ad5a5eb717d743fb308ae80d32f667e
     format_oracle_sha256: ed3f37bc6b820d2b44c528384e12a9b10b96dc989ad740ce9b2430274ba6df04
     semerr_sha256: dfa0c653f470f8a817919dc2495ea055b6606c0db317aac64819b7ae71ce613b
   - name: postponed_attrs
@@ -653,7 +672,12 @@ designs:
       exit: 0
       status: clean
       stop_time: 98 ns
-      messages: []
+      # #35: a zero-width glitch is a warning. The delta glitch of g to
+      # '0' at 20 ns is deliberate (the postponed assert must not see it).
+      messages:
+        - severity: warning
+          code: sim/glitch
+          text: "zero-width glitch on postponed_attrs_tb.g at 20 ns"
     features: [postponed_processes, signal_attributes]
     invariants: [seed_independent, variant_stable, self_stopping]
     oracle: both
@@ -705,9 +729,25 @@ designs:
         Same outcome as GHDL, including S'STABLE being false and S'DELAYED
         still old in the delta of the event. NVC prints a note for FINISH;
         it is not a design message.
-    disagreements: []
-    trace_sha256: pending
-    oracle_sha256: pending
+    disagreements:
+      - topic: initial value of d'delayed(5 ns) (trace oracle)
+        ghdl: >-
+          q_dly settles on '0' at 0 fs: the concurrent assignment runs at
+          initialisation and reads d'delayed(5 ns), whose initial value is
+          d's initial value '0'
+        nvc: >-
+          q_dly stays 'U' until 5 ns, as if d'delayed(5 ns) started at
+          the default value of std_logic
+        follows: ghdl
+        lrm: 16.2.3
+        notes: >-
+          The implicit signal S'DELAYED(T) takes the initial value of S.
+          The trace section compares q_dly with the GHDL recording only.
+        signals:
+          - postponed_attrs_tb.dut.q_dly
+          - postponed_attrs_tb.q_dly
+    trace_sha256: c17eb3e01883750ea8aed51a91c5174d2d21fc10d82ff440b075c9f7d21c4fbe
+    oracle_sha256: 600b1a1b4acde3b2fcd3b4ed974e8cdc39a2c3ea1d355de4e5a245c7419007d4
     format_oracle_sha256: 6a5fe946b5cb751d12431c39f0c18e8ed944bf6108dd579468f9d55291b24f94
     semerr_sha256: 305c7a2f89233bc8c748d447d2e135026e3aef1426b644e5b2458f42d08591dd
   - name: prot_cond
@@ -869,7 +909,7 @@ designs:
         "unknown" and fails the TOOL_NAME check.
     disagreements: []
     trace_sha256: pending
-    oracle_sha256: pending
+    oracle_sha256: 11b484709e5c9656f3ce83f87777efbdc5040b5417f8eda14a14cb2b3b48d6cf
     format_oracle_sha256: 08d5c45934017c8f93b2193e1d9b14ee8e9c627bb684580fd12d5848c0f28d3b
     semerr_sha256: 1f19aa841434177d6e55fd1ca5d14b01134b1732ec27bdb4b968a6522b8208b6
   - name: psl_simple
@@ -963,8 +1003,8 @@ designs:
           Tool exit status is outside the LRM; GoHard's rule (#20, #35) is
           that an error-severity PSL assert under --sim exits 1. Reported
           events and times agree.
-    trace_sha256: pending
-    oracle_sha256: pending
+    trace_sha256: 7342ad0283712ae02428137b9b030adaf6b2c4111d8e90a8a774a433001b215d
+    oracle_sha256: ef9811e748022662bde89003654d0e5fe152ef95b68a8f983f38e98f68c5202d
     format_oracle_sha256: 3991573b856dd572670d95c0f9ef57bdf5fb94b5cfd3452818daf30a90860247
     semerr_sha256: be3e6028c6a180170b354c14e702902d4b65d3f8b5f3502c65154a5d917be28f
   - name: standin_model
@@ -988,16 +1028,18 @@ designs:
     models:
       work.crypt_core: models/crypt_core_model.vhd
     config: gohard.yaml
-    # Provisional (open spec question, see LIMITS.md): this assumes that
-    # allow_opaque plus a simulation.models stand-in lifts the #20 rule that
-    # a run with units depending on an opaque unit never exits 0, and that
-    # the allow_opaque downgrade emits no diagnostic. If #20/#35 decide
-    # otherwise, add the downgraded diagnostic here and change exit/status.
+    # #20: allow_opaque plus a stand-in lets the run exit 0; the
+    # downgrade is a hint.
     expected:
       exit: 0
       status: clean
       stop_time: 80 ns
-      messages: []
+      # #20: the allow_opaque downgrade with a stand-in is a hint naming
+      # the unit (the stand-in is its related location).
+      messages:
+        - severity: hint
+          code: sema/opaque-allowed
+          text: "work.crypt_core is encrypted IP, allowed by allow_opaque"
     features: [standin_models]
     invariants:
       - seed_independent
@@ -1045,8 +1087,8 @@ designs:
         treatment GoHard gives it (#20). The recorded trace contains no
         modeled marking; GoHard adds it to u_core's dout/valid drivers.
     disagreements: []
-    trace_sha256: pending
-    oracle_sha256: pending
+    trace_sha256: 0822cc1204a3e43e5668a8d9d8f154f7d09dd00dbd590dc8ae7f19dbd5c4ded6
+    oracle_sha256: 8bef736395f22d8d1bdb452bfee165a023fae84566b5a38711e720f70ec26121
     format_oracle_sha256: c81d70aad425eac9f85f9738fe80f33b9ae95a06d6d16a6334429c9a3d810324
     semerr_sha256: ee3ef1146246450f7960ab1f0a71721cebbccd455e8cc62491b4dbb5053a340a
   - name: textio_env
@@ -1105,8 +1147,8 @@ designs:
         GHDL. NVC prints a note for FINISH; GHDL prints "simulation
         finished". Neither is a design message.
     disagreements: []
-    trace_sha256: pending
-    oracle_sha256: pending
+    trace_sha256: b79e1f6c9d284526fa3297101197ecdd80987f6daf6fcf43a311ff5c7ac1f583
+    oracle_sha256: afaef1be5d71488477320d6182421897f081308f401741528bd7228887a7d7df
     format_oracle_sha256: 133b47f00a9a9443253709ee7f0f243bb596466257c25e280f2d02266526e34f
     semerr_sha256: f029b9e6cd324c9922a137da89861b3c1f2ae4382753871556303c39df536f01
   - name: vhdl93_only
@@ -1240,8 +1282,8 @@ designs:
           expected.messages lists the first error, which must be on line 12
           (port force); parser recovery may add more errors. 2019 behaves
           the same.
-    trace_sha256: pending
-    oracle_sha256: pending
+    trace_sha256: 9a27748985d1e257ed1e8f90e11b892a4cb188cc8fc5d1fe5616a8e31212d7d7
+    oracle_sha256: b72ab12235d9ebd527cc3e272a93040093b7d681ec2f6f4f277bf62c72974dd1
     format_oracle_sha256: 6284d8838abf6dcbb4dda3b2329acbab72718b52cf1ec66a4b1355274d9eac96
     semerr_sha256: a9535b51fc73c892d15cbd7af900c5e2471a34640bf71e5c24622d831502328e
   - name: wait_forms
@@ -1310,8 +1352,8 @@ designs:
         "simulation stopped". Neither is a design message, and both exit 0
         for std.env.stop.
     disagreements: []
-    trace_sha256: pending
-    oracle_sha256: pending
+    trace_sha256: d466a389d48a9f6d0321d336f27b4a5c93e5bbb4bce5b55079ddacf69e682d79
+    oracle_sha256: e65f232d4c5f950d169fd1aaf52e953c85420ab7a7252aba2d34ccc8326e55ff
     format_oracle_sha256: 725a3af5b035375a9039c2526f2ce30547bff9db603058a65b073e8070733d66
     semerr_sha256: 8e2581f072eaa3077b5a81168bee1724a408d8debd1a540f0d11a6753b35a8a4
 

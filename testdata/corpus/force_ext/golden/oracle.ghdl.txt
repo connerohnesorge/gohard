@@ -1,0 +1,71 @@
+gohard-oracle 1
+tool ghdl 6.0.0
+sources ca318333d7ab6fbc
+testbench force_ext_tb
+signal force_ext_tb.a logic 4
+signal force_ext_tb.b logic 4
+signal force_ext_tb.bit_o logic 1
+signal force_ext_tb.dut.a logic 4
+signal force_ext_tb.dut.b logic 4
+signal force_ext_tb.dut.bit_o logic 1
+signal force_ext_tb.dut.mid logic 4
+signal force_ext_tb.dut.op logic 1
+signal force_ext_tb.dut.sel logic 2
+signal force_ext_tb.dut.y logic 4
+signal force_ext_tb.op logic 1
+signal force_ext_tb.sel logic 2
+signal force_ext_tb.y logic 4
+0 force_ext_tb.a 1100
+0 force_ext_tb.b 1010
+0 force_ext_tb.bit_o 0
+0 force_ext_tb.dut.a 1100
+0 force_ext_tb.dut.b 1010
+0 force_ext_tb.dut.bit_o 0
+0 force_ext_tb.dut.mid 1110
+0 force_ext_tb.dut.op 0
+0 force_ext_tb.dut.sel 00
+0 force_ext_tb.dut.y 1110
+0 force_ext_tb.op 0
+0 force_ext_tb.sel 00
+0 force_ext_tb.y 1110
+1000000 force_ext_tb.dut.mid 1000
+1000000 force_ext_tb.dut.op 1
+1000000 force_ext_tb.dut.y 1000
+1000000 force_ext_tb.op 1
+1000000 force_ext_tb.y 1000
+2000000 force_ext_tb.b 1111
+2000000 force_ext_tb.dut.b 1111
+2000000 force_ext_tb.dut.mid 1100
+2000000 force_ext_tb.dut.y 1100
+2000000 force_ext_tb.y 1100
+3000000 force_ext_tb.bit_o 1
+3000000 force_ext_tb.dut.bit_o 1
+3000000 force_ext_tb.dut.sel 10
+3000000 force_ext_tb.sel 10
+4000000 force_ext_tb.a 1000
+4000000 force_ext_tb.bit_o 0
+4000000 force_ext_tb.dut.a 1000
+4000000 force_ext_tb.dut.bit_o 0
+4000000 force_ext_tb.dut.mid 1000
+4000000 force_ext_tb.dut.y 1000
+4000000 force_ext_tb.y 1000
+5000000 force_ext_tb.bit_o 1
+5000000 force_ext_tb.dut.bit_o 1
+5000000 force_ext_tb.dut.mid 0110
+5000000 force_ext_tb.dut.y 0110
+5000000 force_ext_tb.y 0110
+6000000 force_ext_tb.a 0001
+6000000 force_ext_tb.dut.a 0001
+6000000 force_ext_tb.dut.op 0
+6000000 force_ext_tb.op 0
+7000000 force_ext_tb.dut.mid 1111
+7000000 force_ext_tb.dut.y 1111
+7000000 force_ext_tb.y 1111
+8000000 force_ext_tb.b 0000
+8000000 force_ext_tb.bit_o 0
+8000000 force_ext_tb.dut.b 0000
+8000000 force_ext_tb.dut.bit_o 0
+8000000 force_ext_tb.dut.mid 0001
+8000000 force_ext_tb.dut.y 0001
+8000000 force_ext_tb.y 0001
+digest 53 3fbdf73e89b68b69e375102bcce69d18e4545f35e90511d2ea32a928748362b4

@@ -1,0 +1,2 @@
+gohard: .gohard/traces/sev_tb-3.trace: no recorded trace to compare
+gohard: simulated sev_tb (seed 3): quiet

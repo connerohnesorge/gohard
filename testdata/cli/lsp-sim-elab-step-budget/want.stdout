@@ -1,0 +1,1 @@
+{"testbench":"elab_tb","seed":0,"status":"budget-exceeded","end":"","trace":"","repro":"","diagnostics":[{"path":"","line":0,"col":0,"severity":"error","code":"sim/budget-exceeded","message":"step budget of 1000 steps exceeded at 0 fs"}]}

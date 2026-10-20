@@ -125,8 +125,10 @@ func (ev *Evaluator) checkNames(e *Expr, b *eval.Budget,
 			return e.Node, err
 		}
 	}
-	if n, err := ev.checkNames(e.Prefix, b); err != nil {
-		return n, err
+	if !(e.Kind == ExprAttr && boundsAttr(e.Attr)) {
+		if n, err := ev.checkNames(e.Prefix, b); err != nil {
+			return n, err
+		}
 	}
 	for _, x := range e.Args {
 		if n, err := ev.checkNames(x, b); err != nil {
@@ -228,6 +230,65 @@ func branched(n cst.Node) bool {
 		case cst.KindProcessStmt:
 			return false
 		}
+	}
+	return false
+}
+
+// readExprs returns the expressions a process evaluates every time it
+// runs its statements: the conditions, reports and calls of its
+// top-level statements (not those inside a branch or loop, which may
+// never run). An index of one of their names outside its prefix's
+// static range is an error (LRM 8.4).
+func readExprs(seq []*SeqStmt) []*Expr {
+	var out []*Expr
+	for _, q := range seq {
+		switch q.Kind {
+		case SeqAssert, SeqReport:
+			out = append(out, q.Cond, q.Report, q.Severity)
+		case SeqIf:
+			if len(q.Branches) > 0 {
+				out = append(out, q.Branches[0].Cond)
+			}
+		case SeqCase:
+			out = append(out, q.Selector)
+		case SeqCall:
+			out = append(out, q.Call)
+		}
+	}
+	return out
+}
+
+// processChecks checks the names read by the processes of unit u's
+// bodies (readExprs) and reports their index errors.
+func (ev *Evaluator) processChecks(body []*Stmt, steps int64,
+	report func(cst.Node, error)) {
+	for _, s := range body {
+		switch s.Kind {
+		case StmtBlock:
+			ev.processChecks(s.Body, steps, report)
+		case StmtProcess:
+			for _, e := range readExprs(s.Seq) {
+				if e == nil {
+					continue
+				}
+				n, err := ev.checkNames(e, eval.NewBudget(steps))
+				if eval.CodeOf(err) == eval.ErrCodeIndex {
+					report(n, err)
+				}
+			}
+		}
+	}
+}
+
+// boundsAttr reports whether attribute a of an array object depends only
+// on its prefix's subtype: the prefix names no value that is read, so
+// its index is not checked (v(5)'LEFT is the element subtype's left
+// bound however v is indexed, as NVC and GHDL accept).
+func boundsAttr(a Key) bool {
+	switch a {
+	case "left", "right", "high", "low", "length", "range",
+		"reverse_range", "ascending", "element", "subtype":
+		return true
 	}
 	return false
 }

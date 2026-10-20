@@ -1,0 +1,2 @@
+budget_hang.vhd:1:8: error[sim/budget-exceeded]: time budget of 100 ns exceeded at 100 ns
+summary: 1 errors, 0 warnings, 0 hints, 1 files

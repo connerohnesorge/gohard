@@ -204,7 +204,7 @@ func (s *session) primaryOf(u *Unit) *Unit {
 	if !ok {
 		return nil
 	}
-	p, ok := l.Unit(u.Of)
+	p, ok := l.UnitFrom(u.Of, u)
 	if !ok {
 		return nil
 	}

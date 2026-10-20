@@ -40,7 +40,8 @@ type target struct {
 
 // sections is the registry, in run order. Later stages append theirs
 // (trace, tree).
-var sections = []*section{formatSection, semerrSection}
+var sections = []*section{formatSection, semerrSection,
+	traceSection, treeSection, goldenSection}
 
 // ctx is the state shared by the sections: the repository root, the
 // corpus.yaml bytes and their parsed form.

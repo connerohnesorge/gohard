@@ -27,7 +27,7 @@ Triggers: `pull_request`, pushes to `main` and `v1`, manual dispatch.
 | `detlint` | `detlint.sh` (`go run ./tools/detlint ./...`) | wired; needs `tools/detlint` (#30) |
 | `go test -race` on Linux | `race.sh` | wired for `internal/env/realenv`, `internal/jsonrpc2` and `internal/server` (real pipe transport) |
 | Parser-regression set (`pr` submodules, stdlib, corpus) | `regression.sh pr` | placeholder; later #31 with #8's `corpus.yaml` |
-| Corpus designs at seeds 0..3, `prot_cond` exit 2 | not yet | later: #35/#36 with #8 (a step in `pr.yml`) |
+| Corpus designs at seeds 0..3, `prot_cond` exit 2 | `go test` (`internal/corpus` `TestCorpus`, `-corpus.seeds` defaults to 4); `SEEDS=4 corpus-seeds.sh` adds `-corpus.require-sim` and the oracle check | wired; designs that cannot simulate yet are logged by plain `go test` and fail under `corpus-seeds.sh` until the sequential interpreter registers `simrun.DefaultCode` |
 | `testdata/cli` fixtures at `-p 1` and `-p 16` | `go test` (`internal/cli`) | wired |
 | `testdata/lsp` and `testdata/parse` fixtures | `go test` | `testdata/lsp` wired (#25, see its README); `testdata/parse` later (#31) |
 | Liveness workload (60 s virtual, 5 s no-progress rule) | `go test` | wired: `TestLiveness` and `TestNoProgressRule` in `internal/server` |
@@ -58,7 +58,7 @@ Triggers: daily schedule and manual dispatch (input `fuzztime`, default
 | --- | --- | --- |
 | Fuzz each target for 10 minutes | `fuzz-targets.sh` (the one list) and `fuzz.sh` (one matrix job per target) | wired for `FuzzConfig` (#28), `FuzzIndex` and `FuzzLSPReplay` (#25); later: #31 `FuzzParse`, #32 `FuzzFormat` append to the list |
 | Crash opens a PR adding the minimized input under `testdata/fuzz/<Target>/` | `fuzz.sh` | wired |
-| Every corpus design at 64 seeds | `corpus-seeds.sh` | placeholder; later #35/#36 with #8 |
+| Every corpus design at 64 seeds | `corpus-seeds.sh` (`SEEDS=64`, the default): `TestCorpus -corpus.seeds=64 -corpus.require-sim`, then `go run ./tools/oracle trace tree golden` | wired; fails while the sequential interpreter is missing |
 | Full parser-regression list (`pr` and `nightly` submodules) | `regression.sh nightly` | placeholder; later #31 |
 | Replay every LSP session in `testdata/seeds/` | `lsp-seeds.sh` | wired (`TestSeeds`, `TestLSPReplaySeeds`) |
 | Benchmarks (#19, #22), recorded, never failing | `bench.sh` | wired; runs every `Benchmark*` that exists, uploads `bench.txt` |

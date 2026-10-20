@@ -86,6 +86,9 @@ func fit(e *Expr, t *Type) (int, string) {
 					return 2, ""
 				}
 			}
+			if p.index != nil && Compatible(p.index.elem, t) {
+				return 2, ""
+			}
 			return 0, p.tok.Text() + " does not return " + t.Name()
 		}
 	}
@@ -233,7 +236,7 @@ func match(d *Decl, acts []actual, want *Type, proc bool) candidate {
 			c.near = 0
 			return c
 		}
-		if !used[j] && q.Implicit {
+		if !used[j] && q.Implicit && q.Value == nil {
 			c.reason = "takes " + strconv.Itoa(len(params)) +
 				" arguments, not " + strconv.Itoa(len(acts))
 			c.near = 0
@@ -312,11 +315,37 @@ func (a *analyzer) choose(name string, cands []*Decl, acts []actual,
 			explicit = append(explicit, c)
 		}
 	}
-	if len(explicit) == 1 {
+	if len(explicit) == 1 && (hidesRest(explicit[0], top) ||
+		!want.Unknown() || !resultsDiffer(top)) {
 		o.Chosen = explicit[0].d
 		return o, explicit[0]
 	}
 	return o, nil
+}
+
+// hidesRest reports whether the explicit candidate x is a homograph of
+// every other top candidate, so it hides those implicit declarations
+// (LRM 12.3); an implicit operation with another result type is a
+// different overload that only the context can rule out.
+func hidesRest(x *candidate, top []*candidate) bool {
+	for _, c := range top {
+		if c != x && !homographs(x.d.Denotes(), c.d.Denotes()) {
+			return false
+		}
+	}
+	return true
+}
+
+// resultsDiffer reports whether the candidates return different base
+// types, so a context still to come may choose among them (LRM 12.5).
+func resultsDiffer(cs []*candidate) bool {
+	for _, c := range cs[1:] {
+		x, y := cs[0].d.Denotes().Type, c.d.Denotes().Type
+		if (x == nil) != (y == nil) || x != nil && !SameBase(x, y) {
+			return true
+		}
+	}
+	return false
 }
 
 // sameDenotationC reports whether the candidates are one subprogram:
@@ -465,8 +494,115 @@ func (a *analyzer) call(n cst.Node, nm named, args cst.AssociationList,
 			return e
 		}
 	}
+	if x := indexAlternative(nm.decls, acts); x != nil && !proc &&
+		want.Unknown() {
+		// f(args) may also index the result of a parameterless f
+		// (LRM 8.4, 9.3.4): the context decides between the readings.
+		o, _ := a.choose(nm.tok.Text(), nm.decls, acts, nil, false)
+		var fit []*Decl
+		for _, cd := range o.Candidates {
+			if cd.Fits {
+				fit = append(fit, cd.Decl)
+			}
+		}
+		if len(fit) == 0 {
+			return a.indexReading(n, nm.tok, nm.decls, x, acts, nm.expr)
+		}
+		if !fitsResult(fit, x.elem) {
+			e := &Expr{Kind: ExprCall, Node: n, Type: UnknownType,
+				Prefix: nm.expr}
+			e.pend = &pending{kind: pendCall, cands: nm.decls,
+				tok: nm.tok, acts: acts, name: nm.tok.Text(),
+				object: nm.expr, fitting: fit, index: x}
+			return e
+		}
+	}
 	return a.finishCall(n, nm.tok, nm.tok.Text(), nm.decls, acts, want,
 		proc, nm.expr, false)
+}
+
+// indexAlt is the index reading of f(args): the parameterless function
+// f returning an array (or an access to one) indexed by the actuals.
+type indexAlt struct {
+	fn   *Decl
+	arr  *Type // the array indexed
+	elem *Type
+}
+
+// indexAlternative returns the index reading of f(acts) when exactly
+// one parameterless function of ds returns an array whose dimensions
+// the positional actuals index, each fitting its index type; nil
+// otherwise.
+func indexAlternative(ds []*Decl, acts []actual) *indexAlt {
+	if len(acts) == 0 {
+		return nil
+	}
+	for _, ac := range acts {
+		if ac.formal != "" || ac.open || ac.e.Kind == ExprRange ||
+			ac.e.Kind == ExprTypeMark {
+			return nil
+		}
+	}
+	var alt *indexAlt
+	for _, d := range ds {
+		x := d.Denotes()
+		if x.Kind != DeclFunction || required(x) > 0 || x.Type == nil {
+			continue
+		}
+		at := x.Type
+		if b := at.Base(); b.Class == TypeAccess && b.Designated != nil {
+			at = b.Designated
+		}
+		b := at.Base()
+		if b.Class != TypeArray || len(b.Index) != len(acts) {
+			continue
+		}
+		ok := true
+		for i, ac := range acts {
+			if s, _ := fit(ac.e, b.Index[i]); s == 0 {
+				ok = false
+			}
+		}
+		if !ok {
+			continue
+		}
+		if alt != nil {
+			return nil
+		}
+		alt = &indexAlt{fn: d, arr: at, elem: orUnknown(at.ElemType())}
+	}
+	return alt
+}
+
+// indexReading builds f(acts) as the index of the result of the
+// parameterless function x.fn.
+func (a *analyzer) indexReading(n cst.Node, tok cst.Token,
+	cands []*Decl, x *indexAlt, acts []actual, object *Expr,
+) *Expr {
+	o := &Overload{Name: tok.Text(), Chosen: x.fn}
+	for _, d := range cands {
+		cd := Candidate{Decl: d, Fits: d == x.fn}
+		if !cd.Fits {
+			cd.Reason = "is not the parameterless function indexed"
+		}
+		o.Candidates = append(o.Candidates, cd)
+	}
+	o.Candidates = sortedCandidates(o)
+	a.refOverload(tok, o, RefCall)
+	var v *Expr = &Expr{Kind: ExprCall, Node: n, Decl: x.fn,
+		Type: x.fn.Denotes().Type, Overload: o, Prefix: object}
+	if v.Type.Base().Class == TypeAccess {
+		v = &Expr{Kind: ExprDeref, Node: n, Prefix: v,
+			Type: allocated(x.arr)}
+	}
+	e := &Expr{Kind: ExprIndex, Node: n, Prefix: v, Type: x.elem}
+	b := x.arr.Base()
+	for i, ac := range acts {
+		a.settle(ac.e, b.Index[i])
+		a.expect(ac.e, b.Index[i], ac.node)
+		e.Args = append(e.Args, ac.e)
+	}
+	return e
 }
 
 // indexedCall resolves f(args) as an index or slice of the result of

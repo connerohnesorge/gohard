@@ -1,0 +1,44 @@
+gohard-trace 1
+testbench assert_fail_tb
+end 30000000
+type std_ulogic logic
+type unsigned array std_ulogic
+scope assert_fail_tb instance assert_fail_tb(sim)
+scope assert_fail_tb.dut instance assert_fail(rtl)
+signal assert_fail_tb.a unsigned signal 3 downto 0
+signal assert_fail_tb.b unsigned signal 3 downto 0
+signal assert_fail_tb.dut.a unsigned in 3 downto 0
+signal assert_fail_tb.dut.b unsigned in 3 downto 0
+signal assert_fail_tb.dut.s unsigned out 3 downto 0
+signal assert_fail_tb.s unsigned signal 3 downto 0
+process 1 assert_fail_tb.check
+process 2 assert_fail_tb.dut._p0
+0 0 assert_fail_tb.a 0000 -
+0 0 assert_fail_tb.b 0000 -
+0 0 assert_fail_tb.dut.a 0000 -
+0 0 assert_fail_tb.dut.b 0000 -
+0 0 assert_fail_tb.dut.s UUUU -
+0 0 assert_fail_tb.s UUUU -
+0 1 assert_fail_tb.a 0011 p1
+0 1 assert_fail_tb.b 0100 p1
+0 1 assert_fail_tb.dut.a 0011 p1
+0 1 assert_fail_tb.dut.b 0100 p1
+0 1 assert_fail_tb.dut.s 0000 p2
+0 1 assert_fail_tb.s 0000 p2
+0 2 assert_fail_tb.dut.s 0111 p2
+0 2 assert_fail_tb.s 0111 p2
+10000000 0 ! report note assert_fail_tb.vhd:32 p1 "assert_fail: starting checks"
+10000000 1 assert_fail_tb.a 1001 p1
+10000000 1 assert_fail_tb.b 1001 p1
+10000000 1 assert_fail_tb.dut.a 1001 p1
+10000000 1 assert_fail_tb.dut.b 1001 p1
+10000000 2 assert_fail_tb.dut.s 0010 p2
+10000000 2 assert_fail_tb.s 0010 p2
+20000000 0 ! assert warning assert_fail_tb.vhd:37 p1 "assert_fail: sum wrapped to 2"
+20000000 1 assert_fail_tb.a 0101 p1
+20000000 1 assert_fail_tb.b 0110 p1
+20000000 1 assert_fail_tb.dut.a 0101 p1
+20000000 1 assert_fail_tb.dut.b 0110 p1
+20000000 2 assert_fail_tb.dut.s 1011 p2
+20000000 2 assert_fail_tb.s 1011 p2
+30000000 0 ! assert error assert_fail_tb.vhd:43 p1 "assert_fail: expected 12, got 11"

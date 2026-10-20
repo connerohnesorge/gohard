@@ -47,6 +47,10 @@ type analyzer struct {
 	// an aggregate target, which associate or write their objects
 	// rather than read them.
 	mapActual bool
+	// quietActuals is set while analyzing the maps of a binding
+	// indication whose component is unknown (in a configuration):
+	// its actuals are typed without reporting (stmts.go).
+	quietActuals bool
 	// inStandard is set while analyzing std.standard itself.
 	inStandard bool
 	// labels are the statement labels declared so far.
@@ -278,7 +282,7 @@ func (a *analyzer) primaryUnit() *Unit {
 	if !ok {
 		return nil
 	}
-	p, ok := l.Unit(u.Of)
+	p, ok := l.UnitFrom(u.Of, u)
 	if !ok || !a.s.readable(u, p) || p.Decl == nil {
 		if !ok {
 			a.missingUnit(l, u.Of, tok)

@@ -47,9 +47,40 @@ func analyzeBundle() *Result {
 				parser.Options{Standard: token.Std2019}),
 		})
 	}
+	tags := bundleTags()
+	for _, c := range lrmContexts {
+		src := []byte(c.text)
+		files = append(files, &File{
+			Path: c.path, Bundled: true, Library: "ieee",
+			Text: src, Lines: span.NewIndex(src),
+			Parse: parser.Parse(src,
+				parser.Options{Standard: token.Std2019}),
+		})
+		tags[tagKey{c.path, strings.Index(c.text, c.name)}] =
+			token.Std2008
+	}
 	s := &session{std: token.Std2019, jobs: env.Sequential{},
-		files: files, steps: eval.EditorSteps, tags: bundleTags()}
+		files: files, steps: eval.EditorSteps, tags: tags}
 	return s.run()
+}
+
+// lrmContexts are the two context declarations of library IEEE that
+// IEEE 1076-2008 defines in its own text (16.1, IEEE_BIT_CONTEXT and
+// IEEE_STD_CONTEXT) rather than in the IEEE-P1076 packages repository
+// vendored under internal/stdlib, so the bundle declares them here,
+// from the standard's wording, visible from VHDL-2008 on.
+var lrmContexts = []struct{ path, name, text string }{
+	{"ieee/ieee_bit_context.vhdl", "IEEE_BIT_CONTEXT",
+		"context IEEE_BIT_CONTEXT is\n" +
+			"  library IEEE;\n" +
+			"  use IEEE.NUMERIC_BIT.all;\n" +
+			"end context IEEE_BIT_CONTEXT;\n"},
+	{"ieee/ieee_std_context.vhdl", "IEEE_STD_CONTEXT",
+		"context IEEE_STD_CONTEXT is\n" +
+			"  library IEEE;\n" +
+			"  use IEEE.STD_LOGIC_1164.all;\n" +
+			"  use IEEE.NUMERIC_STD.all;\n" +
+			"end context IEEE_STD_CONTEXT;\n"},
 }
 
 // tagKey locates a bundled declaration by file and name offset.

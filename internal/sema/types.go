@@ -48,6 +48,9 @@ type pending struct {
 	object  *Expr
 	fitting []*Decl // the candidates that fit before the context
 	made    *Type   // the allocated subtype of an allocator
+	// index is the other reading of a pending f(args): an index of
+	// the result of a parameterless f (LRM 8.4, 9.3.4).
+	index *indexAlt
 }
 
 // expr types the expression n against want (nil: no expected type),
@@ -368,9 +371,25 @@ func (a *analyzer) settle(e *Expr, t *Type) {
 			}
 		}
 	case pendCall:
+		if x := p.index; x != nil && !t.Unknown() &&
+			Compatible(x.elem, t) && !fitsResult(p.fitting, t) {
+			*e = *a.indexReading(e.Node, p.tok, p.cands, x, p.acts,
+				p.object)
+			return
+		}
 		*e = *a.finishCall(e.Node, p.tok, p.name, p.cands, p.acts, t,
 			false, p.object, true)
 	}
+}
+
+// fitsResult reports whether one of ds returns a value of t.
+func fitsResult(ds []*Decl, t *Type) bool {
+	for _, d := range ds {
+		if rt := d.Denotes().Type; rt != nil && Compatible(rt, t) {
+			return true
+		}
+	}
+	return false
 }
 
 // sameDenotation reports whether every declaration denotes one entity.
@@ -674,6 +693,7 @@ func (a *analyzer) aggregate(n cst.Node, want *Type) *Expr {
 	if b != nil && b.Class == TypeArray {
 		a.singleDynamicChoice(e)
 		a.mixedAssociations(e)
+		a.aggregateShape(e, want) // aggshape.go
 	}
 	return e
 }
@@ -1094,7 +1114,7 @@ func (a *analyzer) psl(n cst.Node) {
 		if (cst.Expr{}).Accepts(c.Kind()) &&
 			c.Kind() != cst.KindPSLUnion &&
 			c.Kind() != cst.KindPSLValueSet {
-			a.expr(c, nil)
+			a.pslExpr(c)
 			continue
 		}
 		a.psl(c)

@@ -44,13 +44,34 @@
 //     the rules (dependency closure, cascades, syntax recovery,
 //     opaque units, semerr_follows).
 //
-// Planned sections, added by later stages with the same shape:
+//   - trace (#36, #8): GHDL (--vcd) and NVC (--wave --format=vcd
+//     --dump-arrays) run the main run of each design with a trace
+//     oracle (the design's `oracle` field), the opaque IEEE 1735
+//     files left out (the stand-in replaces them), with the design's
+//     stop_level as --assert-level/--exit-severity and the expected
+//     stop_time as --stop-time for a "bounded" tool result. The dumps
+//     become golden/oracle.{ghdl,nvc}.txt (corpus.Oracle: settled
+//     values per time under GoHard's hierarchical paths, the first
+//     corpus.OracleLines changes plus a digest of all). The check
+//     flags stale recordings (sources hash), requires GHDL and NVC to
+//     agree on every signal both dump except those a disagreements
+//     item with `signals:` assigns to one tool, and, once the
+//     sequential interpreter is registered, compares GoHard's settled
+//     projection (corpus.CompareOracle). Hash: oracle_sha256.
 //
-//   - trace (S5, #36): canonical GoHard traces (golden/trace.txt,
-//     trace_sha256) and GHDL/NVC VCD dumps converted to the canonical
-//     form (golden/ghdl.trace.txt, golden/nvc.trace.txt, oracle_sha256).
-//   - tree (S5, #8): GHDL --disp-tree hierarchy recordings
-//     (golden/ghdl.tree.txt, oracle_sha256).
+//   - tree (#8): the elaboration oracle. hierarchy_oracle: ghdl
+//     records GHDL --disp-tree=inst as golden/ghdl.tree.txt and the
+//     check compares its instances, generate iterations and blocks
+//     with internal/elab/hier; "none, hand-checked" keeps a
+//     hand-written golden/hierarchy.txt in hier's Dump form (generic
+//     values included), compared exactly for v1.0 designs. Hash:
+//     oracle_sha256.
+//
+//   - golden (#36): GoHard's own canonical trace at seed 0,
+//     golden/trace.txt. It has targets only once an interpreter is
+//     registered (simrun.DefaultCode); until then trace_sha256 stays
+//     pending and internal/corpus reports the designs as pending.
+//     Hash: trace_sha256.
 //
 // Several sections may feed one hash field (oracle_sha256 covers the
 // GHDL/NVC traces and the --disp-tree output): the

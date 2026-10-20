@@ -1,0 +1,10 @@
+# oracle: none, hand-checked (#8). GHDL 6.0.0 cannot analyze this
+# 2019 design, so there is no --disp-tree recording. Written from the
+# VHDL: mode_views_tb(sim) instantiates dut : entity work.mode_views,
+# whose rtl instantiates u_prod : work.mv_producer and u_cons :
+# work.mv_consumer, in that order. No entity has generics. Form:
+# internal/elab/hier Dump; lines starting with # are not compared.
+mode_views_tb entity work.mode_views_tb(sim)
+  mode_views_tb.dut entity work.mode_views(rtl)
+    mode_views_tb.dut.u_prod entity work.mv_producer(rtl)
+    mode_views_tb.dut.u_cons entity work.mv_consumer(rtl)

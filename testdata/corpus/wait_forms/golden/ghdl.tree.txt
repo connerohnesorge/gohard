@@ -1,0 +1,12 @@
+gohard-tree 1
+tool ghdl 6.0.0
+sources 99a5e3606bbf8afc
+wait_forms_tb [entity]
+`-tb [arch]
+  `-dut [instance]
+    `-wait_forms [entity]
+      `-rtl [arch]
+std.standard [package]
+std.textio [package]
+ieee.std_logic_1164 [package]
+std.env [package]

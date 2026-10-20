@@ -1,0 +1,5 @@
+gohard-oracle 1
+tool nvc 1.23.0
+sources 125b8d9d2a63e1bf
+testbench prot_cond_tb
+digest 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

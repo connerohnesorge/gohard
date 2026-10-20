@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/internal/token"
 )
 
 // Work is the library of unmapped files (#34) and the name every unit
@@ -84,7 +85,21 @@ func (s *session) buildLibraries() {
 		}
 	}
 	for _, u := range s.units {
-		if first := get(u.Library).insert(u); first != nil {
+		l := get(u.Library)
+		first := l.insert(u)
+		switch {
+		case first == nil:
+		case first.File != nil && first.File == u.File &&
+			!u.File.Bundled:
+			// Within one design file the units are analyzed in
+			// textual order, and analyzing a unit replaces the library
+			// unit of the same name (LRM 13.1, 13.5): the later one is
+			// the visible unit, the earlier one stays analyzed but
+			// hidden. Only two files declaring one unit is an error
+			// (#34), as files have no analysis order.
+			l.replace(first, u)
+			first.Duplicate = true
+		default:
 			u.Duplicate = true
 			s.dups = append(s.dups, duplicate{first, u})
 		}
@@ -124,6 +139,24 @@ func (l *Library) insert(u *Unit) *Unit {
 	return nil
 }
 
+// replace makes u, a unit insert found to duplicate old, the visible
+// unit in old's place.
+func (l *Library) replace(old, u *Unit) {
+	if u.Kind.Primary() {
+		l.units[u.Name] = u
+		if l.replaced == nil {
+			l.replaced = map[*Unit]*Unit{}
+		}
+		l.replaced[u] = old
+		return
+	}
+	for i, x := range l.secondary[u.Of] {
+		if x == old {
+			l.secondary[u.Of][i] = u
+		}
+	}
+}
+
 // library returns the library named k as seen from unit from (work is
 // from's own library).
 func (s *session) library(from *Unit, k Key) (*Library, bool) {
@@ -148,7 +181,7 @@ func (s *session) linkDeps() {
 			if !ok {
 				continue
 			}
-			if d, ok := l.Unit(r.unit); ok {
+			if d, ok := l.UnitFrom(r.unit, u); ok {
 				add(d)
 			}
 		}
@@ -163,7 +196,7 @@ func (s *session) linkDeps() {
 		}
 		if !u.Kind.Primary() || u.Kind == UnitConfiguration {
 			if l, ok := s.library(u, Work); ok {
-				if d, ok := l.Unit(u.Of); ok {
+				if d, ok := l.UnitFrom(u.Of, u); ok {
 					add(d)
 				}
 			}
@@ -173,6 +206,76 @@ func (s *session) linkDeps() {
 		})
 		u.Deps = deps
 	}
+	s.linkAllDeps()
+}
+
+// linkAllDeps adds the dependencies a use clause L.all implies: each
+// primary unit of L the unit names (by an identifier) is potentially
+// visible there (LRM 12.4), so it is analyzed first, unless it depends
+// on the unit itself: a name alone never makes an import cycle. Units
+// are linked in canonical order, so the result does not depend on the
+// order of the input files.
+func (s *session) linkAllDeps() {
+	for _, u := range s.units {
+		libs := slices.Clone(u.allLibs)
+		if !u.Kind.Primary() || u.Kind == UnitConfiguration {
+			if l, ok := s.library(u, Work); ok {
+				if p, ok := l.UnitFrom(u.Of, u); ok && p.File != nil &&
+					!p.File.Bundled {
+					libs = append(libs, p.allLibs...)
+				}
+			}
+		}
+		if len(libs) == 0 {
+			continue
+		}
+		var cands []*Unit
+		for t := range u.Node.DescendantTokens() {
+			if t.Kind() != token.Identifier {
+				continue
+			}
+			k := TokenKey(t)
+			for _, lk := range libs {
+				l, ok := s.libs[lk]
+				if !ok {
+					continue
+				}
+				d, ok := l.UnitFrom(k, u)
+				if ok && d != u && d.File != nil && !d.File.Bundled &&
+					!slices.Contains(u.Deps, d) &&
+					!slices.Contains(cands, d) {
+					cands = append(cands, d)
+				}
+			}
+		}
+		for _, d := range cands {
+			if !reaches(d, u) {
+				u.Deps = append(u.Deps, d)
+			}
+		}
+		slices.SortFunc(u.Deps, func(a, b *Unit) int {
+			return cmp.Compare(a.Index, b.Index)
+		})
+	}
+}
+
+// reaches reports whether unit from depends on unit to, transitively.
+func reaches(from, to *Unit) bool {
+	seen := map[*Unit]bool{}
+	stack := []*Unit{from}
+	for len(stack) > 0 {
+		x := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if x == to {
+			return true
+		}
+		if seen[x] {
+			continue
+		}
+		seen[x] = true
+		stack = append(stack, x.Deps...)
+	}
+	return false
 }
 
 // levelize assigns dependency levels with Tarjan's strongly connected

@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/internal/simrun"
 )
 
 // setup is the parsed testdata/cli/<case>/setup file: world changes the
@@ -32,6 +33,9 @@ type setup struct {
 	// tamper lists bundled std/ieee files (stdlib.File paths) whose
 	// integrity check fails, through the stdlib.WithTamper test hook.
 	tamper []string
+	// rand, when set, replaces env.Rand with a SplitMix64 of this
+	// state, so --seed random is reproducible.
+	rand *uint64
 }
 
 func applySetup(t tb, dir, work string) setup {
@@ -96,6 +100,17 @@ func applySetup(t tb, dir, work string) setup {
 				bad()
 			}
 			st.env[k] = v
+		case f[0] == "rand" && len(f) == 2:
+			v, err := strconv.ParseUint(f[1], 10, 64)
+			if err != nil {
+				bad()
+			}
+			st.rand = &v
+		case line == "requires interpreter":
+			if simrun.DefaultCode == nil {
+				t.Skip("needs the sequential interpreter " +
+					"(simrun.DefaultCode)")
+			}
 		case line == "stdout broken":
 			st.broken = true
 		case line == "stdout full":
@@ -137,6 +152,9 @@ func (st setup) wrap(e *env.Env, cancel context.CancelCauseFunc) {
 			}
 			return real(k)
 		}
+	}
+	if st.rand != nil {
+		e.Rand = &env.SplitMix64{State: *st.rand}
 	}
 	if st.broken {
 		e.Transport.Stdout = brokenPipe{}

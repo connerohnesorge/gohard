@@ -25,6 +25,7 @@ import (
 
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/internal/simrun"
 )
 
 // Version is the gohard release version. It is also the value of the
@@ -44,6 +45,9 @@ type Invocation struct {
 	Jobs   int
 	values map[string][]string
 	stderr *bytes.Buffer
+	// simRuns, when set, collects the simulation outcomes of a check
+	// run (gohard lsp sim reads them).
+	simRuns *[]simrun.Outcome
 }
 
 // Result is what a command returns. Either Report is set, and the

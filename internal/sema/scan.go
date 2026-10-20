@@ -1,6 +1,8 @@
 package sema
 
 import (
+	"slices"
+
 	"github.com/connerohnesorge/gohard/internal/cst"
 )
 
@@ -28,6 +30,7 @@ func scanFile(f *File) []*Unit {
 			continue
 		}
 		u.uses = unitRefs(du.Node, f.Library)
+		u.allLibs = allLibs(du.Node, f.Library)
 		out = append(out, u)
 	}
 	return out
@@ -111,5 +114,36 @@ func unitRefs(du cst.Node, own Key) []unitRef {
 		}
 		out = append(out, unitRef{lib: lib, unit: unit, node: n})
 	}
+	return out
+}
+
+// allLibs returns the libraries L of the unit's use clauses L.all
+// (sorted, work as own): every primary unit of L is potentially
+// visible in the unit (LRM 12.4).
+func allLibs(du cst.Node, own Key) []Key {
+	var out []Key
+	for n := range du.Descendants() {
+		uc, ok := cst.As[cst.UseClause](n)
+		if !ok {
+			continue
+		}
+		for m := range uc.Node.Descendants() {
+			sel, ok := cst.As[cst.SelectedName](m)
+			if !ok || TokenKey(sel.Suffix()) != "all" {
+				continue
+			}
+			lib := simpleKey(sel.Prefix().Node)
+			if lib == "" {
+				continue
+			}
+			if lib == Work {
+				lib = own
+			}
+			if !slices.Contains(out, lib) {
+				out = append(out, lib)
+			}
+		}
+	}
+	slices.Sort(out)
 	return out
 }

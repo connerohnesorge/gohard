@@ -1,0 +1,113 @@
+gohard-trace 1
+testbench hier_generate_tb
+end 50000000
+type std_logic logic
+type std_logic_vector array std_ulogic
+type std_ulogic logic
+scope hier_generate_tb instance hier_generate_tb(sim)
+scope hier_generate_tb.dut instance hier_generate(rtl)
+scope hier_generate_tb.dut.lanes(0) for-generate
+scope hier_generate_tb.dut.lanes(0).u instance hier_generate_lane(rtl)
+scope hier_generate_tb.dut.lanes(0).u.polarity.pass if-generate
+scope hier_generate_tb.dut.lanes(1) for-generate
+scope hier_generate_tb.dut.lanes(1).u instance hier_generate_lane(rtl)
+scope hier_generate_tb.dut.lanes(1).u.polarity.inv if-generate
+scope hier_generate_tb.dut.lanes(2) for-generate
+scope hier_generate_tb.dut.lanes(2).u instance hier_generate_lane(rtl)
+scope hier_generate_tb.dut.lanes(2).u.polarity.pass if-generate
+scope hier_generate_tb.dut.lanes(3) for-generate
+scope hier_generate_tb.dut.lanes(3).u instance hier_generate_lane(rtl)
+scope hier_generate_tb.dut.lanes(3).u.polarity.inv if-generate
+scope hier_generate_tb.dut.tap.multi if-generate
+signal hier_generate_tb.din std_logic_vector signal 13 downto 0
+signal hier_generate_tb.dout std_logic_vector signal 13 downto 0
+signal hier_generate_tb.dut.din std_logic_vector in 13 downto 0
+signal hier_generate_tb.dut.dout std_logic_vector out 13 downto 0
+signal hier_generate_tb.dut.lanes(0).u.a std_logic_vector in 1 downto 0
+signal hier_generate_tb.dut.lanes(0).u.y std_logic_vector out 1 downto 0
+signal hier_generate_tb.dut.lanes(1).u.a std_logic_vector in 2 downto 0
+signal hier_generate_tb.dut.lanes(1).u.y std_logic_vector out 2 downto 0
+signal hier_generate_tb.dut.lanes(2).u.a std_logic_vector in 3 downto 0
+signal hier_generate_tb.dut.lanes(2).u.y std_logic_vector out 3 downto 0
+signal hier_generate_tb.dut.lanes(3).u.a std_logic_vector in 4 downto 0
+signal hier_generate_tb.dut.lanes(3).u.y std_logic_vector out 4 downto 0
+signal hier_generate_tb.dut.parity std_logic out
+signal hier_generate_tb.parity std_logic signal
+process 1 hier_generate_tb.check
+process 2 hier_generate_tb.dut.lanes(0).u.polarity.pass._p0
+process 3 hier_generate_tb.dut.lanes(1).u.polarity.inv._p0
+process 4 hier_generate_tb.dut.lanes(2).u.polarity.pass._p0
+process 5 hier_generate_tb.dut.lanes(3).u.polarity.inv._p0
+process 6 hier_generate_tb.dut.tap.multi._p0
+0 0 hier_generate_tb.din 00000000000000 -
+0 0 hier_generate_tb.dout UUUUUUUUUUUUUU -
+0 0 hier_generate_tb.dut.din 00000000000000 -
+0 0 hier_generate_tb.dut.dout UUUUUUUUUUUUUU -
+0 0 hier_generate_tb.dut.lanes(0).u.a 00 -
+0 0 hier_generate_tb.dut.lanes(0).u.y UU -
+0 0 hier_generate_tb.dut.lanes(1).u.a 000 -
+0 0 hier_generate_tb.dut.lanes(1).u.y UUU -
+0 0 hier_generate_tb.dut.lanes(2).u.a 0000 -
+0 0 hier_generate_tb.dut.lanes(2).u.y UUUU -
+0 0 hier_generate_tb.dut.lanes(3).u.a 00000 -
+0 0 hier_generate_tb.dut.lanes(3).u.y UUUUU -
+0 0 hier_generate_tb.dut.parity U -
+0 0 hier_generate_tb.parity U -
+0 1 hier_generate_tb.dout 11111000011100 p2
+0 1 hier_generate_tb.dut.dout 11111000011100 p2
+0 1 hier_generate_tb.dut.lanes(0).u.y 00 p2
+0 1 hier_generate_tb.dut.lanes(1).u.y 111 p3
+0 1 hier_generate_tb.dut.lanes(2).u.y 0000 p4
+0 1 hier_generate_tb.dut.lanes(3).u.y 11111 p5
+0 1 hier_generate_tb.dut.parity 0 p6
+0 1 hier_generate_tb.parity 0 p6
+10000000 1 hier_generate_tb.din 11111111111111 p1
+10000000 1 hier_generate_tb.dut.din 11111111111111 p1
+10000000 1 hier_generate_tb.dut.lanes(0).u.a 11 p1
+10000000 1 hier_generate_tb.dut.lanes(1).u.a 111 p1
+10000000 1 hier_generate_tb.dut.lanes(2).u.a 1111 p1
+10000000 1 hier_generate_tb.dut.lanes(3).u.a 11111 p1
+10000000 2 hier_generate_tb.dout 00000111100011 p2
+10000000 2 hier_generate_tb.dut.dout 00000111100011 p2
+10000000 2 hier_generate_tb.dut.lanes(0).u.y 11 p2
+10000000 2 hier_generate_tb.dut.lanes(1).u.y 000 p3
+10000000 2 hier_generate_tb.dut.lanes(2).u.y 1111 p4
+10000000 2 hier_generate_tb.dut.lanes(3).u.y 00000 p5
+20000000 1 hier_generate_tb.din 10110011100101 p1
+20000000 1 hier_generate_tb.dut.din 10110011100101 p1
+20000000 1 hier_generate_tb.dut.lanes(0).u.a 01 p1
+20000000 1 hier_generate_tb.dut.lanes(1).u.a 001 p1
+20000000 1 hier_generate_tb.dut.lanes(2).u.a 0111 p1
+20000000 1 hier_generate_tb.dut.lanes(3).u.a 10110 p1
+20000000 2 hier_generate_tb.dout 01001011111001 p2
+20000000 2 hier_generate_tb.dut.dout 01001011111001 p2
+20000000 2 hier_generate_tb.dut.lanes(0).u.y 01 p2
+20000000 2 hier_generate_tb.dut.lanes(1).u.y 110 p3
+20000000 2 hier_generate_tb.dut.lanes(2).u.y 0111 p4
+20000000 2 hier_generate_tb.dut.lanes(3).u.y 01001 p5
+30000000 1 hier_generate_tb.din 01001100011010 p1
+30000000 1 hier_generate_tb.dut.din 01001100011010 p1
+30000000 1 hier_generate_tb.dut.lanes(0).u.a 10 p1
+30000000 1 hier_generate_tb.dut.lanes(1).u.a 110 p1
+30000000 1 hier_generate_tb.dut.lanes(2).u.a 1000 p1
+30000000 1 hier_generate_tb.dut.lanes(3).u.a 01001 p1
+30000000 2 hier_generate_tb.dout 10110100000110 p2
+30000000 2 hier_generate_tb.dut.dout 10110100000110 p2
+30000000 2 hier_generate_tb.dut.lanes(0).u.y 10 p2
+30000000 2 hier_generate_tb.dut.lanes(1).u.y 001 p3
+30000000 2 hier_generate_tb.dut.lanes(2).u.y 1000 p4
+30000000 2 hier_generate_tb.dut.lanes(3).u.y 10110 p5
+40000000 1 hier_generate_tb.din 00000000000001 p1
+40000000 1 hier_generate_tb.dut.din 00000000000001 p1
+40000000 1 hier_generate_tb.dut.lanes(0).u.a 01 p1
+40000000 1 hier_generate_tb.dut.lanes(1).u.a 000 p1
+40000000 1 hier_generate_tb.dut.lanes(2).u.a 0000 p1
+40000000 1 hier_generate_tb.dut.lanes(3).u.a 00000 p1
+40000000 2 hier_generate_tb.dout 11111000011101 p2
+40000000 2 hier_generate_tb.dut.dout 11111000011101 p2
+40000000 2 hier_generate_tb.dut.lanes(0).u.y 01 p2
+40000000 2 hier_generate_tb.dut.lanes(1).u.y 111 p3
+40000000 2 hier_generate_tb.dut.lanes(2).u.y 0000 p4
+40000000 2 hier_generate_tb.dut.lanes(3).u.y 11111 p5
+40000000 2 hier_generate_tb.dut.parity 1 p6
+40000000 2 hier_generate_tb.parity 1 p6

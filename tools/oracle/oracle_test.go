@@ -41,7 +41,7 @@ func TestSectionsRegistered(t *testing.T) {
 	if code := run([]string{"-list"}, &out, &out); code != 0 {
 		t.Fatalf("exit %d: %s", code, out.String())
 	}
-	if out.String() != "format\nsemerr\n" {
+	if out.String() != "format\nsemerr\ntrace\ntree\ngolden\n" {
 		t.Fatalf("sections %q", out.String())
 	}
 	if code := run([]string{"nope"}, &out, &out); code != 2 {
@@ -134,11 +134,20 @@ func checkSplice(t *testing.T, ref entryRef, src, out []byte, old,
 		src[len(src)-1-s] == out[len(out)-1-s] {
 		s++
 	}
-	// The common prefix may eat a shared leading part of old and val.
+	// The common prefix and suffix may eat a shared leading or
+	// trailing part of old and val.
 	gotOld := string(src[p : len(src)-s])
 	gotNew := string(out[p : len(out)-s])
-	if !strings.HasSuffix(old, gotOld) || !strings.HasSuffix(val, gotNew) ||
-		old[:len(old)-len(gotOld)] != val[:len(val)-len(gotNew)] {
+	ok := false
+	for i := 0; i <= len(old) && i <= len(val) && old[:i] == val[:i]; i++ {
+		o, v := old[i:], val[i:]
+		if strings.HasPrefix(o, gotOld) && strings.HasPrefix(v, gotNew) &&
+			o[len(gotOld):] == v[len(gotNew):] {
+			ok = true
+			break
+		}
+	}
+	if !ok {
 		t.Fatalf("%s: changed %q to %q, want %q to %q", ref, gotOld,
 			gotNew, old, val)
 	}

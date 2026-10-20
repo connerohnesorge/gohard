@@ -1,0 +1,409 @@
+gohard-trace 1
+testbench md_resolve_tb
+end 99000000
+type std_logic logic
+type std_logic_vector array std_ulogic
+type std_ulogic logic
+scope md_resolve_tb instance md_resolve_tb(tb)
+scope md_resolve_tb.dut instance md_resolve(rtl)
+signal md_resolve_tb.a_en std_logic signal
+signal md_resolve_tb.a_val std_logic signal
+signal md_resolve_tb.b_en std_logic signal
+signal md_resolve_tb.b_val std_logic signal
+signal md_resolve_tb.bus_io std_logic signal
+signal md_resolve_tb.d0 std_logic signal
+signal md_resolve_tb.d3 std_logic signal
+signal md_resolve_tb.dut.a_en std_logic in
+signal md_resolve_tb.dut.a_val std_logic in
+signal md_resolve_tb.dut.b_en std_logic in
+signal md_resolve_tb.dut.b_val std_logic in
+signal md_resolve_tb.dut.bus_io std_logic inout
+signal md_resolve_tb.dut.d0 std_logic in
+signal md_resolve_tb.dut.d1 std_logic signal
+signal md_resolve_tb.dut.d2 std_logic signal
+signal md_resolve_tb.dut.d3 std_logic out
+signal md_resolve_tb.dut.p std_logic signal
+signal md_resolve_tb.dut.p_out std_logic out
+signal md_resolve_tb.dut.q std_logic signal
+signal md_resolve_tb.dut.q_out std_logic out
+signal md_resolve_tb.dut.swap std_logic in
+signal md_resolve_tb.dut.v_en std_logic in
+signal md_resolve_tb.dut.vec_io std_logic_vector inout 3 downto 0
+signal md_resolve_tb.p_out std_logic signal
+signal md_resolve_tb.q_out std_logic signal
+signal md_resolve_tb.swap std_logic signal
+signal md_resolve_tb.t_val std_logic signal
+signal md_resolve_tb.t_vec std_logic_vector signal 3 downto 0
+signal md_resolve_tb.v_en std_logic signal
+signal md_resolve_tb.vec_io std_logic_vector signal 3 downto 0
+process 1 md_resolve_tb._p0
+process 2 md_resolve_tb._p1
+process 3 md_resolve_tb.dut._p0
+process 4 md_resolve_tb.dut._p1
+process 5 md_resolve_tb.dut._p2
+process 6 md_resolve_tb.dut._p3
+process 7 md_resolve_tb.dut._p4
+process 8 md_resolve_tb.dut._p5
+process 9 md_resolve_tb.dut._p6
+process 10 md_resolve_tb.dut._p7
+process 11 md_resolve_tb.dut.swapper
+process 12 md_resolve_tb.stim
+0 0 md_resolve_tb.a_en 0 -
+0 0 md_resolve_tb.a_val Z -
+0 0 md_resolve_tb.b_en 0 -
+0 0 md_resolve_tb.b_val Z -
+0 0 md_resolve_tb.bus_io U -
+0 0 md_resolve_tb.d0 0 -
+0 0 md_resolve_tb.d3 U -
+0 0 md_resolve_tb.dut.a_en 0 -
+0 0 md_resolve_tb.dut.a_val Z -
+0 0 md_resolve_tb.dut.b_en 0 -
+0 0 md_resolve_tb.dut.b_val Z -
+0 0 md_resolve_tb.dut.bus_io U -
+0 0 md_resolve_tb.dut.d0 0 -
+0 0 md_resolve_tb.dut.d1 0 -
+0 0 md_resolve_tb.dut.d2 0 -
+0 0 md_resolve_tb.dut.d3 U -
+0 0 md_resolve_tb.dut.p 0 -
+0 0 md_resolve_tb.dut.p_out U -
+0 0 md_resolve_tb.dut.q 1 -
+0 0 md_resolve_tb.dut.q_out U -
+0 0 md_resolve_tb.dut.swap 0 -
+0 0 md_resolve_tb.dut.v_en 0 -
+0 0 md_resolve_tb.dut.vec_io UUUU -
+0 0 md_resolve_tb.p_out U -
+0 0 md_resolve_tb.q_out U -
+0 0 md_resolve_tb.swap 0 -
+0 0 md_resolve_tb.t_val Z -
+0 0 md_resolve_tb.t_vec ZZZZ -
+0 0 md_resolve_tb.v_en 0 -
+0 0 md_resolve_tb.vec_io UUUU -
+0 1 md_resolve_tb.bus_io Z p3
+0 1 md_resolve_tb.d3 0 p8
+0 1 md_resolve_tb.dut.bus_io Z p3
+0 1 md_resolve_tb.dut.d3 0 p8
+0 1 md_resolve_tb.dut.p_out 0 p9
+0 1 md_resolve_tb.dut.q_out 1 p10
+0 1 md_resolve_tb.dut.vec_io ZZZZ p5
+0 1 md_resolve_tb.p_out 0 p9
+0 1 md_resolve_tb.q_out 1 p10
+0 1 md_resolve_tb.vec_io ZZZZ p5
+10000000 1 md_resolve_tb.a_en 1 p12
+10000000 1 md_resolve_tb.a_val U p12
+10000000 1 md_resolve_tb.b_en 1 p12
+10000000 1 md_resolve_tb.b_val U p12
+10000000 1 md_resolve_tb.dut.a_en 1 p12
+10000000 1 md_resolve_tb.dut.a_val U p12
+10000000 1 md_resolve_tb.dut.b_en 1 p12
+10000000 1 md_resolve_tb.dut.b_val U p12
+10000000 2 md_resolve_tb.bus_io U p3
+10000000 2 md_resolve_tb.dut.bus_io U p3
+11000000 1 md_resolve_tb.b_val X p12
+11000000 1 md_resolve_tb.dut.b_val X p12
+12000000 1 md_resolve_tb.b_val 0 p12
+12000000 1 md_resolve_tb.dut.b_val 0 p12
+13000000 1 md_resolve_tb.b_val 1 p12
+13000000 1 md_resolve_tb.dut.b_val 1 p12
+14000000 1 md_resolve_tb.b_val Z p12
+14000000 1 md_resolve_tb.dut.b_val Z p12
+15000000 1 md_resolve_tb.b_val W p12
+15000000 1 md_resolve_tb.dut.b_val W p12
+16000000 1 md_resolve_tb.b_val L p12
+16000000 1 md_resolve_tb.dut.b_val L p12
+17000000 1 md_resolve_tb.b_val H p12
+17000000 1 md_resolve_tb.dut.b_val H p12
+18000000 1 md_resolve_tb.b_val - p12
+18000000 1 md_resolve_tb.dut.b_val - p12
+19000000 1 md_resolve_tb.a_val X p12
+19000000 1 md_resolve_tb.b_val U p12
+19000000 1 md_resolve_tb.dut.a_val X p12
+19000000 1 md_resolve_tb.dut.b_val U p12
+20000000 1 md_resolve_tb.b_val X p12
+20000000 1 md_resolve_tb.dut.b_val X p12
+20000000 2 md_resolve_tb.bus_io X p4
+20000000 2 md_resolve_tb.dut.bus_io X p4
+21000000 1 md_resolve_tb.b_val 0 p12
+21000000 1 md_resolve_tb.dut.b_val 0 p12
+22000000 1 md_resolve_tb.b_val 1 p12
+22000000 1 md_resolve_tb.dut.b_val 1 p12
+23000000 1 md_resolve_tb.b_val Z p12
+23000000 1 md_resolve_tb.dut.b_val Z p12
+24000000 1 md_resolve_tb.b_val W p12
+24000000 1 md_resolve_tb.dut.b_val W p12
+25000000 1 md_resolve_tb.b_val L p12
+25000000 1 md_resolve_tb.dut.b_val L p12
+26000000 1 md_resolve_tb.b_val H p12
+26000000 1 md_resolve_tb.dut.b_val H p12
+27000000 1 md_resolve_tb.b_val - p12
+27000000 1 md_resolve_tb.dut.b_val - p12
+28000000 1 md_resolve_tb.a_val 0 p12
+28000000 1 md_resolve_tb.b_val U p12
+28000000 1 md_resolve_tb.dut.a_val 0 p12
+28000000 1 md_resolve_tb.dut.b_val U p12
+28000000 2 md_resolve_tb.bus_io U p3
+28000000 2 md_resolve_tb.dut.bus_io U p3
+29000000 1 md_resolve_tb.b_val X p12
+29000000 1 md_resolve_tb.dut.b_val X p12
+29000000 2 md_resolve_tb.bus_io X p4
+29000000 2 md_resolve_tb.dut.bus_io X p4
+30000000 1 md_resolve_tb.b_val 0 p12
+30000000 1 md_resolve_tb.dut.b_val 0 p12
+30000000 2 md_resolve_tb.bus_io 0 p4
+30000000 2 md_resolve_tb.dut.bus_io 0 p4
+31000000 1 md_resolve_tb.b_val 1 p12
+31000000 1 md_resolve_tb.dut.b_val 1 p12
+31000000 2 md_resolve_tb.bus_io X p4
+31000000 2 md_resolve_tb.dut.bus_io X p4
+32000000 1 md_resolve_tb.b_val Z p12
+32000000 1 md_resolve_tb.dut.b_val Z p12
+32000000 2 md_resolve_tb.bus_io 0 p4
+32000000 2 md_resolve_tb.dut.bus_io 0 p4
+33000000 1 md_resolve_tb.b_val W p12
+33000000 1 md_resolve_tb.dut.b_val W p12
+34000000 1 md_resolve_tb.b_val L p12
+34000000 1 md_resolve_tb.dut.b_val L p12
+35000000 1 md_resolve_tb.b_val H p12
+35000000 1 md_resolve_tb.dut.b_val H p12
+36000000 1 md_resolve_tb.b_val - p12
+36000000 1 md_resolve_tb.dut.b_val - p12
+36000000 2 md_resolve_tb.bus_io X p4
+36000000 2 md_resolve_tb.dut.bus_io X p4
+37000000 1 md_resolve_tb.a_val 1 p12
+37000000 1 md_resolve_tb.b_val U p12
+37000000 1 md_resolve_tb.dut.a_val 1 p12
+37000000 1 md_resolve_tb.dut.b_val U p12
+37000000 2 md_resolve_tb.bus_io U p3
+37000000 2 md_resolve_tb.dut.bus_io U p3
+38000000 1 md_resolve_tb.b_val X p12
+38000000 1 md_resolve_tb.dut.b_val X p12
+38000000 2 md_resolve_tb.bus_io X p4
+38000000 2 md_resolve_tb.dut.bus_io X p4
+39000000 1 md_resolve_tb.b_val 0 p12
+39000000 1 md_resolve_tb.dut.b_val 0 p12
+40000000 1 md_resolve_tb.b_val 1 p12
+40000000 1 md_resolve_tb.dut.b_val 1 p12
+40000000 2 md_resolve_tb.bus_io 1 p4
+40000000 2 md_resolve_tb.dut.bus_io 1 p4
+41000000 1 md_resolve_tb.b_val Z p12
+41000000 1 md_resolve_tb.dut.b_val Z p12
+42000000 1 md_resolve_tb.b_val W p12
+42000000 1 md_resolve_tb.dut.b_val W p12
+43000000 1 md_resolve_tb.b_val L p12
+43000000 1 md_resolve_tb.dut.b_val L p12
+44000000 1 md_resolve_tb.b_val H p12
+44000000 1 md_resolve_tb.dut.b_val H p12
+45000000 1 md_resolve_tb.b_val - p12
+45000000 1 md_resolve_tb.dut.b_val - p12
+45000000 2 md_resolve_tb.bus_io X p4
+45000000 2 md_resolve_tb.dut.bus_io X p4
+46000000 1 md_resolve_tb.a_val Z p12
+46000000 1 md_resolve_tb.b_val U p12
+46000000 1 md_resolve_tb.dut.a_val Z p12
+46000000 1 md_resolve_tb.dut.b_val U p12
+46000000 2 md_resolve_tb.bus_io U p3
+46000000 2 md_resolve_tb.dut.bus_io U p3
+47000000 1 md_resolve_tb.b_val X p12
+47000000 1 md_resolve_tb.dut.b_val X p12
+47000000 2 md_resolve_tb.bus_io X p4
+47000000 2 md_resolve_tb.dut.bus_io X p4
+48000000 1 md_resolve_tb.b_val 0 p12
+48000000 1 md_resolve_tb.dut.b_val 0 p12
+48000000 2 md_resolve_tb.bus_io 0 p4
+48000000 2 md_resolve_tb.dut.bus_io 0 p4
+49000000 1 md_resolve_tb.b_val 1 p12
+49000000 1 md_resolve_tb.dut.b_val 1 p12
+49000000 2 md_resolve_tb.bus_io 1 p4
+49000000 2 md_resolve_tb.dut.bus_io 1 p4
+50000000 1 md_resolve_tb.b_val Z p12
+50000000 1 md_resolve_tb.dut.b_val Z p12
+50000000 2 md_resolve_tb.bus_io Z p4
+50000000 2 md_resolve_tb.dut.bus_io Z p4
+51000000 1 md_resolve_tb.b_val W p12
+51000000 1 md_resolve_tb.dut.b_val W p12
+51000000 2 md_resolve_tb.bus_io W p4
+51000000 2 md_resolve_tb.dut.bus_io W p4
+52000000 1 md_resolve_tb.b_val L p12
+52000000 1 md_resolve_tb.dut.b_val L p12
+52000000 2 md_resolve_tb.bus_io L p4
+52000000 2 md_resolve_tb.dut.bus_io L p4
+53000000 1 md_resolve_tb.b_val H p12
+53000000 1 md_resolve_tb.dut.b_val H p12
+53000000 2 md_resolve_tb.bus_io H p4
+53000000 2 md_resolve_tb.dut.bus_io H p4
+54000000 1 md_resolve_tb.b_val - p12
+54000000 1 md_resolve_tb.dut.b_val - p12
+54000000 2 md_resolve_tb.bus_io X p4
+54000000 2 md_resolve_tb.dut.bus_io X p4
+55000000 1 md_resolve_tb.a_val W p12
+55000000 1 md_resolve_tb.b_val U p12
+55000000 1 md_resolve_tb.dut.a_val W p12
+55000000 1 md_resolve_tb.dut.b_val U p12
+55000000 2 md_resolve_tb.bus_io U p3
+55000000 2 md_resolve_tb.dut.bus_io U p3
+56000000 1 md_resolve_tb.b_val X p12
+56000000 1 md_resolve_tb.dut.b_val X p12
+56000000 2 md_resolve_tb.bus_io X p4
+56000000 2 md_resolve_tb.dut.bus_io X p4
+57000000 1 md_resolve_tb.b_val 0 p12
+57000000 1 md_resolve_tb.dut.b_val 0 p12
+57000000 2 md_resolve_tb.bus_io 0 p4
+57000000 2 md_resolve_tb.dut.bus_io 0 p4
+58000000 1 md_resolve_tb.b_val 1 p12
+58000000 1 md_resolve_tb.dut.b_val 1 p12
+58000000 2 md_resolve_tb.bus_io 1 p4
+58000000 2 md_resolve_tb.dut.bus_io 1 p4
+59000000 1 md_resolve_tb.b_val Z p12
+59000000 1 md_resolve_tb.dut.b_val Z p12
+59000000 2 md_resolve_tb.bus_io W p4
+59000000 2 md_resolve_tb.dut.bus_io W p4
+60000000 1 md_resolve_tb.b_val W p12
+60000000 1 md_resolve_tb.dut.b_val W p12
+61000000 1 md_resolve_tb.b_val L p12
+61000000 1 md_resolve_tb.dut.b_val L p12
+62000000 1 md_resolve_tb.b_val H p12
+62000000 1 md_resolve_tb.dut.b_val H p12
+63000000 1 md_resolve_tb.b_val - p12
+63000000 1 md_resolve_tb.dut.b_val - p12
+63000000 2 md_resolve_tb.bus_io X p4
+63000000 2 md_resolve_tb.dut.bus_io X p4
+64000000 1 md_resolve_tb.a_val L p12
+64000000 1 md_resolve_tb.b_val U p12
+64000000 1 md_resolve_tb.dut.a_val L p12
+64000000 1 md_resolve_tb.dut.b_val U p12
+64000000 2 md_resolve_tb.bus_io U p3
+64000000 2 md_resolve_tb.dut.bus_io U p3
+65000000 1 md_resolve_tb.b_val X p12
+65000000 1 md_resolve_tb.dut.b_val X p12
+65000000 2 md_resolve_tb.bus_io X p4
+65000000 2 md_resolve_tb.dut.bus_io X p4
+66000000 1 md_resolve_tb.b_val 0 p12
+66000000 1 md_resolve_tb.dut.b_val 0 p12
+66000000 2 md_resolve_tb.bus_io 0 p4
+66000000 2 md_resolve_tb.dut.bus_io 0 p4
+67000000 1 md_resolve_tb.b_val 1 p12
+67000000 1 md_resolve_tb.dut.b_val 1 p12
+67000000 2 md_resolve_tb.bus_io 1 p4
+67000000 2 md_resolve_tb.dut.bus_io 1 p4
+68000000 1 md_resolve_tb.b_val Z p12
+68000000 1 md_resolve_tb.dut.b_val Z p12
+68000000 2 md_resolve_tb.bus_io L p4
+68000000 2 md_resolve_tb.dut.bus_io L p4
+69000000 1 md_resolve_tb.b_val W p12
+69000000 1 md_resolve_tb.dut.b_val W p12
+69000000 2 md_resolve_tb.bus_io W p4
+69000000 2 md_resolve_tb.dut.bus_io W p4
+70000000 1 md_resolve_tb.b_val L p12
+70000000 1 md_resolve_tb.dut.b_val L p12
+70000000 2 md_resolve_tb.bus_io L p4
+70000000 2 md_resolve_tb.dut.bus_io L p4
+71000000 1 md_resolve_tb.b_val H p12
+71000000 1 md_resolve_tb.dut.b_val H p12
+71000000 2 md_resolve_tb.bus_io W p4
+71000000 2 md_resolve_tb.dut.bus_io W p4
+72000000 1 md_resolve_tb.b_val - p12
+72000000 1 md_resolve_tb.dut.b_val - p12
+72000000 2 md_resolve_tb.bus_io X p4
+72000000 2 md_resolve_tb.dut.bus_io X p4
+73000000 1 md_resolve_tb.a_val H p12
+73000000 1 md_resolve_tb.b_val U p12
+73000000 1 md_resolve_tb.dut.a_val H p12
+73000000 1 md_resolve_tb.dut.b_val U p12
+73000000 2 md_resolve_tb.bus_io U p3
+73000000 2 md_resolve_tb.dut.bus_io U p3
+74000000 1 md_resolve_tb.b_val X p12
+74000000 1 md_resolve_tb.dut.b_val X p12
+74000000 2 md_resolve_tb.bus_io X p4
+74000000 2 md_resolve_tb.dut.bus_io X p4
+75000000 1 md_resolve_tb.b_val 0 p12
+75000000 1 md_resolve_tb.dut.b_val 0 p12
+75000000 2 md_resolve_tb.bus_io 0 p4
+75000000 2 md_resolve_tb.dut.bus_io 0 p4
+76000000 1 md_resolve_tb.b_val 1 p12
+76000000 1 md_resolve_tb.dut.b_val 1 p12
+76000000 2 md_resolve_tb.bus_io 1 p4
+76000000 2 md_resolve_tb.dut.bus_io 1 p4
+77000000 1 md_resolve_tb.b_val Z p12
+77000000 1 md_resolve_tb.dut.b_val Z p12
+77000000 2 md_resolve_tb.bus_io H p4
+77000000 2 md_resolve_tb.dut.bus_io H p4
+78000000 1 md_resolve_tb.b_val W p12
+78000000 1 md_resolve_tb.dut.b_val W p12
+78000000 2 md_resolve_tb.bus_io W p4
+78000000 2 md_resolve_tb.dut.bus_io W p4
+79000000 1 md_resolve_tb.b_val L p12
+79000000 1 md_resolve_tb.dut.b_val L p12
+80000000 1 md_resolve_tb.b_val H p12
+80000000 1 md_resolve_tb.dut.b_val H p12
+80000000 2 md_resolve_tb.bus_io H p4
+80000000 2 md_resolve_tb.dut.bus_io H p4
+81000000 1 md_resolve_tb.b_val - p12
+81000000 1 md_resolve_tb.dut.b_val - p12
+81000000 2 md_resolve_tb.bus_io X p4
+81000000 2 md_resolve_tb.dut.bus_io X p4
+82000000 1 md_resolve_tb.a_val - p12
+82000000 1 md_resolve_tb.b_val U p12
+82000000 1 md_resolve_tb.dut.a_val - p12
+82000000 1 md_resolve_tb.dut.b_val U p12
+82000000 2 md_resolve_tb.bus_io U p3
+82000000 2 md_resolve_tb.dut.bus_io U p3
+83000000 1 md_resolve_tb.b_val X p12
+83000000 1 md_resolve_tb.dut.b_val X p12
+83000000 2 md_resolve_tb.bus_io X p4
+83000000 2 md_resolve_tb.dut.bus_io X p4
+84000000 1 md_resolve_tb.b_val 0 p12
+84000000 1 md_resolve_tb.dut.b_val 0 p12
+85000000 1 md_resolve_tb.b_val 1 p12
+85000000 1 md_resolve_tb.dut.b_val 1 p12
+86000000 1 md_resolve_tb.b_val Z p12
+86000000 1 md_resolve_tb.dut.b_val Z p12
+87000000 1 md_resolve_tb.b_val W p12
+87000000 1 md_resolve_tb.dut.b_val W p12
+88000000 1 md_resolve_tb.b_val L p12
+88000000 1 md_resolve_tb.dut.b_val L p12
+89000000 1 md_resolve_tb.b_val H p12
+89000000 1 md_resolve_tb.dut.b_val H p12
+90000000 1 md_resolve_tb.b_val - p12
+90000000 1 md_resolve_tb.dut.b_val - p12
+91000000 1 md_resolve_tb.a_val L p12
+91000000 1 md_resolve_tb.b_val H p12
+91000000 1 md_resolve_tb.dut.a_val L p12
+91000000 1 md_resolve_tb.dut.b_val H p12
+91000000 2 md_resolve_tb.bus_io W p3
+91000000 2 md_resolve_tb.dut.bus_io W p3
+92000000 1 md_resolve_tb.t_val 1 p12
+92000000 2 md_resolve_tb.bus_io 1 p1
+92000000 2 md_resolve_tb.dut.bus_io 1 p1
+93000000 1 md_resolve_tb.a_val 0 p12
+93000000 1 md_resolve_tb.dut.a_val 0 p12
+93000000 2 md_resolve_tb.bus_io X p3
+93000000 2 md_resolve_tb.dut.bus_io X p3
+94000000 1 md_resolve_tb.a_en 0 p12
+94000000 1 md_resolve_tb.b_en 0 p12
+94000000 1 md_resolve_tb.dut.a_en 0 p12
+94000000 1 md_resolve_tb.dut.b_en 0 p12
+94000000 1 md_resolve_tb.t_val Z p12
+94000000 2 md_resolve_tb.bus_io Z p3
+94000000 2 md_resolve_tb.dut.bus_io Z p3
+95000000 1 md_resolve_tb.dut.v_en 1 p12
+95000000 1 md_resolve_tb.t_vec 1L0Z p12
+95000000 1 md_resolve_tb.v_en 1 p12
+95000000 2 md_resolve_tb.dut.vec_io X10Z p5
+95000000 2 md_resolve_tb.vec_io X10Z p5
+96000000 1 md_resolve_tb.dut.v_en 0 p12
+96000000 1 md_resolve_tb.v_en 0 p12
+96000000 2 md_resolve_tb.dut.vec_io 1L0Z p5
+96000000 2 md_resolve_tb.vec_io 1L0Z p5
+97000000 1 md_resolve_tb.d0 1 p12
+97000000 1 md_resolve_tb.dut.d0 1 p12
+97000000 2 md_resolve_tb.dut.d1 1 p6
+97000000 3 md_resolve_tb.dut.d2 1 p7
+97000000 4 md_resolve_tb.d3 1 p8
+97000000 4 md_resolve_tb.dut.d3 1 p8
+98000000 1 md_resolve_tb.dut.swap 1 p12
+98000000 1 md_resolve_tb.swap 1 p12
+98000000 2 md_resolve_tb.dut.p 1 p11
+98000000 2 md_resolve_tb.dut.q 0 p11
+98000000 3 md_resolve_tb.dut.p_out 1 p9
+98000000 3 md_resolve_tb.dut.q_out 0 p10
+98000000 3 md_resolve_tb.p_out 1 p9
+98000000 3 md_resolve_tb.q_out 0 p10

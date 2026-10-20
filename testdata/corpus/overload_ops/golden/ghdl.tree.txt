@@ -1,0 +1,13 @@
+gohard-tree 1
+tool ghdl 6.0.0
+sources bd99c52d263aa4ea
+overload_ops_tb [entity]
+`-sim [arch]
+  `-dut [instance]
+    `-overload_ops [entity]
+      `-rtl [arch]
+std.standard [package]
+std.env [package]
+work.ow_types [package]
+work.ow_sat [package]
+work.ow_wrap [package]

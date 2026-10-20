@@ -218,10 +218,29 @@ func (a *analyzer) selectedName(sel cst.SelectedName, kind RefKind,
 			return unknownNamed()
 		}
 		return a.denote([]*Decl{u.Decl}, suffix, kind)
+	case p.expr != nil && len(p.decls) > 0 &&
+		p.decls[0].Overloadable() && a.enclosing(p.decls) == nil:
+		// o.f.x with f a parameterless method of the protected
+		// object o returning a record: f is called (LRM 8.3, 4.5.2).
+		v := a.value(p, sel.Prefix().Node, nil)
+		return a.selectInValue(v, suffix, sk, kind)
 	case p.expr != nil:
 		return a.selectInValue(p.expr, suffix, sk, kind)
 	case p.typ != nil:
 		return unknownNamed()
+	case a.enclosing(p.decls) != nil:
+		// f.x with f an enclosing subprogram is an expanded name
+		// (LRM 8.3).
+		x := a.enclosing(p.decls)
+		ds := lookupIn(x.Region, sk, a.std)
+		if len(ds) == 0 {
+			if !a.quiet {
+				a.semaError(suffix.Span(), suffix.Text()+
+					" is not declared in "+x.Text)
+			}
+			return unknownNamed()
+		}
+		return a.denote(ds, suffix, kind)
 	case len(p.decls) > 0 && p.decls[0].Overloadable():
 		// f.x with f a parameterless function returning a record.
 		v := a.value(p, sel.Prefix().Node, nil)
@@ -246,6 +265,23 @@ func (a *analyzer) selectedName(sel cst.SelectedName, kind RefKind,
 		return a.denote(ds, suffix, kind)
 	}
 	return unknownNamed()
+}
+
+// enclosing returns the overloadable declaration of ds whose region
+// encloses the current one: the prefix of an expanded name naming an
+// item of an enclosing subprogram (LRM 8.3), or nil.
+func (a *analyzer) enclosing(ds []*Decl) *Decl {
+	if len(ds) == 0 || !ds[0].Overloadable() {
+		return nil
+	}
+	for r := a.cur; r != nil; r = r.Parent {
+		for _, d := range ds {
+			if d.Region != nil && d.Region == r {
+				return d
+			}
+		}
+	}
+	return nil
 }
 
 // selectInValue selects suffix from the value v: a record element
@@ -316,7 +352,7 @@ func (a *analyzer) notA(tok cst.Token, v *Expr, what string) {
 // may see it, reporting library/missing-unit when it does not exist in
 // the selected standard's view.
 func (a *analyzer) libUnit(l *Library, k Key, tok cst.Token) *Unit {
-	u, ok := l.Unit(k)
+	u, ok := l.UnitFrom(k, a.u)
 	if !ok {
 		a.missingUnit(l, k, tok)
 		return nil
@@ -520,6 +556,7 @@ func (a *analyzer) indexSubtype(t *Type, args cst.AssociationList) *Type {
 // slice when the one argument is a discrete range.
 func (a *analyzer) index(n cst.Node, v *Expr, args cst.AssociationList,
 ) *Expr {
+	a.settleIndexed(v)
 	t := v.Type
 	b := t.Base()
 	if b != nil && b.Class == TypeAccess && b.Designated != nil {
@@ -654,6 +691,19 @@ func firstIndex(b *Type) *Type {
 	return nil
 }
 
+// nthIndex is the index subtype that an array attribute with the
+// dimension arguments args denotes (LRM 16.2.2, 16.2.3): that of the
+// literal dimension N, else that of the first dimension.
+func nthIndex(b *Type, args []*Expr) *Type {
+	if len(args) == 1 {
+		if n, ok := literalInt(args[0]); ok && n >= 1 &&
+			n <= int64(len(b.Index)) {
+			return b.Index[n-1]
+		}
+	}
+	return firstIndex(b)
+}
+
 func (a *analyzer) sliceName(s cst.SliceName, kind RefKind) named {
 	p := a.resolveName(s.Prefix().Node, kind, nil)
 	var v *Expr
@@ -671,6 +721,7 @@ func (a *analyzer) sliceName(s cst.SliceName, kind RefKind) named {
 		a.discreteRange(sliceRange(s), nil)
 		return unknownNamed()
 	}
+	a.settleIndexed(v)
 	t := v.Type
 	b := t.Base()
 	if b != nil && b.Class == TypeAccess && b.Designated != nil {
@@ -805,7 +856,7 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		dimension()
 		rc := &RangeCons{Node: an.Node, Attr: e, Type: UnknownType}
 		if isArray {
-			rc.Type = orUnknown(firstIndex(pt.Base()))
+			rc.Type = orUnknown(nthIndex(pt.Base(), e.Args))
 		} else if pt != nil {
 			rc.Type = pt
 		}
@@ -825,7 +876,7 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		case dk == "designated_subtype":
 			return named{typ: orUnknown(pt.Base().Designated)}
 		case dk == "index":
-			return named{typ: orUnknown(firstIndex(pt.Base()))}
+			return named{typ: orUnknown(nthIndex(pt.Base(), e.Args))}
 		case pv != nil && notFullyConstrained(pt, 0):
 			// obj'SUBTYPE of an unconstrained interface object: its
 			// constraint is the actual's, known at run time.
@@ -922,7 +973,7 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 	case dk == "ascending":
 		e.Type = orUnknown(a.stdType("boolean"))
 	case isArray:
-		e.Type = orUnknown(firstIndex(pt.Base()))
+		e.Type = orUnknown(nthIndex(pt.Base(), e.Args))
 	case pt != nil:
 		e.Type = pt
 	}
@@ -950,22 +1001,57 @@ func (a *analyzer) signalPrefix(dtok cst.Token, pv *Expr) {
 func (a *analyzer) userAttribute(an cst.AttributeName, p named,
 	dtok cst.Token,
 ) named {
-	if arg := attrArg(an); !arg.IsZero() {
-		a.expr(arg, nil)
-	}
+	argNode := attrArg(an)
 	r := a.lookup(TokenKey(dtok))
+	if len(p.decls) == 1 && len(r.Decls) == 0 {
+		// lib.e'A of a design unit whose attribute A is not visible
+		// here: the attribute specification in the unit gives e the
+		// attribute (LRM 7.2), and P'A denotes its value (LRM 8.6).
+		if x := p.decls[0].Denotes(); x.Unit != nil &&
+			x.Unit.Decl == x && x.Unit != a.u {
+			for _, ad := range x.Unit.unitAttrs {
+				if ad.Name == TokenKey(dtok) {
+					r.Decls = []*Decl{ad}
+					break
+				}
+			}
+		}
+	}
 	for _, d := range r.Decls {
 		if d.Denotes().Kind == DeclAttribute {
 			a.ref(dtok, d, RefRead)
-			return named{expr: &Expr{Kind: ExprAttr, Node: an.Node,
+			v := &Expr{Kind: ExprAttr, Node: an.Node,
 				Attr: TokenKey(dtok), Prefix: p.expr, Decl: d,
-				Type: orUnknown(d.Denotes().Type)}}
+				Type: orUnknown(d.Denotes().Type)}
+			if argNode.IsZero() {
+				return named{expr: v}
+			}
+			return named{expr: a.attrIndex(an.Node, v, argNode)}
 		}
+	}
+	if !argNode.IsZero() {
+		a.expr(argNode, nil)
 	}
 	if !p.unknown {
 		a.undefined(dtok)
 	}
 	return unknownNamed()
+}
+
+// attrIndex types P'A(X) for a user-defined attribute A: the name
+// P'A denotes the attribute's value, and (X) indexes it (LRM 8.4,
+// 8.6) when that value is a one-dimensional array.
+func (a *analyzer) attrIndex(n cst.Node, v *Expr, x cst.Node) *Expr {
+	b := v.Type.Base()
+	if v.Type.Unknown() || b == nil || b.Class != TypeArray ||
+		b.Dims() != 1 {
+		a.expr(x, nil)
+		return &Expr{Kind: ExprAttr, Node: n, Attr: v.Attr,
+			Prefix: v.Prefix, Decl: v.Decl, Type: UnknownType}
+	}
+	i := a.expr(x, b.Index[0])
+	return &Expr{Kind: ExprIndex, Node: n, Prefix: v,
+		Args: []*Expr{i}, Type: orUnknown(v.Type.ElemType())}
 }
 
 // externalName types <<class path : subtype>> (LRM 8.7) by its subtype
@@ -1018,7 +1104,7 @@ func (a *analyzer) packagePathname(path cst.Node) *Decl {
 	if l.Decl != nil {
 		a.ref(toks[0], l.Decl, RefSelect)
 	}
-	u, ok := l.Unit(TokenKey(toks[1]))
+	u, ok := l.UnitFrom(TokenKey(toks[1]), a.u)
 	if !ok || u.Decl == nil || !a.s.readable(a.u, u) ||
 		!visibleIn(u.Decl, a.std) {
 		return nil
@@ -1042,4 +1128,44 @@ func (a *analyzer) packagePathname(path cst.Node) *Decl {
 		a.ref(tok, d, kind)
 	}
 	return d
+}
+
+// isArrayish reports whether t is an array type or an access to one.
+func isArrayish(t *Type) bool {
+	if t.Unknown() {
+		return false
+	}
+	b := t.Base()
+	if b.Class == TypeAccess && b.Designated != nil {
+		b = b.Designated.Base()
+	}
+	return b.Class == TypeArray
+}
+
+// arrayResult reports whether one of ds returns an array (or an access
+// to one).
+func arrayResult(ds []*Decl) bool {
+	for _, d := range ds {
+		if isArrayish(d.Denotes().Type) {
+			return true
+		}
+	}
+	return false
+}
+
+// settleIndexed settles a pending f(x) that is the prefix of an index
+// or slice name, f(x)(y): it is the reading that yields an array (LRM
+// 8.4, 8.5).
+func (a *analyzer) settleIndexed(v *Expr) {
+	p := v.pend
+	if p == nil || p.kind != pendCall || p.index == nil {
+		return
+	}
+	if !arrayResult(p.fitting) && isArrayish(p.index.elem) {
+		*v = *a.indexReading(v.Node, p.tok, p.cands, p.index, p.acts,
+			p.object)
+		return
+	}
+	*v = *a.finishCall(v.Node, p.tok, p.name, p.cands, p.acts, nil,
+		false, p.object, true)
 }

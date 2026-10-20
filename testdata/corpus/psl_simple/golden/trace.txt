@@ -1,0 +1,115 @@
+gohard-trace 1
+testbench psl_simple_tb
+end 100000000
+type integer integer 0 2147483647
+type std_logic logic
+scope psl_simple_tb instance psl_simple_tb(sim)
+scope psl_simple_tb.dut instance psl_simple(rtl)
+signal psl_simple_tb.a std_logic signal
+signal psl_simple_tb.b std_logic signal
+signal psl_simple_tb.clk std_logic signal
+signal psl_simple_tb.dut.a std_logic out
+signal psl_simple_tb.dut.ai std_logic signal
+signal psl_simple_tb.dut.b std_logic out
+signal psl_simple_tb.dut.bi std_logic signal
+signal psl_simple_tb.dut.clk std_logic in
+signal psl_simple_tb.dut.n integer signal
+process 1 psl_simple_tb._p0
+process 2 psl_simple_tb.dut._p0
+process 3 psl_simple_tb.dut._p1
+process 4 psl_simple_tb.dut._p2
+process 5 psl_simple_tb.dut._p3
+process 6 psl_simple_tb.dut.a_then_b
+process 7 psl_simple_tb.dut.b_twice
+process 8 psl_simple_tb.dut.count
+process 9 psl_simple_tb.dut.never_both
+process 10 psl_simple_tb.stopper
+0 0 psl_simple_tb.a U -
+0 0 psl_simple_tb.b U -
+0 0 psl_simple_tb.clk 0 -
+0 0 psl_simple_tb.dut.a U -
+0 0 psl_simple_tb.dut.ai 0 -
+0 0 psl_simple_tb.dut.b U -
+0 0 psl_simple_tb.dut.bi 0 -
+0 0 psl_simple_tb.dut.clk 0 -
+0 0 psl_simple_tb.dut.n 0 -
+0 1 psl_simple_tb.a 0 p4
+0 1 psl_simple_tb.b 0 p5
+0 1 psl_simple_tb.dut.a 0 p4
+0 1 psl_simple_tb.dut.b 0 p5
+5000000 0 psl_simple_tb.clk 1 p1
+5000000 0 psl_simple_tb.dut.clk 1 p1
+10000000 0 psl_simple_tb.clk 0 p1
+10000000 0 psl_simple_tb.dut.clk 0 p1
+10000000 1 psl_simple_tb.dut.n 1 p8
+15000000 0 psl_simple_tb.clk 1 p1
+15000000 0 psl_simple_tb.dut.clk 1 p1
+20000000 0 psl_simple_tb.clk 0 p1
+20000000 0 psl_simple_tb.dut.clk 0 p1
+20000000 1 psl_simple_tb.dut.n 2 p8
+20000000 2 psl_simple_tb.dut.ai 1 p2
+20000000 3 psl_simple_tb.a 1 p4
+20000000 3 psl_simple_tb.dut.a 1 p4
+25000000 0 psl_simple_tb.clk 1 p1
+25000000 0 psl_simple_tb.dut.clk 1 p1
+30000000 0 psl_simple_tb.clk 0 p1
+30000000 0 psl_simple_tb.dut.clk 0 p1
+30000000 1 psl_simple_tb.dut.n 3 p8
+30000000 2 psl_simple_tb.dut.ai 0 p2
+30000000 2 psl_simple_tb.dut.bi 1 p3
+30000000 3 psl_simple_tb.a 0 p4
+30000000 3 psl_simple_tb.b 1 p5
+30000000 3 psl_simple_tb.dut.a 0 p4
+30000000 3 psl_simple_tb.dut.b 1 p5
+35000000 0 psl_simple_tb.clk 1 p1
+35000000 0 psl_simple_tb.dut.clk 1 p1
+35000000 0 ! cover-hit - psl_simple.vhd:41 p6 "a then b"
+40000000 0 psl_simple_tb.clk 0 p1
+40000000 0 psl_simple_tb.dut.clk 0 p1
+40000000 1 psl_simple_tb.dut.n 4 p8
+40000000 2 psl_simple_tb.dut.bi 0 p3
+40000000 3 psl_simple_tb.b 0 p5
+40000000 3 psl_simple_tb.dut.b 0 p5
+45000000 0 psl_simple_tb.clk 1 p1
+45000000 0 psl_simple_tb.dut.clk 1 p1
+50000000 0 psl_simple_tb.clk 0 p1
+50000000 0 psl_simple_tb.dut.clk 0 p1
+50000000 1 psl_simple_tb.dut.n 5 p8
+50000000 2 psl_simple_tb.dut.ai 1 p2
+50000000 2 psl_simple_tb.dut.bi 1 p3
+50000000 3 psl_simple_tb.a 1 p4
+50000000 3 psl_simple_tb.b 1 p5
+50000000 3 psl_simple_tb.dut.a 1 p4
+50000000 3 psl_simple_tb.dut.b 1 p5
+55000000 0 psl_simple_tb.clk 1 p1
+55000000 0 psl_simple_tb.dut.clk 1 p1
+55000000 0 ! assert error psl_simple.vhd:38 p9 "a and b high in the same cycle"
+60000000 0 psl_simple_tb.clk 0 p1
+60000000 0 psl_simple_tb.dut.clk 0 p1
+60000000 1 psl_simple_tb.dut.n 6 p8
+60000000 2 psl_simple_tb.dut.ai 0 p2
+60000000 2 psl_simple_tb.dut.bi 0 p3
+60000000 3 psl_simple_tb.a 0 p4
+60000000 3 psl_simple_tb.b 0 p5
+60000000 3 psl_simple_tb.dut.a 0 p4
+60000000 3 psl_simple_tb.dut.b 0 p5
+65000000 0 psl_simple_tb.clk 1 p1
+65000000 0 psl_simple_tb.dut.clk 1 p1
+70000000 0 psl_simple_tb.clk 0 p1
+70000000 0 psl_simple_tb.dut.clk 0 p1
+70000000 1 psl_simple_tb.dut.n 7 p8
+75000000 0 psl_simple_tb.clk 1 p1
+75000000 0 psl_simple_tb.dut.clk 1 p1
+80000000 0 psl_simple_tb.clk 0 p1
+80000000 0 psl_simple_tb.dut.clk 0 p1
+80000000 1 psl_simple_tb.dut.n 8 p8
+85000000 0 psl_simple_tb.clk 1 p1
+85000000 0 psl_simple_tb.dut.clk 1 p1
+90000000 0 psl_simple_tb.clk 0 p1
+90000000 0 psl_simple_tb.dut.clk 0 p1
+90000000 1 psl_simple_tb.dut.n 9 p8
+95000000 0 psl_simple_tb.clk 1 p1
+95000000 0 psl_simple_tb.dut.clk 1 p1
+100000000 0 psl_simple_tb.clk 0 p1
+100000000 0 psl_simple_tb.dut.clk 0 p1
+100000000 0 ! cover-miss - psl_simple.vhd:44 p7 "b twice in a row"

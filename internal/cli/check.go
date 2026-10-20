@@ -21,11 +21,16 @@ func init() { lookup("check").Run = runCheck }
 // root, loads gohard.yaml, discovers the VHDL files and reads them,
 // then parses and analyzes them (#31, #34: sema.Analyze, pure jobs on
 // the env job runner) and elaborates the instance hierarchy for the
-// per-instance static checks (internal/elab/hier). The simulation stage
-// (#35) plugs in after analysis.
+// per-instance static checks (internal/elab/hier). With --sim, --tb,
+// --seed or --repro it then runs the testbenches (simulate.go, #35,
+// #29).
 func runCheck(inv *Invocation) Result {
 	r := inv.NewReport()
 	fsys := inv.Env.FS
+	rp := loadRepro(inv)
+	if rp.fail != nil {
+		return *rp.fail
+	}
 	if !validSeed(inv.String("seed")) {
 		r.Diagnostics = append(r.Diagnostics, newUsage("--seed must "+
 			"be an unsigned integer or random, not "+
@@ -35,6 +40,11 @@ func runCheck(inv *Invocation) Result {
 	// the library folders and --define all go through config.Load and
 	// config.ApplyDefines, so check and config check agree.
 	l := inv.LoadConfig()
+	ds, stop := rp.apply(inv, &l)
+	if stop {
+		return inv.Fail(ds...)
+	}
+	r.Diagnostics = append(r.Diagnostics, ds...)
 	r.Diagnostics = append(r.Diagnostics, l.Diagnostics...)
 	r.Source = sources(l, nil)
 	// The bundled std/ieee files must match their integrity hashes
@@ -65,14 +75,11 @@ func runCheck(inv *Invocation) Result {
 	}
 	ctx := contextSources(inv, l.Root, cwd, found.Files)
 	cfg, libs := libraryFolders(inv, l.Root, l.Config, found.Files, ctx)
-	analyzeSources(inv, r, cfg, srcs, append(ctx, libs...))
+	res := analyzeSources(inv, r, cfg, srcs, append(ctx, libs...))
 
 	if simRequested(inv) {
-		// --sim, --tb, --seed and --repro are parsed and validated
-		// here; the simulation stage (#35, #29) is not built yet, and
-		// a clean exit would claim testbenches passed.
-		r.Diagnostics = append(r.Diagnostics,
-			diag.New(diag.CLINotImplemented, "check --sim"))
+		simulate(inv, r, simInput{root: l.Root, cfg: cfg, res: res,
+			files: srcs, repro: rp})
 	}
 	return Result{Report: r}
 }
@@ -175,9 +182,9 @@ func rootRelative(root, folder string) (abs, rel string) {
 // sources and the configuration, never on -p.
 func analyzeSources(inv *Invocation, r *diag.Report, cfg config.Config,
 	srcs, ctx []workspace.Source,
-) {
+) *sema.Result {
 	if len(srcs) == 0 {
-		return
+		return nil
 	}
 	in := sema.Input{Config: cfg, ToolVersion: Version,
 		Jobs: inv.Env.Jobs, Limit: inv.Jobs}
@@ -204,6 +211,7 @@ func analyzeSources(inv *Invocation, r *diag.Report, cfg config.Config,
 	h := hier.Build(res, hier.Options{})
 	keep(h.Diagnostics)
 	r.Incomplete = append(r.Incomplete, h.Incomplete...)
+	return res
 }
 
 // searched names what discovery looked at, for cli/no-files.

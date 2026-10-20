@@ -1,0 +1,12 @@
+gohard-tree 1
+tool ghdl 6.0.0
+sources 867378ddcd1d6b8f
+md_resolve_tb [entity]
+`-tb [arch]
+  `-dut [instance]
+    `-md_resolve [entity]
+      `-rtl [arch]
+std.standard [package]
+std.textio [package]
+ieee.std_logic_1164 [package]
+std.env [package]

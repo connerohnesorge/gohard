@@ -1,0 +1,116 @@
+gohard-oracle 1
+tool nvc 1.23.0
+sources 74d6dc9be919a6f4
+testbench postponed_attrs_tb
+signal postponed_attrs_tb.clk logic 1
+signal postponed_attrs_tb.d logic 1
+signal postponed_attrs_tb.dut.clk logic 1
+signal postponed_attrs_tb.dut.d logic 1
+signal postponed_attrs_tb.dut.edges integer 32
+signal postponed_attrs_tb.dut.n_runs integer 32
+signal postponed_attrs_tb.dut.p_runs integer 32
+signal postponed_attrs_tb.dut.p_seen logic 1
+signal postponed_attrs_tb.dut.q_dly logic 1
+signal postponed_attrs_tb.edges integer 32
+signal postponed_attrs_tb.g logic 1
+signal postponed_attrs_tb.g_lows integer 32
+signal postponed_attrs_tb.n_runs integer 32
+signal postponed_attrs_tb.n_tx integer 32
+signal postponed_attrs_tb.never logic 1
+signal postponed_attrs_tb.p_runs integer 32
+signal postponed_attrs_tb.p_seen logic 1
+signal postponed_attrs_tb.q_dly logic 1
+signal postponed_attrs_tb.q_ev75 integer 32
+signal postponed_attrs_tb.r logic 1
+signal postponed_attrs_tb.s logic 1
+0 postponed_attrs_tb.clk 0
+0 postponed_attrs_tb.d 0
+0 postponed_attrs_tb.dut.clk 0
+0 postponed_attrs_tb.dut.d 0
+0 postponed_attrs_tb.dut.edges 0
+0 postponed_attrs_tb.dut.n_runs 1
+0 postponed_attrs_tb.dut.p_runs 0
+0 postponed_attrs_tb.dut.p_seen U
+0 postponed_attrs_tb.dut.q_dly U
+0 postponed_attrs_tb.edges 0
+0 postponed_attrs_tb.g 1
+0 postponed_attrs_tb.g_lows 0
+0 postponed_attrs_tb.n_runs 1
+0 postponed_attrs_tb.n_tx 0
+0 postponed_attrs_tb.never L
+0 postponed_attrs_tb.p_runs 0
+0 postponed_attrs_tb.p_seen U
+0 postponed_attrs_tb.q_dly U
+0 postponed_attrs_tb.q_ev75 0
+0 postponed_attrs_tb.r 1
+0 postponed_attrs_tb.s 0
+1000000 postponed_attrs_tb.dut.p_runs 1
+1000000 postponed_attrs_tb.dut.p_seen 0
+1000000 postponed_attrs_tb.p_runs 1
+1000000 postponed_attrs_tb.p_seen 0
+5000000 postponed_attrs_tb.dut.q_dly 0
+5000000 postponed_attrs_tb.q_dly 0
+10000000 postponed_attrs_tb.n_tx 1
+10000000 postponed_attrs_tb.s 1
+20000000 postponed_attrs_tb.g_lows 1
+20000000 postponed_attrs_tb.n_tx 2
+30000000 postponed_attrs_tb.n_tx 3
+30000000 postponed_attrs_tb.s 0
+40000000 postponed_attrs_tb.clk 1
+40000000 postponed_attrs_tb.dut.clk 1
+40000000 postponed_attrs_tb.dut.edges 1
+40000000 postponed_attrs_tb.edges 1
+45000000 postponed_attrs_tb.clk 0
+45000000 postponed_attrs_tb.dut.clk 0
+50000000 postponed_attrs_tb.clk X
+50000000 postponed_attrs_tb.dut.clk X
+55000000 postponed_attrs_tb.clk 1
+55000000 postponed_attrs_tb.dut.clk 1
+60000000 postponed_attrs_tb.clk 0
+60000000 postponed_attrs_tb.dut.clk 0
+65000000 postponed_attrs_tb.clk 1
+65000000 postponed_attrs_tb.dut.clk 1
+65000000 postponed_attrs_tb.dut.edges 2
+65000000 postponed_attrs_tb.edges 2
+70000000 postponed_attrs_tb.d 1
+70000000 postponed_attrs_tb.dut.d 1
+70000000 postponed_attrs_tb.dut.n_runs 4
+70000000 postponed_attrs_tb.n_runs 4
+71000000 postponed_attrs_tb.dut.p_runs 2
+71000000 postponed_attrs_tb.dut.p_seen 1
+71000000 postponed_attrs_tb.p_runs 2
+71000000 postponed_attrs_tb.p_seen 1
+75000000 postponed_attrs_tb.dut.q_dly 1
+75000000 postponed_attrs_tb.q_dly 1
+75000000 postponed_attrs_tb.q_ev75 1
+80000000 postponed_attrs_tb.d 0
+80000000 postponed_attrs_tb.dut.d 0
+80000000 postponed_attrs_tb.dut.n_runs 5
+80000000 postponed_attrs_tb.n_runs 5
+81000000 postponed_attrs_tb.dut.p_runs 3
+81000000 postponed_attrs_tb.dut.p_seen 0
+81000000 postponed_attrs_tb.p_runs 3
+81000000 postponed_attrs_tb.p_seen 0
+85000000 postponed_attrs_tb.dut.q_dly 0
+85000000 postponed_attrs_tb.q_dly 0
+90000000 postponed_attrs_tb.d 1
+90000000 postponed_attrs_tb.dut.d 1
+90000000 postponed_attrs_tb.dut.n_runs 6
+90000000 postponed_attrs_tb.n_runs 6
+91000000 postponed_attrs_tb.dut.p_runs 4
+91000000 postponed_attrs_tb.dut.p_seen 1
+91000000 postponed_attrs_tb.p_runs 4
+91000000 postponed_attrs_tb.p_seen 1
+92000000 postponed_attrs_tb.d 0
+92000000 postponed_attrs_tb.dut.d 0
+92000000 postponed_attrs_tb.dut.n_runs 7
+92000000 postponed_attrs_tb.n_runs 7
+93000000 postponed_attrs_tb.dut.p_runs 5
+93000000 postponed_attrs_tb.dut.p_seen 0
+93000000 postponed_attrs_tb.p_runs 5
+93000000 postponed_attrs_tb.p_seen 0
+95000000 postponed_attrs_tb.dut.q_dly 1
+95000000 postponed_attrs_tb.q_dly 1
+97000000 postponed_attrs_tb.dut.q_dly 0
+97000000 postponed_attrs_tb.q_dly 0
+digest 90 7b4ae9dba359fa2d867a8e6504a9c1dd8f31e164ada5dda87c8ecb31a313c1fe

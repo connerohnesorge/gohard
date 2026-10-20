@@ -1,0 +1,10 @@
+gohard-tree 1
+tool ghdl 6.0.0
+sources a78e0e4650879baa
+vhdl93_only_tb [entity]
+`-sim [arch]
+  `-dut [instance]
+    `-vhdl93_only [entity]
+      `-rtl [arch]
+std.standard [package]
+ieee.std_logic_1164 [package]

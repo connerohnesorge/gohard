@@ -26,6 +26,8 @@ type opSpec struct {
 	// FILE_OPEN; zero means in constant.
 	modes   []Mode
 	classes []ObjClass
+	// defaults optionally gives the parameters' default values.
+	defaults []*Expr
 }
 
 var logicOps = []struct {
@@ -112,6 +114,9 @@ func (a *analyzer) declareOp(o opSpec, d *Decl, t *Type) *Decl {
 		}
 		if i < len(o.classes) && o.classes[i] != 0 {
 			p.Class = o.classes[i]
+		}
+		if i < len(o.defaults) {
+			p.Value = o.defaults[i]
 		}
 		f.Params = append(f.Params, p)
 	}
@@ -341,13 +346,21 @@ func (a *analyzer) fileOps(t *Type) []opSpec {
 	in, out, inout := ModeIn, ModeOut, ModeInout
 	var ops []opSpec
 	add := func(o opSpec) { ops = append(ops, o) }
+	// LRM 5.5.2: OPEN_KIND defaults to READ_MODE.
+	var readMode *Expr
+	if kind != nil && len(kind.Base().Literals) > 0 {
+		readMode = &Expr{Kind: ExprName, Decl: kind.Base().Literals[0],
+			Type: kind}
+	}
 	add(opSpec{name: "file_open", params: []*Type{t, str, kind},
-		pnames:  []string{"f", "external_name", "open_kind"},
-		classes: []ObjClass{f}})
+		pnames:   []string{"f", "external_name", "open_kind"},
+		classes:  []ObjClass{f},
+		defaults: []*Expr{nil, nil, readMode}})
 	add(opSpec{name: "file_open", params: []*Type{status, t, str, kind},
-		pnames:  []string{"status", "f", "external_name", "open_kind"},
-		modes:   []Mode{out},
-		classes: []ObjClass{ClassVariable, f}})
+		pnames:   []string{"status", "f", "external_name", "open_kind"},
+		modes:    []Mode{out},
+		classes:  []ObjClass{ClassVariable, f},
+		defaults: []*Expr{nil, nil, nil, readMode}})
 	add(opSpec{name: "file_close", params: []*Type{t},
 		pnames: []string{"f"}, classes: []ObjClass{f}})
 	add(opSpec{name: "read", params: []*Type{t, ct},

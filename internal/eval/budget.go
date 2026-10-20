@@ -18,6 +18,31 @@ const EditorSteps = 1_000_000
 type Budget struct {
 	limit int64
 	used  int64
+	// obs is an observer attached by the caller (a step profile): a
+	// StepObserver is told of every charge.
+	obs any
+}
+
+// SetObserver attaches o to b: whoever charges b may report to it (the
+// interpreter's step profile, sema.Profile).
+func (b *Budget) SetObserver(o any) {
+	if b != nil {
+		b.obs = o
+	}
+}
+
+// StepObserver is an observer told of every charge of the budgets it
+// is attached to.
+type StepObserver interface {
+	Steps(n int64)
+}
+
+// Observer returns the observer attached to b (nil when none).
+func (b *Budget) Observer() any {
+	if b == nil {
+		return nil
+	}
+	return b.obs
 }
 
 // NewBudget returns a budget of limit steps; limit <= 0 means
@@ -32,6 +57,11 @@ func (b *Budget) Step(n int64) error {
 		return nil
 	}
 	b.used += n
+	if b.obs != nil {
+		if o, ok := b.obs.(StepObserver); ok {
+			o.Steps(n)
+		}
+	}
 	if b.limit > 0 && b.used > b.limit {
 		return ErrBudget
 	}

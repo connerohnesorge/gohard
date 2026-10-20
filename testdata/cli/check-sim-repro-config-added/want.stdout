@@ -1,0 +1,2 @@
+.gohard/traces/sev_tb-3.repro.json:1:1: error[repro/source-changed]: sources changed since the recorded run: gohard.yaml
+summary: 1 errors, 0 warnings, 0 hints, 0 files

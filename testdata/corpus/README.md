@@ -21,10 +21,12 @@ testdata/corpus/
                      (or in `variants[].files`, or a `models` stand-in)
     gohard.yaml      optional design-local project config (`config`)
     golden/          written only by `go run ./tools/oracle --update`
-      trace.txt      canonical text trace (#36), the golden
-      ghdl.*         recorded GHDL results (trace, semantic errors,
-                     --disp-tree hierarchy)
-      nvc.*          recorded NVC results
+      trace.txt      GoHard's canonical text trace (#36) at seed 0, the
+                     golden (section `golden`; needs the interpreter)
+      oracle.ghdl.txt, oracle.nvc.txt
+                     GHDL/NVC VCD dumps as settled values per time under
+                     GoHard's paths (section `trace`, see below)
+      ghdl.tree.txt  GHDL --disp-tree=inst (section `tree`)
       format.ghdl.txt  formatter oracle (#32): GHDL analysis of every
       format.nvc.txt   file as written and as formatted (NVC likewise)
       hierarchy.txt  hand-written expected hierarchy and generic values
@@ -204,7 +206,9 @@ and are covered by the design's `oracle_sha256`.
 
 Each item: `topic` (what differs), `ghdl` and `nvc` (what each did),
 `follows` (`ghdl`, `nvc` or `lrm` when both deviate), `lrm` (the IEEE 1076
-section that decides it, for example `14.7.3.4`), `notes`. The same
+section that decides it, for example `14.7.3.4`), `notes`, and optional
+`signals` (trace paths): the trace oracle compares those signals with
+the followed tool's recording only, and drops them from the other's. The same
 rule applies to semantic errors: wherever both tools report an error on a
 line of a PR-set file GoHard must report one on that line, and every
 disagreement is recorded here.
@@ -265,6 +269,71 @@ way, from inside the copied design directory.
 Use `--std=93`/`--std=1993` or `--std=19`/`--std=2019` as the entry's
 `standard` requires. Append `--stop-time=<t>` (after the unit for GHDL,
 after `-r` for NVC) for any design that must not terminate on its own.
+
+## Trace and hierarchy oracles
+
+`go run ./tools/oracle --update trace tree` (inside `nix develop`) runs
+GHDL (`ghdl -a`, then `ghdl --elab-run <tb> --vcd=dump.vcd
+--assert-level=<stop_level>`) and NVC (`nvc -a [-D N=V] ... -e <tb> -r
+--wave=dump.vcd --format=vcd --dump-arrays --exit-severity=<stop_level>`)
+on the main run of every design whose `oracle` names them, in a fresh
+`/tmp` work dir, with `--stop-time=<stop_time>` when the tool's recorded
+result is `bounded`. Files carrying an IEEE 1735 envelope are left out
+(the `models` stand-in replaces them). Each dump is converted to
+`golden/oracle.<tool>.txt`:
+
+```
+gohard-oracle 1
+tool <tool> <version>
+sources <hash of the analysed files and config>
+testbench <tb>
+signal <path> logic|integer|real <width>      (sorted by path)
+<time fs> <path> <value>                       (settled value per time)
+digest <changes> <sha256 of all change lines>
+```
+
+Paths are the VCD scopes below the testbench joined with `.`, lower
+case, without the `[l:r]` range: GoHard's hierarchical paths. Values
+are the value each signal settles on at each time (the VCD carries no
+deltas): logic characters upper case, vectors left to right, integers in
+decimal. Only the first 4096 change lines are kept; the digest covers
+all of them (`budget_hang`). Signals a tool cannot dump (width 0) are
+left out. The check (`go test ./tools/oracle`, no tool runs) fails on a
+stale `sources` line, on a signal both tools dump with different
+settled values unless a `disagreements` item lists it in `signals`, and,
+once the sequential interpreter is registered, on any difference between
+the recording and GoHard's settled projection of its own trace (the
+first differing change is shown).
+
+`tree` records `ghdl --elab-run <tb> --disp-tree=inst --stop-time=0fs`
+as `golden/ghdl.tree.txt`; the check compares its instances, blocks and
+generate iterations, in order, with `internal/elab/hier` (alternative
+labels of if/case generates, which GHDL does not print, are dropped).
+`--disp-tree` prints no generic values. Designs with `hierarchy_oracle:
+"none, hand-checked"` keep a hand-written `golden/hierarchy.txt` in
+hier's `Dump` form (generic values included; `#` lines are comments),
+compared exactly once the design's milestone is v1.0. Both files feed
+`oracle_sha256`.
+
+`golden/trace.txt` is GoHard's own trace at seed 0 (section `golden`,
+`trace_sha256`); it is written once the sequential interpreter exists.
+
+## Corpus harness
+
+`go test ./internal/corpus` runs every design (no skips): the main run
+and each `variants` item at seeds 0..3 (`-corpus.seeds=64` nightly via
+`scripts/ci/corpus-seeds.sh`), checks `expected` (or `expected_v1_0`
+for v1.1 designs; `prot_cond` must give exactly its diagnostics),
+byte-identical traces across seeds (first differing line shown), and
+`golden/trace.txt` with `trace_sha256`. Four generated variants of each
+design (#8 `variant_stable`) must give the same outcome with lines
+ignored: `layout` (doubled white space and line breaks), `case` (reserved
+words and identifiers in upper case), `rename` (every declared signal,
+variable and constant gets `_rn`, consistently in all files) and
+`reorder` (the concurrent statements of each architecture without tool
+directives, reversed). A design that cannot simulate yet for want of
+an interpreter is logged under plain `go test` and fails under
+`-corpus.require-sim`.
 
 ## Formatter oracle
 

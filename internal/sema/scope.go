@@ -151,7 +151,15 @@ func lookup(r *Region, f *File, off int, k Key,
 			}
 		}
 		if ld, ok := reg.Libs[k]; ok {
-			here = append(here, ld)
+			if reg.Kind == RegionContext && reg.Parent != nil {
+				// A secondary unit's library clauses extend the
+				// context of its primary unit, whose declarations
+				// (an entity's type named work) are inner to it
+				// (LRM 12.1, 13.2).
+				late = append(late, ld)
+			} else {
+				here = append(here, ld)
+			}
 		}
 		for _, d := range dropHidden(here) {
 			if hiddenBy(d, direct) {
@@ -216,9 +224,19 @@ func potential(r *Region, f *File, off int, k Key,
 		if !visibleIn(d, std) {
 			return
 		}
-		for _, o := range out {
+		for i, o := range out {
 			if o == d || o.Denotes() == d.Denotes() &&
 				sameEntity(o, d, std) {
+				return
+			}
+			// An incomplete type declaration and its full
+			// declaration declare one type (LRM 5.4.2): the full
+			// one stands for both.
+			switch {
+			case completes(d, o):
+				out[i] = d
+				return
+			case completes(o, d):
 				return
 			}
 		}
@@ -252,6 +270,24 @@ func potential(r *Region, f *File, off int, k Key,
 	return out
 }
 
+// completes reports whether full is the full type declaration of the
+// incomplete type declaration inc.
+func completes(full, inc *Decl) bool {
+	return full.Kind == DeclType && inc.Kind == DeclType &&
+		full.Spec == inc
+}
+
+// completed reports whether ds holds the full declaration of the
+// incomplete type declaration d.
+func completed(d *Decl, ds []*Decl) bool {
+	for _, e := range ds {
+		if completes(e, d) {
+			return true
+		}
+	}
+	return false
+}
+
 // sameEntity reports whether two potentially visible declarations
 // denoting one named entity count as one (LRM 12.4). Before VHDL-2008
 // an alias of a type is a declaration of its own, so a type and its
@@ -271,8 +307,9 @@ func sameEntity(a, b *Decl, std token.Standard) bool {
 // declarations, explicit ones hiding implicit homographs.
 func lookupIn(r *Region, k Key, std token.Standard) []*Decl {
 	var out []*Decl
-	for _, d := range r.Lookup(k) {
-		if visibleIn(d, std) {
+	ds := r.Lookup(k)
+	for _, d := range ds {
+		if visibleIn(d, std) && !completed(d, ds) {
 			out = append(out, d)
 		}
 	}

@@ -1,0 +1,92 @@
+gohard-trace 1
+testbench force_ext_tb
+end 9000000
+type std_logic logic
+type std_logic_vector array std_ulogic
+type std_ulogic logic
+scope force_ext_tb instance force_ext_tb(tb)
+scope force_ext_tb.chk block
+scope force_ext_tb.dut instance force_ext(rtl)
+signal force_ext_tb.a std_logic_vector signal 3 downto 0
+signal force_ext_tb.b std_logic_vector signal 3 downto 0
+signal force_ext_tb.bit_o std_logic signal
+signal force_ext_tb.dut.a std_logic_vector in 3 downto 0
+signal force_ext_tb.dut.b std_logic_vector in 3 downto 0
+signal force_ext_tb.dut.bit_o std_logic out
+signal force_ext_tb.dut.mid std_logic_vector signal 3 downto 0
+signal force_ext_tb.dut.op std_logic in
+signal force_ext_tb.dut.sel std_logic_vector in 1 downto 0
+signal force_ext_tb.dut.y std_logic_vector out 3 downto 0
+signal force_ext_tb.op std_logic signal
+signal force_ext_tb.sel std_logic_vector signal 1 downto 0
+signal force_ext_tb.y std_logic_vector signal 3 downto 0
+process 1 force_ext_tb.chk.stim
+process 2 force_ext_tb.dut._p0
+process 3 force_ext_tb.dut.comb
+process 4 force_ext_tb.dut.pick
+process 5 force_ext_tb.rel_watch
+0 0 force_ext_tb.a 0000 -
+0 0 force_ext_tb.b 0000 -
+0 0 force_ext_tb.bit_o U -
+0 0 force_ext_tb.dut.a 0000 -
+0 0 force_ext_tb.dut.b 0000 -
+0 0 force_ext_tb.dut.bit_o U -
+0 0 force_ext_tb.dut.mid UUUU -
+0 0 force_ext_tb.dut.op 0 -
+0 0 force_ext_tb.dut.sel 00 -
+0 0 force_ext_tb.dut.y UUUU -
+0 0 force_ext_tb.op 0 -
+0 0 force_ext_tb.sel 00 -
+0 0 force_ext_tb.y UUUU -
+0 1 force_ext_tb.a 1100 p1
+0 1 force_ext_tb.b 1010 p1
+0 1 force_ext_tb.dut.a 1100 p1
+0 1 force_ext_tb.dut.b 1010 p1
+0 1 force_ext_tb.dut.mid 0000 p3
+0 2 force_ext_tb.bit_o 0 p4
+0 2 force_ext_tb.dut.bit_o 0 p4
+0 2 force_ext_tb.dut.mid 1110 p3
+0 2 force_ext_tb.dut.y 0000 p2
+0 2 force_ext_tb.y 0000 p2
+0 3 force_ext_tb.dut.y 1110 p2
+0 3 force_ext_tb.y 1110 p2
+1000000 1 force_ext_tb.dut.op 1 p1
+1000000 1 force_ext_tb.op 1 p1
+1000000 2 force_ext_tb.dut.mid 1000 p3
+1000000 3 force_ext_tb.dut.y 1000 p2
+1000000 3 force_ext_tb.y 1000 p2
+2000000 1 force_ext_tb.b 1111 p1
+2000000 1 force_ext_tb.dut.b 1111 p1
+2000000 2 force_ext_tb.dut.mid 1100 p3
+2000000 3 force_ext_tb.dut.y 1100 p2
+2000000 3 force_ext_tb.y 1100 p2
+3000000 1 force_ext_tb.dut.sel 10 p1
+3000000 1 force_ext_tb.sel 10 p1
+3000000 2 force_ext_tb.bit_o 1 p4
+3000000 2 force_ext_tb.dut.bit_o 1 p4
+4000000 1 force_ext_tb.a 1000 p1
+4000000 1 force_ext_tb.dut.a 1000 p1
+4000000 2 force_ext_tb.dut.mid 1000 p3
+4000000 3 force_ext_tb.bit_o 0 p4
+4000000 3 force_ext_tb.dut.bit_o 0 p4
+4000000 3 force_ext_tb.dut.y 1000 p2
+4000000 3 force_ext_tb.y 1000 p2
+5000000 1 force_ext_tb.dut.mid 0110 -
+5000000 2 force_ext_tb.bit_o 1 p4
+5000000 2 force_ext_tb.dut.bit_o 1 p4
+5000000 2 force_ext_tb.dut.y 0110 p2
+5000000 2 force_ext_tb.y 0110 p2
+6000000 1 force_ext_tb.a 0001 p1
+6000000 1 force_ext_tb.dut.a 0001 p1
+6000000 1 force_ext_tb.dut.op 0 p1
+6000000 1 force_ext_tb.op 0 p1
+7000000 1 force_ext_tb.dut.mid 1111 -
+7000000 2 force_ext_tb.dut.y 1111 p2
+7000000 2 force_ext_tb.y 1111 p2
+8000000 1 force_ext_tb.b 0000 p1
+8000000 1 force_ext_tb.dut.b 0000 p1
+8000000 2 force_ext_tb.dut.mid 0001 p3
+8000000 3 force_ext_tb.bit_o 0 p4
+8000000 3 force_ext_tb.dut.bit_o 0 p4
+8000000 3 force_ext_tb.dut.y 0001 p2
+8000000 3 force_ext_tb.y 0001 p2

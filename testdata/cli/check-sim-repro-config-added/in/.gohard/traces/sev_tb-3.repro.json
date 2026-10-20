@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "version": "0.0.0-dev",
+  "standard": "2008",
+  "testbench": "sev_tb",
+  "seed": 3,
+  "defines": {},
+  "budgets": {
+    "time": "1 ms",
+    "delta": 10000,
+    "step": 50000000
+  },
+  "models": {},
+  "config": null,
+  "sources": [
+    {
+      "path": "sev_tb.vhd",
+      "sha256": "53c366420d07821e33a7ee45a580eb601ef8e2d0849651ec0f8f28fb6e6b0151"
+    }
+  ]
+}

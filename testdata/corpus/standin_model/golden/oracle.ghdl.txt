@@ -1,0 +1,133 @@
+gohard-oracle 1
+tool ghdl 6.0.0
+sources 54c02102427bcf94
+testbench standin_model_tb
+signal standin_model_tb.clk logic 1
+signal standin_model_tb.din logic 8
+signal standin_model_tb.done logic 1
+signal standin_model_tb.dout logic 8
+signal standin_model_tb.dut.clk logic 1
+signal standin_model_tb.dut.core_dout logic 8
+signal standin_model_tb.dut.core_valid logic 1
+signal standin_model_tb.dut.din logic 8
+signal standin_model_tb.dut.dout logic 8
+signal standin_model_tb.dut.rst logic 1
+signal standin_model_tb.dut.u_core.clk logic 1
+signal standin_model_tb.dut.u_core.din logic 8
+signal standin_model_tb.dut.u_core.dout logic 8
+signal standin_model_tb.dut.u_core.rst logic 1
+signal standin_model_tb.dut.u_core.valid logic 1
+signal standin_model_tb.dut.valid logic 1
+signal standin_model_tb.rst logic 1
+signal standin_model_tb.valid logic 1
+0 standin_model_tb.clk 0
+0 standin_model_tb.din 00000000
+0 standin_model_tb.done 0
+0 standin_model_tb.dout UUUUUUUU
+0 standin_model_tb.dut.clk 0
+0 standin_model_tb.dut.core_dout UUUUUUUU
+0 standin_model_tb.dut.core_valid U
+0 standin_model_tb.dut.din 00000000
+0 standin_model_tb.dut.dout UUUUUUUU
+0 standin_model_tb.dut.rst 1
+0 standin_model_tb.dut.u_core.clk 0
+0 standin_model_tb.dut.u_core.din 00000000
+0 standin_model_tb.dut.u_core.dout UUUUUUUU
+0 standin_model_tb.dut.u_core.rst 1
+0 standin_model_tb.dut.u_core.valid U
+0 standin_model_tb.dut.valid U
+0 standin_model_tb.rst 1
+0 standin_model_tb.valid U
+5000000 standin_model_tb.clk 1
+5000000 standin_model_tb.dut.clk 1
+5000000 standin_model_tb.dut.core_dout 00000000
+5000000 standin_model_tb.dut.core_valid 0
+5000000 standin_model_tb.dut.u_core.clk 1
+5000000 standin_model_tb.dut.u_core.dout 00000000
+5000000 standin_model_tb.dut.u_core.valid 0
+10000000 standin_model_tb.clk 0
+10000000 standin_model_tb.dut.clk 0
+10000000 standin_model_tb.dut.u_core.clk 0
+15000000 standin_model_tb.clk 1
+15000000 standin_model_tb.dout 00000000
+15000000 standin_model_tb.dut.clk 1
+15000000 standin_model_tb.dut.dout 00000000
+15000000 standin_model_tb.dut.u_core.clk 1
+15000000 standin_model_tb.dut.valid 0
+15000000 standin_model_tb.valid 0
+20000000 standin_model_tb.clk 0
+20000000 standin_model_tb.dut.clk 0
+20000000 standin_model_tb.dut.rst 0
+20000000 standin_model_tb.dut.u_core.clk 0
+20000000 standin_model_tb.dut.u_core.rst 0
+20000000 standin_model_tb.rst 0
+25000000 standin_model_tb.clk 1
+25000000 standin_model_tb.dut.clk 1
+25000000 standin_model_tb.dut.core_dout 01011010
+25000000 standin_model_tb.dut.core_valid 1
+25000000 standin_model_tb.dut.u_core.clk 1
+25000000 standin_model_tb.dut.u_core.dout 01011010
+25000000 standin_model_tb.dut.u_core.valid 1
+30000000 standin_model_tb.clk 0
+30000000 standin_model_tb.din 01011010
+30000000 standin_model_tb.dut.clk 0
+30000000 standin_model_tb.dut.din 01011010
+30000000 standin_model_tb.dut.u_core.clk 0
+30000000 standin_model_tb.dut.u_core.din 01011010
+35000000 standin_model_tb.clk 1
+35000000 standin_model_tb.dout 01011010
+35000000 standin_model_tb.dut.clk 1
+35000000 standin_model_tb.dut.core_dout 00000000
+35000000 standin_model_tb.dut.dout 01011010
+35000000 standin_model_tb.dut.u_core.clk 1
+35000000 standin_model_tb.dut.u_core.dout 00000000
+35000000 standin_model_tb.dut.valid 1
+35000000 standin_model_tb.valid 1
+40000000 standin_model_tb.clk 0
+40000000 standin_model_tb.din 10100101
+40000000 standin_model_tb.dut.clk 0
+40000000 standin_model_tb.dut.din 10100101
+40000000 standin_model_tb.dut.u_core.clk 0
+40000000 standin_model_tb.dut.u_core.din 10100101
+45000000 standin_model_tb.clk 1
+45000000 standin_model_tb.dout 00000000
+45000000 standin_model_tb.dut.clk 1
+45000000 standin_model_tb.dut.core_dout 11111111
+45000000 standin_model_tb.dut.dout 00000000
+45000000 standin_model_tb.dut.u_core.clk 1
+45000000 standin_model_tb.dut.u_core.dout 11111111
+50000000 standin_model_tb.clk 0
+50000000 standin_model_tb.din 11111111
+50000000 standin_model_tb.dut.clk 0
+50000000 standin_model_tb.dut.din 11111111
+50000000 standin_model_tb.dut.u_core.clk 0
+50000000 standin_model_tb.dut.u_core.din 11111111
+55000000 standin_model_tb.clk 1
+55000000 standin_model_tb.dout 11111111
+55000000 standin_model_tb.dut.clk 1
+55000000 standin_model_tb.dut.core_dout 10100101
+55000000 standin_model_tb.dut.dout 11111111
+55000000 standin_model_tb.dut.u_core.clk 1
+55000000 standin_model_tb.dut.u_core.dout 10100101
+60000000 standin_model_tb.clk 0
+60000000 standin_model_tb.din 00111100
+60000000 standin_model_tb.dut.clk 0
+60000000 standin_model_tb.dut.din 00111100
+60000000 standin_model_tb.dut.u_core.clk 0
+60000000 standin_model_tb.dut.u_core.din 00111100
+65000000 standin_model_tb.clk 1
+65000000 standin_model_tb.dout 10100101
+65000000 standin_model_tb.dut.clk 1
+65000000 standin_model_tb.dut.core_dout 01100110
+65000000 standin_model_tb.dut.dout 10100101
+65000000 standin_model_tb.dut.u_core.clk 1
+65000000 standin_model_tb.dut.u_core.dout 01100110
+70000000 standin_model_tb.clk 0
+70000000 standin_model_tb.dut.clk 0
+70000000 standin_model_tb.dut.u_core.clk 0
+75000000 standin_model_tb.clk 1
+75000000 standin_model_tb.dout 01100110
+75000000 standin_model_tb.dut.clk 1
+75000000 standin_model_tb.dut.dout 01100110
+75000000 standin_model_tb.dut.u_core.clk 1
+digest 110 d522763601359d7d6d7022b0eabfe1fc89a0d8b2f45757c01380fb8386c1aab0

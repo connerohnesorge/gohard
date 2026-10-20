@@ -1,0 +1,4 @@
+gohard.yaml:2:15: warning[config/redundant-default]: simulation.stop_level is set to its default value error
+stop_tb.vhd:9:5: warning[sim/assert-warning]: assertion warning: first
+stop_tb.vhd:11:5: error[sim/assert-error]: assertion error: second
+summary: 1 errors, 2 warnings, 0 hints, 1 files

@@ -1,0 +1,4 @@
+stop_tb.vhd:9:5: warning[sim/assert-warning]: assertion warning: first
+stop_tb.vhd:11:5: error[sim/assert-error]: assertion error: second
+stop_tb.vhd:13:5: hint[sim/assert-note]: report note: third
+summary: 1 errors, 1 warnings, 1 hints, 1 files

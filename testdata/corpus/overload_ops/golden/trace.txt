@@ -1,0 +1,106 @@
+gohard-trace 1
+testbench overload_ops_tb
+end 1000000
+type character enum nul soh stx etx eot enq ack bel bs ht lf vt ff cr so si dle dc1 dc2 dc3 dc4 nak syn etb can em sub esc fsp gsp rsp usp "' '" '!' '"' '#' '$' '%' '&' ''' '(' ')' '*' '+' ',' '-' '.' '/' '0' '1' '2' '3' '4' '5' '6' '7' '8' '9' ':' ';' '<' '=' '>' '?' '@' 'A' 'B' 'C' 'D' 'E' 'F' 'G' 'H' 'I' 'J' 'K' 'L' 'M' 'N' 'O' 'P' 'Q' 'R' 'S' 'T' 'U' 'V' 'W' 'X' 'Y' 'Z' '[' '\' ']' '^' '_' '`' 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 'u' 'v' 'w' 'x' 'y' 'z' '{' '|' '}' '~' del c128 c129 c130 c131 c132 c133 c134 c135 c136 c137 c138 c139 c140 c141 c142 c143 c144 c145 c146 c147 c148 c149 c150 c151 c152 c153 c154 c155 c156 c157 c158 c159 "'\xa0'" "'\xa1'" "'\xa2'" "'\xa3'" "'\xa4'" "'\xa5'" "'\xa6'" "'\xa7'" "'\xa8'" "'\xa9'" "'\xaa'" "'\xab'" "'\xac'" "'\xad'" "'\xae'" "'\xaf'" "'\xb0'" "'\xb1'" "'\xb2'" "'\xb3'" "'\xb4'" "'\xb5'" "'\xb6'" "'\xb7'" "'\xb8'" "'\xb9'" "'\xba'" "'\xbb'" "'\xbc'" "'\xbd'" "'\xbe'" "'\xbf'" "'\xc0'" "'\xc1'" "'\xc2'" "'\xc3'" "'\xc4'" "'\xc5'" "'\xc6'" "'\xc7'" "'\xc8'" "'\xc9'" "'\xca'" "'\xcb'" "'\xcc'" "'\xcd'" "'\xce'" "'\xcf'" "'\xd0'" "'\xd1'" "'\xd2'" "'\xd3'" "'\xd4'" "'\xd5'" "'\xd6'" "'\xd7'" "'\xd8'" "'\xd9'" "'\xda'" "'\xdb'" "'\xdc'" "'\xdd'" "'\xde'" "'\xdf'" "'\xe0'" "'\xe1'" "'\xe2'" "'\xe3'" "'\xe4'" "'\xe5'" "'\xe6'" "'\xe7'" "'\xe8'" "'\xe9'" "'\xea'" "'\xeb'" "'\xec'" "'\xed'" "'\xee'" "'\xef'" "'\xf0'" "'\xf1'" "'\xf2'" "'\xf3'" "'\xf4'" "'\xf5'" "'\xf6'" "'\xf7'" "'\xf8'" "'\xf9'" "'\xfa'" "'\xfb'" "'\xfc'" "'\xfd'" "'\xfe'" "'\xff'"
+type integer integer 0 255
+type integer_2 integer -2147483648 2147483647
+scope overload_ops_tb instance overload_ops_tb(sim)
+scope overload_ops_tb.a record word_t
+scope overload_ops_tb.b record word_t
+scope overload_ops_tb.dut instance overload_ops(rtl)
+scope overload_ops_tb.dut.a record word_t
+scope overload_ops_tb.dut.b record word_t
+scope overload_ops_tb.dut.neg_w record word_t
+scope overload_ops_tb.dut.sum_wi record word_t
+scope overload_ops_tb.dut.sum_wrap record word_t
+scope overload_ops_tb.dut.sum_ww record word_t
+scope overload_ops_tb.neg_w record word_t
+scope overload_ops_tb.sum_wi record word_t
+scope overload_ops_tb.sum_wrap record word_t
+scope overload_ops_tb.sum_ww record word_t
+signal overload_ops_tb.a.src character signal
+signal overload_ops_tb.a.v integer signal
+signal overload_ops_tb.b.src character signal
+signal overload_ops_tb.b.v integer signal
+signal overload_ops_tb.dut.a.src character in
+signal overload_ops_tb.dut.a.v integer in
+signal overload_ops_tb.dut.b.src character in
+signal overload_ops_tb.dut.b.v integer in
+signal overload_ops_tb.dut.neg_i integer_2 out
+signal overload_ops_tb.dut.neg_w.src character out
+signal overload_ops_tb.dut.neg_w.v integer out
+signal overload_ops_tb.dut.sum_wi.src character out
+signal overload_ops_tb.dut.sum_wi.v integer out
+signal overload_ops_tb.dut.sum_wrap.src character out
+signal overload_ops_tb.dut.sum_wrap.v integer out
+signal overload_ops_tb.dut.sum_ww.src character out
+signal overload_ops_tb.dut.sum_ww.v integer out
+signal overload_ops_tb.neg_i integer_2 signal
+signal overload_ops_tb.neg_w.src character signal
+signal overload_ops_tb.neg_w.v integer signal
+signal overload_ops_tb.sum_wi.src character signal
+signal overload_ops_tb.sum_wi.v integer signal
+signal overload_ops_tb.sum_wrap.src character signal
+signal overload_ops_tb.sum_wrap.v integer signal
+signal overload_ops_tb.sum_ww.src character signal
+signal overload_ops_tb.sum_ww.v integer signal
+process 1 overload_ops_tb.check
+process 2 overload_ops_tb.dut._p0
+process 3 overload_ops_tb.dut._p1
+process 4 overload_ops_tb.dut._p2
+process 5 overload_ops_tb.dut._p3
+process 6 overload_ops_tb.dut._p4
+0 0 overload_ops_tb.a.src '-' -
+0 0 overload_ops_tb.a.v 0 -
+0 0 overload_ops_tb.b.src '-' -
+0 0 overload_ops_tb.b.v 0 -
+0 0 overload_ops_tb.dut.a.src '-' -
+0 0 overload_ops_tb.dut.a.v 0 -
+0 0 overload_ops_tb.dut.b.src '-' -
+0 0 overload_ops_tb.dut.b.v 0 -
+0 0 overload_ops_tb.dut.neg_i -2147483648 -
+0 0 overload_ops_tb.dut.neg_w.src nul -
+0 0 overload_ops_tb.dut.neg_w.v 0 -
+0 0 overload_ops_tb.dut.sum_wi.src nul -
+0 0 overload_ops_tb.dut.sum_wi.v 0 -
+0 0 overload_ops_tb.dut.sum_wrap.src nul -
+0 0 overload_ops_tb.dut.sum_wrap.v 0 -
+0 0 overload_ops_tb.dut.sum_ww.src nul -
+0 0 overload_ops_tb.dut.sum_ww.v 0 -
+0 0 overload_ops_tb.neg_i -2147483648 -
+0 0 overload_ops_tb.neg_w.src nul -
+0 0 overload_ops_tb.neg_w.v 0 -
+0 0 overload_ops_tb.sum_wi.src nul -
+0 0 overload_ops_tb.sum_wi.v 0 -
+0 0 overload_ops_tb.sum_wrap.src nul -
+0 0 overload_ops_tb.sum_wrap.v 0 -
+0 0 overload_ops_tb.sum_ww.src nul -
+0 0 overload_ops_tb.sum_ww.v 0 -
+0 1 overload_ops_tb.a.v 200 p1
+0 1 overload_ops_tb.b.v 100 p1
+0 1 overload_ops_tb.dut.a.v 200 p1
+0 1 overload_ops_tb.dut.b.v 100 p1
+0 1 overload_ops_tb.dut.neg_i 0 p6
+0 1 overload_ops_tb.dut.neg_w.src 'N' p5
+0 1 overload_ops_tb.dut.neg_w.v 255 p5
+0 1 overload_ops_tb.dut.sum_wi.src 'I' p3
+0 1 overload_ops_tb.dut.sum_wi.v 100 p3
+0 1 overload_ops_tb.dut.sum_wrap.src 'W' p4
+0 1 overload_ops_tb.dut.sum_ww.src 'S' p2
+0 1 overload_ops_tb.neg_i 0 p6
+0 1 overload_ops_tb.neg_w.src 'N' p5
+0 1 overload_ops_tb.neg_w.v 255 p5
+0 1 overload_ops_tb.sum_wi.src 'I' p3
+0 1 overload_ops_tb.sum_wi.v 100 p3
+0 1 overload_ops_tb.sum_wrap.src 'W' p4
+0 1 overload_ops_tb.sum_ww.src 'S' p2
+0 2 overload_ops_tb.dut.neg_i -200 p6
+0 2 overload_ops_tb.dut.neg_w.v 55 p5
+0 2 overload_ops_tb.dut.sum_wi.v 255 p3
+0 2 overload_ops_tb.dut.sum_wrap.v 44 p4
+0 2 overload_ops_tb.dut.sum_ww.v 255 p2
+0 2 overload_ops_tb.neg_i -200 p6
+0 2 overload_ops_tb.neg_w.v 55 p5
+0 2 overload_ops_tb.sum_wi.v 255 p3
+0 2 overload_ops_tb.sum_wrap.v 44 p4
+0 2 overload_ops_tb.sum_ww.v 255 p2

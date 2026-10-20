@@ -35,6 +35,27 @@ type design struct {
 	Variants []variant         `yaml:"variants"`
 	GHDL     toolEntry         `yaml:"ghdl"`
 	NVC      toolEntry         `yaml:"nvc"`
+	// Testbench, Oracle and HierarchyOracle feed the trace and tree
+	// sections.
+	Milestone       string         `yaml:"milestone"`
+	Testbench       string         `yaml:"testbench"`
+	Oracle          string         `yaml:"oracle"`
+	HierarchyOracle string         `yaml:"hierarchy_oracle"`
+	Expected        expected       `yaml:"expected"`
+	Disagreements   []disagreement `yaml:"disagreements"`
+}
+
+// disagreement is a recorded GHDL/NVC difference; Signals lists the
+// trace signals it covers (the trace section compares GoHard on them
+// only with the followed tool).
+type disagreement struct {
+	Topic   string   `yaml:"topic"`
+	Follows string   `yaml:"follows"`
+	Signals []string `yaml:"signals"`
+}
+
+type expected struct {
+	StopTime string `yaml:"stop_time"`
 }
 
 type fileEntry struct {
@@ -50,6 +71,7 @@ type variant struct {
 
 type toolEntry struct {
 	Version string `yaml:"version"`
+	Result  string `yaml:"result"`
 }
 
 type regEntry struct {

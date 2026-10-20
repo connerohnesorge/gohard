@@ -1,2 +1,1 @@
-gohard: error[cli/not-implemented]: gohard check --sim is not implemented in this build
-summary: 1 errors, 0 warnings, 0 hints, 1 files
+summary: 0 errors, 0 warnings, 0 hints, 1 files

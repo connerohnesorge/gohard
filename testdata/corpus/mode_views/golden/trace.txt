@@ -1,0 +1,278 @@
+gohard-trace 1
+testbench mode_views_tb
+end 165000000
+type boolean enum false true
+type integer integer 0 2147483647
+type std_logic logic
+type std_logic_vector array std_ulogic
+type std_ulogic logic
+scope mode_views_tb instance mode_views_tb(sim)
+scope mode_views_tb.dut instance mode_views(rtl)
+scope mode_views_tb.dut.link record bus_t
+scope mode_views_tb.dut.u_cons instance mv_consumer(rtl)
+scope mode_views_tb.dut.u_cons.b record bus_t
+scope mode_views_tb.dut.u_prod instance mv_producer(rtl)
+scope mode_views_tb.dut.u_prod.b record bus_t
+signal mode_views_tb.clk std_logic signal
+signal mode_views_tb.count integer signal
+signal mode_views_tb.done boolean signal
+signal mode_views_tb.dut.clk std_logic in
+signal mode_views_tb.dut.count integer out
+signal mode_views_tb.dut.link.ack std_logic signal
+signal mode_views_tb.dut.link.data std_logic_vector signal 7 downto 0
+signal mode_views_tb.dut.link.req std_logic signal
+signal mode_views_tb.dut.sum integer out
+signal mode_views_tb.dut.u_cons.b.ack std_logic out
+signal mode_views_tb.dut.u_cons.b.data std_logic_vector in 7 downto 0
+signal mode_views_tb.dut.u_cons.b.req std_logic in
+signal mode_views_tb.dut.u_cons.clk std_logic in
+signal mode_views_tb.dut.u_cons.count integer out
+signal mode_views_tb.dut.u_cons.sum integer out
+signal mode_views_tb.dut.u_prod.b.ack std_logic in
+signal mode_views_tb.dut.u_prod.b.data std_logic_vector out 7 downto 0
+signal mode_views_tb.dut.u_prod.b.req std_logic out
+signal mode_views_tb.dut.u_prod.clk std_logic in
+signal mode_views_tb.sum integer signal
+process 1 mode_views_tb._p0
+process 2 mode_views_tb.check
+process 3 mode_views_tb.dut.u_cons._p0
+process 4 mode_views_tb.dut.u_prod._p0
+0 0 mode_views_tb.clk 0 -
+0 0 mode_views_tb.count 0 -
+0 0 mode_views_tb.done false -
+0 0 mode_views_tb.dut.clk 0 -
+0 0 mode_views_tb.dut.count 0 -
+0 0 mode_views_tb.dut.link.ack U -
+0 0 mode_views_tb.dut.link.data UUUUUUUU -
+0 0 mode_views_tb.dut.link.req U -
+0 0 mode_views_tb.dut.sum 0 -
+0 0 mode_views_tb.dut.u_cons.b.ack U -
+0 0 mode_views_tb.dut.u_cons.b.data UUUUUUUU -
+0 0 mode_views_tb.dut.u_cons.b.req U -
+0 0 mode_views_tb.dut.u_cons.clk 0 -
+0 0 mode_views_tb.dut.u_cons.count 0 -
+0 0 mode_views_tb.dut.u_cons.sum 0 -
+0 0 mode_views_tb.dut.u_prod.b.ack U -
+0 0 mode_views_tb.dut.u_prod.b.data UUUUUUUU -
+0 0 mode_views_tb.dut.u_prod.b.req U -
+0 0 mode_views_tb.dut.u_prod.clk 0 -
+0 0 mode_views_tb.sum 0 -
+0 1 mode_views_tb.dut.link.ack 0 p3
+0 1 mode_views_tb.dut.link.data 00000000 p4
+0 1 mode_views_tb.dut.link.req 0 p4
+0 1 mode_views_tb.dut.u_cons.b.ack 0 p3
+0 1 mode_views_tb.dut.u_cons.b.data 00000000 p4
+0 1 mode_views_tb.dut.u_cons.b.req 0 p4
+0 1 mode_views_tb.dut.u_prod.b.ack 0 p3
+0 1 mode_views_tb.dut.u_prod.b.data 00000000 p4
+0 1 mode_views_tb.dut.u_prod.b.req 0 p4
+5000000 0 mode_views_tb.clk 1 p1
+5000000 0 mode_views_tb.dut.clk 1 p1
+5000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+5000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+5000000 1 mode_views_tb.dut.link.data 10100100 p4
+5000000 1 mode_views_tb.dut.link.req 1 p4
+5000000 1 mode_views_tb.dut.u_cons.b.data 10100100 p4
+5000000 1 mode_views_tb.dut.u_cons.b.req 1 p4
+5000000 1 mode_views_tb.dut.u_prod.b.data 10100100 p4
+5000000 1 mode_views_tb.dut.u_prod.b.req 1 p4
+10000000 0 mode_views_tb.clk 0 p1
+10000000 0 mode_views_tb.dut.clk 0 p1
+10000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+10000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+15000000 0 mode_views_tb.clk 1 p1
+15000000 0 mode_views_tb.dut.clk 1 p1
+15000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+15000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+15000000 1 mode_views_tb.count 1 p3
+15000000 1 mode_views_tb.dut.count 1 p3
+15000000 1 mode_views_tb.dut.link.ack 1 p3
+15000000 1 mode_views_tb.dut.sum 1 p3
+15000000 1 mode_views_tb.dut.u_cons.b.ack 1 p3
+15000000 1 mode_views_tb.dut.u_cons.count 1 p3
+15000000 1 mode_views_tb.dut.u_cons.sum 1 p3
+15000000 1 mode_views_tb.dut.u_prod.b.ack 1 p3
+15000000 1 mode_views_tb.sum 1 p3
+20000000 0 mode_views_tb.clk 0 p1
+20000000 0 mode_views_tb.dut.clk 0 p1
+20000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+20000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+25000000 0 mode_views_tb.clk 1 p1
+25000000 0 mode_views_tb.dut.clk 1 p1
+25000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+25000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+25000000 1 mode_views_tb.dut.link.req 0 p4
+25000000 1 mode_views_tb.dut.u_cons.b.req 0 p4
+25000000 1 mode_views_tb.dut.u_prod.b.req 0 p4
+30000000 0 mode_views_tb.clk 0 p1
+30000000 0 mode_views_tb.dut.clk 0 p1
+30000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+30000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+35000000 0 mode_views_tb.clk 1 p1
+35000000 0 mode_views_tb.dut.clk 1 p1
+35000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+35000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+35000000 1 mode_views_tb.dut.link.ack 0 p3
+35000000 1 mode_views_tb.dut.u_cons.b.ack 0 p3
+35000000 1 mode_views_tb.dut.u_prod.b.ack 0 p3
+40000000 0 mode_views_tb.clk 0 p1
+40000000 0 mode_views_tb.dut.clk 0 p1
+40000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+40000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+45000000 0 mode_views_tb.clk 1 p1
+45000000 0 mode_views_tb.dut.clk 1 p1
+45000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+45000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+50000000 0 mode_views_tb.clk 0 p1
+50000000 0 mode_views_tb.dut.clk 0 p1
+50000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+50000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+55000000 0 mode_views_tb.clk 1 p1
+55000000 0 mode_views_tb.dut.clk 1 p1
+55000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+55000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+55000000 1 mode_views_tb.dut.link.data 10100111 p4
+55000000 1 mode_views_tb.dut.link.req 1 p4
+55000000 1 mode_views_tb.dut.u_cons.b.data 10100111 p4
+55000000 1 mode_views_tb.dut.u_cons.b.req 1 p4
+55000000 1 mode_views_tb.dut.u_prod.b.data 10100111 p4
+55000000 1 mode_views_tb.dut.u_prod.b.req 1 p4
+60000000 0 mode_views_tb.clk 0 p1
+60000000 0 mode_views_tb.dut.clk 0 p1
+60000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+60000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+65000000 0 mode_views_tb.clk 1 p1
+65000000 0 mode_views_tb.dut.clk 1 p1
+65000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+65000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+65000000 1 mode_views_tb.count 2 p3
+65000000 1 mode_views_tb.dut.count 2 p3
+65000000 1 mode_views_tb.dut.link.ack 1 p3
+65000000 1 mode_views_tb.dut.sum 3 p3
+65000000 1 mode_views_tb.dut.u_cons.b.ack 1 p3
+65000000 1 mode_views_tb.dut.u_cons.count 2 p3
+65000000 1 mode_views_tb.dut.u_cons.sum 3 p3
+65000000 1 mode_views_tb.dut.u_prod.b.ack 1 p3
+65000000 1 mode_views_tb.sum 3 p3
+70000000 0 mode_views_tb.clk 0 p1
+70000000 0 mode_views_tb.dut.clk 0 p1
+70000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+70000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+75000000 0 mode_views_tb.clk 1 p1
+75000000 0 mode_views_tb.dut.clk 1 p1
+75000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+75000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+75000000 1 mode_views_tb.dut.link.req 0 p4
+75000000 1 mode_views_tb.dut.u_cons.b.req 0 p4
+75000000 1 mode_views_tb.dut.u_prod.b.req 0 p4
+80000000 0 mode_views_tb.clk 0 p1
+80000000 0 mode_views_tb.dut.clk 0 p1
+80000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+80000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+85000000 0 mode_views_tb.clk 1 p1
+85000000 0 mode_views_tb.dut.clk 1 p1
+85000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+85000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+85000000 1 mode_views_tb.dut.link.ack 0 p3
+85000000 1 mode_views_tb.dut.u_cons.b.ack 0 p3
+85000000 1 mode_views_tb.dut.u_prod.b.ack 0 p3
+90000000 0 mode_views_tb.clk 0 p1
+90000000 0 mode_views_tb.dut.clk 0 p1
+90000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+90000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+95000000 0 mode_views_tb.clk 1 p1
+95000000 0 mode_views_tb.dut.clk 1 p1
+95000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+95000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+100000000 0 mode_views_tb.clk 0 p1
+100000000 0 mode_views_tb.dut.clk 0 p1
+100000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+100000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+105000000 0 mode_views_tb.clk 1 p1
+105000000 0 mode_views_tb.dut.clk 1 p1
+105000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+105000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+105000000 1 mode_views_tb.dut.link.data 10100110 p4
+105000000 1 mode_views_tb.dut.link.req 1 p4
+105000000 1 mode_views_tb.dut.u_cons.b.data 10100110 p4
+105000000 1 mode_views_tb.dut.u_cons.b.req 1 p4
+105000000 1 mode_views_tb.dut.u_prod.b.data 10100110 p4
+105000000 1 mode_views_tb.dut.u_prod.b.req 1 p4
+110000000 0 mode_views_tb.clk 0 p1
+110000000 0 mode_views_tb.dut.clk 0 p1
+110000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+110000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+115000000 0 mode_views_tb.clk 1 p1
+115000000 0 mode_views_tb.dut.clk 1 p1
+115000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+115000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+115000000 1 mode_views_tb.count 3 p3
+115000000 1 mode_views_tb.dut.count 3 p3
+115000000 1 mode_views_tb.dut.link.ack 1 p3
+115000000 1 mode_views_tb.dut.sum 6 p3
+115000000 1 mode_views_tb.dut.u_cons.b.ack 1 p3
+115000000 1 mode_views_tb.dut.u_cons.count 3 p3
+115000000 1 mode_views_tb.dut.u_cons.sum 6 p3
+115000000 1 mode_views_tb.dut.u_prod.b.ack 1 p3
+115000000 1 mode_views_tb.sum 6 p3
+120000000 0 mode_views_tb.clk 0 p1
+120000000 0 mode_views_tb.dut.clk 0 p1
+120000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+120000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+125000000 0 mode_views_tb.clk 1 p1
+125000000 0 mode_views_tb.dut.clk 1 p1
+125000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+125000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+125000000 1 mode_views_tb.dut.link.req 0 p4
+125000000 1 mode_views_tb.dut.u_cons.b.req 0 p4
+125000000 1 mode_views_tb.dut.u_prod.b.req 0 p4
+130000000 0 mode_views_tb.clk 0 p1
+130000000 0 mode_views_tb.dut.clk 0 p1
+130000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+130000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+135000000 0 mode_views_tb.clk 1 p1
+135000000 0 mode_views_tb.dut.clk 1 p1
+135000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+135000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+135000000 1 mode_views_tb.dut.link.ack 0 p3
+135000000 1 mode_views_tb.dut.u_cons.b.ack 0 p3
+135000000 1 mode_views_tb.dut.u_prod.b.ack 0 p3
+140000000 0 mode_views_tb.clk 0 p1
+140000000 0 mode_views_tb.dut.clk 0 p1
+140000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+140000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+145000000 0 mode_views_tb.clk 1 p1
+145000000 0 mode_views_tb.dut.clk 1 p1
+145000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+145000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+150000000 0 mode_views_tb.clk 0 p1
+150000000 0 mode_views_tb.dut.clk 0 p1
+150000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+150000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+155000000 0 mode_views_tb.clk 1 p1
+155000000 0 mode_views_tb.dut.clk 1 p1
+155000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+155000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+155000000 1 mode_views_tb.dut.link.data 10100001 p4
+155000000 1 mode_views_tb.dut.link.req 1 p4
+155000000 1 mode_views_tb.dut.u_cons.b.data 10100001 p4
+155000000 1 mode_views_tb.dut.u_cons.b.req 1 p4
+155000000 1 mode_views_tb.dut.u_prod.b.data 10100001 p4
+155000000 1 mode_views_tb.dut.u_prod.b.req 1 p4
+160000000 0 mode_views_tb.clk 0 p1
+160000000 0 mode_views_tb.dut.clk 0 p1
+160000000 0 mode_views_tb.dut.u_cons.clk 0 p1
+160000000 0 mode_views_tb.dut.u_prod.clk 0 p1
+165000000 0 mode_views_tb.clk 1 p1
+165000000 0 mode_views_tb.dut.clk 1 p1
+165000000 0 mode_views_tb.dut.u_cons.clk 1 p1
+165000000 0 mode_views_tb.dut.u_prod.clk 1 p1
+165000000 1 mode_views_tb.count 4 p3
+165000000 1 mode_views_tb.dut.count 4 p3
+165000000 1 mode_views_tb.dut.link.ack 1 p3
+165000000 1 mode_views_tb.dut.sum 10 p3
+165000000 1 mode_views_tb.dut.u_cons.b.ack 1 p3
+165000000 1 mode_views_tb.dut.u_cons.count 4 p3
+165000000 1 mode_views_tb.dut.u_cons.sum 10 p3
+165000000 1 mode_views_tb.dut.u_prod.b.ack 1 p3
+165000000 1 mode_views_tb.sum 10 p3

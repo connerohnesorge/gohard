@@ -60,8 +60,8 @@ func (a *analyzer) declItem(n cst.Node) {
 		a.componentDecl(cst.ComponentDecl{Node: n})
 	case cst.KindConfigurationSpec:
 		cs := cst.ConfigurationSpec{Node: n}
-		a.componentSpec(cs.Spec())
-		a.bindingIndication(cs.Binding())
+		comp := a.componentSpec(cs.Spec())
+		a.bindingIndication(cs.Binding(), comp)
 	case cst.KindDisconnectionSpec:
 		ds := cst.DisconnectionSpec{Node: n}
 		for s := range ds.Signals() {
@@ -100,7 +100,7 @@ func (a *analyzer) declItem(n cst.Node) {
 		cst.KindPSLEndpointDecl:
 		a.pslDecl(n)
 	case cst.KindPSLDefaultClock:
-		a.expr(cst.PSLDefaultClock{Node: n}.Clock().Node, nil)
+		a.pslExpr(cst.PSLDefaultClock{Node: n}.Clock().Node)
 	}
 }
 
@@ -367,11 +367,17 @@ func (a *analyzer) aliasDecl(ad cst.AliasDecl) {
 		}
 	case r.expr != nil && r.expr.Kind != ExprUnknown &&
 		len(r.decls) <= 1 && (len(r.decls) == 0 ||
-		r.decls[0].Denotes().Kind.IsObject()):
-		// An object alias: it denotes the (sub)element named.
+		r.decls[0].Denotes().Kind.IsObject() ||
+		r.decls[0].Denotes().Kind == DeclElement):
+		// An object alias: it denotes the (sub)element named (a
+		// selected record element is an object name, LRM 6.6.2).
 		d.Value = r.expr
 		d.Type = t
-		if d.Type == nil {
+		if d.Type == nil || notFullyConstrained(t, 0) &&
+			SameBase(t, r.expr.Type) &&
+			!notFullyConstrained(r.expr.Type, 0) {
+			// An unconstrained alias subtype takes the object's
+			// constraint (LRM 6.6.2).
 			d.Type = r.expr.Type
 		}
 		d.Class = ClassConstant
@@ -400,6 +406,31 @@ func (a *analyzer) aliasDecl(ad cst.AliasDecl) {
 		d.Type = r.typ
 	}
 	a.declare(d)
+	if r.typ != nil && !r.typ.Unknown() && r.expr == nil {
+		a.typeAliasImplicits(d, r.typ)
+	}
+}
+
+// typeAliasImplicits declares the aliases a nonobject alias of a type
+// implies (LRM 6.6.3): one for each enumeration literal, physical
+// unit and predefined operation of the type, so a use clause of the
+// alias's package makes them visible too.
+func (a *analyzer) typeAliasImplicits(d *Decl, t *Type) {
+	b := t.Base()
+	var ds []*Decl
+	ds = append(ds, b.Literals...)
+	ds = append(ds, b.Units...)
+	ds = append(ds, b.Ops...)
+	for _, x := range ds {
+		if x == nil || x.Name == "" {
+			continue
+		}
+		al := &Decl{Kind: DeclAlias, Name: x.Name, Text: x.Text,
+			File: d.File, Span: d.Span, Full: d.Full, Unit: a.u,
+			Target: x, Type: x.Type, Params: x.Params, Implicit: true,
+			Pure: true, First: d.First}
+		a.declare(al)
+	}
 }
 
 func classOf(k DeclKind) ObjClass {
@@ -420,11 +451,12 @@ func classOf(k DeclKind) ObjClass {
 func (a *analyzer) attributeSpec(as cst.AttributeSpec) {
 	tok := as.Designator()
 	var t *Type
+	var attr *Decl
 	if r := a.lookup(TokenKey(tok)); len(r.Decls) > 0 {
 		for _, d := range r.Decls {
 			if d.Denotes().Kind == DeclAttribute {
 				a.ref(tok, d, RefRead)
-				t = d.Denotes().Type
+				t, attr = d.Denotes().Type, d.Denotes()
 				break
 			}
 		}
@@ -437,10 +469,16 @@ func (a *analyzer) attributeSpec(as cst.AttributeSpec) {
 		if k == "" || k == "others" || k == "all" {
 			continue
 		}
+		var named *Decl
 		if r := a.lookup(k); len(r.Decls) > 0 {
-			a.ref(et, r.Decls[0], RefRead)
+			named = r.Decls[0]
 		} else if a.u.Decl != nil && k == a.u.Decl.Name {
-			a.ref(et, a.u.Decl, RefRead)
+			named = a.u.Decl
+		}
+		a.ref(et, named, RefRead)
+		if attr != nil && named != nil && named == a.u.Decl &&
+			a.u.Kind.Primary() {
+			a.u.unitAttrs = append(a.u.unitAttrs, attr)
 		}
 	}
 	if v := as.Value(); !v.IsZero() {
@@ -500,9 +538,31 @@ func (a *analyzer) subprogramSpec(spec cst.Node, kind DeclKind) *Decl {
 	}
 	if !ret.IsZero() {
 		d.Type = a.typeMark(ret.TypeMark().Node)
+		a.returnIdentifier(ret, d.Type)
 	}
 	a.pop()
 	return d
+}
+
+// returnIdentifier declares the VHDL-2019 return identifier of
+// `return R of T` in the function's region: a subtype of T whose
+// constraint is the return value's, known only per call (LRM 4.2.1).
+func (a *analyzer) returnIdentifier(ret cst.ReturnSpec, t *Type) {
+	if ret.Node.Token(token.KwOf, 0).IsZero() {
+		return
+	}
+	tok := ret.Node.TokenIn(nameTokens, 0)
+	if tok.IsZero() || tok.Missing() {
+		return
+	}
+	r := a.newDecl(DeclSubtype, tok, ret.Node)
+	st := &Type{Class: TypeUnknown}
+	if !t.Unknown() {
+		st = runTime(t)
+	}
+	st.Decl = r
+	r.Type = st
+	a.declare(r)
 }
 
 func (a *analyzer) subprogramDecl(sd cst.SubprogramDecl) {
@@ -668,11 +728,43 @@ func (a *analyzer) subprogramInst(si cst.SubprogramInstantiation) {
 			d.Kind = g.Kind
 		}
 		a.ref(r.tok, g, RefRead)
-		a.genericMap(si.GenericMap().List(), g.Region)
+		as := a.assocMap(si.GenericMap().List(), g.Region, DeclGeneric)
+		instanceProfile(d, as)
 	} else {
 		a.genericMap(si.GenericMap().List(), nil)
 	}
 	a.declare(d)
+}
+
+// instanceProfile gives the instance d of a generic subprogram its
+// parameter and result type profile (LRM 4.4, 4.5.1): each generic
+// type of the uninstantiated subprogram is replaced by its actual
+// subtype, so instances for different types are no homographs.
+func instanceProfile(d *Decl, as []Association) {
+	subst := map[*Type]*Type{} // lookup only
+	for _, x := range as {
+		if x.Formal != nil && x.Formal.Kind == DeclGenericType &&
+			x.Actual != nil && !x.Actual.Type.Unknown() {
+			subst[x.Formal.Type] = x.Actual.Type
+		}
+	}
+	if len(subst) == 0 {
+		return
+	}
+	sub := func(t *Type) *Type {
+		if n, ok := subst[t]; ok {
+			return n
+		}
+		return t
+	}
+	d.Type = sub(d.Type)
+	ps := make([]*Decl, len(d.Params))
+	for i, p := range d.Params {
+		c := *p
+		c.Type = sub(p.Type)
+		ps[i] = &c
+	}
+	d.Params = ps
 }
 
 // pslDecl declares a PSL property, sequence or endpoint; its body is

@@ -1,0 +1,83 @@
+gohard-oracle 1
+tool ghdl 6.0.0
+sources 797604d95e2f55ca
+testbench hier_generate_tb
+signal hier_generate_tb.din logic 14
+signal hier_generate_tb.dout logic 14
+signal hier_generate_tb.dut.din logic 14
+signal hier_generate_tb.dut.dout logic 14
+signal hier_generate_tb.dut.lanes(0).u.a logic 2
+signal hier_generate_tb.dut.lanes(0).u.y logic 2
+signal hier_generate_tb.dut.lanes(1).u.a logic 3
+signal hier_generate_tb.dut.lanes(1).u.y logic 3
+signal hier_generate_tb.dut.lanes(2).u.a logic 4
+signal hier_generate_tb.dut.lanes(2).u.y logic 4
+signal hier_generate_tb.dut.lanes(3).u.a logic 5
+signal hier_generate_tb.dut.lanes(3).u.y logic 5
+signal hier_generate_tb.dut.parity logic 1
+signal hier_generate_tb.parity logic 1
+0 hier_generate_tb.din 00000000000000
+0 hier_generate_tb.dout 11111000011100
+0 hier_generate_tb.dut.din 00000000000000
+0 hier_generate_tb.dut.dout 11111000011100
+0 hier_generate_tb.dut.lanes(0).u.a 00
+0 hier_generate_tb.dut.lanes(0).u.y 00
+0 hier_generate_tb.dut.lanes(1).u.a 000
+0 hier_generate_tb.dut.lanes(1).u.y 111
+0 hier_generate_tb.dut.lanes(2).u.a 0000
+0 hier_generate_tb.dut.lanes(2).u.y 0000
+0 hier_generate_tb.dut.lanes(3).u.a 00000
+0 hier_generate_tb.dut.lanes(3).u.y 11111
+0 hier_generate_tb.dut.parity 0
+0 hier_generate_tb.parity 0
+10000000 hier_generate_tb.din 11111111111111
+10000000 hier_generate_tb.dout 00000111100011
+10000000 hier_generate_tb.dut.din 11111111111111
+10000000 hier_generate_tb.dut.dout 00000111100011
+10000000 hier_generate_tb.dut.lanes(0).u.a 11
+10000000 hier_generate_tb.dut.lanes(0).u.y 11
+10000000 hier_generate_tb.dut.lanes(1).u.a 111
+10000000 hier_generate_tb.dut.lanes(1).u.y 000
+10000000 hier_generate_tb.dut.lanes(2).u.a 1111
+10000000 hier_generate_tb.dut.lanes(2).u.y 1111
+10000000 hier_generate_tb.dut.lanes(3).u.a 11111
+10000000 hier_generate_tb.dut.lanes(3).u.y 00000
+20000000 hier_generate_tb.din 10110011100101
+20000000 hier_generate_tb.dout 01001011111001
+20000000 hier_generate_tb.dut.din 10110011100101
+20000000 hier_generate_tb.dut.dout 01001011111001
+20000000 hier_generate_tb.dut.lanes(0).u.a 01
+20000000 hier_generate_tb.dut.lanes(0).u.y 01
+20000000 hier_generate_tb.dut.lanes(1).u.a 001
+20000000 hier_generate_tb.dut.lanes(1).u.y 110
+20000000 hier_generate_tb.dut.lanes(2).u.a 0111
+20000000 hier_generate_tb.dut.lanes(2).u.y 0111
+20000000 hier_generate_tb.dut.lanes(3).u.a 10110
+20000000 hier_generate_tb.dut.lanes(3).u.y 01001
+30000000 hier_generate_tb.din 01001100011010
+30000000 hier_generate_tb.dout 10110100000110
+30000000 hier_generate_tb.dut.din 01001100011010
+30000000 hier_generate_tb.dut.dout 10110100000110
+30000000 hier_generate_tb.dut.lanes(0).u.a 10
+30000000 hier_generate_tb.dut.lanes(0).u.y 10
+30000000 hier_generate_tb.dut.lanes(1).u.a 110
+30000000 hier_generate_tb.dut.lanes(1).u.y 001
+30000000 hier_generate_tb.dut.lanes(2).u.a 1000
+30000000 hier_generate_tb.dut.lanes(2).u.y 1000
+30000000 hier_generate_tb.dut.lanes(3).u.a 01001
+30000000 hier_generate_tb.dut.lanes(3).u.y 10110
+40000000 hier_generate_tb.din 00000000000001
+40000000 hier_generate_tb.dout 11111000011101
+40000000 hier_generate_tb.dut.din 00000000000001
+40000000 hier_generate_tb.dut.dout 11111000011101
+40000000 hier_generate_tb.dut.lanes(0).u.a 01
+40000000 hier_generate_tb.dut.lanes(0).u.y 01
+40000000 hier_generate_tb.dut.lanes(1).u.a 000
+40000000 hier_generate_tb.dut.lanes(1).u.y 111
+40000000 hier_generate_tb.dut.lanes(2).u.a 0000
+40000000 hier_generate_tb.dut.lanes(2).u.y 0000
+40000000 hier_generate_tb.dut.lanes(3).u.a 00000
+40000000 hier_generate_tb.dut.lanes(3).u.y 11111
+40000000 hier_generate_tb.dut.parity 1
+40000000 hier_generate_tb.parity 1
+digest 64 4aed1460e3150c52bc2e80a7a1d7d0ff81cac9f983d85bce5e6c116db0d4291c

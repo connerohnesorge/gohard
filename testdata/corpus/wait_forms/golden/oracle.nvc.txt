@@ -1,0 +1,169 @@
+gohard-oracle 1
+tool nvc 1.23.0
+sources 99a5e3606bbf8afc
+testbench wait_forms_tb
+signal wait_forms_tb.a logic 1
+signal wait_forms_tb.b logic 1
+signal wait_forms_tb.c logic 1
+signal wait_forms_tb.dut.x logic 1
+signal wait_forms_tb.dut.y_inert logic 1
+signal wait_forms_tb.dut.y_rej logic 1
+signal wait_forms_tb.dut.y_trans logic 1
+signal wait_forms_tb.ii integer 32
+signal wait_forms_tb.n_all integer 32
+signal wait_forms_tb.n_edge integer 32
+signal wait_forms_tb.n_for integer 32
+signal wait_forms_tb.n_forever integer 32
+signal wait_forms_tb.n_ii integer 32
+signal wait_forms_tb.n_inert integer 32
+signal wait_forms_tb.n_on integer 32
+signal wait_forms_tb.n_on2 integer 32
+signal wait_forms_tb.n_on_for integer 32
+signal wait_forms_tb.n_on_until integer 32
+signal wait_forms_tb.n_rej integer 32
+signal wait_forms_tb.n_sens integer 32
+signal wait_forms_tb.n_ti integer 32
+signal wait_forms_tb.n_trans integer 32
+signal wait_forms_tb.n_true integer 32
+signal wait_forms_tb.n_until integer 32
+signal wait_forms_tb.n_until_for integer 32
+signal wait_forms_tb.ti integer 32
+signal wait_forms_tb.x logic 1
+signal wait_forms_tb.y_inert logic 1
+signal wait_forms_tb.y_rej logic 1
+signal wait_forms_tb.y_trans logic 1
+signal wait_forms_tb.zd logic 1
+0 wait_forms_tb.a 0
+0 wait_forms_tb.b 0
+0 wait_forms_tb.c 0
+0 wait_forms_tb.dut.x 0
+0 wait_forms_tb.dut.y_inert U
+0 wait_forms_tb.dut.y_rej U
+0 wait_forms_tb.dut.y_trans U
+0 wait_forms_tb.ii 0
+0 wait_forms_tb.n_all 0
+0 wait_forms_tb.n_edge 0
+0 wait_forms_tb.n_for 0
+0 wait_forms_tb.n_forever 1
+0 wait_forms_tb.n_ii 0
+0 wait_forms_tb.n_inert 0
+0 wait_forms_tb.n_on 0
+0 wait_forms_tb.n_on2 0
+0 wait_forms_tb.n_on_for 0
+0 wait_forms_tb.n_on_until 0
+0 wait_forms_tb.n_rej 0
+0 wait_forms_tb.n_sens 1
+0 wait_forms_tb.n_ti 0
+0 wait_forms_tb.n_trans 0
+0 wait_forms_tb.n_true 0
+0 wait_forms_tb.n_until 0
+0 wait_forms_tb.n_until_for 0
+0 wait_forms_tb.ti 0
+0 wait_forms_tb.x 0
+0 wait_forms_tb.y_inert U
+0 wait_forms_tb.y_rej U
+0 wait_forms_tb.y_trans U
+0 wait_forms_tb.zd 0
+3000000 wait_forms_tb.n_true 1
+6000000 wait_forms_tb.n_true 2
+7000000 wait_forms_tb.zd 1
+10000000 wait_forms_tb.a 1
+10000000 wait_forms_tb.dut.y_inert 0
+10000000 wait_forms_tb.dut.y_rej 0
+10000000 wait_forms_tb.dut.y_trans 0
+10000000 wait_forms_tb.n_edge 1
+10000000 wait_forms_tb.n_inert 1
+10000000 wait_forms_tb.n_on 1
+10000000 wait_forms_tb.n_on2 1
+10000000 wait_forms_tb.n_rej 1
+10000000 wait_forms_tb.n_trans 1
+10000000 wait_forms_tb.y_inert 0
+10000000 wait_forms_tb.y_rej 0
+10000000 wait_forms_tb.y_trans 0
+15000000 wait_forms_tb.n_on_for 1
+19000000 wait_forms_tb.n_for 3
+20000000 wait_forms_tb.b 1
+20000000 wait_forms_tb.n_on2 2
+25000000 wait_forms_tb.n_until_for 1
+30000000 wait_forms_tb.a 0
+30000000 wait_forms_tb.n_on 2
+30000000 wait_forms_tb.n_on2 3
+30000000 wait_forms_tb.n_on_until 1
+40000000 wait_forms_tb.c 1
+40000000 wait_forms_tb.n_on_for 2
+40000000 wait_forms_tb.n_sens 2
+40000000 wait_forms_tb.n_until 1
+50000000 wait_forms_tb.b 0
+50000000 wait_forms_tb.n_on2 4
+50000000 wait_forms_tb.n_until_for 2
+60000000 wait_forms_tb.a 1
+60000000 wait_forms_tb.n_all 1
+60000000 wait_forms_tb.n_edge 2
+60000000 wait_forms_tb.n_on 3
+60000000 wait_forms_tb.n_on2 5
+65000000 wait_forms_tb.b 1
+65000000 wait_forms_tb.n_on2 6
+65000000 wait_forms_tb.n_on_until 2
+70000000 wait_forms_tb.c 0
+70000000 wait_forms_tb.n_sens 3
+72000000 wait_forms_tb.n_all 2
+80000000 wait_forms_tb.c 1
+80000000 wait_forms_tb.n_sens 4
+80000000 wait_forms_tb.n_until 2
+100000000 wait_forms_tb.dut.x 1
+100000000 wait_forms_tb.x 1
+102000000 wait_forms_tb.dut.x 0
+102000000 wait_forms_tb.x 0
+110000000 wait_forms_tb.dut.x 1
+110000000 wait_forms_tb.dut.y_trans 1
+110000000 wait_forms_tb.n_trans 2
+110000000 wait_forms_tb.x 1
+110000000 wait_forms_tb.y_trans 1
+112000000 wait_forms_tb.dut.y_trans 0
+112000000 wait_forms_tb.n_trans 3
+112000000 wait_forms_tb.y_trans 0
+115000000 wait_forms_tb.dut.x 0
+115000000 wait_forms_tb.x 0
+120000000 wait_forms_tb.dut.y_rej 1
+120000000 wait_forms_tb.dut.y_trans 1
+120000000 wait_forms_tb.n_rej 2
+120000000 wait_forms_tb.n_trans 4
+120000000 wait_forms_tb.y_rej 1
+120000000 wait_forms_tb.y_trans 1
+125000000 wait_forms_tb.dut.y_rej 0
+125000000 wait_forms_tb.dut.y_trans 0
+125000000 wait_forms_tb.n_rej 3
+125000000 wait_forms_tb.n_trans 5
+125000000 wait_forms_tb.y_rej 0
+125000000 wait_forms_tb.y_trans 0
+130000000 wait_forms_tb.dut.x 1
+130000000 wait_forms_tb.x 1
+140000000 wait_forms_tb.dut.y_inert 1
+140000000 wait_forms_tb.dut.y_rej 1
+140000000 wait_forms_tb.dut.y_trans 1
+140000000 wait_forms_tb.n_inert 2
+140000000 wait_forms_tb.n_rej 4
+140000000 wait_forms_tb.n_trans 6
+140000000 wait_forms_tb.y_inert 1
+140000000 wait_forms_tb.y_rej 1
+140000000 wait_forms_tb.y_trans 1
+150000000 wait_forms_tb.dut.x 0
+150000000 wait_forms_tb.x 0
+160000000 wait_forms_tb.dut.y_inert 0
+160000000 wait_forms_tb.dut.y_rej 0
+160000000 wait_forms_tb.dut.y_trans 0
+160000000 wait_forms_tb.n_inert 3
+160000000 wait_forms_tb.n_rej 5
+160000000 wait_forms_tb.n_trans 7
+160000000 wait_forms_tb.y_inert 0
+160000000 wait_forms_tb.y_rej 0
+160000000 wait_forms_tb.y_trans 0
+215000000 wait_forms_tb.n_ti 1
+215000000 wait_forms_tb.ti 2
+236000000 wait_forms_tb.n_ti 2
+236000000 wait_forms_tb.ti 3
+310000000 wait_forms_tb.ii 2
+310000000 wait_forms_tb.n_ii 1
+406000000 wait_forms_tb.ii 7
+406000000 wait_forms_tb.n_ii 2
+digest 133 b6fec685821251c22f94c12064e26ca65b2276e5095f18f6508579991e03479e

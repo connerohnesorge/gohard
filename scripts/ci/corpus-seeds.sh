@@ -1,13 +1,30 @@
 #!/usr/bin/env bash
 # shellcheck source-path=SCRIPTDIR
-# Nightly: every corpus design at 64 seeds (#30, #8). Placeholder until
-# the corpus runner exists (#35, #36 with #8's corpus.yaml): later
-# stages replace the body with a run that checks byte-identical traces
-# across seeds 0..63 and the trace hashes in corpus.yaml, and fails on
-# a mismatch, printing the first differing trace line.
+# Corpus designs at many seeds (#8, #30, #35, #36). Runs the corpus
+# harness (internal/corpus TestCorpus): every design of
+# testdata/corpus/corpus.yaml, its listed variants and the generated
+# layout/case/rename/reorder variants, checking exit, status, messages
+# and stop time, byte-identical traces across seeds 0..SEEDS-1 (the
+# first differing line is printed), the golden trace and its
+# trace_sha256, and prot_cond's exit 2. Pull requests: SEEDS=4 (the
+# plain `go test` default); nightly: SEEDS=64. A design that cannot
+# simulate yet (no sequential interpreter) fails here
+# (-corpus.require-sim) instead of being skipped. Then the recorded
+# GHDL/NVC oracles are checked against GoHard (tools/oracle trace,
+# tree and golden sections; no tool runs).
 . "$(dirname "$0")/lib.sh"
 
 SEEDS=${SEEDS:-64}
-notice "corpus at $SEEDS seeds: not wired yet (needs corpus.yaml" \
-	"and the simulator); nothing to run"
-summary "- corpus at $SEEDS seeds: not wired yet"
+case "$SEEDS" in
+'' | *[!0-9]*) die "SEEDS must be a number, got '$SEEDS'" ;;
+esac
+
+group "corpus harness at $SEEDS seeds"
+go test -count=1 -timeout 60m -run '^TestCorpus$' ./internal/corpus \
+	-args -corpus.seeds="$SEEDS" -corpus.require-sim
+endgroup
+
+group "recorded trace and hierarchy oracles"
+go run ./tools/oracle trace tree golden
+endgroup
+summary "- corpus at $SEEDS seeds: every design, oracles checked"

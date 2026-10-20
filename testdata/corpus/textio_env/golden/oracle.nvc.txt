@@ -1,0 +1,25 @@
+gohard-oracle 1
+tool nvc 1.23.0
+sources d472aefcec594599
+testbench textio_env_tb
+signal textio_env_tb.a logic 8
+signal textio_env_tb.dut.a logic 8
+signal textio_env_tb.dut.y logic 8
+signal textio_env_tb.y logic 8
+0 textio_env_tb.a 00000000
+0 textio_env_tb.dut.a 00000000
+0 textio_env_tb.dut.y 11111111
+0 textio_env_tb.y 11111111
+10000000 textio_env_tb.a 10100101
+10000000 textio_env_tb.dut.a 10100101
+10000000 textio_env_tb.dut.y 01011010
+10000000 textio_env_tb.y 01011010
+20000000 textio_env_tb.a 00111100
+20000000 textio_env_tb.dut.a 00111100
+20000000 textio_env_tb.dut.y 11000011
+20000000 textio_env_tb.y 11000011
+30000000 textio_env_tb.a 11111111
+30000000 textio_env_tb.dut.a 11111111
+30000000 textio_env_tb.dut.y 00000000
+30000000 textio_env_tb.y 00000000
+digest 16 d46ddf4ce402cbef86a49050778dfdc79a6afcad3bd74ceb83140cb12b881d97

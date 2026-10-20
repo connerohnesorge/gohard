@@ -16,6 +16,9 @@ import (
 var semFalse = flag.Bool("semerr-false", false,
 	"TestSemerrGaps also counts GoHard errors in files both tools accept")
 
+var debugPath = flag.String("semerr-debug", "",
+	"TestSemerrGaps logs the analysis of this repository path")
+
 var updateGaps = flag.Bool("update-gaps", false,
 	"rewrite "+semerrDir+"/"+semGapsName+" from the current GoHard "+
 		"results (TestSemerrGaps)")
@@ -32,7 +35,8 @@ func TestSemerrGaps(t *testing.T) {
 	}
 	root := repoRoot(t)
 	semCountFalse = *semFalse
-	defer func() { semCountFalse = false }()
+	semDebugPath = *debugPath
+	defer func() { semCountFalse, semDebugPath = false, "" }()
 	probs, err := doCheck(root, []*section{semerrSection}, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -52,6 +56,9 @@ func TestSemerrGaps(t *testing.T) {
 		total.add(semResults.stats[n])
 	}
 	t.Logf("%-26s %s", "total", total)
+	for _, l := range semResults.debug {
+		t.Log(l)
+	}
 	if *semFalse {
 		slices.Sort(semResults.false)
 		for _, f := range semResults.false {
@@ -360,7 +367,7 @@ func TestClosure(t *testing.T) {
 		[]byte("package p9 is end;"),                // 6
 		[]byte("architecture b of e is begin end;"), // 7
 	}
-	x := newUnitIndex(texts)
+	x := newUnitIndex(texts, nil)
 	cases := map[int][]int{
 		0: {},
 		1: {0},
@@ -368,6 +375,35 @@ func TestClosure(t *testing.T) {
 		5: {1, 2, 3, 4},
 		7: {3},
 	}
+	for i, want := range cases {
+		if got := x.closure(i); !slices.Equal(got, want) {
+			t.Errorf("closure(%d) = %v, want %v", i, got, want)
+		}
+	}
+}
+
+// TestClosureLibraries: re-analysis replaces a unit only within its
+// library, and a file's own architecture does not hide another
+// entity's architecture of the same name.
+func TestClosureLibraries(t *testing.T) {
+	texts := [][]byte{
+		[]byte(
+			"package g is end;",
+		), // 0, library stim
+		[]byte(
+			"package g is end;",
+		), // 1, work: does not replace 0
+		[]byte("library stim; use stim.g.all; entity t is end;"), // 2
+		[]byte("entity f is end;"),                               // 3
+		[]byte("architecture rtl of f is begin end;"),            // 4
+		[]byte("entity top is end; architecture rtl of top is\n" +
+			"begin u: entity work.f(rtl); end;"), // 5
+		[]byte("package g is end;"),                 // 6, stim: replaces 0
+		[]byte("use stim.g.all; entity t2 is end;"), // 7
+	}
+	libs := []string{"stim", work, work, work, work, work, "stim", work}
+	x := newUnitIndex(texts, libs)
+	cases := map[int][]int{2: {0, 1}, 5: {3, 4}, 7: {1, 6}}
 	for i, want := range cases {
 		if got := x.closure(i); !slices.Equal(got, want) {
 			t.Errorf("closure(%d) = %v, want %v", i, got, want)

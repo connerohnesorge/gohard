@@ -39,6 +39,14 @@ type shared struct {
 	// computation during which it does not change is the same in every
 	// instance. Frame cells are counted by frame.loads.
 	reads int
+	// dynReads counts the reads of a simulator context (dynamic.go):
+	// what reads it is never cached.
+	dynReads int
+	// memo records pure function calls (memo.go); lookup only. fills
+	// counts the layouts and constants computed: a call that computes
+	// one costs more than its repetitions and is not recorded.
+	memo  map[string]memoEntry
+	fills int
 }
 
 func newShared() *shared {
@@ -90,6 +98,18 @@ type outcome struct {
 // std packages) and calls deeper than maxCallDepth are not static.
 func (ev *Evaluator) Call(fn eval.Func, args []eval.Value, b *eval.Budget,
 ) (eval.Value, error) {
+	if pr, ok := b.Observer().(*Profile); ok { // profile.go
+		if d, ok := fn.(*Decl); ok {
+			pr.enter(d.Denotes())
+			defer pr.exit()
+		}
+	}
+	if ev.dyn != nil {
+		if v, ok, err := ev.dyn.Call(fn, args, b); ok {
+			ev.sh.dynReads++
+			return v, err
+		}
+	}
 	d, ok := fn.(*Decl)
 	if !ok {
 		return eval.Value{}, eval.NotStatic("call")
@@ -98,6 +118,15 @@ func (ev *Evaluator) Call(fn eval.Func, args []eval.Value, b *eval.Budget,
 	if x.Kind != DeclFunction || !x.Pure {
 		return eval.Value{}, eval.NotStatic("call of " + x.Text)
 	}
+	if ev.memo {
+		return ev.memoCall(x, args, b) // memo.go
+	}
+	return ev.pureCall(x, args, b)
+}
+
+// pureCall interprets the body of the pure function x on args.
+func (ev *Evaluator) pureCall(x *Decl, args []eval.Value, b *eval.Budget,
+) (eval.Value, error) {
 	out, err := ev.invoke(x, args, nil, b)
 	if err != nil {
 		return eval.Value{}, err
@@ -130,6 +159,10 @@ func (ev *Evaluator) invoke(x *Decl, args []eval.Value, outs []eval.Value,
 	}
 	ev.sh.depth++
 	defer func() { ev.sh.depth-- }()
+	if pr, ok := b.Observer().(*Profile); ok { // profile.go
+		pr.enter(x)
+		defer pr.exit()
+	}
 	fe := ev.enter()
 	for i, p := range body.Params {
 		if p.Class == ClassSignal || p.Class == ClassFile {
@@ -177,8 +210,8 @@ func (c ObjClass) word() string {
 // of ev's instance, no cells.
 func (ev *Evaluator) enter() *Evaluator {
 	c := *ev
-	c.fr = &frame{vars: map[*Decl]*cell{},
-		consts: map[*Decl]constResult{}, layouts: map[*Type]*eval.Type{}}
+	// consts and layouts are made on first use.
+	c.fr = &frame{vars: make(map[*Decl]*cell, 8)}
 	return &c
 }
 

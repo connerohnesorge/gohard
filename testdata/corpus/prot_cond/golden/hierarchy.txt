@@ -1,0 +1,9 @@
+# oracle: none, hand-checked (#8). GHDL 6.0.0 cannot analyze this
+# 2019 design, so there is no --disp-tree recording. Written from the
+# VHDL: prot_cond_tb(sim) instantiates dut : entity work.prot_cond
+# (architecture rtl), its only instance; neither entity has generics
+# (the generic k belongs to the uninstantiated subprograms of
+# prot_cond_pkg, which add no hierarchy level). Form:
+# internal/elab/hier Dump; lines starting with # are not compared.
+prot_cond_tb entity work.prot_cond_tb(sim)
+  prot_cond_tb.dut entity work.prot_cond(rtl)

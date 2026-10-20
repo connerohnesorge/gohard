@@ -1,0 +1,2 @@
+gohard: error[sim/budget-exceeded]: step budget of 1000 steps exceeded at 0 fs
+summary: 1 errors, 0 warnings, 0 hints, 1 files

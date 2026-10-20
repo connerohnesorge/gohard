@@ -1,0 +1,29 @@
+gohard-oracle 1
+tool nvc 1.23.0
+sources 3452c93164549bea
+testbench assert_fail_tb
+signal assert_fail_tb.a logic 4
+signal assert_fail_tb.b logic 4
+signal assert_fail_tb.dut.a logic 4
+signal assert_fail_tb.dut.b logic 4
+signal assert_fail_tb.dut.s logic 4
+signal assert_fail_tb.s logic 4
+0 assert_fail_tb.a 0011
+0 assert_fail_tb.b 0100
+0 assert_fail_tb.dut.a 0011
+0 assert_fail_tb.dut.b 0100
+0 assert_fail_tb.dut.s 0111
+0 assert_fail_tb.s 0111
+10000000 assert_fail_tb.a 1001
+10000000 assert_fail_tb.b 1001
+10000000 assert_fail_tb.dut.a 1001
+10000000 assert_fail_tb.dut.b 1001
+10000000 assert_fail_tb.dut.s 0010
+10000000 assert_fail_tb.s 0010
+20000000 assert_fail_tb.a 0101
+20000000 assert_fail_tb.b 0110
+20000000 assert_fail_tb.dut.a 0101
+20000000 assert_fail_tb.dut.b 0110
+20000000 assert_fail_tb.dut.s 1011
+20000000 assert_fail_tb.s 1011
+digest 18 fbfd37ff3024e2cb10c3b3485f838c8fc24341c6c61d0487122c0d1a6c6f6371

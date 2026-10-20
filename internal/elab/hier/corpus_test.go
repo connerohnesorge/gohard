@@ -193,7 +193,15 @@ func TestCorpusDumps(t *testing.T) {
 				t.Logf("no hand-checked hierarchy yet: %v", err)
 				return
 			}
-			if d.Milestone != "v1.1" && h.Dump() != string(hand) {
+			// Lines starting with # are notes, not compared.
+			var kept []string
+			for l := range strings.Lines(string(hand)) {
+				if !strings.HasPrefix(l, "#") {
+					kept = append(kept, l)
+				}
+			}
+			if d.Milestone != "v1.1" &&
+				h.Dump() != strings.Join(kept, "") {
 				t.Errorf("golden/hierarchy.txt:\n%s\ndump:\n%s", hand,
 					h.Dump())
 			}

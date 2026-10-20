@@ -254,6 +254,9 @@ func relation(o Op, x, y Value) bool {
 // matching implements the VHDL-2008 matching relational operators of
 // BIT (and the "?=" of BIT arrays): the result is a BIT.
 func matching(b *Budget, o Op, rt *Type, x, y Value) (Value, error) {
+	if isULogic(rt) {
+		return matchingULogic(b, o, rt, x, y)
+	}
 	var r bool
 	switch o {
 	case OpMatchEq, OpMatchNe:
@@ -604,4 +607,161 @@ func divZero() error { return errf(ErrCodeDivZero, "division by zero") }
 func typeErr(o Op, x Value) error {
 	return errf(ErrCodeType, o.String()+" is not defined for "+
 		x.Kind().String()+" operands")
+}
+
+// isULogic reports whether t is STD_ULOGIC: the nine-valued
+// enumeration 'U', 'X', '0', '1', 'Z', 'W', 'L', 'H', '-'.
+func isULogic(t *Type) bool {
+	return t != nil && t.Kind == KindEnum && len(t.Literals) == 9 &&
+		t.Literals[0] == "'U'" && t.Literals[8] == "'-'"
+}
+
+// STD_ULOGIC positions.
+const (
+	uU int64 = iota
+	uX
+	u0
+	u1
+)
+
+// uMatchEq is the "?=" of STD_ULOGIC (LRM 9.2.3), by position.
+var uMatchEq = [9][9]int64{
+	{uU, uU, uU, uU, uU, uU, uU, uU, u1},
+	{uU, uX, uX, uX, uX, uX, uX, uX, u1},
+	{uU, uX, u1, u0, uX, uX, u1, u0, u1},
+	{uU, uX, u0, u1, uX, uX, u0, u1, u1},
+	{uU, uX, uX, uX, uX, uX, uX, uX, u1},
+	{uU, uX, uX, uX, uX, uX, uX, uX, u1},
+	{uU, uX, u1, u0, uX, uX, u1, u0, u1},
+	{uU, uX, u0, u1, uX, uX, u0, u1, u1},
+	{u1, u1, u1, u1, u1, u1, u1, u1, u1},
+}
+
+// uMatchLt is the "?<" of STD_ULOGIC (LRM 9.2.3); a '-' operand is an
+// error.
+var uMatchLt = [9][9]int64{
+	{uU, uU, uU, uU, uU, uU, uU, uU, uX},
+	{uU, uX, uX, uX, uX, uX, uX, uX, uX},
+	{uU, uX, u0, u1, uX, uX, u0, u1, uX},
+	{uU, uX, u0, u0, uX, uX, u0, u0, uX},
+	{uU, uX, uX, uX, uX, uX, uX, uX, uX},
+	{uU, uX, uX, uX, uX, uX, uX, uX, uX},
+	{uU, uX, u0, u1, uX, uX, u0, u1, uX},
+	{uU, uX, u0, u0, uX, uX, u0, u0, uX},
+	{uX, uX, uX, uX, uX, uX, uX, uX, uX},
+}
+
+// uAnd is the "and" of the results of "?=" ('U', 'X', '0', '1').
+func uAnd(l, r int64) int64 {
+	switch {
+	case l == u0 || r == u0:
+		return u0
+	case l == uU || r == uU:
+		return uU
+	case l == uX || r == uX:
+		return uX
+	}
+	return u1
+}
+
+func uNot(v int64) int64 {
+	switch v {
+	case u0:
+		return u1
+	case u1:
+		return u0
+	}
+	return v
+}
+
+// matchingULogic implements the matching operators of STD_ULOGIC and
+// "?=", "?/=" of STD_ULOGIC arrays (the "and" of the element results).
+func matchingULogic(b *Budget, o Op, rt *Type, x, y Value) (Value,
+	error,
+) {
+	pos := func(v Value) (int64, error) {
+		if v.I < 0 || v.I > 8 {
+			return 0, typeErr(o, v)
+		}
+		return v.I, nil
+	}
+	eq := func(l, r Value) (int64, error) {
+		a, err := pos(l)
+		if err != nil {
+			return 0, err
+		}
+		c, err := pos(r)
+		if err != nil {
+			return 0, err
+		}
+		return uMatchEq[a][c], nil
+	}
+	var r int64
+	switch o {
+	case OpMatchEq, OpMatchNe:
+		if x.Kind() == KindArray {
+			if len(x.E) != len(y.E) {
+				return Value{}, LengthError(int64(len(x.E)),
+					int64(len(y.E)))
+			}
+			if err := b.Step(int64(len(x.E))); err != nil {
+				return Value{}, err
+			}
+			r = u1
+			for i := range x.E {
+				e, err := eq(x.E[i], y.E[i])
+				if err != nil {
+					return Value{}, err
+				}
+				r = uAnd(r, e)
+			}
+		} else {
+			e, err := eq(x, y)
+			if err != nil {
+				return Value{}, err
+			}
+			r = e
+		}
+		if o == OpMatchNe {
+			r = uNot(r)
+		}
+	default:
+		a, err := pos(x)
+		if err != nil {
+			return Value{}, err
+		}
+		c, err := pos(y)
+		if err != nil {
+			return Value{}, err
+		}
+		if a == 8 || c == 8 {
+			return Value{}, errf(ErrCodeRange, "'-' operand of the "+
+				"matching ordering operator "+o.String())
+		}
+		lt := uMatchLt[a][c]
+		le := uOr(lt, uMatchEq[a][c])
+		switch o {
+		case OpMatchLt:
+			r = lt
+		case OpMatchLe:
+			r = le
+		case OpMatchGt:
+			r = uNot(le)
+		default:
+			r = uNot(lt)
+		}
+	}
+	return Value{T: rt, I: r}, nil
+}
+
+func uOr(l, r int64) int64 {
+	switch {
+	case l == u1 || r == u1:
+		return u1
+	case l == uU || r == uU:
+		return uU
+	case l == uX || r == uX:
+		return uX
+	}
+	return u0
 }

@@ -308,10 +308,11 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 			out = append(out, as)
 			continue
 		}
-		saved := a.mapActual
+		saved, savedQ := a.mapActual, a.quiet
 		a.mapActual = true // associating a port is no read of it
+		a.quiet = a.quiet || a.quietActuals
 		e := a.typed(v.Node, want)
-		a.mapActual = saved
+		a.mapActual, a.quiet = saved, savedQ
 		if f != nil && f.Kind.IsObject() {
 			a.expect(e, want, v.Node)
 		}
@@ -417,6 +418,11 @@ func (a *analyzer) convertedName(fn cst.Node) (cst.Token, bool) {
 func (a *analyzer) nonObjectActual(v cst.Node, f *Decl) bool {
 	isName := (cst.Name{}).Accepts(v.Kind())
 	switch {
+	case f != nil && f.Kind == DeclGenericPackage &&
+		v.Kind() == cst.KindBoxExpr:
+		// generic map (<>) of an interface package (LRM 6.5.5): any
+		// instance of the formal's package is accepted.
+		return true
 	case f != nil && f.Kind == DeclGenericPackage:
 		r := a.resolveName(v, RefRead, nil)
 		if !r.unknown && (len(r.decls) != 1 ||
@@ -1159,15 +1165,16 @@ func (a *analyzer) blockConfiguration(bc cst.BlockConfiguration,
 				nil)
 		case cst.KindComponentConfiguration:
 			cc := cst.ComponentConfiguration{Node: item.Node}
-			a.componentSpec(cc.Spec())
-			a.bindingIndication(cc.Binding())
+			comp := a.componentSpec(cc.Spec())
+			a.bindingIndication(cc.Binding(), comp)
 			a.blockConfiguration(cc.Block(), nil)
 		}
 	}
 }
 
-// componentSpec resolves `labels : component` leniently.
-func (a *analyzer) componentSpec(cs cst.ComponentSpecification) {
+// componentSpec resolves `labels : component` leniently and returns
+// the component declaration it names, nil if none resolves.
+func (a *analyzer) componentSpec(cs cst.ComponentSpecification) *Decl {
 	for tok := range cs.Instances().Labels() {
 		for _, d := range a.lookup(TokenKey(tok)).Decls {
 			if d.Kind == DeclLabel {
@@ -1175,11 +1182,27 @@ func (a *analyzer) componentSpec(cs cst.ComponentSpecification) {
 			}
 		}
 	}
-	a.lenientName(cs.Component().Node)
+	saved := a.quiet
+	a.quiet = true
+	r := a.resolveName(cs.Component().Node, RefRead, nil)
+	a.quiet = saved
+	if len(r.decls) == 1 {
+		if d := r.decls[0].Denotes(); d.Kind == DeclComponent {
+			return d
+		}
+	}
+	return nil
 }
 
-// bindingIndication resolves `use entity lib.e(a)` and its maps.
-func (a *analyzer) bindingIndication(b cst.BindingIndication) {
+// bindingIndication resolves `use entity lib.e(a)` and its maps. comp
+// is the component the specification binds (nil if unknown): the
+// actuals of the maps see its local generics and ports (LRM 7.3.2.2,
+// 12.1: the scope of a local generic or port extends into the binding
+// indication of a configuration specification or component
+// configuration naming the component).
+func (a *analyzer) bindingIndication(b cst.BindingIndication,
+	comp *Decl,
+) {
 	if b.IsZero() {
 		return
 	}
@@ -1209,6 +1232,19 @@ func (a *analyzer) bindingIndication(b cst.BindingIndication) {
 				}
 			}
 		}
+	}
+	switch {
+	case comp != nil && comp.Region != nil:
+		a.push(RegionComponent, comp, b.Node).Includes =
+			[]*Region{comp.Region}
+		defer a.pop()
+	case a.u.Kind == UnitConfiguration:
+		// The architecture declaring the component is not a
+		// dependency of the configuration, so its ports are not
+		// known here: the actuals are checked at elaboration (#35).
+		saved := a.quietActuals
+		a.quietActuals = true
+		defer func() { a.quietActuals = saved }()
 	}
 	a.assocMap(b.GenericMap().List(), region, DeclGeneric)
 	a.assocMap(b.PortMap().List(), region, DeclPort)

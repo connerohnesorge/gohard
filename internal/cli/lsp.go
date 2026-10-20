@@ -206,6 +206,9 @@ func replayLSP(inv *Invocation) Result {
 // output are LSP positions (zero-based) in UTF-8 code units.
 func lspAction(inv *Invocation) Result {
 	name := inv.Args[0]
+	if name == "sim" {
+		return runLSPSim(inv)
+	}
 	a, ok := server.LookupAction(name)
 	if !ok {
 		var names []string

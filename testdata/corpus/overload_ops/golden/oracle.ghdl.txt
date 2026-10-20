@@ -1,0 +1,9 @@
+gohard-oracle 1
+tool ghdl 6.0.0
+sources bd99c52d263aa4ea
+testbench overload_ops_tb
+signal overload_ops_tb.dut.neg_i integer 32
+signal overload_ops_tb.neg_i integer 32
+0 overload_ops_tb.dut.neg_i -200
+0 overload_ops_tb.neg_i -200
+digest 2 66ddb1184a6382cece9bb62b95eefc1dfe2db9761dbec27c121df94a4067183c

@@ -1,0 +1,2 @@
+missing.repro.json:1:1: error[repro/invalid]: invalid repro file missing.repro.json: no such file or directory
+summary: 1 errors, 0 warnings, 0 hints, 0 files

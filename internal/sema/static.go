@@ -41,6 +41,11 @@ type Evaluator struct {
 	// instance's own evaluator.
 	fr   *frame
 	used int64
+	// dyn is the simulator's run-time context (dynamic.go); nil for
+	// static evaluation.
+	dyn Dynamic
+	// memo enables the memoization of pure calls (memo.go).
+	memo bool
 }
 
 type constResult struct {
@@ -237,6 +242,10 @@ func (ev *Evaluator) value(e *Expr, b *eval.Budget) (eval.Value, error) {
 // Load implements eval.Env: bound objects and the cells of an
 // interpreted call are static here.
 func (ev *Evaluator) Load(ref eval.Ref) (eval.Value, error) {
+	if _, ok := ref.(*Decl); !ok && ev.dyn != nil {
+		ev.sh.dynReads++
+		return ev.dyn.Load(ref)
+	}
 	if d, ok := ref.(*Decl); ok {
 		if c := ev.cell(d); c != nil {
 			return c.v, nil
@@ -360,6 +369,9 @@ func (ev *Evaluator) lower(e *Expr, b *eval.Budget) (eval.Expr, error) {
 			c.Else = x
 		}
 		return c, nil
+	}
+	if l, ok, err := ev.dynLower(e, b); ok {
+		return l, err
 	}
 	return nil, eval.NotStatic("expression")
 }
@@ -510,6 +522,10 @@ func (ev *Evaluator) unitFactor(u *Decl, b *eval.Budget, depth int,
 func (ev *Evaluator) name(e *Expr, b *eval.Budget) (eval.Expr, error) {
 	d := e.Decl
 	if d == nil {
+		// An external name: the simulator resolves it (dynamic.go).
+		if l, ok, err := ev.dynLower(e, b); ok {
+			return l, err
+		}
 		return nil, eval.NotStatic("name")
 	}
 	if c := ev.cell(d); c != nil {
@@ -526,6 +542,9 @@ func (ev *Evaluator) name(e *Expr, b *eval.Budget) (eval.Expr, error) {
 	if v, ok := ev.bind[x]; ok {
 		ev.sh.reads++
 		return &eval.Const{V: v}, nil
+	}
+	if l, ok := ev.dynRef(x); ok {
+		return l, nil
 	}
 	switch x.Kind {
 	case DeclEnumLiteral:
@@ -604,16 +623,22 @@ func (ev *Evaluator) constant(d *Decl, b *eval.Budget) (eval.Value, error) {
 	}
 	ev.active[d] = true
 	defer delete(ev.active, d)
-	reads, loads := ev.sh.reads, ev.loads()
+	reads, loads, dyn := ev.sh.reads, ev.loads(), ev.sh.dynReads
 	v, err := ev.constantValue(d, b)
-	if c := eval.CodeOf(err); c != eval.ErrCodeBudget {
+	if c := eval.CodeOf(err); c != eval.ErrCodeBudget &&
+		ev.sh.dynReads == dyn {
 		frameFree := ev.fr == nil || ev.fr.loads == loads
 		switch {
 		case ev.sh.reads == reads && frameFree:
 			ev.sh.consts[d] = constResult{v, err}
+			ev.sh.fills++ // memo.go: a cold computation
 		case frameFree:
 			ev.consts[d] = constResult{v, err}
+			ev.sh.fills++
 		default:
+			if ev.fr.consts == nil {
+				ev.fr.consts = map[*Decl]constResult{}
+			}
 			ev.fr.consts[d] = constResult{v, err}
 		}
 	}
@@ -675,6 +700,9 @@ func (ev *Evaluator) call(e *Expr, b *eval.Budget) (eval.Expr, error) {
 	if x.Kind == DeclEnumLiteral {
 		return ev.name(&Expr{Kind: ExprName, Decl: d, Type: x.Type}, b)
 	}
+	if l, ok, err := ev.dynLower(e, b); ok {
+		return l, err
+	}
 	if x.Kind != DeclFunction || (x.Implicit && x.Op == 0) || !x.Pure {
 		return nil, eval.NotStatic("call of " + x.Text)
 	}
@@ -715,6 +743,9 @@ var attrKinds = map[Key]eval.AttrKind{
 }
 
 func (ev *Evaluator) attr(e *Expr, b *eval.Budget) (eval.Expr, error) {
+	if l, ok, err := ev.dynLower(e, b); ok {
+		return l, err
+	}
 	k, ok := attrKinds[e.Attr]
 	if !ok || e.Prefix == nil {
 		return nil, eval.NotStatic("'" + string(e.Attr))
@@ -859,6 +890,11 @@ func (ev *Evaluator) aggregate(e *Expr, b *eval.Budget) (eval.Expr, error) {
 		if err != nil {
 			return nil, err
 		}
+		if et := elemSubtype(t, as.Choices); et != nil {
+			// Each element value belongs to the element subtype
+			// (LRM 9.3.3.3, 9.3.3.2).
+			v = &eval.Qualify{X: v, T: et}
+		}
 		x := eval.Assoc{Value: v}
 		if len(as.Choices) == 0 {
 			x.Choices = []eval.Choice{{Kind: eval.ChoicePositional}}
@@ -893,6 +929,29 @@ func (ev *Evaluator) aggregate(e *Expr, b *eval.Budget) (eval.Expr, error) {
 	return ag, nil
 }
 
+// elemSubtype returns the subtype the value of an aggregate element
+// association with choices cs belongs to: the element subtype of a
+// one-dimensional array, the field's subtype of a record element named
+// or placed by position alone; nil when there is no single one.
+func elemSubtype(t *eval.Type, cs []*Expr) *eval.Type {
+	switch t.Kind {
+	case eval.KindArray:
+		if len(t.BaseType().Index) != 1 {
+			return nil
+		}
+		return t.Elem
+	case eval.KindRecord:
+		if len(cs) != 1 || cs[0].Decl == nil ||
+			cs[0].Decl.Kind != DeclElement {
+			return nil
+		}
+		if p := cs[0].Decl.Pos; p >= 0 && p < len(t.Fields) {
+			return t.Fields[p].Type
+		}
+	}
+	return nil
+}
+
 // layout evaluates the layout of t.
 func (ev *Evaluator) layout(t *Type, b *eval.Budget) (*eval.Type, error) {
 	if t == nil || t.Class == TypeUnknown {
@@ -924,17 +983,22 @@ func (ev *Evaluator) layout(t *Type, b *eval.Budget) (*eval.Type, error) {
 		ev.busy = map[*Type]bool{}
 	}
 	ev.busy[t] = true
-	reads, loads := ev.sh.reads, ev.loads()
+	reads, loads, dyn := ev.sh.reads, ev.loads(), ev.sh.dynReads
 	lt, err := ev.computeLayout(t, b)
 	delete(ev.busy, t)
 	frameFree := ev.fr == nil || ev.fr.loads == loads
 	switch {
-	case err != nil:
+	case err != nil, ev.sh.dynReads != dyn:
 	case ev.sh.reads == reads && frameFree:
 		ev.sh.layouts[t] = lt
+		ev.sh.fills++ // memo.go: a cold computation
 	case frameFree:
 		ev.layouts[t] = lt
+		ev.sh.fills++
 	default:
+		if ev.fr.layouts == nil {
+			ev.fr.layouts = map[*Type]*eval.Type{}
+		}
 		ev.fr.layouts[t] = lt
 	}
 	return lt, err
@@ -960,6 +1024,9 @@ func (ev *Evaluator) computeLayout(t *Type, b *eval.Budget,
 			if err != nil {
 				return nil, err
 			}
+			if err := compatible(r, base); err != nil {
+				return nil, err
+			}
 			out.Range = r
 		}
 		if t.IndexCons != nil {
@@ -971,6 +1038,11 @@ func (ev *Evaluator) computeLayout(t *Type, b *eval.Budget,
 				r, err := ev.rangeOf(rc, b)
 				if err != nil {
 					return nil, err
+				}
+				if i := len(bs); i < len(base.Index) {
+					if err := compatible(r, base.Index[i]); err != nil {
+						return nil, err
+					}
 				}
 				bs = append(bs, r)
 			}
@@ -1069,6 +1141,26 @@ func (ev *Evaluator) computeLayout(t *Type, b *eval.Budget,
 	return nil, eval.NotStatic("the type " + name)
 }
 
+// compatible checks that the range r of a range or index constraint is
+// compatible with the subtype t it constrains: a null range always is,
+// otherwise both bounds belong to t (LRM 5.2.1, 5.3.2.2).
+func compatible(r eval.Range, t *eval.Type) error {
+	if t == nil || r.Null() {
+		return nil
+	}
+	switch t.Kind {
+	case eval.KindInteger, eval.KindEnum, eval.KindPhysical:
+	default:
+		return nil
+	}
+	for _, v := range []int64{r.Left, r.Right} {
+		if !t.Range.Contains(v) {
+			return eval.RangeError(eval.Value{T: t, I: v}, t)
+		}
+	}
+	return nil
+}
+
 // staticChecks evaluates the constants of every project unit that need
 // no instance and reports values out of range, bad indices and width
 // mismatches (sema/static-error) and the step limit (sema/eval-limit).
@@ -1100,6 +1192,17 @@ func (s *session) staticChecks() []string {
 				rg = d.Value.Node.Span()
 			case d.Kind == DeclSignal || d.Kind == DeclSharedVariable:
 				rg, err = ev.signalCheck(d, eval.NewBudget(s.steps))
+			case d.Kind == DeclType || d.Kind == DeclSubtype:
+				// A range or index constraint incompatible with the
+				// subtype it constrains (LRM 5.2.1, 5.3.2.2).
+				_, err = ev.layout(d.Type, eval.NewBudget(s.steps))
+				err = designOnly(err)
+			case d.Kind == DeclVariable && inProcess(d):
+				// A process variable is elaborated once, with its
+				// unit: its subtype and initial value are static
+				// checks like a signal's (LRM 14.4.2.5).
+				rg, err = ev.signalCheck(d, eval.NewBudget(s.steps))
+				err = designOnly(err)
 			default:
 				continue
 			}
@@ -1118,6 +1221,18 @@ func (s *session) staticChecks() []string {
 						u.Label())))
 			}
 		}
+		u.diags = append(u.diags, targetChecks(u)...)
+		for _, tok := range bigLiterals(u.Node) {
+			u.diags = append(u.diags, at(u.File, tok.Span(),
+				diag.New(diag.SemaStaticError, "integer literal "+
+					tok.Text()+" is outside the range of "+
+					"universal_integer", u.Label())))
+		}
+		ev.processChecks(u.Body, s.steps, func(n cst.Node, err error) {
+			u.diags = append(u.diags, at(u.File, n.Span(),
+				diag.New(diag.SemaStaticError, err.Error(),
+					u.Label())))
+		})
 		if s.assignChecks(u, ev) {
 			incomplete = append(incomplete, u.Label())
 		}
@@ -1178,6 +1293,92 @@ func (ev *Evaluator) signalCheck(d *Decl, b *eval.Budget,
 		_, err = eval.Check(v, t)
 	}
 	return d.Value.Node.Span(), err
+}
+
+// bigLiterals returns the integer literals of design unit n whose value
+// lies outside the implementation's universal_integer, a 64-bit
+// two's-complement range as in GHDL and NVC (LRM 5.2.3.1, 15.5.2).
+func bigLiterals(n cst.Node) []cst.Token {
+	var out []cst.Token
+	for tok := range n.DescendantTokens() {
+		if tok.Kind() != token.IntegerLiteral || tok.Missing() ||
+			tok.Inactive() {
+			continue
+		}
+		if _, ok := ParseInteger(tok.Text()); !ok && wellFormed(tok.Text()) {
+			out = append(out, tok)
+		}
+	}
+	return out
+}
+
+// wellFormed reports whether integer literal s has only valid digits for
+// its base, so that ParseInteger failing on it means overflow.
+func wellFormed(s string) bool {
+	s = strings.ReplaceAll(lowerASCII(s), "_", "")
+	mant, base := s, 10
+	if i := strings.IndexAny(s, "#:"); i >= 0 {
+		b, err := strconv.Atoi(s[:i])
+		if err != nil || b < 2 || b > 16 {
+			return false
+		}
+		rest := s[i+1:]
+		j := strings.IndexAny(rest, "#:")
+		if j < 0 {
+			return false
+		}
+		mant, base = rest[:j], b
+		s = rest[j+1:]
+	} else if j := strings.IndexByte(s, 'e'); j >= 0 {
+		mant, s = s[:j], s[j:]
+	} else {
+		s = ""
+	}
+	if mant == "" {
+		return false
+	}
+	for _, c := range mant {
+		if d := strings.IndexRune("0123456789abcdef", c); d < 0 ||
+			d >= base {
+			return false
+		}
+	}
+	if s == "" {
+		return true
+	}
+	exp := strings.TrimPrefix(strings.TrimPrefix(s, "e"), "+")
+	if exp == "" {
+		return false
+	}
+	for _, c := range exp {
+		if c < '0' || c > '9' {
+			return false
+		}
+	}
+	return true
+}
+
+// designOnly keeps only a design error: the checks added for types and
+// process variables never report the step limit.
+func designOnly(err error) error {
+	if DesignError(eval.CodeOf(err)) {
+		return err
+	}
+	return nil
+}
+
+// inProcess reports whether d is declared in a process (outside any
+// subprogram).
+func inProcess(d *Decl) bool {
+	for r := d.Parent; r != nil; r = r.Parent {
+		switch r.Kind {
+		case RegionSubprogram:
+			return false
+		case RegionProcess:
+			return true
+		}
+	}
+	return false
 }
 
 // inSubprogram reports whether d is declared in a subprogram body:

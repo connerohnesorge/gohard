@@ -1,0 +1,27 @@
+gohard-oracle 1
+tool nvc 1.23.0
+sources bd99c52d263aa4ea
+testbench overload_ops_tb
+signal overload_ops_tb.a.v integer 32
+signal overload_ops_tb.b.v integer 32
+signal overload_ops_tb.dut.neg_i integer 32
+signal overload_ops_tb.dut.neg_w.v integer 32
+signal overload_ops_tb.dut.sum_wi.v integer 32
+signal overload_ops_tb.dut.sum_wrap.v integer 32
+signal overload_ops_tb.dut.sum_ww.v integer 32
+signal overload_ops_tb.neg_i integer 32
+signal overload_ops_tb.neg_w.v integer 32
+signal overload_ops_tb.sum_wi.v integer 32
+signal overload_ops_tb.sum_wrap.v integer 32
+signal overload_ops_tb.sum_ww.v integer 32
+0 overload_ops_tb.dut.neg_i -200
+0 overload_ops_tb.dut.neg_w.v 55
+0 overload_ops_tb.dut.sum_wi.v 255
+0 overload_ops_tb.dut.sum_wrap.v 44
+0 overload_ops_tb.dut.sum_ww.v 255
+0 overload_ops_tb.neg_i -200
+0 overload_ops_tb.neg_w.v 55
+0 overload_ops_tb.sum_wi.v 255
+0 overload_ops_tb.sum_wrap.v 44
+0 overload_ops_tb.sum_ww.v 255
+digest 10 13e07561f2212ee2eed494d1f9ca2e9f0066f71870e6dbd02b89418ec310a430

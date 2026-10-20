@@ -13,6 +13,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/internal/token"
 )
 
 // The semerr check (#34 Done when): wherever GHDL and NVC both report
@@ -46,7 +47,10 @@ type semStats struct {
 	// Opaque in files GoHard reports as opaque, AfterSyntax after
 	// GoHard's first syntax error; Gated are the lines checked, and
 	// Hits those GoHard reports an error on.
+	// Vendor are in files that use a vendor package GoHard does not
+	// bundle (vendorUnit).
 	Agree, Cascade, Excluded, Opaque, AfterSyntax, Gated, Hits int
+	Vendor                                                     int
 	// GHDLOnly and NVCOnly count lines only one tool reports (in
 	// gated files); Followed the recorded ones.
 	GHDLOnly, NVCOnly, Followed int
@@ -60,6 +64,10 @@ type semStats struct {
 // -semerr-false); the gate itself never needs it.
 var semCountFalse bool
 
+// semDebugPath, when set (TestSemerrGaps -semerr-debug), makes the
+// check log the analysis inputs and every diagnostic of that file.
+var semDebugPath string
+
 func (s *semStats) add(o semStats) {
 	s.Runs += o.Runs
 	s.Files += o.Files
@@ -69,6 +77,7 @@ func (s *semStats) add(o semStats) {
 	s.Cascade += o.Cascade
 	s.Excluded += o.Excluded
 	s.Opaque += o.Opaque
+	s.Vendor += o.Vendor
 	s.AfterSyntax += o.AfterSyntax
 	s.Gated += o.Gated
 	s.Hits += o.Hits
@@ -80,13 +89,28 @@ func (s *semStats) add(o semStats) {
 }
 
 func (s semStats) String() string {
-	return fmt.Sprintf("runs=%d files=%d ghdl-error-files=%d "+
-		"nvc-error-files=%d agreed=%d cascade=%d excluded=%d opaque=%d "+
-		"after-syntax=%d checked=%d gohard=%d gaps=%d ghdl-only=%d "+
-		"nvc-only=%d followed=%d", s.Runs, s.Files, s.GHDLFiles,
-		s.NVCFiles, s.Agree, s.Cascade, s.Excluded, s.Opaque,
-		s.AfterSyntax, s.Gated, s.Hits, s.Gated-s.Hits, s.GHDLOnly,
-		s.NVCOnly, s.Followed) + fmt.Sprintf(" clean=%d gohard-errors-in"+
+	return fmt.Sprintf(
+		"runs=%d files=%d ghdl-error-files=%d "+
+			"nvc-error-files=%d agreed=%d cascade=%d excluded=%d opaque=%d "+
+			"vendor=%d after-syntax=%d checked=%d gohard=%d gaps=%d "+
+			"ghdl-only=%d nvc-only=%d followed=%d",
+		s.Runs,
+		s.Files,
+		s.GHDLFiles,
+		s.NVCFiles,
+		s.Agree,
+		s.Cascade,
+		s.Excluded,
+		s.Opaque,
+		s.Vendor,
+		s.AfterSyntax,
+		s.Gated,
+		s.Hits,
+		s.Gated-s.Hits,
+		s.GHDLOnly,
+		s.NVCOnly,
+		s.Followed,
+	) + fmt.Sprintf(" clean=%d gohard-errors-in"+
 		"-clean=%d", s.CleanFiles, s.FalseFiles)
 }
 
@@ -97,6 +121,7 @@ var semResults = struct {
 	stats map[string]semStats
 	gaps  map[string][]string
 	false []string
+	debug []string
 }{stats: map[string]semStats{}, gaps: map[string][]string{}}
 
 // readGaps returns the known gaps of the golden file names, by name.
@@ -265,7 +290,11 @@ func evalRun(root string, r *semRun, rec recRun,
 		}
 		texts[i] = b
 	}
-	idx := newUnitIndex(texts)
+	libs := make([]string, len(r.Files))
+	for i, f := range r.Files {
+		libs[i] = f.Lib
+	}
+	idx := newUnitIndex(texts, libs)
 	for i, f := range r.Files {
 		g, n := rec.files[i].ghdl, rec.files[i].nvc
 		if len(g.Lines) > 0 {
@@ -287,6 +316,10 @@ func evalRun(root string, r *semRun, rec recRun,
 		}
 		if !clean {
 			o.stats.Excluded += len(agreed)
+			continue
+		}
+		if usesVendor(texts, append(slices.Clone(closure), i), r.Std) {
+			o.stats.Vendor += len(agreed)
 			continue
 		}
 		ghdlOnly := minusInts(g.Lines, n.Lines)
@@ -438,10 +471,14 @@ func gohardErrorLines(r *semRun, texts [][]byte, closure []int,
 	cfg.Defines = r.Defines
 	own := virtualPath(r.Files[i])
 	at := map[string]int{} // virtual path -> latest index
-	var libs []string
 	for _, j := range append(slices.Clone(closure), i) {
-		f := r.Files[j]
-		at[virtualPath(f)] = j
+		at[virtualPath(r.Files[j])] = j
+	}
+	// Every library a file of the run up to i is analyzed into exists
+	// for the tools, whether or not the closure needs a unit of it (a
+	// library clause alone names it), so it is mapped for GoHard too.
+	var libs []string
+	for _, f := range r.Files[:i+1] {
 		if f.Lib != work && !slices.Contains(libs, f.Lib) {
 			libs = append(libs, f.Lib)
 		}
@@ -461,6 +498,14 @@ func gohardErrorLines(r *semRun, texts [][]byte, closure []int,
 	}
 	res := sema.Analyze(sema.Input{Files: srcs, Config: cfg,
 		ToolVersion: toolVersion})
+	if again, ok := supersede(srcs, res); ok {
+		srcs = again
+		res = sema.Analyze(sema.Input{Files: srcs, Config: cfg,
+			ToolVersion: toolVersion})
+	}
+	if semDebugPath != "" && r.Files[i].Path == semDebugPath {
+		semDebug(r, cfg, srcs, res)
+	}
 	out.errs = map[int]bool{}
 	for _, d := range res.Diagnostics {
 		if d.Severity != diag.Error || d.Path != own {
@@ -494,6 +539,8 @@ func gohardErrorLines(r *semRun, texts [][]byte, closure []int,
 // over-approximates (any identifier counts as a mention), which only
 // adds clean files to an analysis.
 type unitIndex struct {
+	// libs are the libraries of the files ("" for all work).
+	libs  []string
 	words [][]string
 	defs  [][]unitDef
 	// by maps a unit name to its definers in file order.
@@ -527,8 +574,11 @@ var (
 	semWord = regexp.MustCompile(`[a-z][a-z0-9_]*`)
 )
 
-func newUnitIndex(texts [][]byte) *unitIndex {
-	x := &unitIndex{words: make([][]string, len(texts)),
+func newUnitIndex(texts [][]byte, libs []string) *unitIndex {
+	if libs == nil {
+		libs = make([]string, len(texts))
+	}
+	x := &unitIndex{libs: libs, words: make([][]string, len(texts)),
 		defs: make([][]unitDef, len(texts)), by: map[string][]definer{}}
 	for i, t := range texts {
 		s := semNoise.ReplaceAllString(strings.ToLower(string(t)), " ")
@@ -561,18 +611,21 @@ func (x *unitIndex) mentions(f int, w string) bool {
 
 // closure returns the sorted indexes of the earlier files file i may
 // depend on. For a name, the definers before i from its last primary
-// unit on count (a later analysis replaces an earlier one); a name file
-// i declares itself excludes the earlier declarations of the same kind
-// (all of them, for a primary unit).
+// unit on count, per library (a later analysis into the same library
+// replaces an earlier one); a name file i declares itself excludes the
+// earlier declarations of the same kind in its library (all of them,
+// for a primary unit).
 func (x *unitIndex) closure(i int) []int {
-	own := map[string]int{} // 1 secondary, 2 primary
+	own := map[string]bool{}    // primary units of file i
+	ownSec := map[string]bool{} // its secondary units, "name of"
 	for _, d := range x.defs[i] {
-		k := 1
 		if d.primary {
-			k = 2
+			own[d.name] = true
+		} else {
+			ownSec[d.name+" "+d.of] = true
 		}
-		own[d.name] = max(own[d.name], k)
 	}
+	mine := x.libs[i]
 	seen := map[int]bool{}
 	queue := []int{i}
 	for len(queue) > 0 {
@@ -580,18 +633,17 @@ func (x *unitIndex) closure(i int) []int {
 		queue = queue[1:]
 		for _, w := range x.words[f] {
 			ds := x.by[w]
-			if len(ds) == 0 || own[w] == 2 {
-				continue
-			}
-			from := 0
+			from := map[string]int{} // library -> first counted definer
 			for k, d := range ds {
 				if d.file < i && d.primary {
-					from = k
+					from[x.libs[d.file]] = k
 				}
 			}
-			for _, d := range ds[from:] {
-				if d.file >= i || seen[d.file] ||
-					(own[w] == 1 && !d.primary) ||
+			for k, d := range ds {
+				l := x.libs[d.file]
+				if k < from[l] || d.file >= i || seen[d.file] ||
+					l == mine && (own[w] ||
+						!d.primary && ownSec[w+" "+d.of]) ||
 					d.of != "" && !x.mentions(f, d.of) {
 					continue
 				}
@@ -606,4 +658,120 @@ func (x *unitIndex) closure(i int) []int {
 	}
 	slices.Sort(out)
 	return out
+}
+
+// semDebug logs one analysis for -semerr-debug.
+func semDebug(r *semRun, cfg config.Config, srcs []sema.Source,
+	res *sema.Result) {
+	out := []string{"run " + r.ID + " std " + cfg.Standard}
+	for _, l := range cfg.Libraries {
+		out = append(out, "library "+l.Name)
+	}
+	for _, s := range srcs {
+		out = append(out, "source "+s.Path)
+	}
+	for _, d := range res.Diagnostics {
+		out = append(out, fmt.Sprintf("diag %s:%d: %s: %s", d.Path,
+			d.Line, d.Code, d.Message))
+	}
+	semResults.Lock()
+	semResults.debug = append(semResults.debug, out...)
+	semResults.Unlock()
+}
+
+// Recorded decision (#33, #34): the Synopsys packages std_logic_arith,
+// std_logic_unsigned, std_logic_signed and std_logic_misc, the
+// pre-2008 Synopsys std_logic_textio and the VITAL packages (IEEE
+// 1076.4) are not IEEE 1076 packages: GHDL and NVC ship their own
+// copies in library ieee, GoHard bundles only the Apache-licensed
+// IEEE 1076 text (#33). For GoHard a use of one is library/missing-unit
+// until the project maps a library that declares it (#34: "a mapped
+// library that lacks the unit is an error"), so a file that names one,
+// itself or through its closure, is neither checked nor counted as a
+// false error; Vendor counts its lines.
+var (
+	vendorUnit = regexp.MustCompile(`\bieee\s*\.\s*(std_logic_arith|` +
+		`std_logic_unsigned|std_logic_signed|std_logic_misc|` +
+		`vital_[a-z_]+)\b`)
+	vendorTextio = regexp.MustCompile(`\bieee\s*\.\s*std_logic_textio\b`)
+)
+
+// usesVendor reports whether one of files names a vendor package of
+// ieee GoHard does not bundle under std.
+func usesVendor(texts [][]byte, files []int, std token.Standard) bool {
+	for _, f := range files {
+		s := semNoise.ReplaceAllString(strings.ToLower(string(texts[f])),
+			" ")
+		if vendorUnit.MatchString(s) ||
+			std < token.Std2008 && vendorTextio.MatchString(s) {
+			return true
+		}
+	}
+	return false
+}
+
+// supersede models re-analysis for GoHard. The tools analyze a run's
+// files in order into one library, and analyzing a unit replaces the
+// library unit of the same name (LRM 13.1, 13.5); GoHard analyzes a
+// project, where one unit in two files is library/duplicate-unit (#34).
+// So a unit of an earlier source that a later source declares again in
+// its library is blanked out of the earlier source (spaces, keeping
+// lines) before GoHard sees it. It returns the new sources and whether
+// any unit was blanked.
+func supersede(srcs []sema.Source, res *sema.Result) ([]sema.Source,
+	bool) {
+	at := map[string]int{}
+	for k, src := range srcs {
+		at[src.Path] = k
+	}
+	type place struct {
+		src        int
+		start, end int
+	}
+	last := map[string]int{} // unit key -> latest source declaring it
+	var units []struct {
+		key string
+		place
+	}
+	for _, f := range res.Files {
+		k, ok := at[f.Path]
+		if !ok || f.Bundled {
+			continue
+		}
+		for _, u := range f.Units {
+			key := string(u.Library) + " " + string(u.Name)
+			switch u.Kind {
+			case sema.UnitArchitecture:
+				key += " of " + string(u.Of)
+			case sema.UnitPackageBody:
+				key = string(u.Library) + " body " + string(u.Of)
+			}
+			sp := u.Node.Span()
+			units = append(units, struct {
+				key string
+				place
+			}{key, place{k, sp.Start, sp.End}})
+			last[key] = max(last[key], k)
+		}
+	}
+	var cut []place
+	for _, u := range units {
+		if last[u.key] > u.src {
+			cut = append(cut, u.place)
+		}
+	}
+	if len(cut) == 0 {
+		return srcs, false
+	}
+	out := slices.Clone(srcs)
+	for _, c := range cut {
+		t := slices.Clone(out[c.src].Text)
+		for b := c.start; b < c.end && b < len(t); b++ {
+			if t[b] != '\n' && t[b] != '\r' {
+				t[b] = ' '
+			}
+		}
+		out[c.src].Text = t
+	}
+	return out, true
 }

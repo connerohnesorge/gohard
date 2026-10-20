@@ -1,0 +1,146 @@
+gohard-trace 1
+testbench standin_model_tb
+end 80000000
+type boolean enum false true
+type std_logic logic
+type std_logic_vector array std_ulogic
+type std_ulogic logic
+scope standin_model_tb instance standin_model_tb(sim)
+scope standin_model_tb.dut instance standin_model(rtl)
+scope standin_model_tb.dut.u_core instance crypt_core(model)
+signal standin_model_tb.clk std_logic signal
+signal standin_model_tb.din std_logic_vector signal 7 downto 0
+signal standin_model_tb.done boolean signal
+signal standin_model_tb.dout std_logic_vector signal 7 downto 0
+signal standin_model_tb.dut.clk std_logic in
+signal standin_model_tb.dut.core_dout std_logic_vector signal 7 downto 0
+signal standin_model_tb.dut.core_valid std_logic signal
+signal standin_model_tb.dut.din std_logic_vector in 7 downto 0
+signal standin_model_tb.dut.dout std_logic_vector out 7 downto 0
+signal standin_model_tb.dut.rst std_logic in
+signal standin_model_tb.dut.u_core.clk std_logic in
+signal standin_model_tb.dut.u_core.din std_logic_vector in 7 downto 0
+signal standin_model_tb.dut.u_core.dout std_logic_vector out 7 downto 0
+signal standin_model_tb.dut.u_core.rst std_logic in
+signal standin_model_tb.dut.u_core.valid std_logic out
+signal standin_model_tb.dut.valid std_logic out
+signal standin_model_tb.rst std_logic signal
+signal standin_model_tb.valid std_logic signal
+process 1 standin_model_tb._p0
+process 2 standin_model_tb.dut.reg
+process 3 standin_model_tb.dut.u_core._p0 modeled
+process 4 standin_model_tb.edge_mon
+process 5 standin_model_tb.stim
+0 0 standin_model_tb.clk 0 -
+0 0 standin_model_tb.din 00000000 -
+0 0 standin_model_tb.done false -
+0 0 standin_model_tb.dout UUUUUUUU -
+0 0 standin_model_tb.dut.clk 0 -
+0 0 standin_model_tb.dut.core_dout UUUUUUUU - modeled
+0 0 standin_model_tb.dut.core_valid U - modeled
+0 0 standin_model_tb.dut.din 00000000 -
+0 0 standin_model_tb.dut.dout UUUUUUUU -
+0 0 standin_model_tb.dut.rst 1 -
+0 0 standin_model_tb.dut.u_core.clk 0 -
+0 0 standin_model_tb.dut.u_core.din 00000000 -
+0 0 standin_model_tb.dut.u_core.dout UUUUUUUU - modeled
+0 0 standin_model_tb.dut.u_core.rst 1 -
+0 0 standin_model_tb.dut.u_core.valid U - modeled
+0 0 standin_model_tb.dut.valid U -
+0 0 standin_model_tb.rst 1 -
+0 0 standin_model_tb.valid U -
+5000000 0 standin_model_tb.clk 1 p1
+5000000 0 standin_model_tb.dut.clk 1 p1
+5000000 0 standin_model_tb.dut.u_core.clk 1 p1
+5000000 1 standin_model_tb.dut.core_dout 00000000 p3 modeled
+5000000 1 standin_model_tb.dut.core_valid 0 p3 modeled
+5000000 1 standin_model_tb.dut.u_core.dout 00000000 p3 modeled
+5000000 1 standin_model_tb.dut.u_core.valid 0 p3 modeled
+10000000 0 standin_model_tb.clk 0 p1
+10000000 0 standin_model_tb.dut.clk 0 p1
+10000000 0 standin_model_tb.dut.u_core.clk 0 p1
+15000000 0 standin_model_tb.clk 1 p1
+15000000 0 standin_model_tb.dut.clk 1 p1
+15000000 0 standin_model_tb.dut.u_core.clk 1 p1
+15000000 1 standin_model_tb.dout 00000000 p2
+15000000 1 standin_model_tb.dut.dout 00000000 p2
+15000000 1 standin_model_tb.dut.valid 0 p2
+15000000 1 standin_model_tb.valid 0 p2
+20000000 0 standin_model_tb.clk 0 p1
+20000000 0 standin_model_tb.dut.clk 0 p1
+20000000 0 standin_model_tb.dut.u_core.clk 0 p1
+20000000 1 standin_model_tb.dut.rst 0 p5
+20000000 1 standin_model_tb.dut.u_core.rst 0 p5
+20000000 1 standin_model_tb.rst 0 p5
+25000000 0 standin_model_tb.clk 1 p1
+25000000 0 standin_model_tb.dut.clk 1 p1
+25000000 0 standin_model_tb.dut.u_core.clk 1 p1
+25000000 1 standin_model_tb.dut.core_dout 01011010 p3 modeled
+25000000 1 standin_model_tb.dut.core_valid 1 p3 modeled
+25000000 1 standin_model_tb.dut.u_core.dout 01011010 p3 modeled
+25000000 1 standin_model_tb.dut.u_core.valid 1 p3 modeled
+30000000 0 standin_model_tb.clk 0 p1
+30000000 0 standin_model_tb.dut.clk 0 p1
+30000000 0 standin_model_tb.dut.u_core.clk 0 p1
+30000000 1 standin_model_tb.din 01011010 p5
+30000000 1 standin_model_tb.dut.din 01011010 p5
+30000000 1 standin_model_tb.dut.u_core.din 01011010 p5
+35000000 0 standin_model_tb.clk 1 p1
+35000000 0 standin_model_tb.dut.clk 1 p1
+35000000 0 standin_model_tb.dut.u_core.clk 1 p1
+35000000 1 standin_model_tb.dout 01011010 p2
+35000000 1 standin_model_tb.dut.core_dout 00000000 p3 modeled
+35000000 1 standin_model_tb.dut.dout 01011010 p2
+35000000 1 standin_model_tb.dut.u_core.dout 00000000 p3 modeled
+35000000 1 standin_model_tb.dut.valid 1 p2
+35000000 1 standin_model_tb.valid 1 p2
+40000000 0 standin_model_tb.clk 0 p1
+40000000 0 standin_model_tb.dut.clk 0 p1
+40000000 0 standin_model_tb.dut.u_core.clk 0 p1
+40000000 1 standin_model_tb.din 10100101 p5
+40000000 1 standin_model_tb.dut.din 10100101 p5
+40000000 1 standin_model_tb.dut.u_core.din 10100101 p5
+45000000 0 standin_model_tb.clk 1 p1
+45000000 0 standin_model_tb.dut.clk 1 p1
+45000000 0 standin_model_tb.dut.u_core.clk 1 p1
+45000000 1 standin_model_tb.dout 00000000 p2
+45000000 1 standin_model_tb.dut.core_dout 11111111 p3 modeled
+45000000 1 standin_model_tb.dut.dout 00000000 p2
+45000000 1 standin_model_tb.dut.u_core.dout 11111111 p3 modeled
+50000000 0 standin_model_tb.clk 0 p1
+50000000 0 standin_model_tb.dut.clk 0 p1
+50000000 0 standin_model_tb.dut.u_core.clk 0 p1
+50000000 1 standin_model_tb.din 11111111 p5
+50000000 1 standin_model_tb.dut.din 11111111 p5
+50000000 1 standin_model_tb.dut.u_core.din 11111111 p5
+55000000 0 standin_model_tb.clk 1 p1
+55000000 0 standin_model_tb.dut.clk 1 p1
+55000000 0 standin_model_tb.dut.u_core.clk 1 p1
+55000000 1 standin_model_tb.dout 11111111 p2
+55000000 1 standin_model_tb.dut.core_dout 10100101 p3 modeled
+55000000 1 standin_model_tb.dut.dout 11111111 p2
+55000000 1 standin_model_tb.dut.u_core.dout 10100101 p3 modeled
+60000000 0 standin_model_tb.clk 0 p1
+60000000 0 standin_model_tb.dut.clk 0 p1
+60000000 0 standin_model_tb.dut.u_core.clk 0 p1
+60000000 1 standin_model_tb.din 00111100 p5
+60000000 1 standin_model_tb.dut.din 00111100 p5
+60000000 1 standin_model_tb.dut.u_core.din 00111100 p5
+65000000 0 standin_model_tb.clk 1 p1
+65000000 0 standin_model_tb.dut.clk 1 p1
+65000000 0 standin_model_tb.dut.u_core.clk 1 p1
+65000000 1 standin_model_tb.dout 10100101 p2
+65000000 1 standin_model_tb.dut.core_dout 01100110 p3 modeled
+65000000 1 standin_model_tb.dut.dout 10100101 p2
+65000000 1 standin_model_tb.dut.u_core.dout 01100110 p3 modeled
+70000000 0 standin_model_tb.clk 0 p1
+70000000 0 standin_model_tb.dut.clk 0 p1
+70000000 0 standin_model_tb.dut.u_core.clk 0 p1
+75000000 0 standin_model_tb.clk 1 p1
+75000000 0 standin_model_tb.dut.clk 1 p1
+75000000 0 standin_model_tb.dut.u_core.clk 1 p1
+75000000 1 standin_model_tb.dout 01100110 p2
+75000000 1 standin_model_tb.dut.dout 01100110 p2
+80000000 0 standin_model_tb.clk 0 p1
+80000000 0 standin_model_tb.dut.clk 0 p1
+80000000 0 standin_model_tb.dut.u_core.clk 0 p1

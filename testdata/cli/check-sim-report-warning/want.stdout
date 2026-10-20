@@ -1,0 +1,3 @@
+sev_tb.vhd:9:5: warning[sim/assert-warning]: report warning: boom
+sev_tb.vhd:10:5: hint[sim/assert-note]: report note: after
+summary: 0 errors, 1 warnings, 1 hints, 1 files
