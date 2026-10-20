@@ -97,6 +97,7 @@ const (
 	SemaEvalLimit         Code = "sema/eval-limit"
 	SemaNoOverload        Code = "sema/no-overload"
 	SemaOpaqueAllowed     Code = "sema/opaque-allowed"
+	SemaRelaxed           Code = "sema/relaxed"
 	SemaStaticError       Code = "sema/static-error"
 	SemaTypeMismatch      Code = "sema/type-mismatch"
 	SemaUnchecked         Code = "sema/unchecked-unit"
@@ -392,6 +393,12 @@ var table = []Info{
 		Owner:   34,
 		Summary: "encrypted IP allowed by allow_opaque",
 		Message: "{unit} is encrypted IP, allowed by allow_opaque",
+	},
+	{
+		Code: SemaRelaxed, Severity: Warning, Class: Design,
+		Owner:   28,
+		Summary: "code that breaks a rule lenient mode relaxes",
+		Message: "{problem} (allowed by lenient)",
 	},
 	{
 		Code: SemaStaticError, Severity: Error, Class: Design,

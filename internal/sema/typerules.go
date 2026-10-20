@@ -109,8 +109,9 @@ func needsActual(d *Decl) bool {
 }
 
 // aliasSignature reports an alias of a subprogram or an enumeration
-// literal without a signature (LRM 6.6.3 b; lenient analysis, as GHDL
-// -frelaxed and NVC, takes the first visible one).
+// literal without a signature (LRM 6.6.3 b; lenient analysis, as NVC
+// does in every mode, takes the first visible one; GHDL always reports
+// it).
 func (a *analyzer) aliasSignature(ad cst.AliasDecl, ds []*Decl) {
 	if a.quiet || a.s.cfg.Lenient || a.u.File.Bundled ||
 		!ad.Signature().IsZero() {

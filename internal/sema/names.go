@@ -102,8 +102,8 @@ func (a *analyzer) simpleName(tok cst.Token, kind RefKind) named {
 	if a.declaring[k] && a.directlyDeclared(k) && !a.s.cfg.Lenient {
 		// LRM 12.3: a declaration is not visible within itself, and it
 		// already hides an outer homograph there. Lenient analysis
-		// (GHDL -frelaxed, NVC --relaxed) lets the outer homograph be
-		// seen there instead.
+		// (NVC --relaxed; GHDL in every mode, with a -Whide warning)
+		// lets the outer homograph be seen there instead.
 		if !a.quiet {
 			a.semaError(tok.Span(), tok.Text()+" is used in its own "+
 				"declaration")

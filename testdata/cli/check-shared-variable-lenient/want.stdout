@@ -1,0 +1,2 @@
+counter.vhd:5:27: warning[sema/relaxed]: the type of a shared variable must be a protected type, not INTEGER (allowed by lenient)
+summary: 0 errors, 1 warnings, 0 hints, 1 files

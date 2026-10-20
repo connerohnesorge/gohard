@@ -1,0 +1,2 @@
+counter.vhd:5:27: error[sema/error]: the type of a shared variable must be a protected type, not INTEGER
+summary: 1 errors, 0 warnings, 0 hints, 1 files

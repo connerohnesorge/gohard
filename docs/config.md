@@ -71,7 +71,7 @@ The VHDL standard files are analyzed under. It must be a quoted string: `standar
 
 ### `lenient`
 
-Relax analysis rules that other VHDL tools commonly relax.
+Relax analysis rules that other VHDL tools commonly relax. Under `lenient: true`: from VHDL-2002 on a shared variable need not be of a protected type, reported as a `sema/relaxed` warning (GHDL `-frelaxed`, NVC `--relaxed`); a subprogram body may add or omit `constant` on a parameter that names no mode (GHDL `-frelaxed`, NVC `--relaxed`); a subelement of a formal associated individually may be associated with `open` (GHDL `-frelaxed`, NVC `--relaxed`); a pure function may declare a file (GHDL `-frelaxed`, NVC `--relaxed`) and name an external signal or variable (GHDL `-frelaxed`); an `others` aggregate assigned to an unconstrained port, parameter or alias takes the target's index range (GHDL `-frelaxed`, NVC `--relaxed`); a name used in its own declaration denotes the outer homograph (NVC `--relaxed`; GHDL accepts it with a `-Whide` warning in every mode); an alias of a subprogram or enumeration literal may omit the signature and denotes the first visible one (NVC in every mode; GHDL always requires the signature); a component instantiation may name an entity without the reserved word `entity` (neither GHDL nor NVC accepts this). Only the shared variable rule is reported; the others are accepted silently.
 
 * Type: bool
 * Default: `false`

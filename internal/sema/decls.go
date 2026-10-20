@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/cst"
+	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/token"
 )
 
@@ -265,13 +266,18 @@ func (a *analyzer) objectDecl(n cst.Node, k DeclKind,
 	a.objectDeclRules(si, k, t)     // objrules.go
 	a.protectedElaborated(si, k, t) // typecheck.go
 	if k == DeclSharedVariable && a.std >= token.Std2002 && !a.quiet &&
-		!a.s.cfg.Lenient && !t.Unknown() &&
+		!t.Unknown() &&
 		t.Base().Class != TypeProtected && t.Base().Class != TypeGeneric {
 		// LRM 6.4.2.4: from VHDL-2002 on a shared variable is of a
-		// protected type. Lenient mode (#28) keeps the VHDL-93 rule,
-		// as GHDL's -frelaxed and NVC's --relaxed do.
-		a.semaError(si.Span(), "the type of a shared variable must "+
-			"be a protected type, not "+t.Name())
+		// protected type. Lenient mode (#28) keeps the VHDL-93 rule
+		// with a warning, as GHDL's -frelaxed and NVC's --relaxed do.
+		problem := "the type of a shared variable must be a " +
+			"protected type, not " + t.Name()
+		if a.s.cfg.Lenient {
+			a.report(si.Span(), diag.New(diag.SemaRelaxed, problem))
+		} else {
+			a.semaError(si.Span(), problem)
+		}
 	}
 	if value.IsZero() && (k == DeclSignal || k == DeclVariable) &&
 		!a.quiet && (notFullyConstrained(t, 0) ||

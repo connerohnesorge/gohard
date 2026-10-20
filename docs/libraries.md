@@ -410,12 +410,15 @@ end architecture sim;
 Clone UVVM (`git clone https://github.com/UVVM/UVVM`). Each UVVM
 library has its sources in its own `src` folder: map `uvvm_util`, and
 add `uvvm_vvc_framework`, `bitvis_vip_*` and the others the same way
-when you use them.
+when you use them. UVVM declares VHDL-2008 shared variables that are
+not of a protected type, so set `lenient: true`
+([relaxed rules](#relaxed-rules-lenient)).
 
 Linux:
 
 <!-- example: uvvm linux -->
 ```yaml
+lenient: true
 libraries:
   uvvm_util: ['/home/you/vhdl/UVVM/uvvm_util/src']
 ```
@@ -424,6 +427,7 @@ macOS:
 
 <!-- example: uvvm macos -->
 ```yaml
+lenient: true
 libraries:
   uvvm_util: ['/Users/you/vhdl/UVVM/uvvm_util/src']
 ```
@@ -432,6 +436,7 @@ Windows:
 
 <!-- example: uvvm windows -->
 ```yaml
+lenient: true
 libraries:
   uvvm_util: ['C:\Users\you\Documents\VHDL Libraries\UVVM\uvvm_util\src']
 ```
@@ -458,6 +463,33 @@ begin
   end process;
 end architecture sim;
 ```
+
+## Relaxed rules: `lenient`
+
+GHDL and NVC refuse some code that UVVM and open-logic rely on unless
+they run with GHDL's `-frelaxed` or NVC's `--relaxed`. GoHard's
+equivalent is `lenient: true` in `gohard.yaml`
+([config.md](config.md#lenient)). UVVM's packages and open-logic's
+testbenches declare VHDL-2008 shared variables that are not of a
+protected type. For open-logic, map its `src` folder as `olo`
+(`olo: ['/home/you/vhdl/open-logic/src']`), and its `test` folder
+too when you check its testbenches, which also use OSVVM and VUnit.
+`lenient: true` relaxes these rules:
+
+| Rule (strict: an error) | Under `lenient: true` | GHDL, NVC |
+| --- | --- | --- |
+| From VHDL-2002 on a shared variable is of a protected type (LRM 6.4.2.4; legal under VHDL-1993) | allowed, with a `sema/relaxed` warning | `-frelaxed`, `--relaxed` (a warning) |
+| A subprogram body conforms to its declaration (LRM 4.10) | a parameter that names no mode may add or omit `constant` | `-frelaxed`, `--relaxed` (a warning) |
+| No subelement of a formal associated individually is associated with `open` (LRM 6.5.7.1) | allowed | `-frelaxed`, `--relaxed` (a warning) |
+| A pure function declares no file (LRM 4.1) | allowed | `-frelaxed`, `--relaxed` (a warning) |
+| A pure function names no external signal or variable (LRM 4.1) | allowed | `-frelaxed` (a warning); NVC always reports it |
+| `others` in an aggregate needs an index range from the context (LRM 9.3.3.3) | an aggregate assigned to an unconstrained port, parameter or alias takes the target's range | `-frelaxed`, `--relaxed` |
+| A declaration is not visible within itself (LRM 12.3) | the outer homograph is seen there | `--relaxed`; GHDL accepts it in every mode, with a `-Whide` warning |
+| An alias of a subprogram or enumeration literal has a signature (LRM 6.6.3) | it may omit it and denotes the first visible one | NVC accepts it in every mode; GHDL always reports it |
+| A component instantiation names a component unless `entity` precedes the name (LRM 11.7.1) | it may name an entity | neither accepts it |
+
+Only the shared variable rule is reported under `lenient: true`; the
+others are accepted silently. Strict analysis is the default.
 
 ## VUnit
 

@@ -1,6 +1,7 @@
 package sema
 
 import (
+	"fmt"
 	"slices"
 	"strings"
 	"testing"
@@ -107,21 +108,73 @@ end;
 }
 
 // TestSharedVariableLenient: from VHDL-2002 on a shared variable is of
-// a protected type (LRM 6.4.2.4); lenient mode keeps the VHDL-93 rule
-// as GHDL's -frelaxed and NVC's --relaxed do.
+// a protected type (LRM 6.4.2.4). Strict analysis reports an error;
+// lenient mode keeps the VHDL-93 rule with a sema/relaxed warning, as
+// GHDL's -frelaxed and NVC's --relaxed do. Under VHDL-1993 it is legal.
 func TestSharedVariableLenient(t *testing.T) {
-	src := `
+	const src = `
 package p is
-  shared variable v : integer;  %s
+  type pt is protected
+    procedure inc;
+  end protected;
+  shared variable v : integer;
+end;
+package body p is
+  type pt is protected body
+    procedure inc is begin end;
+  end protected body;
+  shared variable ok : pt;
 end;
 `
-	checkMarked(t, []markedCase{
-		{name: "2008", src: strings.Replace(src, "%s", "--E", 1)},
-		{name: "1993", std: "1993", src: strings.Replace(src, "%s", "",
-			1)},
-		{name: "lenient", lenient: true,
-			src: strings.Replace(src, "%s", "", 1)},
-	})
+	const msg = "the type of a shared variable must be a protected " +
+		"type, not INTEGER"
+	for _, c := range []struct {
+		std     string
+		lenient bool
+		want    string // "code severity line: message", "" for none
+	}{
+		{"2002", false, "sema/error error 6: " + msg},
+		{"2008", false, "sema/error error 6: " + msg},
+		{"2019", false, "sema/error error 6: " + msg},
+		{"2002", true, "sema/relaxed warning 6: " + msg +
+			" (allowed by lenient)"},
+		{"2008", true, "sema/relaxed warning 6: " + msg +
+			" (allowed by lenient)"},
+		{"2019", true, "sema/relaxed warning 6: " + msg +
+			" (allowed by lenient)"},
+		{"1993", false, ""},
+		{"1993", true, ""},
+	} {
+		name := c.std
+		if c.lenient {
+			name += "-lenient"
+		}
+		t.Run(name, func(t *testing.T) {
+			text := src
+			if c.std == "1993" {
+				// VHDL-93 has no protected types.
+				text = "package p is\n  shared variable v : integer;\n" +
+					"end;\n"
+			}
+			r := analyze(t, map[string]string{"t.vhd": text},
+				func(cf *config.Config) {
+					cf.Standard = c.std
+					cf.Lenient = c.lenient
+				})
+			var got []string
+			for _, d := range r.Diagnostics {
+				got = append(got, fmt.Sprintf("%s %s %d: %s", d.Code,
+					d.Severity, d.Line, d.Message))
+			}
+			var want []string
+			if c.want != "" {
+				want = []string{c.want}
+			}
+			if !slices.Equal(got, want) {
+				t.Errorf("diagnostics %q, want %q", got, want)
+			}
+		})
+	}
 }
 
 // TestForceInParameter: a force or release of mode in, given or by
