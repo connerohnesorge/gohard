@@ -180,6 +180,17 @@ func runOnce(t tb, dir string, args []string,
 	exit := run(ctx, e, args)
 	st.restorePerms(t)
 	clean := func(b []byte) []byte {
+		// A Windows path in a URI is file:///C:/...; show it as
+		// file://$TOKEN like a Unix path.
+		for w, tok := range map[string]string{
+			bundle: "$BUNDLE", work: "$WORK",
+		} {
+			if filepath.VolumeName(w) != "" {
+				b = bytes.ReplaceAll(b,
+					[]byte("file:///"+filepath.ToSlash(w)),
+					[]byte("file://"+tok))
+			}
+		}
 		for _, w := range []string{bundle, filepath.ToSlash(bundle)} {
 			b = bytes.ReplaceAll(b, []byte(w), []byte("$BUNDLE"))
 		}
