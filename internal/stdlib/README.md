@@ -30,12 +30,13 @@ sorted by path, as `sha256sum` prints) and run the tests below.
 | --- | --- |
 | `SHA256SUMS` | integrity hash of every bundled file; `sha256sum -c SHA256SUMS` checks a checkout |
 | `firststd.tsv` | the first standard of every bundled declaration |
-| `testdata/ghdl/{1993,2008,2019}.txt` | the declaration sets of GHDL's std/ieee sources, recorded |
-| `testdata/nvc/2008.txt` | the declaration set of NVC 1.23's VHDL-2008 std/ieee sources (`TestRecordNVC`) |
+| `testdata/ghdl/{1993,2008,2019}.txt` | the declaration sets of GHDL's std/ieee sources, recorded by `tools/oracle` (section `stdlib`) |
+| `testdata/nvc/2008.txt` | the declaration set of NVC 1.23's VHDL-2008 std/ieee sources, recorded by `tools/oracle` |
+| `refset.go` | `RefSets` (the reference sources), `RecordRefSet`, `MatchKey` |
 | `stdlib.go` | the embedded files and their analysis order |
 | `integrity.go` | `Verify`, the `WithTamper` test hook, `InternalError` |
 | `decls.go`, `tags.go` | declaration extraction, tags and per-standard views |
-| `prebuilt.go` | the hook for the build-time analysis (#34) |
+| `prebuilt.go`, `prebuilt.bin` | the bundle analyzed at build time, embedded (generated: `go generate ./internal/sema`) |
 
 ## Integrity
 
@@ -72,6 +73,30 @@ methods belong to their type. Implicitly declared operations
 (`TO_STRING` on character arrays, `MINIMUM`, the predefined operators)
 are not bundled declarations; analysis declares them per standard
 (#34).
+
+### The 2008 type model before 2008
+
+Only the 1076-2019 text ships (#13 entry 7), so the 1993 and 2002 views
+keep its type model: `STD_LOGIC_VECTOR` is a subtype of
+`STD_ULOGIC_VECTOR` (and `UNSIGNED` of the hidden `UNRESOLVED_UNSIGNED`)
+in every view. For `numeric_std` and `numeric_bit` this changes nothing
+a 1993 design can see, since the unresolved types are hidden. For
+`std_logic_1164` under 1993 and 2002 it means, recorded as a decision
+and pinned by `TestView93TypeModel` (internal/sema):
+
+* assigning a `STD_ULOGIC_VECTOR` to a `STD_LOGIC_VECTOR` without a
+  conversion is accepted; GHDL `--std=93` and NVC `--std=1993` reject
+  it. This is a missed error, never a false one.
+* two user subprograms that differ only between the two vector types
+  are homographs (`sema/error`, "already declared"); 1993 tools accept
+  them as distinct overloads. This is a false error.
+
+A 1993 type model needs the 1993 text of `std_logic_1164`, which
+declares every vector operation twice; that text cannot ship, and
+generating the duplicates from the 2019 text would make the interpreted
+bodies differ from the shipped source (#33: the files the simulator
+runs are the files the editor shows). Revisit with the v1.1 plan if
+users report the false error.
 
 ## First-standard tags
 
@@ -141,20 +166,26 @@ string, so both GHDL differences above agree with NVC.
 
 ```sh
 nix develop -c go test ./internal/stdlib
-# re-record the GHDL reference sets (developer only; CI reads the
-# recorded files):
-nix develop -c sh -c 'go test ./internal/stdlib -run TestRecordGHDL \
-  -ghdl "$(dirname "$(readlink -f "$(command -v ghdl)")")/../lib/ghdl/src"'
-# re-record the NVC 2008 set from the pinned NVC sources:
-nix develop -c go test ./internal/stdlib -run TestRecordNVC \
-  -nvc "$PWD/testdata/nvc/lib"
+# re-record the GHDL and NVC reference sets (developer only; CI reads
+# the recorded files): GHDL's sources come from the shell's ghdl, NVC's
+# from the pinned testdata/nvc submodule at the shell's nvc version
+nix develop -c go run ./tools/oracle --update stdlib
 # rewrite firststd.tsv from the recorded sets, keeping manual lines:
 nix develop -c go test ./internal/stdlib -run TestTags -update
 ```
 
 ## Prebuilt
 
-`std`/`ieee` are analyzed at build time (#33). `Prebuilt` returns nil
-until analysis (#34) exists; the end of S4b adds the generator, the
-embedded result and the test that startup performs no analysis of
-them.
+`std`/`ieee` are analyzed at build time (#33). `go generate
+./internal/sema` regenerates the codec (`tools/gencodec` writes
+`internal/sema/codec_gen.go` from the sema type definitions), analyzes
+the bundled text as VHDL-2019 and stores the result in `prebuilt.bin`
+(`tools/prebuild`: the whole analyzed graph, green trees, red nodes and
+the sema model, with every pointer identity, DEFLATE-compressed). The
+binary embeds it; `sema.Bundle` decodes it at first use and analyzes
+nothing (`TestStartupNoAnalysis`). The codec is checked against a fresh
+analysis object by object (`TestCodecComplete`), and the generated-file
+sync check fails a stale `prebuilt.bin` or `codec_gen.go`
+(`scripts/ci/gen-check.d/20-prebuilt-bundle.sh`). A blob of another
+codec schema or other sources is never decoded: such a build analyzes
+the text at first use instead, and the tests fail.

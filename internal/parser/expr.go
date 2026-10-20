@@ -256,26 +256,12 @@ func (p *Parser) exNonAssoc(ops token.Set, operand func() cst.Kind,
 	return k
 }
 
-// exRelation parses shift_expression {relational_operator
-// shift_expression}. The LRM allows one relational operator, but GHDL
-// and NVC accept a chain left-associatively (`a > b = false`, NVC's
-// regress/range4), so a chain is parsed without an error.
+// exRelation parses shift_expression [relational_operator
+// shift_expression] (LRM 9.1). Relational operators do not chain: a
+// second one (a = b = c) is a syntax error, and the chain is parsed
+// left-associatively so the tree stays whole.
 func (p *Parser) exRelation() cst.Kind {
-	m := p.mark()
-	k := p.exShift()
-	if k == 0 {
-		return 0
-	}
-	for exRelOps.Has(p.nth(0)) {
-		if exMatchOps.Has(p.nth(0)) {
-			p.exGateTok("match_ops")
-		}
-		p.bump()
-		p.exRequire(p.exShift)
-		p.exWrap(m, cst.KindBinaryExpr)
-		k = cst.KindBinaryExpr
-	}
-	return k
+	return p.exNonAssoc(exRelOps, p.exShift, "relational")
 }
 
 // exShift parses simple_expression [shift_operator simple_expression].

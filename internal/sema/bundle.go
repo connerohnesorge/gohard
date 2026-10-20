@@ -1,6 +1,9 @@
 package sema
 
 import (
+	"bytes"
+	"compress/flate"
+	"io"
 	"strconv"
 	"strings"
 	"sync"
@@ -14,26 +17,66 @@ import (
 	"github.com/connerohnesorge/gohard/internal/token"
 )
 
-// The bundled std and ieee libraries (#33) are analyzed once per
-// process, as VHDL-2019 text, and shared read-only by every analysis:
+// The bundled std and ieee libraries (#33) are analyzed as VHDL-2019
+// text when GoHard is built (go generate: tools/prebuild stores the
+// result with the codec of codec.go in internal/stdlib/prebuilt.bin,
+// which the binary embeds), and shared read-only by every analysis:
 // project units read their declarations and never modify them. Per
 // standard views are applied at lookup (Decl.First, visibleIn), so the
 // bundle itself does not depend on the selected standard.
 //
-// stdlib.Prebuilt is the hook for analyzing at build time instead
-// (#33); until it lands the bundle is analyzed on first use.
+// Startup decodes the stored bundle and analyzes nothing. Only a build
+// whose prebuilt.bin is stale (another codec schema or other sources,
+// which the generated-file sync check fails in CI) analyzes the text
+// on first use instead; BundleSource reports which happened.
 
 var (
 	bundleOnce sync.Once
 	bundle     *Result
+	bundleFrom string
 )
 
 // Bundle returns the analyzed std/ieee bundle. Its Diagnostics are
 // errors inside the bundled text, which project analyses report as
 // stdlib/internal-error (exit 2).
 func Bundle() *Result {
-	bundleOnce.Do(func() { bundle = analyzeBundle() })
+	bundleOnce.Do(func() {
+		if r, err := unpackBundle(stdlib.Prebuilt()); err == nil {
+			bundle, bundleFrom = r, "prebuilt"
+			return
+		}
+		bundle, bundleFrom = analyzeBundle(), "analyzed"
+	})
 	return bundle
+}
+
+// BundleSource reports where Bundle's result came from: "prebuilt"
+// (decoded from the build-time analysis) or "analyzed" (the embedded
+// result was stale, so the text was analyzed at first use).
+func BundleSource() string {
+	Bundle()
+	return bundleFrom
+}
+
+// PrebuildBundle analyzes the bundled text and returns its stored form,
+// the content of internal/stdlib/prebuilt.bin (tools/prebuild): the
+// encoded bundle, DEFLATE-compressed.
+func PrebuildBundle() []byte { return packBundle(analyzeBundle()) }
+
+func packBundle(r *Result) []byte {
+	var b bytes.Buffer
+	w, _ := flate.NewWriter(&b, flate.BestCompression)
+	w.Write(encodeBundle(r))
+	w.Close()
+	return b.Bytes()
+}
+
+func unpackBundle(b []byte) (*Result, error) {
+	raw, err := io.ReadAll(flate.NewReader(bytes.NewReader(b)))
+	if err != nil {
+		return nil, errCodec
+	}
+	return decodeBundle(raw)
 }
 
 func analyzeBundle() *Result {

@@ -63,6 +63,10 @@ jobs:
       - name: Generated-file sync
         run: bash scripts/ci/gen-check.sh
 
+      - name: CI self-test (gates fail when they should)
+        if: runner.os == 'Linux'
+        run: bash scripts/ci/selftest.sh
+
       - name: detlint
         run: bash scripts/ci/detlint.sh
 

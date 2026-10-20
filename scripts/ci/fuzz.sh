@@ -11,7 +11,10 @@
 # where the target replays it; with "local" it stays where Go put it,
 # which go test replays automatically. Then, unless FUZZ_OPEN_PR=0, it
 # pushes a branch fuzz/<Target>-<id> and opens a pull request with gh
-# (GH_TOKEN must be set). The pull request
+# (GH_TOKEN must be set). It always prints the compare URL; if gh
+# cannot create the pull request (Actions not permitted to create pull
+# requests and no FUZZ_PR_TOKEN), the job fails with that URL and the
+# setting to change. The pull request
 # stays red until the fix lands on its branch. The job itself then
 # fails so the crash is visible on the nightly run.
 . "$(dirname "$0")/lib.sh"
@@ -119,7 +122,29 @@ body="$tmp/body.md"
 	tail -n 60 "$tmp/log"
 	echo '```'
 } >"$body"
-gh pr create --base "$base" --head "$branch" \
+# The compare URL opens the same pull request by hand. It is printed
+# whatever gh does, so the job log always carries a way to the input.
+server=${GITHUB_SERVER_URL:-https://github.com}
+repo=${GITHUB_REPOSITORY:-}
+if [ -z "$repo" ]; then
+	repo=$(git remote get-url origin 2>/dev/null |
+		sed -E 's#^.*github\.com[:/]##; s#\.git$##') || true
+fi
+compare="$server/$repo/compare/$base...$branch?expand=1"
+notice "pushed $branch; compare: $compare"
+if pr=$(gh pr create --base "$base" --head "$branch" \
 	--title "fuzz: $target crash input ${first:0:16}" \
-	--body-file "$body"
+	--body-file "$body" 2>"$tmp/gh.err"); then
+	notice "opened crash pull request: $pr"
+	summary "  pull request: $pr"
+	exit 1
+fi
+cat "$tmp/gh.err" >&2
+err "$target: branch $branch is pushed but gh could not open the" \
+	"pull request. If Actions may not create pull requests, enable" \
+	"Settings > Actions > General > Workflow permissions > 'Allow" \
+	"GitHub Actions to create and approve pull requests', or set the" \
+	"FUZZ_PR_TOKEN secret (a token with contents and pull-requests" \
+	"write). Open it by hand: $compare"
+summary "  pull request NOT opened (gh failed); open it by hand: $compare"
 exit 1

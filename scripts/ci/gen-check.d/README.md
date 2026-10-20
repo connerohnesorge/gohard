@@ -16,3 +16,8 @@ Planned hooks (#30):
   `git show "$(git merge-base HEAD origin/main)":internal/cst/kinds.yaml`.
   On a shallow checkout, fetch the base first or compare against the
   committed generated table instead.
+
+* `20-prebuilt-bundle.sh` (#33): `internal/stdlib/prebuilt.bin`, the
+  std/ieee bundle analyzed at build time, is non-empty, decodes, and is
+  byte-identical to a fresh `go generate ./internal/sema` (the sema tests
+  `TestStartupNoAnalysis` and `TestPrebuiltUpToDate`).

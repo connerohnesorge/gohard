@@ -383,3 +383,53 @@ func TestDirectExpectedFailure(t *testing.T) {
 		t.Errorf("unlisted: %+v", s.unlisted)
 	}
 }
+
+// TestMissingSubmoduleCheckout: on a checkout where the submodules
+// were never initialised (git leaves each one an empty directory, or
+// no directory at all), every pr and nightly regression entry of the
+// real corpus.yaml fails with the git submodule update --init hint
+// naming that submodule; none is skipped (#30, #8).
+func TestMissingSubmoduleCheckout(t *testing.T) {
+	m := readManifest(t)
+	for i, e := range m.Regression {
+		root := t.TempDir()
+		if i%2 == 0 {
+			// An uninitialised submodule: an empty directory.
+			dir := filepath.Join(root, filepath.FromSlash(e.Path))
+			if err := os.MkdirAll(dir, 0o755); err != nil {
+				t.Fatal(err)
+			}
+		}
+		_, err := entrySourceAt(root, e)
+		want := "git submodule update --init " + e.Path
+		if err == nil || !strings.Contains(err.Error(), want) {
+			t.Errorf("%s (%s): err = %v, want %q", e.Name, e.Path,
+				err, want)
+		}
+	}
+}
+
+// TestInvalidUpstream: every file on invalidUpstream exists and still
+// reports its listed syntax error, so the may-fail exemption is exact.
+func TestInvalidUpstream(t *testing.T) {
+	for _, d := range invalidUpstream {
+		src, err := os.ReadFile(filepath.Join(repoRoot,
+			filepath.FromSlash(d.file)))
+		if err != nil {
+			t.Errorf("%s: %v (run git submodule update --init)",
+				d.file, err)
+			continue
+		}
+		r := Parse(src, Options{Standard: d.std})
+		found := false
+		for _, p := range r.Problems {
+			for _, a := range p.Args {
+				found = found || strings.Contains(a, d.want)
+			}
+		}
+		if !found {
+			t.Errorf("%s: no longer reports %q (%s); remove it from "+
+				"invalidUpstream", d.file, d.want, d.why)
+		}
+	}
+}

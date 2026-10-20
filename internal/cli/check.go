@@ -48,8 +48,11 @@ func runCheck(inv *Invocation) Result {
 	r.Diagnostics = append(r.Diagnostics, l.Diagnostics...)
 	r.Source = sources(l, nil)
 	// The bundled std/ieee files must match their integrity hashes
-	// (#33): a mismatch is stdlib/integrity, exit 2.
+	// (#33): a mismatch is stdlib/integrity, exit 2. An error inside
+	// the bundled text is stdlib/internal-error, also exit 2.
 	r.Diagnostics = append(r.Diagnostics, stdlib.Verify(inv.Ctx)...)
+	r.Diagnostics = append(r.Diagnostics,
+		stdlib.InternalErrors(inv.Ctx)...)
 	if hasTool(r.Diagnostics) {
 		return Result{Report: r} // an invalid gohard.yaml exits 2
 	}

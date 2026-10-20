@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- test: std=2008 kind=BinaryExpr\npackage p is\n  constant c : boolean := (a = b) = c;\n  constant d : boolean := a < b and b /= c;\nend;\n")

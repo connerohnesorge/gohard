@@ -162,7 +162,11 @@ func runOnce(t tb, dir string, args []string,
 	for _, p := range st.tamper {
 		ctx = stdlib.WithTamper(ctx, p)
 	}
+	for _, p := range st.bundleErr {
+		ctx = stdlib.WithInternalError(ctx, p)
+	}
 	exit := run(ctx, e, args)
+	st.restorePerms(t)
 	clean := func(b []byte) []byte {
 		for _, w := range []string{work, filepath.ToSlash(work)} {
 			b = bytes.ReplaceAll(b, []byte(w), []byte("$WORK"))

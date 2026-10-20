@@ -1,5 +1,5 @@
-# Declarations of NVC 1.23's VHDL-2008 std/ieee sources,
-# recorded by TestRecordNVC; see internal/stdlib/README.md.
+# Declarations of NVC 1.23.0's VHDL-2008 std/ieee sources,
+# recorded by go run ./tools/oracle --update stdlib; see internal/stdlib/README.md.
 # source: std.08/standard.vhd
 # source: std.08/textio.vhd
 # source: std.08/env.vhd

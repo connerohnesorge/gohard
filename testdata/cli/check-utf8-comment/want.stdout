@@ -1,0 +1,2 @@
+a.vhd:1:1: hint[syntax/utf8-comment]: non-ASCII text in a comment is not portable under VHDL-1993
+summary: 0 errors, 0 warnings, 1 hints, 1 files

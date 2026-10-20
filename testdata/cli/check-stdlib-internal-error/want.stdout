@@ -1,0 +1,2 @@
+gohard: error[stdlib/internal-error]: error inside bundled ieee: ieee/numeric_std.vhdl:1:1: error injected by the test hook
+summary: 1 errors, 0 warnings, 0 hints, 0 files

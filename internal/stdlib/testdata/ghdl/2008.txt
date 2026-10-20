@@ -1,5 +1,5 @@
-# Declarations of GHDL's VHDL-2008 std/ieee sources,
-# recorded by TestRecordGHDL; see internal/stdlib/README.md.
+# Declarations of GHDL 6.0.0's VHDL-2008 std/ieee sources,
+# recorded by go run ./tools/oracle --update stdlib; see internal/stdlib/README.md.
 # source: std/v08/standard.vhdl
 # source: std/v08/textio.vhdl
 # source: std/v08/env.vhdl

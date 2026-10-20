@@ -1,0 +1,2 @@
+stop_tb.vhd:11:5: error[sim/stop-status]: std.env.stop called with status 3
+summary: 1 errors, 0 warnings, 0 hints, 1 files

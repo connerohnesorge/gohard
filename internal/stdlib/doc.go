@@ -19,7 +19,9 @@
 //     the declarations newer than std: 2008 hides the 2019 additions,
 //     1993 and 2002 hide the 2008 and 2019 additions. Every view
 //     analyzes the same 2019 text; a view hides names, not text.
-//   - Prebuilt is the hook for the build-time analysis (#34).
+//   - Prebuilt is the bundle analyzed at build time (prebuilt.bin,
+//     written by go generate ./internal/sema), which sema.Bundle
+//     decodes so startup analyzes nothing.
 //
 // Everything here is a pure function of the embedded bytes (P1).
 package stdlib

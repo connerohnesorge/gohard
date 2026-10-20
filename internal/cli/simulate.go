@@ -151,11 +151,14 @@ func simulate(inv *Invocation, r *diag.Report, in simInput) {
 	tbs, ds := testbenches(inv, in)
 	r.Diagnostics = append(r.Diagnostics, ds...)
 	for _, tb := range tbs {
-		out := simrun.Run(simrun.Options{Result: in.res,
+		opts := simrun.Options{Result: in.res,
 			Sim: in.cfg.Simulation, Testbench: tb, Seed: seed,
-			Cancelled: func() bool { return inv.Ctx.Err() != nil }})
+			Cancelled: func() bool { return inv.Ctx.Err() != nil }}
+		out := simrun.Run(opts)
 		r.Diagnostics = append(r.Diagnostics, out.Diagnostics...)
 		if !hasTool(out.Diagnostics) {
+			r.Diagnostics = append(r.Diagnostics,
+				races(inv, opts, out)...)
 			r.Diagnostics = append(r.Diagnostics,
 				writeRun(inv, in, out)...)
 			inv.Logf("simulated %s (%s): %s", out.Testbench,
@@ -165,6 +168,19 @@ func simulate(inv *Invocation, r *diag.Report, in simInput) {
 			*inv.simRuns = append(*inv.simRuns, out)
 		}
 	}
+}
+
+// races compares a run at a non-zero seed with the declaration-order
+// run at seed 0 (#29, #35): a trace that changes with the seed is one
+// sim/race warning naming the two processes. Seed 0 is the reference,
+// so a default run costs nothing extra.
+func races(inv *Invocation, o simrun.Options,
+	out simrun.Outcome,
+) []diag.Diagnostic {
+	if out.Seed == 0 || out.Trace == nil || inv.Ctx.Err() != nil {
+		return nil
+	}
+	return simrun.Races(o, []uint64{0, out.Seed})
 }
 
 // writeRun writes the trace (diffed against the recorded one under a

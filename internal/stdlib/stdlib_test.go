@@ -343,7 +343,7 @@ func TestGHDL2008Set(t *testing.T) {
 	ref := readRef(t, token.Std2008)
 	view := map[string]bool{}
 	for _, d := range ViewOf(token.Std2008).Decls() {
-		k := matchKey(d)
+		k := MatchKey(d)
 		view[k] = true
 		if !ref[k] && !ghdlLacks(d) {
 			t.Errorf("view 2008 has %q; GHDL 2008 does not", k)
@@ -394,8 +394,8 @@ func TestLookup(t *testing.T) {
 	if !IsLibrary("IEEE") || !IsLibrary("std") || IsLibrary("work") {
 		t.Error("IsLibrary")
 	}
-	if Prebuilt() != nil {
-		t.Error("Prebuilt before the build-time analysis exists")
+	if len(Prebuilt()) == 0 {
+		t.Error("Prebuilt is empty: run go generate ./internal/sema")
 	}
 	d := InternalError("ieee", "x")
 	if d.Code != diag.StdlibInternal || d.Class() != diag.Tool {
@@ -410,5 +410,34 @@ func TestParseTags(t *testing.T) {
 	if len(tags) != 1 || tags[0].Key != "k" ||
 		!slices.Equal(bad, []int{4, 5, 6, 7}) {
 		t.Errorf("parseTags: %v %v", tags, bad)
+	}
+}
+
+// TestInternalErrorHook: the stdlib/internal-error test hook reports
+// one tool failure per injected file, sorted, naming the library and
+// the file, and nothing without the hook.
+func TestInternalErrorHook(t *testing.T) {
+	if ds := InternalErrors(context.Background()); len(ds) != 0 {
+		t.Fatalf("without the hook: %v", ds)
+	}
+	var none context.Context
+	if ds := InternalErrors(none); len(ds) != 0 {
+		t.Fatalf("nil context: %v", ds)
+	}
+	ctx := WithInternalError(WithInternalError(context.Background(),
+		"std/textio.vhdl"), "ieee/numeric_std.vhdl")
+	ds := InternalErrors(ctx)
+	if len(ds) != 2 {
+		t.Fatalf("two injected: %v", ds)
+	}
+	for _, d := range ds {
+		if d.Code != diag.StdlibInternal || d.Class() != diag.Tool {
+			t.Errorf("%+v: want a stdlib/internal-error tool failure", d)
+		}
+	}
+	if !strings.Contains(ds[0].Message, "ieee/numeric_std.vhdl") ||
+		!strings.Contains(ds[0].Message, "bundled ieee") ||
+		!strings.Contains(ds[1].Message, "bundled std") {
+		t.Errorf("messages: %q, %q", ds[0].Message, ds[1].Message)
 	}
 }

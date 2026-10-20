@@ -1,0 +1,2 @@
+a.vhd:6:8: error[sema/type-mismatch]: expected INTEGER, found a string literal
+summary: 1 errors, 0 warnings, 0 hints, 1 files

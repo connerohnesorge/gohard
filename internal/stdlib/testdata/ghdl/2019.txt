@@ -1,5 +1,5 @@
-# Declarations of GHDL's VHDL-2019 std/ieee sources,
-# recorded by TestRecordGHDL; see internal/stdlib/README.md.
+# Declarations of GHDL 6.0.0's VHDL-2019 std/ieee sources,
+# recorded by go run ./tools/oracle --update stdlib; see internal/stdlib/README.md.
 # source: std/v19/textio.vhdl
 # source: std/v19/env.vhdl
 std.env CLEARVHDLASSERT []

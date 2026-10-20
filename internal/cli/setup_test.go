@@ -33,9 +33,33 @@ type setup struct {
 	// tamper lists bundled std/ieee files (stdlib.File paths) whose
 	// integrity check fails, through the stdlib.WithTamper test hook.
 	tamper []string
+	// bundleErr lists bundled files (File.Path) whose analysis
+	// reports an error through stdlib.WithInternalError.
+	bundleErr []string
 	// rand, when set, replaces env.Rand with a SplitMix64 of this
 	// state, so --seed random is reproducible.
 	rand *uint64
+	// restore lists paths chmod made unreadable; restorePerms makes
+	// them readable again after the run.
+	restore []string
+}
+
+// restorePerms undoes the chmod directives so the temp dir can be read
+// back and removed.
+func (st setup) restorePerms(t tb) {
+	for _, p := range st.restore {
+		if err := os.Chmod(p, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+// aggregate is a package whose constant aggregate has n+1 elements:
+// about 2n syntax-tree nodes in 2n bytes, so a small file can exceed
+// the 1,000,000-node limit (#20, #31) without committing it.
+func aggregate(n int) []byte {
+	return []byte("package big is\n  constant c : integer_vector := (\n" +
+		strings.Repeat("0,", n) + "0);\nend package;\n")
 }
 
 func applySetup(t tb, dir, work string) setup {
@@ -88,6 +112,38 @@ func applySetup(t tb, dir, work string) setup {
 			if err != nil {
 				t.Fatal(err)
 			}
+		case f[0] == "aggregate" && len(f) == 3:
+			n, err := strconv.Atoi(f[2])
+			if err != nil || n < 1 {
+				bad()
+			}
+			mkparent(t, at(f[1]))
+			if err := os.WriteFile(at(f[1]), aggregate(n),
+				0o644); err != nil {
+				t.Fatal(err)
+			}
+		case f[0] == "chmod" && len(f) == 3:
+			mode, err := strconv.ParseUint(f[2], 8, 32)
+			if err != nil {
+				bad()
+			}
+			// Windows has no permission bits: the case cannot be
+			// built there.
+			if runtime.GOOS == "windows" {
+				t.Skip("cannot make a path unreadable here")
+			}
+			p := at(f[1])
+			if err := os.Chmod(p, os.FileMode(mode)); err != nil {
+				t.Fatal(err)
+			}
+			// Restore it so t.TempDir can remove the tree.
+			st.restore = append(st.restore, p)
+			// Root (or a capability) reads everything: probe the
+			// path instead of asking for the user id.
+			if readable(p) {
+				st.restorePerms(t)
+				t.Skip("path stays readable (running as root?)")
+			}
 		case f[0] == "mkdir" && len(f) == 2:
 			if err := os.MkdirAll(at(f[1]), 0o755); err != nil {
 				t.Fatal(err)
@@ -117,6 +173,8 @@ func applySetup(t tb, dir, work string) setup {
 			st.full = true
 		case f[0] == "tamper-stdlib" && len(f) == 2:
 			st.tamper = append(st.tamper, f[1])
+		case f[0] == "stdlib-internal-error" && len(f) == 2:
+			st.bundleErr = append(st.bundleErr, f[1])
 		case f[0] == "panic-on-read" && len(f) == 2:
 			st.panicOn = append(st.panicOn, f[1])
 		case f[0] == "interrupt" && len(f) == 4 && f[2] == "on-read":
@@ -221,4 +279,15 @@ func (p panicFS) ReadFile(name string) ([]byte, error) {
 		}
 	}
 	return p.FS.ReadFile(name)
+}
+
+// readable reports whether p can still be read after a chmod: a
+// directory is listed, a file opened and read.
+func readable(p string) bool {
+	if fi, err := os.Stat(p); err == nil && fi.IsDir() {
+		_, err := os.ReadDir(p)
+		return err == nil
+	}
+	_, err := os.ReadFile(p)
+	return err == nil
 }

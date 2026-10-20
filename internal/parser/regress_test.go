@@ -224,12 +224,17 @@ func sortedValues(m map[string]string) []string {
 // entrySource reads a regression entry's expected-failure files as
 // corpus.yaml documents.
 func entrySource(e regEntry) (*regSource, error) {
+	return entrySourceAt(repoRoot, e)
+}
+
+// entrySourceAt is entrySource for the repository checked out at root.
+func entrySourceAt(root string, e regEntry) (*regSource, error) {
 	sub := path.Clean(e.Subfolder)
 	s := &regSource{name: e.Name, dir: path.Join(e.Path, sub),
 		exp: map[string]*expectation{}, submodule: e.Path}
-	module := filepath.Join(repoRoot, filepath.FromSlash(e.Path))
-	root := filepath.Join(module, filepath.FromSlash(sub))
-	if n, err := countVHDL(root); n == 0 {
+	module := filepath.Join(root, filepath.FromSlash(e.Path))
+	dir := filepath.Join(module, filepath.FromSlash(sub))
+	if n, err := countVHDL(dir); n == 0 {
 		return nil, missingSubmodule(s.dir, e.Path, err)
 	}
 	if len(e.ExpectedFailures) == 0 {
@@ -280,26 +285,26 @@ func entrySource(e regEntry) (*regSource, error) {
 			switch {
 			case path.Base(p) == "testsuite.sh":
 				isGHDL = true
-				refs, err := readGHDLScript(root, p)
+				refs, err := readGHDLScript(dir, p)
 				if err != nil {
 					return nil, err
 				}
 				ghdl = append(ghdl, refs...)
 			case path.Ext(p) == ".exp":
-				refs, err := readExp(root, p, token.Std1993, exactExpMode)
+				refs, err := readExp(dir, p, token.Std1993, exactExpMode)
 				if err != nil {
 					return nil, err
 				}
 				ghdl = append(ghdl, refs...)
 			case path.Base(p) == "testlist.txt":
-				refs, err := readTestlist(root)
+				refs, err := readTestlist(dir)
 				if err != nil {
 					return nil, err
 				}
 				nvc = append(nvc, refs...)
 			case strings.HasPrefix(path.Base(p), "test_") &&
 				path.Ext(p) == ".c":
-				refs, err := readUnitTests(root, p)
+				refs, err := readUnitTests(dir, p)
 				if err != nil {
 					return nil, err
 				}
@@ -324,7 +329,7 @@ func entrySource(e regEntry) (*regSource, error) {
 		// Files GHDL must analyse are also named by the scripts that
 		// carry no failures (synth, vhpi, vpi, nested gna dirs) and by
 		// the VESTS driver's compliant lists.
-		more, err := ghdlMustParseRefs(root, read)
+		more, err := ghdlMustParseRefs(dir, read)
 		if err != nil {
 			return nil, err
 		}
@@ -368,7 +373,32 @@ func entrySource(e regEntry) (*regSource, error) {
 			why: r.why,
 		})
 	}
+	for _, d := range invalidUpstream {
+		if strings.HasPrefix(d.file, s.dir+"/") && fileExists(d.file) {
+			e := s.get(d.file)
+			e.mayFail, e.runs = true, nil
+		}
+	}
 	return s, nil
+}
+
+// invalidUpstream lists upstream regression files that the upstream
+// tool expects to analyse but that are not valid VHDL, so GoHard
+// rejects them by design. Each is gated as may-fail (it must still
+// round-trip and never crash); TestInvalidUpstream proves each still
+// reports the listed error, so the list cannot go stale.
+var invalidUpstream = []struct {
+	file string
+	std  token.Standard
+	// want is the syntax/error message the file must report.
+	want string
+	why  string
+}{
+	{file: "testdata/nvc/test/regress/range4.vhd", std: token.Std2019,
+		want: "relational operators are not associative; add " +
+			"parentheses",
+		why: "`ascending > descending = false` chains relational " +
+			"operators; LRM 9.1 relation allows one (NVC accepts it)"},
 }
 
 // ghdlMustParseRefs reads every testsuite.sh below root not in read

@@ -74,6 +74,16 @@
 //     pending and internal/corpus reports the designs as pending.
 //     Hash: trace_sha256.
 //
+//   - stdlib (#33): the declaration sets of GHDL's VHDL-93, 2008 and
+//     2019 std/ieee sources (lib/ghdl/src of the shell's ghdl) and of
+//     NVC's VHDL-2008 sources (NVC ships them compiled only, so they
+//     are read from the pinned testdata/nvc submodule, whose
+//     configure.ac version must be the shell's nvc), recorded as
+//     internal/stdlib/testdata/{ghdl,nvc}/<std>.txt (stdlib.RefSets).
+//     The internal/stdlib tests derive the first-standard tags from
+//     them and compare the 2008 view with both 2008 sets; the check
+//     here verifies each file's provenance and source list. No hash.
+//
 // Several sections may feed one hash field (oracle_sha256 covers the
 // GHDL/NVC traces and the --disp-tree output): the
 // field is the hash over every golden file of every section that names

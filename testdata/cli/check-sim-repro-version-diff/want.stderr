@@ -1,0 +1,4 @@
+gohard: .gohard/traces/sev_tb-3.trace: trace differs from the recorded run at line 7
+gohard: -"1000000 0 ! report note sev_tb.vhd:10 p1 \"before\""
+gohard: +"1000000 0 ! report note sev_tb.vhd:10 p1 \"after\""
+gohard: simulated sev_tb (seed 3): quiet

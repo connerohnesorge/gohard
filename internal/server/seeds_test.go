@@ -186,40 +186,81 @@ func FuzzLSPReplay(f *testing.F) {
 		f.Fatal(err)
 	}
 	f.Fuzz(func(t *testing.T, data []byte) {
-		sess := repro.Session{Header: h}
-		for line := range bytes.SplitSeq(data, []byte("\n")) {
-			if json.Valid(line) && len(bytes.TrimSpace(line)) > 0 {
-				sess.Messages = append(sess.Messages, line)
-			}
-		}
-		if len(sess.Messages) > 200 {
-			return
-		}
-		totalAnalyzers(sess.Messages)
-		file, err := sess.Marshal()
-		if err != nil {
-			return
-		}
-		// Inputs that are not a replayable session (a malformed
-		// "$gohard" entry, embedded files that do not match the
-		// header) are rejected by Replay, which is not a bug.
-		if r, err := server.Replay(sess, simenv.New(simenv.Options{
-			Dir: workDir}).Env().FS, server.Options{
-			Version: h.Version}, "fuzz"); err != nil ||
-			len(r.Diagnostics) > 0 {
-			return
-		}
-		defer func() {
-			// A failing input is also written as a replayable session
-			// (#29). Minimizing calls this again with smaller inputs,
-			// so the file ends up holding the last, smallest one.
-			if t.Failed() {
-				_ = writeSeedFile(fuzzSeed, file)
-				t.Logf("session written to %s", fuzzSeed)
-			}
-		}()
-		replaySeed(t, file, "fuzz")
+		fuzzReplayOne(t, t.Failed, h, data, fuzzSeed,
+			func(t tb, file []byte) { replaySeed(t, file, "fuzz") })
 	})
+}
+
+// fuzzReplayOne is the body of FuzzLSPReplay: it builds the session
+// for one input, runs check on it and, when failed reports a failure
+// afterwards, writes the session to seed (#29). Minimizing calls this
+// again with smaller inputs, so the file ends up holding the last,
+// smallest one.
+func fuzzReplayOne(t tb, failed func() bool, h repro.Header,
+	data []byte, seed string, check func(tb, []byte)) {
+	sess := repro.Session{Header: h}
+	for line := range bytes.SplitSeq(data, []byte("\n")) {
+		if json.Valid(line) && len(bytes.TrimSpace(line)) > 0 {
+			sess.Messages = append(sess.Messages, line)
+		}
+	}
+	if len(sess.Messages) > 200 {
+		return
+	}
+	totalAnalyzers(sess.Messages)
+	file, err := sess.Marshal()
+	if err != nil {
+		return
+	}
+	// Inputs that are not a replayable session (a malformed "$gohard"
+	// entry, embedded files that do not match the header) are rejected
+	// by Replay, which is not a bug.
+	if r, err := server.Replay(sess, simenv.New(simenv.Options{
+		Dir: workDir}).Env().FS, server.Options{
+		Version: h.Version}, "fuzz"); err != nil ||
+		len(r.Diagnostics) > 0 {
+		return
+	}
+	defer func() {
+		if failed() {
+			_ = writeSeedFile(seed, file)
+			t.Logf("session written to %s", seed)
+		}
+	}()
+	check(t, file)
+}
+
+// TestFuzzLSPReplayWritesSeed forces a FuzzLSPReplay failure and checks
+// that the failing input is written as a session that replays (#29).
+func TestFuzzLSPReplayWritesSeed(t *testing.T) {
+	sim := simenv.New(simenv.Options{Dir: workDir})
+	h, err := server.SessionHeader(sim.Env(), workDir, testVersion)
+	if err != nil {
+		t.Fatal(err)
+	}
+	data := []byte(`{"jsonrpc":"2.0","id":1,"method":"initialize",` +
+		`"params":{"rootUri":"file:///work","capabilities":{}}}` + "\n" +
+		`{"jsonrpc":"2.0","id":2,"method":"shutdown"}` + "\n" +
+		`{"jsonrpc":"2.0","method":"exit"}` + "\n")
+	seed := filepath.Join(t.TempDir(), "FuzzLSPReplay-failure.jsonl")
+	f := &fakeTB{T: t}
+	fuzzReplayOne(f, func() bool { return len(f.errs) > 0 }, h, data,
+		seed, func(t tb, _ []byte) { t.Errorf("forced failure") })
+	if len(f.errs) == 0 {
+		t.Fatal("the forced failure did not fail")
+	}
+	got, err := os.ReadFile(seed)
+	if err != nil {
+		t.Fatalf("no seed written: %v", err)
+	}
+	replaySeed(t, got, seed)
+	// A passing input writes nothing.
+	ok := filepath.Join(t.TempDir(), "none.jsonl")
+	fuzzReplayOne(t, t.Failed, h, data, ok,
+		func(t tb, file []byte) { replaySeed(t, file, "fuzz") })
+	if _, err := os.Stat(ok); err == nil {
+		t.Fatal("a passing input wrote a seed")
+	}
 }
 
 // fuzzAnalyzers are the analyzers a fuzzed session can name.

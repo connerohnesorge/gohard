@@ -1,0 +1,4 @@
+psl_simple.vhd:38:3: error[sim/assert-error]: assertion error: a and b high in the same cycle
+psl_simple.vhd:41:3: hint[sim/cover-hit]: cover a_then_b (a then b) hit 1 times
+psl_simple.vhd:44:3: warning[sim/cover-miss]: cover b_twice (b twice in a row) was never hit
+summary: 1 errors, 1 warnings, 1 hints, 2 files

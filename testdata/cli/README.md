@@ -26,6 +26,8 @@ trees, and must match the committed files.
 | --- | --- |
 | `symlink PATH TARGET` | Creates a symbolic link. On Windows, if the OS refuses (no developer mode or elevation), the case is skipped, except under `CI`, where it fails, so CI runs it on every OS. |
 | `size PATH BYTES` | Creates or extends PATH to BYTES bytes, sparse where the OS allows (for the 10 MB limit). |
+| `aggregate PATH N` | Writes PATH as a package whose constant aggregate has N+1 elements (about 2N syntax-tree nodes in 2N bytes), for the 1,000,000-node limit without committing a large file. |
+| `chmod PATH MODE` | Sets PATH's permission bits to the octal MODE (for example `000`, to make a library folder or source file unreadable); they are restored after the run. Skipped on Windows and when running as root, where permission bits cannot deny a read. |
 | `mkdir PATH` | Creates a directory, for example `.git`, which git cannot store. |
 | `cwd PATH` | Runs the command from PATH instead of the temp dir. |
 | `env NAME=VALUE` | Overrides an environment variable seen through the Env. |
@@ -34,6 +36,7 @@ trees, and must match the committed files.
 | `stdout broken` | Standard output fails every write, like a closed pipe (`env.ErrBrokenPipe`): the run keeps its exit code. |
 | `stdout full` | Standard output fails every write, like a full disk: the run logs `cli/output-failed` and exits 2. |
 | `tamper-stdlib PATH` | The bundled std/ieee file PATH (as `ieee/numeric_std.vhdl`) fails its integrity check, through the `stdlib.WithTamper` context hook (#33): the run reports `stdlib/integrity` and exits 2. |
+| `stdlib-internal-error PATH` | The bundled file PATH (such as `ieee/numeric_std.vhdl`) reports an analysis error, through the `stdlib.WithInternalError` context hook: the run reports `stdlib/internal-error` and exits 2 (#20, #33). |
 | `panic-on-read PATH` | Reading a file whose path ends in `/PATH` panics, to reach the crash path. |
 | `interrupt SIGINT\|SIGTERM on-read PATH` | Reading a file whose path ends in `/PATH` delivers the signal, as the shell does: the run's context is cancelled with `env.SIGINT` or `env.SIGTERM` as the cause (exit 130 or 143). The read itself succeeds. |
 

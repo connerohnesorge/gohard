@@ -1,0 +1,2 @@
+# An analysis error inside the bundled ieee text is a tool failure.
+stdlib-internal-error ieee/numeric_std.vhdl

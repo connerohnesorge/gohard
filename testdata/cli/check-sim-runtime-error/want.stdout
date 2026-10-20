@@ -1,0 +1,2 @@
+div_tb.vhd:6:3: error[sim/runtime-error]: div_tb.vhd:10:5: division by zero in div_tb._p0 at 1 ns
+summary: 1 errors, 0 warnings, 0 hints, 1 files

@@ -1,5 +1,5 @@
-# Declarations of GHDL's VHDL-1993 std/ieee sources,
-# recorded by TestRecordGHDL; see internal/stdlib/README.md.
+# Declarations of GHDL 6.0.0's VHDL-1993 std/ieee sources,
+# recorded by go run ./tools/oracle --update stdlib; see internal/stdlib/README.md.
 # source: std/v93/standard.vhdl
 # source: std/v93/textio.vhdl
 # source: ieee/v93/std_logic_1164.vhdl

@@ -1,0 +1,4 @@
+.gohard/traces/sev_tb-3.repro.json:1:1: warning[repro/version-mismatch]: recorded with gohard 0.9.0, running 0.0.0-dev; rerunning and diffing the trace
+sev_tb.vhd:9:5: hint[sim/assert-note]: assertion note: boom
+sev_tb.vhd:10:5: hint[sim/assert-note]: report note: after
+summary: 0 errors, 1 warnings, 2 hints, 1 files

@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "status": "tool_error",
+  "exit": 2,
+  "summary": {
+    "errors": 1,
+    "warnings": 0,
+    "hints": 0,
+    "files": 0
+  },
+  "diagnostics": [
+    {
+      "path": "",
+      "line": 0,
+      "col": 0,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "error",
+      "code": "stdlib/internal-error",
+      "message": "error inside bundled ieee: ieee/numeric_std.vhdl:1:1: error injected by the test hook",
+      "related": []
+    }
+  ],
+  "incomplete": [],
+  "error": {
+    "code": "stdlib/internal-error",
+    "message": "error inside bundled ieee: ieee/numeric_std.vhdl:1:1: error injected by the test hook"
+  }
+}

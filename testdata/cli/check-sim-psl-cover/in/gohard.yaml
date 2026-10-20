@@ -1,0 +1,9 @@
+# Project config for the psl_simple corpus design (#28, #35).
+# The PSL assert fails with severity error at 55 ns. With the default
+# simulation.stop_level (error) the run would halt there, before the
+# 100 ns finish that GHDL and NVC both reach. Halting only on failure
+# keeps the whole run comparable with both oracles and lets the cover
+# miss be judged at the end of the full run. stop_level does not change
+# the diagnostic severity or the exit code (#35): the run still exits 1.
+simulation:
+  stop_level: failure

@@ -10,15 +10,13 @@ import (
 )
 
 // TestExprOracleForms pins the expression forms the GHDL and NVC
-// regression suites need (#31 oracle): chained relational operators
-// (NVC regress/range4), an operator symbol as a selected-name prefix
+// regression suites need (#31 oracle): an operator symbol as a selected-name prefix
 // (VESTS tc945), indexing and slicing an attribute's value (tc1038,
 // tc1091), a character literal as an attribute prefix (attr21,
 // issue369), replacement characters (tc2853, based.vhd) and VHDL-2019
 // conditional expressions as association actuals (issue1607).
 func TestExprOracleForms(t *testing.T) {
 	runCases(t, fnExpr, []exCase{
-		{"a > b = false", "(BinaryExpr (BinaryExpr a > b) = false)"},
 		{`"+".d`, `(SelectedName (OperatorSymbol "+") . d)`},
 		{`"-".b.v`,
 			`(SelectedName (SelectedName (OperatorSymbol "-") . b) . v)`},

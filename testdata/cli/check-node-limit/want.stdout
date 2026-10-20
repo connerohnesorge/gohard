@@ -1,0 +1,2 @@
+big.vhd:1:1: warning[workspace/file-too-large]: file not parsed: its syntax tree (over 1000000 nodes) exceeds the limit of 1000000 nodes
+summary: 0 errors, 1 warnings, 0 hints, 2 files

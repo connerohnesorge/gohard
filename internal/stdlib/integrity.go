@@ -130,3 +130,33 @@ func verify(sums []Sum, read func(string) ([]byte, bool),
 func InternalError(lib, problem string) diag.Diagnostic {
 	return diag.New(diag.StdlibInternal, lib, problem)
 }
+
+type faultKey struct{}
+
+// WithInternalError returns a context under which InternalErrors
+// reports an error inside the bundled file at p (a File.Path). It is
+// the test hook of the stdlib/internal-error fixture (#20, #33): the
+// bundled text is analyzed at build time and has no errors, so only
+// this hook can make one appear, and a context is the only way in (no
+// flag, file or environment variable reaches it).
+func WithInternalError(ctx context.Context, p string) context.Context {
+	prev, _ := ctx.Value(faultKey{}).([]string)
+	return context.WithValue(ctx, faultKey{}, append(slices.Clip(prev), p))
+}
+
+// InternalErrors returns the stdlib/internal-error diagnostics the test
+// hook in ctx injects, sorted; none without the hook. Callers report
+// them with Verify's (exit 2).
+func InternalErrors(ctx context.Context) []diag.Diagnostic {
+	if ctx == nil {
+		return nil
+	}
+	ps, _ := ctx.Value(faultKey{}).([]string)
+	var out []diag.Diagnostic
+	for _, p := range ps {
+		lib, _, _ := strings.Cut(p, "/")
+		out = append(out, InternalError(lib, p+":1:1: "+
+			"error injected by the test hook"))
+	}
+	return diag.Normalize(out)
+}

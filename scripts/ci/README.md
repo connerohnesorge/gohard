@@ -24,6 +24,7 @@ Triggers: `pull_request`, pushes to `main` and `v1`, manual dispatch.
 | `gofmt` and `golines -m 80` (golines pinned to v0.13.0 in `lib.sh`) | `format.sh` | wired |
 | Generated-file sync (`go generate ./...` then compare) | `gen-check.sh` | wired; no generators exist yet |
 | Kind renumbering | `gen-check.d/*.sh` hook | later: #31 adds `10-kind-numbers.sh` |
+| Gates fail when they should: a hand-edited generated file and a renumbered kind fail `gen-check.sh`, the fuzz crash flow pushes its branch and opens (or links) the pull request | `selftest.sh` (Linux; throwaway clone, fake `go`/`gh` for the fuzz flow) | wired |
 | `detlint` | `detlint.sh` (`go run ./tools/detlint ./...`) | wired; needs `tools/detlint` (#30) |
 | `go test -race` on Linux | `race.sh` | wired for `internal/env/realenv`, `internal/jsonrpc2` and `internal/server` (real pipe transport) |
 | Parser-regression set (`pr` submodules, stdlib, corpus) | `regression.sh pr` | placeholder; later #31 with #8's `corpus.yaml` |
@@ -57,7 +58,7 @@ Triggers: daily schedule and manual dispatch (input `fuzztime`, default
 | #30 item | Where | Status |
 | --- | --- | --- |
 | Fuzz each target for 10 minutes | `fuzz-targets.sh` (the one list) and `fuzz.sh` (one matrix job per target) | wired for `FuzzConfig` (#28), `FuzzIndex` and `FuzzLSPReplay` (#25); later: #31 `FuzzParse`, #32 `FuzzFormat` append to the list |
-| Crash opens a PR adding the minimized input under `testdata/fuzz/<Target>/` | `fuzz.sh` | wired |
+| Crash opens a PR adding the minimized input under `testdata/fuzz/<Target>/` | `fuzz.sh` | wired; pushes `fuzz/<Target>-<id>`, prints the compare URL, then `gh pr create`. GitHub refuses the PR unless Settings > Actions > General > Workflow permissions > "Allow GitHub Actions to create and approve pull requests" is on, or the `FUZZ_PR_TOKEN` secret holds a token with contents and pull-requests write; otherwise the job fails naming that setting and the compare URL. `selftest.sh` covers both paths |
 | Every corpus design at 64 seeds | `corpus-seeds.sh` (`SEEDS=64`, the default): `TestCorpus -corpus.seeds=64 -corpus.require-sim`, then `go run ./tools/oracle trace tree golden` | wired; fails while the sequential interpreter is missing |
 | Full parser-regression list (`pr` and `nightly` submodules) | `regression.sh nightly` | placeholder; later #31 |
 | Replay every LSP session in `testdata/seeds/` | `lsp-seeds.sh` | wired (`TestSeeds`, `TestLSPReplaySeeds`) |

@@ -203,7 +203,7 @@ var typingCases = []typingCase{
   constant k1 : std_logic := and s1;
   constant k2 : std_logic := xor s1;
   constant k3 : std_logic := s2 ?< s2;
-  constant k4 : boolean := s1 ?= s1 = '1';
+  constant k4 : boolean := (s1 ?= s1) = '1';
   constant k5 : boolean := ?? '1';`, stmts: `
     if sl then end if;
     if sl and '1' then end if;

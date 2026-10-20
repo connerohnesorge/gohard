@@ -1,0 +1,89 @@
+DesignFile 0..135
+  DesignUnit 0..134
+    ContextClause 0..0
+    PackageDecl 0..134
+        lead LineComment "-- test: std=2008 kind=BinaryExpr"
+        lead Newline "\n"
+      KwPackage 34..41 "package"
+        trail Whitespace " "
+      Identifier 42..43 "p"
+        trail Whitespace " "
+      KwIs 44..46 "is"
+      DeclarativePart 46..129
+        ConstantDecl 46..85
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 49..57 "constant"
+            trail Whitespace " "
+          IdentifierList 58..60
+            Identifier 58..59 "c"
+              trail Whitespace " "
+          Colon 60..61 ":"
+            trail Whitespace " "
+          SubtypeIndication 62..70
+            SimpleName 62..70
+              Identifier 62..69 "boolean"
+                trail Whitespace " "
+          VarAssign 70..72 ":="
+            trail Whitespace " "
+          BinaryExpr 73..84
+            ParenExpr 73..81
+              LParen 73..74 "("
+              BinaryExpr 74..79
+                SimpleName 74..76
+                  Identifier 74..75 "a"
+                    trail Whitespace " "
+                Eq 76..77 "="
+                  trail Whitespace " "
+                SimpleName 78..79
+                  Identifier 78..79 "b"
+              RParen 79..80 ")"
+                trail Whitespace " "
+            Eq 81..82 "="
+              trail Whitespace " "
+            SimpleName 83..84
+              Identifier 83..84 "c"
+          Semicolon 84..85 ";"
+        ConstantDecl 85..129
+            lead Newline "\n"
+            lead Whitespace "  "
+          KwConstant 88..96 "constant"
+            trail Whitespace " "
+          IdentifierList 97..99
+            Identifier 97..98 "d"
+              trail Whitespace " "
+          Colon 99..100 ":"
+            trail Whitespace " "
+          SubtypeIndication 101..109
+            SimpleName 101..109
+              Identifier 101..108 "boolean"
+                trail Whitespace " "
+          VarAssign 109..111 ":="
+            trail Whitespace " "
+          BinaryExpr 112..128
+            BinaryExpr 112..118
+              SimpleName 112..114
+                Identifier 112..113 "a"
+                  trail Whitespace " "
+              Lt 114..115 "<"
+                trail Whitespace " "
+              SimpleName 116..118
+                Identifier 116..117 "b"
+                  trail Whitespace " "
+            KwAnd 118..121 "and"
+              trail Whitespace " "
+            BinaryExpr 122..128
+              SimpleName 122..124
+                Identifier 122..123 "b"
+                  trail Whitespace " "
+              Ne 124..126 "/="
+                trail Whitespace " "
+              SimpleName 127..128
+                Identifier 127..128 "c"
+          Semicolon 128..129 ";"
+      EndClause 129..134
+          lead Newline "\n"
+        KwEnd 130..133 "end"
+        Semicolon 133..134 ";"
+    lead Newline "\n"
+  EOF 135..135 ""

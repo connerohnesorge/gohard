@@ -41,7 +41,7 @@ type target struct {
 // sections is the registry, in run order. Later stages append theirs
 // (trace, tree).
 var sections = []*section{formatSection, semerrSection,
-	traceSection, treeSection, goldenSection}
+	traceSection, treeSection, goldenSection, stdlibSection}
 
 // ctx is the state shared by the sections: the repository root, the
 // corpus.yaml bytes and their parsed form.
@@ -206,7 +206,9 @@ func doUpdate(root string, sel []*section, only []string, tl *toolset,
 			if err := writeGolden(root, t, files, stdout); err != nil {
 				return err
 			}
-			if !slices.Contains(refs, t.Ref) {
+			// A target without a hash field feeds no corpus.yaml hash
+			// (the stdlib section).
+			if t.Ref.Field != "" && !slices.Contains(refs, t.Ref) {
 				refs = append(refs, t.Ref)
 			}
 		}
@@ -353,7 +355,9 @@ func doCheck(root string, sel []*section, only []string) ([]string,
 			for _, p := range s.check(x, t, got) {
 				probs = append(probs, s.name+" "+t.Ref.Name+": "+p)
 			}
-			if !slices.Contains(refs, t.Ref) {
+			// A target without a hash field feeds no corpus.yaml hash
+			// (the stdlib section).
+			if t.Ref.Field != "" && !slices.Contains(refs, t.Ref) {
 				refs = append(refs, t.Ref)
 			}
 		}

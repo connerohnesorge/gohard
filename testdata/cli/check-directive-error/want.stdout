@@ -1,0 +1,2 @@
+x.vhd:1:1: error[syntax/directive-error]: `error: stop here
+summary: 1 errors, 0 warnings, 0 hints, 1 files

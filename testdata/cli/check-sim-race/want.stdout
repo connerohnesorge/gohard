@@ -1,0 +1,2 @@
+tb.vhd:1:8: warning[sim/race]: race between tb.w and tb.r: traces differ between seed 0 and seed 1
+summary: 0 errors, 1 warnings, 0 hints, 1 files
