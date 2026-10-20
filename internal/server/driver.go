@@ -44,6 +44,8 @@ type Driver struct {
 	// loadFiles, when set, performs LoadWorkspace instead of
 	// LoadFiles, for the same reason.
 	loadFiles func(LoadWorkspace) WorkspaceLoaded
+	// bundle maps bundled std/ieee URIs to the cached files (#33).
+	bundle bundleFiles
 }
 
 // NewDriver returns a driver for a new server. send writes one
@@ -80,6 +82,7 @@ func (d *Driver) Push(body []byte) {
 	if d.done || d.closed {
 		return
 	}
+	body = d.bundle.incoming(d.env, body)
 	d.State = d.State.Push(Message{Data: body}, PriorityClient)
 }
 
@@ -153,7 +156,11 @@ func (d *Driver) Exited() (code int, ok bool) { return d.exit, d.done }
 func (d *Driver) perform(e Effect) error {
 	switch e := e.(type) {
 	case Send:
-		return d.send(e)
+		m, err := d.bundle.outgoing(d.env, e.Msg, d.send)
+		if err != nil {
+			return err
+		}
+		return d.send(Send{m})
 	case LoadConfig:
 		var l config.Loaded
 		if d.loadConfig != nil {
@@ -169,6 +176,7 @@ func (d *Driver) perform(e Effect) error {
 		} else {
 			w = LoadFiles(d.env, d.jobs, e.Root)
 		}
+		w = d.bundle.dropCached(d.env, w)
 		d.State = d.State.Push(w, PriorityResult)
 	case Exit:
 		d.exit, d.done = e.Code, true

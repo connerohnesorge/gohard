@@ -221,7 +221,14 @@ func HoverAt(r *sema.Result, path string, off int) (Hover, bool) {
 	}
 	var b strings.Builder
 	if t.decl != nil {
-		b.WriteString("```vhdl\n" + Describe(t.decl) + "\n```")
+		if text, from, ok := typeDecl(t.decl); ok {
+			b.WriteString("```vhdl\n" + text + "\n```")
+			if from != "" {
+				b.WriteString("\n\nfrom " + from)
+			}
+		} else {
+			b.WriteString("```vhdl\n" + Describe(t.decl) + "\n```")
+		}
 		if doc := DocOf(r, t.decl); doc != "" {
 			b.WriteString("\n\n" + doc)
 		}
@@ -245,6 +252,77 @@ func HoverAt(r *sema.Result, path string, off int) (Hover, bool) {
 	}
 	h.Markdown = b.String()
 	return h, h.Markdown != ""
+}
+
+// Limits of the declaration text a type hover shows.
+const (
+	hoverMaxLines = 16
+	hoverMaxCols  = 100
+)
+
+// typeDecl returns the source text of a type or subtype declaration
+// (a record with its elements, an enumeration with its literals, a
+// subtype with its indication), dedented and trimmed to hoverMaxLines
+// lines of at most hoverMaxCols bytes, and the unit it is declared in
+// ("util.util_pkg"). ok is false for other declarations and for one
+// without source text.
+func typeDecl(d *sema.Decl) (text, from string, ok bool) {
+	if d == nil || d.File == nil || d.Implicit ||
+		d.Kind != sema.DeclType && d.Kind != sema.DeclSubtype {
+		return "", "", false
+	}
+	src, full := d.File.Text, d.Full
+	if full.Start < 0 || full.End > len(src) || full.End <= full.Start ||
+		d.Span.Start < full.Start || d.Span.End > full.End {
+		return "", "", false
+	}
+	// The indentation of the first line is the column of its first
+	// byte; the other lines lose as much leading whitespace.
+	ls := full.Start
+	for ls > 0 && src[ls-1] != '\n' {
+		ls--
+	}
+	indent := 0
+	for i := ls; i < full.Start && (src[i] == ' ' || src[i] == '\t'); i++ {
+		indent++
+	}
+	lines := strings.Split(strings.ReplaceAll(string(src[full.Start:full.End]),
+		"\r\n", "\n"), "\n")
+	for i := range lines {
+		l := strings.TrimRight(lines[i], " \t\r")
+		if i > 0 {
+			n := 0
+			for n < indent && n < len(l) && (l[n] == ' ' || l[n] == '\t') {
+				n++
+			}
+			l = l[n:]
+		}
+		if len(l) > hoverMaxCols {
+			l = l[:hoverMaxCols] + " ..."
+		}
+		lines[i] = l
+	}
+	if len(lines) > hoverMaxLines {
+		last := lines[len(lines)-1]
+		lines = append(lines[:hoverMaxLines-2], "  ...", last)
+	}
+	text = strings.Join(lines, "\n")
+	if !strings.HasSuffix(text, ";") {
+		text += ";"
+	}
+	if u := d.Unit; u != nil {
+		from = string(u.Library) + "." + string(u.Name)
+	}
+	return text, from, true
+}
+
+// Summary is the code block text hover shows for d: the declaration
+// text of a type or subtype (typeDecl), else Describe.
+func Summary(d *sema.Decl) string {
+	if text, _, ok := typeDecl(d); ok {
+		return text
+	}
+	return Describe(d)
 }
 
 // DocOf returns the doc comment of d as plain text (comment markers

@@ -181,8 +181,12 @@ func Replay(s repro.Session, fsys env.FS, o Options, name string,
 	if found == config.FoundGit {
 		files[filepath.Join(root, ".git")] = nil
 	}
+	// The bundled std/ieee files a location names are written to a
+	// cache in the simulated file system (#33).
+	cache := filepath.VolumeName(folder) + string(filepath.Separator) +
+		"gohard-cache"
 	sim := simenv.New(simenv.Options{Seed: s.Header.Seed, Dir: folder,
-		Files: files})
+		Files: files, Vars: map[string]string{"XDG_CACHE_HOME": cache}})
 	var buf bytes.Buffer
 	d := NewDriver(o, sim.Env(), 1, func(m Send) error {
 		buf.Write(jsonrpc2.AppendFrame(nil, m.Body()))

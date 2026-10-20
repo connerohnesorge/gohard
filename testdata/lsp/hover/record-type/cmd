@@ -1,0 +1,2 @@
+# a record type: its declaration with the element list, the unit it is from and its doc comment.
+gohard lsp hover --at top.vhd:18:35

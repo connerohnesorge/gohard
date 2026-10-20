@@ -158,6 +158,18 @@ func runOnce(t tb, dir string, args []string,
 	})
 	ctx, cancel := context.WithCancelCause(context.Background())
 	defer cancel(nil)
+	// The bundled std/ieee files the language server writes for its
+	// locations (#33) go to a cache of this run, shown as $BUNDLE.
+	cache := t.TempDir()
+	getenv := e.Getenv
+	e.Getenv = func(k string) (string, bool) {
+		if k == "XDG_CACHE_HOME" {
+			return cache, true
+		}
+		return getenv(k)
+	}
+	bundle := filepath.Join(cache, "gohard", "bundle", stdlib.CacheKey())
+	defer unlockTree(bundle)
 	st.wrap(&e, cancel)
 	for _, p := range st.tamper {
 		ctx = stdlib.WithTamper(ctx, p)
@@ -168,6 +180,9 @@ func runOnce(t tb, dir string, args []string,
 	exit := run(ctx, e, args)
 	st.restorePerms(t)
 	clean := func(b []byte) []byte {
+		for _, w := range []string{bundle, filepath.ToSlash(bundle)} {
+			b = bytes.ReplaceAll(b, []byte(w), []byte("$BUNDLE"))
+		}
 		for _, w := range []string{work, filepath.ToSlash(work)} {
 			b = bytes.ReplaceAll(b, []byte(w), []byte("$WORK"))
 		}
@@ -179,6 +194,17 @@ func runOnce(t tb, dir string, args []string,
 		stderr: clean(stderr.Bytes()),
 		tree:   readTree(t, work),
 	}
+}
+
+// unlockTree makes the read-only files under dir writable again, so
+// the temp dir can be removed on every OS.
+func unlockTree(dir string) {
+	_ = filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
+		if err == nil && !d.IsDir() {
+			_ = os.Chmod(p, 0o644)
+		}
+		return nil
+	})
 }
 
 // commandWords splits the first non-blank, non-comment line of a cmd

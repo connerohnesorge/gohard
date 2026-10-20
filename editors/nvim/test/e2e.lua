@@ -6,7 +6,8 @@
 -- each testbench, runs its "▶ Run" code lens, waits for the run to end
 -- (the lens turns into "▶ Re-run · seed N") and checks the gohard-sim
 -- diagnostics against `gohard lsp sim` on the same project; then it
--- checks hover, definition, references and rename across files.
+-- checks hover, definition, references and rename across files, and
+-- go-to-definition into the bundled ieee sources (md_resolve).
 
 local plugin, bin, work = arg[1], arg[2], arg[3]
 assert(plugin and bin and work, 'usage: e2e.lua PLUGIN_DIR GOHARD_BIN WORK')
@@ -289,7 +290,78 @@ local function cross_file()
     'definition after the rename still finds pkg.vhd')
 end
 
--- GOHARD_E2E_ONLY=name runs one part: cross-file, wait_forms or
+--- bundle: go-to-definition on std_logic opens the read-only cached
+--- copy of ieee/std_logic_1164.vhdl (#33), with no error, attached to
+--- the same client, and hover inside it is the bundled unit's.
+local function bundle()
+  log('-- definition into the bundled ieee sources')
+  local tb, client = open(work .. '/md_resolve/md_resolve_tb.vhd')
+  if not client then
+    return
+  end
+  wait(20000, function()
+    return #vim.diagnostic.get(tb) > 0 or false
+  end)
+  local lines = vim.api.nvim_buf_get_lines(tb, 0, -1, false)
+  local ln, col
+  for i, l in ipairs(lines) do
+    col = l:find(': std_logic :=', 1, true)
+    if col then
+      ln, col = i, col + 2
+      break
+    end
+  end
+  if not check(ln ~= nil, 'md_resolve_tb.vhd declares a std_logic signal') then
+    return
+  end
+  vim.api.nvim_win_set_buf(0, tb)
+  vim.api.nvim_win_set_cursor(0, { ln, col })
+  vim.v.errmsg = ''
+  local ok, e = pcall(vim.lsp.buf.definition)
+  local want = 'ieee/std_logic_1164.vhdl'
+  local jumped = wait(20000, function()
+    local n = vim.api.nvim_buf_get_name(0)
+    return n:sub(-#want) == want
+  end)
+  local name = vim.api.nvim_buf_get_name(0)
+  check(ok and jumped and vim.v.errmsg == '',
+    'definition of std_logic opens %s%s', name,
+    (not ok and (': ' .. tostring(e))) or
+    (vim.v.errmsg ~= '' and (': ' .. vim.v.errmsg)) or '')
+  if not jumped then
+    return
+  end
+  local cache = vim.env.XDG_CACHE_HOME .. '/gohard/bundle/'
+  check(name:sub(1, #cache) == cache, 'it is under %s', cache)
+  check(vim.fn.filewritable(name) == 0, 'the cached file is read-only')
+  local buf = vim.api.nvim_get_current_buf()
+  local attached = wait(20000, function()
+    local c = gohard.client(buf)
+    return c ~= nil and c.initialized
+  end)
+  local c = gohard.client(buf)
+  check(attached and c.id == client.id,
+    'the cached file is on the same gohard client')
+  if not attached then
+    return
+  end
+  local blines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+  local hl, hc
+  for i, l in ipairs(blines) do
+    hc = l:find('STD_ULOGIC;', 1, true)
+    if hc then
+      hl = i
+      break
+    end
+  end
+  local h, err = request(c, buf, 'textDocument/hover', at(buf, hl, hc + 1))
+  local htext = h and h.contents and (h.contents.value or '') or ''
+  check(err == nil and htext:find('from ieee.std_logic_1164', 1, true),
+    'hover inside the cached file is the bundled unit: %s',
+    err and vim.inspect(err) or htext)
+end
+
+-- GOHARD_E2E_ONLY=name runs one part: cross-file, bundle, wait_forms or
 -- assert_fail. GOHARD_E2E_LOG=1 writes the LSP log at debug level.
 local only = vim.env.GOHARD_E2E_ONLY
 if vim.env.GOHARD_E2E_LOG == '1' then
@@ -303,6 +375,7 @@ local function part(name, fn, ...)
 end
 local ok, e = pcall(function()
   part('cross-file', cross_file)
+  part('bundle', bundle)
   part('wait_forms', testbench, 'wait_forms', 0)
   part('assert_fail', testbench, 'assert_fail', 1)
 end)

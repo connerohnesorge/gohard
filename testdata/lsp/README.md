@@ -99,6 +99,8 @@ result; positions are zero-based UTF-8.
 | `hover/cross-library-call` | a call of a function of another library: the chosen overload, its package and doc comment |
 | `hover/bundled-operator` | an operator: the chosen overload from ieee.numeric_std |
 | `hover/record-field` | a record field with its doc comment |
+| `hover/record-type` | a record type: its declaration with the element list, `from lib.pkg` and its doc comment |
+| `hover/enum-type` | an enumeration type: its declaration with the literals, `from lib.pkg` and its doc comment |
 | `hover/entity-doc` | a design unit: the doc comment above the entity, after the context clause |
 | `hover/enum-literal` | an enumeration literal and the type it belongs to |
 | `hover/ambiguous-overload` | an ambiguous call (#34): the diagnostic's message and every candidate with its reason, as in diagnostics/ambiguous-overload |
@@ -119,7 +121,7 @@ result; positions are zero-based UTF-8.
 | `definition/label` | the loop label of an exit statement |
 | `definition/end-label` | the label of an end process |
 | `definition/subprogram-end` | the designator of an end function in a package body |
-| `definition/bundled-type` | a std_logic_1164 type: the read-only bundled source (gohard-bundle URI) |
+| `definition/bundled-type` | a std_logic_1164 type: the read-only cached copy of the bundled source (a file URI under `$BUNDLE`) |
 | `definition/bundled-function` | to_integer: the numeric_std overload chosen, in the bundled source |
 | `definition/extended-identifier` | an extended identifier |
 | `definition/ambiguous-overload` | an ambiguous call (#34): every candidate that fits |
@@ -142,7 +144,7 @@ result; positions are zero-based UTF-8.
 | `rename/conflict-region` | a new name already declared in the same region is refused |
 | `rename/conflict-port` | an architecture signal may not take a port name of its entity (case-insensitive) |
 | `rename/conflict-unit` | an entity may not take the name of another design unit of its library |
-| `hover/opaque-unit` | hover still describes a declaration of an opaque unit |
+| `hover/opaque-unit` | hover still shows a declaration of an opaque unit (a protected type: its declaration text) |
 
 | `run/lens-position` | `gohard lsp run --at PATH:LINE:COL`: the Run testbench code lens (`gohard.runTestbench`) on the entity at the position; the result is `gohard lsp sim`'s JSON, and the run writes its trace and repro file (`want/`) |
 | `run/seed` | `gohard lsp run --at PATH:1:1 1`: re-run with a seed; the `sim/race` warning against seed 0, as `gohard lsp sim --seed 1` |
@@ -171,8 +173,10 @@ The navigation cases (`hover/`, `definition/`, `references/`,
 `rename/`) share one project: library `util` in `util/` (a package
 with doc comments, a record, an enumeration, an alias, a function and
 an entity) used from `top.vhd` in `work`. Bundled std/ieee locations
-use the URI `gohard-bundle:///<lib>/<file>.vhdl` (read-only, the text
-of `ide.BundledSource`). `gohard lsp rename` writes the edits;
+are `file://` URIs of the read-only copies the server writes to its
+cache (`$XDG_CACHE_HOME/gohard/bundle/<key>/<lib>/<file>.vhdl`, #33);
+the harness points `XDG_CACHE_HOME` at a temp dir and prints that
+bundle root as `$BUNDLE`. `gohard lsp rename` writes the edits;
 `--dry-run` prints the same WorkspaceEdit and writes nothing; a
 refused rename is a usage error (exit 2) with the reason. Use sites
 keep their letter case: a site spelled like the declaration gets the

@@ -26,7 +26,8 @@ type navStats struct {
 //   - definition(occurrence) is the declaration's location, and it is
 //     in references(definition) (includeDeclaration), as is the
 //     occurrence itself;
-//   - hover there names the declaration (its one-line description);
+//   - hover there names the declaration (resolve.Summary: its
+//     one-line description, or a type's declaration text);
 //   - at an occurrence whose overload is not decided, hover shows the
 //     message of the diagnostic the overload result gives, and that
 //     diagnostic is the one published at the occurrence when sema
@@ -125,7 +126,7 @@ func checkNav(t *testing.T, an *Analysis) navStats {
 				}
 				h := an.HoverAt(q)
 				if h == nil || !strings.Contains(h.Markdown,
-					resolve.Describe(d)) || *h.Span != Span(ref.Span) {
+					resolve.Summary(d)) || *h.Span != Span(ref.Span) {
 					t.Fatalf("%s:%d: hover %v", f.Path, ref.Span.Start, h)
 				}
 				st.hovers++

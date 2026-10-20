@@ -100,8 +100,16 @@ func (an *Analysis) query(q server.Query) (string, int, bool) {
 	if an.Result == nil {
 		return "", 0, false
 	}
-	p, ok := an.Path(q.URI)
-	return p, q.Offset, ok
+	if p, ok := an.Path(q.URI); ok {
+		return p, q.Offset, true
+	}
+	// A bundled file the editor opened (its cached copy, #33).
+	if p, ok := server.BundlePath(q.URI); ok {
+		if f, ok := an.Result.File(p); ok && f.Bundled {
+			return p, q.Offset, true
+		}
+	}
+	return "", 0, false
 }
 
 // At returns the occurrence or defining name at q (position ->

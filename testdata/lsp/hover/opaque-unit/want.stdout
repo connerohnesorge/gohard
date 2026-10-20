@@ -1,1 +1,1 @@
-{"contents":{"kind":"markdown","value":"```vhdl\ntype counter_t\n```"},"range":{"start":{"line":4,"character":11},"end":{"line":4,"character":20}}}
+{"contents":{"kind":"markdown","value":"```vhdl\ntype counter_t is protected\n  procedure inc;\n  impure function get return integer;\nend protected counter_t;\n```\n\nfrom work.counter"},"range":{"start":{"line":4,"character":11},"end":{"line":4,"character":20}}}

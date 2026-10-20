@@ -17,18 +17,16 @@ func init() {
 		server.FeatureReferences | server.FeatureRename)
 }
 
-// BundleScheme is the URI scheme of the bundled std/ieee sources
-// (#33): gohard-bundle:///ieee/numeric_std.vhdl. They are not
-// snapshot documents; the editor opens them read-only with the text
-// from BundledSource.
-const BundleScheme = "gohard-bundle"
-
-// BundledURI returns the URI of the bundled file at bundle path p.
-func BundledURI(p string) string { return BundleScheme + ":///" + p }
+// BundledURI returns the core URI of the bundled file at bundle path
+// p (server.BundleURI, #33): gohard-bundle:///ieee/numeric_std.vhdl.
+// The server sends the file:// URI of the read-only cached copy
+// instead, and maps that copy back to this URI when the editor opens
+// it, so queries in it are queries in the bundled unit.
+func BundledURI(p string) string { return server.BundleURI(p) }
 
 // BundledSource returns the text of the bundled file at uri.
 func BundledSource(uri string) ([]byte, bool) {
-	p, ok := strings.CutPrefix(uri, BundleScheme+":///")
+	p, ok := server.BundlePath(uri)
 	if !ok {
 		return nil, false
 	}

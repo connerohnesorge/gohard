@@ -216,9 +216,17 @@ Navigation (hover, definition, references, rename) is `resolve` over
 the snapshot's sema result. A declaration and its completions (body,
 full constant, package body, and a subprogram's parameters and
 generics in both) are one entity for references and rename. Bundled
-std/ieee locations carry the URI `gohard-bundle:///<path>` and their
-own line index (`server.Location.Lines`); the editor opens them
-read-only with `ide.BundledSource`. A rename is refused (the server
+std/ieee locations carry the core URI `gohard-bundle:///<path>` and
+their own line index (`server.Location.Lines`). That URI never reaches
+the client: the first outgoing message naming one makes the Driver
+write the bundled files, read-only (0444) and checked against their
+integrity hashes, to `$XDG_CACHE_HOME/gohard/bundle/<key>/` (falling
+back to `~/.cache`, `%LocalAppData%` or `~/Library/Caches`;
+`stdlib.CacheRoot`) and send their `file://` URIs, and every client
+message naming a file there is mapped back to the bundle URI, so an
+opened copy is the bundled unit, never a `work` file. When the cache
+cannot be written the client gets one `window/showMessage` error and
+bundled locations are left out. A rename is refused (the server
 answers RequestFailed, `gohard lsp rename` exits 2) for bundled,
 predefined and library names, declarations of opaque units, stand-ins
 named like an opaque unit, and extended identifiers; each use site

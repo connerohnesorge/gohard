@@ -1,0 +1,2 @@
+# an enumeration type: its declaration with the literals and the unit it is from.
+gohard lsp hover --at top.vhd:17:22

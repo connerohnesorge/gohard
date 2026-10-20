@@ -12,7 +12,7 @@ trap 'rm -rf "$tmp"' EXIT
 
 (cd "$root" && go build -o "$tmp/gohard" ./cmd/gohard)
 mkdir -p "$tmp/work"
-for d in wait_forms assert_fail; do
+for d in wait_forms assert_fail md_resolve; do
 	cp -R "$root/testdata/corpus/$d" "$tmp/work/$d"
 	rm -rf "$tmp/work/$d/golden"
 done

@@ -115,6 +115,17 @@ end
 
 local function root_dir(bufnr)
   local fname = vim.api.nvim_buf_get_name(bufnr)
+  -- A read-only bundled std/ieee file the server wrote to its cache
+  -- (go-to-definition into ieee): keep it on the client that sent us
+  -- there, so it is queried as the bundled unit of that project.
+  if fname:gsub('\\', '/'):find('/gohard/bundle/', 1, true) then
+    local cur = vim.lsp.get_clients({ name = 'gohard',
+      bufnr = vim.fn.bufnr('#') })[1] or
+      vim.lsp.get_clients({ name = 'gohard' })[1]
+    if cur and cur.root_dir then
+      return cur.root_dir
+    end
+  end
   local found = vim.fs.find(M.options.root_markers, {
     path = vim.fs.dirname(fname),
     upward = true,

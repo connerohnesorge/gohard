@@ -1,0 +1,1 @@
+{"contents":{"kind":"markdown","value":"```vhdl\ntype xfer_t is record\n  addr : natural;\n  -- The data byte.\n  data : std_logic_vector(7 downto 0);\nend record xfer_t;\n```\n\nfrom util.util_pkg\n\nA bus transfer."},"range":{"start":{"line":17,"character":34},"end":{"line":17,"character":40}}}

@@ -1,0 +1,1 @@
+{"contents":{"kind":"markdown","value":"```vhdl\ntype state_t is (idle, busy, done);\n```\n\nfrom util.util_pkg\n\nThe controller states."},"range":{"start":{"line":16,"character":20},"end":{"line":16,"character":27}}}
