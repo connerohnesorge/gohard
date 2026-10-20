@@ -48,6 +48,7 @@ type harness struct {
 	s    State
 	sent []sent
 	exit int
+	hold bool // drop LoadConfig and LoadWorkspace: loads never finish
 }
 
 type sent struct {
@@ -81,10 +82,16 @@ func (h *harness) step() bool {
 			h.sent = append(h.sent, sent{e.Msg, h.s.Snapshot().ID,
 				h.s.Now()})
 		case LoadConfig:
+			if h.hold {
+				continue
+			}
 			l := config.Loaded{Root: e.Folder, Found: config.FoundStart,
 				Config: config.Defaults()}
 			h.s = h.s.Push(ConfigLoaded{l}, PriorityResult)
 		case LoadWorkspace:
+			if h.hold {
+				continue
+			}
 			h.s = h.s.Push(WorkspaceLoaded{Root: e.Root},
 				PriorityResult)
 		case Exit:

@@ -17,7 +17,8 @@ import (
 //   - every request gets at most one response (a client that reuses an
 //     ID gets one per request; errors for messages without a readable
 //     ID use the null ID and may repeat), and every request sent
-//     before shutdown gets exactly one;
+//     before shutdown, or before exit, gets exactly one (the server
+//     reads nothing after exit);
 //   - every response after the initialize result, and every
 //     publishDiagnostics, is followed by $/gohard/snapshot naming it;
 //   - snapshot IDs never decrease;
@@ -30,7 +31,7 @@ func checkSession(client, srv []json.RawMessage) []string {
 	}
 	sent := map[string]int{} // requests per ID the client sent
 	mustAnswer := map[string]bool{}
-	shutdown := false
+	shutdown, exited := false, false
 	for _, raw := range client {
 		m, err := jsonrpc2.Decode(raw)
 		var de *jsonrpc2.DecodeError
@@ -38,8 +39,12 @@ func checkSession(client, srv []json.RawMessage) []string {
 			sent[de.ID.String()]++ // answered with an error
 			continue
 		}
+		if n, ok := m.(*jsonrpc2.Notification); ok && err == nil &&
+			n.Method == "exit" {
+			exited = true // the server reads nothing after exit
+		}
 		r, ok := m.(*jsonrpc2.Request)
-		if err != nil || !ok {
+		if err != nil || !ok || exited {
 			continue
 		}
 		sent[r.ID.String()]++
@@ -50,7 +55,7 @@ func checkSession(client, srv []json.RawMessage) []string {
 			shutdown = true
 		}
 	}
-	if !shutdown {
+	if !shutdown && !exited {
 		mustAnswer = map[string]bool{}
 	}
 	answered := map[string]int{}

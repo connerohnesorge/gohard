@@ -143,14 +143,19 @@ func (s *State) initialized(o *out) {
 
 func (s *State) shutdown(o *out, m call) {
 	s.phase = phaseShutdown
+	s.cancelRequests(o, "the server is shutting down")
+	s.dropWork(s.diagWork)
+	s.respond(o, m.id, nil)
+}
+
+// cancelRequests answers every request still running or parked (on
+// the workspace load or a reread) with RequestCancelled and drops it.
+func (s *State) cancelRequests(o *out, msg string) {
 	for _, k := range sortedKeys(s.byRequest) {
 		w := s.work[s.byRequest[k]]
 		s.finish(o, w)
-		s.fail(o, w.reqID, jsonrpc2.CodeRequestCancelled,
-			"the server is shutting down")
+		s.fail(o, w.reqID, jsonrpc2.CodeRequestCancelled, msg)
 	}
-	s.dropWork(s.diagWork)
-	s.respond(o, m.id, nil)
 }
 
 // configLoaded stores gohard.yaml, publishes its diagnostics, merges

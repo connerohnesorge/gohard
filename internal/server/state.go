@@ -372,6 +372,9 @@ func (s *State) exit(o *out) {
 	if s.phase == phaseShutdown {
 		code = 0
 	}
+	// Exit without shutdown: every request still running or parked
+	// gets its one response before the session ends (#25).
+	s.cancelRequests(o, "the server is exiting")
 	s.phase = phaseExited
 	s.work, s.byRequest, s.diagWork = nil, nil, 0
 	s.queue = Queue{}
