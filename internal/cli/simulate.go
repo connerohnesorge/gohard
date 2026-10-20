@@ -223,7 +223,9 @@ func header(inv *Invocation, in simInput, out simrun.Outcome) (
 	repro.Header, error,
 ) {
 	s := in.cfg.Simulation
-	h := repro.Header{Version: Version, Standard: in.cfg.Standard,
+	b := inv.build()
+	h := repro.Header{Version: b.Version, Commit: b.Commit, IEEE: b.IEEE,
+		Go: b.Go, Standard: in.cfg.Standard,
 		Testbench: out.Testbench, Seed: out.Seed,
 		Defines: map[string]string{}, Models: map[string]string{}}
 	h.Budgets.Time, h.Budgets.Delta, h.Budgets.Step = simrun.Budgets(s)

@@ -1,4 +1,4 @@
-{"schema":1,"version":"0.0.0-test","standard":"2008","testbench":"","seed":0,"defines":{},"budgets":{"time":"1 ms","delta":10000,"step":50000000},"models":{},"config":null,"sources":[]}
+{"schema":1,"version":"0.0.0-test","commit":"unknown","ieee":"1076-2019 16a012320947d378611cc7457f64ed76cb52bac4","go":"unknown","standard":"2008","testbench":"","seed":0,"defines":{},"budgets":{"time":"1 ms","delta":10000,"step":50000000},"models":{},"config":null,"sources":[]}
 {"$gohard":"analyzer","name":"echo"}
 {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":null,"rootUri":"file:///work","capabilities":{"general":{"positionEncodings":["utf-16","utf-8"]}}}}
 {"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///work/top.vhd","languageId":"vhdl","version":1,"text":"-- é😀 x\nentity top is end;\n"}}}

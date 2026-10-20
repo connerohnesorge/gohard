@@ -163,4 +163,6 @@ jobs:
           cd "$RUNNER_TEMP"
           go install \
             "github.com/connerohnesorge/gohard/cmd/gohard@$SHA"
-          "$GOPATH/bin/gohard" version
+          "$GOPATH/bin/gohard" version | tee version.txt
+          # The pseudo-version names the commit (#39).
+          grep -qx "commit ${SHA:0:12}" version.txt

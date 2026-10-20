@@ -13,6 +13,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
 	"github.com/connerohnesorge/gohard/internal/repro"
 	"github.com/connerohnesorge/gohard/internal/span"
+	"github.com/connerohnesorge/gohard/internal/stdlib"
 	"github.com/connerohnesorge/gohard/internal/trace"
 	"github.com/connerohnesorge/gohard/internal/trace/waveform"
 	"github.com/connerohnesorge/gohard/internal/workspace"
@@ -497,7 +498,8 @@ func (s *State) waveformOpened(o *out, e WaveformOpened) {
 // text: the hashes are of the text that was simulated.
 func (s *State) reproHeader(tb string, seed uint64) repro.Header {
 	c := s.snap.Config
-	h := repro.Header{Version: s.opts.Version, Standard: c.Standard,
+	h := repro.Header{Version: s.opts.Version, Commit: s.opts.Commit,
+		IEEE: stdlib.IEEE(), Go: s.opts.Go, Standard: c.Standard,
 		Testbench: tb, Seed: seed, Defines: map[string]string{},
 		Models: map[string]string{}}
 	sm := c.Simulation

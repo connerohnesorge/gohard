@@ -3,8 +3,8 @@
 // and the language-server session file `<n>.jsonl`, whose first line
 // carries the same header.
 //
-// A header names everything a run depends on: the gohard version, the
-// standard, the testbench, the seed, the defines, the budgets and
+// A header names everything a run depends on: the gohard version,
+// commit and Go toolchain, the bundled IEEE library, the standard, the testbench, the seed, the defines, the budgets and
 // models in effect, and the sha256 of every source file and of
 // gohard.yaml. Encoding is canonical (fixed key order, sorted maps and
 // sources), so the same run always writes the same bytes, and reading
@@ -51,6 +51,15 @@ type Header struct {
 	Schema int `json:"schema"`
 	// Version is the gohard version that recorded the run.
 	Version string `json:"version"`
+	// Commit is the commit the gohard binary was built from, with a
+	// "-dirty" suffix for a modified tree, or "unknown" (#39).
+	Commit string `json:"commit"`
+	// IEEE is the bundled IEEE library, "<tag> <commit>" (stdlib.IEEE),
+	// or "unknown".
+	IEEE string `json:"ieee"`
+	// Go is the Go toolchain that built the binary, such as "go1.27.2",
+	// or "unknown".
+	Go string `json:"go"`
 	// Standard is the VHDL standard, for example "2008".
 	Standard string `json:"standard"`
 	// Testbench is the simulated top unit; empty in an LSP session
@@ -120,10 +129,20 @@ func encodeJSON(v any, indent string) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-// canonical returns h with its schema set, empty collections non-nil
-// and sources sorted. It never modifies the caller's slices.
+// Unknown is the value recorded for a build fact the binary does not
+// know (#39).
+const Unknown = "unknown"
+
+// canonical returns h with its schema set, unknown build facts written
+// as Unknown, empty collections non-nil and sources sorted. It never
+// modifies the caller's slices.
 func canonical(h Header) Header {
 	h.Schema = Schema
+	for _, f := range []*string{&h.Commit, &h.IEEE, &h.Go} {
+		if *f == "" {
+			*f = Unknown
+		}
+	}
 	if h.Defines == nil {
 		h.Defines = map[string]string{}
 	}

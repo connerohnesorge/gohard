@@ -237,7 +237,8 @@ func TestOutputFile(t *testing.T) {
 		t.Fatalf("exit %d", code)
 	}
 	b, _ := os.ReadFile(filepath.Join(dir, "v.txt"))
-	if string(b) != "gohard "+Version+"\n" || out.Len() != 0 {
+	if !strings.HasPrefix(string(b), "version "+Version+"\ncommit ") ||
+		out.Len() != 0 {
 		t.Fatalf("file %q, stdout %q", b, out)
 	}
 	ents, _ := os.ReadDir(dir)

@@ -15,6 +15,10 @@
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
       version = "1.0.0";
+      # The source copy has no .git, so the Go build info has no
+      # vcs.revision: pass the flake's commit (#39). A dirty tree has
+      # only dirtyRev ("<sha>-dirty"); with neither, gohard says unknown.
+      commit = self.rev or self.dirtyRev or "";
       gohard = (pkgs.buildGoModule.override {go = pkgs.go_1_27;}) {
         pname = "gohard";
         inherit version;
@@ -27,6 +31,7 @@
           "-s"
           "-w"
           "-X github.com/connerohnesorge/gohard/internal/cli.Version=${version}"
+          "-X github.com/connerohnesorge/gohard/internal/cli.Commit=${commit}"
         ];
         doCheck = false;
         meta = {

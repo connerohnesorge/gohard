@@ -2,9 +2,12 @@ package cli
 
 import (
 	"errors"
+	"io"
 	"io/fs"
 	"path/filepath"
+	"slices"
 
+	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/format"
@@ -38,13 +41,23 @@ func init() { lookup("fmt").Run = runFmt }
 // files (unless --allow-empty) exit 2 (#20); the files that were found
 // are still formatted. --define sets conditional-analysis identifiers,
 // which decide the inactive branches left unchanged.
+//
+// `gohard fmt -` formats standard input instead (fmtStdin).
 func runFmt(inv *Invocation) Result {
+	stdin := slices.Contains(inv.Args, stdinPath)
+	if stdin && len(inv.Args) > 1 {
+		return inv.usage("gohard fmt - reads standard input and takes " +
+			"no other paths")
+	}
 	r := inv.NewReport()
 	l := inv.LoadConfig()
 	r.Diagnostics = append(r.Diagnostics, l.Diagnostics...)
 	r.Source = sources(l, nil)
 	if !l.Valid() {
 		return Result{Report: r}
+	}
+	if stdin {
+		return fmtStdin(inv, r, l)
 	}
 	fsys := inv.Env.FS
 	cwd, err := fsys.Getwd()
@@ -98,6 +111,63 @@ func runFmt(inv *Invocation) Result {
 		}
 	}
 	return Result{Report: r}
+}
+
+// stdinPath is the PATH argument that means standard input, and
+// stdinName the path diagnostics show for it.
+const (
+	stdinPath = "-"
+	stdinName = "<stdin>"
+)
+
+// fmtStdin is `gohard fmt [--check] -` (#42): it formats standard
+// input with the gohard.yaml of the project root of the current
+// directory and writes the result to standard output, exit 0, for
+// editors and pre-commit hooks that pipe a buffer through the
+// formatter. With --check it writes nothing and exits 1 with
+// format/would-change when the input would change, 0 when it would
+// not. Input that does not parse is format/not-parsed with its syntax
+// diagnostics (exit 1) and is not echoed, so a caller that checks the
+// exit code never replaces its buffer with diagnostics. Input over
+// the 10 MB limit is workspace/file-too-large plus format/not-parsed.
+func fmtStdin(inv *Invocation, r *diag.Report, l config.Loaded) Result {
+	r.Files = 1
+	var text []byte
+	if in := inv.Env.Transport.Stdin; in != nil {
+		var err error
+		text, err = io.ReadAll(io.LimitReader(in,
+			workspace.MaxFileSize+1))
+		if err != nil {
+			r.Diagnostics = append(r.Diagnostics,
+				workspace.Unreadable(stdinName, err))
+			return Result{Report: r}
+		}
+	}
+	src := workspace.Source{File: workspace.File{Path: stdinName,
+		Name: stdinPath, Size: int64(len(text))}, Text: text}
+	r.Source = sources(l, []workspace.Source{src})
+	if src.Size > workspace.MaxFileSize {
+		r.Diagnostics = append(r.Diagnostics,
+			workspace.TooLarge(stdinName, src.Size,
+				workspace.MaxFileSize).At(stdinName, 0, 0),
+			diag.New(diag.FormatNotParsed).At(stdinName, 0, 0))
+		return Result{Report: r}
+	}
+	o := formatSource(src, parser.FromConfig(l.Config, Version),
+		format.FromConfig(l.Config))
+	r.Diagnostics = append(r.Diagnostics, o.diags...)
+	switch {
+	case o.res == nil:
+		return Result{Report: r}
+	case inv.Bool("check"):
+		if o.res.Changed() {
+			r.Diagnostics = append(r.Diagnostics,
+				wouldChange(src, o.res.Edits[0]))
+			return Result{Report: r}
+		}
+		return Result{}
+	}
+	return Result{Stdout: o.res.Text}
 }
 
 // fmtOutcome is the formatting of one file: its parser diagnostics, and

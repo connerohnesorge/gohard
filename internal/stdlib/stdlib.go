@@ -10,10 +10,10 @@ import (
 // sources holds the vendored IEEE-P1076 files, their license files and
 // the data files of this package, exactly as committed (.gitattributes
 // keeps git from converting line endings, so the hashes hold on every
-// OS).
+// OS). README.md is embedded for its Source table (Upstream).
 //
 //go:embed std/*.vhdl ieee/*.vhdl LICENSE AUTHORS.md SHA256SUMS
-//go:embed firststd.tsv
+//go:embed firststd.tsv README.md
 var sources embed.FS
 
 // File is one bundled VHDL source file.
@@ -120,4 +120,57 @@ func validName(p string) bool {
 // IsLibrary reports whether name (any case) is a bundled library.
 func IsLibrary(name string) bool {
 	return slices.Contains(Libraries, strings.ToLower(name))
+}
+
+// Upstream returns the upstream tag and commit of the vendored files,
+// read from the Tag and Commit rows of the Source table in the embedded
+// README.md, so the pin is written down once. Either is "" when the
+// table lacks it; TestUpstream requires both.
+func Upstream() (tag, commit string) {
+	raw, err := sources.ReadFile("README.md")
+	if err != nil {
+		return "", ""
+	}
+	return parseUpstream(string(raw))
+}
+
+// parseUpstream reads the first code span of the "| Tag |" and
+// "| Commit |" table rows.
+func parseUpstream(s string) (tag, commit string) {
+	for line := range strings.Lines(s) {
+		cells := strings.Split(strings.TrimSpace(line), "|")
+		if len(cells) < 3 || cells[0] != "" {
+			continue
+		}
+		_, v, ok := strings.Cut(cells[2], "`")
+		if !ok {
+			continue
+		}
+		v, _, ok = strings.Cut(v, "`")
+		if !ok {
+			continue
+		}
+		switch strings.TrimSpace(cells[1]) {
+		case "Tag":
+			if tag == "" {
+				tag = v
+			}
+		case "Commit":
+			if commit == "" {
+				commit = v
+			}
+		}
+	}
+	return tag, commit
+}
+
+// IEEE describes the bundled IEEE library as "<tag> <commit>", for
+// `gohard version` and the repro header (#39), or "unknown" when the
+// README table lacks either.
+func IEEE() string {
+	tag, commit := Upstream()
+	if tag == "" || commit == "" {
+		return "unknown"
+	}
+	return tag + " " + commit
 }

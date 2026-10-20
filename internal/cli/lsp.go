@@ -39,7 +39,9 @@ var newAnalyzer = func(inv *Invocation) (server.Analyzer,
 
 func serverOptions(inv *Invocation) server.Options {
 	an, sim := newAnalyzer(inv)
-	return server.Options{Analyzer: an, Simulator: sim, Version: Version}
+	b := inv.build()
+	return server.Options{Analyzer: an, Simulator: sim, Version: Version,
+		Commit: b.Commit, Go: b.Go}
 }
 
 // runLSP is `gohard lsp` (#25, #26): with no arguments the stdio
@@ -141,6 +143,8 @@ func (r *recording) open() error {
 	if err != nil {
 		return err
 	}
+	b := r.inv.build()
+	h.Commit, h.Go = b.Commit, b.Go
 	if err := fsys.MkdirAll(r.dir, 0o755); err != nil {
 		return err
 	}

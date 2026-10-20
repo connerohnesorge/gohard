@@ -1,6 +1,9 @@
 {
   "schema": 1,
   "version": "0.0.0-dev",
+  "commit": "unknown",
+  "ieee": "1076-2019 16a012320947d378611cc7457f64ed76cb52bac4",
+  "go": "unknown",
   "standard": "2008",
   "testbench": "sev_tb",
   "seed": 3,

@@ -175,6 +175,9 @@ func runOnce(t tb, dir string, args []string,
 	if st.hostOS != "" {
 		ctx = libs.WithHost(ctx, st.hostOS, st.hostRoot)
 	}
+	if b := st.build; b != nil {
+		ctx = cli.WithBuildInfo(ctx, b.version, b.commit, b.bi)
+	}
 	for _, p := range st.tamper {
 		ctx = stdlib.WithTamper(ctx, p)
 	}

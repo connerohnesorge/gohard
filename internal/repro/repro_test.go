@@ -21,6 +21,9 @@ import (
 func sample() Header {
 	return Header{
 		Version:   "1.0.0",
+		Commit:    "a57bb0b24672e1f7e6c1b0d2f0a3b4c5d6e7f809-dirty",
+		IEEE:      "1076-2019 16a012320947d378611cc7457f64ed76cb52bac4",
+		Go:        "go1.27.2",
 		Standard:  "2008",
 		Testbench: "tb_top",
 		Seed:      18446744073709551615,
@@ -38,6 +41,9 @@ func sample() Header {
 const golden = `{
   "schema": 1,
   "version": "1.0.0",
+  "commit": "a57bb0b24672e1f7e6c1b0d2f0a3b4c5d6e7f809-dirty",
+  "ieee": "1076-2019 16a012320947d378611cc7457f64ed76cb52bac4",
+  "go": "go1.27.2",
   "standard": "2008",
   "testbench": "tb_top",
   "seed": 18446744073709551615,
@@ -98,7 +104,8 @@ func TestEmptyCollections(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := `{"schema":1,"version":"","standard":"","testbench":"",` +
+	want := `{"schema":1,"version":"","commit":"unknown",` +
+		`"ieee":"unknown","go":"unknown","standard":"","testbench":"",` +
 		`"seed":0,"defines":{},"budgets":{"time":"0 fs","delta":1,` +
 		`"step":1},` +
 		`"models":{},"config":null,"sources":[]}` + "\n"

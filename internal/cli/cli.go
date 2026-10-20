@@ -31,8 +31,13 @@ import (
 // Version is the gohard release version. It is also the value of the
 // TOOL_VERSION conditional-analysis identifier (#31) and is recorded in
 // repro files (#29). Release builds set it with
-// -ldflags "-X github.com/connerohnesorge/gohard/internal/cli.Version=…".
-var Version = "0.0.0-dev"
+// -ldflags "-X github.com/connerohnesorge/gohard/internal/cli.Version=…";
+// otherwise SetBuildInfo takes the module version (version.go).
+var Version = devVersion
+
+// devVersion is Version when neither -ldflags nor the module version
+// sets it.
+const devVersion = "0.0.0-dev"
 
 // Invocation is what a command's Run receives.
 type Invocation struct {

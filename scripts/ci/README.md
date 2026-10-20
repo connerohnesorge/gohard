@@ -78,6 +78,21 @@ workflow, so set the secret `FUZZ_PR_TOKEN` (fine-grained, contents and
 pull-requests write) for the PR to show its red checks. Local dry run:
 `FUZZ_OPEN_PR=0 bash scripts/ci/fuzz.sh FuzzIndex ./internal/span local 30s`.
 
+## Release workflow (`release.yml`)
+
+Triggers: `v*` tags. It first runs `goreleaser release --snapshot
+--clean` and `archive-check.sh dist`, which lists every archive and
+fails if one lacks the binary, `internal/stdlib/LICENSE` or
+`internal/stdlib/AUTHORS.md` (the IEEE-P1076 license the binary embeds,
+#40), or the root `LICENSE` and `AUTHORS.md` once those files exist
+(#38). Only then does it run the real `goreleaser release --clean`.
+Local check:
+
+```
+nix run nixpkgs#goreleaser -- release --snapshot --clean
+bash scripts/ci/archive-check.sh
+```
+
 ## Rules (#30)
 
 * CI downloads nothing beyond checking out submodules and the Go module

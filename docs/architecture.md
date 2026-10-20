@@ -151,14 +151,15 @@ wipes existing GitHub alerts.
 | Command | Purpose | Owner |
 | --- | --- | --- |
 | `gohard check [PATH...]` | parse and analyze; `--sim`, `--tb`, `--seed N\|random`, `--repro FILE`, `--strict`, `--define`, `--allow-empty` | #20, #34, #35, #29 |
-| `gohard fmt [--check] [PATH...]` | format in place (temp file + rename) or check | #32 |
+| `gohard fmt [--check] [PATH...]` | format in place (temp file + rename) or check; `gohard fmt [--check] -` formats stdin to stdout with the `gohard.yaml` of the current directory's project | #32, #42 |
 | `gohard parse --dump FILE` | stable tree dump | #31 |
 | `gohard config check\|schema` | config diagnostics; JSON schema | #28 |
 | `gohard lsp` | stdio LSP 3.17 server; `--record DIR` | #25 |
 | `gohard lsp <action> --at PATH:LINE:COL` | one LSP action on the server's code path; `lsp sim`, `lsp replay FILE` | #26 |
 | `gohard trace export --format vcd\|fst` | export a native trace | #36 |
 | `gohard libs detect [--write]` | find vendor library sources | #1 |
-| `gohard version`, `gohard help [COMMAND]` | | #20 |
+| `gohard version` | prints `version`, `commit`, `ieee` (bundled IEEE tag and commit) and `go` lines; `unknown` when not known | #20, #39 |
+| `gohard help [COMMAND]` | | #20 |
 
 Global flags: `-p/--jobs N`, `--output FILE`, `-h/--help`. There is no
 `gohard sim`; `--env` and `--real-env` are v1.1 (#18). A command that is

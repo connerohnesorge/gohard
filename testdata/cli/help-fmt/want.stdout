@@ -1,0 +1,16 @@
+Usage:
+  gohard fmt [flags] [PATH... | -]
+
+Format VHDL files in place (- for stdin to stdout), or check formatting.
+
+Flags:
+      --allow-empty        exit 0 when no VHDL files are found
+      --check              write nothing; exit 1 if a file would change
+      --define NAME=VALUE  define a conditional-analysis identifier (overrides defines:); repeatable
+      --format FORMAT      diagnostic output format: text, json or sarif (default text)
+      --strict             exit 1 on any warning (hints never fail a run)
+
+Global flags:
+  -h, --help         show help
+  -p, --jobs N       run at most N parallel jobs (output never depends on N)
+      --output FILE  write standard output to FILE (a temp file, then rename)

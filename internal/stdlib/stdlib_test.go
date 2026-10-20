@@ -441,3 +441,20 @@ func TestInternalErrorHook(t *testing.T) {
 		t.Errorf("messages: %q, %q", ds[0].Message, ds[1].Message)
 	}
 }
+
+// TestUpstream: the README's Source table names the pinned tag and a
+// full commit, and IEEE reports them; a table without them is unknown.
+func TestUpstream(t *testing.T) {
+	tag, commit := Upstream()
+	if tag != "1076-2019" || len(commit) != 40 ||
+		strings.Trim(commit, "0123456789abcdef") != "" {
+		t.Fatalf("Upstream() = %q, %q", tag, commit)
+	}
+	if got := IEEE(); got != tag+" "+commit {
+		t.Errorf("IEEE() = %q", got)
+	}
+	if tag, commit := parseUpstream("| Tag | none |\n"); tag != "" ||
+		commit != "" {
+		t.Errorf("parseUpstream without code spans = %q, %q", tag, commit)
+	}
+}

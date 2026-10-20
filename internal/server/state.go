@@ -33,6 +33,10 @@ type Options struct {
 	Analyzer Analyzer
 	// Version is reported in serverInfo.
 	Version string
+	// Commit and Go are the commit and Go toolchain gohard was built
+	// from, recorded in the repro headers of editor runs (#39); "" is
+	// recorded as unknown.
+	Commit, Go string
 	// Simulator, when set, runs testbenches in the editor: code
 	// lenses, the Open waveform code action and the gohard.* commands
 	// (sim.go, #25, #35, #36).

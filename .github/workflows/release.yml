@@ -23,6 +23,17 @@ jobs:
           go-version: '1.27.x'
           check-latest: false
 
+      # Build the archives first and check each one carries the license
+      # files (#40), so a broken file list never publishes.
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --snapshot --clean
+
+      - name: Check the archive contents
+        run: bash scripts/ci/archive-check.sh dist
+
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser

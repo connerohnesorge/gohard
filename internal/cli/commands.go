@@ -76,8 +76,9 @@ var commands = []Command{
 		Flags:   []Flag{defineFlag, formatFlag, strictFlag},
 	},
 	{
-		Name: "fmt", Args: "[PATH...]",
-		Summary: "format VHDL files in place, or check formatting",
+		Name: "fmt", Args: "[PATH... | -]",
+		Summary: "format VHDL files in place (- for stdin to " +
+			"stdout), or check formatting",
 		Flags: []Flag{
 			{
 				Name: "allow-empty", Kind: Bool,
@@ -168,7 +169,8 @@ var commands = []Command{
 		},
 	},
 	{
-		Name: "version", Summary: "print the gohard version",
+		Name: "version", Summary: "print the version, commit, IEEE " +
+			"library and Go toolchain",
 		Run: runVersion,
 	},
 }

@@ -8,10 +8,12 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 	"slices"
 	"strconv"
 	"strings"
 
+	"github.com/connerohnesorge/gohard/internal/cli"
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/env/simenv"
 	"github.com/connerohnesorge/gohard/internal/simrun"
@@ -48,9 +50,57 @@ type setup struct {
 	// a host of that OS whose file-system root is the folder hostRoot
 	// (libs.WithHost, #1).
 	hostOS, hostRoot string
+	// build, when set, is the -ldflags values and Go build info of
+	// the binary under test (cli.WithBuildInfo, #39).
+	build *buildInfo
 	// restore lists paths chmod made unreadable; restorePerms makes
 	// them readable again after the run.
 	restore []string
+}
+
+// buildInfo is a `build-info` directive.
+type buildInfo struct {
+	version, commit string // -ldflags values
+	bi              *debug.BuildInfo
+}
+
+// parseBuildInfo parses the KEY=VALUE words of a build-info directive:
+// ldflags.version and ldflags.commit are the -ldflags values; go,
+// main.version and vcs.* fill a debug.BuildInfo, which is nil when none
+// of them is given.
+func parseBuildInfo(words []string) (*buildInfo, bool) {
+	out := &buildInfo{}
+	var bi debug.BuildInfo
+	seen := false
+	for _, w := range words {
+		k, v, ok := strings.Cut(w, "=")
+		if !ok {
+			return nil, false
+		}
+		switch {
+		case k == "ldflags.version":
+			out.version = v
+		case k == "ldflags.commit":
+			out.commit = v
+		case k == "go":
+			bi.GoVersion, seen = v, true
+		case k == "main.version":
+			bi.Main.Version, seen = v, true
+		case strings.HasPrefix(k, "vcs"):
+			bi.Settings = append(bi.Settings,
+				debug.BuildSetting{Key: k, Value: v})
+			seen = true
+		default:
+			return nil, false
+		}
+	}
+	if out.version == "" {
+		out.version = cli.Version
+	}
+	if seen {
+		out.bi = &bi
+	}
+	return out, true
 }
 
 // restorePerms undoes the chmod directives so the temp dir can be read
@@ -188,6 +238,12 @@ func applySetup(t tb, dir, work string) setup {
 			st.broken = true
 		case line == "stdout full":
 			st.full = true
+		case f[0] == "build-info":
+			b, ok := parseBuildInfo(f[1:])
+			if !ok {
+				bad()
+			}
+			st.build = b
 		case f[0] == "tamper-stdlib" && len(f) == 2:
 			st.tamper = append(st.tamper, f[1])
 		case f[0] == "stdlib-internal-error" && len(f) == 2:

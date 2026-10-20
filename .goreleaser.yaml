@@ -18,6 +18,10 @@ builds:
     ldflags:
       - -s -w
       - -X github.com/connerohnesorge/gohard/internal/cli.Version={{.Version}}
+      # `gohard version` and the repro headers show the commit (#39). A
+      # release refuses a dirty tree, so there is no -dirty suffix here
+      # (and goreleaser reports a snapshot's tree as clean anyway).
+      - -X github.com/connerohnesorge/gohard/internal/cli.Commit={{.FullCommit}}
     # Reproducible: file times come from the commit, not the clock.
     mod_timestamp: "{{ .CommitTimestamp }}"
 
@@ -28,9 +32,20 @@ archives:
       - goos: windows
         formats: [zip]
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    # scripts/ci/archive-check.sh fails the release when an archive lacks
+    # the IEEE license files (#40).
     files:
       - README.md
       - docs/editors.md
+      # The binary embeds the Apache-2.0 IEEE-P1076 packages, so their
+      # license and copyright holders ship with it.
+      - internal/stdlib/LICENSE
+      - internal/stdlib/AUTHORS.md
+      # The project license and authors (#38). They are globs on
+      # purpose: a glob that matches nothing adds nothing, so the build
+      # passes until the files are added, and then picks them up.
+      - LICENS[E]
+      - AUTHORS.m[d]
 
 checksum:
   name_template: checksums.txt

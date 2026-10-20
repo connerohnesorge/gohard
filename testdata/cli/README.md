@@ -37,6 +37,7 @@ trees, and must match the committed files.
 | `requires interpreter` | Skips the case while no sequential interpreter is registered (`simrun.DefaultCode` is nil); the case's want files are created with `-update` once it is. |
 | `stdout broken` | Standard output fails every write, like a closed pipe (`env.ErrBrokenPipe`): the run keeps its exit code. |
 | `stdout full` | Standard output fails every write, like a full disk: the run logs `cli/output-failed` and exits 2. |
+| `build-info [KEY=VALUE...]` | `gohard version` and the repro and session headers describe a binary built with these facts, through the `cli.WithBuildInfo` context hook (#39). `ldflags.version` and `ldflags.commit` are the `-ldflags` values (as goreleaser and Nix set them); `go`, `main.version` and `vcs.revision`, `vcs.modified` (any `vcs.*` key) fill the Go build info, which is absent when none of them is given. Without the directive the run shows the commit and toolchain as `unknown`, so fixtures stay stable across toolchains. |
 | `tamper-stdlib PATH` | The bundled std/ieee file PATH (as `ieee/numeric_std.vhdl`) fails its integrity check, through the `stdlib.WithTamper` context hook (#33): the run reports `stdlib/integrity` and exits 2. |
 | `stdlib-internal-error PATH` | The bundled file PATH (such as `ieee/numeric_std.vhdl`) reports an analysis error, through the `stdlib.WithInternalError` context hook: the run reports `stdlib/internal-error` and exits 2 (#20, #33). |
 | `panic-on-read PATH` | Reading a file whose path ends in `/PATH` panics, to reach the crash path. |

@@ -1,0 +1,1 @@
+build-info ldflags.version=1.2.3 ldflags.commit=a57bb0b24672e1f7e6c1b0d2f0a3b4c5d6e7f809 go=go1.27.2 main.version=(devel) vcs.revision=a57bb0b24672e1f7e6c1b0d2f0a3b4c5d6e7f809 vcs.modified=false

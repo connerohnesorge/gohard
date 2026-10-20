@@ -15,6 +15,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/env/simenv"
 	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
 	"github.com/connerohnesorge/gohard/internal/repro"
+	"github.com/connerohnesorge/gohard/internal/stdlib"
 	"github.com/connerohnesorge/gohard/internal/workspace"
 )
 
@@ -35,7 +36,8 @@ func SessionFolder(bodies [][]byte, dir string) string {
 }
 
 // SessionHeader builds the header of a recorded session (#29): the
-// version, the configuration of the project of folder (standard, seed,
+// version, the bundled IEEE library (the caller sets the commit and Go
+// toolchain, #39), the configuration of the project of folder (standard, seed,
 // defines, budgets, models) and the hashes of gohard.yaml and of every
 // VHDL file the server reads.
 func SessionHeader(e env.Env, folder, version string) (repro.Header,
@@ -45,6 +47,7 @@ func SessionHeader(e env.Env, folder, version string) (repro.Header,
 	c := l.Config
 	h := repro.Header{
 		Version:  version,
+		IEEE:     stdlib.IEEE(),
 		Standard: c.Standard,
 		Seed:     c.Simulation.Seed,
 		Defines:  map[string]string{},

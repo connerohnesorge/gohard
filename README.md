@@ -17,11 +17,21 @@ Pick one:
 * Nix: `nix profile install github:connerohnesorge/gohard`, or
   `nix run github:connerohnesorge/gohard -- version`.
 
-Then run `gohard version`.
+Then run `gohard version`. It prints the version, the commit, the
+bundled IEEE library tag and commit, and the Go toolchain:
+
+```
+version 1.0.0
+commit <40-hex commit>
+ieee 1076-2019 16a012320947d378611cc7457f64ed76cb52bac4
+go go1.27.2
+```
 
 ## Use
 
-* `gohard check` checks a project; `gohard fmt` formats it.
+* `gohard check` checks a project; `gohard fmt` formats it, and
+  `gohard fmt -` formats standard input to standard output (exit 1 if it
+  does not parse; with `--check`, exit 1 if it would change).
 * `gohard check --sim` also runs testbenches; failures print a repro
   command.
 * `gohard lsp` is the language server over stdio.

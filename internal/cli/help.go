@@ -28,14 +28,6 @@ func (inv *Invocation) usage(problem string) Result {
 	return inv.Fail(newUsage(problem))
 }
 
-// runVersion is `gohard version`.
-func runVersion(inv *Invocation) Result {
-	if len(inv.Args) > 0 {
-		return inv.usage("gohard version takes no arguments")
-	}
-	return Result{Stdout: []byte("gohard " + Version + "\n")}
-}
-
 const exitHelp = `Exit codes:
   0    clean (warnings and hints do not fail a run)
   1    the design has problems (any warning with --strict)
