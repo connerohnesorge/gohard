@@ -9,6 +9,10 @@
 # Elaboration and simulation are not fuzz targets until the corpus
 # passes.
 #
+# With GOHARD_FUZZ_SEEDED_CRASH=1 (nightly dispatch input seed_crash)
+# the list also holds FuzzSeededCrash (tools/fuzzselftest), which fails
+# on purpose so the crash pull request flow can be proven on demand.
+#
 # Usage: fuzz-targets.sh         one entry per line
 #        fuzz-targets.sh --json  GitHub Actions matrix include list
 . "$(dirname "$0")/lib.sh"
@@ -21,6 +25,9 @@ TARGETS=(
 	"FuzzLSPReplay ./internal/server root"
 	"FuzzParse ./internal/parser root"
 )
+if [ "${GOHARD_FUZZ_SEEDED_CRASH:-}" = "1" ]; then
+	TARGETS+=("FuzzSeededCrash ./tools/fuzzselftest root")
+fi
 
 if [ "${1:-}" = "--json" ]; then
 	sep=""

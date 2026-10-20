@@ -55,13 +55,13 @@ fixtures and Go files keep LF bytes.
 
 ## Nightly workflow (`nightly.yml`)
 
-Triggers: daily schedule and manual dispatch (input `fuzztime`, default
-`10m`).
+Triggers: daily schedule and manual dispatch (inputs `fuzztime`,
+default `10m`, and `seed_crash`, default false).
 
 | #30 item | Where | Status |
 | --- | --- | --- |
 | Fuzz each target for 10 minutes | `fuzz-targets.sh` (the one list) and `fuzz.sh` (one matrix job per target) | wired for `FuzzConfig` (#28), `FuzzIndex` and `FuzzLSPReplay` (#25); later: #31 `FuzzParse`, #32 `FuzzFormat` append to the list |
-| Crash opens a PR adding the minimized input under `testdata/fuzz/<Target>/` | `fuzz.sh` | wired; pushes `fuzz/<Target>-<id>`, prints the compare URL, then `gh pr create`. GitHub refuses the PR unless Settings > Actions > General > Workflow permissions > "Allow GitHub Actions to create and approve pull requests" is on, or the `FUZZ_PR_TOKEN` secret holds a token with contents and pull-requests write; otherwise the job fails naming that setting and the compare URL. `selftest.sh` covers both paths |
+| Crash opens a PR adding the minimized input under `testdata/fuzz/<Target>/` | `fuzz.sh` | wired, provable on demand with dispatch input `seed_crash` (see below); pushes `fuzz/<Target>-<id>`, prints the compare URL, then `gh pr create`. GitHub refuses the PR unless Settings > Actions > General > Workflow permissions > "Allow GitHub Actions to create and approve pull requests" is on, or the `FUZZ_PR_TOKEN` secret holds a token with contents and pull-requests write; otherwise the job fails naming that setting and the compare URL. `selftest.sh` covers both paths |
 | Every corpus design at 64 seeds | `corpus-seeds.sh` (`SEEDS=64`, the default): `TestCorpus -corpus.seeds=64 -corpus.require-sim`, then `go run ./tools/oracle trace tree golden` | wired; fails while the sequential interpreter is missing |
 | Full parser-regression list (`pr` and `nightly` submodules) | `regression.sh nightly` | placeholder; later #31 |
 | Replay every LSP session in `testdata/seeds/` | `lsp-seeds.sh` | wired (`TestSeeds`, `TestLSPReplaySeeds`) |
@@ -77,6 +77,25 @@ opened with the default `GITHUB_TOKEN` does not trigger the `pr`
 workflow, so set the secret `FUZZ_PR_TOKEN` (fine-grained, contents and
 pull-requests write) for the PR to show its red checks. Local dry run:
 `FUZZ_OPEN_PR=0 bash scripts/ci/fuzz.sh FuzzIndex ./internal/span local 30s`.
+
+Seeded crash (proving the flow on demand): dispatch `nightly` with
+`seed_crash` true (`gh workflow run nightly.yml --ref v1 -f
+seed_crash=true -f fuzztime=1m`). The `targets` and `fuzz` jobs then
+set `GOHARD_FUZZ_SEEDED_CRASH=1`, so `fuzz-targets.sh` adds one entry,
+`FuzzSeededCrash ./tools/fuzzselftest root`, and that matrix job runs
+the same `fuzz.sh` path as the real targets: its `cras` seed passes,
+the fuzzer finds an input starting with `crash` in under a second, Go
+minimizes it, and `fuzz.sh` commits `testdata/fuzz/FuzzSeededCrash/<id>`
+on `fuzz/FuzzSeededCrash-<id16>` and opens the pull request. Close that
+pull request without merging and delete its branch; the minimized input
+is always `crash`, so a later seeded run with the branch still present
+only notes that the pull request is already open. The target skips
+unless `GOHARD_FUZZ_SEEDED_CRASH=1`, so plain `go test ./...` (and the
+crash pull request's own checks) pass, and scheduled runs never list
+it. No corpus is ever saved under `testdata/fuzz/FuzzSeededCrash`.
+Local dry run:
+`GOHARD_FUZZ_SEEDED_CRASH=1 FUZZ_OPEN_PR=0 bash scripts/ci/fuzz.sh FuzzSeededCrash ./tools/fuzzselftest root 1m`
+(then delete `testdata/fuzz/FuzzSeededCrash`).
 
 ## Release workflow (`release.yml`)
 

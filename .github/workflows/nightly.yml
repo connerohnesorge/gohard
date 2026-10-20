@@ -19,6 +19,13 @@ on:
         description: Fuzz time per target (go test -fuzztime)
         required: false
         default: 10m
+      seed_crash:
+        description: >-
+          Also fuzz FuzzSeededCrash (tools/fuzzselftest), which fails on
+          purpose, to prove a crash opens a pull request
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -43,6 +50,8 @@ jobs:
           persist-credentials: false
       - id: list
         shell: bash
+        env:
+          GOHARD_FUZZ_SEEDED_CRASH: ${{ inputs.seed_crash && '1' || '' }}
         run: |
           echo "matrix=$(bash scripts/ci/fuzz-targets.sh --json)" \
             >>"$GITHUB_OUTPUT"
@@ -80,6 +89,7 @@ jobs:
           TARGET: ${{ matrix.target }}
           PACKAGE: ${{ matrix.package }}
           CORPUS: ${{ matrix.corpus }}
+          GOHARD_FUZZ_SEEDED_CRASH: ${{ inputs.seed_crash && '1' || '' }}
         run: bash scripts/ci/fuzz.sh "$TARGET" "$PACKAGE" "$CORPUS"
 
   evidence:
