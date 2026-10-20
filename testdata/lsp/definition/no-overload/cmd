@@ -1,0 +1,2 @@
+# a call no overload fits (#34): every candidate, as hover/no-overload lists them.
+gohard lsp definition --at amb.vhd:19:25

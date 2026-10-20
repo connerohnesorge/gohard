@@ -79,6 +79,37 @@ type Snapshot struct {
 
 	docs  []*Document // sorted by URI
 	byKey map[string]int
+	// config is the gohard.yaml of the root as read from disk (empty
+	// text when there is none); see ConfigDocument.
+	config        *Document
+	configPresent bool
+}
+
+// ConfigDocument returns gohard.yaml at the project root: the open
+// buffer when the client has it open, else the text the server read
+// (empty when the file does not exist; present reports whether it
+// does or is open). Quick fixes edit it (#34); it is not a project
+// file, so Document and Documents do not list the disk copy.
+func (s *Snapshot) ConfigDocument() (d *Document, present bool) {
+	if s == nil || s.config == nil {
+		return nil, false
+	}
+	if d, ok := s.Document(s.config.URI); ok {
+		return d, true
+	}
+	return s.config, s.configPresent
+}
+
+// lookup is Document with the disk gohard.yaml as a fallback, for
+// converting edits of a quick fix.
+func (s *Snapshot) lookup(uri string) (*Document, bool) {
+	if d, ok := s.Document(uri); ok {
+		return d, true
+	}
+	if s != nil && s.config != nil && docKey(uri) == s.config.key {
+		return s.config, true
+	}
+	return nil, false
 }
 
 // Document returns the document for uri. An open buffer wins over the

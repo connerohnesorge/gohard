@@ -1,0 +1,1 @@
+{"contents":{"kind":"markdown","value":"```vhdl\nelement data : STD_LOGIC_VECTOR\n```\n\nThe data byte."},"range":{"start":{"line":26,"character":32},"end":{"line":26,"character":36}}}

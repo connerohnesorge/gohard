@@ -1,0 +1,2 @@
+# an extended identifier.
+gohard lsp definition --at top.vhd:28:4

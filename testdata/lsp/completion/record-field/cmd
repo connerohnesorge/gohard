@@ -1,0 +1,2 @@
+# Completion after a '.' lists the fields of the record signal p (#25).
+gohard lsp completion --at top.vhd:16:12

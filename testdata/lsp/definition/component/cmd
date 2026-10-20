@@ -1,0 +1,2 @@
+# the component of a component instantiation.
+gohard lsp definition --at top.vhd:25:8

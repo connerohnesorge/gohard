@@ -67,6 +67,16 @@ func Serve(ctx context.Context, e env.Env, o Options, jobs int,
 				Config: configRead(c.Folder, l)})
 			return l
 		}
+		loads := 0
+		d.loadFiles = func(l LoadWorkspace) WorkspaceLoaded {
+			w := LoadFiles(e, jobs, l.Root)
+			if loads > 0 {
+				_ = record(Arrival{Step: d.Steps(),
+					Workspace: workspaceRead(w)})
+			}
+			loads++
+			return w
+		}
 	}
 	arrive := func(a Arrival) {
 		a.Step, a.Busy = d.Steps(), !d.Idle()

@@ -1,0 +1,2 @@
+# a function across libraries and files: declaration, body, end designator and calls.
+gohard lsp references --at top.vhd:32:12

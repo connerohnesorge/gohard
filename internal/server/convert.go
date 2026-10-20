@@ -15,7 +15,7 @@ type conv struct {
 }
 
 func (c conv) rng(uri string, s Span) Range {
-	d, ok := c.snap.Document(uri)
+	d, ok := c.snap.lookup(uri)
 	if !ok {
 		return Range{}
 	}
@@ -54,7 +54,11 @@ func (c conv) hover(uri string, h *Hover) any {
 func (c conv) locations(ls []Location) any {
 	out := make([]lspLocation, 0, len(ls))
 	for _, l := range ls {
-		out = append(out, lspLocation{l.URI, c.rng(l.URI, l.Span)})
+		r := c.rng(l.URI, l.Span)
+		if l.Lines != nil {
+			r = toRange(l.Lines, l.Span, c.enc)
+		}
+		out = append(out, lspLocation{l.URI, r})
 	}
 	return out
 }
@@ -65,6 +69,16 @@ func (c conv) edits(uri string, es []Edit) any {
 		out = append(out, textEdit{c.rng(uri, e.Span), e.NewText})
 	}
 	return out
+}
+
+// failure is a feature result the server answers with RequestFailed.
+type failure struct{ msg string }
+
+func (c conv) renamed(r Renamed) any {
+	if r.Refused != "" {
+		return failure{r.Refused}
+	}
+	return c.workspaceEdit(r.Edits)
 }
 
 func (c conv) workspaceEdit(fs []FileEdit) any {
@@ -177,6 +191,21 @@ func (c conv) lenses(uri string, ls []Lens) any {
 	for _, l := range ls {
 		out = append(out, lens{c.rng(uri, l.Span),
 			command{l.Title, l.Command, l.Args}})
+	}
+	return out
+}
+
+func (c conv) codeActions(as []CodeAction) any {
+	type action struct {
+		Title       string `json:"title"`
+		Kind        string `json:"kind,omitempty"`
+		IsPreferred bool   `json:"isPreferred,omitempty"`
+		Edit        any    `json:"edit"`
+	}
+	out := make([]action, 0, len(as))
+	for _, a := range as {
+		out = append(out, action{a.Title, a.Kind, a.Preferred,
+			c.workspaceEdit(a.Edits)})
 	}
 	return out
 }

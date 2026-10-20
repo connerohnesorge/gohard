@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"errors"
 	"slices"
 	"strings"
@@ -116,6 +117,56 @@ func init() {
 			"folding ranges"),
 		document("codelens", "textDocument/codeLens", "code lenses"),
 		{
+			Name: "workspace-symbols", Method: "workspace/symbol",
+			Summary: "workspace symbols matching QUERY (all without)",
+			Args:    "[QUERY]",
+			Params: func(_ string, _ Position, args []string) (any,
+				error,
+			) {
+				if len(args) > 1 {
+					return nil, errors.New("gohard lsp " +
+						"workspace-symbols takes at most one argument")
+				}
+				q := ""
+				if len(args) == 1 {
+					q = args[0]
+				}
+				return struct {
+					Query string `json:"query"`
+				}{q}, nil
+			},
+		},
+		{
+			Name: "codeaction", Method: "textDocument/codeAction",
+			Summary: "quick fixes for the diagnostics at the position",
+			Params: func(uri string, pos Position, args []string) (any,
+				error,
+			) {
+				var p struct {
+					TextDocument struct {
+						URI string `json:"uri"`
+					} `json:"textDocument"`
+					Range   Range `json:"range"`
+					Context struct {
+						Diagnostics []any `json:"diagnostics"`
+					} `json:"context"`
+				}
+				p.TextDocument.URI = uri
+				p.Range = Range{Start: pos, End: pos}
+				p.Context.Diagnostics = []any{}
+				return p, noArgs("codeaction", args)
+			},
+		},
+		{
+			Name: "diagnostics", Method: publishMethod,
+			Summary: "the diagnostics published for the file",
+			Params: func(uri string, _ Position, args []string) (any,
+				error,
+			) {
+				return nil, noArgs("diagnostics", args)
+			},
+		},
+		{
 			Name: "references", Method: "textDocument/references",
 			Summary: "references, including the declaration",
 			Params: func(uri string, pos Position, args []string) (any,
@@ -157,10 +208,16 @@ func init() {
 // provide the action's feature.
 var ErrNotProvided = errors.New("the analyzer does not provide it")
 
+// publishMethod is the notification the diagnostics action reports.
+const publishMethod = "textDocument/publishDiagnostics"
+
 // RunAction runs a at the zero-based UTF-8 position pos of the file
 // path (an OS path) on the server's own code path: an in-memory
 // session in folder that negotiates utf-8, opens the file with text,
 // sends the request, shuts down and exits. It returns the response.
+// The diagnostics action sends no request: its result is the last
+// textDocument/publishDiagnostics for the file once the server is idle
+// after the open (the quiescent diagnostics, equal to `gohard check`).
 func RunAction(e env.Env, o Options, jobs int, folder string, a Action,
 	path string, text []byte, pos Position, args []string,
 ) (*jsonrpc2.Response, error) {
@@ -170,10 +227,20 @@ func RunAction(e env.Env, o Options, jobs int, folder string, a Action,
 		return nil, err
 	}
 	var got *jsonrpc2.Response
+	var published json.RawMessage
 	d := NewDriver(o, e, jobs, func(s Send) error {
 		if r, ok := s.Msg.(*jsonrpc2.Response); ok {
 			if n, ok := r.ID.Int(); ok && n == 2 {
 				got = r
+			}
+		}
+		if n, ok := s.Msg.(*jsonrpc2.Notification); ok &&
+			n.Method == publishMethod {
+			var p struct {
+				URI string `json:"uri"`
+			}
+			if json.Unmarshal(n.Params, &p) == nil && p.URI == uri {
+				published = n.Params
 			}
 		}
 		return nil
@@ -199,9 +266,20 @@ func RunAction(e env.Env, o Options, jobs int, folder string, a Action,
 		&jsonrpc2.Request{ID: jsonrpc2.IntID(3), Method: "shutdown"},
 		&jsonrpc2.Notification{Method: "exit"},
 	}
-	for _, m := range msgs {
+	diags := a.Method == publishMethod
+	if diags {
+		if o.Analyzer == nil ||
+			!o.Analyzer.Features().Has(FeatureDiagnostics) {
+			return nil, ErrNotProvided
+		}
+		msgs = slices.Delete(msgs, 3, 4)
+	}
+	for i, m := range msgs {
 		if err := d.Deliver(Send{m}.Body()); err != nil {
 			return nil, err
+		}
+		if diags && i == 2 {
+			got = diagnosticsResponse(published, uri)
 		}
 	}
 	if got == nil {
@@ -211,4 +289,17 @@ func RunAction(e env.Env, o Options, jobs int, folder string, a Action,
 		return got, ErrNotProvided
 	}
 	return got, nil
+}
+
+// diagnosticsResponse is the result of the diagnostics action: the
+// publishDiagnostics params, or an empty list when none was published.
+func diagnosticsResponse(params json.RawMessage, uri string,
+) *jsonrpc2.Response {
+	if params == nil {
+		params = marshal(struct {
+			URI         string `json:"uri"`
+			Diagnostics []any  `json:"diagnostics"`
+		}{uri, []any{}})
+	}
+	return &jsonrpc2.Response{ID: jsonrpc2.IntID(2), Result: params}
 }

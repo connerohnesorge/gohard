@@ -1,0 +1,2 @@
+# a name written in another letter case (INC).
+gohard lsp definition --at top.vhd:32:12

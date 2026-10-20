@@ -1,0 +1,2 @@
+# a signal: its declaration and doc comment.
+gohard lsp hover --at top.vhd:16:10

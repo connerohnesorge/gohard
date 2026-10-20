@@ -1,0 +1,2 @@
+# Completion after 'work.' lists the primary units of the library.
+gohard lsp completion --at top.vhd:3:10

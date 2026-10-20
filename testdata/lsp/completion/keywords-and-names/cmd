@@ -1,0 +1,2 @@
+# Visible names and the keywords of the selected standard starting with the word before the cursor.
+gohard lsp completion --at top.vhd:20:7

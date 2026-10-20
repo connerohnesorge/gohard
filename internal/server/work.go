@@ -29,6 +29,8 @@ type work struct {
 	// the edit count when it arrived.
 	parked *call
 	edits  uint64
+	// sim marks simulation work (sim.go).
+	sim *simJob
 }
 
 // runner is a Task with its result converted to the value the server
@@ -69,7 +71,7 @@ func (s *State) startWork(w work) work {
 	if w.isReq {
 		s.byRequest = cloneSet(s.byRequest, w.reqID.String(), w.id)
 	}
-	*s = s.Push(Work{ID: w.id}, PrioritySlice)
+	*s = s.Push(Work{ID: w.id}, w.pri())
 	return w
 }
 
@@ -95,6 +97,9 @@ func (s *State) finish(o *out, w work) {
 			Value: progressValue{Kind: "end"}})
 	}
 	s.dropWork(w.id)
+	if w.sim != nil && w.sim.tb != "" {
+		s.refreshLenses(o)
+	}
 }
 
 // slice runs one slice of work id. A request whose snapshot is no
@@ -113,6 +118,13 @@ func (s *State) slice(o *out, id uint64) {
 		}
 		return
 	}
+	if w.sim != nil && s.outranked(id) {
+		// Editor requests and diagnostics outrank simulation.
+		w.since = s.now
+		s.setWork(w)
+		*s = s.Push(Work{ID: w.id}, PrioritySim)
+		return
+	}
 	next, res, finished, rep, err := safeStep(w.run)
 	if err != nil {
 		s.finish(o, w)
@@ -128,7 +140,12 @@ func (s *State) slice(o *out, id uint64) {
 	}
 	if finished {
 		s.finish(o, w)
-		if w.isReq {
+		if s.simFinished(o, w, res) {
+			return
+		}
+		if f, ok := res.(failure); ok && w.isReq {
+			s.fail(o, w.reqID, jsonrpc2.CodeRequestFailed, f.msg)
+		} else if w.isReq {
 			s.respond(o, w.reqID, res)
 		} else {
 			s.publishResults(o, res)
@@ -150,7 +167,7 @@ func (s *State) slice(o *out, id uint64) {
 	w.run = next
 	s.progress(o, &w, rep)
 	s.setWork(w)
-	*s = s.Push(Work{ID: w.id}, PrioritySlice)
+	*s = s.Push(Work{ID: w.id}, w.pri())
 }
 
 // safeStep runs one slice and turns a panic in the analyzer into an
@@ -204,7 +221,7 @@ type progressValue struct {
 // creates with window/workDoneProgress/create when the client supports
 // it, and begin only after the client accepted it.
 func (s *State) progress(o *out, w *work, rep *Report) {
-	if w.token == nil && !w.isReq && s.progressOK {
+	if w.token == nil && (!w.isReq || w.sim != nil) && s.progressOK {
 		s.nextOut++
 		w.token = marshal("gohard/" + strconv.FormatInt(s.nextOut, 10))
 		s.creating = cloneSet(s.creating, s.nextOut, w.id)
@@ -236,7 +253,12 @@ func (s *State) beginProgress(o *out, w *work) {
 	}
 	w.begun = true
 	title := w.method
-	if !w.isReq {
+	switch {
+	case w.sim != nil && w.sim.tb != "":
+		title = "gohard: simulating " + w.sim.tb
+	case w.sim != nil:
+		title = "gohard: simulation"
+	case !w.isReq:
 		title = "gohard: checking"
 	}
 	o.notify("$/progress", progressParams{Token: w.token,

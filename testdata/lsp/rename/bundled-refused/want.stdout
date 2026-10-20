@@ -1,0 +1,2 @@
+gohard: error[cli/usage]: gohard lsp rename: cannot rename STD_LOGIC: it is declared in the bundled std/ieee libraries, which are read-only; run 'gohard help' for usage
+summary: 1 errors, 0 warnings, 0 hints, 0 files

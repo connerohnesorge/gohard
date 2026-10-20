@@ -17,9 +17,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/elab"
-	"github.com/connerohnesorge/gohard/internal/elab/psl"
 	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/sim"
 	"github.com/connerohnesorge/gohard/internal/trace"
@@ -125,66 +123,19 @@ func Order(seed uint64) env.Order {
 }
 
 // Run elaborates and simulates o.Testbench. Elaboration and simulation
-// share one step budget (simulation.step_budget).
+// share one step budget (simulation.step_budget). It is Start, Step
+// until done (polling o.Cancelled between slices) and Outcome: the
+// code path the editor runs one slice at a time.
 func Run(o Options) Outcome {
-	out := Outcome{Testbench: strings.ToLower(o.Testbench), Seed: o.Seed}
-	code := o.Code
-	if code == nil {
-		code = DefaultCode
-	}
-	// Without an interpreter the design is still elaborated, so
-	// elaboration errors (and elaboration-time evaluation over
-	// simulation.step_budget) are reported; the run itself is then
-	// cli/not-implemented, a tool error, never a pass.
-	// PSL directives run in the PSL runner, the rest in code.
-	elabCode := psl.Wrap(code)
-	b := eval.NewBudget(o.Sim.StepBudget)
-	d, ds := elab.Elaborate(o.Result, elab.Options{Top: o.Testbench,
-		Budget: b, Code: elabCode})
-	out.Diagnostics = append(out.Diagnostics, ds...)
-	if d == nil || len(ds) > 0 && failed(ds) {
-		out.Status = sim.Failed
-		if exceeded(ds) {
-			out.Status = sim.Exceeded
+	r := Start(o)
+	for !r.Done() {
+		if o.Cancelled != nil && o.Cancelled() {
+			r.Cancel()
+			break
 		}
-		return out
+		r.Step(Slice)
 	}
-	if code == nil {
-		out.Status = sim.Failed
-		out.Diagnostics = append(out.Diagnostics, diag.New(
-			diag.CLINotImplemented, "check --sim"))
-		return out
-	}
-	if len(d.Missing) > 0 {
-		out.Status = sim.Failed
-		out.Diagnostics = append(out.Diagnostics, diag.New(
-			diag.UnsupportedConstruct, "process "+d.Missing[0]+
-				" (no interpreter code)"))
-		return out
-	}
-	rec := trace.NewRecorder(o.Sim.DumpScope)
-	out.Model = d.Model
-	so := sim.Options{Seed: o.Seed,
-		Order: Order(o.Seed), TimeBudget: sim.Time(o.Sim.TimeBudget),
-		DeltaBudget: o.Sim.DeltaBudget, Budget: b,
-		StopLevel: StopLevel(o.Sim.StopLevel), Writer: rec}
-	if o.Orders != nil {
-		so.Observe = o.Orders.Observe
-	}
-	k, err := sim.New(d.Model, so)
-	if err != nil {
-		out.Status = sim.Failed
-		out.Diagnostics = append(out.Diagnostics, diag.New(
-			diag.SimRuntimeError, err.Error(), d.Model.Testbench,
-			"0 fs"))
-		return out
-	}
-	out.Status = k.RunAll(Slice, o.Cancelled)
-	out.Diagnostics = append(out.Diagnostics, k.Diagnostics()...)
-	if t, err := rec.Trace(); err == nil {
-		out.Trace = t
-	}
-	return out
+	return r.Outcome()
 }
 
 func failed(ds []diag.Diagnostic) bool {

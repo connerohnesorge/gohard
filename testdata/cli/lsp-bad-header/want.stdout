@@ -1,5 +1,5 @@
-Content-Length: 336
+Content-Length: 824
 
-{"jsonrpc":"2.0","id":1,"result":{"capabilities":{"documentFormattingProvider":true,"documentRangeFormattingProvider":true,"positionEncoding":"utf-16","textDocumentSync":{"change":2,"openClose":true,"save":{"includeText":false}},"workspace":{"workspaceFolders":{"supported":true}}},"serverInfo":{"name":"gohard","version":"0.0.0-dev"}}}Content-Length: 77
+{"jsonrpc":"2.0","id":1,"result":{"capabilities":{"codeActionProvider":{"codeActionKinds":["quickfix"]},"codeLensProvider":{"resolveProvider":false},"completionProvider":{"triggerCharacters":["."]},"definitionProvider":true,"documentFormattingProvider":true,"documentHighlightProvider":true,"documentRangeFormattingProvider":true,"documentSymbolProvider":true,"executeCommandProvider":{"commands":["gohard.copyRepro","gohard.openWaveform","gohard.runTestbench"]},"foldingRangeProvider":true,"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"textDocumentSync":{"change":2,"openClose":true,"save":{"includeText":false}},"workspace":{"workspaceFolders":{"supported":true}},"workspaceSymbolProvider":true},"serverInfo":{"name":"gohard","version":"0.0.0-dev"}}}Content-Length: 77
 
 {"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":0,"id":1}}

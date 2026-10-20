@@ -1,0 +1,2 @@
+# a call no overload fits (#34): every candidate and why it does not fit, as in diagnostics/ambiguous-overload.
+gohard lsp hover --at amb.vhd:19:25

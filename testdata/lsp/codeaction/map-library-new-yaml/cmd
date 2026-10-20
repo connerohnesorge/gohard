@@ -1,0 +1,2 @@
+# Without gohard.yaml the fix adds a libraries block to a new one.
+gohard lsp codeaction --at top.vhd:1:9

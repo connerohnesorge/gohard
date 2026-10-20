@@ -1,0 +1,2 @@
+# a call of a function of another library: the chosen overload, its package and doc comment.
+gohard lsp hover --at top.vhd:32:12

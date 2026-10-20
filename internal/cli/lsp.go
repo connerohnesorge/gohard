@@ -13,6 +13,8 @@ import (
 
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/internal/ide"
+	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
 	"github.com/connerohnesorge/gohard/internal/repro"
 	"github.com/connerohnesorge/gohard/internal/server"
 	"github.com/connerohnesorge/gohard/internal/span"
@@ -21,14 +23,23 @@ import (
 func init() { lookup("lsp").Run = runLSP }
 
 // newAnalyzer returns the analyzer of the language server and of every
-// `gohard lsp <action>`. Later stages (#34, #35) replace the Nop;
-// formatting (#32) wraps whatever analyzer they provide.
-var newAnalyzer = func() server.Analyzer {
-	return server.WithFormatting(server.Nop{}, Version)
+// `gohard lsp <action>`: the analysis bridge to sema (internal/ide,
+// #25, #34), its pure jobs on the env job runner at -p N, wrapped by
+// formatting (#32), and the same bridge as the simulator of the code
+// lenses and commands (#35, #36). Each session gets a fresh analyzer,
+// so its reuse of parse trees and results starts empty (replay runs
+// twice).
+var newAnalyzer = func(inv *Invocation) (server.Analyzer,
+	server.Simulator,
+) {
+	an := ide.New(ide.Options{ToolVersion: Version, Jobs: inv.Env.Jobs,
+		Limit: inv.Jobs})
+	return server.WithFormatting(an, Version), an
 }
 
-func serverOptions() server.Options {
-	return server.Options{Analyzer: newAnalyzer(), Version: Version}
+func serverOptions(inv *Invocation) server.Options {
+	an, sim := newAnalyzer(inv)
+	return server.Options{Analyzer: an, Simulator: sim, Version: Version}
 }
 
 // runLSP is `gohard lsp` (#25, #26): with no arguments the stdio
@@ -56,7 +67,7 @@ func serveLSP(inv *Invocation) Result {
 	if rec != nil {
 		record = rec.record
 	}
-	code := server.Serve(inv.Ctx, inv.Env, serverOptions(), inv.Jobs,
+	code := server.Serve(inv.Ctx, inv.Env, serverOptions(inv), inv.Jobs,
 		record)
 	if rec != nil {
 		if rec.close(); rec.err != nil {
@@ -177,7 +188,7 @@ func replayLSP(inv *Invocation) Result {
 	}
 	var runs [2]server.Replayed
 	for i := range runs {
-		runs[i], err = server.Replay(sess, inv.Env.FS, serverOptions(),
+		runs[i], err = server.Replay(sess, inv.Env.FS, serverOptions(inv),
 			name)
 		if err != nil {
 			return inv.Fail(repro.Invalid(name,
@@ -251,7 +262,7 @@ func lspAction(inv *Invocation) Result {
 	x := span.NewIndex(text)
 	off, _ := x.OffsetOf(line, col)
 	p := x.Position(off, span.UTF8)
-	resp, err := server.RunAction(inv.Env, serverOptions(), inv.Jobs, wd,
+	resp, err := server.RunAction(inv.Env, serverOptions(inv), inv.Jobs, wd,
 		a, path, text, server.Position{Line: p.Line, Character: p.Col},
 		inv.Args[1:])
 	switch {
@@ -259,6 +270,11 @@ func lspAction(inv *Invocation) Result {
 		return inv.Fail(diag.New(diag.CLINotImplemented, "lsp "+name))
 	case err != nil:
 		return inv.usage(err.Error())
+	case resp.Error != nil &&
+		resp.Error.Code == jsonrpc2.CodeRequestFailed:
+		// A refused request (a rename of a bundled name, an invalid
+		// new name) is a usage error, as the editor shows it.
+		return inv.usage("gohard lsp " + name + ": " + resp.Error.Message)
 	case resp.Error != nil:
 		panic("gohard lsp " + name + ": " + resp.Error.Message)
 	}

@@ -1,0 +1,2 @@
+# an ambiguous call (#34): every candidate that fits, as hover/ambiguous-overload lists them.
+gohard lsp definition --at amb.vhd:17:25

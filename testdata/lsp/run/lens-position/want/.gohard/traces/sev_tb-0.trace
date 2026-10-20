@@ -1,0 +1,7 @@
+gohard-trace 1
+testbench sev_tb
+end 1000000
+scope sev_tb instance sev_tb(sim)
+process 1 sev_tb._p0
+1000000 0 ! assert warning sev_tb.vhd:9 p1 "boom"
+1000000 0 ! report note sev_tb.vhd:10 p1 "after"

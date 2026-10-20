@@ -1,0 +1,1 @@
+{"testbench":"","seed":null,"status":"","end":"","trace":"","repro":"","diagnostics":[{"path":"tb.vhd","line":4,"col":21,"severity":"error","code":"sema/undefined","message":"nope is not declared"}]}

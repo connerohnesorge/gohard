@@ -1,0 +1,2 @@
+# a loop label with its exit and end label.
+gohard lsp references --at top.vhd:35:5

@@ -1,0 +1,2 @@
+# a record field: declaration and selected names.
+gohard lsp references --at util/util_pkg.vhd:13:5

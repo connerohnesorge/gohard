@@ -1,0 +1,2 @@
+# an enumeration literal.
+gohard lsp references --at util/util_pkg.vhd:7:20

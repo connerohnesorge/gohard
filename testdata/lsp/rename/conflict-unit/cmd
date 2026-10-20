@@ -1,0 +1,2 @@
+# an entity may not take the name of another unit of its library.
+gohard lsp rename --dry-run --at a.vhd:1:8 top

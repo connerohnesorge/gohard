@@ -1,0 +1,30 @@
+*gohard.txt*  GoHard VHDL language server and simulator
+
+SETUP                                                   *gohard-setup*
+
+    require('gohard').setup({ cmd = { 'gohard', 'lsp' } })
+
+Options (all optional): `cmd`, `filetypes` ({ 'vhdl' }), `root_markers`
+({ 'gohard.yaml', '.git' }), `settings` (editor settings under a
+`gohard` key; gohard.yaml wins), `capabilities`, `on_attach`,
+`codelens` (true), `keymaps` (false). On Neovim 0.11+ with this
+directory on 'runtimepath', `vim.lsp.enable('gohard')` also works.
+
+There is no waveform viewer option: the server opens Surfer, else
+GTKWave, else shows the FST path.
+
+COMMANDS                                                *gohard-commands*
+
+:GoHardRun              Run the testbench lens nearest the cursor.
+:GoHardRerun [SEED]     Re-run it, at SEED (a number or "random").
+:GoHardCopyRepro        Copy the repro command of the last run.
+:GoHardOpenWaveform     The server's "Open waveform" code action.
+:GoHardLenses           List the code lenses of the buffer.
+
+Lenses: "▶ Run tb_top", "◉ Running…", "▶ Re-run · seed 42" and
+"Copy repro". Run results are `gohard-sim` diagnostics.
+
+See docs/editors.md in the GoHard repository for Helix and platform
+notes.
+
+ vim:tw=78:ft=help:norl:

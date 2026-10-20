@@ -1,0 +1,2 @@
+# In-file highlights of signal n: the declaration, writes and reads.
+gohard lsp highlight --at top.vhd:16:5

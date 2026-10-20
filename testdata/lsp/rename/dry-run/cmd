@@ -1,0 +1,2 @@
+# the edit plan across files and libraries; each use site keeps its letter case (INC becomes STEP).
+gohard lsp rename --dry-run --at util/util_pkg.vhd:21:12 Step

@@ -1,0 +1,2 @@
+# a record field in its declaration and in selected names.
+gohard lsp rename --dry-run --at top.vhd:32:42 address

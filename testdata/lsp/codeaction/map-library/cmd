@@ -1,0 +1,2 @@
+# An unmapped library gets the fix writing its libraries line in gohard.yaml, with the folder that declares the unit (#34).
+gohard lsp codeaction --at top.vhd:1:9

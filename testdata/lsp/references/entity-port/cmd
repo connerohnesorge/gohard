@@ -1,0 +1,2 @@
+# an entity port: declaration, use in the architecture and the formal in another file.
+gohard lsp references --at util/sub.vhd:9:5

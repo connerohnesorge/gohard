@@ -1,0 +1,2 @@
+# a port map formal of an entity instantiation: the port in the other file.
+gohard lsp definition --at top.vhd:24:15

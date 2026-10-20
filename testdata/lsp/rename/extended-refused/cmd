@@ -1,0 +1,2 @@
+# an extended identifier keeps its spelling: refused.
+gohard lsp rename --dry-run --at top.vhd:28:4 other

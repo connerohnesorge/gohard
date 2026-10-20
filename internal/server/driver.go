@@ -1,9 +1,16 @@
 package server
 
 import (
+	"context"
+	"errors"
+	"path/filepath"
+
 	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/internal/repro"
+	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/internal/trace/waveform"
 	"github.com/connerohnesorge/gohard/internal/workspace"
 )
 
@@ -34,6 +41,9 @@ type Driver struct {
 	// on the env's file system: Serve records each read and Replay
 	// feeds the recorded ones back (#29).
 	loadConfig func(LoadConfig) config.Loaded
+	// loadFiles, when set, performs LoadWorkspace instead of
+	// LoadFiles, for the same reason.
+	loadFiles func(LoadWorkspace) WorkspaceLoaded
 }
 
 // NewDriver returns a driver for a new server. send writes one
@@ -153,10 +163,17 @@ func (d *Driver) perform(e Effect) error {
 		}
 		d.State = d.State.Push(ConfigLoaded{Loaded: l}, PriorityResult)
 	case LoadWorkspace:
-		d.State = d.State.Push(LoadFiles(d.env, d.jobs, e.Root),
-			PriorityResult)
+		var w WorkspaceLoaded
+		if d.loadFiles != nil {
+			w = d.loadFiles(e)
+		} else {
+			w = LoadFiles(d.env, d.jobs, e.Root)
+		}
+		d.State = d.State.Push(w, PriorityResult)
 	case Exit:
 		d.exit, d.done = e.Code, true
+	case WriteRun, OpenWaveform:
+		d.performSim(e)
 	}
 	return nil
 }
@@ -170,3 +187,50 @@ func LoadFiles(e env.Env, jobs int, root string) WorkspaceLoaded {
 	return WorkspaceLoaded{Root: root, Sources: srcs,
 		Diagnostics: diag.Normalize(append(found.Diagnostics, ds...))}
 }
+
+// performSim performs the simulation effects (sim.go) and pushes
+// their results.
+func (d *Driver) performSim(e Effect) {
+	switch e := e.(type) {
+	case WriteRun:
+		var msg string
+		if e.Trace != "" {
+			name := filepath.Join(e.Root, filepath.FromSlash(e.Trace))
+			if err := trace.WriteFile(d.env.FS, name,
+				e.Data); err != nil {
+				msg = e.Trace + ": " + err.Error()
+			}
+		}
+		if _, err := repro.Write(d.env.FS, e.Root,
+			e.Header); err != nil && msg == "" {
+			msg = repro.FileName(e.Header.Testbench, e.Header.Seed) +
+				": " + err.Error()
+		}
+		d.State = d.State.Push(RunWritten{Err: msg}, PriorityResult)
+	case OpenWaveform:
+		x := d.env.Executor
+		if x == nil {
+			x = noViewer{}
+		}
+		r, err := waveform.Open(d.env.FS, x, e.Trace)
+		ev := WaveformOpened{ID: e.ID, Root: e.Root, Result: r}
+		if err != nil {
+			ev.Err = err.Error()
+		}
+		d.State = d.State.Push(ev, PriorityResult)
+	}
+}
+
+// noViewer is the Executor of an Env without one: nothing is on PATH,
+// so Open waveform shows the FST path.
+type noViewer struct{}
+
+func (noViewer) LookPath(string) (string, error) {
+	return "", errors.New("no executor")
+}
+
+func (noViewer) Run(context.Context, env.Command) (env.Result, error) {
+	return env.Result{}, errors.New("no executor")
+}
+
+func (noViewer) Start(env.Command) error { return errors.New("no executor") }

@@ -1,0 +1,2 @@
+# a port: declaration, architecture use and the formal of the entity instantiation, not the component's port.
+gohard lsp rename --dry-run --at util/sub.vhd:9:5 din

@@ -1,0 +1,2 @@
+# a std_logic_1164 type: the read-only bundled source (gohard-bundle URI).
+gohard lsp definition --at top.vhd:16:21

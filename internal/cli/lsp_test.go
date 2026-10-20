@@ -207,8 +207,8 @@ func TestLSPActions(t *testing.T) {
 		exit int
 		want string
 	}{
-		{[]string{"lsp", "hover", "--at", "a.vhd:1:1"}, 2,
-			"gohard lsp hover is not implemented"},
+		// Hover on a keyword: no result.
+		{[]string{"lsp", "hover", "--at", "a.vhd:1:1"}, 0, "null"},
 		{[]string{"lsp", "hover"}, 2, "needs --at PATH:LINE:COL"},
 		{[]string{"lsp", "hover", "--at", "a.vhd:0:1"}, 2,
 			"--at must be PATH:LINE:COL"},

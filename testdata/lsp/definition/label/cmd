@@ -1,0 +1,2 @@
+# the loop label of an exit statement.
+gohard lsp definition --at top.vhd:36:12

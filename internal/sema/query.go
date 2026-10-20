@@ -68,3 +68,9 @@ func (r *Result) LookupAt(path string, off int, k Key) []*Decl {
 
 // AllUnits returns the bundled and project units in canonical order.
 func (r *Result) AllUnits() []*Unit { return r.allUnits() }
+
+// Homographs reports whether a and b, assumed to have the same
+// designator, are homographs (LRM 4.5.1): at most one is overloadable,
+// or both have the same parameter and result type profile. Rename
+// uses it to refuse a new name that collides (internal/resolve).
+func Homographs(a, b *Decl) bool { return homographs(a, b) }

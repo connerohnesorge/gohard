@@ -23,9 +23,15 @@ func (s *State) startDiagnostics(o *out) {
 // empty list for every document that had diagnostics before and has
 // none now.
 func (s *State) publishResults(o *out, res any) {
-	fds, _ := res.([]FileDiagnostics)
+	s.anDiags, _ = res.([]FileDiagnostics)
+	s.publishAll(o)
+}
+
+// publishAll publishes the analysis diagnostics with the gohard-sim
+// diagnostics of the last runs after them.
+func (s *State) publishAll(o *out) {
 	byURI := map[string][]lspDiagnostic{}
-	for _, fd := range fds {
+	for _, fd := range s.anDiags {
 		d, ok := s.snap.Document(fd.URI)
 		if !ok {
 			continue
@@ -34,6 +40,10 @@ func (s *State) publishResults(o *out, res any) {
 			byURI[d.URI] = append(byURI[d.URI],
 				s.toLSPDiagnostic(d.index, dg))
 		}
+	}
+	sim := s.simDiagnostics()
+	for _, uri := range sortedKeys(sim) {
+		byURI[uri] = append(byURI[uri], sim[uri]...)
 	}
 	now := sortedKeys(byURI)
 	for _, uri := range now {

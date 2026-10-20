@@ -1,0 +1,2 @@
+# hover still describes a declaration of an opaque unit.
+gohard lsp hover --at protected_record.vhd:5:12

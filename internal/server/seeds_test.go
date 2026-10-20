@@ -158,7 +158,10 @@ func TestHarnessWritesFailingSession(t *testing.T) {
 
 // FuzzLSPReplay replays arbitrary client messages, one JSON value per
 // line of the input after a fixed header: the server never panics, the
-// replay is deterministic and the invariants hold (#29, #30). The
+// replay is deterministic and the invariants hold (#29, #30). The same
+// input, read as an edit script (fuzzQuiescence), drives the analyzer
+// of `gohard lsp`: after the edits and a save, once the server
+// settles, its diagnostics equal `gohard check` on the final text. The
 // committed seed sessions and the saved inputs in the repository's
 // testdata/fuzz/FuzzLSPReplay/ seed the corpus, so plain go test
 // replays them. A failing input is written to
@@ -188,6 +191,7 @@ func FuzzLSPReplay(f *testing.F) {
 	f.Fuzz(func(t *testing.T, data []byte) {
 		fuzzReplayOne(t, t.Failed, h, data, fuzzSeed,
 			func(t tb, file []byte) { replaySeed(t, file, "fuzz") })
+		fuzzQuiescence(t, t.Failed, data, fuzzSeed)
 	})
 }
 

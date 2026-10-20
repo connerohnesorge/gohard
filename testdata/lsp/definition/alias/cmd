@@ -1,0 +1,2 @@
+# an alias used as an actual.
+gohard lsp definition --at top.vhd:26:27

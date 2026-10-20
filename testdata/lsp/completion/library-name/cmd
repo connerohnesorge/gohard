@@ -1,0 +1,2 @@
+# Library names complete after 'use'.
+gohard lsp completion --at top.vhd:2:7

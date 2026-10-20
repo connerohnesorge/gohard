@@ -1,0 +1,2 @@
+# a generic map formal of an entity instantiation.
+gohard lsp definition --at top.vhd:23:18

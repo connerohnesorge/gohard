@@ -1,0 +1,1 @@
+{"uri":"file://$WORK/protected_record.vhd","version":1,"diagnostics":[{"range":{"start":{"line":3,"character":7},"end":{"line":3,"character":13}},"severity":1,"code":"unsupported/construct","source":"gohard","message":"records of protected types is not supported yet (planned for v1.1)"}]}

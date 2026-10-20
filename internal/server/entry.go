@@ -32,6 +32,11 @@ import (
 //	    events), in order, with the gohard.yaml it read (PATH relative to the session folder,
 //	    "missing":true when there was none). Replay feeds them back,
 //	    so a session that saves gohard.yaml replays byte for byte.
+//	{"$gohard":"workspace","step":N,"files":[{"path":P,"data":B64}]}
+//	    one entry per workspace reread after the first load (a save,
+//	    or files changed on disk), in order, with every project file
+//	    it read (P relative to the project root). Replay puts exactly
+//	    these files in place before the reread.
 //	{"$gohard":"end","step":N}
 //	    the client's input ended after N events, while the core was
 //	    busy; an end at idle is not written.
@@ -51,13 +56,14 @@ const entryKey = "$gohard"
 
 // Entry kinds.
 const (
-	entryMessage  = "message"
-	entryRaw      = "raw"
-	entryEnd      = "end"
-	entryRejected = "rejected"
-	entryConfig   = "config"
-	entryFile     = "file"
-	entryAnalyzer = "analyzer"
+	entryMessage   = "message"
+	entryRaw       = "raw"
+	entryEnd       = "end"
+	entryRejected  = "rejected"
+	entryConfig    = "config"
+	entryFile      = "file"
+	entryAnalyzer  = "analyzer"
+	entryWorkspace = "workspace"
 )
 
 type entry struct {
@@ -71,6 +77,12 @@ type entry struct {
 	ID      json.RawMessage `json:"id,omitempty"`
 	Reason  string          `json:"reason,omitempty"`
 	Missing bool            `json:"missing,omitempty"`
+	Files   []entryFileData `json:"files,omitempty"`
+}
+
+type entryFileData struct {
+	Path string `json:"path"`
+	Data []byte `json:"data"`
 }
 
 // Arrival is one client input of a live session as the shell queued
@@ -91,6 +103,16 @@ type Arrival struct {
 	// Config, when set, is not client input but a gohard.yaml read the
 	// server performed after Step events (Body is nil then).
 	Config *ConfigRead
+	// Workspace, when set, is not client input but a workspace reread
+	// (after the first load) the server performed after Step events.
+	Workspace *WorkspaceRead
+}
+
+// WorkspaceRead is one reread of the project files by the live
+// server: slash paths relative to the root, in the order read.
+type WorkspaceRead struct {
+	Paths []string
+	Data  [][]byte
 }
 
 // ConfigRead is one read of gohard.yaml by the live server.
@@ -102,6 +124,16 @@ type ConfigRead struct {
 	Data []byte
 	// Missing reports that no gohard.yaml was found.
 	Missing bool
+}
+
+// workspaceRead describes what a workspace load read.
+func workspaceRead(w WorkspaceLoaded) *WorkspaceRead {
+	r := &WorkspaceRead{}
+	for _, src := range w.Sources {
+		r.Paths = append(r.Paths, src.Path)
+		r.Data = append(r.Data, src.Text)
+	}
+	return r
 }
 
 // configRead describes what config.Load read from folder.
@@ -124,6 +156,13 @@ func (a Arrival) Line() []byte {
 		step = &a.Step
 	}
 	switch {
+	case a.Workspace != nil:
+		e := entry{Kind: entryWorkspace, Step: &a.Step,
+			Files: []entryFileData{}}
+		for i, p := range a.Workspace.Paths {
+			e.Files = append(e.Files, entryFileData{p, a.Workspace.Data[i]})
+		}
+		return marshalEntry(e)
 	case a.Config != nil:
 		return marshalEntry(entry{Kind: entryConfig, Step: &a.Step,
 			Path: a.Config.Path, Data: a.Config.Data,
@@ -211,6 +250,7 @@ type project struct {
 	files    map[string][]byte // slash path -> data
 	analyzer string
 	configs  []ConfigRead // the live server's gohard.yaml reads
+	rereads  []WorkspaceRead
 }
 
 // parseLines splits a session's lines into inputs and project data.
@@ -275,6 +315,19 @@ func parseLines(lines []json.RawMessage) ([]input, project, error) {
 			continue
 		case entryAnalyzer:
 			p.analyzer = e.Name
+			continue
+		case entryWorkspace:
+			var w WorkspaceRead
+			for _, f := range e.Files {
+				if !cleanRel(f.Path, false) {
+					return nil, p, fmt.Errorf("message %d: workspace "+
+						"path %s is not a clean relative path", i+1,
+						strconv.Quote(f.Path))
+				}
+				w.Paths = append(w.Paths, f.Path)
+				w.Data = append(w.Data, append([]byte{}, f.Data...))
+			}
+			p.rereads = append(p.rereads, w)
 			continue
 		default:
 			return nil, p, fmt.Errorf("message %d: unknown entry %s",

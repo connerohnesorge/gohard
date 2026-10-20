@@ -1,0 +1,2 @@
+# a port map formal of a component instantiation: the component's port.
+gohard lsp definition --at top.vhd:27:15

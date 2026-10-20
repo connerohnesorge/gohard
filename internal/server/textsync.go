@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
 	"github.com/connerohnesorge/gohard/internal/span"
 )
 
@@ -105,8 +107,10 @@ func (s *State) didClose(o *out, params json.RawMessage) {
 	s.newSnapshot(o)
 }
 
-// didSave of gohard.yaml reloads the configuration; other saves change
-// nothing yet (on-save checks arrive with #34 and #35).
+// didSave of gohard.yaml reloads the configuration; a save of a VHDL
+// file rereads the workspace, so the disk copy behind a buffer (used
+// again once it closes) and files saved without being open stay
+// current.
 func (s *State) didSave(o *out, params json.RawMessage) {
 	var p struct {
 		TextDocument struct {
@@ -117,7 +121,95 @@ func (s *State) didSave(o *out, params json.RawMessage) {
 		return
 	}
 	path, ok := URIToPath(p.TextDocument.URI)
-	if ok && path == filepath.Join(s.root, config.FileName) {
+	switch {
+	case ok && path == filepath.Join(s.root, config.FileName):
+		s.rereading = s.loaded
 		o.do(LoadConfig{Folder: s.folder})
+	case ok && s.loaded && isVHDLPath(path) && within(s.root, path):
+		s.rereading = true
+		o.do(LoadWorkspace{Root: s.root})
 	}
+	if ok {
+		s.didSaveSim(path)
+	}
+}
+
+// watchGlobs are the files the server asks the client to watch.
+var watchGlobs = []string{"**/*.vhd", "**/*.vhdl", "**/" + config.FileName}
+
+// registerWatchers asks a client that supports it to report changes
+// made outside the editor (deletes, git checkouts, generators).
+func (s *State) registerWatchers(o *out) {
+	if !s.watchReg {
+		return
+	}
+	type watcher struct {
+		GlobPattern string `json:"globPattern"`
+	}
+	ws := make([]watcher, len(watchGlobs))
+	for i, g := range watchGlobs {
+		ws[i] = watcher{g}
+	}
+	type registration struct {
+		ID              string `json:"id"`
+		Method          string `json:"method"`
+		RegisterOptions any    `json:"registerOptions"`
+	}
+	params, _ := json.Marshal(struct {
+		Registrations []registration `json:"registrations"`
+	}{[]registration{{"gohard-watch", "workspace/didChangeWatchedFiles",
+		struct {
+			Watchers []watcher `json:"watchers"`
+		}{ws}}}})
+	s.nextOut++
+	o.send(&jsonrpc2.Request{ID: jsonrpc2.IntID(s.nextOut),
+		Method: "client/registerCapability", Params: params})
+}
+
+// didChangeWatchedFiles rereads the workspace (or gohard.yaml, which
+// rereads the workspace in turn) when a file changed on disk. Open
+// buffers still win over their disk copies; the reread result is an
+// event, so replay sees exactly what the live session read.
+func (s *State) didChangeWatchedFiles(o *out, params json.RawMessage) {
+	var p struct {
+		Changes []struct {
+			URI string `json:"uri"`
+		} `json:"changes"`
+	}
+	if json.Unmarshal(params, &p) != nil || s.root == "" || !s.loaded {
+		return
+	}
+	cfg, vhdl := false, false
+	for _, c := range p.Changes {
+		path, ok := URIToPath(c.URI)
+		switch {
+		case !ok || !within(s.root, path):
+		case path == filepath.Join(s.root, config.FileName):
+			cfg = true
+		case isVHDLPath(path):
+			vhdl = true
+		}
+	}
+	switch {
+	case cfg:
+		s.rereading = true
+		o.do(LoadConfig{Folder: s.folder})
+	case vhdl:
+		s.rereading = true
+		o.do(LoadWorkspace{Root: s.root})
+	}
+}
+
+func isVHDLPath(p string) bool {
+	switch strings.ToLower(filepath.Ext(p)) {
+	case ".vhd", ".vhdl":
+		return true
+	}
+	return false
+}
+
+func within(root, p string) bool {
+	rel, err := filepath.Rel(root, p)
+	return err == nil && rel != ".." &&
+		!strings.HasPrefix(rel, ".."+string(filepath.Separator))
 }

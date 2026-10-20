@@ -1,0 +1,2 @@
+# renaming to an extended identifier uses it verbatim at every site.
+gohard lsp rename --dry-run --at top.vhd:24:30 '\Ack Line\'

@@ -1,0 +1,2 @@
+# a new name declared in the same region is refused.
+gohard lsp rename --dry-run --at a.vhd:6:10 other

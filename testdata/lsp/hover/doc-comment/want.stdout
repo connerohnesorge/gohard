@@ -1,0 +1,1 @@
+{"contents":{"kind":"markdown","value":"```vhdl\nsignal req : STD_LOGIC\n```\n\nThe request line."},"range":{"start":{"line":15,"character":9},"end":{"line":15,"character":12}}}

@@ -1,0 +1,1 @@
+{"isIncomplete":false,"items":[{"label":"first","kind":5,"detail":"element first : INTEGER","textEdit":{"range":{"start":{"line":15,"character":11},"end":{"line":15,"character":11}},"newText":"first"}},{"label":"second","kind":5,"detail":"element second : STD_LOGIC","textEdit":{"range":{"start":{"line":15,"character":11},"end":{"line":15,"character":11}},"newText":"second"}}]}

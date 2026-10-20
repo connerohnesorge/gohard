@@ -1,0 +1,2 @@
+# An undefined name gets one 'add use' fix per package that declares it (#25).
+gohard lsp codeaction --at counter.vhd:8:18

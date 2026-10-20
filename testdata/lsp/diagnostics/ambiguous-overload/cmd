@@ -1,0 +1,2 @@
+# the overload diagnostics hover/ambiguous-overload and hover/no-overload show (#34).
+gohard lsp diagnostics --at amb.vhd:1:1

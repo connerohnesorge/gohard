@@ -1,0 +1,2 @@
+# Every design unit and package declaration of the project (#25).
+gohard lsp workspace-symbols --at top.vhd:1:1

@@ -1,0 +1,2 @@
+# a package named in a use clause, in another library.
+gohard lsp definition --at top.vhd:5:10

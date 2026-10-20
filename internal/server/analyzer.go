@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/internal/span"
 )
 
 // Analyzer computes the language features from a Snapshot. Later
@@ -35,8 +36,9 @@ type Analyzer interface {
 	// PrepareRename returns the span of the name at q, or nil when
 	// there is nothing to rename there.
 	PrepareRename(q Query) Task[*Span]
-	// Rename returns the edits of every affected file.
-	Rename(q Query, newName string) Task[[]FileEdit]
+	// Rename returns the edits of every affected file, or why the
+	// rename is refused (the server answers RequestFailed with it).
+	Rename(q Query, newName string) Task[Renamed]
 	Completion(q Query) Task[[]CompletionItem]
 	DocumentSymbols(snap *Snapshot, uri string) Task[[]Symbol]
 	WorkspaceSymbols(snap *Snapshot, query string) Task[[]Symbol]
@@ -50,6 +52,10 @@ type Analyzer interface {
 	// Features.Commands (for example running a testbench, #35).
 	Command(snap *Snapshot, name string,
 		args []json.RawMessage) Task[json.RawMessage]
+	// CodeActions returns the quick fixes for the diagnostics of the
+	// range r of the document q.URI (q.Offset is r.Start): add a
+	// missing use, map an unmapped library (#25, #34).
+	CodeActions(q Query, r Span) Task[[]CodeAction]
 }
 
 // Feature is one optional language feature.
@@ -71,6 +77,7 @@ const (
 	FeatureHighlights
 	FeatureCodeLens
 	FeatureCommands
+	FeatureCodeActions
 )
 
 // Features is what an Analyzer provides.
@@ -98,10 +105,13 @@ type Span struct {
 	End   int
 }
 
-// Location is a span in any document of the snapshot.
+// Location is a span in any document of the snapshot, or in a
+// read-only text outside it (a bundled std/ieee file, #33), whose line
+// index is then Lines.
 type Location struct {
-	URI  string
-	Span Span
+	URI   string
+	Span  Span
+	Lines *span.Index
 }
 
 // FileDiagnostics are the diagnostics of one document. Line and Col are
@@ -122,6 +132,13 @@ type Hover struct {
 type FileEdit struct {
 	URI   string
 	Edits []Edit
+}
+
+// Renamed is the result of a rename: the edits of every affected
+// file, or, when Refused is set, why there are none.
+type Renamed struct {
+	Edits   []FileEdit
+	Refused string
 }
 
 // Edit replaces Span with NewText.
@@ -174,6 +191,16 @@ type Lens struct {
 	Args    []json.RawMessage
 }
 
+// CodeAction is a quick fix: the edits of every affected document,
+// which may include gohard.yaml (Snapshot.ConfigDocument).
+type CodeAction struct {
+	Title string
+	// Kind is the LSP CodeActionKind ("quickfix").
+	Kind      string
+	Preferred bool
+	Edits     []FileEdit
+}
+
 // Nop is the Analyzer of a server without analysis: it provides no
 // features and every task finishes at once with an empty result.
 type Nop struct{}
@@ -205,8 +232,8 @@ func (Nop) References(Query, bool) Task[[]Location] {
 func (Nop) PrepareRename(Query) Task[*Span] { return Done[*Span](nil) }
 
 // Rename implements Analyzer.
-func (Nop) Rename(Query, string) Task[[]FileEdit] {
-	return Done[[]FileEdit](nil)
+func (Nop) Rename(Query, string) Task[Renamed] {
+	return Done(Renamed{})
 }
 
 // Completion implements Analyzer.
@@ -249,4 +276,9 @@ func (Nop) Command(*Snapshot, string,
 	[]json.RawMessage,
 ) Task[json.RawMessage] {
 	return Done[json.RawMessage](nil)
+}
+
+// CodeActions implements Analyzer.
+func (Nop) CodeActions(Query, Span) Task[[]CodeAction] {
+	return Done[[]CodeAction](nil)
 }

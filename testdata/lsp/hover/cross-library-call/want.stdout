@@ -1,0 +1,1 @@
+{"contents":{"kind":"markdown","value":"```vhdl\nfunction inc [INTEGER return INTEGER] from util.util_pkg\n```\n\nIncrements x by one."},"range":{"start":{"line":31,"character":11},"end":{"line":31,"character":14}}}

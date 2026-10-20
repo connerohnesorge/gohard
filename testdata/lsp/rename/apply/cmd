@@ -1,0 +1,2 @@
+# without --dry-run the edits are written to the files.
+gohard lsp rename --at top.vhd:16:10 request

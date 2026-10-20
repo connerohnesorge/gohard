@@ -1,0 +1,2 @@
+# Workspace symbols whose name contains the query, case insensitive.
+gohard lsp workspace-symbols --at top.vhd:1:1 PAIR

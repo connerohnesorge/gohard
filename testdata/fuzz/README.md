@@ -31,7 +31,7 @@ testdata/fuzz/
 | --- | --- |
 | `FuzzParse` | Never panics or hangs, round-trips byte for byte, every reported error points at a real position in the input. |
 | `FuzzFormat` | Formatting twice equals formatting once; only whitespace and keyword case change; literals and extended identifiers are byte-identical; the output parses to the same tree (same node types and token text ignoring spacing, keywords compared case-insensitively, same comment text in the same order). |
-| `FuzzLSPReplay` | The server never panics, two replays of the session give the same bytes, and the session invariants of `testdata/lsp/README.md` hold. When analysis lands (#34): after a random series of edits and a save, once the server settles, its diagnostics equal `gohard check` on the final text. |
+| `FuzzLSPReplay` | The server never panics, two replays of the session give the same bytes, and the session invariants of `testdata/lsp/README.md` hold. The same bytes, read as an edit script on a corpus design (`fuzzQuiescence` in `internal/server`), drive the analyzer of `gohard lsp`: after the edits and a save, once the server settles, its diagnostics equal `gohard check` on the final text. |
 | `FuzzConfig` | Config loading never panics and is deterministic. |
 
 Elaboration and simulation are not fuzz targets until the corpus passes.

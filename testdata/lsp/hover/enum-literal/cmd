@@ -1,0 +1,2 @@
+# an enumeration literal and the type it belongs to.
+gohard lsp hover --at top.vhd:34:12

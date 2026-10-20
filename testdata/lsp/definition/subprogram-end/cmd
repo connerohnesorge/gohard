@@ -1,0 +1,2 @@
+# the designator of an end function in a package body.
+gohard lsp definition --at util/util_pkg.vhd:28:16

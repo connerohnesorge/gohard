@@ -1,0 +1,2 @@
+# a bundled std/ieee name is not renamed.
+gohard lsp rename --dry-run --at top.vhd:16:21 sl

@@ -32,6 +32,7 @@ trees, and must match the committed files.
 | `cwd PATH` | Runs the command from PATH instead of the temp dir. |
 | `env NAME=VALUE` | Overrides an environment variable seen through the Env. |
 | `rand STATE` | Replaces the Env's random source with `env.SplitMix64{State: STATE}`, so `--seed random` picks the same seed every run. |
+| `viewers [NAME...]` | Replaces the Env's Executor with a simulated one whose `PATH` holds exactly the named programs (none when no name is given), for Open waveform (#36). |
 | `requires interpreter` | Skips the case while no sequential interpreter is registered (`simrun.DefaultCode` is nil); the case's want files are created with `-update` once it is. |
 | `stdout broken` | Standard output fails every write, like a closed pipe (`env.ErrBrokenPipe`): the run keeps its exit code. |
 | `stdout full` | Standard output fails every write, like a full disk: the run logs `cli/output-failed` and exits 2. |

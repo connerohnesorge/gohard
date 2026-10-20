@@ -1,0 +1,2 @@
+# The declarations of a file as a tree.
+gohard lsp symbols --at top.vhd:1:1

@@ -1,0 +1,15 @@
+{"schema":1,"version":"0.0.0-test","standard":"2008","testbench":"","seed":0,"defines":{},"budgets":{"time":"1 ms","delta":10000,"step":50000000},"models":{},"config":null,"sources":[]}
+{"$gohard":"analyzer","name":"echo"}
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":null,"rootUri":"file:///work","capabilities":{"general":{"positionEncodings":["utf-16","utf-8"]}}}}
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///work/top.vhd","languageId":"vhdl","version":1,"text":"-- é😀 x\nentity top is end;\n"}}}
+{"jsonrpc":"2.0","id":2,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///work/top.vhd"},"position":{"line":1,"character":8}}}
+{"jsonrpc":"2.0","id":"four","method":"textDocument/hover","params":{"textDocument":{"uri":"file:///work/top.vhd"},"position":{"line":1,"character":8}}}
+{"jsonrpc":"2.0","method":"$/cancelRequest","params":{"id":2}}
+{"jsonrpc":"2.0","method":"$/cancelRequest","params":{"id":77}}
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///work/top.vhd","version":2},"contentChanges":[{"range":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}},"text":"--\n"}]}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+{"jsonrpc":"2.0","id":3,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///work/top.vhd"},"position":{"line":2,"character":8}}}
+{"jsonrpc":"2.0","method":"$/cancelRequest","params":{"id":3}}
+{"jsonrpc":"2.0","method":"$/cancelRequest","params":{"id":2}}
+{"jsonrpc":"2.0","id":99,"method":"shutdown"}
+{"jsonrpc":"2.0","method":"exit"}

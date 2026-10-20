@@ -1,0 +1,2 @@
+gohard: error[cli/usage]: gohard lsp rename: cannot rename tmp: the new name is already in use: signal other : BIT is visible (a.vhd:7); run 'gohard help' for usage
+summary: 1 errors, 0 warnings, 0 hints, 0 files

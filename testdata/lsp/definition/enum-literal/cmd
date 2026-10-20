@@ -1,0 +1,2 @@
+# an enumeration literal.
+gohard lsp definition --at top.vhd:34:12

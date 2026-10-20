@@ -1,0 +1,2 @@
+# the label of an end process.
+gohard lsp definition --at top.vhd:39:15

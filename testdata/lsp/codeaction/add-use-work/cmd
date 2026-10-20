@@ -1,0 +1,2 @@
+# A name declared by a project package: the use clause goes after the unit's last context clause, through work.
+gohard lsp codeaction --at top.vhd:5:27

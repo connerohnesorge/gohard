@@ -1,0 +1,2 @@
+# a std_logic_1164 type: the bundled declaration and every project use.
+gohard lsp references --at top.vhd:16:21

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"maps"
+	"path/filepath"
 	"slices"
 	"time"
 
@@ -32,6 +33,10 @@ type Options struct {
 	Analyzer Analyzer
 	// Version is reported in serverInfo.
 	Version string
+	// Simulator, when set, runs testbenches in the editor: code
+	// lenses, the Open waveform code action and the gohard.* commands
+	// (sim.go, #25, #35, #36).
+	Simulator Simulator
 }
 
 type phase uint8
@@ -56,14 +61,19 @@ type State struct {
 
 	enc        span.Encoding
 	progressOK bool // window.workDoneProgress
-	folder     string
-	root       string
+	// watchReg: the client registers file watchers dynamically.
+	watchReg bool
+	folder   string
+	root     string
 
-	file      *config.Loaded // gohard.yaml, once loaded
-	editor    *config.Config // editor settings, if the client sent any
-	cfg       config.Config  // gohard.yaml over the editor settings
-	cfgDiags  bool           // gohard.yaml diagnostics are published
-	loaded    bool           // the workspace files were read
+	file     *config.Loaded // gohard.yaml, once loaded
+	editor   *config.Config // editor settings, if the client sent any
+	cfg      config.Config  // gohard.yaml over the editor settings
+	cfgDiags bool           // gohard.yaml diagnostics are published
+	loaded   bool           // the workspace files were read
+	// rereading is set from a watched-file change until the reread
+	// lands: requests arriving meanwhile wait for the new snapshot.
+	rereading bool
 	discovery []diag.Diagnostic
 
 	open map[string]*Document // by docKey; copy on write
@@ -79,6 +89,15 @@ type State struct {
 	nextOut   int64    // last server-to-client request ID
 	creating  map[int64]uint64
 	edits     uint64 // count of document changes
+
+	// Simulation (sim.go): the last run of each testbench (copy on
+	// write), the analysis diagnostics last published, the save count
+	// of the auto_run_on_save debounce, and whether the client takes
+	// workspace/codeLens/refresh.
+	runs        map[string]simRun
+	anDiags     []FileDiagnostics
+	saves       uint64
+	lensRefresh bool
 }
 
 // New returns the state of a server that has not been initialized.
@@ -152,6 +171,14 @@ func Step(s State, ev Event) (State, []Effect) {
 		st.workspaceLoaded(&o, b)
 	case Work:
 		st.slice(&o, b.ID)
+	case AutoRun:
+		st.autoRun(b.Gen)
+	case WaveformOpened:
+		st.waveformOpened(&o, b)
+	case RunWritten:
+		if b.Err != "" && st.phase != phaseExited {
+			st.log(&o, LogError, "simulation: "+b.Err)
+		}
 	}
 	s.now += Tick
 	return s, o.fx
@@ -298,6 +325,8 @@ func (s *State) notification(o *out, m call) {
 		s.didSave(o, m.params)
 	case "workspace/didChangeConfiguration":
 		s.didChangeConfiguration(o, m.params)
+	case "workspace/didChangeWatchedFiles":
+		s.didChangeWatchedFiles(o, m.params)
 	}
 }
 
@@ -327,6 +356,11 @@ func (s *State) newSnapshot(o *out) {
 	s.ids++
 	s.snap = newSnapshot(s.ids, s.root, s.cfg, s.open, s.disk)
 	s.snap.Discovery = s.discovery
+	if s.file != nil && s.root != "" {
+		name := filepath.Join(s.root, config.FileName)
+		d := newDocument(PathToURI(name), s.root, s.file.Source)
+		s.snap.config, s.snap.configPresent = d, s.file.Present
+	}
 	s.startDiagnostics(o)
 }
 

@@ -1,0 +1,2 @@
+# a record field in a selected name.
+gohard lsp definition --at top.vhd:32:42

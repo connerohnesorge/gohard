@@ -190,7 +190,11 @@ lines for input that arrived while idle, `"$gohard"` entries
 otherwise, and for bodies that are not JSON), so the output is a
 function of the session file and the project files and `gohard lsp
 replay` reproduces it byte for byte. The session also holds every
-`gohard.yaml` read (a save reloads it) and every request the
+`gohard.yaml` read (a save reloads it), every reread of the project
+files after the first load (a save of a VHDL file, or
+`workspace/didChangeWatchedFiles`, which the server registers for
+`**/*.vhd`, `**/*.vhdl` and `**/gohard.yaml` when the client supports
+dynamic registration) and every request the
 transport skipped unread (answered with InvalidRequest), and its
 folder is the one the first initialize request names, wherever that
 request is. Failing harness sessions embed
@@ -198,9 +202,27 @@ their project files and test analyzer, so a seed replays on its own.
 Every response and publish is followed by the notification
 `$/gohard/snapshot` with the snapshot ID. Features come from a
 `server.Analyzer` (pure tasks over a whole-workspace `Snapshot`, byte
-offsets, cross-file locations), `server.Nop` until #32, #34 and #35
-implement it; `gohard lsp <action>` runs the action as an in-memory
+offsets, cross-file locations). `internal/ide` implements it on sema
+and resolve (`ide.New`, wrapped by `server.WithFormatting`, is the
+analyzer of `gohard lsp`): it analyzes each snapshot in memory in
+bounded slices (plan, parse, analyze), reuses parse trees and results
+across snapshots without changing slice counts or values, and its
+`ide.Analysis` is the query layer of every feature. `ide` implements
+the interface `server` defines, so it imports `server`; `server` never
+imports it. `gohard lsp <action>` runs the action as an in-memory
 session on the same code path (`server.RunAction`).
+
+Navigation (hover, definition, references, rename) is `resolve` over
+the snapshot's sema result. A declaration and its completions (body,
+full constant, package body, and a subprogram's parameters and
+generics in both) are one entity for references and rename. Bundled
+std/ieee locations carry the URI `gohard-bundle:///<path>` and their
+own line index (`server.Location.Lines`); the editor opens them
+read-only with `ide.BundledSource`. A rename is refused (the server
+answers RequestFailed, `gohard lsp rename` exits 2) for bundled,
+predefined and library names, declarations of opaque units, stand-ins
+named like an opaque unit, and extended identifiers; each use site
+keeps its letter case.
 
 ## Test data
 

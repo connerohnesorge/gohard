@@ -8,10 +8,12 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/internal/env/simenv"
 	"github.com/connerohnesorge/gohard/internal/simrun"
 )
 
@@ -39,6 +41,9 @@ type setup struct {
 	// rand, when set, replaces env.Rand with a SplitMix64 of this
 	// state, so --seed random is reproducible.
 	rand *uint64
+	// viewers, when set, replaces env.Executor with a simulated one
+	// whose PATH holds exactly these programs (Open waveform, #36).
+	viewers *[]string
 	// restore lists paths chmod made unreadable; restorePerms makes
 	// them readable again after the run.
 	restore []string
@@ -162,6 +167,9 @@ func applySetup(t tb, dir, work string) setup {
 				bad()
 			}
 			st.rand = &v
+		case f[0] == "viewers":
+			vs := slices.Clone(f[1:])
+			st.viewers = &vs
 		case line == "requires interpreter":
 			if simrun.DefaultCode == nil {
 				t.Skip("needs the sequential interpreter " +
@@ -213,6 +221,17 @@ func (st setup) wrap(e *env.Env, cancel context.CancelCauseFunc) {
 	}
 	if st.rand != nil {
 		e.Rand = &env.SplitMix64{State: *st.rand}
+	}
+	if st.viewers != nil {
+		ps := map[string]simenv.Program{}
+		for _, v := range *st.viewers {
+			ps["/viewers/"+v] = func(context.Context, env.Command) (
+				env.Result, error,
+			) {
+				return env.Result{}, nil
+			}
+		}
+		e.Executor = simenv.NewExecutor([]string{"/viewers"}, ps)
 	}
 	if st.broken {
 		e.Transport.Stdout = brokenPipe{}

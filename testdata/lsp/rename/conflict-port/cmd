@@ -1,0 +1,2 @@
+# an architecture signal may not take a port name of its entity.
+gohard lsp rename --dry-run --at a.vhd:6:10 DIN

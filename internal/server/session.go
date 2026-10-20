@@ -191,6 +191,9 @@ func Replay(s repro.Session, fsys env.FS, o Options, name string,
 	if len(proj.configs) > 0 {
 		d.loadConfig = feedConfig(sim.Env().FS, folder, proj.configs)
 	}
+	if len(proj.rereads) > 0 {
+		d.loadFiles = feedFiles(sim.Env(), proj.rereads)
+	}
 	mark := -1
 	step := func() {
 		if mark >= 0 {
@@ -259,6 +262,48 @@ func feedConfig(fsys env.FS, folder string, cfgs []ConfigRead,
 		}
 		return config.Load(fsys, e.Folder)
 	}
+}
+
+// feedFiles returns a Driver.loadFiles that leaves the first load
+// alone (the header's files) and, before each later one, makes the
+// project files under the root exactly the next recorded reread, so
+// every reread sees what the live server read.
+func feedFiles(e env.Env, reads []WorkspaceRead,
+) func(LoadWorkspace) WorkspaceLoaded {
+	first := true
+	var placed []string
+	return func(l LoadWorkspace) WorkspaceLoaded {
+		if !first && len(reads) > 0 {
+			r := reads[0]
+			reads = reads[1:]
+			for _, p := range found(e, l.Root) {
+				_ = e.FS.Remove(p)
+			}
+			for _, p := range placed {
+				_ = e.FS.Remove(p)
+			}
+			placed = placed[:0]
+			for i, rel := range r.Paths {
+				p := filepath.Join(l.Root, filepath.FromSlash(rel))
+				if e.FS.MkdirAll(filepath.Dir(p), 0o755) == nil &&
+					e.FS.WriteFile(p, r.Data[i], 0o644) == nil {
+					placed = append(placed, p)
+				}
+			}
+		}
+		first = false
+		return LoadFiles(e, 1, l.Root)
+	}
+}
+
+// found lists the project files a load of root would read.
+func found(e env.Env, root string) []string {
+	f := workspace.Discover(e.FS, workspace.Options{Root: root, Dir: root})
+	names := make([]string, len(f.Files))
+	for i, x := range f.Files {
+		names[i] = x.Name
+	}
+	return names
 }
 
 // Mismatch compares two replays and returns the one-based number of

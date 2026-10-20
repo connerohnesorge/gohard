@@ -1,0 +1,2 @@
+gohard: error[cli/usage]: gohard lsp rename: cannot rename sub: the new name is already in use: entity top is visible (b.vhd:1); run 'gohard help' for usage
+summary: 1 errors, 0 warnings, 0 hints, 0 files

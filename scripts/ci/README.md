@@ -32,7 +32,10 @@ Triggers: `pull_request`, pushes to `main` and `v1`, manual dispatch.
 | `testdata/cli` fixtures at `-p 1` and `-p 16` | `go test` (`internal/cli`) | wired |
 | `testdata/lsp` and `testdata/parse` fixtures | `go test` | `testdata/lsp` wired (#25, see its README); `testdata/parse` later (#31) |
 | Liveness workload (60 s virtual, 5 s no-progress rule) | `go test` | wired: `TestLiveness` and `TestNoProgressRule` in `internal/server` |
-| `docs/libraries.md` examples, Neovim and Helix tests | new steps | later: #1, #38 |
+| Liveness with the analyzer of `gohard lsp` | `go test` | wired: `TestLSPLivenessRealAnalyzer` in `internal/cli` |
+| Headless Neovim end-to-end test (Linux) | `nvim.sh` (job `editors`, `nix develop` provides Neovim) | wired (#38): `editors/nvim/test/run.sh` |
+| Helix stdio connection test | `go test` (`TestHelixStdio` in `cmd/gohard`, real pipes) | wired (#38) |
+| `docs/libraries.md` examples | new step | later: #1 |
 
 Formatting scope: every tracked or untracked, non-ignored `*.go` file,
 except files under any `testdata/` directory (test inputs, analyzer
@@ -78,7 +81,9 @@ pull-requests write) for the PR to show its red checks. Local dry run:
 ## Rules (#30)
 
 * CI downloads nothing beyond checking out submodules and the Go module
-  cache (the pinned golines comes from the module proxy). GHDL and NVC
+  cache (the pinned golines comes from the module proxy).
+  The one exception is the `editors` job, which installs Nix and
+  takes Neovim from the flake's dev shell (#38). GHDL and NVC
   never run in CI; hashes recorded by `tools/oracle` are compared.
 * A missing submodule must fail with a message naming
   `git submodule update --init`; nothing is skipped.

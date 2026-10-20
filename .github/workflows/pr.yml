@@ -92,3 +92,27 @@ jobs:
 
       - name: go test -race
         run: bash scripts/ci/race.sh
+
+  # The headless Neovim end-to-end test (#38). Neovim comes from the
+  # flake's dev shell, the same one used locally. The Helix stdio test,
+  # the liveness workload and FuzzLSPReplay run in `check` (go test).
+  editors:
+    name: neovim (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Headless Neovim end-to-end test
+        env:
+          GOHARD_MEMCAP: '0'
+        run: nix develop -c bash scripts/ci/nvim.sh

@@ -1,0 +1,2 @@
+# a declaration of an opaque unit (a v1.1 construct) is not renamed: its references are not known.
+gohard lsp rename --dry-run --at protected_record.vhd:4:8 pair2_t

@@ -28,6 +28,14 @@ type initializeParams struct {
 		Window struct {
 			WorkDoneProgress bool `json:"workDoneProgress"`
 		} `json:"window"`
+		Workspace struct {
+			CodeLens struct {
+				RefreshSupport bool `json:"refreshSupport"`
+			} `json:"codeLens"`
+			DidChangeWatchedFiles struct {
+				DynamicRegistration bool `json:"dynamicRegistration"`
+			} `json:"didChangeWatchedFiles"`
+		} `json:"workspace"`
 	} `json:"capabilities"`
 }
 
@@ -98,6 +106,9 @@ func (s *State) initialize(o *out, m call) {
 	}
 	s.enc = Negotiate(p.Capabilities.General.PositionEncodings)
 	s.progressOK = p.Capabilities.Window.WorkDoneProgress
+	s.lensRefresh = p.Capabilities.Workspace.CodeLens.RefreshSupport
+	s.watchReg = p.Capabilities.Workspace.DidChangeWatchedFiles.
+		DynamicRegistration
 	s.folder, _ = p.Folder()
 	s.root = s.folder
 	s.phase = phaseInitialized
@@ -126,6 +137,7 @@ func (s *State) initialized(o *out) {
 		s.unpark(o)
 		return
 	}
+	s.registerWatchers(o)
 	o.do(LoadConfig{Folder: s.folder})
 }
 
@@ -167,6 +179,7 @@ func (s *State) workspaceLoaded(o *out, w WorkspaceLoaded) {
 	s.disk = docs
 	s.discovery = w.Diagnostics
 	s.loaded = true
+	s.rereading = false
 	// Open documents were made before the root was known.
 	open := map[string]*Document{}
 	for _, k := range sortedKeys(s.open) {
@@ -270,7 +283,7 @@ func (s *State) publishConfig(o *out, l config.Loaded) {
 // capabilities are the server capabilities: incremental text sync,
 // the negotiated position encoding, and the analyzer's features.
 func (s *State) capabilities() map[string]any {
-	f := s.an.Features()
+	f := s.features()
 	c := map[string]any{
 		"positionEncoding": s.enc.String(),
 		"textDocumentSync": map[string]any{
@@ -306,6 +319,8 @@ func (s *State) capabilities() map[string]any {
 	set(FeatureHighlights, "documentHighlightProvider", true)
 	set(FeatureCodeLens, "codeLensProvider",
 		map[string]any{"resolveProvider": false})
+	set(FeatureCodeActions, "codeActionProvider",
+		map[string]any{"codeActionKinds": []string{"quickfix"}})
 	cmds := slices.Clone(f.Commands)
 	if cmds == nil {
 		cmds = []string{}

@@ -1,0 +1,1 @@
+{"contents":{"kind":"markdown","value":"```vhdl\nenumeration literal busy [return state_t] from util.util_pkg\n```"},"range":{"start":{"line":33,"character":11},"end":{"line":33,"character":15}}}

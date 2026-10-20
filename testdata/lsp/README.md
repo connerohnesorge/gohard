@@ -79,6 +79,108 @@ result; positions are zero-based UTF-8.
 | `range-format/lines` | `gohard lsp range-format --at PATH:2:1 4:1`: lines 2 and 3 only, with `format.indent` and `format.keyword_case` from `gohard.yaml` |
 | `range-format/partial-line` | a range inside one line: the indentation before it is left alone |
 | `range-format/bad-end` | a range end that is not LINE:COL is a usage error (exit 2) |
+| `diagnostics/cross-file` | `gohard lsp diagnostics --at PATH:1:1`: the syntax and semantic diagnostics published for a file using a package in another file |
+| `diagnostics/v1.1-construct` | a construct planned for v1.1 gives the same `unsupported/construct` diagnostic as `gohard check` (#25) |
+| `completion/record-field` | after `p.` the fields of the record signal `p` |
+| `completion/library-units` | after `work.` the primary units of the library and `all` |
+| `completion/library-name` | library names (`ieee`) |
+| `completion/keywords-and-names` | visible names and the keywords of the selected standard, filtered by the word before the cursor |
+| `completion/overload-candidates` | inside an undecided call the candidates come first, each with the reason hover shows (#34) |
+| `symbols/document` | `gohard lsp symbols`: the declarations of the file as a tree |
+| `workspace-symbols/all` | `gohard lsp workspace-symbols --at PATH:1:1 [QUERY]`: every unit and package declaration of the project |
+| `workspace-symbols/query` | only the names containing the query, case insensitive |
+| `folding/blocks` | the context clause (`imports`), the architecture, the process (each to the line before its `end`) and a comment run |
+| `highlight/signal` | the declaration (text), assignment targets (write) and reads of a signal in the file |
+| `codeaction/add-use` | `gohard lsp codeaction`: one "add use" quick fix per bundled package declaring the undefined name |
+| `codeaction/add-use-work` | a project package: `use work.util.all;` after the unit's last context clause |
+| `codeaction/map-library` | an unmapped library: the `libraries` line written into `gohard.yaml`, with the folder declaring the unit (the search of `gohard libs detect`, #34) |
+| `codeaction/map-library-new-yaml` | without `gohard.yaml` the fix adds a `libraries` block |
+| `hover/doc-comment` | a signal: its declaration and doc comment |
+| `hover/cross-library-call` | a call of a function of another library: the chosen overload, its package and doc comment |
+| `hover/bundled-operator` | an operator: the chosen overload from ieee.numeric_std |
+| `hover/record-field` | a record field with its doc comment |
+| `hover/entity-doc` | a design unit: the doc comment above the entity, after the context clause |
+| `hover/enum-literal` | an enumeration literal and the type it belongs to |
+| `hover/ambiguous-overload` | an ambiguous call (#34): the diagnostic's message and every candidate with its reason, as in diagnostics/ambiguous-overload |
+| `hover/no-overload` | a call no overload fits (#34): every candidate and why it does not fit, as in diagnostics/ambiguous-overload |
+| `diagnostics/ambiguous-overload` | the overload diagnostics hover/ambiguous-overload and hover/no-overload show (#34) |
+| `definition/use-clause` | a package named in a use clause, in another library |
+| `definition/library-unit` | the entity of an entity instantiation, in another library |
+| `definition/component` | the component of a component instantiation |
+| `definition/port-map-formal` | a port map formal of an entity instantiation: the port in the other file |
+| `definition/generic-map-formal` | a generic map formal of an entity instantiation |
+| `definition/component-formal` | a port map formal of a component instantiation: the component's port |
+| `definition/alias` | an alias used as an actual |
+| `definition/selected-name` | the last name of a selected name lib.pkg.name |
+| `definition/selected-prefix` | the package prefix of a selected name |
+| `definition/record-field` | a record field in a selected name |
+| `definition/enum-literal` | an enumeration literal |
+| `definition/case-insensitive` | a name written in another letter case (INC) |
+| `definition/label` | the loop label of an exit statement |
+| `definition/end-label` | the label of an end process |
+| `definition/subprogram-end` | the designator of an end function in a package body |
+| `definition/bundled-type` | a std_logic_1164 type: the read-only bundled source (gohard-bundle URI) |
+| `definition/bundled-function` | to_integer: the numeric_std overload chosen, in the bundled source |
+| `definition/extended-identifier` | an extended identifier |
+| `definition/ambiguous-overload` | an ambiguous call (#34): every candidate that fits |
+| `definition/no-overload` | a call no overload fits (#34): every candidate |
+| `references/cross-library` | a function across libraries and files: declaration, body, end designator and calls |
+| `references/record-field` | a record field: declaration and selected names |
+| `references/entity-port` | an entity port: declaration, use in the architecture and the formal in another file |
+| `references/enum-literal` | an enumeration literal |
+| `references/label` | a loop label with its exit and end label |
+| `references/bundled` | a std_logic_1164 type: the bundled declaration and every project use |
+| `rename/dry-run` | the edit plan across files and libraries; each use site keeps its letter case (INC becomes STEP) |
+| `rename/record-field` | a record field in its declaration and in selected names |
+| `rename/entity-port` | a port: declaration, architecture use and the formal of the entity instantiation, not the component's port |
+| `rename/apply` | without --dry-run the edits are written to the files |
+| `rename/bundled-refused` | a bundled std/ieee name is not renamed |
+| `rename/extended-refused` | an extended identifier keeps its spelling: refused |
+| `rename/reserved-word` | a reserved word is not a valid new name |
+| `rename/to-extended` | renaming to an extended identifier uses it verbatim at every site |
+| `rename/opaque-refused` | a declaration of an opaque unit (a v1.1 construct) is not renamed: its references are not known |
+| `rename/conflict-region` | a new name already declared in the same region is refused |
+| `rename/conflict-port` | an architecture signal may not take a port name of its entity (case-insensitive) |
+| `rename/conflict-unit` | an entity may not take the name of another design unit of its library |
+| `hover/opaque-unit` | hover still describes a declaration of an opaque unit |
+
+| `run/lens-position` | `gohard lsp run --at PATH:LINE:COL`: the Run testbench code lens (`gohard.runTestbench`) on the entity at the position; the result is `gohard lsp sim`'s JSON, and the run writes its trace and repro file (`want/`) |
+| `run/seed` | `gohard lsp run --at PATH:1:1 1`: re-run with a seed; the `sim/race` warning against seed 0, as `gohard lsp sim --seed 1` |
+| `run/design-error` | a design with errors is not simulated; the report holds the errors |
+| `waveform/no-viewer` | `gohard lsp waveform`: Open waveform (#36) runs the testbench, exports FST next to the trace and, with neither `surfer` nor `gtkwave` on `PATH`, shows the FST path (`want/` holds the three files) |
+| `waveform/surfer` | Surfer wins when both viewers are on `PATH` |
+| `waveform/gtkwave` | only GTKWave on `PATH` |
+| `repro/default` | `gohard lsp repro`: Copy repro, the `gohard check --repro FILE` command |
+| `codelens/testbench` | the "▶ Run sev_tb" lens on a portless entity |
+
+The `waveform/` cases replace the Executor with a simulated one through
+the `viewers [NAME...]` setup directive (see `testdata/cli/README.md`).
+`TestLSPRunSharesSimFixtures` runs every `testdata/cli/lsp-sim-*`
+fixture through `gohard lsp run` (the editor's code path) and expects
+the same stdout and the same trace and repro bytes.
+
+`gohard lsp diagnostics` sends no request: it prints the last
+`textDocument/publishDiagnostics` for the file once the server is idle
+after opening it (an empty list when none was published).
+`TestLSPDiagnosticsFixturesEqualCheck` checks that every
+`diagnostics/` case equals `gohard check` on the same project, and
+`TestLSPQuiescentDiagnosticsEqualCheck` checks the same after random
+edit sequences over every corpus design.
+
+The navigation cases (`hover/`, `definition/`, `references/`,
+`rename/`) share one project: library `util` in `util/` (a package
+with doc comments, a record, an enumeration, an alias, a function and
+an entity) used from `top.vhd` in `work`. Bundled std/ieee locations
+use the URI `gohard-bundle:///<lib>/<file>.vhdl` (read-only, the text
+of `ide.BundledSource`). `gohard lsp rename` writes the edits;
+`--dry-run` prints the same WorkspaceEdit and writes nothing; a
+refused rename is a usage error (exit 2) with the reason. Use sites
+keep their letter case: a site spelled like the declaration gets the
+new name as typed, an all upper-case or all lower-case site gets it in
+that case. `TestNavCorpus`, `TestNavOSVVM`, `TestNavUVVM` and
+`TestNavNEORV32` (`internal/ide`) check definition, references and
+hover at every name occurrence, and `TestRenameCorpus` renames every
+renamable declaration of the corpus and re-analyzes it.
 
 `gohard lsp range-format --at PATH:LINE:COL END_LINE:END_COL` formats
 the half-open range from `--at` to the end position (both one-based,

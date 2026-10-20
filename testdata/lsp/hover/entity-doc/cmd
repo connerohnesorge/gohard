@@ -1,0 +1,2 @@
+# a design unit: the doc comment above the entity, after the context clause.
+gohard lsp hover --at top.vhd:22:20

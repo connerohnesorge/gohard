@@ -1,0 +1,14 @@
+{"schema":1,"version":"0.0.0-test","standard":"2008","testbench":"","seed":0,"defines":{},"budgets":{"time":"1 ms","delta":10000,"step":50000000},"models":{},"config":null,"sources":[]}
+{"jsonrpc":"2.0","id":0,"method":"textDocument/hover","params":{}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":null,"rootUri":"file:///work","capabilities":{"general":{"positionEncodings":["utf-16","utf-8"]}}}}
+{"jsonrpc":"2.0","id":2,"method":"initialize","params":{"capabilities":{}}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+{"jsonrpc":"1.0","id":3,"method":"gohard/what"}
+{"jsonrpc":"2.0","id":4,"method":"gohard/unknown","params":{}}
+{"jsonrpc":"2.0","id":5,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///work/x.vhd"},"position":{"line":0,"character":0}}}
+{"jsonrpc":"2.0","method":"gohard/unknownNotification","params":{}}
+{"jsonrpc":"2.0","id":6,"method":"shutdown"}
+{"jsonrpc":"2.0","id":7,"method":"textDocument/hover","params":{}}
+{"jsonrpc":"2.0","method":"exit"}
+{"jsonrpc":"2.0","id":8,"method":"shutdown"}

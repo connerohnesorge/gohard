@@ -1,0 +1,3 @@
+# Syntax and semantic diagnostics of a file that uses a package in
+# another file, as gohard check reports them (#25).
+gohard lsp diagnostics --at top.vhd:1:1

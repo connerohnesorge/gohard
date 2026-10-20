@@ -1,0 +1,2 @@
+# an operator: the chosen overload from ieee.numeric_std.
+gohard lsp hover --at top.vhd:33:16

@@ -44,6 +44,7 @@ var methods = map[string]Feature{
 	"textDocument/documentHighlight": FeatureHighlights,
 	"textDocument/codeLens":          FeatureCodeLens,
 	"workspace/executeCommand":       FeatureCommands,
+	"textDocument/codeAction":        FeatureCodeActions,
 }
 
 // Methods returns the feature request methods, sorted.
@@ -63,12 +64,12 @@ func Methods() []string {
 // document changes before it starts.
 func (s *State) feature(o *out, m call) {
 	feat, ok := methods[m.method]
-	if !ok || !s.an.Features().Has(feat) {
+	if !ok || !s.features().Has(feat) {
 		s.fail(o, m.id, jsonrpc2.CodeMethodNotFound,
 			"method not found: "+m.method)
 		return
 	}
-	if !s.loaded {
+	if !s.loaded || s.rereading {
 		s.nextWork++
 		w := work{id: s.nextWork, isReq: true, reqID: m.id,
 			method: m.method, parked: &m, edits: s.edits, since: s.now}
@@ -109,8 +110,18 @@ func (s *State) begin(o *out, m call, id uint64) {
 	}
 	c := conv{snap: snap, enc: s.enc}
 	run := s.runner(m.method, q, p, c)
+	var job *simJob
+	if m.method == "workspace/executeCommand" {
+		if r, j, ok := s.simCommand(p.Command, p.Arguments); ok {
+			run, job = r, j
+		}
+	}
+	run = s.decorate(m.method, q, run)
 	s.startWork(work{id: id, isReq: true, reqID: m.id, method: m.method,
-		run: run, token: p.WorkDoneToken})
+		run: run, token: p.WorkDoneToken, sim: job})
+	if job != nil && job.tb != "" {
+		s.refreshLenses(o)
+	}
 }
 
 // unpark starts every parked request, in arrival order, once the
@@ -135,7 +146,7 @@ func takesPosition(method string) bool {
 	switch method {
 	case "textDocument/documentSymbol", "textDocument/formatting",
 		"textDocument/rangeFormatting", "textDocument/foldingRange",
-		"textDocument/codeLens":
+		"textDocument/codeLens", "textDocument/codeAction":
 		return false
 	}
 	return true
@@ -163,7 +174,7 @@ func (s *State) runner(method string, q Query, p docParams,
 			return c.rng(uri, *sp)
 		})
 	case "textDocument/rename":
-		return runTask(an.Rename(q, p.NewName), c.workspaceEdit)
+		return runTask(an.Rename(q, p.NewName), c.renamed)
 	case "textDocument/completion":
 		return runTask(an.Completion(q), func(items []CompletionItem,
 		) any {
@@ -192,6 +203,13 @@ func (s *State) runner(method string, q Query, p docParams,
 		return runTask(an.Highlights(q), func(hs []Highlight) any {
 			return c.highlights(uri, hs)
 		})
+	case "textDocument/codeAction":
+		var r Span
+		if d, ok := snap.Document(uri); ok && p.Range != nil {
+			r = toSpan(d.index, *p.Range, s.enc)
+		}
+		q.Offset = r.Start
+		return runTask(an.CodeActions(q, r), c.codeActions)
 	case "textDocument/codeLens":
 		return runTask(an.CodeLens(snap, uri), func(ls []Lens) any {
 			return c.lenses(uri, ls)

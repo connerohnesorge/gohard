@@ -1,0 +1,2 @@
+# the entity of an entity instantiation, in another library.
+gohard lsp definition --at top.vhd:22:20

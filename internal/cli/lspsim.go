@@ -6,11 +6,8 @@ import (
 	"maps"
 
 	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/repro"
 	"github.com/connerohnesorge/gohard/internal/server"
 	"github.com/connerohnesorge/gohard/internal/simrun"
-	"github.com/connerohnesorge/gohard/internal/trace"
 )
 
 func init() {
@@ -46,22 +43,17 @@ func runLSPSim(inv *Invocation) Result {
 	res := runCheck(&sub)
 	r := res.Report
 	r.Strict = inv.Bool("strict")
-	out := lspSimJSON{Diagnostics: []simDiag{}}
+	var out server.SimReport
 	if len(runs) > 0 {
 		o := runs[0]
-		out.Testbench, out.Seed = o.Testbench, &o.Seed
-		out.Status = o.Status.String()
+		end := ""
 		if o.Trace != nil {
-			out.End = config.Time(o.Trace.Header.End).String()
-			out.Trace = trace.FileName(o.Testbench, o.Seed)
-			out.Repro = repro.FileName(o.Testbench, o.Seed)
+			end = config.Time(o.Trace.Header.End).String()
 		}
-	}
-	ds := diag.Normalize(r.Diagnostics)
-	for _, d := range ds {
-		out.Diagnostics = append(out.Diagnostics, simDiag{Path: d.Path,
-			Line: d.Line, Col: d.Col, Severity: d.Severity.String(),
-			Code: string(d.Code), Message: d.Message})
+		out = server.NewSimReport(o.Testbench, &o.Seed,
+			o.Status.String(), end, r.Diagnostics)
+	} else {
+		out = server.NewSimReport("", nil, "", "", r.Diagnostics)
 	}
 	var b bytes.Buffer
 	enc := json.NewEncoder(&b)
@@ -70,25 +62,4 @@ func runLSPSim(inv *Invocation) Result {
 		panic(err) // plain strings and numbers always encode
 	}
 	return Result{Stdout: b.Bytes(), Exit: r.Exit()}
-}
-
-// lspSimJSON is the stdout of gohard lsp sim; field order is the key
-// order.
-type lspSimJSON struct {
-	Testbench   string    `json:"testbench"`
-	Seed        *uint64   `json:"seed"`
-	Status      string    `json:"status"`
-	End         string    `json:"end"`
-	Trace       string    `json:"trace"`
-	Repro       string    `json:"repro"`
-	Diagnostics []simDiag `json:"diagnostics"`
-}
-
-type simDiag struct {
-	Path     string `json:"path"`
-	Line     int    `json:"line"`
-	Col      int    `json:"col"`
-	Severity string `json:"severity"`
-	Code     string `json:"code"`
-	Message  string `json:"message"`
 }

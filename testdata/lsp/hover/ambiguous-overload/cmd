@@ -1,0 +1,2 @@
+# an ambiguous call (#34): the diagnostic's message and every candidate with its reason, as in diagnostics/ambiguous-overload.
+gohard lsp hover --at amb.vhd:17:25

@@ -1,0 +1,1 @@
+{"contents":{"kind":"markdown","value":"```vhdl\nfunction \"+\" [UNRESOLVED_UNSIGNED, NATURAL return UNRESOLVED_UNSIGNED] from ieee.numeric_std\n```\n\nId: A.5"},"range":{"start":{"line":32,"character":15},"end":{"line":32,"character":16}}}
