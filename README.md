@@ -50,3 +50,9 @@ nix develop -c go test -p 4 ./...
 Releases are built by goreleaser on `v*` tags
 (`.goreleaser.yaml`, `.github/workflows/release.yml`). Try it locally
 with `nix run nixpkgs#goreleaser -- release --snapshot --clean`.
+
+## License
+
+GoHard is licensed under the [Mozilla Public License 2.0](LICENSE).
+Contributions use a DCO sign-off; see [CONTRIBUTING.md](CONTRIBUTING.md).
+The bundled IEEE packages in `internal/stdlib` are Apache-2.0.

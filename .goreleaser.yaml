@@ -41,11 +41,9 @@ archives:
       # license and copyright holders ship with it.
       - internal/stdlib/LICENSE
       - internal/stdlib/AUTHORS.md
-      # The project license and authors (#38). They are globs on
-      # purpose: a glob that matches nothing adds nothing, so the build
-      # passes until the files are added, and then picks them up.
-      - LICENS[E]
-      - AUTHORS.m[d]
+      # The project license (MPL-2.0) and authors (#38, #40).
+      - LICENSE
+      - AUTHORS.md
 
 checksum:
   name_template: checksums.txt
