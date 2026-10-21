@@ -1,6 +1,6 @@
 # GoHard
 
-![GoHard mascot: two gophers under a GO HARD banner](docs/assets/gohard-banner.png)
+![GoHard mascot: two gophers under a GO HARD banner](docs/assets/gohard-banner.jpg)
 
 GoHard is a VHDL language server, checker, formatter and simulator in
 one pure-Go binary. Runs are deterministic: the same inputs and seed
