@@ -40,6 +40,11 @@ type Options struct {
 	// searches for vendor libraries like `gohard libs detect` (#1); a
 	// nil FS turns that search off.
 	Libraries libs.Host
+	// Cache, when set, opens the on-disk analysis cache (#37) of a
+	// project root for a configuration, or returns nil when there is
+	// none. Each analysis restores what it can from it and stores the
+	// rest; it never changes a result.
+	Cache func(root string, cfg config.Config) sema.Cache
 }
 
 // phase reports the start of an analysis phase to the probe.
@@ -62,6 +67,10 @@ type Analyzer struct {
 	parses, prevParses map[string]*parser.Result
 	// results are the latest analyses by content key, newest last.
 	results []*Analysis
+	// cache is the analysis cache opened last, for cacheKey (the root
+	// and the configuration).
+	cache    sema.Cache
+	cacheKey string
 }
 
 var _ server.Analyzer = (*Analyzer)(nil)
@@ -214,10 +223,7 @@ func hash(parts ...[]byte) string {
 
 func (a *Analyzer) plan(snap *server.Snapshot, budget int) *plan {
 	p := &plan{a: a, snap: snap, cfg: Config(snap)}
-	cj, err := json.Marshal(p.cfg)
-	if err != nil {
-		panic(err) // plain values always encode
-	}
+	cj := p.cfg.Identity()
 	ck := hash(cj, []byte(a.opts.ToolVersion))
 	keys := [][]byte{[]byte(ck), []byte(snap.Root)}
 	for _, d := range Files(snap) {
@@ -261,10 +267,15 @@ func (p *plan) parse(i int) server.Task[*Analysis] {
 		}
 		if p.a.cached(p.key) == nil {
 			popts := parser.FromConfig(p.cfg, p.a.opts.ToolVersion)
+			c := p.a.diskCache(p)
 			for j := p.chunks[i]; j < p.chunks[i+1]; j++ {
 				s := p.srcs[j]
 				t := p.a.tree(s.key)
-				if t == nil {
+				switch {
+				case t != nil:
+				case c != nil:
+					t = sema.ParseCached(c, s.path, s.doc.Text(), popts)
+				default:
 					t = parser.Parse(s.doc.Text(), popts)
 				}
 				p.trees[j] = t
@@ -313,6 +324,22 @@ func (a *Analyzer) store(an *Analysis, p *plan) {
 	}
 }
 
+// diskCache returns the analysis cache of the plan's root and
+// configuration, opening it when the last one was for another.
+func (a *Analyzer) diskCache(p *plan) sema.Cache {
+	if a.opts.Cache == nil || p.snap.Root == "" {
+		return nil
+	}
+	cj := p.cfg.Identity()
+	key := hash([]byte(p.snap.Root), cj)
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.cacheKey != key {
+		a.cache, a.cacheKey = a.opts.Cache(p.snap.Root, p.cfg), key
+	}
+	return a.cache
+}
+
 // analyze runs the analysis of the plan (or reuses a stored one).
 func (p *plan) analyze() *Analysis {
 	if r := p.a.cached(p.key); r != nil {
@@ -328,7 +355,7 @@ func (p *plan) analyze() *Analysis {
 	if len(p.srcs) > 0 {
 		in := sema.Input{Config: p.cfg, ToolVersion: p.a.opts.ToolVersion,
 			Jobs: p.a.opts.Jobs, Limit: p.a.opts.Limit,
-			Probe: p.a.opts.Probe}
+			Probe: p.a.opts.Probe, Cache: p.a.diskCache(p)}
 		for i, s := range p.srcs {
 			t := p.trees[i]
 			if t == nil { // the trees came from a stored analysis

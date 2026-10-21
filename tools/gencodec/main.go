@@ -250,12 +250,16 @@ func (g *gen) encMap(m *types.Map, x string) string {
 	case *types.Pointer:
 		n := g.id(kt.Elem().(*types.Named))
 		c := g.v("n")
+		l := g.v("l")
 		return fmt.Sprintf("e.later = append(e.later, func() {\n%s"+
-			"%s := 0\nfor _, %s := range e.t.p_%s.list {\n"+
+			"%s := 0\n%s := len(e.t.p_%s.list)\n"+
+			"for _, %s := range e.t.p_%s.list {\n"+
 			"if _, ok := %s[%s]; !ok {\ncontinue\n}\n%s++\n%s}\n"+
+			"for _, %s := range extraKeys(e, &e.t.p_%s, %s, %s, %s) {\n"+
+			"%s++\n%s}\n"+
 			"if %s != len(%s) {\npanic(\"sema: codec: map key "+
-			"unreachable\")\n}\n}\n})\n", head, c, k, n, x, k, c, body,
-			c, x)
+			"unreachable\")\n}\n}\n})\n", head, c, l, n, k, n, x, k, c,
+			body, k, n, x, l, c, c, body, c, x)
 	case *types.Named:
 		if st, ok := kt.Underlying().(*types.Struct); ok {
 			var cmps []string

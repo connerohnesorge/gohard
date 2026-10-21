@@ -76,8 +76,10 @@ func (c *Ctx) out(t Target, m ForceMode) bool {
 // mode.
 func (c *Ctx) Forced(s SigID) bool {
 	for _, ni := range c.k.sigs[s].nets {
-		if n := &c.k.nets[ni]; n.forced || n.oforced {
-			return true
+		if f := c.k.nets[ni].forced; f != 0 {
+			if nf := &c.k.forced[f-1]; nf.forced || nf.oforced {
+				return true
+			}
 		}
 	}
 	return false

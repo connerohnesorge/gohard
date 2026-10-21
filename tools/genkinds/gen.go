@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"go/format"
 	"os"
@@ -107,6 +109,9 @@ type model struct {
 	tokenKinds map[string]bool
 	nodeKinds  map[string]bool
 	groups     map[string]groupDef
+	// hash is the SHA-256 of kinds.yaml and keywords.yaml (line endings
+	// normalized to LF), cst.KindsHash.
+	hash string
 }
 
 // Generate reads the inputs under root and returns every generated file
@@ -166,6 +171,18 @@ func load(root string) (*model, error) {
 		return nil, err
 	}
 	m.words = kw.Words
+	h := sha256.New()
+	for _, p := range []string{kindsPath, keywordsPath} {
+		data, err := os.ReadFile(filepath.Join(root,
+			filepath.FromSlash(p)))
+		if err != nil {
+			return nil, err
+		}
+		data = bytes.ReplaceAll(data, []byte("\r\n"), []byte("\n"))
+		fmt.Fprintf(h, "%s %d\n", p, len(data))
+		h.Write(data)
+	}
+	m.hash = hex.EncodeToString(h.Sum(nil))
 	if m.kinds.Schema != 1 || kw.Schema != 1 {
 		return nil, fmt.Errorf("unsupported schema")
 	}
@@ -536,6 +553,11 @@ func genNodeKinds(m *model) string {
 	b.WriteString(header + "package cst\n\n")
 	b.WriteString("import \"github.com/connerohnesorge/gohard/" +
 		"internal/token\"\n\n")
+	b.WriteString("// KindsHash is the SHA-256 of kinds.yaml and " +
+		"keywords.yaml (line\n// endings normalized to LF): a " +
+		"component of the on-disk analysis\n// cache key (#37), so a " +
+		"cache written by another kind table is\n// never read.\n")
+	fmt.Fprintf(&b, "const KindsHash = %q\n\n", m.hash)
 	b.WriteString("// Node kinds (kinds.yaml, append only).\nconst (\n")
 	for i, n := range m.kinds.Nodes {
 		if n.Doc != "" {

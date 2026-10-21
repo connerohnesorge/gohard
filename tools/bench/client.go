@@ -72,8 +72,9 @@ type msg struct {
 }
 
 // client is a scripted LSP client of an in-process `gohard lsp` (the
-// same analyzer, formatting wrapper and simulator as cli's newAnalyzer)
-// over pipes, with the probe attached to the analyzer.
+// same analyzer, formatting wrapper, simulator and analysis cache as
+// cli's newAnalyzer) over pipes, with the probe attached to the
+// analyzer.
 type client struct {
 	in    *io.PipeWriter
 	msgs  chan msg
@@ -94,8 +95,14 @@ func start(dir string) *client {
 		Stdout: s2cW, Stderr: io.Discard})
 	c := &client{in: c2sW, msgs: make(chan msg, 1<<16),
 		errs: make(chan error, 1), rec: &recorder{}}
-	an := ide.New(ide.Options{ToolVersion: cli.Version, Jobs: e.Jobs,
-		Probe: c.rec.probe()})
+	o := ide.Options{ToolVersion: cli.Version, Jobs: e.Jobs,
+		Probe: c.rec.probe()}
+	// The on-disk analysis cache of the project (#37), as gohard lsp
+	// uses it; GOHARD_BENCH_NOCACHE=1 measures without it.
+	if os.Getenv("GOHARD_BENCH_NOCACHE") == "" {
+		o.Cache = cli.CacheOpener(e.FS)
+	}
+	an := ide.New(o)
 	opts := server.Options{Analyzer: server.WithFormatting(an,
 		cli.Version), Simulator: an, Version: cli.Version}
 	ctx, cancel := context.WithCancel(context.Background())

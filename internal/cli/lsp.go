@@ -29,16 +29,24 @@ func init() { lookup("lsp").Run = runLSP }
 // lenses and commands (#35, #36). Each session gets a fresh analyzer,
 // so its reuse of parse trees and results starts empty (replay runs
 // twice).
-var newAnalyzer = func(inv *Invocation) (server.Analyzer,
+//
+// With useCache the analyses use the on-disk analysis cache of the
+// session's project root (#37); a replay does not, since its root is
+// the recorded one.
+var newAnalyzer = func(inv *Invocation, useCache bool) (server.Analyzer,
 	server.Simulator,
 ) {
-	an := ide.New(ide.Options{ToolVersion: Version, Jobs: inv.Env.Jobs,
-		Limit: inv.Jobs, Libraries: libsHost(inv)})
+	o := ide.Options{ToolVersion: Version, Jobs: inv.Env.Jobs,
+		Limit: inv.Jobs, Libraries: libsHost(inv)}
+	if useCache {
+		o.Cache = inv.cacheOpener()
+	}
+	an := ide.New(o)
 	return server.WithFormatting(an, Version), an
 }
 
-func serverOptions(inv *Invocation) server.Options {
-	an, sim := newAnalyzer(inv)
+func serverOptions(inv *Invocation, useCache bool) server.Options {
+	an, sim := newAnalyzer(inv, useCache)
 	b := inv.build()
 	return server.Options{Analyzer: an, Simulator: sim, Version: Version,
 		Commit: b.Commit, Go: b.Go}
@@ -69,7 +77,7 @@ func serveLSP(inv *Invocation) Result {
 	if rec != nil {
 		record = rec.record
 	}
-	code := server.Serve(inv.Ctx, inv.Env, serverOptions(inv), inv.Jobs,
+	code := server.Serve(inv.Ctx, inv.Env, serverOptions(inv, true), inv.Jobs,
 		record)
 	if rec != nil {
 		if rec.close(); rec.err != nil {
@@ -192,8 +200,8 @@ func replayLSP(inv *Invocation) Result {
 	}
 	var runs [2]server.Replayed
 	for i := range runs {
-		runs[i], err = server.Replay(sess, inv.Env.FS, serverOptions(inv),
-			name)
+		runs[i], err = server.Replay(sess, inv.Env.FS,
+			serverOptions(inv, false), name)
 		if err != nil {
 			return inv.Fail(repro.Invalid(name,
 				errors.New(errReason(err))))
@@ -266,9 +274,9 @@ func lspAction(inv *Invocation) Result {
 	x := span.NewIndex(text)
 	off, _ := x.OffsetOf(line, col)
 	p := x.Position(off, span.UTF8)
-	resp, err := server.RunAction(inv.Env, serverOptions(inv), inv.Jobs, wd,
-		a, path, text, server.Position{Line: p.Line, Character: p.Col},
-		inv.Args[1:])
+	resp, err := server.RunAction(inv.Env, serverOptions(inv, true),
+		inv.Jobs, wd, a, path, text,
+		server.Position{Line: p.Line, Character: p.Col}, inv.Args[1:])
 	switch {
 	case errors.Is(err, server.ErrNotProvided):
 		return inv.Fail(diag.New(diag.CLINotImplemented, "lsp "+name))

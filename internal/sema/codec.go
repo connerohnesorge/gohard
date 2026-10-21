@@ -89,17 +89,34 @@ func (t *encTable[T]) add(p *T) {
 	t.list = append(t.list, p)
 }
 
-// ref writes p; a new object is queued for fill.
+// ref writes p; a new object is queued for fill. In a cache entry
+// (e.x set) an object of another entry is an external reference (tag
+// 2, its owner and its number there) and ids start at 3.
 func (t *encTable[T]) ref(e *encoder, p *T, fill func(*T)) {
 	if p == nil {
 		e.uint(0)
 		return
 	}
+	base := uint64(2)
+	if e.x != nil {
+		base = 3
+	}
 	if id, ok := t.ids[p]; ok {
-		e.uint(id + 2)
+		e.uint(id + base)
 		return
 	}
+	if e.x != nil {
+		if owner, seq, ok := e.x.find(p); ok {
+			e.x.use(p, owner)
+			t.add(p)
+			e.uint(2)
+			e.uint(owner)
+			e.uint(seq)
+			return
+		}
+	}
 	t.add(p)
+	e.objs = append(e.objs, p)
 	e.uint(1)
 	e.queue = append(e.queue, func() { fill(p) })
 }
@@ -111,16 +128,30 @@ func (t *decTable[T]) seed(ps ...*T) { t.list = append(t.list, ps...) }
 
 func (t *decTable[T]) ref(d *decoder, fill func(*T)) *T {
 	n := d.uint()
+	base := uint64(2)
+	if d.x != nil {
+		base = 3
+	}
 	switch {
 	case n == 0:
 		return nil
 	case n == 1:
 		p := new(T)
 		t.list = append(t.list, p)
+		d.objs = append(d.objs, p)
 		d.queue = append(d.queue, func() { fill(p) })
 		return p
-	case n-2 < uint64(len(t.list)):
-		return t.list[n-2]
+	case n == 2 && d.x != nil:
+		owner, seq := d.uint(), d.uint()
+		p, ok := d.x.resolve(owner, seq).(*T)
+		if !ok || p == nil {
+			d.fail()
+			return nil
+		}
+		t.list = append(t.list, p)
+		return p
+	case n >= base && n-base < uint64(len(t.list)):
+		return t.list[n-base]
 	}
 	d.fail()
 	return nil
@@ -137,6 +168,11 @@ type encoder struct {
 	nodes        map[cst.Node]uint64
 	results      encTable[parser.Result]
 	t            encTables
+	// objs are the new objects in the order they got their ids, the
+	// numbering external references of later entries use; x is set
+	// while encoding a cache entry (cache.go).
+	objs []any
+	x    *xenc
 }
 
 type decoder struct {
@@ -150,6 +186,8 @@ type decoder struct {
 	nodes        []cst.Node
 	results      decTable[parser.Result]
 	t            decTables
+	objs         []any
+	x            *xdec
 }
 
 func (e *encoder) uint(v uint64) { e.buf = binary.AppendUvarint(e.buf, v) }
@@ -172,6 +210,9 @@ func (e *encoder) str(s string) {
 		e.uint(id + 1)
 		return
 	}
+	if e.x != nil {
+		e.x.text(s)
+	}
 	e.strs[s] = uint64(len(e.strs))
 	e.uint(0)
 	e.uint(uint64(len(s)))
@@ -188,6 +229,9 @@ func (e *encoder) bytes(b []byte) {
 	if id, ok := e.blobs[string(b)]; ok {
 		e.uint(id + 2)
 		return
+	}
+	if e.x != nil {
+		e.x.text(string(b))
 	}
 	e.blobs[string(b)] = uint64(len(e.blobs))
 	e.uint(1)
@@ -385,6 +429,10 @@ func (d *decoder) green() *cst.Green {
 
 // node writes a red node: its parent chain first, its id after.
 func (e *encoder) node(n cst.Node) {
+	if e.x != nil {
+		e.xnode(n)
+		return
+	}
 	if n.IsZero() {
 		e.uint(0)
 		return
@@ -403,6 +451,9 @@ func (e *encoder) node(n cst.Node) {
 }
 
 func (d *decoder) node() cst.Node {
+	if d.x != nil {
+		return d.xnode()
+	}
 	switch id := d.uint(); {
 	case id == 0:
 		return cst.Node{}
@@ -425,6 +476,10 @@ func (d *decoder) node() cst.Node {
 }
 
 func (e *encoder) token(t cst.Token) {
+	if e.x != nil {
+		e.xtoken(t)
+		return
+	}
 	g, parent, off, idx := t.Raw()
 	e.green(g)
 	e.node(parent)
@@ -433,6 +488,9 @@ func (e *encoder) token(t cst.Token) {
 }
 
 func (d *decoder) token() cst.Token {
+	if d.x != nil {
+		return d.xtoken()
+	}
 	g := d.green()
 	parent := d.node()
 	off, idx := int(d.int()), int(d.int())
@@ -473,6 +531,39 @@ func seedTables(seed func(ts []*Type, es []*eval.Type)) {
 			eval.Positive, eval.String, eval.BitVector})
 }
 
+// extraKeys returns the keys of a pointer-keyed map that the loop over
+// the table (its first l0 objects, which found n keys) did not visit.
+// A bundle has none. In a cache entry they are keys that got their ids
+// during the loop, in id order, then keys of other entries (external
+// references), in the order of their owners' objects (cache.go).
+func extraKeys[T, V any](e *encoder, t *encTable[T], m map[*T]V,
+	l0, n int,
+) []*T {
+	if e.x == nil {
+		return nil
+	}
+	var out []*T
+	for _, p := range t.list[l0:] {
+		if _, ok := m[p]; ok {
+			out = append(out, p)
+		}
+	}
+	if missing := len(m) - n - len(out); missing > 0 {
+		e.x.scan(func(o any) bool {
+			if p, ok := o.(*T); ok {
+				if _, in := m[p]; in {
+					if _, own := t.ids[p]; !own {
+						out = append(out, p)
+						missing--
+					}
+				}
+			}
+			return missing > 0
+		})
+	}
+	return out
+}
+
 // drain writes the queued objects, then the deferred maps, until both
 // are empty.
 func drain(queue, later *[]func()) {
@@ -492,8 +583,14 @@ func drain(queue, later *[]func()) {
 
 // encodeBundle returns the stored form of the bundle r.
 func encodeBundle(r *Result) []byte {
-	e := &encoder{strs: map[string]uint64{}, blobs: map[string]uint64{},
-		greens: map[*cst.Green]uint64{}, nodes: map[cst.Node]uint64{}}
+	b, _ := encodeBundleObjs(r)
+	return b
+}
+
+// encodeBundleObjs is encodeBundle that also returns the objects in id
+// order, as decodeBundleObjs does.
+func encodeBundleObjs(r *Result) ([]byte, []any) {
+	e := newEncoder()
 	seedTables(func(ts []*Type, es []*eval.Type) {
 		e.t.p_Type.seed(ts...)
 		e.t.p_eval_Type.seed(es...)
@@ -503,18 +600,31 @@ func encodeBundle(r *Result) []byte {
 	e.str(sourcesHash())
 	e.p_Result(r)
 	drain(&e.queue, &e.later)
-	return e.buf
+	return e.buf, e.objs
+}
+
+func newEncoder() *encoder {
+	return &encoder{strs: map[string]uint64{}, blobs: map[string]uint64{},
+		greens: map[*cst.Green]uint64{}, nodes: map[cst.Node]uint64{}}
 }
 
 // decodeBundle restores a bundle encodeBundle stored. A blob of another
 // schema or other sources, or a damaged one, is errCodec.
 func decodeBundle(b []byte) (*Result, error) {
+	r, _, err := decodeBundleObjs(b)
+	return r, err
+}
+
+// decodeBundleObjs is decodeBundle that also returns the decoded
+// objects in id order (the encoder's objs), which cache entries refer
+// to (cache.go).
+func decodeBundleObjs(b []byte) (*Result, []any, error) {
 	if !bytes.HasPrefix(b, []byte(codecMagic)) {
-		return nil, errCodec
+		return nil, nil, errCodec
 	}
 	d := &decoder{buf: b, off: len(codecMagic)}
 	if d.str() != codecSchema || d.str() != sourcesHash() {
-		return nil, errCodec
+		return nil, nil, errCodec
 	}
 	seedTables(func(ts []*Type, es []*eval.Type) {
 		d.t.p_Type.seed(ts...)
@@ -523,7 +633,7 @@ func decodeBundle(b []byte) (*Result, error) {
 	r := d.p_Result()
 	drain(&d.queue, &d.later)
 	if d.bad || d.off != len(d.buf) || r == nil {
-		return nil, errCodec
+		return nil, nil, errCodec
 	}
-	return r, nil
+	return r, d.objs, nil
 }

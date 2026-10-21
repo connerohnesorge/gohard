@@ -87,3 +87,42 @@ func leafAt(tmpl eval.Value, i int) (eval.Value, bool) {
 	}
 	return eval.Value{}, false
 }
+
+// eachLeaf calls f with the template leaves [lo, hi) of tmpl in order:
+// the leaves leafAt returns for lo..hi-1, without visiting the
+// subelements outside the range or allocating.
+func eachLeaf(tmpl eval.Value, lo, hi int, f func(eval.Value)) {
+	if lo >= hi {
+		return
+	}
+	if isLeaf(tmpl) {
+		if lo == 0 {
+			f(tmpl)
+		}
+		return
+	}
+	if tmpl.T != nil && tmpl.T.Kind == eval.KindArray {
+		if len(tmpl.E) == 0 {
+			return
+		}
+		n := leaves(tmpl.E[0]) // the same for every element
+		if n == 0 {
+			return
+		}
+		for i := lo / n; i < len(tmpl.E) && i*n < hi; i++ {
+			eachLeaf(tmpl.E[i], max(lo-i*n, 0), min(hi-i*n, n), f)
+		}
+		return
+	}
+	off := 0
+	for _, e := range tmpl.E {
+		if off >= hi {
+			break
+		}
+		n := leaves(e)
+		if off+n > lo {
+			eachLeaf(e, max(lo-off, 0), min(hi-off, n), f)
+		}
+		off += n
+	}
+}

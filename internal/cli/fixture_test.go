@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"maps"
 	"os"
+	"path"
 	"path/filepath"
 	"slices"
 	"strconv"
@@ -73,6 +74,44 @@ type outcome struct {
 	exit           int
 	stdout, stderr []byte
 	tree           map[string][]byte
+	// cache holds the files of the on-disk analysis cache (#37), every
+	// file under a .gohard/cache folder; tree holds the others.
+	cache map[string][]byte
+}
+
+// cacheModes are the analysis cache states every fixture runs with
+// (#37): none (cold), the cache the cold run wrote (warm), and that
+// cache with every entry damaged (corrupted). All three must give the
+// same outcome.
+var cacheModes = []string{"cold", "warm", "corrupted"}
+
+// isCacheFile reports whether the slash path p is in an analysis cache
+// folder.
+func isCacheFile(p string) bool {
+	return strings.HasPrefix(p, ".gohard/cache/") ||
+		strings.Contains(p, "/.gohard/cache/")
+}
+
+// corruptCache returns the cache files with every entry damaged in
+// turn: truncated, a bit flipped, emptied. The index stays intact, so
+// the entries are what the run finds broken.
+func corruptCache(c map[string][]byte) map[string][]byte {
+	out := map[string][]byte{}
+	for i, name := range sortedKeys(c) {
+		b := bytes.Clone(c[name])
+		if path.Base(name) != "index" && len(b) > 0 {
+			switch i % 3 {
+			case 0:
+				b = b[:len(b)/2]
+			case 1:
+				b[len(b)/2] ^= 0x10
+			default:
+				b = []byte{}
+			}
+		}
+		out[name] = b
+	}
+	return out
 }
 
 func runFixture(t tb, dir string, run runner) {
@@ -93,19 +132,43 @@ func runFixture(t tb, dir string, run runner) {
 	var first outcome
 	for i, p := range jobCounts {
 		args := append([]string{"-p", strconv.Itoa(p)}, words[1:]...)
-		got := runOnce(t, dir, args, stdin, run)
+		var cold outcome
+		for _, mode := range cacheModes {
+			var seed map[string][]byte
+			switch mode {
+			case "warm":
+				seed = cold.cache
+			case "corrupted":
+				seed = corruptCache(cold.cache)
+			}
+			if mode != "cold" && len(cold.cache) == 0 {
+				break // the command wrote no cache: nothing to warm
+			}
+			got := runOnce(t, dir, args, stdin, run, seed)
+			switch {
+			case mode == "cold":
+				cold = got
+			case !sameOutcome(got, cold, checkTree):
+				t.Fatalf("-p %d with a %s cache differs from a cold "+
+					"cache:\nexit %d vs %d\nstdout:\n%s\nvs\n%s\n"+
+					"stderr:\n%s\nvs\n%s", p, mode, got.exit, cold.exit,
+					got.stdout, cold.stdout, got.stderr, cold.stderr)
+			}
+		}
 		if i == 0 {
-			first = got
+			first = cold
 			continue
 		}
-		if got.exit != first.exit ||
-			!bytes.Equal(got.stdout, first.stdout) ||
-			!bytes.Equal(got.stderr, first.stderr) ||
-			checkTree && !sameTree(got.tree, first.tree) {
+		if !sameOutcome(cold, first, checkTree) {
 			t.Fatalf("-p %d differs from -p %d:\nexit %d vs %d\n"+
 				"stdout:\n%s\nvs\n%s\nstderr:\n%s\nvs\n%s",
-				p, jobCounts[0], got.exit, first.exit, got.stdout,
-				first.stdout, got.stderr, first.stderr)
+				p, jobCounts[0], cold.exit, first.exit, cold.stdout,
+				first.stdout, cold.stderr, first.stderr)
+		}
+		// The cache itself is a pure function of the run too.
+		if !sameTree(cold.cache, first.cache) {
+			t.Fatalf("-p %d wrote another analysis cache than -p %d",
+				p, jobCounts[0])
 		}
 	}
 	if *update {
@@ -140,10 +203,19 @@ func runFixture(t tb, dir string, run runner) {
 	}
 }
 
-// runOnce copies in/ to a fresh temp dir, runs args there, and returns
-// the outcome with the temp dir replaced by $WORK in both streams.
+// sameOutcome reports whether two runs gave the same exit code,
+// streams and (when compared) project tree.
+func sameOutcome(a, b outcome, checkTree bool) bool {
+	return a.exit == b.exit && bytes.Equal(a.stdout, b.stdout) &&
+		bytes.Equal(a.stderr, b.stderr) &&
+		(!checkTree || sameTree(a.tree, b.tree))
+}
+
+// runOnce copies in/ to a fresh temp dir, adds the analysis cache files
+// cache, runs args there, and returns the outcome with the temp dir
+// replaced by $WORK in both streams.
 func runOnce(t tb, dir string, args []string,
-	stdin []byte, run runner,
+	stdin []byte, run runner, cache map[string][]byte,
 ) outcome {
 	work := t.TempDir()
 	if in := filepath.Join(dir, "in"); exists(in) {
@@ -151,6 +223,7 @@ func runOnce(t tb, dir string, args []string,
 			t.Fatal(err)
 		}
 	}
+	writeTree(t, work, cache)
 	st := applySetup(t, dir, work)
 	var stdout, stderr bytes.Buffer
 	e := realenv.New(realenv.Options{
@@ -161,15 +234,15 @@ func runOnce(t tb, dir string, args []string,
 	defer cancel(nil)
 	// The bundled std/ieee files the language server writes for its
 	// locations (#33) go to a cache of this run, shown as $BUNDLE.
-	cache := t.TempDir()
+	xdg := t.TempDir()
 	getenv := e.Getenv
 	e.Getenv = func(k string) (string, bool) {
 		if k == "XDG_CACHE_HOME" {
-			return cache, true
+			return xdg, true
 		}
 		return getenv(k)
 	}
-	bundle := filepath.Join(cache, "gohard", "bundle", stdlib.CacheKey())
+	bundle := filepath.Join(xdg, "gohard", "bundle", stdlib.CacheKey())
 	defer unlockTree(bundle)
 	st.wrap(&e, cancel)
 	if st.hostOS != "" {
@@ -206,11 +279,20 @@ func runOnce(t tb, dir string, args []string,
 		}
 		return b
 	}
+	tree, files := map[string][]byte{}, map[string][]byte{}
+	for name, b := range readTree(t, work) {
+		if isCacheFile(name) {
+			files[name] = b
+		} else {
+			tree[name] = b
+		}
+	}
 	return outcome{
 		exit:   exit,
 		stdout: clean(stdout.Bytes()),
 		stderr: clean(stderr.Bytes()),
-		tree:   readTree(t, work),
+		tree:   tree,
+		cache:  files,
 	}
 }
 

@@ -191,6 +191,18 @@ type Resolver interface {
 	Resolve(b *eval.Budget, drivers []eval.Value) (eval.Value, error)
 }
 
+// Memoizable is implemented by a comparable Resolver (a pointer) whose
+// calls with the same driver values return the same value and, once
+// two calls in a row cost the same steps, cost that from then on (a
+// first call may cost more: it warms caches). The kernel then resolves
+// the initial values of the many single-driver nets once per distinct
+// value (initCache): only wall time changes, never a value or a step
+// count.
+type Memoizable interface {
+	Resolver
+	Memoizable()
+}
+
 // ResolverFunc adapts a Go function to Resolver.
 type ResolverFunc func(b *eval.Budget, drivers []eval.Value) (
 	eval.Value, error)

@@ -5,6 +5,12 @@ package cst
 
 import "github.com/connerohnesorge/gohard/internal/token"
 
+// KindsHash is the SHA-256 of kinds.yaml and keywords.yaml (line
+// endings normalized to LF): a component of the on-disk analysis
+// cache key (#37), so a cache written by another kind table is
+// never read.
+const KindsHash = "a1f045020ecfd7a282b2a17983ad9e2d789f45c08e91c175b66480264067db99"
+
 // Node kinds (kinds.yaml, append only).
 const (
 	// KindDesignFile: the root: design units, then the EOF token.

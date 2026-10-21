@@ -50,6 +50,10 @@ type Input struct {
 	// Probe, when set, observes the phases of the analysis (the #19
 	// latency benchmark). It never changes the result.
 	Probe *Probe
+	// Cache, when set, is the on-disk analysis cache (#37): parse
+	// results and analyzed units are restored from it and stored in
+	// it. It never changes the result (cache.go).
+	Cache Cache
 }
 
 // Probe observes an analysis without changing it: Phase is called as
@@ -177,7 +181,11 @@ func Analyze(in Input) *Result {
 	popts := parser.FromConfig(in.Config, in.ToolVersion)
 	files := env.Map(jobs, in.Limit, srcs, func(s Source) *File {
 		p := s.Parse
-		if p == nil {
+		switch {
+		case p != nil:
+		case in.Cache != nil:
+			p = parseCached(in.Cache, s.Path, s.Text, popts)
+		default:
 			p = parser.Parse(s.Text, popts)
 		}
 		return &File{Path: s.Path, Text: s.Text, Parse: p,
@@ -188,7 +196,7 @@ func Analyze(in Input) *Result {
 		std: std, cfg: in.Config, jobs: jobs, limit: in.Limit,
 		files: files, base: Bundle(), steps: cmp.Or(in.Steps,
 			int64(eval.EditorSteps)), stop: in.Stop,
-		probe: in.Probe,
+		probe: in.Probe, cache: in.Cache, popts: popts,
 	}
 	if s.stopped() {
 		return nil
@@ -235,6 +243,11 @@ type session struct {
 	tags  map[tagKey]token.Standard
 	stop  func() bool
 	probe *Probe
+	// cache and uc are the on-disk analysis cache and its semantic
+	// state (cache.go); popts are the parse options of the files.
+	cache Cache
+	uc    *unitCache
+	popts parser.Options
 }
 
 func (s *session) run() *Result {
@@ -256,6 +269,9 @@ func (s *session) run() *Result {
 	s.applyStandIns() // libs.go
 	s.linkDeps()
 	s.levelize()
+	if s.cache != nil && s.base != nil {
+		s.uc = newUnitCache(s.cache, s, s.popts)
+	}
 	if !s.analyzeUnits() {
 		return nil
 	}
@@ -286,6 +302,12 @@ func (s *session) analyzeUnits() bool {
 			return false
 		}
 		us := byLevel[l]
+		if s.uc != nil {
+			if len(us) > 0 {
+				s.analyzeCached(us) // cache.go
+			}
+			continue
+		}
 		s.jobs.Run(s.limit, len(us), func(i int) {
 			s.analyzeUnit(us[i])
 		})
@@ -308,7 +330,13 @@ func (s *session) readable(from, to *Unit) bool {
 	if from.File != nil && from.File.Bundled {
 		return to.File != nil && to.File.Bundled && to.Level < from.Level
 	}
-	return to.Level < from.Level
+	if to.Level >= from.Level {
+		return false
+	}
+	if s.uc != nil {
+		s.uc.record(from, to)
+	}
+	return true
 }
 
 // allUnits returns the bundle's and the project's units in canonical

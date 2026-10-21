@@ -3,6 +3,7 @@ package cli_test
 import (
 	"bytes"
 	"context"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -13,6 +14,7 @@ import (
 	"go.yaml.in/yaml/v3"
 
 	"github.com/connerohnesorge/gohard/internal/cli"
+	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/env/realenv"
 	"github.com/connerohnesorge/gohard/internal/libs"
 )
@@ -82,6 +84,16 @@ func TestLibrariesGuide(t *testing.T) {
 	}
 }
 
+// noCacheFS refuses to create any .gohard folder.
+type noCacheFS struct{ env.FS }
+
+func (f noCacheFS) MkdirAll(name string, perm fs.FileMode) error {
+	if strings.Contains(filepath.ToSlash(name), ".gohard") {
+		return fs.ErrPermission
+	}
+	return f.FS.MkdirAll(name, perm)
+}
+
 func checkExample(t *testing.T, dir, name string,
 	blocks map[string]string, used map[string]bool,
 ) {
@@ -92,6 +104,9 @@ func checkExample(t *testing.T, dir, name string,
 	var stdout, stderr bytes.Buffer
 	e := realenv.New(realenv.Options{Stdout: &stdout, Stderr: &stderr,
 		Dir: abs})
+	// The examples are committed folders: their analysis cache (#37)
+	// cannot be created, so the check leaves the tree as it is.
+	e.FS = noCacheFS{e.FS}
 	code := cli.Run(context.Background(), e, []string{"check"})
 	if code != 0 || !strings.Contains(stdout.String(),
 		"summary: 0 errors, 0 warnings, 0 hints") {

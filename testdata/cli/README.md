@@ -3,9 +3,17 @@
 Each directory `testdata/cli/<case>/` is one end-to-end run of the
 `gohard` command line (#20). `TestCLIFixtures` in `internal/cli` runs
 every case in-process through `cli.Run` with a real Env
-(`internal/env/realenv`), once with `-p 1` and once with `-p 16`. Both
-runs must give byte-identical exit codes, stdout, stderr and project
-trees, and must match the committed files.
+(`internal/env/realenv`), once with `-p 1` and once with `-p 16`, and
+each of those with a cold, a warm and a corrupted analysis cache (#37):
+cold is a fresh copy of `in/`; warm is a fresh copy plus the
+`.gohard/cache` files the cold run wrote; corrupted is the same with
+every cache entry damaged (truncated, a bit flipped or emptied, by
+turns). A command that writes no cache runs cold only, since its warm
+and corrupted runs would be the same run. Every run must give
+byte-identical exit codes, stdout, stderr and project trees, and must
+match the committed files; the cache files themselves must not depend
+on `-p`. Files under a `.gohard/cache/` folder are not part of the
+compared project tree.
 
 ## Files
 
@@ -43,9 +51,9 @@ trees, and must match the committed files.
 | `panic-on-read PATH` | Reading a file whose path ends in `/PATH` panics, to reach the crash path. |
 | `interrupt SIGINT\|SIGTERM on-read PATH` | Reading a file whose path ends in `/PATH` delivers the signal, as the shell does: the run's context is cancelled with `env.SIGINT` or `env.SIGTERM` as the cause (exit 130 or 143). The read itself succeeds. |
 
-`TestHarness` checks the harness itself: it runs at `-p 1` and `-p 16`,
-and it fails cases with a wrong exit code, stdout or stderr, or output
-that depends on `-p`.
+`TestHarness` checks the harness itself: it runs at `-p 1` and `-p 16`
+with each cache state, and it fails cases with a wrong exit code,
+stdout or stderr, or output that depends on `-p` or on the cache.
 
 The harness inserts `-p N` right after `gohard`, so a fixture never sets
 `-p` itself. Any occurrence of the temp directory's path in stdout or

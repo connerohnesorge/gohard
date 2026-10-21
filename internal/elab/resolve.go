@@ -16,7 +16,14 @@ type FuncResolver struct {
 	Fn  *sema.Decl
 	ev  *sema.Evaluator
 	arr *eval.Type // the parameter's (unconstrained) array type
+	// subs[n] is the argument subtype of n drivers, built on first
+	// use: a net resolves the same few driver counts over and over.
+	subs []*eval.Type
 }
+
+// Memoizable implements sim.Memoizable: a resolution function is pure
+// (LRM 4.6) and its warm calls cost the same steps (sema's memo).
+func (f *FuncResolver) Memoizable() {}
 
 // Resolve implements sim.Resolver.
 func (f *FuncResolver) Resolve(b *eval.Budget, drivers []eval.Value) (
@@ -33,10 +40,24 @@ func (f *FuncResolver) Resolve(b *eval.Budget, drivers []eval.Value) (
 		v.T = f.arr.Elem
 		elems[i] = v
 	}
-	arg := eval.Array(f.arr.ArraySubtype(r), []eval.Range{r}, elems)
+	arg := eval.Array(f.subtype(len(drivers), r), []eval.Range{r}, elems)
 	return metered(b, func(sb *eval.Budget) (eval.Value, error) {
 		return f.ev.Call(f.Fn, []eval.Value{arg}, sb)
 	})
+}
+
+// subtype returns the argument subtype of n drivers, index range r.
+func (f *FuncResolver) subtype(n int, r eval.Range) *eval.Type {
+	if n >= len(f.subs) {
+		if n > 64 {
+			return f.arr.ArraySubtype(r)
+		}
+		f.subs = append(f.subs, make([]*eval.Type, n+1-len(f.subs))...)
+	}
+	if f.subs[n] == nil {
+		f.subs[n] = f.arr.ArraySubtype(r)
+	}
+	return f.subs[n]
 }
 
 type resolverEntry struct {

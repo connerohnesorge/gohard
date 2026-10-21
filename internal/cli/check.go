@@ -78,7 +78,8 @@ func runCheck(inv *Invocation) Result {
 	}
 	ctx := contextSources(inv, l.Root, cwd, found.Files)
 	cfg, libs := libraryFolders(inv, l.Root, l.Config, found.Files, ctx)
-	res := analyzeSources(inv, r, cfg, srcs, append(ctx, libs...))
+	res := analyzeSources(inv, r, cfg, srcs, append(ctx, libs...),
+		l.Root)
 
 	if simRequested(inv) {
 		simulate(inv, r, simInput{root: l.Root, cfg: cfg, res: res,
@@ -184,13 +185,14 @@ func rootRelative(root, folder string) (abs, rel string) {
 // sources and the incomplete entries. The result depends only on the
 // sources and the configuration, never on -p.
 func analyzeSources(inv *Invocation, r *diag.Report, cfg config.Config,
-	srcs, ctx []workspace.Source,
+	srcs, ctx []workspace.Source, root string,
 ) *sema.Result {
 	if len(srcs) == 0 {
 		return nil
 	}
 	in := sema.Input{Config: cfg, ToolVersion: Version,
-		Jobs: inv.Env.Jobs, Limit: inv.Jobs}
+		Jobs: inv.Env.Jobs, Limit: inv.Jobs,
+		Cache: inv.openCache(root, cfg)}
 	checked := map[string]bool{}
 	for _, s := range srcs {
 		checked[s.Path] = true

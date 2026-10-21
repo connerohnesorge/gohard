@@ -5,6 +5,9 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"io"
 	"os"
 	"os/signal"
 	"runtime/debug"
@@ -43,7 +46,36 @@ func main() {
 	}()
 	bi, _ := debug.ReadBuildInfo()
 	cli.SetBuildInfo(bi)
+	// A hash of the executable's content is part of the analysis cache
+	// key (#37), so a rebuilt binary never reads what another build
+	// wrote, even with the same version, commit, size and time (nix
+	// store and snapshot builds). It is computed only when a command
+	// opens the cache.
+	cli.SetBinary(func() string {
+		exe, err := os.Executable()
+		if err != nil {
+			return ""
+		}
+		return binaryIdentity(exe)
+	})
 	os.Exit(cli.Run(ctx, realenv.New(realenv.Options{}), os.Args[1:]))
+}
+
+// binaryIdentity is the SHA-256 of the file at path, in hex: the
+// identity of a gohard build for the analysis cache key. A file that
+// cannot be read gives "unreadable", which turns the cache off (the
+// identity of the code is unknown).
+func binaryIdentity(path string) string {
+	f, err := os.Open(path)
+	if err != nil {
+		return "unreadable"
+	}
+	defer f.Close()
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return "unreadable"
+	}
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 func interrupt(s os.Signal) env.Interrupt {

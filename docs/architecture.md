@@ -66,6 +66,7 @@ Env, maps SIGINT/SIGTERM to 130/143, and calls `cli.Run`.
 | 5 | `internal/sema` | scopes, names, types, overloads, static evaluation (shared evaluator) | #34 |
 | 4 | `internal/libs` | `gohard libs detect`: the read-only search of vendor installs (Vivado, Quartus, Diamond), vendor variables, `PATH` and GHDL library indexes through `env.FS`/`Getenv`; the `gohard.yaml` edits shared with the "library not found" quick fix | #1 |
 | 5 | `internal/resolve` | queries over sema results: definition, references, hover data | #34 |
+| 5 | `internal/cache` | the on-disk analysis cache `.gohard/cache` (#37): whole-cache key, file format and versioning, recovery; sema stores and restores the entries (`sema.Cache`) | #37 |
 | 6 | `internal/elab` | lowers a resolved design to a compact model; instance paths like `tb.dut.u0` | #35 |
 | 6 | `internal/sim` | single-threaded discrete-event kernel ordered by (time, delta, process sequence) | #35 |
 | 6 | `internal/trace` | lossless native trace, `Writer`/`Recorder` fed by the kernel, canonical text form (grammar in `doc.go`), value lookup; exports in `trace/vcd` and `trace/fst` (pure Go, fixed bytes); `trace/waveform` is "Open waveform" | #36 |
@@ -176,7 +177,73 @@ not built yet exits 2 with `cli/not-implemented`.
   (`\Foo\` is `%5C%46oo%5C`), so names never collide on a
   case-insensitive file system.
 * `.gohard/crash/<hash>.txt` on an internal crash (#20).
+* `.gohard/cache/` under the project root: the on-disk analysis cache
+  (#37, see below), written by `gohard check` and the language server
+  (`gohard lsp` and `gohard lsp <action>`; not `lsp replay`). The
+  folder is not configurable.
 * `DIR/<n>.jsonl` for `gohard lsp --record DIR` (#29).
+
+## Analysis cache (#37)
+
+One cache folder per project root, `.gohard/cache/`, holds syntax
+entries (`syntax/<key>`: a file's parse result) and semantic entries
+(`sema/<key>`: what one unit job of sema produced, its declarations,
+regions, references, typed expressions, statements and diagnostics),
+plus `index`. It only ever changes speed, never results, and prints
+nothing.
+
+* The whole-cache key is the GoHard build (version, commit, and a
+  SHA-256 of the executable's content from `cmd/gohard`, computed once
+  when a command first opens the cache, so two builds with the same
+  version, commit, size and time, as in the nix store, never share
+  entries; an executable that cannot be read runs without the cache),
+  the entry schema
+  (`sema.CacheSchema`: the codec schema, the bundled sources, the
+  entry format), the VHDL standard, the hash of the configuration sema
+  sees (`config.Config.Identity`: every value and the position of
+  every key the file set, since diagnostics point at key positions),
+  `psl.comments` and the kinds.yaml hash (`cst.KindsHash`, from
+  `tools/genkinds`). A mismatch, or any damaged file (each file
+  carries the whole-cache key, its own key and a CRC-32C), throws the
+  whole cache away; it is rebuilt silently. A folder that cannot be
+  written means no cache. Files are written to a temp file and
+  renamed; past 4096 entries of a kind, opening removes the older
+  half, and a store keeps one entry per file and unit it writes.
+* A syntax entry is keyed by the file content, the kinds.yaml hash,
+  the standard, the psl settings and the conditional-analysis values.
+  A restored tree is used only when it checks out on its own: it is
+  consistent (`cst.Green.Consistent`: IDs, widths and kinds match the
+  content), spells the file byte for byte and holds offsets inside
+  it. Otherwise, or on any decoder panic (also of a semantic entry),
+  the cache is thrown away.
+* A semantic entry is keyed by the unit's node ID (its tokens, the
+  trivia lengths and the line breaks, without comment text), the
+  conditional-analysis values and step limit, the unit graph (every
+  file, unit and library of the session, with levels and
+  dependencies) and the keys of the units it depends on; the entry
+  also lists the other units it read (readable lookups and the owners
+  of objects it points at) with their keys, which must be unchanged
+  for a hit. The soundness argument is the unit's node ID plus the
+  keys of its dependency closure (`Unit.Deps`, recomputed every run):
+  the tests prove those parts (dropping the node ID's tree or a
+  dependency key makes `TestCacheSameLengthCode` and `TestCacheEdits`
+  fail). The unit graph and the recorded reads are a second line of
+  defence for reads outside the `Deps` closure; no known input needs
+  them, and no test proves them necessary. An entry whose stored text
+  holds comment text also needs
+  the texts of its files unchanged (the text key). Hover and other
+  queries read comments from the current tree, so they always see the
+  current text.
+* Entries are encoded with the bundle codec in a cache mode: objects of
+  the bundle, of the session (files, units, libraries) and of other
+  entries are references by owner and number, red nodes and tokens
+  are paths from their file's root. Restored units go through the same
+  phases across units as analyzed ones. Encoding runs in the unit's
+  job, after its analysis.
+* `testdata/cli` fixtures run with a cold, warm and corrupted cache at
+  `-p 1` and `-p 16`; `TestCacheCorpus` and `TestCacheEdits` (sema)
+  and `TestDiskCache` (ide) compare cached and uncached results on
+  every corpus file.
 
 ## Language server (#25, #26)
 
@@ -238,7 +305,7 @@ keeps its letter case.
 
 | Path | Contents | Owner |
 | --- | --- | --- |
-| `testdata/cli/<case>/` | `cmd`, `want.exit`, `want.stdout`, `want.stderr`, optional `in/`, `stdin`, `want/`; run in-process at `-p 1` and `-p 16` (see its README) | #20 |
+| `testdata/cli/<case>/` | `cmd`, `want.exit`, `want.stdout`, `want.stderr`, optional `in/`, `stdin`, `want/`; run in-process at `-p 1` and `-p 16`, each with a cold, warm and corrupted analysis cache (see its README) | #20, #37 |
 | `testdata/lsp/<action>/<case>/` | `gohard lsp <action>` fixtures | #26 |
 | `testdata/parse/<rule>/` | one valid file with a tree dump, one invalid file with an error position | #31 |
 | `testdata/corpus/<name>/` + `corpus.yaml` | the 14 oracle designs; goldens under `golden/` | #8 |

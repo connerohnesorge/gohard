@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"errors"
 	"fmt"
+	"math"
 	"slices"
 	"strconv"
 
@@ -88,17 +89,29 @@ type net struct {
 	eventCyc   uint64
 	activeCyc  uint64
 	actProc    int32 // lowest process (0-based) applied this cycle; -1
-	drivers    []int32
-	resolve    Resolver
-	forced     bool
-	force      eval.Value
-	// oforced and oforce are a force of mode out (force.go): they
-	// replace the driving value, below a force of mode in.
-	oforced   bool
-	oforce    eval.Value
+	// forced is 1 + the index of the net's forces in Kernel.forced, 0
+	// when the net was never forced: forces are rare, so a net keeps
+	// only the index.
+	forced    int32
+	drivers   []int32
+	resolve   Resolver
 	users     []int32 // signals on this net element
 	waiters   []waiter
 	compactAt int
+}
+
+// noForce is the forces of a net that was never forced (read only).
+var noForce netForce
+
+// netForce is the forces of one net element. A force of mode in
+// (forced, force) replaces the effective value; oforced and oforce are
+// a force of mode out (force.go): they replace the driving value,
+// below a force of mode in.
+type netForce struct {
+	forced  bool
+	force   eval.Value
+	oforced bool
+	oforce  eval.Value
 }
 
 type waiter struct {
@@ -173,8 +186,9 @@ type Kernel struct {
 	procs   []procState
 	queue   []qitem // binary min-heap by (at, seq)
 	forces  []forceOp
-	post    []int32 // postponed processes ready in this time step
-	multi   []int32 // signals with two or more events in this step
+	forced  []netForce // net.forced indexes it
+	post    []int32    // postponed processes ready in this time step
+	multi   []int32    // signals with two or more events in this step
 
 	traceSigs []traceSig
 	stopReq   Status
@@ -200,6 +214,7 @@ func New(m *Model, o Options) (*Kernel, error) {
 		return nil, err
 	}
 	k.procs = make([]procState, len(m.Processes))
+	k.allocDrivers()
 	for i, p := range m.Processes {
 		if p.Code == nil {
 			return nil, fmt.Errorf("sim: process %s has no code", p.Path)
@@ -210,16 +225,20 @@ func New(m *Model, o Options) (*Kernel, error) {
 			if err != nil {
 				return nil, fmt.Errorf("sim: process %s: %w", p.Path, err)
 			}
-			for j := lo; j < hi; j++ {
-				k.driverFor(int32(i), t.Sig, j)
-			}
+			j := lo
+			eachLeaf(m.Signals[t.Sig].Init, lo, hi, func(v eval.Value) {
+				k.newDriver(int32(i), t.Sig, j, v)
+				j++
+			})
 		}
 	}
 	for i, s := range m.Signals {
 		if s.Implicit != ImplicitNone {
-			for j := range k.sigs[i].nets {
-				k.driverFor(-1, SigID(i), j)
-			}
+			j := 0
+			eachLeaf(s.Init, 0, len(k.sigs[i].nets), func(v eval.Value) {
+				k.newDriver(-1, SigID(i), j, v)
+				j++
+			})
 		}
 	}
 	k.ctx.k = k
@@ -237,6 +256,8 @@ func (k *Kernel) buildNets() error {
 		}
 	}
 	k.nets = slices.Grow(k.nets, owned) // no regrowth of a large net table
+	// The nets of the signals that own them, from one allocation.
+	arena := make([]int32, owned)
 	var build func(i int) error
 	build = func(i int) error {
 		switch state[i] {
@@ -288,24 +309,28 @@ func (k *Kernel) buildNets() error {
 					"outside %s", s.Path, s.Offset, s.Offset+n-1,
 					ss[s.Of].Path)
 			}
-			st.nets = slices.Clone(of[s.Offset : s.Offset+n])
+			// Signal nets never change: a collapsed signal shares
+			// its actual's.
+			st.nets = of[s.Offset : s.Offset+n : s.Offset+n]
 		} else {
 			if s.LeafResolve != nil && len(s.LeafResolve) != n {
 				return fmt.Errorf("sim: signal %s: %d leaf resolvers "+
 					"for %d elements", s.Path, len(s.LeafResolve), n)
 			}
-			flat := flatten(s.Init, nil)
-			st.nets = make([]int32, n)
-			for j := range n {
+			st.nets, arena = arena[:n:n], arena[n:]
+			j := 0
+			eachLeaf(s.Init, 0, n, func(v eval.Value) {
 				st.nets[j] = int32(len(k.nets))
-				k.nets = append(k.nets, net{
-					cur: flat[j], last: flat[j], lastEvent: -1,
-					lastActive: -1, actProc: -1, resolve: s.Resolve,
-				})
+				r := s.Resolve
 				if s.LeafResolve != nil {
-					k.nets[len(k.nets)-1].resolve = s.LeafResolve[j]
+					r = s.LeafResolve[j]
 				}
-			}
+				k.nets = append(k.nets, net{
+					cur: v, last: v, lastEvent: -1,
+					lastActive: -1, actProc: -1, resolve: r,
+				})
+				j++
+			})
 		}
 		state[i] = 2
 		return nil
@@ -315,12 +340,63 @@ func (k *Kernel) buildNets() error {
 			return err
 		}
 	}
+	// The users of every net, in signal order, out of one exactly
+	// sized allocation: count, then fill.
+	cnt := make([]int32, len(k.nets)+1)
+	for i := range ss {
+		for _, n := range k.sigs[i].nets {
+			cnt[n+1]++
+		}
+	}
+	for i := 1; i < len(cnt); i++ {
+		cnt[i] += cnt[i-1]
+	}
+	users := make([]int32, cnt[len(k.nets)])
+	for n := range k.nets {
+		k.nets[n].users = users[cnt[n]:cnt[n]:cnt[n+1]]
+	}
 	for i := range ss {
 		for _, n := range k.sigs[i].nets {
 			k.nets[n].users = append(k.nets[n].users, int32(i))
 		}
 	}
 	return nil
+}
+
+// allocDrivers gives every net room for its drivers out of one
+// allocation, and the driver table room for all of them: one slot per
+// process target leaf and implicit signal leaf (an upper bound; a
+// process naming a leaf twice has one driver). Targets outside their
+// signal are skipped here and reported by New.
+func (k *Kernel) allocDrivers() {
+	cnt := make([]int32, len(k.nets)+1)
+	for _, p := range k.m.Processes {
+		for _, t := range p.Drivers {
+			lo, hi, err := k.span(t)
+			if err != nil {
+				continue
+			}
+			for _, n := range k.sigs[t.Sig].nets[lo:hi] {
+				cnt[n+1]++
+			}
+		}
+	}
+	for i, s := range k.m.Signals {
+		if s.Implicit != ImplicitNone {
+			for _, n := range k.sigs[i].nets {
+				cnt[n+1]++
+			}
+		}
+	}
+	for i := 1; i < len(cnt); i++ {
+		cnt[i] += cnt[i-1]
+	}
+	total := cnt[len(k.nets)]
+	slots := make([]int32, total)
+	for n := range k.nets {
+		k.nets[n].drivers = slots[cnt[n]:cnt[n]:cnt[n+1]]
+	}
+	k.drivers = make([]driver, 0, total)
 }
 
 // span returns the leaf range [lo, hi) of target t.
@@ -350,6 +426,21 @@ func (k *Kernel) driverFor(p int32, s SigID, j int) int32 {
 		}
 	}
 	init, _ := leafAt(k.m.Signals[s].Init, j)
+	return k.addDriver(p, n, init)
+}
+
+// newDriver is driverFor with the template leaf init of leaf j given.
+func (k *Kernel) newDriver(p int32, s SigID, j int, init eval.Value) {
+	n := k.sigs[s].nets[j]
+	for _, d := range k.nets[n].drivers {
+		if k.drivers[d].proc == p {
+			return
+		}
+	}
+	k.addDriver(p, n, init)
+}
+
+func (k *Kernel) addDriver(p, n int32, init eval.Value) int32 {
 	id := int32(len(k.drivers))
 	k.drivers = append(k.drivers, driver{proc: p, net: n, cur: init})
 	k.nets[n].drivers = append(k.nets[n].drivers, id)
@@ -367,9 +458,11 @@ func (k *Kernel) Clone() *Kernel {
 	c.opts.Budget = &b
 	c.nets = slices.Clone(k.nets)
 	for i := range c.nets {
+		// Users never change and drivers only grow (driverFor): the
+		// copy shares them, clipped so that a new driver of either
+		// kernel reallocates instead of writing the other's slot.
 		n := &c.nets[i]
-		n.drivers = slices.Clone(n.drivers)
-		n.users = slices.Clone(n.users)
+		n.drivers = slices.Clip(n.drivers)
 		n.waiters = slices.Clone(n.waiters)
 	}
 	c.drivers = slices.Clone(k.drivers)
@@ -378,7 +471,6 @@ func (k *Kernel) Clone() *Kernel {
 	}
 	c.sigs = slices.Clone(k.sigs)
 	for i := range c.sigs {
-		c.sigs[i].nets = slices.Clone(c.sigs[i].nets)
 		c.sigs[i].traces = slices.Clone(c.sigs[i].traces)
 	}
 	c.procs = slices.Clone(k.procs)
@@ -389,6 +481,7 @@ func (k *Kernel) Clone() *Kernel {
 	}
 	c.queue = slices.Clone(k.queue)
 	c.forces = slices.Clone(k.forces)
+	c.forced = slices.Clone(k.forced)
 	c.post = slices.Clone(k.post)
 	c.multi = slices.Clone(k.multi)
 	c.traceSigs = slices.Clone(k.traceSigs)
@@ -471,12 +564,13 @@ func (k *Kernel) initialize() {
 	}
 	// Initial effective values (LRM 14.7.5.2): resolved nets resolve
 	// their drivers' initial values.
+	var ic initCache
 	for i := range k.nets {
 		n := &k.nets[i]
 		if n.resolve == nil || len(n.drivers) == 0 {
 			continue
 		}
-		v, err := k.resolveNet(n)
+		v, err := ic.resolve(k, n)
 		if err != nil {
 			k.runtime(-1, err)
 			return
@@ -573,10 +667,17 @@ func (k *Kernel) cycle() {
 	}
 	for _, f := range k.forces {
 		n := &k.nets[f.net]
-		if f.out {
-			n.oforced, n.oforce = !f.release, f.v
-		} else {
-			n.forced, n.force = !f.release, f.v
+		if n.forced == 0 && !f.release {
+			k.forced = append(k.forced, netForce{})
+			n.forced = int32(len(k.forced))
+		}
+		if n.forced != 0 {
+			nf := &k.forced[n.forced-1]
+			if f.out {
+				nf.oforced, nf.oforce = !f.release, f.v
+			} else {
+				nf.forced, nf.force = !f.release, f.v
+			}
 		}
 		if n.activeCyc != k.cyc {
 			n.activeCyc = k.cyc
@@ -612,11 +713,15 @@ func (k *Kernel) cycle() {
 func (k *Kernel) updateNet(ni int32, changed *[]int32) bool {
 	n := &k.nets[ni]
 	var v eval.Value
+	nf := &noForce
+	if n.forced != 0 {
+		nf = &k.forced[n.forced-1]
+	}
 	switch {
-	case n.forced:
-		v = n.force
-	case n.oforced:
-		v = n.oforce
+	case nf.forced:
+		v = nf.force
+	case nf.oforced:
+		v = nf.oforce
 	case n.resolve != nil && len(n.drivers) > 0:
 		var err error
 		v, err = k.resolveNet(n)
@@ -668,6 +773,86 @@ func (k *Kernel) updateNet(ni int32, changed *[]int32) bool {
 		}
 	}
 	return false
+}
+
+// initCache remembers the initial resolution of the nets that have one
+// driver with a scalar value: a design has hundreds of thousands of
+// such nets (memories of std_logic) and a handful of distinct
+// (resolver, value) pairs. A resolution function is pure (LRM 4.6), so
+// the result depends on the pair alone. The first call of a function
+// may cost more than the next ones (it fills the evaluator's layouts
+// and constants), so a pair is answered from the cache only once two
+// calls in a row returned the same value for the same steps; a hit
+// charges those steps, so the step count is the one of calling it
+// (the rule of sema's memo of pure calls, memo.go). Every call the
+// cache makes is one the uncached kernel makes too.
+type initCache struct {
+	m map[initKey]initEntry
+}
+
+type initKey struct {
+	r Memoizable
+	t *eval.Type
+	i int64
+	f uint64
+}
+
+type initEntry struct {
+	v      eval.Value
+	steps  int64
+	stable bool // the last two calls agreed
+}
+
+// resolve is k.resolveNet(n) through the cache.
+func (c *initCache) resolve(k *Kernel, n *net) (eval.Value, error) {
+	key, ok := initKeyOf(k, n)
+	if !ok {
+		return k.resolveNet(n)
+	}
+	e, seen := c.m[key]
+	if lim := k.budget.Limit(); e.stable &&
+		(lim <= 0 || k.budget.Used()+e.steps <= lim) {
+		return e.v, k.budget.Step(e.steps)
+	}
+	// Not yet stable, or near the limit, where the call fails as it
+	// would uncached.
+	u0 := k.budget.Used()
+	v, err := k.resolveNet(n)
+	if err != nil {
+		return v, err
+	}
+	steps := k.budget.Used() - u0
+	if c.m == nil {
+		c.m = map[initKey]initEntry{}
+	}
+	c.m[key] = initEntry{v: v, steps: steps,
+		stable: seen && e.steps == steps && e.v.Equal(v) &&
+			isLeaf(v) && len(v.E) == 0 && len(v.B) == 0}
+	return v, nil
+}
+
+// initKeyOf is the cache key of net n: ok when n has exactly one
+// driver, it is not null and its value is a scalar, and no observer
+// counts the budget's charges (a hit charges them at once), and the
+// resolver is Memoizable.
+func initKeyOf(k *Kernel, n *net) (initKey, bool) {
+	r, ok := n.resolve.(Memoizable)
+	if !ok || len(n.drivers) != 1 || k.budget.Observer() != nil {
+		return initKey{}, false
+	}
+	d := &k.drivers[n.drivers[0]]
+	v := d.cur
+	if d.null || v.T == nil || len(v.E) != 0 || len(v.B) != 0 {
+		return initKey{}, false
+	}
+	switch v.T.Kind {
+	case eval.KindEnum, eval.KindInteger, eval.KindPhysical,
+		eval.KindFloating:
+	default:
+		return initKey{}, false
+	}
+	return initKey{r: r, t: v.T, i: v.I,
+		f: math.Float64bits(v.F)}, true
 }
 
 func (k *Kernel) resolveNet(n *net) (eval.Value, error) {

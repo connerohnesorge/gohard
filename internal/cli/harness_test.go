@@ -74,9 +74,10 @@ func fixture(t *testing.T, files map[string]string) string {
 }
 
 // TestHarness proves the fixture harness itself: it runs every case at
-// -p 1 and -p 16 by inserting -p, and it fails a case whose exit code,
-// stdout or stderr differ from the want files, or whose output depends
-// on -p. Without this the #20 gate is only as strong as unreviewed
+// -p 1 and -p 16 by inserting -p, each with a cold, warm and corrupted
+// analysis cache, and it fails a case whose exit code, stdout or
+// stderr differ from the want files, or whose output depends on -p or
+// on the cache. Without this the #20 gate is only as strong as unreviewed
 // harness code.
 func TestHarness(t *testing.T) {
 	if !slices.Equal(jobCounts, []int{1, 16}) {
@@ -177,6 +178,66 @@ func TestHarness(t *testing.T) {
 	if len(errs) == 0 || !strings.Contains(errs[0], "differs") {
 		t.Errorf("a -p 16 only output file change passed: %q", errs)
 	}
+	// Each case also runs with the analysis cache the cold run wrote
+	// and with that cache corrupted (#37): output that depends on the
+	// cache fails, and so does a cache that depends on -p.
+	byCache := func(ctx context.Context, e env.Env, args []string) int {
+		b, err := e.FS.ReadFile(".gohard/cache/sema/x")
+		switch {
+		case err != nil:
+			fmt.Fprintln(e.Transport.Stdout, "cold")
+		case string(b) == "entry":
+			fmt.Fprintln(e.Transport.Stdout, "warm")
+		default:
+			fmt.Fprintln(e.Transport.Stdout, "corrupted")
+		}
+		_ = e.FS.MkdirAll(".gohard/cache/sema", 0o755)
+		_ = e.FS.WriteFile(".gohard/cache/sema/x", []byte("entry"),
+			0o644)
+		return 0
+	}
+	errs = harness(t, fixture(t, with("want.stdout", "cold\n")), byCache)
+	if len(errs) == 0 || !strings.Contains(errs[0], "warm cache") {
+		t.Errorf("a run that depends on the cache passed: %q", errs)
+	}
+	warmOnly := func(ctx context.Context, e env.Env, args []string) int {
+		b, err := e.FS.ReadFile(".gohard/cache/sema/x")
+		if err == nil && string(b) != "entry" {
+			fmt.Fprintln(e.Transport.Stdout, "corrupted")
+		}
+		_ = e.FS.MkdirAll(".gohard/cache/sema", 0o755)
+		_ = e.FS.WriteFile(".gohard/cache/sema/x", []byte("entry"),
+			0o644)
+		return 0
+	}
+	errs = harness(t, fixture(t, with("want.stdout", "")), warmOnly)
+	if len(errs) == 0 || !strings.Contains(errs[0], "corrupted cache") {
+		t.Errorf("a run that depends on a corrupted cache passed: %q",
+			errs)
+	}
+	cacheByJobs := func(ctx context.Context, e env.Env,
+		args []string,
+	) int {
+		_ = e.FS.MkdirAll(".gohard/cache/sema", 0o755)
+		_ = e.FS.WriteFile(".gohard/cache/sema/x", []byte(args[1]),
+			0o644)
+		return 0
+	}
+	errs = harness(t, fixture(t, with("want.stdout", "")), cacheByJobs)
+	if len(errs) == 0 || !strings.Contains(errs[0], "analysis cache") {
+		t.Errorf("a -p dependent cache passed: %q", errs)
+	}
+	// The cache files are not part of the compared project tree.
+	if errs := harness(t, fixture(t, tree("x")), func(ctx context.Context,
+		e env.Env, args []string,
+	) int {
+		_ = e.FS.MkdirAll(".gohard/cache", 0o755)
+		_ = e.FS.WriteFile(".gohard/cache/index", []byte("i"), 0o644)
+		return fixed(ctx, e, args)
+	}); len(errs) != 0 {
+		t.Errorf("the cache folder counted as project tree: %q", errs)
+	}
+
 	exitJobs := func(ctx context.Context, e env.Env, args []string) int {
 		if args[1] == "16" {
 			return 1

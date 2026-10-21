@@ -41,8 +41,8 @@ var (
 // stdlib/internal-error (exit 2).
 func Bundle() *Result {
 	bundleOnce.Do(func() {
-		if r, err := unpackBundle(stdlib.Prebuilt()); err == nil {
-			bundle, bundleFrom = r, "prebuilt"
+		if r, objs, err := unpackBundleObjs(stdlib.Prebuilt()); err == nil {
+			bundle, bundleFrom, bundleObjs = r, "prebuilt", objs
 			return
 		}
 		bundle, bundleFrom = analyzeBundle(), "analyzed"
@@ -72,11 +72,16 @@ func packBundle(r *Result) []byte {
 }
 
 func unpackBundle(b []byte) (*Result, error) {
+	r, _, err := unpackBundleObjs(b)
+	return r, err
+}
+
+func unpackBundleObjs(b []byte) (*Result, []any, error) {
 	raw, err := io.ReadAll(flate.NewReader(bytes.NewReader(b)))
 	if err != nil {
-		return nil, errCodec
+		return nil, nil, errCodec
 	}
-	return decodeBundle(raw)
+	return decodeBundleObjs(raw)
 }
 
 func analyzeBundle() *Result {
