@@ -6,6 +6,7 @@ import (
 	"math"
 	"reflect"
 	"strconv"
+	"sync"
 	"testing"
 
 	"github.com/connerohnesorge/gohard/internal/eval"
@@ -275,6 +276,9 @@ func (c *iso) cmp(p pair) error {
 		c.work = append(c.work, pair{a.Elem(), b.Elem(), p.path + ".*"})
 	case reflect.Struct:
 		for i := range a.NumField() {
+			if a.Type().Field(i).Type == reflect.TypeFor[sync.Map]() {
+				continue // a memo (parser.Result.Memo): derived, never stored
+			}
 			c.work = append(c.work, pair{a.Field(i), b.Field(i),
 				p.path + "." + a.Type().Field(i).Name})
 		}

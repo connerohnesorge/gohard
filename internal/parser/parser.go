@@ -24,6 +24,7 @@ package parser
 import (
 	"slices"
 	"strconv"
+	"sync"
 
 	"github.com/connerohnesorge/gohard/internal/condanal"
 	"github.com/connerohnesorge/gohard/internal/config"
@@ -140,7 +141,14 @@ type Result struct {
 	Directives []condanal.Directive
 
 	src []byte
+	// memo holds what later stages derive from this tree alone.
+	memo sync.Map
 }
+
+// Memo returns the values later stages derived from r's tree (sema's
+// unit node IDs, #53). The editor reuses a Result for an unchanged
+// file, so they survive across analyses.
+func (r *Result) Memo() *sync.Map { return &r.memo }
 
 // Tree returns the red root of the tree.
 func (r *Result) Tree() cst.Node { return cst.NewRoot(r.Root) }

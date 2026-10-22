@@ -515,9 +515,8 @@ func (e *encoder) parseResult(p *parser.Result) {
 
 func (d *decoder) parseResult() *parser.Result {
 	return d.results.ref(d, func(r *parser.Result) {
-		var v parser.Result
-		d.s_parser_Result(&v)
-		*r = *parser.Restore(v, d.bytes())
+		d.s_parser_Result(r)
+		parser.Restore(r, d.bytes())
 	})
 }
 

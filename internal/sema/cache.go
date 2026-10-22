@@ -233,7 +233,7 @@ func decodeSyntax(b, text []byte) (r *parser.Result, ok bool) {
 			return nil, false
 		}
 	}
-	return parser.Restore(v, text), true
+	return parser.Restore(&v, text), true
 }
 
 // bundleObjs are the bundle's objects in codec id order, set when the
@@ -466,10 +466,33 @@ func (uc *unitCache) graph(w *keyWriter) {
 	}
 }
 
-// nodeID is the unit's semantic node ID: its tree (node kinds, token
-// kinds, flags and text), the length and kind of every trivia piece but
-// not its text, and the line breaks, so every position is covered.
+// nodeID writes the unit's semantic node ID: its tree (node kinds,
+// token kinds, flags and text), the length and kind of every trivia
+// piece but not its text, and the line breaks, so every position is
+// covered. It is memoized on the file's parse result, which the editor
+// reuses for an unchanged file on every keystroke (#53).
 func nodeID(w *keyWriter, u *Unit) {
+	if u.File.Parse == nil {
+		w.key(nodeIDSum(u))
+		return
+	}
+	_, _, off, _ := u.Node.Raw()
+	k := nodeIDKey(off)
+	if d, ok := u.File.Parse.Memo().Load(k); ok {
+		w.key(d.([32]byte))
+		return
+	}
+	d := nodeIDSum(u)
+	u.File.Parse.Memo().Store(k, d)
+	w.key(d)
+}
+
+// nodeIDKey keys a unit's node ID in its parse result's memo by the
+// unit's offset.
+type nodeIDKey int
+
+func nodeIDSum(u *Unit) [32]byte {
+	w := newKey()
 	g, _, off, _ := u.Node.Raw()
 	fs := u.Node.FullSpan()
 	w.int(int64(off))
@@ -491,6 +514,7 @@ func nodeID(w *keyWriter, u *Unit) {
 	var buf []byte
 	buf = greenID(buf, g)
 	w.bytes(buf)
+	return w.sum()
 }
 
 func greenID(buf []byte, g *cst.Green) []byte {
