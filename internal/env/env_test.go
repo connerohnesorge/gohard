@@ -1,6 +1,7 @@
 package env
 
 import (
+	"maps"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -276,6 +277,34 @@ func TestAbs(t *testing.T) {
 		if got := Abs(c.dir, c.name); got != c.want {
 			t.Errorf("Abs(%q, %q) = %q, want %q", c.dir, c.name, got,
 				c.want)
+		}
+	}
+}
+
+// TestIsRooted: a rooted name is exactly one Abs keeps at the root
+// instead of joining below dir, on every OS.
+func TestIsRooted(t *testing.T) {
+	cases := map[string]bool{
+		"": false, "a": false, "a/b": false, "./a": false, "../a": false,
+		"/": true, "/work": true, "/x/y": true,
+	}
+	if runtime.GOOS == "windows" {
+		cases[`\x`] = true
+		cases[`C:\x`] = true
+		cases[`C:x`] = false
+		cases[`\\srv\share\x`] = true
+		cases[`a\b`] = false
+	}
+	const dir = "/work/sub"
+	for _, name := range slices.Sorted(maps.Keys(cases)) {
+		want := cases[name]
+		if got := IsRooted(name); got != want {
+			t.Errorf("IsRooted(%q) = %v, want %v", name, got, want)
+		}
+		joined := filepath.Join(dir, name)
+		if name != "" && (Abs(dir, name) != filepath.Clean(joined)) != want {
+			t.Errorf("IsRooted(%q) = %v disagrees with Abs: %q",
+				name, want, Abs(dir, name))
 		}
 	}
 }

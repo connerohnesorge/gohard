@@ -44,7 +44,7 @@ func TestRules(t *testing.T) {
 		{mod + "/internal/env/realenv/x", false, 0},
 		{mod + "/tools/detlint", false, analyzer.MapOrder},
 		{mod + "/tools/detlint/analyzer_test", true, 0},
-		{mod + "/internal/env", false, analyzer.All},
+		{mod + "/internal/env", false, analyzer.All &^ analyzer.Rooted},
 		{mod + "/internal/env/simenv", false, analyzer.All},
 		{mod + "/internal/env/realenvx", false, analyzer.All},
 		{mod + "/cmdx", false, analyzer.All},
@@ -130,6 +130,8 @@ func checkLaws(t *testing.T, path string) {
 		want = analyzer.MapOrder
 	case base == analyzer.StdioPackage:
 		want = analyzer.All &^ analyzer.StdioAllowed
+	case base == analyzer.EnvPackage:
+		want = analyzer.All &^ analyzer.Rooted
 	}
 	if pkg != want {
 		t.Errorf("Rules(%q) = %v, want %v", path, pkg, want)
@@ -141,10 +143,10 @@ func TestRuleString(t *testing.T) {
 		t.Errorf("Rule(0) = %q", s)
 	}
 	all := analyzer.All.String()
-	if strings.Count(all, "|") != 12 {
-		t.Errorf("All = %q, want 13 names", all)
+	if strings.Count(all, "|") != 13 {
+		t.Errorf("All = %q, want 14 names", all)
 	}
-	for i := range 13 {
+	for i := range 14 {
 		s := analyzer.Rule(1 << i).String()
 		if s == "" || strings.Contains(s, "|") {
 			t.Errorf("rule %d has name %q", i, s)
@@ -247,6 +249,8 @@ func expected(pkg, name string) analyzer.Rule {
 		switch name {
 		case "Abs", "EvalSymlinks", "Glob", "Walk", "WalkDir":
 			return analyzer.FS
+		case "IsAbs":
+			return analyzer.Rooted
 		}
 	}
 	return 0

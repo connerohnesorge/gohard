@@ -379,7 +379,7 @@ func header(inv *Invocation, in simInput, tb string, seed uint64,
 	for _, f := range in.files {
 		p := f.Path
 		if p == ".." || strings.HasPrefix(p, "../") ||
-			filepath.IsAbs(filepath.FromSlash(p)) {
+			env.IsRooted(filepath.FromSlash(p)) {
 			continue // a vendor library outside the root
 		}
 		paths = append(paths, p)

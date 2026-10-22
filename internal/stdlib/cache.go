@@ -44,7 +44,7 @@ var ErrNoCacheDir = errors.New("no cache directory: neither " +
 // reads the environment.
 func CacheRoot(getenv env.Getenv, goos string) (string, error) {
 	base := ""
-	if v, ok := getenv("XDG_CACHE_HOME"); ok && rooted(v) {
+	if v, ok := getenv("XDG_CACHE_HOME"); ok && env.IsRooted(v) {
 		base = v
 	} else {
 		switch goos {
@@ -68,15 +68,6 @@ func CacheRoot(getenv env.Getenv, goos string) (string, error) {
 		return "", ErrNoCacheDir
 	}
 	return filepath.Join(base, "gohard", "bundle", CacheKey()), nil
-}
-
-// rooted reports whether v is absolute, counting a Windows name rooted
-// without a volume (\x or /x) as absolute the way env.Abs does: simenv
-// roots its tree at /, and the OS resolves such a name on the current
-// drive.
-func rooted(v string) bool {
-	return filepath.IsAbs(v) || filepath.VolumeName(v) == "" && v != "" &&
-		(v[0] == '/' || v[0] == filepath.Separator)
 }
 
 // Materialize writes every bundled file (the VHDL sources, LICENSE and

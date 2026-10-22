@@ -141,7 +141,7 @@ func libraryFolders(inv *Invocation, root string, cfg config.Config,
 			abs, rel := rootRelative(root, f.Path)
 			lib.Folders[j].Path = rel
 			if rel == ".." || strings.HasPrefix(rel, "../") ||
-				filepath.IsAbs(filepath.FromSlash(rel)) {
+				env.IsRooted(filepath.FromSlash(rel)) {
 				outside = append(outside, abs)
 			}
 		}

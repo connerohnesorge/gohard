@@ -390,7 +390,7 @@ func realPath(fsys env.FS, name string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		if filepath.IsAbs(link) {
+		if env.IsRooted(link) {
 			v := filepath.VolumeName(link)
 			if v == "" {
 				v = vol

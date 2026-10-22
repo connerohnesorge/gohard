@@ -227,8 +227,7 @@ func (o *Overlay) resolve(r string) (string, bool) {
 		var tr string
 		// A rooted target ("/x" on Windows) is absolute too, as Abs
 		// treats it.
-		if filepath.IsAbs(t) || t != "" &&
-			(t[0] == '/' || t[0] == filepath.Separator) {
+		if IsRooted(t) {
 			var ok bool
 			if tr, ok = o.lexical(Abs(o.Root, t)); !ok {
 				return "", false

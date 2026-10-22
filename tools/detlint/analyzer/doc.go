@@ -58,6 +58,11 @@
 //     or hash by address) and a constant fmt format with a %p verb.
 //     Addresses change from run to run. Not covered: %v of a pointer
 //     to a non-struct value, which also prints an address.
+//   - rooted: filepath.IsAbs, which is false on Windows for a name
+//     rooted without a volume (/work in simenv, \x on the OS). Use
+//     env.IsRooted, which treats such names as env.Abs does. Only
+//     internal/env itself (that package, not its subpackages) may call
+//     filepath.IsAbs.
 //
 // Uses are found through type information, so aliases, dot imports
 // and function values (f := time.Now) are caught as well as calls.
@@ -153,10 +158,11 @@
 //     programs (generators, the GHDL/NVC oracle) that may touch the
 //     world, but their output is committed and checked by the
 //     generated-file sync gate, so it must not depend on map order.
-//   - _test.go files in core packages: getenv, fs, stdio, realenv and
-//     maporder are allowed, so tests may read and update golden files,
-//     use realenv for fixture harnesses and assert over maps (only
-//     failure messages could be reordered). clock, rand, net,
+//   - _test.go files in core packages: getenv, fs, stdio, realenv,
+//     maporder and rooted are allowed, so tests may read and update
+//     golden files, use realenv for fixture harnesses, assert over
+//     maps (only failure messages could be reordered) and check OS
+//     paths. clock, rand, net,
 //     process, go, select, linkname and address stay banned: a test
 //     must not sleep, roll dice, touch the network, spawn programs or
 //     race. The one select a test

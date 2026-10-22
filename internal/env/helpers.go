@@ -16,11 +16,20 @@ func Abs(dir, name string) string {
 	if filepath.IsAbs(name) {
 		return filepath.Clean(name)
 	}
-	if filepath.VolumeName(name) == "" && name != "" &&
-		(name[0] == '/' || name[0] == filepath.Separator) {
+	if IsRooted(name) {
 		return filepath.Join(filepath.VolumeName(dir), name)
 	}
 	return filepath.Join(dir, name)
+}
+
+// IsRooted reports whether name is absolute or rooted: filepath.IsAbs,
+// or on Windows a name without a volume that starts with / or \, which
+// Abs keeps at the root instead of joining below dir. Use it, not
+// filepath.IsAbs, wherever a name may come from simenv (/work) or a
+// design; detlint enforces this outside internal/env.
+func IsRooted(name string) bool {
+	return filepath.IsAbs(name) || filepath.VolumeName(name) == "" &&
+		name != "" && (name[0] == '/' || name[0] == filepath.Separator)
 }
 
 // SplitMix64 is a tiny, fast, seedable generator (Steele, Lea and

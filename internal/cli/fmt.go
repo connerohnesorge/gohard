@@ -270,7 +270,7 @@ func linkTarget(fsys env.FS, name string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		if !filepath.IsAbs(dest) {
+		if !env.IsRooted(dest) {
 			dest = filepath.Join(filepath.Dir(name), dest)
 		}
 		name = dest

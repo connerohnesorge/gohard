@@ -26,6 +26,7 @@ const (
 	MapOrder
 	Linkname
 	Address
+	Rooted
 )
 
 // World is every rule that guards an env.Env door.
@@ -33,11 +34,11 @@ const World = Clock | Rand | Getenv | FS | Stdio | Net | Process | Go |
 	Select | RealEnv | Linkname | Address
 
 // All is every rule.
-const All = World | MapOrder
+const All = World | MapOrder | Rooted
 
 // TestAllowed is the set of rules lifted in _test.go files of core
 // packages.
-const TestAllowed = Getenv | FS | Stdio | RealEnv | MapOrder
+const TestAllowed = Getenv | FS | Stdio | RealEnv | MapOrder | Rooted
 
 // Stdio goroutines: internal/jsonrpc2 (the package itself, not its
 // subpackages) runs the stdio reader and writer, the only goroutines
@@ -48,9 +49,13 @@ const (
 	StdioAllowed = Go | Select
 )
 
+// EnvPackage defines env.IsRooted, the one place that may call
+// filepath.IsAbs (the rooted rule).
+const EnvPackage = Module + "/internal/env"
+
 var ruleNames = [...]string{
 	"clock", "rand", "getenv", "fs", "stdio", "net", "process", "go",
-	"select", "realenv", "maporder", "linkname", "address",
+	"select", "realenv", "maporder", "linkname", "address", "rooted",
 }
 
 // String returns the rule names joined by "|", or "none".
@@ -93,6 +98,9 @@ func (r Rule) door() string {
 	case Address:
 		return "memory addresses differ between runs; " +
 			"order and print by value or ID"
+	case Rooted:
+		return "use env.IsRooted: on Windows /x and \\x are rooted " +
+			"but not filepath.IsAbs"
 	}
 	return "range over slices.Sorted(maps.Keys(m)) or sort what you collect"
 }
@@ -121,6 +129,8 @@ func Rules(pkgPath string, test bool) Rule {
 		return MapOrder
 	case test:
 		return All &^ TestAllowed
+	case pkgPath == EnvPackage:
+		return All &^ Rooted
 	}
 	return All
 }
@@ -194,6 +204,7 @@ var bannedObjects = map[string]Rule{
 	"context.AfterFunc":         Go,
 
 	"path/filepath.Abs":          FS,
+	"path/filepath.IsAbs":        Rooted,
 	"path/filepath.EvalSymlinks": FS,
 	"path/filepath.Glob":         FS,
 	"path/filepath.Walk":         FS,

@@ -105,7 +105,7 @@ func (l *Loaded) Valid() bool {
 // parses its gohard.yaml, and checks that every library folder can be
 // read. A missing gohard.yaml gives Defaults and no diagnostic.
 func Load(fsys env.FS, start string) Loaded {
-	if start == "" || !filepath.IsAbs(start) {
+	if start == "" || !env.IsRooted(start) {
 		wd, err := fsys.Getwd()
 		if err != nil {
 			return Loaded{Root: start, Found: FoundStart,

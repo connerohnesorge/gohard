@@ -814,7 +814,7 @@ func (w *world) dirDoor() env.FS {
 func (w *world) dirRel(p string) (string, bool) {
 	var r string
 	switch {
-	case filepath.IsAbs(p) || strings.HasPrefix(p, "/"):
+	case env.IsRooted(p):
 		root := w.o.Env.Root
 		if root == "" {
 			if sb, ok := w.dirDoor().(sandbox); ok {
@@ -848,7 +848,7 @@ func (w *world) dirRel(p string) (string, bool) {
 // and for an absolute name).
 func (w *world) inCwd(name string) string {
 	if w.cwd == "." || w.cwd == "" || name == "" ||
-		filepath.IsAbs(name) || strings.HasPrefix(name, "/") {
+		env.IsRooted(name) {
 		return name
 	}
 	return path.Join(w.cwd, filepath.ToSlash(name))
