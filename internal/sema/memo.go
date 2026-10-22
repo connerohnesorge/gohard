@@ -40,12 +40,19 @@ func (ev *Evaluator) WithMemo() *Evaluator {
 
 // memoKey encodes a call of x on args; ok is false for arguments not
 // worth or not safe to key (access, file and protected values, large
-// composites).
-func memoKey(x *Decl, args []eval.Value) (string, bool) {
+// composites). The call of a subprogram instance is keyed by its
+// generics' bindings too (in.key), which may differ from call to call
+// (a generic map's actuals may be variables).
+func memoKey(x *Decl, in *Instance, args []eval.Value) (string, bool) {
 	buf := make([]byte, 0, 64)
-	buf = strconv.AppendUint(buf, uint64(x.Unit.Index), 36)
-	buf = append(buf, ':')
-	buf = strconv.AppendInt(buf, int64(x.Span.Start), 36)
+	if in != nil {
+		if in.key == "" {
+			return "", false
+		}
+		buf = append(buf, in.key...)
+		buf = append(buf, '/')
+	}
+	buf = appendDecl(buf, x)
 	n := 0
 	for _, a := range args {
 		buf = append(buf, '|')
@@ -91,6 +98,43 @@ func appendValue(buf []byte, v eval.Value, n *int) ([]byte, bool) {
 	return buf, false
 }
 
+// appendDecl identifies the declaration x by its unit and position.
+func appendDecl(buf []byte, x *Decl) []byte {
+	buf = strconv.AppendUint(buf, uint64(x.Unit.Index), 36)
+	buf = append(buf, ':')
+	return strconv.AppendInt(buf, int64(x.Span.Start), 36)
+}
+
+// appendLayout identifies the whole subtype t, the actual of a generic
+// type: its name, constraints, index, element and field subtypes.
+func appendLayout(buf []byte, t *eval.Type, depth int) []byte {
+	if t == nil || depth > 8 {
+		return append(buf, '?')
+	}
+	buf = appendType(buf, t)
+	buf = append(buf, byte('a'+t.Kind))
+	for _, r := range t.Bounds {
+		buf = strconv.AppendInt(buf, r.Left, 36)
+		buf = append(buf, byte('0'+r.Dir))
+		buf = strconv.AppendInt(buf, r.Right, 36)
+		buf = append(buf, ';')
+	}
+	for _, it := range t.Index {
+		buf = append(buf, '[')
+		buf = appendLayout(buf, it, depth+1)
+	}
+	if t.Elem != nil {
+		buf = append(buf, '{')
+		buf = appendLayout(buf, t.Elem, depth+1)
+	}
+	for _, f := range t.Fields {
+		buf = append(buf, '.')
+		buf = append(buf, f.Name...)
+		buf = appendLayout(buf, f.Type, depth+1)
+	}
+	return append(buf, '$')
+}
+
 // appendType identifies the subtype t by its name and its constraint:
 // the attributes a function body may read of an argument.
 func appendType(buf []byte, t *eval.Type) []byte {
@@ -109,15 +153,19 @@ func appendType(buf []byte, t *eval.Type) []byte {
 	return append(buf, '#')
 }
 
-// memoCall is Call of the pure function x through the memo table.
-func (ev *Evaluator) memoCall(x *Decl, args []eval.Value, b *eval.Budget,
+// memoCall is Call of the pure function x through the memo table; in
+// binds the generics of an instance x. The call of an instance may read
+// its own bindings, which its key holds, and nothing else that is
+// bound.
+func (ev *Evaluator) memoCall(x *Decl, in *Instance, args []eval.Value,
+	b *eval.Budget,
 ) (eval.Value, error) {
 	key, ok := "", x.Unit != nil
 	if ok {
-		key, ok = memoKey(x, args)
+		key, ok = memoKey(x, in, args)
 	}
 	if !ok {
-		return ev.pureCall(x, args, b)
+		return ev.pureCall(x, in, args, b)
 	}
 	if r, hit := ev.sh.memo[key]; hit {
 		if err := b.Step(r.steps); err != nil {
@@ -127,7 +175,14 @@ func (ev *Evaluator) memoCall(x *Decl, args []eval.Value, b *eval.Budget,
 	}
 	u0, reads, dyn, fills := b.Used(), ev.sh.reads, ev.sh.dynReads,
 		ev.sh.fills
-	v, err := ev.pureCall(x, args, b)
+	own := 0 // the reads of in's own bindings
+	if in != nil {
+		own = in.env.reads
+	}
+	v, err := ev.pureCall(x, in, args, b)
+	if in != nil {
+		reads += in.env.reads - own
+	}
 	if err == nil && ev.sh.reads == reads && ev.sh.dynReads == dyn &&
 		ev.sh.fills == fills && len(ev.sh.memo) < memoLimit {
 		if ev.sh.memo == nil {

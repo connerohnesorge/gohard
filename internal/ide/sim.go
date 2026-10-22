@@ -238,7 +238,8 @@ func (t simTask) result(out simrun.Outcome) server.SimResult {
 	seed := out.Seed
 	end := ""
 	r := server.SimResult{Ran: true, Run: ds, Write: !tool,
-		Inputs: repro.InputFiles(out.Inputs)}
+		Inputs:   repro.InputFiles(out.Inputs),
+		Listings: repro.InputFiles(out.Listings)}
 	if out.Trace != nil {
 		end = config.Time(out.Trace.Header.End).String()
 		r.Trace = trace.Encode(out.Trace)

@@ -453,6 +453,7 @@ func (w *world) open(f *fileState, name string, mode int64) int64 {
 	if mode != modeRead && mode != modeWrite && mode != modeAppend {
 		return 3
 	}
+	name = w.inCwd(name)
 	if w.denied(name) {
 		return 2
 	}

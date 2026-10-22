@@ -57,6 +57,9 @@ func (m *machine) builtinFunc(fn *callFn, obj int64, args []arg,
 ) (eval.Value, error) {
 	x := fn.x
 	rt := fn.ret
+	if err := m.builtinOuts(fn, args); err != nil {
+		return eval.Value{}, err
+	}
 	switch u := unitOf(x); {
 	case x.Name == "now" && u == "std.standard":
 		if m.ctx == nil {
@@ -77,6 +80,39 @@ func (m *machine) builtinFunc(fn *callFn, obj int64, args []arg,
 		return m.implicitFunc(fn, args)
 	}
 	return eval.Value{}, unsupported(x)
+}
+
+// builtinOuts gives the out and inout variable parameters of the call
+// fn of a built-in function (VHDL-2019, as DIR_OPEN's Dir) the places
+// of their actuals, resolved in the caller's frame, so the native
+// writes them with machine.out.
+func (m *machine) builtinOuts(fn *callFn, args []arg) error {
+	if fn.e == nil {
+		return nil
+	}
+	var acts []*sema.Expr
+	for i, p := range fn.x.Params {
+		if i >= len(args) || p.Class == sema.ClassSignal ||
+			p.Class == sema.ClassFile ||
+			p.Mode != sema.ModeOut && p.Mode != sema.ModeInout {
+			continue
+		}
+		if acts == nil {
+			var err error
+			if acts, err = actualsOf(fn.e, fn.x); err != nil {
+				return err
+			}
+		}
+		if i >= len(acts) || acts[i] == nil || acts[i] == p.Value {
+			continue
+		}
+		dst, err := m.placeOf(acts[i])
+		if err != nil {
+			return err
+		}
+		args[i].dst = &dst
+	}
+	return nil
 }
 
 // builtinProc executes a built-in procedure; stop reports

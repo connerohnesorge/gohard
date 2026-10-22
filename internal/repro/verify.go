@@ -63,8 +63,8 @@ func Invalid(file string, err error) diag.Diagnostic {
 }
 
 // Verify hashes the files h recorded under root (sources, gohard.yaml
-// and the design's inputs) and compares them, and version, with the
-// recording. An input that cannot be read is changed. A file that cannot be read for a reason
+// and the design's inputs and directory listings) and compares them,
+// and version, with the recording. An input that cannot be read is changed. A file that cannot be read for a reason
 // other than not existing is an error.
 func Verify(fsys env.FS, root string, h Header, version string) (
 	Check, error,
@@ -98,6 +98,12 @@ func Verify(fsys env.FS, root string, h Header, version string) (
 		}
 		data, err := readRegular(fsys, name)
 		if err != nil || Hash(data) != f.SHA256 {
+			c.Changed = append(c.Changed, f.Path)
+		}
+	}
+	for _, f := range h.Listings {
+		sum, err := env.ProjectListing(fsys, root, f.Path)
+		if err != nil || sum != f.SHA256 {
 			c.Changed = append(c.Changed, f.Path)
 		}
 	}

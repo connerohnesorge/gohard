@@ -1,0 +1,10 @@
+# gohard check --sim --seed 0 --tb call_generic_map_dynamic_tb (VHDL-2019)
+exit 0
+== stdout
+call_generic_map_dynamic.vhd:34:5: hint[sim/assert-note]: report note: sum of scale (k => 1 .. 4) (10) = 100
+call_generic_map_dynamic.vhd:35:5: hint[sim/assert-note]: report note: acc = 100
+call_generic_map_dynamic.vhd:39:7: hint[sim/assert-note]: report note: i = 1: 9
+call_generic_map_dynamic.vhd:39:7: hint[sim/assert-note]: report note: i = 2: 15
+summary: 0 errors, 0 warnings, 4 hints, 1 files
+== stderr
+gohard: simulated call_generic_map_dynamic_tb (seed 0): quiet

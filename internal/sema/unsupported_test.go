@@ -31,10 +31,11 @@ type v11Design struct {
 	} `yaml:"expected_v1_0"`
 }
 
-// TestV11CorpusExact: every milestone-v1.1 corpus design (prot_cond)
-// gives exactly the diagnostics corpus.yaml records in expected_v1_0,
-// in order, and its exit code (#18, #20). Only the listed messages may
-// appear.
+// TestV11CorpusExact: every milestone-v1.1 corpus design (prot_cond,
+// gc_heap) gives exactly the diagnostics corpus.yaml records in
+// expected_v1_0, in order, and its exit code (#18, #20). Only the
+// listed messages may appear; a design without expected_v1_0 (every
+// construct it uses is delivered) analyzes with none and exit 0.
 func TestV11CorpusExact(t *testing.T) {
 	b, err := os.ReadFile("../../testdata/corpus/corpus.yaml")
 	if err != nil {
@@ -127,9 +128,6 @@ func readTree(t testing.TB, dir string) []Source {
 // construct fixture holds, by file.
 var v11Names = map[string]string{
 	"protected_generics.vhd": cProtGenerics,
-	"method_alias.vhd":       cMethodAlias,
-	"call_generic_map.vhd":   cCallGenericMap,
-	"env_dir.vhd":            cEnvDir,
 	"env_psl.vhd":            cEnvPSL,
 	"path_name.vhd":          cPathName,
 }
@@ -147,6 +145,7 @@ var flippedLegacy = map[string]string{
 	"protected_array.vhd":             cProtArray,
 	"protected_array_constrained.vhd": cProtArray,
 	"protected_record.vhd":            cProtRecord,
+	"method_alias.vhd":                cMethodAlias,
 }
 
 // TestV11Constructs: each v1.1 construct, alone in a file, gives exactly
@@ -277,24 +276,26 @@ func TestV11Delivered(t *testing.T) {
 func TestDesignEntityGroups(t *testing.T) {
 	files := map[string]string{
 		"a_ent.vhd": "entity e is\n" +
-			"  constant d : string := std.env.dir_workingdir;\nend;\n",
+			"  constant d : boolean := std.env.PslIsCovered;\nend;\n",
 		"b_arch.vhd": "architecture rtl of e is\n" +
-			"  constant x : boolean := std.env.PslIsCovered;\n" +
-			"  constant y : string := std.env.dir_workingdir;\n" +
+			"  type pt is protected\n" +
+			"    generic (n : integer := 1);\n" +
+			"  end protected pt;\n" +
+			"  constant y : boolean := std.env.PslIsCovered;\n" +
 			"begin end;\n",
 		"c_other.vhd": "entity f is\n" +
-			"  constant d : string := std.env.dir_workingdir;\nend;\n" +
+			"  constant d : boolean := std.env.PslIsCovered;\nend;\n" +
 			"architecture rtl of f is begin end;\n",
 		"d_user.vhd": "entity g is end;\narchitecture rtl of g is\n" +
 			"begin\n  u : entity work.e;\nend;\n",
 	}
 	r := analyze(t, files, func(c *config.Config) { c.Standard = "2019" })
 	got := diagText(r)
-	want := "a_ent.vhd:2:34: unsupported/construct: " + cEnvDir +
+	want := "a_ent.vhd:2:35: unsupported/construct: " + cEnvPSL +
 		" is not supported yet (planned for v1.1)\n" +
-		"b_arch.vhd:2:35: unsupported/construct: " + cEnvPSL +
+		"b_arch.vhd:3:5: unsupported/construct: " + cProtGenerics +
 		" is not supported yet (planned for v1.1)\n" +
-		"c_other.vhd:2:34: unsupported/construct: " + cEnvDir +
+		"c_other.vhd:2:35: unsupported/construct: " + cEnvPSL +
 		" is not supported yet (planned for v1.1)\n" +
 		"d_user.vhd:2:14: sema/unchecked-unit: work.g(rtl) was not " +
 		"checked: it depends on opaque unit work.e\n"

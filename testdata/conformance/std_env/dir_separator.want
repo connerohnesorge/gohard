@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb dir_separator_tb (VHDL-2019)
+exit 0
+== stdout
+dir_separator.vhd:12:5: hint[sim/assert-note]: report note: DIR_SEPARATOR = "/", length 1
+dir_separator.vhd:16:5: hint[sim/assert-note]: report note: sep_a/b is a directory: true
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated dir_separator_tb (seed 0): quiet

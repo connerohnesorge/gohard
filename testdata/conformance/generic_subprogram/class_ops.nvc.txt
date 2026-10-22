@@ -1,0 +1,18 @@
+# NVC output of testdata/conformance/generic_subprogram/class_ops.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a class_ops.vhd -e class_ops_tb -r
+# source sha256: da45f205ea2a4ac9c228d14a3dcc2d1c41eb3298df6f9f1e35f30c78dddd856a
+# exit: 0
+** Note: 0ms+0: dbl = 42
+   Process :class_ops_tb:check at class_ops.vhd:60
+** Note: 0ms+0: sq = 33
+   Process :class_ops_tb:check at class_ops.vhd:60
+** Note: 0ms+0: phy = 4000000 fs
+   Process :class_ops_tb:check at class_ops.vhd:60
+** Note: 0ms+0: flt = 3.75
+   Process :class_ops_tb:check at class_ops.vhd:60
+** Note: 0ms+0: mx = green
+   Process :class_ops_tb:check at class_ops.vhd:60
+** Note: 0ms+0: take = 9 true
+   Process :class_ops_tb:check at class_ops.vhd:60

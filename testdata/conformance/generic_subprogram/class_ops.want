@@ -1,0 +1,12 @@
+# gohard check --sim --seed 0 --tb class_ops_tb (VHDL-2019)
+exit 0
+== stdout
+class_ops.vhd:66:5: hint[sim/assert-note]: report note: dbl = 42
+class_ops.vhd:69:5: hint[sim/assert-note]: report note: sq = 33
+class_ops.vhd:71:5: hint[sim/assert-note]: report note: phy = 4000000 fs
+class_ops.vhd:73:5: hint[sim/assert-note]: report note: flt = 3.75
+class_ops.vhd:75:5: hint[sim/assert-note]: report note: mx = green
+class_ops.vhd:79:5: hint[sim/assert-note]: report note: take = 9 true
+summary: 0 errors, 0 warnings, 6 hints, 1 files
+== stderr
+gohard: simulated class_ops_tb (seed 0): quiet

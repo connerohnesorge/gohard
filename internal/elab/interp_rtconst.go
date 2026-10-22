@@ -45,7 +45,7 @@ func (w *world) runtimeExpr(ev *sema.Evaluator, e *sema.Expr, depth int,
 			!x.Implicit && (ev.Body(x) == nil || runsHere(x)):
 			return true
 		case e.Kind == sema.ExprName && x.Kind == sema.DeclConstant &&
-			w.runtimeConst(ev, x):
+			(w.runtimeConst(ev, x) || envDeferred(x)):
 			return true
 		}
 	}

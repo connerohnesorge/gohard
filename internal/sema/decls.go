@@ -461,6 +461,12 @@ func (a *analyzer) aliasDecl(ad cst.AliasDecl) {
 			d.Target = pick[0]
 			d.Type = pick[0].Denotes().Type
 			d.Params = pick[0].Denotes().Params
+			if x := pick[0].Denotes(); r.expr != nil &&
+				x.Parent != nil && x.Parent.Kind == RegionProtected {
+				// A method of a named object (obj.m): the alias keeps
+				// the object it calls the method on (LRM 6.6.1).
+				d.MethodObj = r.expr
+			}
 		}
 		if len(pick) >= 1 {
 			a.ref(r.tok, pick[0], RefRead)
@@ -469,6 +475,16 @@ func (a *analyzer) aliasDecl(ad cst.AliasDecl) {
 		a.aliasRules(ad, nil)
 		a.aliasTypeName(target.Node) // typerules.go
 		d.Type = r.typ
+	}
+	if a.std >= token.Std2019 && d.Parent != nil &&
+		d.Parent.Kind == RegionProtected && d.MethodObj == nil &&
+		!r.unknown {
+		// LRM 5.6.2 (2019): an alias in a protected type declaration
+		// denotes a method of a private variable (NVC alike); older
+		// standards report the alias as syntax/standard.
+		a.semaError(d.Span, "alias "+d.Text+" in a protected type "+
+			"declaration must denote a method of a private variable "+
+			"(LRM 5.6.2)")
 	}
 	a.declare(d)
 	if r.typ != nil && !r.typ.Unknown() && r.expr == nil {
@@ -764,7 +780,7 @@ func (a *analyzer) findSpec(d *Decl) *Decl {
 		for _, old := range r.Lookup(d.Name) {
 			if !old.Implicit && old.Kind == d.Kind && old.Spec == nil &&
 				old.Node.Kind() != cst.KindSubprogramBody &&
-				sameProfile(old, d) {
+				(sameProfile(old, d) || sameGenericProfile(old, d)) {
 				return old
 			}
 		}
@@ -811,8 +827,14 @@ func (a *analyzer) subprogramInst(si cst.SubprogramInstantiation) {
 		as := a.assocMap(si.GenericMap().List(), g.Region, DeclGeneric)
 		a.instSubst = nil
 		if g.Kind.IsSubprogram() {
+			a.mapRules(as, g.Region, DeclGeneric, si.Node) // assocrules.go
 			a.missingGenerics(as, g.Region, si.Node)
+			a.instanceObjects(g, as, si.Node) // pkginst.go
 		}
+		if as == nil {
+			as = []Association{}
+		}
+		d.Generics = as
 		instanceProfile(d, as)
 	} else {
 		a.genericMap(si.GenericMap().List(), nil)

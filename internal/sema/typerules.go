@@ -160,19 +160,34 @@ func (a *analyzer) rangeOperand(e *Expr, n cst.Node) {
 // 6.5.3) its index and element subtypes, so A'INDEX and A'ELEMENT
 // denote them. An anonymous index or element type indication is a
 // generic type of its own, bound with A's actual (Evaluator.BindType);
-// a type mark or a subtype indication stays unknown.
+// an index type mark (T range <>) or an element subtype indication
+// denotes its subtype, so objects of A can be indexed (arrayClass).
 func (a *analyzer) genericArrayClass(def cst.TypeDef, d *Decl) {
+	if def.Kind() == cst.KindAccessIncompleteTypeDef {
+		// type t is access d: t designates d (LRM 6.5.3), so p.all
+		// and DEALLOCATE (predef.go) apply to its objects.
+		si := cst.AccessIncompleteTypeDef{Node: def.Node}.Subtype()
+		if !si.IsZero() {
+			d.Type.Designated = a.subtypeIndication(si)
+		}
+		return
+	}
 	if def.Kind() != cst.KindArrayIncompleteTypeDef {
 		return
 	}
 	var parts []*Type
 	for c := range def.Nodes() {
 		t := UnknownType
-		if c.Kind() == cst.KindAnonymousTypeIndication {
+		switch c.Kind() {
+		case cst.KindAnonymousTypeIndication:
 			g := a.newDecl(DeclGenericType, cst.Token{}, c)
 			g.Text = d.Text + "'element"
 			t = &Type{Class: TypeGeneric, Decl: g}
 			g.Type = t
+		case cst.KindIndexSubtypeDef:
+			t = a.typeMark(cst.IndexSubtypeDef{Node: c}.TypeMark().Node)
+		case cst.KindSubtypeIndication:
+			t = a.subtypeIndication(cst.SubtypeIndication{Node: c})
 		}
 		parts = append(parts, t)
 	}
@@ -181,7 +196,8 @@ func (a *analyzer) genericArrayClass(def cst.TypeDef, d *Decl) {
 	}
 	n := len(parts) - 1
 	for i, t := range parts[:n] {
-		if t.Decl != nil {
+		if t.Class == TypeGeneric && t.Decl != nil &&
+			t.Decl.Node.Kind() == cst.KindAnonymousTypeIndication {
 			t.Decl.Text = d.Text + "'index"
 			if n > 1 {
 				t.Decl.Text += "(" + strconv.Itoa(i+1) + ")"
@@ -207,6 +223,7 @@ func (a *analyzer) recordGenericActual(f *Decl, e *Expr) {
 		a.semaError(e.Node.Span(), "the actual "+e.Type.Name()+" of "+
 			"generic type "+f.Text+" has no predefined = and /=")
 	}
+	a.genericTypeClass(f, e)
 	if a.instSubst == nil {
 		a.instSubst = map[*Type]*Type{}
 	}
@@ -322,6 +339,108 @@ func (a *analyzer) unconstrainedConversion(e *Expr, want *Type,
 	}
 	a.semaError(n.Span(), "the conversion "+a.text(n)+" of an actual "+
 		"for an unconstrained port must have a constrained type")
+}
+
+// genericClassDef returns the kind of the incomplete type definition
+// of the VHDL-2019 generic type d (type t is range <>: an
+// IntegerIncompleteTypeDef; LRM 6.5.3), zero for a VHDL-2008 one.
+func genericClassDef(d *Decl) cst.Kind {
+	if d == nil || d.Kind != DeclGenericType || d.Node.IsZero() {
+		return 0
+	}
+	for c := range d.Node.Nodes() {
+		switch k := c.Kind(); k {
+		case cst.KindPrivateIncompleteTypeDef,
+			cst.KindScalarIncompleteTypeDef,
+			cst.KindDiscreteIncompleteTypeDef,
+			cst.KindIntegerIncompleteTypeDef,
+			cst.KindPhysicalIncompleteTypeDef,
+			cst.KindFloatingIncompleteTypeDef,
+			cst.KindArrayIncompleteTypeDef,
+			cst.KindAccessIncompleteTypeDef,
+			cst.KindFileIncompleteTypeDef:
+			return k
+		}
+	}
+	return 0
+}
+
+// genericOpClass returns the class whose implicit operations the
+// generic type d declares (LRM 6.5.3): a scalar or discrete one has
+// the relational operators and MINIMUM/MAXIMUM of an enumeration type,
+// an integer, floating or physical one the arithmetic of its class, an
+// access one DEALLOCATE; TypeGeneric for the others ("=" and "/="
+// only).
+func genericOpClass(d *Decl) TypeClass {
+	switch genericClassDef(d) {
+	case cst.KindScalarIncompleteTypeDef, cst.KindDiscreteIncompleteTypeDef:
+		return TypeEnum
+	case cst.KindIntegerIncompleteTypeDef:
+		return TypeInteger
+	case cst.KindFloatingIncompleteTypeDef:
+		return TypeFloating
+	case cst.KindPhysicalIncompleteTypeDef:
+		return TypePhysical
+	case cst.KindAccessIncompleteTypeDef:
+		return TypeAccess
+	}
+	return TypeGeneric
+}
+
+// genericTypeClass checks that the actual subtype e of the VHDL-2019
+// generic type f is of the class f declares (LRM 6.5.3, 6.5.7.2), as
+// NVC does; an actual of another generic type is checked per instance.
+func (a *analyzer) genericTypeClass(f *Decl, e *Expr) {
+	b := e.Type.Base()
+	if b == nil || b.Class == TypeGeneric {
+		return
+	}
+	c := b.Class
+	var what string
+	switch genericClassDef(f) {
+	case cst.KindScalarIncompleteTypeDef:
+		if c != TypeEnum && c != TypeInteger && c != TypeFloating &&
+			c != TypePhysical {
+			what = "a scalar type"
+		}
+	case cst.KindDiscreteIncompleteTypeDef:
+		if c != TypeEnum && c != TypeInteger {
+			what = "a discrete type"
+		}
+	case cst.KindIntegerIncompleteTypeDef:
+		if c != TypeInteger {
+			what = "an integer type"
+		}
+	case cst.KindFloatingIncompleteTypeDef:
+		if c != TypeFloating {
+			what = "a floating-point type"
+		}
+	case cst.KindPhysicalIncompleteTypeDef:
+		if c != TypePhysical {
+			what = "a physical type"
+		}
+	case cst.KindArrayIncompleteTypeDef:
+		if c != TypeArray {
+			what = "an array type"
+		}
+	case cst.KindAccessIncompleteTypeDef:
+		if c != TypeAccess {
+			what = "an access type"
+		}
+	case cst.KindFileIncompleteTypeDef:
+		if c != TypeFile {
+			what = "a file type"
+		}
+	}
+	if what == "" {
+		return
+	}
+	a.misfits++
+	if !a.quiet {
+		a.semaError(e.Node.Span(), "cannot map type "+e.Type.Name()+
+			" to generic type "+f.Text+", which requires "+what+
+			" (LRM 6.5.3)")
+	}
 }
 
 // genericPrivate reports a VHDL-2019 generic type with an incomplete

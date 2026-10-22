@@ -1,4 +1,6 @@
-# The corpus design prot_cond (#8, milestone v1.1) under v1.0: exactly
-# the unsupported/construct diagnostics corpus.yaml records in
-# expected_v1_0, one per v1.1 construct, exit 2.
-gohard check
+# The corpus design prot_cond (#8, milestone v1.1): with generic maps
+# on subprogram calls delivered (v1.1 Stage 2) it uses no construct
+# GoHard does not implement, so it analyzes clean and simulates:
+# every check of prot_cond_tb passes, and the one deliberate warning
+# probe is the only message, as in NVC's run (corpus.yaml).
+gohard check --sim --seed 0 --tb prot_cond_tb

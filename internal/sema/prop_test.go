@@ -306,12 +306,14 @@ func loadCorpus(t *testing.T) ([]corpusDesign,
 // standard and configuration. A v1.0 design and every variant GHDL
 // analyzes must analyze without errors (their failures are elaboration
 // and simulation results); the variants GHDL rejects at analysis must
-// get an error; v1.1 designs must be opaque (exit 2) in v1.0. Every
-// result is independent of the file order.
+// get an error. The v1.1 designs analyze without errors too: their
+// constructs are delivered (prot_cond's last one, generic maps on
+// subprogram calls, in Stage 2) or not constructs at all (gc_heap's
+// garbage collection). Every result is independent of the file order.
 func TestCorpus(t *testing.T) {
 	designs, run := loadCorpus(t)
-	if len(designs) != 14 {
-		t.Fatalf("%d corpus designs, want 14", len(designs))
+	if len(designs) != 15 {
+		t.Fatalf("%d corpus designs, want 15", len(designs))
 	}
 	for _, d := range designs {
 		dir := filepath.Join("../../testdata/corpus", d.Name)
@@ -340,11 +342,6 @@ func TestCorpus(t *testing.T) {
 			analysisFails := c.GHDL.Result == "analysis-error" ||
 				strings.Contains(c.GHDL.Result, "analy")
 			switch {
-			case d.Milestone == "v1.1":
-				if !strings.Contains(diagText(r), "unsupported/construct") {
-					t.Errorf("%s: v1.1 design is not opaque:\n%s", name,
-						diagText(r))
-				}
 			case analysisFails:
 				if errs == 0 {
 					t.Errorf("%s: GHDL rejects it, sema finds nothing",

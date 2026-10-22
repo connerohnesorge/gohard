@@ -128,6 +128,10 @@ type Outcome struct {
 	// header records them so a replay with other input data is
 	// refused (repro/source-changed, #29).
 	Inputs []env.Input
+	// Listings are the project directories the design listed (std.env
+	// DIR_*), with env.ListingSHA256 of their entries, sorted: the
+	// repro header records them like Inputs.
+	Listings []env.Input
 }
 
 // interpOptions are the interpreter options of a run with its own

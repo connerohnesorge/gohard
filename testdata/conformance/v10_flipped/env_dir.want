@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb env_dir (VHDL-2019)
+exit 0
+== stdout
+env_dir.vhd:12:5: hint[sim/assert-note]: report note: .
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated env_dir (seed 0): quiet

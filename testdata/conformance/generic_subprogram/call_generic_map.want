@@ -1,0 +1,10 @@
+# gohard check --sim --seed 0 --tb call_generic_map_tb (VHDL-2019)
+exit 0
+== stdout
+call_generic_map.vhd:33:5: hint[sim/assert-note]: report note: scale generic map (k => 3) (x => 4) = 12
+call_generic_map.vhd:35:5: hint[sim/assert-note]: report note: c = 35
+call_generic_map.vhd:37:5: hint[sim/assert-note]: report note: scale (k => 2) (10) + scale (4) (10) = 60
+call_generic_map.vhd:40:5: hint[sim/assert-note]: report note: acc = 13
+summary: 0 errors, 0 warnings, 4 hints, 1 files
+== stderr
+gohard: simulated call_generic_map_tb (seed 0): quiet

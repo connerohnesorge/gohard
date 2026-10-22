@@ -1,0 +1,16 @@
+# NVC output of testdata/conformance/generic_subprogram/generic_type.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a generic_type.vhd -e generic_type_tb -r
+# source sha256: 2a6ea06a0c6281a78c1e75b66f5b70d2c10394b53ae91eb2cdf0833f6d327905
+# exit: 0
+** Note: 0ms+0: ident(true) = true
+   Process :generic_type_tb:p at generic_type.vhd:40
+** Note: 0ms+0: ident_color(green) = green
+   Process :generic_type_tb:p at generic_type.vhd:40
+** Note: 0ms+0: green of blue
+   Process :generic_type_tb:p at generic_type.vhd:47
+** Note: 0ms+0: 5 of 9223372036854775807
+   Process :generic_type_tb:p at generic_type.vhd:48
+** Note: 0ms+0: swapped 2 1 2.5 1.5
+   Process :generic_type_tb:p at generic_type.vhd:40

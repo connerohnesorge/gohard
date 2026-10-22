@@ -56,6 +56,11 @@ type (
 		ret    *eval.Type
 	}
 	derefFn struct{}
+	// methodObjFn is the object of a method alias: its prefix
+	// evaluated in the frame of the object Args[0] (0: the current
+	// frames).
+	methodObjFn struct{ obj *sema.Expr }
+
 	allocFn struct {
 		t   *eval.Type // the access type
 		def *eval.Type // the designated subtype of `new T`
@@ -108,17 +113,53 @@ func (m *machine) Ref(d *sema.Decl) (eval.Ref, bool) {
 			return r, true
 		}
 		if d.Kind == sema.DeclFile && d.Parent != nil &&
-			globalRegion(d.Parent) || m.w.runtimeConst(m.ev, d) {
-			// A design-region file, or a constant whose value the
-			// interpreter computes (interp_rtconst.go).
+			globalRegion(d.Parent) || m.w.runtimeConst(m.ev, d) ||
+			m.envConstant(d) {
+			// A design-region file, a constant whose value the
+			// interpreter computes (interp_rtconst.go), or a deferred
+			// std.env constant the interpreter supplies.
 			return sharedRef{m.sharedKeyOf(d)}, true
 		}
 		return nil, false
 	case sema.DeclSharedVariable:
 		return sharedRef{m.sharedKeyOf(d)}, true
+	case sema.DeclGeneric:
+		// A generic constant of a running subprogram instance (an
+		// object of its frame); else the instance's binding.
+		return m.varOf(d)
 	}
 	return nil, false
 }
+
+// GenericLayout implements sema.GenericDynamic: the actual subtype of
+// the generic type d of the innermost running instance binding it.
+func (m *machine) GenericLayout(d *sema.Decl) (*eval.Type, bool) {
+	for i := len(m.frames) - 1; i >= 0; i-- {
+		if s, ok := m.frames[i].vars[d]; ok {
+			return s.t, s.t != nil
+		}
+	}
+	return nil, false
+}
+
+// GenericSubprogram implements sema.GenericDynamic: the actual of the
+// generic subprogram d in the innermost running instance binding it.
+func (m *machine) GenericSubprogram(d *sema.Decl) (*sema.Decl, bool) {
+	for i := len(m.frames) - 1; i >= 0; i-- {
+		f := &m.frames[i]
+		if _, ok := f.vars[d]; !ok {
+			continue
+		}
+		if f.call == nil || f.call.Decl == nil {
+			return nil, false
+		}
+		a := m.ev.InstanceSubprogram(f.call.Decl.Denotes(), d)
+		return a, a != nil
+	}
+	return nil, false
+}
+
+var _ sema.GenericDynamic = (*machine)(nil)
 
 // globalRegion reports whether objects of r are elaborated once per
 // design (packages) or per instance (architectures, entities, blocks)
@@ -410,7 +451,7 @@ func (m *machine) lowerAttr(ev *sema.Evaluator, e *sema.Expr,
 // access type (whose objects live in the world), or an out or inout
 // variable parameter (written back to its actual).
 func runsHere(x *sema.Decl) bool {
-	if !x.Pure {
+	if !sema.Pure(x) {
 		return true
 	}
 	if x.Parent != nil && x.Parent.Kind == sema.RegionProtected {
@@ -468,7 +509,20 @@ func (m *machine) lowerCall(ev *sema.Evaluator, e *sema.Expr,
 		}
 	}
 	var args []eval.Expr
-	if e.Prefix != nil && x.Parent != nil &&
+	if mo := methodObj(e.Decl); mo != nil {
+		// A method alias (VHDL-2019): the object it names, in the
+		// frame of the call's object.
+		fn.method = true
+		var outer eval.Expr = &eval.Const{V: eval.Value{}}
+		if e.Prefix != nil {
+			var err error
+			if outer, err = ev.Lower(e.Prefix, b); err != nil {
+				return nil, true, err
+			}
+		}
+		args = append(args, &eval.Call{Fn: methodObjFn{mo},
+			Args: []eval.Expr{outer}})
+	} else if e.Prefix != nil && x.Parent != nil &&
 		x.Parent.Kind == sema.RegionProtected {
 		fn.method = true
 		ox, err := ev.Lower(e.Prefix, b)
@@ -522,6 +576,9 @@ func (m *machine) Call(fn eval.Func, args []eval.Value, b *eval.Budget,
 	case *callFn:
 		v, err := m.callFunction(f, args, b)
 		return v, true, err
+	case methodObjFn:
+		h, err := m.methodObject(args[0].I, f.obj, b)
+		return eval.Value{I: h}, true, err
 	}
 	return eval.Value{}, false, nil
 }

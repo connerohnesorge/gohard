@@ -1,0 +1,10 @@
+# NVC output of testdata/conformance/generic_subprogram/box_default_site.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a box_default_site.vhd -e box_default_site_tb -r
+# source sha256: 561d56373c98cc6e5fecc9709568e16d183aeb4b47b4b5750e15bec6024f4f25
+# exit: 0
+** Note: 0ms+0: call = 1
+   Process :box_default_site_tb:check at box_default_site.vhd:38
+** Note: 0ms+0: instance = 1
+   Process :box_default_site_tb:check at box_default_site.vhd:38

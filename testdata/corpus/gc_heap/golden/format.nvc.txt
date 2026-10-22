@@ -1,0 +1,17 @@
+# GoHard formatter oracle (#32): gc_heap, nvc.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool nvc 1.23.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2019
+file gc_heap.vhd std=2019 sha256=15a2ba9b851f492d7fa1c3d63386da5ea5f3e6f10f1840767d2007707a487e80 formatted=ba6ead84f7fc3fcf340a2f7692dbf1accc99e923d77592e490559f850c3dd82c changed
+  exit original=0 formatted=0
+file gc_heap_tb.vhd std=2019 sha256=d93db6df9a1c2dcf03589ddfba79a23576c2bf8b7e7dd6b889bbb1503ac633d1 formatted=b8bfd1849a27cda313c295d73f6356287280e19a247475e61e7b0efaff1a0bb2 changed
+  exit original=0 formatted=0
+result new=0

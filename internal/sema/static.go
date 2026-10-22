@@ -50,6 +50,10 @@ type Evaluator struct {
 	// std is the standard of the analysis: it picks the layout of
 	// std.standard's INTEGER, NATURAL and POSITIVE (integerLayout).
 	std token.Standard
+	// gen binds the generics of the subprogram instance whose call ev
+	// interprets (interp.go); its consts and layouts caches are then
+	// the call's own.
+	gen *instEnv
 }
 
 type constResult struct {
@@ -575,8 +579,18 @@ func (ev *Evaluator) name(e *Expr, b *eval.Budget) (eval.Expr, error) {
 		ev.sh.reads++
 		return &eval.Const{V: v}, nil
 	}
+	if x.Kind == DeclGeneric {
+		if v, ok := ev.genConst(x); ok {
+			return &eval.Const{V: v}, nil
+		}
+	}
 	if l, ok := ev.dynRef(x); ok {
 		return l, nil
+	}
+	if packageGeneric(x) {
+		ev.sh.reads++ // another instance may bind it
+		return nil, &UnsupportedError{What: cPackageInstanceGeneric,
+			err: eval.NotStatic(x.Text)}
 	}
 	switch x.Kind {
 	case DeclEnumLiteral:
@@ -666,7 +680,9 @@ func (ev *Evaluator) constant(d *Decl, b *eval.Budget) (eval.Value, error) {
 			ev.sh.fills++ // memo.go: a cold computation
 		case frameFree:
 			ev.consts[d] = constResult{v, err}
-			ev.sh.fills++
+			if ev.gen == nil { // an instance call's caches are its own
+				ev.sh.fills++
+			}
 		default:
 			if ev.fr.consts == nil {
 				ev.fr.consts = map[*Decl]constResult{}
@@ -729,6 +745,14 @@ func (ev *Evaluator) call(e *Expr, b *eval.Budget) (eval.Expr, error) {
 		return nil, eval.NotStatic("call")
 	}
 	x := d.Denotes()
+	if x.Kind == DeclGenericSubprogram {
+		// A generic subprogram of an instance: its actual's call.
+		de, err := ev.Dispatch(e)
+		if err != nil {
+			return nil, err
+		}
+		return ev.call(de, b)
+	}
 	if x.Kind == DeclEnumLiteral {
 		return ev.name(&Expr{Kind: ExprName, Decl: d, Type: x.Type}, b)
 	}
@@ -738,7 +762,7 @@ func (ev *Evaluator) call(e *Expr, b *eval.Budget) (eval.Expr, error) {
 	if l, ok, err := ev.native(e, x, b); ok {
 		return l, err
 	}
-	if x.Kind != DeclFunction || (x.Implicit && x.Op == 0) || !x.Pure {
+	if x.Kind != DeclFunction || (x.Implicit && x.Op == 0) || !Pure(x) {
 		return nil, eval.NotStatic("call of " + x.Text)
 	}
 	acts := e.Args
@@ -1106,7 +1130,9 @@ func (ev *Evaluator) layout(t *Type, b *eval.Budget) (*eval.Type, error) {
 		ev.sh.fills++ // memo.go: a cold computation
 	case frameFree:
 		ev.layouts[t] = lt
-		ev.sh.fills++
+		if ev.gen == nil { // an instance call's caches are its own
+			ev.sh.fills++
+		}
 	default:
 		if ev.fr.layouts == nil {
 			ev.fr.layouts = map[*Type]*eval.Type{}
@@ -1296,6 +1322,9 @@ func (ev *Evaluator) computeLayout(t *Type, b *eval.Budget,
 		if t.Decl != nil {
 			if bt, ok := ev.types[t.Decl]; ok {
 				return ev.layout(bt, b)
+			}
+			if lt, ok := ev.genLayout(t.Decl); ok {
+				return lt, nil
 			}
 		}
 	}

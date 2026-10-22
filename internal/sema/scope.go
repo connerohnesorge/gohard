@@ -58,6 +58,67 @@ func sameProfile(a, b *Decl) bool {
 	return ra == nil || sameBaseOrUnknown(ra, rb)
 }
 
+// sameGenericProfile reports whether the uninstantiated subprograms a
+// and b (a declaration and a body) have the same profile once each
+// generic type of b is read as a's generic type at the same position
+// in the generic list (LRM 4.10: the body repeats the declaration's
+// generic list, whose generic types sameProfile sees as distinct).
+func sameGenericProfile(a, b *Decl) bool {
+	if !uninstantiated(a) || !uninstantiated(b) {
+		return false
+	}
+	ga, gb := genericDecls(a), genericDecls(b)
+	if len(ga) != len(gb) {
+		return false
+	}
+	m := map[*Type]*Type{} // b's generic types to a's; lookup only
+	for i := range ga {
+		if ga[i].Kind != gb[i].Kind {
+			return false
+		}
+		if ga[i].Kind == DeclGenericType && ga[i].Type != nil &&
+			gb[i].Type != nil {
+			m[gb[i].Type.Base()] = ga[i].Type.Base()
+		}
+	}
+	same := func(x, y *Type) bool {
+		if sameBaseOrUnknown(x, y) {
+			return true
+		}
+		if x.Unknown() || y.Unknown() {
+			return false
+		}
+		t, ok := m[y.Base()]
+		return ok && t == x.Base()
+	}
+	pa, pb := profileParams(a), profileParams(b)
+	if len(pa) != len(pb) {
+		return false
+	}
+	for i := range pa {
+		if !same(pa[i].Type, pb[i].Type) {
+			return false
+		}
+	}
+	ra, rb := resultType(a), resultType(b)
+	if (ra == nil) != (rb == nil) {
+		return false
+	}
+	return ra == nil || same(ra, rb)
+}
+
+// genericDecls returns the generic declarations of a subprogram's
+// generic list, in order.
+func genericDecls(d *Decl) []*Decl {
+	var out []*Decl
+	for _, x := range d.Region.Decls {
+		if isGenericKind(x.Kind) {
+			out = append(out, x)
+		}
+	}
+	return out
+}
+
 func sameBaseOrUnknown(a, b *Type) bool {
 	if a.Unknown() || b.Unknown() {
 		return a.Unknown() && b.Unknown()

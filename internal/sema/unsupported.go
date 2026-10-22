@@ -12,17 +12,17 @@ package sema
 //
 // Every VHDL-2019 feature of #18 that v1.1 does not implement yet is in
 // the table below (the syntactic ones by node kind) or found by meaning
-// (detectors: the std.env DIR_* and PSL names, 'PATH_NAME and
-// 'INSTANCE_NAME inside protected types). The delivered features whose
-// older-standard use no other check reports (inferred constraints,
-// variable ports, composites of protected types, protected and access
-// function parameters) are still found, to report them as
-// syntax/standard there. A protected type whose body declares
-// variables of other protected types is VHDL-2008 (OSVVM relies on it)
-// and is analyzed. Each construct is reported once per design entity
-// (a primary unit and its secondary units), at its first use in
-// canonical order; every unit using it is opaque, and so is every
-// secondary unit of a primary unit made opaque by a construct (an
+// (detectors: the std.env PSL names, 'PATH_NAME and 'INSTANCE_NAME
+// inside protected types). The delivered features whose older-standard
+// use no other check reports (inferred constraints, variable ports,
+// composites of protected types, protected and access function
+// parameters, method aliases in protected types) are still found, to
+// report them as syntax/standard there. A protected type whose body
+// declares variables of other protected types is VHDL-2008 (OSVVM
+// relies on it) and is analyzed. Each construct is reported once per
+// design entity (a primary unit and its secondary units), at its first
+// use in canonical order; every unit using it is opaque, and so is
+// every secondary unit of a primary unit made opaque by a construct (an
 // architecture cannot be analyzed without its entity). Under an older
 // standard the 2019 constructs are not "unsupported" but not allowed:
 // the parser reports the syntactic ones and this file reports the rest
@@ -54,18 +54,16 @@ type construct struct {
 // The names of the v1.1 constructs found by meaning rather than by node
 // kind. The texts are the ones #18 lists.
 const (
-	cEnvDir         = "std.env DIR_* functions"
-	cEnvPSL         = "std.env PSL assert and cover API"
-	cEnvOther       = "std.env VHDL-2019 additions"
-	cPathName       = "'PATH_NAME/'INSTANCE_NAME for protected types"
-	cMethodAlias    = "method aliases in protected types"
-	cProtGenerics   = "generic clauses on protected types"
-	cCallGenericMap = "generic maps on subprogram calls"
-	cInferred       = "inferred constraints"
-	cVariablePort   = "shared-variable ports of protected type"
-	cProtArray      = "arrays of protected types"
-	cProtRecord     = "records of protected types"
-	cProtParam      = "protected-type and access parameters on functions"
+	cEnvPSL       = "std.env PSL assert and cover API"
+	cEnvOther     = "std.env VHDL-2019 additions"
+	cPathName     = "'PATH_NAME/'INSTANCE_NAME for protected types"
+	cMethodAlias  = "method aliases in protected types"
+	cProtGenerics = "generic clauses on protected types"
+	cInferred     = "inferred constraints"
+	cVariablePort = "shared-variable ports of protected type"
+	cProtArray    = "arrays of protected types"
+	cProtRecord   = "records of protected types"
+	cProtParam    = "protected-type and access parameters on functions"
 )
 
 // constructs are the legal constructs GoHard does not implement, by
@@ -76,9 +74,6 @@ var constructs = []construct{
 			return !(cst.ProtectedTypeHeader{Node: n}).Generics().IsZero()
 		}},
 	{kind: cst.KindProtectedTypeInstantiationDef, name: cProtGenerics,
-		planned: true},
-	{kind: cst.KindCallGenericMap, name: cCallGenericMap, planned: true},
-	{kind: cst.KindParameterMapAspect, name: cCallGenericMap,
 		planned: true},
 	{kind: cst.KindAliasDecl, name: cMethodAlias, planned: true,
 		match: inProtectedDecl},
@@ -103,7 +98,7 @@ var legacy = map[string]bool{
 // them under older standards.
 var delivered = map[string]bool{
 	cInferred: true, cVariablePort: true, cProtParam: true,
-	cProtArray: true, cProtRecord: true,
+	cMethodAlias: true, cProtArray: true, cProtRecord: true,
 }
 
 // inProtectedDecl reports whether n is inside a protected type
@@ -574,7 +569,7 @@ func refDecl(ref Ref) *Decl {
 // bundledConstruct names the v1.1 construct a reference to the bundled
 // declaration d uses: the VHDL-2019 additions to std.env that v1.1 does
 // not implement yet (std.reflection and the other groups are
-// implemented).
+// implemented, DIR_* included).
 func bundledConstruct(d *Decl) string {
 	if d == nil || d.Unit == nil || d.Unit.File == nil ||
 		!d.Unit.File.Bundled || d.Unit.Library != "std" {
@@ -595,7 +590,7 @@ func bundledConstruct(d *Decl) string {
 }
 
 // envGroup sorts a VHDL-2019 std.env declaration into the #18 groups
-// still planned (DIR_*, PSL, unknown additions), or "" for the
+// still planned (PSL, unknown additions), or "" for the
 // implemented ones:
 // by its name, else (implicit operations, to_string, "+") by the type
 // of its first parameter, else (record elements, enumeration literals)
@@ -623,7 +618,8 @@ func envGroup(d *Decl) string {
 
 // envDone is the envName group of the implemented std.env additions:
 // VHDL_VERSION and TOOL_*, GETENV, FILE_NAME/FILE_PATH/FILE_LINE,
-// GET_CALL_PATH, the date and time functions and the VHDL assert API.
+// GET_CALL_PATH, the date and time functions, the VHDL assert API and
+// the DIR_* directory API.
 const envDone = "implemented"
 
 // envName is the #18 group of a std.env name, envDone for an
@@ -631,11 +627,10 @@ const envDone = "implemented"
 func envName(name string) string {
 	n := strings.ToUpper(name)
 	switch {
-	case strings.HasPrefix(n, "DIR") || n == "FILE_DELETE_STATUS":
-		return cEnvDir
 	case strings.Contains(n, "PSL"):
 		return cEnvPSL
-	case n == "VHDL_VERSION" || strings.HasPrefix(n, "TOOL_") ||
+	case strings.HasPrefix(n, "DIR") || n == "FILE_DELETE_STATUS" ||
+		n == "VHDL_VERSION" || strings.HasPrefix(n, "TOOL_") ||
 		n == "GETENV" || n == "FILE_NAME" || n == "FILE_PATH" ||
 		n == "FILE_LINE" || strings.Contains(n, "CALL_PATH") ||
 		strings.Contains(n, "ASSERT") ||

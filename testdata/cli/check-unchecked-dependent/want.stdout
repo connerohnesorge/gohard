@@ -1,3 +1,3 @@
-p.vhd:4:5: error[unsupported/construct]: method aliases in protected types is not supported yet (planned for v1.1)
+p.vhd:3:5: error[unsupported/construct]: generic clauses on protected types is not supported yet (planned for v1.1)
 user.vhd:3:8: warning[sema/unchecked-unit]: work.user was not checked: it depends on opaque unit work.p
 summary: 1 errors, 1 warnings, 0 hints, 2 files

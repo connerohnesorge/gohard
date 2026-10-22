@@ -1,0 +1,1 @@
+gohard check --repro .gohard/traces/tb-0.repro.json

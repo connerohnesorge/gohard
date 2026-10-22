@@ -314,6 +314,11 @@ func (a *analyzer) protectedBody(tok cst.Token, pb cst.ProtectedTypeBody) {
 		if d.Kind == DeclType && d.Type != nil &&
 			d.Type.Class == TypeProtected {
 			spec = d
+			if x := d.Type.Decl; x != nil && x.Kind == DeclType {
+				// An incomplete declaration (type t;) shares the
+				// full declaration's Type: the body is the full one's.
+				spec = x
+			}
 			break
 		}
 	}

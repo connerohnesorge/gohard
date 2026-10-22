@@ -62,6 +62,10 @@ vocabulary:
       semantic: overload resolution
     - id: standin_models
       semantic: stand-in models
+    - id: access_gc
+      semantic: >-
+        garbage collection of access-type objects (#27, not in the #8
+        list)
   invariants:
     - id: seed_independent
       meaning: byte-identical trace at seeds 0-3 (PR) and 64 seeds (nightly)
@@ -298,6 +302,103 @@ designs:
     oracle_sha256: d6d54594d33b03d28a0db0d05c0dc07e1a7fca28ef23f643ab814cc2844b391d
     format_oracle_sha256: 7c16ae3aba230fb4e90c6b22d3bb804c3e88d0cbed8b6081bce316e7b6bff792
     semerr_sha256: 6b8cf8314f1f818ee756eb77ae1e3569eb087fbb5a48ce28b995cba8238e26ed
+  - name: gc_heap
+    standard: "2019"
+    milestone: v1.1
+    files:
+      - path: gc_heap.vhd
+        standard: "2019"
+      - path: gc_heap_tb.vhd
+        standard: "2019"
+    top: gc_heap
+    testbench: gc_heap_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 2020 ns
+      messages: []
+    features: [access_gc, textio, std_env]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=19 gc_heap.vhd gc_heap_tb.vhd;
+        ghdl --elab-run --std=19 gc_heap_tb
+      result: pass
+      exit: 0
+      stop_time: 2020 ns
+      messages:
+        - "gc_heap: queue and lists ok"
+        - "simulation finished @2020ns"
+      notes: >-
+        Finished via std.env.finish at 2020 ns, after the 200-value queue
+        stream and 40 rounds of a dropped 500-node list (20,000
+        allocations, none deallocated). The only stdout line from the
+        design is the writeline(output) line "gc_heap: queue and lists
+        ok"; it is textio output, not a diagnostic.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2019 -a gc_heap.vhd gc_heap_tb.vhd -e gc_heap_tb -r
+      result: pass
+      exit: 0
+      stop_time: 2020 ns
+      messages:
+        - "gc_heap: queue and lists ok"
+        - "** Note: 2020ns+1: FINISH called"
+      notes: >-
+        Same writeline(output) line as GHDL. Garbage collection is not
+        visible in VHDL: the design passes with the same trace whether or
+        not the dropped nodes are reclaimed. GoHard's collector (#27)
+        keeps the live heap bounded (internal/elab TestGCHeapCorpus);
+        the trace is identical with the collector off, forced on every
+        allocation and at its default period.
+    disagreements:
+      - topic: INTEGER range under VHDL-2019 (trace oracle)
+        ghdl: >-
+          INTEGER stays 32 bits under --std=19: dout starts at
+          -2147483648 and the integer signals dump 32 bits wide
+        nvc: >-
+          INTEGER is 64 bits under --std=2019: dout starts at
+          -9223372036854775808
+        follows: nvc
+        lrm: 5.2.3.2
+        notes: >-
+          VHDL-2019 requires INTEGER to cover at least 64-bit two's
+          complement (#18, Stage 1); GoHard's dout starts at
+          integer'left = -9223372036854775808, as NVC's. The trace
+          section compares dout with the NVC recording only.
+        signals:
+          - gc_heap_tb.dout
+          - gc_heap_tb.dut.dout
+      - topic: last clock edge at the std.env.finish time (trace oracle)
+        ghdl: >-
+          the VCD ends before the falling clk edge at 2020 ns, the time
+          step in which std.env.finish is called (in its next delta)
+        nvc: >-
+          dumps clk settling on '0' at 2020 ns, then FINISH is called at
+          2020ns+1
+        follows: ghdl
+        lrm: 14.7.5
+        notes: >-
+          The clk assignment matures in delta 0 of 2020 ns, before the
+          delta in which lists calls finish, so GoHard's own trace
+          (golden/trace.txt) has the change, as NVC's dump does. The
+          trace section leaves the final time step of a run the design
+          stops out of GoHard's projection (CompareOracleStopped: the
+          tools normally do not dump it), as GHDL does, so it compares
+          clk with the GHDL recording only.
+        signals:
+          - gc_heap_tb.clk
+          - gc_heap_tb.dut.clk
+    trace_sha256: 112fc2f5cda5dd3ed418e4ea26842deaf54772d058b0832833dbf841a4c41b8b
+    oracle_sha256: c349ca59272331ab82de13f374a052ccf53587b836fbed80248d44cdc54bff62
+    format_oracle_sha256: a46cc677927dcaf5ae493f04191070779dcd2f1f44e91c1a89e08393a4db503f
+    semerr_sha256: bcc2fb4edb05a128b0f3f3bdf962542831605c5862806533fbfc3684c011b7f9
   - name: hier_generate
     standard: "2008"
     milestone: v1.0
@@ -774,26 +875,11 @@ designs:
         - severity: warning
           text: "prot_cond: counter probe"
           time: 1 ns
-    expected_v1_0:
-      exit: 2
-      status: tool_error
-      stop_time: none
-      # One per v1.1 construct (#18) not delivered yet, at its first use,
-      # in #20 sorted (path, line) order.
-      messages:
-        - severity: error
-          code: unsupported/construct
-          path: prot_cond_tb.vhd
-          line: 84
-          text: >-
-            generic maps on subprogram calls is not supported yet (planned for
-            v1.1)
     features: [protected_type_ports, std_env]
     invariants:
       - seed_independent
       - variant_stable
       - self_stopping
-      - unsupported_before_milestone
     oracle: nvc
     # GHDL 6.0.0 cannot elaborate this 2019 design, so there is no
     # --disp-tree recording: the hierarchy and generic values are a
@@ -846,7 +932,7 @@ designs:
         The TOOL_NAME branch has a "gohard" arm; any other tool gets
         "unknown" and fails the TOOL_NAME check.
     disagreements: []
-    trace_sha256: pending
+    trace_sha256: 8a387344bf36236a746846fd72a410684e87ec3a1367fade1fe99c2dd4c52171
     oracle_sha256: 11b484709e5c9656f3ce83f87777efbdc5040b5417f8eda14a14cb2b3b48d6cf
     format_oracle_sha256: 08d5c45934017c8f93b2193e1d9b14ee8e9c627bb684580fd12d5848c0f28d3b
     semerr_sha256: 6c3d1fbac9cf9232749e5afacb9710f2841965daae69d091c6b2eb21aaf3906b

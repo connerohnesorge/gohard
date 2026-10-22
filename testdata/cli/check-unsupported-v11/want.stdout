@@ -1,7 +1,4 @@
-call_generic_map.vhd:17:18: error[unsupported/construct]: generic maps on subprogram calls is not supported yet (planned for v1.1)
-env_dir.vhd:8:20: error[unsupported/construct]: std.env DIR_* functions is not supported yet (planned for v1.1)
 env_psl.vhd:8:24: error[unsupported/construct]: std.env PSL assert and cover API is not supported yet (planned for v1.1)
-method_alias.vhd:4:5: error[unsupported/construct]: method aliases in protected types is not supported yet (planned for v1.1)
 path_name.vhd:12:14: error[unsupported/construct]: 'PATH_NAME/'INSTANCE_NAME for protected types is not supported yet (planned for v1.1)
 protected_generics.vhd:3:5: error[unsupported/construct]: generic clauses on protected types is not supported yet (planned for v1.1)
-summary: 6 errors, 0 warnings, 0 hints, 6 files
+summary: 3 errors, 0 warnings, 0 hints, 3 files

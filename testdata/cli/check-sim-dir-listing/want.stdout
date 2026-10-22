@@ -1,0 +1,8 @@
+tb.vhd:16:5: hint[sim/assert-note]: report note: status_ok data 6
+tb.vhd:19:7: hint[sim/assert-note]: report note: .
+tb.vhd:19:7: hint[sim/assert-note]: report note: ..
+tb.vhd:19:7: hint[sim/assert-note]: report note: Mid.txt
+tb.vhd:19:7: hint[sim/assert-note]: report note: alpha.txt
+tb.vhd:19:7: hint[sim/assert-note]: report note: sub
+tb.vhd:19:7: hint[sim/assert-note]: report note: zeta.txt
+summary: 0 errors, 0 warnings, 7 hints, 1 files

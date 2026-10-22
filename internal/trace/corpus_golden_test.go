@@ -13,7 +13,7 @@ import (
 )
 
 // corpusGoldens decodes every testdata/corpus/*/golden/trace.txt. The
-// v1.0 corpus has 13 traced designs (prot_cond stops at exit 2).
+// corpus has 15 traced designs (at least the 13 of v1.0).
 func corpusGoldens(t *testing.T) map[string]*trace.Trace {
 	t.Helper()
 	files, err := filepath.Glob("../../testdata/corpus/*/golden/trace.txt")
@@ -44,16 +44,28 @@ func corpusGoldens(t *testing.T) map[string]*trace.Trace {
 // TestValueLookupCorpus: value lookup by time agrees with a naive scan
 // of the change list on every corpus golden: for every signal at its
 // first and last change, and at random queries drawn from change times
-// (exactly, one before, one after) and from the whole run (#36).
+// (exactly, one before, one after) and from the whole run (#36). A
+// design without signals (prot_cond checks variables and a protected
+// port only) has nothing to look up; at least 13 goldens must.
 func TestValueLookupCorpus(t *testing.T) {
 	r := &env.SplitMix64{State: 36}
 	deltas := []uint32{0, 1, 2, ^uint32(0)}
 	goldens := corpusGoldens(t)
+	looked := 0
+	defer func() {
+		if looked < 13 {
+			t.Errorf("only %d goldens with signals and changes", looked)
+		}
+	}()
 	for _, name := range slices.Sorted(maps.Keys(goldens)) {
 		tr := goldens[name]
-		if len(tr.Signals) == 0 || len(tr.Changes) == 0 {
-			t.Fatalf("%s: no signals or changes", name)
+		if len(tr.Signals) == 0 {
+			continue
 		}
+		if len(tr.Changes) == 0 {
+			t.Fatalf("%s: signals but no changes", name)
+		}
+		looked++
 		first := map[int]trace.Time{}
 		last := map[int]trace.Time{}
 		for _, c := range tr.Changes {

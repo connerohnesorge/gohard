@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb dropped_mirrors_tb (VHDL-2019)
+exit 0
+== stdout
+dropped_mirrors.vhd:41:5: hint[sim/assert-note]: report note: second node 2
+dropped_mirrors.vhd:43:5: hint[sim/assert-note]: report note: sum 50005000
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated dropped_mirrors_tb (seed 0): quiet

@@ -1,0 +1,10 @@
+# gohard check --sim --seed 0 --tb operator_formal_tb (VHDL-2019)
+exit 0
+== stdout
+operator_formal.vhd:32:5: hint[sim/assert-note]: report note: imn = 3
+operator_formal.vhd:35:5: hint[sim/assert-note]: report note: imx = 9
+operator_formal.vhd:38:5: hint[sim/assert-note]: report note: call min = 3
+operator_formal.vhd:41:5: hint[sim/assert-note]: report note: call max = 9
+summary: 0 errors, 0 warnings, 4 hints, 1 files
+== stderr
+gohard: simulated operator_formal_tb (seed 0): quiet

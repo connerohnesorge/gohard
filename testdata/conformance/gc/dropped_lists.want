@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb dropped_lists_tb (VHDL-2019)
+exit 0
+== stdout
+dropped_lists.vhd:77:5: hint[sim/assert-note]: report note: 30 lists of 300 nodes summed; the list kept from round 3 sums to 46050
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated dropped_lists_tb (seed 0): quiet

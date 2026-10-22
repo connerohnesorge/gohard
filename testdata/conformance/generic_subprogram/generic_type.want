@@ -1,0 +1,11 @@
+# gohard check --sim --seed 0 --tb generic_type_tb (VHDL-2019)
+exit 0
+== stdout
+generic_type.vhd:44:5: hint[sim/assert-note]: report note: ident(true) = true
+generic_type.vhd:46:5: hint[sim/assert-note]: report note: ident_color(green) = green
+generic_type.vhd:47:5: hint[sim/assert-note]: report note: green of blue
+generic_type.vhd:48:5: hint[sim/assert-note]: report note: 5 of 9223372036854775807
+generic_type.vhd:55:5: hint[sim/assert-note]: report note: swapped 2 1 2.5 1.5
+summary: 0 errors, 0 warnings, 5 hints, 1 files
+== stderr
+gohard: simulated generic_type_tb (seed 0): quiet

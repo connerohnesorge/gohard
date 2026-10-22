@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/gc/dropped_lists.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a dropped_lists.vhd -e dropped_lists_tb -r
+# source sha256: 275e938fe3e86c6a0c15b0686bc5dd3d13848930f4497e09d3549a94a2e5c8a4
+# exit: 0
+** Note: 30ns+0: 30 lists of 300 nodes summed; the list kept from round 3 sums to 46050
+   Process :dropped_lists_tb:check at dropped_lists.vhd:46

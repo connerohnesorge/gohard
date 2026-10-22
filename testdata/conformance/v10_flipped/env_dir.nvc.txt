@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/v10_flipped/env_dir.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a env_dir.vhd -e env_dir -r
+# source sha256: b4db0e1b876afd1c314557b393ea4ff15d58d0268113004851d3ae463a15dbfc
+# exit: 0
+** Note: 0ms+0: $WORK
+   Process :env_dir:_p0 at env_dir.vhd:12

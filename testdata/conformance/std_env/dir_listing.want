@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb dir_listing_tb (VHDL-2019)
+exit 0
+== stdout
+dir_listing.vhd:35:5: hint[sim/assert-note]: report note: DIR_OPEN: status_ok, name scratch, 6 items
+dir_listing.vhd:41:5: hint[sim/assert-note]: report note: items: . .. Beta.txt alpha.txt mid zeta.txt
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated dir_listing_tb (seed 0): quiet

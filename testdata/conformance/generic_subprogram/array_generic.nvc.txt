@@ -1,0 +1,14 @@
+# NVC output of testdata/conformance/generic_subprogram/array_generic.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a array_generic.vhd -e array_generic_tb -r
+# source sha256: caf219194812e5cabb28725df9ccf50d4158100ac2aa07b955c277c3ad27806e
+# exit: 0
+** Note: 0ms+0: k = 905
+   Process :array_generic_tb:check at array_generic.vhd:46
+** Note: 0ms+0: sum = 2408
+   Process :array_generic_tb:check at array_generic.vhd:46
+** Note: 0ms+0: upd = 1
+   Process :array_generic_tb:check at array_generic.vhd:46
+** Note: 1ns+0: swp = 7 1
+   Process :array_generic_tb:check at array_generic.vhd:46

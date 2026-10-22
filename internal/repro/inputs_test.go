@@ -2,6 +2,7 @@ package repro
 
 import (
 	"bytes"
+	"path"
 	"slices"
 	"strings"
 	"testing"
@@ -107,6 +108,123 @@ func TestInputsEncoding(t *testing.T) {
 		h.Inputs = bad
 		if _, err := Marshal(h); err == nil {
 			t.Errorf("inputs %+v accepted", bad)
+		}
+	}
+}
+
+// TestVerifyListings (#18, #29): the directories a run listed (std.env
+// DIR_*) are recorded with the hash of what the overlay saw, and a
+// replay whose project listing differs, by an added, removed or
+// retyped entry or a directory that appeared or went away, is
+// repro/source-changed naming the directory. Property: over seeded
+// random trees and edits, Verify flags exactly the listed directories
+// whose entries changed, and accepts the unchanged tree.
+func TestVerifyListings(t *testing.T) {
+	for seed := range uint64(40) {
+		r := &env.SplitMix64{State: seed}
+		names := []string{"a.txt", "B.txt", "c", "d/e.txt", "d/f.txt",
+			"d/g/h.txt", "x/y.txt"}
+		files := map[string][]byte{"src/a.vhd": []byte("entity a is end;")}
+		for _, n := range names {
+			if env.Intn(r, 2) == 0 {
+				files["p/"+n] = []byte(n)
+			}
+		}
+		s := simenv.New(simenv.Options{Dir: "/proj", Files: files})
+		fsys := s.Env().FS
+		ov := env.NewOverlay(fsys, "/proj")
+		dirs := []string{".", "p", "p/d", "p/d/g", "p/x", "p/none"}
+		for _, d := range dirs {
+			_, _ = ov.ReadDir(d)
+		}
+		h := sample()
+		h.Sources, h.Config = nil, nil
+		h.Listings = InputFiles(ov.Listings())
+		exist := 0 // an absent directory is seen in its parent's listing
+		for _, d := range dirs {
+			if fi, err := fsys.Stat("/proj/" + d); err == nil && fi.IsDir() {
+				exist++
+			}
+		}
+		if len(h.Listings) != exist {
+			t.Fatalf("seed %d: listings %+v", seed, h.Listings)
+		}
+		for _, l := range h.Listings {
+			got, err := env.ProjectListing(fsys, "/proj", l.Path)
+			if err != nil || got != l.SHA256 {
+				t.Fatalf("seed %d: %s: overlay %q, project %q (%v)",
+					seed, l.Path, l.SHA256, got, err)
+			}
+		}
+		if c, err := Verify(fsys, "/proj", h, h.Version); err != nil ||
+			!c.OK() {
+			t.Fatalf("seed %d: unchanged tree refused: %+v %v", seed, c,
+				err)
+		}
+		// One edit: add or remove a file below a random directory.
+		n := "p/" + names[env.Intn(r, len(names))]
+		want := map[string]bool{}
+		if _, ok := files[n]; ok {
+			if err := fsys.Remove("/proj/" + n); err != nil {
+				t.Fatal(err)
+			}
+		} else {
+			if err := fsys.MkdirAll(path.Dir("/proj/"+n),
+				0o755); err != nil {
+				t.Fatal(err)
+			}
+			if err := fsys.WriteFile("/proj/"+n, []byte("new"),
+				0o644); err != nil {
+				t.Fatal(err)
+			}
+		}
+		for _, l := range h.Listings {
+			now, _ := env.ProjectListing(fsys, "/proj", l.Path)
+			if now != l.SHA256 {
+				want[l.Path] = true
+			}
+		}
+		c, err := Verify(fsys, "/proj", h, h.Version)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(want) == 0 {
+			t.Fatalf("seed %d: edit of %s changed no listing", seed, n)
+		}
+		if len(c.Changed) != len(want) || c.OK() {
+			t.Fatalf("seed %d: edit of %s: changed %v, want %v", seed, n,
+				c.Changed, want)
+		}
+		for _, p := range c.Changed {
+			if !want[p] {
+				t.Fatalf("seed %d: %s flagged, want %v", seed, p, want)
+			}
+		}
+	}
+	h := sample()
+	a, _ := Marshal(h)
+	h.Listings = []File{}
+	if b, _ := Marshal(h); !bytes.Equal(a, b) {
+		t.Error("empty listings reached the bytes")
+	}
+	h.Listings = []File{{Path: "d", SHA256: Hash(nil)}, {Path: "."}}
+	b, err := Marshal(h)
+	if err != nil {
+		t.Fatal(err)
+	}
+	back, err := Unmarshal(b)
+	if err != nil || len(back.Listings) != 2 ||
+		back.Listings[0].Path != "." {
+		t.Fatalf("round trip %+v %v", back.Listings, err)
+	}
+	if RunDir(h) != RunDir(sample()) {
+		t.Error("the listings changed the run directory")
+	}
+	for _, bad := range [][]File{{{Path: "../x"}}, {{Path: "/abs"}},
+		{{Path: "d"}, {Path: "d"}}} {
+		h.Listings = bad
+		if _, err := Marshal(h); err == nil {
+			t.Errorf("listings %+v accepted", bad)
 		}
 	}
 }

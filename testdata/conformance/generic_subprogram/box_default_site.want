@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb box_default_site_tb (VHDL-2019)
+exit 0
+== stdout
+box_default_site.vhd:42:5: hint[sim/assert-note]: report note: call = 1
+box_default_site.vhd:45:5: hint[sim/assert-note]: report note: instance = 1
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated box_default_site_tb (seed 0): quiet

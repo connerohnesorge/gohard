@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/v10_flipped/call_generic_map.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a call_generic_map.vhd -e call_generic_map_tb -r
+# source sha256: 5c249aa2b7a65df780a4667cb74d097f398ab5f652200937c5c3c9c17efd6681
+# exit: 0
+** Note: 0ms+0: scale (k => 3) (7) = 21
+   Process :call_generic_map_tb:_p0 at call_generic_map.vhd:31

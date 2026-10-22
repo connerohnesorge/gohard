@@ -605,7 +605,7 @@ func (a *analyzer) indexReading(n cst.Node, tok cst.Token,
 		o.Candidates = append(o.Candidates, cd)
 	}
 	o.Candidates = sortedCandidates(o)
-	a.refOverload(tok, o, RefCall)
+	a.refOverload(tok, editorOverload(o), RefCall) // pkginst.go
 	var v *Expr = &Expr{Kind: ExprCall, Node: n, Decl: x.fn,
 		Type: x.fn.Denotes().Type, Overload: o, Prefix: object}
 	if v.Type.Base().Class == TypeAccess {
@@ -665,7 +665,7 @@ func (a *analyzer) indexedCall(n cst.Node, nm named,
 	}
 	o.Chosen = zero
 	o.Candidates = sortedCandidates(o)
-	a.refOverload(nm.tok, o, RefCall)
+	a.refOverload(nm.tok, editorOverload(o), RefCall) // pkginst.go
 	c := &Expr{Kind: ExprCall, Node: n, Decl: zero,
 		Type: zero.Denotes().Type, Overload: o, Prefix: nm.expr}
 	return a.index(n, c, args)
@@ -749,11 +749,13 @@ func (a *analyzer) finishCall(n cst.Node, tok cst.Token, name string,
 			e.Type = orUnknown(c.d.Denotes().Type)
 		}
 		e.Formals = c.formals
+		a.uninstantiatedCall(tok, c.d) // pkginst.go
 		for i, ac := range acts {
 			if f := c.formals[i]; f != nil {
 				a.settle(ac.e, partType(ac.fpart, f.Type))
 				if ac.formal != "" {
-					a.ref(ac.ftok, f, RefFormal)
+					a.ref(ac.ftok, instanceFormal(c.d.Denotes(), f),
+						RefFormal)
 				}
 				if !ac.open && ac.fpart.IsZero() {
 					a.actualClass(f, ac)
@@ -795,7 +797,7 @@ func (a *analyzer) finishCall(n cst.Node, tok cst.Token, name string,
 	for _, ac := range acts {
 		e.Args = append(e.Args, ac.e)
 	}
-	a.refOverload(tok, o, RefCall)
+	a.refOverload(tok, editorOverload(o), RefCall) // pkginst.go
 	return e
 }
 

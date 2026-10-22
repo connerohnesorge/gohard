@@ -1,0 +1,32 @@
+# NVC output of testdata/conformance/std_env/dir_status.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a dir_status.vhd -e dir_status_tb -r
+# source sha256: 4d7958ebb52fb0a852cb92e61c98d3c4e1328fb12dde6a67e08994fc3c7d8748
+# exit: 0
+** Note: 0ms+0: createdir: status_ok
+   Process :dir_status_tb:check at dir_status.vhd:14
+** Note: 0ms+0: createdir again: status_item_exists
+   Process :dir_status_tb:check at dir_status.vhd:14
+** Note: 0ms+0: createdir, no parent: status_error
+   Process :dir_status_tb:check at dir_status.vhd:14
+** Note: 0ms+0: exists true, isdir true, isfile false, missing false
+   Process :dir_status_tb:check at dir_status.vhd:14
+** Note: 0ms+0: workingdir: status_ok
+   Process :dir_status_tb:check at dir_status.vhd:14
+** Note: 0ms+0: out.txt is a file: true
+   Process :dir_status_tb:check at dir_status.vhd:14
+** Note: 0ms+0: back: status_ok, work_dir/out.txt is a file: true
+   Process :dir_status_tb:check at dir_status.vhd:14
+** Note: 0ms+0: workingdir to a missing folder: status_not_found
+   Process :dir_status_tb:check at dir_status.vhd:14
+** Note: 0ms+0: deletedir, not empty: status_not_empty
+   Process :dir_status_tb:check at dir_status.vhd:14
+** Note: 0ms+0: deletefile: status_ok
+   Process :dir_status_tb:check at dir_status.vhd:14
+** Note: 0ms+0: deletefile again: status_no_file
+   Process :dir_status_tb:check at dir_status.vhd:14
+** Note: 0ms+0: deletedir: status_ok, exists false
+   Process :dir_status_tb:check at dir_status.vhd:14
+** Note: 0ms+0: deletedir again: status_no_directory
+   Process :dir_status_tb:check at dir_status.vhd:14

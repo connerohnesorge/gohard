@@ -36,6 +36,10 @@ type analyzer struct {
 	// instSubst maps the generic types of the instance whose maps are
 	// being analyzed to their actual subtypes (typerules.go).
 	instSubst map[*Type]*Type
+	// misfits counts the generic map actuals that do not fit their
+	// formal (genericSubActual, genericTypeClass), quiet or not: an
+	// overloaded call's instance with one is no candidate (instances).
+	misfits int
 	// asg is the assignment statement being analyzed (assign.go).
 	asg *Assign
 	// typeDef is set while analyzing the range of an integer, floating
@@ -606,6 +610,7 @@ func (a *analyzer) packageInst(p cst.PackageInstantiation) *Decl {
 	as := a.assocMap(p.GenericMap().List(), d.Region, DeclGeneric)
 	d.instTypes, a.instSubst = a.instSubst, nil
 	if d.Target != nil {
+		a.mapRules(as, d.Region, DeclGeneric, p.Node) // assocrules.go
 		a.missingGenerics(as, d.Region, p.Node)
 	}
 	return d

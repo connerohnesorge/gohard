@@ -232,6 +232,7 @@ func simulate(inv *Invocation, r *diag.Report, in simInput) {
 			Cancelled: func() bool { return inv.Ctx.Err() != nil }}
 		out := simrun.Run(opts)
 		h.Inputs = repro.InputFiles(out.Inputs)
+		h.Listings = repro.InputFiles(out.Listings)
 		r.Diagnostics = append(r.Diagnostics, out.Diagnostics...)
 		if !hasTool(out.Diagnostics) {
 			r.Diagnostics = append(r.Diagnostics,

@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb method_alias_tb (VHDL-2019)
+exit 0
+== stdout
+method_alias.vhd:51:5: hint[sim/assert-note]: report note: a.hit_count = 7
+method_alias.vhd:52:5: hint[sim/assert-note]: report note: b.hit_count = 1
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated method_alias_tb (seed 0): quiet

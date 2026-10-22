@@ -172,11 +172,17 @@ func (a *analyzer) implicitOps(t *Type, d *Decl) []opSpec {
 		bin(`"="`, eval.OpEq, t, t, boolean, 0)
 		bin(`"/="`, eval.OpNe, t, t, boolean, 0)
 	}
+	// A VHDL-2019 generic type of a class has the operations of its
+	// class (LRM 6.5.3); its actual's values are those of the class.
+	class := t.Class
+	if class == TypeGeneric {
+		class = genericOpClass(d)
+	}
 	isBit := a.isStdType(d, "bit")
 	isBool := a.isStdType(d, "boolean")
 	isULogic := d.Unit != nil && d.Unit.Library == "ieee" &&
 		d.Unit.Name == "std_logic_1164" && d.Name == "std_ulogic"
-	switch t.Class {
+	switch class {
 	case TypeEnum, TypeInteger, TypeFloating, TypePhysical:
 		for _, r := range relOps {
 			bin(r.name, r.op, t, t, boolean, 0)
@@ -195,14 +201,14 @@ func (a *analyzer) implicitOps(t *Type, d *Decl) []opSpec {
 		if isBit {
 			un(`"??"`, eval.OpCondition, t, boolean, token.Std2008)
 		}
-		if t.Class != TypeEnum {
+		if class != TypeEnum {
 			un(`"+"`, eval.OpPlus, t, t, 0)
 			un(`"-"`, eval.OpNeg, t, t, 0)
 			un(`"abs"`, eval.OpAbs, t, t, 0)
 			bin(`"+"`, eval.OpAdd, t, t, t, 0)
 			bin(`"-"`, eval.OpSub, t, t, t, 0)
 		}
-		switch t.Class {
+		switch class {
 		case TypeInteger:
 			bin(`"*"`, eval.OpMul, t, t, t, 0)
 			bin(`"/"`, eval.OpDiv, t, t, t, 0)
@@ -240,7 +246,8 @@ func (a *analyzer) implicitOps(t *Type, d *Decl) []opSpec {
 	case TypeFile:
 		out = append(out, a.fileOps(t)...)
 	case TypeGeneric:
-		// LRM 6.5.3: a generic type has only "=" and "/=", above.
+		// LRM 6.5.3: a private (or VHDL-2008) generic type has only
+		// "=" and "/=", above.
 	}
 	return out
 }

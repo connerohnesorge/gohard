@@ -1,0 +1,10 @@
+# gohard check --sim --seed 0 --tb array_generic_tb (VHDL-2019)
+exit 0
+== stdout
+array_generic.vhd:50:5: hint[sim/assert-note]: report note: k = 905
+array_generic.vhd:53:5: hint[sim/assert-note]: report note: sum = 2408
+array_generic.vhd:56:5: hint[sim/assert-note]: report note: upd = 1
+array_generic.vhd:59:5: hint[sim/assert-note]: report note: swp = 7 1
+summary: 0 errors, 0 warnings, 4 hints, 1 files
+== stderr
+gohard: simulated array_generic_tb (seed 0): quiet

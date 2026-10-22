@@ -92,6 +92,13 @@ type Header struct {
 	// The key is omitted when the design read no file, so a v1.0 file
 	// reads and writes back byte for byte.
 	Inputs []File `json:"inputs,omitempty"`
+	// Listings are the project directories the design listed while it
+	// ran (std.env DIR_*, #18), sorted by path ("." the root), with
+	// env.ListingSHA256 of the entries it saw; an empty SHA256 records
+	// a directory it looked for and did not find. A replay whose
+	// listings differ is repro/source-changed. The key is omitted when
+	// the design listed no directory.
+	Listings []File `json:"listings,omitempty"`
 }
 
 // Env is the recorded std.env environment. Field order is the JSON key
@@ -152,7 +159,7 @@ func RunDir(h Header) string {
 	// The inputs are known only once the run ended, and the run
 	// directory is needed before it starts; the directory is replaced
 	// whole by every run, so it never mixes the output of two runs.
-	id.Inputs = nil
+	id.Inputs, id.Listings = nil, nil
 	data, err := encodeJSON(id, "")
 	if err != nil {
 		panic(err) // plain strings, numbers and maps always encode
@@ -256,6 +263,14 @@ func canonical(h Header) Header {
 			return cmp.Compare(a.Path, b.Path)
 		})
 	}
+	if len(h.Listings) == 0 {
+		h.Listings = nil // the key is omitted
+	} else {
+		h.Listings = slices.Clone(h.Listings)
+		slices.SortFunc(h.Listings, func(a, b File) int {
+			return cmp.Compare(a.Path, b.Path)
+		})
+	}
 	if h.Env != nil {
 		e := *h.Env
 		if e.Vars == nil {
@@ -340,6 +355,26 @@ func Validate(h Header) error {
 			return fmt.Errorf("input %s is listed twice", f.Path)
 		}
 		inputs[f.Path] = true
+	}
+	lists := make(map[string]bool, len(h.Listings))
+	for _, f := range h.Listings {
+		g := f
+		if g.SHA256 == "" {
+			g.SHA256 = Hash(nil)
+		}
+		if g.Path == "." {
+			g.Path = "x" // the root
+		}
+		if err := validFile(g); err != nil {
+			return fmt.Errorf("listing: %w", err)
+		}
+		if strings.HasPrefix(f.Path, "../") {
+			return fmt.Errorf("listing %s is outside the project", f.Path)
+		}
+		if lists[f.Path] {
+			return fmt.Errorf("listing %s is listed twice", f.Path)
+		}
+		lists[f.Path] = true
 	}
 	return nil
 }

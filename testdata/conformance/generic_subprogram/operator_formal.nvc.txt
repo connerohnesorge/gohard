@@ -1,0 +1,14 @@
+# NVC output of testdata/conformance/generic_subprogram/operator_formal.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a operator_formal.vhd -e operator_formal_tb -r
+# source sha256: 5a1867eeed25c4ff11d3fd6d2387657d234dccbc90af5929698514bcd57c29a3
+# exit: 0
+** Note: 0ms+0: imn = 3
+   Process :operator_formal_tb:check at operator_formal.vhd:28
+** Note: 0ms+0: imx = 9
+   Process :operator_formal_tb:check at operator_formal.vhd:28
+** Note: 0ms+0: call min = 3
+   Process :operator_formal_tb:check at operator_formal.vhd:28
+** Note: 0ms+0: call max = 9
+   Process :operator_formal_tb:check at operator_formal.vhd:28

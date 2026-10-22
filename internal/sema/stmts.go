@@ -275,8 +275,17 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 		}
 	}
 	i := 0
+	named, mixed := false, false
 	for item := range l.Items() {
 		var f *Decl
+		if !item.Formal().IsZero() {
+			named = true
+		} else if named && !mixed && k == DeclGeneric && !a.quiet {
+			// LRM 6.5.7.1: positional associations come first.
+			mixed = true
+			a.semaError(item.Span(), "a positional actual cannot "+
+				"follow a named one")
+		}
 		if fn := item.Formal(); !fn.IsZero() && !a.formalForm(fn.Node) {
 			i++ // assocrules.go reported it
 			out = append(out, Association{Node: item.Node})
@@ -286,6 +295,10 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 		var part *Expr
 		if fn := item.Formal(); !fn.IsZero() {
 			tok := leftmostToken(fn.Node)
+			op := operatorFormal(fn.Node)
+			if !op.IsZero() {
+				tok = op
+			}
 			key := TokenKey(tok)
 			for _, d := range formals {
 				if d.Name == key {
@@ -320,7 +333,7 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 			}
 			if conv {
 				a.conversionName(fn.Node, f)
-			} else if fn.Kind() != cst.KindSimpleName {
+			} else if fn.Kind() != cst.KindSimpleName && op.IsZero() {
 				if part = a.formalPart(fn.Node, f); part == nil {
 					a.lenientFormal(fn.Node)
 				}
@@ -361,6 +374,12 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 			a.expect(e, want, v.Node)
 		}
 		a.recordGenericActual(f, e) // typerules.go
+		if f != nil && f.Kind == DeclGenericType && objectActual(e) &&
+			!a.quiet {
+			// LRM 6.5.7.2: the actual of a generic type is a subtype.
+			a.semaError(v.Span(), a.text(v.Node)+" does not denote a "+
+				"type or a subtype")
+		}
 		if k == DeclPort && f != nil {
 			a.unconstrainedConversion(e, want, v.Node) // typerules.go
 			if !a.quiet {
@@ -374,6 +393,23 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 		out = append(out, as)
 	}
 	return out
+}
+
+// objectActual reports whether the actual e of a generic type is a
+// value (an object, a literal, a call or an aggregate) rather than a
+// type or subtype.
+func objectActual(e *Expr) bool {
+	if e == nil || e.illTyped || e.Kind == ExprTypeMark {
+		return false
+	}
+	switch e.Kind {
+	case ExprLiteral, ExprPhysical, ExprAggregate, ExprCall:
+		return true
+	case ExprName:
+		return e.Decl != nil && (e.Decl.Denotes().Kind.IsObject() ||
+			e.Decl.Denotes().Kind == DeclEnumLiteral)
+	}
+	return false
 }
 
 // formalPart types the formal designator fn of a subelement
@@ -565,6 +601,7 @@ func (a *analyzer) nonObjectActual(v cst.Node, f *Decl) bool {
 				o.Chosen = fit[0]
 			}
 			a.refOverload(r.tok, o, RefRead)
+			a.genericSubActual(v, r, f) // pkginst.go
 		}
 		a.subprogramActual(v, r) // names.go
 		return true
@@ -572,11 +609,13 @@ func (a *analyzer) nonObjectActual(v cst.Node, f *Decl) bool {
 		saved := a.quiet
 		a.quiet = true
 		r := a.resolveName(v, RefRead, nil)
-		a.quiet = saved
 		if r.expr != nil || (len(r.decls) > 0 &&
 			r.decls[0].Overloadable()) {
+			// The actual of an unknown formal: its errors would only
+			// follow from the formal's.
 			a.u.Exprs = append(a.u.Exprs, a.value(r, v, nil))
 		}
+		a.quiet = saved
 		return true
 	}
 	return false
@@ -1034,6 +1073,15 @@ func (a *analyzer) procedureCall(n cst.Node) *Expr {
 		args   cst.AssociationList
 	)
 	if c, ok := cst.As[cst.CallOrIndexName](n); ok {
+		if !c.GenericMap().IsZero() || !c.ParameterMap().IsZero() {
+			// VHDL-2019 generic and parameter maps (pkginst.go).
+			e := a.mappedCall(c, RefCall, nil, true).expr
+			if e != nil {
+				a.u.Exprs = append(a.u.Exprs, e)
+				a.exprRules(e) // callrules.go
+			}
+			return e
+		}
 		prefix, args = c.Prefix().Node, c.Args()
 	} else {
 		prefix = n

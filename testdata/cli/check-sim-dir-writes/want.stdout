@@ -1,0 +1,4 @@
+tb.vhd:16:5: hint[sim/assert-note]: report note: status_ok
+tb.vhd:17:5: hint[sim/assert-note]: report note: status_access_denied
+tb.vhd:18:5: hint[sim/assert-note]: report note: status_ok
+summary: 0 errors, 0 warnings, 3 hints, 1 files

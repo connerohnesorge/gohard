@@ -39,6 +39,7 @@ type Overlay struct {
 	dirs  map[string]bool   // directories created by the run
 	gone  map[string]bool   // project files the run removed
 	reads map[string]string // project path read -> sha256 ("" absent)
+	lists map[string]string // project directory listed -> ListingSHA256
 	temps int
 }
 
@@ -46,7 +47,7 @@ type Overlay struct {
 func NewOverlay(base FS, root string) *Overlay {
 	return &Overlay{Base: base, Root: root, files: map[string][]byte{},
 		dirs: map[string]bool{}, gone: map[string]bool{},
-		reads: map[string]string{}}
+		reads: map[string]string{}, lists: map[string]string{}}
 }
 
 // Input is one project file a run read through Base: its
@@ -67,6 +68,60 @@ func (o *Overlay) Inputs() []Input {
 		out = append(out, Input{Path: p, SHA256: o.reads[p]})
 	}
 	return out
+}
+
+// Listings returns every project directory the run listed (ReadDir),
+// sorted by path: Path is the root-relative slash path of the
+// directory ("." for the root) and SHA256 is ListingSHA256 of the
+// project's entries (the run's own changes left out), or "" when the
+// project has no such directory. Like Inputs, they are part of what a
+// replay must see again: a design's DIR_OPEN listing (#18) depends on
+// them.
+func (o *Overlay) Listings() []Input {
+	out := make([]Input, 0, len(o.lists))
+	for _, p := range slices.Sorted(maps.Keys(o.lists)) {
+		out = append(out, Input{Path: p, SHA256: o.lists[p]})
+	}
+	return out
+}
+
+// ListingSHA256 is the lowercase hex sha256 of a directory listing:
+// one line per entry in the order given (ReadDir sorts by name), the
+// name followed by "/" for a directory and "@" for a symbolic link.
+// The project root's Reserved entry is not part of its listing.
+func ListingSHA256(es []fs.DirEntry) string {
+	var b bytes.Buffer
+	for _, e := range es {
+		b.WriteString(e.Name())
+		switch {
+		case e.Type()&fs.ModeSymlink != 0:
+			b.WriteByte('@')
+		case e.IsDir():
+			b.WriteByte('/')
+		}
+		b.WriteByte('\n')
+	}
+	return hashHex(b.Bytes())
+}
+
+// ProjectListing returns what Overlay.Listings records for the
+// project directory rel (a root-relative slash path, "." the root) of
+// the project at root in fsys: ListingSHA256 of its entries, the root's
+// Reserved entry left out, or "" when there is no such directory. A
+// replay compares it with the recording (repro.Verify).
+func ProjectListing(fsys FS, root, rel string) (string, error) {
+	es, err := fsys.ReadDir(filepath.Join(root, filepath.FromSlash(rel)))
+	switch {
+	case errors.Is(err, fs.ErrNotExist):
+		return "", nil
+	case err != nil:
+		return "", err
+	}
+	if rel == "." {
+		es = slices.DeleteFunc(slices.Clone(es),
+			func(e fs.DirEntry) bool { return e.Name() == Reserved })
+	}
+	return ListingSHA256(es), nil
 }
 
 // Written is one file a run wrote.
@@ -196,6 +251,13 @@ func (o *Overlay) base(r string) string {
 	return filepath.Join(o.Root, filepath.FromSlash(r))
 }
 
+// Rel returns the clean root-relative slash path ("." for the root)
+// name denotes in the sandbox, with the project's symbolic links
+// resolved; a name outside the sandbox is fs.ErrPermission.
+func (o *Overlay) Rel(name string) (string, error) {
+	return o.rel("rel", name)
+}
+
 // Getwd implements FS: the project root.
 func (o *Overlay) Getwd() (string, error) { return o.Root, nil }
 
@@ -305,8 +367,19 @@ func (o *Overlay) Remove(name string) error {
 		delete(o.dirs, r)
 		return nil
 	}
-	if _, err := o.Stat(name); err != nil {
+	fi, err := o.Stat(name)
+	if err != nil {
 		return err
+	}
+	if fi.IsDir() {
+		if r == "." {
+			return &fs.PathError{Op: "remove", Path: name,
+				Err: fs.ErrPermission}
+		}
+		if es, err := o.ReadDir(name); err != nil || len(es) > 0 {
+			return &fs.PathError{Op: "remove", Path: name,
+				Err: errors.New("directory not empty")}
+		}
 	}
 	o.gone[r] = true
 	return nil
@@ -432,10 +505,17 @@ func (o *Overlay) ReadDir(name string) ([]fs.DirEntry, error) {
 		if err != nil && !o.dirs[r] {
 			return nil, err
 		}
+		if r == "." {
+			es = slices.DeleteFunc(slices.Clone(es),
+				func(e fs.DirEntry) bool { return e.Name() == Reserved })
+		}
+		switch {
+		case err == nil:
+			o.lists[r] = ListingSHA256(es)
+		case errors.Is(err, fs.ErrNotExist):
+			o.lists[r] = ""
+		}
 		for _, e := range es {
-			if r == "." && e.Name() == Reserved {
-				continue
-			}
 			if !o.gone[path.Join(r, e.Name())] {
 				byName[e.Name()] = e
 			}

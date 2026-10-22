@@ -1,0 +1,12 @@
+# gohard check --sim --seed 0 --tb instance_2008_tb (VHDL-2008)
+exit 0
+== stdout
+instance_2008.vhd:61:5: hint[sim/assert-note]: report note: triple(4) = 12
+instance_2008.vhd:62:5: hint[sim/assert-note]: report note: double(4) = 8
+instance_2008.vhd:63:5: hint[sim/assert-note]: report note: c = 21
+instance_2008.vhd:64:5: hint[sim/assert-note]: report note: max_int = 9
+instance_2008.vhd:65:5: hint[sim/assert-note]: report note: min_real = 1.5
+instance_2008.vhd:68:5: hint[sim/assert-note]: report note: acc = 13
+summary: 0 errors, 0 warnings, 6 hints, 1 files
+== stderr
+gohard: simulated instance_2008_tb (seed 0): quiet

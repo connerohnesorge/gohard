@@ -1,0 +1,18 @@
+# NVC output of testdata/conformance/generic_subprogram/instance_2008.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2008 -a instance_2008.vhd -e instance_2008_tb -r
+# source sha256: 1bae6f3823f0d28409d60653765fa81418d88f96252c3ec4457eaa5f708916e3
+# exit: 0
+** Note: 0ms+0: triple(4) = 12
+   Process :instance_2008_tb:p at instance_2008.vhd:58
+** Note: 0ms+0: double(4) = 8
+   Process :instance_2008_tb:p at instance_2008.vhd:58
+** Note: 0ms+0: c = 21
+   Process :instance_2008_tb:p at instance_2008.vhd:58
+** Note: 0ms+0: max_int = 9
+   Process :instance_2008_tb:p at instance_2008.vhd:58
+** Note: 0ms+0: min_real = 1.5
+   Process :instance_2008_tb:p at instance_2008.vhd:58
+** Note: 0ms+0: acc = 13
+   Process :instance_2008_tb:p at instance_2008.vhd:58

@@ -1,0 +1,8 @@
+gohard-trace 1
+testbench tb
+end 0
+scope tb instance tb(sim)
+process 1 tb._p0
+0 0 ! report note tb.vhd:16 p1 "status_ok"
+0 0 ! report note tb.vhd:17 p1 "status_access_denied"
+0 0 ! report note tb.vhd:18 p1 "status_ok"

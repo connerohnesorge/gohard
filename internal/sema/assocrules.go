@@ -32,7 +32,8 @@ func wholeFormal(x Association) bool {
 	}
 	fn := cst.AssociationElement{Node: x.Node}.Formal()
 	// conversion(f) => actual associates f as a whole too.
-	if fn.IsZero() || fn.Kind() == cst.KindSimpleName {
+	if fn.IsZero() || fn.Kind() == cst.KindSimpleName ||
+		!operatorFormal(fn.Node).IsZero() {
 		return true
 	}
 	c, ok := cst.As[cst.CallOrIndexName](fn.Node)
@@ -374,8 +375,43 @@ func (a *analyzer) formalForm(fn cst.Node) bool {
 		cst.KindCallOrIndexName, cst.KindSliceName, cst.KindErrorNode:
 		return true
 	}
+	if !operatorFormal(fn).IsZero() {
+		return true
+	}
 	if !a.checksOff() {
 		a.semaError(fn.Span(), a.text(fn)+" is not a formal designator")
+	}
+	return false
+}
+
+// operatorFormal returns the operator symbol of a formal part written
+// as a string literal ("" => actual): the designator of a generic
+// subprogram that is an operator (LRM 6.5.6.2, 6.5.7.1), which the
+// parser reads as a literal. Zero otherwise.
+func operatorFormal(fn cst.Node) cst.Token {
+	if fn.Kind() != cst.KindLiteralExpr {
+		return cst.Token{}
+	}
+	t := cst.LiteralExpr{Node: fn}.Literal()
+	if t.Kind() != token.StringLiteral || t != fn.LastToken() ||
+		!validOperatorSymbol(t.Text()) {
+		return cst.Token{}
+	}
+	return t
+}
+
+// validOperatorSymbol reports whether the string literal s (quotes
+// included) is an operator symbol (LRM 4.2, 9.2).
+func validOperatorSymbol(s string) bool {
+	if len(s) < 3 {
+		return false
+	}
+	switch lowerASCII(s[1 : len(s)-1]) {
+	case "and", "or", "nand", "nor", "xor", "xnor", "=", "/=", "<",
+		"<=", ">", ">=", "?=", "?/=", "?<", "?<=", "?>", "?>=", "sll",
+		"srl", "sla", "sra", "rol", "ror", "+", "-", "&", "*", "/",
+		"mod", "rem", "**", "abs", "not", "??":
+		return true
 	}
 	return false
 }

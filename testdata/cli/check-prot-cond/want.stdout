@@ -1,2 +1,2 @@
-prot_cond_tb.vhd:84:18: error[unsupported/construct]: generic maps on subprogram calls is not supported yet (planned for v1.1)
-summary: 1 errors, 0 warnings, 0 hints, 3 files
+prot_cond_tb.vhd:100:5: warning[sim/assert-warning]: assertion warning: prot_cond: counter probe
+summary: 0 errors, 1 warnings, 0 hints, 3 files

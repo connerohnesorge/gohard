@@ -1,0 +1,10 @@
+# NVC output of testdata/conformance/std_env/dir_separator.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a dir_separator.vhd -e dir_separator_tb -r
+# source sha256: 971e7c40f2fbcb3164e58a9cce8779b59d78de5cef9a01b09ee93d1e3f3fc66b
+# exit: 0
+** Note: 0ms+0: DIR_SEPARATOR = "/", length 1
+   Process :dir_separator_tb:check at dir_separator.vhd:10
+** Note: 0ms+0: sep_a/b is a directory: true
+   Process :dir_separator_tb:check at dir_separator.vhd:10

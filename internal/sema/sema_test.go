@@ -543,8 +543,8 @@ func TestOpaque(t *testing.T) {
 		"core.vhd": enc,
 		"pkg.vhd": `package p is
   type t is protected
+    generic (n : natural);
     procedure inc;
-    alias bump is inc [];
   end protected t;
 end;
 `,
@@ -556,7 +556,7 @@ end;
 	for _, w := range []string{
 		"core.vhd:2:14: sema/encrypted-unit: work.core(rtl) is " +
 			"encrypted IP and cannot be analyzed",
-		"pkg.vhd:4:5: unsupported/construct: method aliases in " +
+		"pkg.vhd:3:5: unsupported/construct: generic clauses on " +
 			"protected types is not supported yet (planned for v1.1)",
 	} {
 		if !strings.Contains(got, w) {

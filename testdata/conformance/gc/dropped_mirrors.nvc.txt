@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/gc/dropped_mirrors.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a dropped_mirrors.vhd -e dropped_mirrors_tb -r
+# source sha256: 90d195c2b5300e76893347fc8e8a0961c93dd244c292d55441a473f1c2a426b2
+# exit: 1
+** Fatal: 0ms+0: unsupported type NODE in prefix of REFLECT attribute
+   Process :dropped_mirrors_tb:check at dropped_mirrors.vhd:28

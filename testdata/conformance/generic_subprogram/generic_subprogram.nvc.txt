@@ -1,0 +1,18 @@
+# NVC output of testdata/conformance/generic_subprogram/generic_subprogram.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a generic_subprogram.vhd -e generic_subprogram_tb -r
+# source sha256: 3984541b086ab2467437e9cbe77dd95ad54f9087ba003a861e3c09e435604076
+# exit: 0
+** Note: 0ms+0: max_int(3, 9) = 9
+   Process :generic_subprogram_tb:p at generic_subprogram.vhd:55
+** Note: 0ms+0: nearest(-7, 4) = 4
+   Process :generic_subprogram_tb:p at generic_subprogram.vhd:55
+** Note: 0ms+0: min(2.5, 1.5) = 1.5
+   Process :generic_subprogram_tb:p at generic_subprogram.vhd:55
+** Note: 0ms+0: largest(4, 11, 6) = 11
+   Process :generic_subprogram_tb:p at generic_subprogram.vhd:55
+** Note: 0ms+0: largest('q', 'z', 'a') = 'z'
+   Process :generic_subprogram_tb:p at generic_subprogram.vhd:55
+** Note: 0ms+0: apply twice 3 times = 24
+   Process :generic_subprogram_tb:p at generic_subprogram.vhd:55

@@ -1,0 +1,12 @@
+gohard-trace 1
+testbench tb
+end 0
+scope tb instance tb(sim)
+process 1 tb._p0
+0 0 ! report note tb.vhd:16 p1 "status_ok data 6"
+0 0 ! report note tb.vhd:19 p1 "."
+0 0 ! report note tb.vhd:19 p1 ".."
+0 0 ! report note tb.vhd:19 p1 "Mid.txt"
+0 0 ! report note tb.vhd:19 p1 "alpha.txt"
+0 0 ! report note tb.vhd:19 p1 "sub"
+0 0 ! report note tb.vhd:19 p1 "zeta.txt"

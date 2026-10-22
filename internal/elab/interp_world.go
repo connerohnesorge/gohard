@@ -45,6 +45,12 @@ type world struct {
 	next int64 // the last handle given out
 	// mirrors are the std.reflection mirror objects (interp_reflect.go).
 	mirrors mirrorState
+	// gc is the collector of heap and protected objects (gc.go).
+	gc gcState
+	// cwd is the working directory of the DIR_* natives (DIR_WORKINGDIR),
+	// a clean root-relative slash path ("." for the project root); it
+	// is the world's, never the process's (interp_env.go).
+	cwd string
 
 	// copy is the world the current Kernel.Clone pass copies into, and
 	// copied the processes already cloned into it: each pass clones
@@ -72,7 +78,7 @@ func newWorld(d *Design, o InterpOptions) *world {
 		shared: map[sharedKey]slot{}, heap: map[int64]eval.Value{},
 		prot: map[*sema.Type]bool{}, rtConst: map[*sema.Decl]bool{},
 		objs: map[int64]*protObj{}, files: map[int64]*fileState{},
-		disk: map[string][]byte{}, mirrors: newMirrorState()}
+		disk: map[string][]byte{}, mirrors: newMirrorState(), cwd: "."}
 }
 
 // fork returns the world process idx's clone uses: a copy shared by
@@ -95,6 +101,7 @@ func (w *world) fork(idx int) *world {
 		}
 		c.disk = maps.Clone(w.disk)
 		c.mirrors = w.mirrors.clone()
+		c.gc = w.forkGC()
 		w.copy, w.copied = &c, map[int]bool{}
 	}
 	w.copied[idx] = true
@@ -217,9 +224,11 @@ func (w *world) genericPackage(u *sema.Unit) bool {
 	return false
 }
 
-// handle returns a new heap, object or file handle.
+// handle returns a new heap, object or file handle. Handles are never
+// reused; each one counts towards the next collection (gc.go).
 func (w *world) handle() int64 {
 	w.next++
+	w.gc.since++
 	return w.next
 }
 
@@ -227,6 +236,7 @@ func (w *world) handle() int64 {
 func (w *world) alloc(t *eval.Type, v eval.Value) eval.Value {
 	h := w.handle()
 	w.heap[h] = v
+	w.notePeak()
 	return eval.Value{T: t, I: h}
 }
 

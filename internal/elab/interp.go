@@ -50,6 +50,9 @@ type InterpOptions struct {
 	// Env is the world the VHDL-2019 std.env natives see (#18). The
 	// zero value is a deterministic, empty world.
 	Env EnvOptions
+	// GC configures the garbage collector of the access heap (#27,
+	// gc.go). The zero value collects at the default period.
+	GC GCOptions
 }
 
 // EnvOptions is the world of the VHDL-2019 std.env natives (#18):
@@ -121,6 +124,7 @@ func codeIn(w *world, p *Proc) (sim.Code, error) {
 	}
 	m := &machine{prog: prog, w: w, idx: p.Index}
 	m.ev = p.Ev.WithDynamic(m)
+	w.register(m)
 	return &code{m: m}, nil
 }
 
@@ -143,9 +147,16 @@ func (c *code) Resume(ctx *sim.Ctx) (sim.Wait, error) {
 }
 
 // Close implements sim.Closer: the files still open at the end of the
-// run are closed (the first process closes those of the whole world).
+// run are closed (the first process closes those of the whole world),
+// and GCOptions.Done receives the world's heap statistics.
 func (c *code) Close(*sim.Ctx) error {
-	return c.m.w.closeAll()
+	w := c.m.w
+	err := w.closeAll()
+	if done := w.o.GC.Done; done != nil && !w.gc.reported {
+		w.gc.reported = true
+		done(w.stats())
+	}
+	return err
 }
 
 // Until implements sim.Condition: the condition of the current wait,
@@ -171,7 +182,10 @@ func (c *code) Until(ctx *sim.Ctx) (bool, error) {
 // (sim.Ctx.Abort); the diagnostic makes the exit code 2.
 func (m *machine) native(err error) bool {
 	var ne *nativeError
-	if err == nil || !errors.As(err, &ne) || m.ctx == nil {
+	if ue := (*sema.UnsupportedError)(nil); errors.As(err, &ue) {
+		ne = &nativeError{name: ue.What}
+	}
+	if err == nil || ne == nil && !errors.As(err, &ne) || m.ctx == nil {
 		return false
 	}
 	var src sim.SrcRef
@@ -305,6 +319,7 @@ func (m *machine) clone() *machine {
 	c := *m
 	c.ctx, c.b = nil, nil
 	c.w = m.w.fork(m.idx)
+	c.w.register(&c)
 	c.ev = m.ev.WithDynamic(&c)
 	c.frames = make([]frame, len(m.frames))
 	for i, f := range m.frames {
@@ -422,6 +437,9 @@ func (m *machine) run(base int) (w sim.Wait, susp bool, err error) {
 			}
 			continue
 		}
+		// A safe point of the collector (gc.go): between statements,
+		// with no function running. It charges no step.
+		m.safePoint()
 		n := c.ss[c.i]
 		c.i++
 		if err := m.b.Step(1); err != nil {

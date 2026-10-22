@@ -158,9 +158,10 @@ func (s *session) needsBody(u *Unit, r *Region,
 	return false
 }
 
-// uninstantiated reports whether d is a generic subprogram (VHDL-2008),
-// whose body findSpec does not link to it: its profile names its own
-// generic types.
+// uninstantiated reports whether d is a generic subprogram (VHDL-2008):
+// one with a generic list, called only through an instance (LRM 4.4,
+// 9.3.4). findSpec links its body to it through sameGenericProfile,
+// the body's generic types read as the declaration's by position.
 func uninstantiated(d *Decl) bool {
 	if d.Region == nil {
 		return false

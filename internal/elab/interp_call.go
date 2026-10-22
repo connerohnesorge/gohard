@@ -86,13 +86,32 @@ func (m *machine) procedure(n *node) (sim.Wait, bool, error) {
 		return sim.Wait{}, false, errors.New("call of an unknown " +
 			"procedure")
 	}
+	// A generic procedure of a running instance: its actual.
+	e, err := m.ev.Dispatch(e)
+	if err != nil {
+		return sim.Wait{}, false, err
+	}
 	x := e.Decl.Denotes()
 	var body *sema.Decl
 	if !x.Implicit {
 		body = m.ev.Body(x)
 	}
 	var obj int64
-	if e.Prefix != nil && x.Parent != nil &&
+	if mo := methodObj(e.Decl); mo != nil {
+		// A method alias (VHDL-2019): the method of the object the
+		// alias names, in the frame of the call's object.
+		var outer int64
+		if e.Prefix != nil {
+			ov, err := m.ev.Eval(e.Prefix, m.b)
+			if err != nil {
+				return sim.Wait{}, false, err
+			}
+			outer = ov.I
+		}
+		if obj, err = m.methodObject(outer, mo, m.b); err != nil {
+			return sim.Wait{}, false, err
+		}
+	} else if e.Prefix != nil && x.Parent != nil &&
 		x.Parent.Kind == sema.RegionProtected {
 		ov, err := m.ev.Eval(e.Prefix, m.b)
 		if err != nil {
@@ -140,9 +159,24 @@ func (m *machine) enter(body *sema.Decl, e *sema.Expr, obj int64,
 	if err != nil {
 		return nil, err
 	}
+	// A subprogram instance: its generics are bound in the caller's
+	// frame, then become objects of the call's (LRM 4.4, 9.3.4).
+	var in *sema.Instance
+	if e != nil && e.Decl != nil && sema.InstanceOf(e.Decl.Denotes()) != nil {
+		if in, err = m.ev.Instance(e.Decl.Denotes(), m.b); err != nil {
+			return nil, err
+		}
+	}
 	m.frames = append(m.frames, frame{sub: body, call: e, obj: obj,
 		vars: map[*sema.Decl]slot{}})
 	fi := len(m.frames) - 1
+	if in != nil {
+		for _, g := range in.Generics {
+			// A generic subprogram's slot marks the frame that binds
+			// it (GenericSubprogram).
+			m.frames[fi].vars[g.Decl] = slot{v: g.Value, t: g.Layout}
+		}
+	}
 	for i, p := range body.Params {
 		if i >= len(args) {
 			break
@@ -277,4 +311,43 @@ func (m *machine) funcOuts(fn *callFn) ([]outArg, error) {
 		outs = append(outs, outArg{formal: fn.body.Params[i], dst: dst})
 	}
 	return outs, nil
+}
+
+// methodObj returns the object prefix of the method alias d (or of the
+// alias it names), nil when d is no method alias.
+func methodObj(d *sema.Decl) *sema.Expr {
+	for range 64 {
+		if d == nil || d.Kind != sema.DeclAlias {
+			return nil
+		}
+		if d.MethodObj != nil {
+			return d.MethodObj
+		}
+		if d.Target == d {
+			return nil
+		}
+		d = d.Target
+	}
+	return nil
+}
+
+// methodObject evaluates the object prefix mo of a method alias in the
+// frame of the protected object outer (0: the current frames, a call
+// in the protected body itself) and returns the object's handle.
+func (m *machine) methodObject(outer int64, mo *sema.Expr, b *eval.Budget,
+) (int64, error) {
+	if outer != 0 {
+		m.frames = append(m.frames, frame{obj: outer,
+			vars: map[*sema.Decl]slot{}})
+		defer func(n int) { m.frames = m.frames[:n] }(len(m.frames) - 1)
+	}
+	v, err := m.ev.Eval(mo, b)
+	if err != nil {
+		return 0, err
+	}
+	if v.I == 0 {
+		return 0, errors.New("the object of method alias " +
+			mo.Node.Text() + " is not elaborated")
+	}
+	return v.I, nil
 }

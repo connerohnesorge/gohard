@@ -183,8 +183,12 @@ wins). A command that is not built yet exits 2 with
   Since v1.1 a repro header also has `env` (the std.env epoch, the
   variables and `real`) and, when the design read project files,
   `inputs`: the sha256 of every file it read, or `""` for one it looked
-  for and did not find. `--repro` refuses a recording whose inputs
-  differ (`repro/source-changed`) or that was made with `--real-env`
+  for and did not find, and, when it listed project directories
+  (std.env `DIR_*`), `listings`: per directory (`.` the root) the
+  sha256 of its sorted entry names (`env.ListingSHA256`, `.gohard`
+  left out), or `""` for one that did not exist. `--repro` refuses a
+  recording whose inputs or listings differ (`repro/source-changed`)
+  or that was made with `--real-env`
   (`repro/non-reproducible`). A `--real-env` trace has the header line
   `reproducible no` after `end` (the magic stays `gohard-trace 1`), and
   `corpus`/`tools/oracle` refuse it as an answer key.
@@ -338,7 +342,7 @@ keeps its letter case.
 | `testdata/cli/<case>/` | `cmd`, `want.exit`, `want.stdout`, `want.stderr`, optional `in/`, `stdin`, `want/`; run in-process at `-p 1` and `-p 16`, each with a cold, warm and corrupted analysis cache (see its README) | #20, #37 |
 | `testdata/lsp/<action>/<case>/` | `gohard lsp <action>` fixtures | #26 |
 | `testdata/parse/<rule>/` | one valid file with a tree dump, one invalid file with an error position | #31 |
-| `testdata/corpus/<name>/` + `corpus.yaml` | the 14 oracle designs; goldens under `golden/` | #8 |
+| `testdata/corpus/<name>/` + `corpus.yaml` | the 15 oracle designs (#8, #27); goldens under `golden/` | #8 |
 | `testdata/fuzz/<Target>/` | saved inputs for `FuzzParse`, `FuzzFormat`, `FuzzLSPReplay`, `FuzzConfig` | #30 |
 | `testdata/seeds/<pkg>/` | committed generator failures and LSP sessions, replayed by `go test` | #29 |
 | `testdata/libs/` | pinned real libraries (OSVVM, UVVM, VUnit, regression sources) as submodules | #1, #8 |

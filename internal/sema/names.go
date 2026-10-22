@@ -471,6 +471,12 @@ func (a *analyzer) selectInValue(v *Expr, suffix cst.Token, sk Key,
 		return named{expr: unknownExpr(suffix.Parent()), unknown: true}
 	}
 	b := t.Base()
+	if b.Class == TypeGeneric && b.Designated != nil &&
+		suffix.Kind() == token.KwAll {
+		// An access-class generic type (LRM 6.5.3).
+		return named{expr: &Expr{Kind: ExprDeref, Node: suffix.Parent(),
+			Prefix: v, Type: allocated(b.Designated)}}
+	}
 	if suffix.Kind() == token.KwAll {
 		if b.Class != TypeAccess {
 			a.notA(suffix, v, "an access value")
@@ -567,13 +573,8 @@ func (a *analyzer) callOrIndex(c cst.CallOrIndexName, kind RefKind,
 	pn := c.Prefix().Node
 	args := c.Args()
 	if !c.GenericMap().IsZero() || !c.ParameterMap().IsZero() {
-		// VHDL-2019 generic maps on calls (v1.1, #18): unsupported.go
-		// reports the construct; only the names are resolved here.
-		a.lenientName(pn)
-		a.lenientArgs(c.GenericMap().List())
-		a.lenientArgs(c.ParameterMap().List())
-		a.lenientArgs(args)
-		return unknownNamed()
+		// VHDL-2019 generic and parameter maps on calls (pkginst.go).
+		return a.mappedCall(c, kind, want, false)
 	}
 	p := a.resolveName(pn, kind, nil)
 	switch {
@@ -770,17 +771,21 @@ func (a *analyzer) index(n cst.Node, v *Expr, args cst.AssociationList,
 			Type: allocated(b.Designated)}
 		t, b = v.Type, b.Designated.Base()
 	}
-	if t.Unknown() || b.Class == TypeGeneric {
+	if t.Unknown() || b.Class == TypeGeneric && !arrayClass(b) {
 		a.lenientArgs(args)
 		return unknownExpr(n)
 	}
-	if b.Class != TypeArray {
+	if b.Class != TypeArray && b.Class != TypeGeneric {
 		a.lenientArgs(args)
 		if !a.quiet {
 			a.semaError(n.Span(), a.text(v.Node)+" is "+t.Name()+
 				", which cannot be indexed")
 		}
 		return unknownExpr(n)
+	}
+	dims := b.Dims()
+	if b.Class == TypeGeneric {
+		dims = len(b.Index) // an array-class generic type
 	}
 	if allRanges(args) {
 		var rc *RangeCons
@@ -796,9 +801,9 @@ func (a *analyzer) index(n cst.Node, v *Expr, args cst.AssociationList,
 			}
 			count++
 		}
-		if count == 1 && b.Dims() > 1 && !a.quiet {
+		if count == 1 && dims > 1 && !a.quiet {
 			a.semaError(args.Span(), a.text(v.Node)+" has "+
-				strconv.Itoa(b.Dims())+" dimensions and cannot be sliced")
+				strconv.Itoa(dims)+" dimensions and cannot be sliced")
 		}
 		a.sliceDirection(rc, t)
 		st := NewSubtype(t)
@@ -820,7 +825,7 @@ func (a *analyzer) index(n cst.Node, v *Expr, args cst.AssociationList,
 		if x.Kind != ExprTypeMark {
 			a.expect(x, w, an)
 		}
-		if x.Kind == ExprTypeMark && b.Dims() == 1 {
+		if x.Kind == ExprTypeMark && dims == 1 {
 			// X(S) with S a discrete subtype name is a slice (LRM
 			// 8.5): the syntax does not tell it from an index.
 			rc := &RangeCons{Node: x.Node, Attr: x, Type: x.Type}
@@ -836,10 +841,10 @@ func (a *analyzer) index(n cst.Node, v *Expr, args cst.AssociationList,
 		e.Args = append(e.Args, x)
 		i++
 	}
-	if i != b.Dims() && !a.quiet {
+	if i != dims && !a.quiet {
 		// LRM 8.4: one index per dimension.
 		a.semaError(args.Span(), a.text(v.Node)+" has "+
-			strconv.Itoa(b.Dims())+" dimensions, not "+strconv.Itoa(i)+
+			strconv.Itoa(dims)+" dimensions, not "+strconv.Itoa(i)+
 			" indices")
 	}
 	return e
@@ -901,6 +906,21 @@ func literalInt(e *Expr) (int64, bool) {
 	return ParseInteger(e.Lit.Text())
 }
 
+// arrayClass reports whether the generic type b is of the array class
+// (type t is array (...) of ..., LRM 6.5.3) with known index and
+// element subtypes: its objects can be indexed.
+func arrayClass(b *Type) bool {
+	if b.Class != TypeGeneric || len(b.Index) == 0 || b.Elem == nil {
+		return false
+	}
+	for _, x := range b.Index {
+		if x.Unknown() {
+			return false
+		}
+	}
+	return !b.Elem.Unknown()
+}
+
 func firstIndex(b *Type) *Type {
 	if len(b.Index) > 0 {
 		return b.Index[0]
@@ -960,7 +980,7 @@ func (a *analyzer) sliceName(s cst.SliceName, kind RefKind) named {
 		t, b = v.Type, b.Designated.Base()
 	}
 	var w *Type
-	if b != nil && b.Class == TypeArray {
+	if b != nil && (b.Class == TypeArray || arrayClass(b)) {
 		w = firstIndex(b)
 	}
 	rc := a.discreteRange(sliceRange(s), w)
@@ -1093,6 +1113,9 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		e.Args = append(e.Args, a.expr(argNode, w))
 	}
 	isArray := pt != nil && !pt.Unknown() && pt.Base().Class == TypeArray
+	// An array-class generic type has known index subtypes too.
+	indexed := isArray || pt != nil && !pt.Unknown() &&
+		arrayClass(pt.Base())
 	dimension := func() {
 		// LRM 16.2.3: the dimension is a static integer from 1 to
 		// the array's dimensionality.
@@ -1120,7 +1143,7 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		arg(UniversalInteger)
 		dimension()
 		rc := &RangeCons{Node: an.Node, Attr: e, Type: UnknownType}
-		if isArray {
+		if indexed {
 			rc.Type = orUnknown(nthIndex(pt.Base(), e.Args))
 		} else if pt != nil {
 			rc.Type = pt
@@ -1236,7 +1259,7 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		e.Type = UniversalInteger
 	case dk == "ascending":
 		e.Type = orUnknown(a.stdType("boolean"))
-	case isArray:
+	case indexed:
 		e.Type = orUnknown(nthIndex(pt.Base(), e.Args))
 	case pt != nil:
 		e.Type = pt

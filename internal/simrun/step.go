@@ -131,7 +131,7 @@ func (r *Running) end() {
 	r.out.Diagnostics = append(r.out.Diagnostics, r.k.Diagnostics()...)
 	r.out.Asserts = r.k.Asserts()
 	r.out.Files, r.out.Dirs = r.ov.Files(), r.ov.Dirs()
-	r.out.Inputs = r.ov.Inputs()
+	r.out.Inputs, r.out.Listings = r.ov.Inputs(), r.ov.Listings()
 	if t, err := r.rec.Trace(); err == nil {
 		t.Header.NonReproducible = r.real
 		r.out.Trace = t

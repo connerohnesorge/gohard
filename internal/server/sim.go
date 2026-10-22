@@ -72,6 +72,9 @@ type SimResult struct {
 	// Inputs are the project files the design read (repro.Header
 	// Inputs), recorded in the run's repro file.
 	Inputs []repro.File
+	// Listings are the project directories it listed (repro.Header
+	// Listings).
+	Listings []repro.File
 }
 
 // SimReport is the JSON object of gohard lsp sim (#35); field order
@@ -494,6 +497,7 @@ func (s *State) simDone(o *out, w work, d simDone) {
 		}
 		h := s.reproHeader(d.tb, seed)
 		h.Inputs = slices.Clone(d.res.Inputs)
+		h.Listings = slices.Clone(d.res.Listings)
 		o.do(WriteRun{Root: s.root, Trace: run.trace, Data: d.res.Trace,
 			Header: h})
 	}

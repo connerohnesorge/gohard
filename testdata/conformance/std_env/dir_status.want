@@ -1,0 +1,19 @@
+# gohard check --sim --seed 0 --tb dir_status_tb (VHDL-2019)
+exit 0
+== stdout
+dir_status.vhd:23:5: hint[sim/assert-note]: report note: createdir: status_ok
+dir_status.vhd:25:5: hint[sim/assert-note]: report note: createdir again: status_item_exists
+dir_status.vhd:27:5: hint[sim/assert-note]: report note: createdir, no parent: status_error
+dir_status.vhd:28:5: hint[sim/assert-note]: report note: exists true, isdir true, isfile false, missing false
+dir_status.vhd:33:5: hint[sim/assert-note]: report note: workingdir: status_ok
+dir_status.vhd:38:5: hint[sim/assert-note]: report note: out.txt is a file: true
+dir_status.vhd:40:5: hint[sim/assert-note]: report note: back: status_ok, work_dir/out.txt is a file: true
+dir_status.vhd:43:5: hint[sim/assert-note]: report note: workingdir to a missing folder: status_not_found
+dir_status.vhd:46:5: hint[sim/assert-note]: report note: deletedir, not empty: status_not_empty
+dir_status.vhd:48:5: hint[sim/assert-note]: report note: deletefile: status_ok
+dir_status.vhd:50:5: hint[sim/assert-note]: report note: deletefile again: status_no_file
+dir_status.vhd:52:5: hint[sim/assert-note]: report note: deletedir: status_ok, exists false
+dir_status.vhd:55:5: hint[sim/assert-note]: report note: deletedir again: status_no_directory
+summary: 0 errors, 0 warnings, 13 hints, 1 files
+== stderr
+gohard: simulated dir_status_tb (seed 0): quiet

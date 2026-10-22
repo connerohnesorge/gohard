@@ -13,10 +13,10 @@ import (
 )
 
 // TestNativeMissingIsUnsupported: a call of a bundled subprogram the
-// kernel has no native for (std.env.DIR_WORKINGDIR, whose v1.0
-// analysis diagnostic is tolerated here) is the diagnostic unsupported/construct
-// (please report) at the call, never sim/runtime-error; the run fails
-// there (sim.Ctx.Abort) and exits 2.
+// kernel has no native for (std.env.PslIsCovered, whose v1.1
+// analysis diagnostic is tolerated here) is the diagnostic
+// unsupported/construct (please report) at the call, never
+// sim/runtime-error; the run fails there (sim.Ctx.Abort) and exits 2.
 func TestNativeMissingIsUnsupported(t *testing.T) {
 	const src = `
 use std.env.all;
@@ -26,7 +26,7 @@ begin
   process
   begin
     wait for 1 ns;
-    report dir_workingdir;
+    report boolean'image(PslIsCovered);
     report "after";
     wait;
   end process;
@@ -54,7 +54,7 @@ end;
 		t.Fatalf("unsupported diagnostics %v, want one", got)
 	}
 	d := got[0]
-	if want := "std.env.DIR_WORKINGDIR is not supported yet, please " +
+	if want := "std.env.PslIsCovered is not supported yet, please " +
 		"report"; d.Message != want {
 		t.Errorf("message %q, want %q", d.Message, want)
 	}

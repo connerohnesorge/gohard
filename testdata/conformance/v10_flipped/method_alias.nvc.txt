@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/v10_flipped/method_alias.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a method_alias.vhd -e method_alias_tb -r
+# source sha256: 149906cde7f864133664221f65c1a427340acf7df012baa67d67f2293c9b4603
+# exit: 0
+** Note: 0ms+0: a.count = 2, b.count = 1
+   Process :method_alias_tb:_p0 at method_alias.vhd:43

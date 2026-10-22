@@ -1,0 +1,20 @@
+# GoHard semantic-error oracle (#34, R12): corpus-gc_heap.txt.
+# Written by go run ./tools/oracle --update semerr; do not edit.
+# Each "run" is one analysis group of the project's own driver (a
+# testsuite.sh between cleans, a VESTS list, an NVC regression test or
+# unit-test block, a corpus design run, or a file no driver names,
+# alone under 2008): its files are analyzed in order, one command per
+# file, in a fresh work directory per tool ("dir" is the working
+# directory; the run's GHDL --std and the sha256 prefix of its sources
+# follow). Each file line is the argument, the library when not work,
+# the GHDL options, then per tool the exit code and the lines of that
+# file it reports errors on; "~" marks a line whose only errors are
+# cascades (GHDL's "<unit> was not analysed", NVC's "... was analysed
+# with errors"). tools/oracle checks that GoHard reports an error on
+# every line both tools report one on, cascades aside
+# (semerr_check.go).
+tool ghdl 6.0.0
+tool nvc 1.23.0
+run corpus:gc_heap:main dir=testdata/corpus/gc_heap std=19 sha=95c77b200bb45060
+ gc_heap.vhd ghdl=0 nvc=0
+ gc_heap_tb.vhd ghdl=0 nvc=0

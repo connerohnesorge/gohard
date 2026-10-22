@@ -1,0 +1,2 @@
+gc_heap_tb entity work.gc_heap_tb(sim)
+  gc_heap_tb.dut entity work.gc_heap(behav)

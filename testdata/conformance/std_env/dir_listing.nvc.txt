@@ -1,0 +1,14 @@
+# NVC output of testdata/conformance/std_env/dir_listing.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a dir_listing.vhd -e dir_listing_tb -r
+# source sha256: 4b8b67961b7036a939dcfcecc7c9727931f49ca10a7c64ec5b44994ecefb3c0d
+# exit: 1
+** Note: 0ms+0: DIR_OPEN: status_ok, name $WORK/scratch, 6 items
+   Process :dir_listing_tb:check at dir_listing.vhd:24
+** Note: 0ms+0: items: . alpha.txt mid .. zeta.txt Beta.txt
+   Process :dir_listing_tb:check at dir_listing.vhd:24
+** Error: 0ms+0: not sorted at 2
+   Process :dir_listing_tb:check at dir_listing.vhd:24
+** Error: 0ms+0: not sorted at 4
+   Process :dir_listing_tb:check at dir_listing.vhd:24

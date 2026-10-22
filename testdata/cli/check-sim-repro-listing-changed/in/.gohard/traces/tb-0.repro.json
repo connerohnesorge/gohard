@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "version": "0.0.0-dev",
+  "commit": "unknown",
+  "ieee": "1076-2019 16a012320947d378611cc7457f64ed76cb52bac4",
+  "go": "unknown",
+  "standard": "2019",
+  "testbench": "tb",
+  "seed": 0,
+  "defines": {},
+  "budgets": {
+    "time": "1 ms",
+    "delta": 10000,
+    "step": 50000000
+  },
+  "models": {},
+  "config": {
+    "path": "gohard.yaml",
+    "sha256": "a130079c16f7a394a434300e94beb0cf3996161b8a21f9e7081dbb5524624830"
+  },
+  "sources": [
+    {
+      "path": "tb.vhd",
+      "sha256": "6410b8f33316970030dd90cd63033229a30ec53654fea67b6da8792c37836917"
+    }
+  ],
+  "env": {
+    "epoch": "2000-01-01T00:00:00Z",
+    "vars": {},
+    "real": false
+  },
+  "listings": [
+    {
+      "path": ".",
+      "sha256": "a7b9df5a321be4e0257c39c47ddbb91d159e4111401b406cd525e99c251c4cbd"
+    },
+    {
+      "path": "data",
+      "sha256": "d845e552e47218fc2d210fcd2e47bd6fc73718fd5d2bfcd9014634759238ad6c"
+    }
+  ]
+}

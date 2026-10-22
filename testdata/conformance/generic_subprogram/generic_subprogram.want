@@ -1,0 +1,12 @@
+# gohard check --sim --seed 0 --tb generic_subprogram_tb (VHDL-2019)
+exit 0
+== stdout
+generic_subprogram.vhd:58:5: hint[sim/assert-note]: report note: max_int(3, 9) = 9
+generic_subprogram.vhd:59:5: hint[sim/assert-note]: report note: nearest(-7, 4) = 4
+generic_subprogram.vhd:60:5: hint[sim/assert-note]: report note: min(2.5, 1.5) = 1.5
+generic_subprogram.vhd:62:5: hint[sim/assert-note]: report note: largest(4, 11, 6) = 11
+generic_subprogram.vhd:64:5: hint[sim/assert-note]: report note: largest('q', 'z', 'a') = 'z'
+generic_subprogram.vhd:67:5: hint[sim/assert-note]: report note: apply twice 3 times = 24
+summary: 0 errors, 0 warnings, 6 hints, 1 files
+== stderr
+gohard: simulated generic_subprogram_tb (seed 0): quiet

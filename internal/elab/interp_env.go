@@ -7,17 +7,23 @@ package elab
 // counter-and-format API. The world is EnvOptions: the clock is the
 // epoch plus the simulated time in UTC, GETENV sees EnvOptions.Vars,
 // and only EnvOptions.Real reads the outside world, through its
-// doors (#18). The DIR_* and PSL natives come later.
+// doors (#18). The DIR_* natives work in the run's sandbox (below).
+// The PSL natives come later.
 
 import (
 	"errors"
+	"io/fs"
+	"maps"
 	"math"
 	"path"
+	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/connerohnesorge/gohard/internal/condanal"
+	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/token"
@@ -32,6 +38,11 @@ var DefaultEpoch = time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
 func (m *machine) envFunc(x *sema.Decl, args []arg, rt *eval.Type,
 ) (eval.Value, error) {
 	name := strings.Trim(string(x.Name), `"`)
+	if strings.HasPrefix(name, "dir_") {
+		if v, ok, err := m.dirEnv(x, args, rt); ok {
+			return v, err
+		}
+	}
 	switch name {
 	case "resolution_limit":
 		return eval.Phys(rt, 1), nil
@@ -92,6 +103,11 @@ func (m *machine) envFunc(x *sema.Decl, args []arg, rt *eval.Type,
 // after which the process does not go on.
 func (m *machine) envProc(n *node, x *sema.Decl, args []arg,
 ) (stop bool, err error) {
+	if strings.HasPrefix(string(x.Name), "dir_") {
+		if ok, err := m.dirProc(x, args); ok {
+			return false, err
+		}
+	}
 	switch x.Name {
 	case "stop", "finish":
 		var status int64
@@ -674,4 +690,457 @@ func isoTime(t time.Time, digits int) string {
 		s += "." + us[:digits]
 	}
 	return s
+}
+
+// The DIR_* natives (LRM 16.5.6). Paths are relative to the working
+// directory, which starts at the project root (EnvOptions.Root, the
+// sandbox of env.Overlay) and only DIR_WORKINGDIR changes; it is never
+// the process's own (no chdir). Names are root-relative slash paths:
+// DIRECTORY.Name and DIR_WORKINGDIR give "." for the root and "a/b"
+// below it, the same on every machine. A path outside the sandbox
+// (above the root, or inside .gohard) is STATUS_ACCESS_DENIED. Reads
+// go through the door, which sees the run's own writes; every write
+// (DIR_CREATEDIR, the deletions) lands in the run's overlay, which the
+// shell flushes to .gohard/run/<hash>/, so the project itself is never
+// changed. A listing is sorted by name, "." and ".." included (as
+// NVC lists them), and every listing the run makes of the project is
+// recorded (env.Overlay.Listings), the item queries listing the
+// directory that holds the item.
+
+// Status positions of the std.env status enumerations.
+const (
+	openOK, openNotFound, openNoDirectory, openDenied, openError = 0, 1,
+		2, 3, 4
+	createOK, createExists, createDenied, createError = 0, 1, 2, 3
+	deleteOK, deleteNoDirectory, deleteNotEmpty, deleteDenied,
+	deleteError = 0, 1, 2, 3, 4
+	fileOK, fileNoFile, fileDenied, fileError = 0, 1, 2, 3
+)
+
+// DirSeparator is the value of std.env.DIR_SEPARATOR: names are slash
+// paths on every host.
+const DirSeparator = "/"
+
+// sandbox is a door that maps names into its sandbox (env.Overlay).
+type sandbox interface {
+	Rel(name string) (string, error)
+}
+
+// dirDoor is the door of the DIR_* natives (nil: none, an empty
+// read-only project).
+func (w *world) dirDoor() env.FS {
+	if w.o.Env.FS != nil {
+		return w.o.Env.FS
+	}
+	return w.o.FS
+}
+
+// dirRel maps the design's path p to its clean root-relative slash
+// path; ok is false when p leaves the sandbox.
+func (w *world) dirRel(p string) (string, bool) {
+	var r string
+	switch {
+	case filepath.IsAbs(p) || strings.HasPrefix(p, "/"):
+		root := w.o.Env.Root
+		if root == "" {
+			if sb, ok := w.dirDoor().(sandbox); ok {
+				x, err := sb.Rel(p)
+				return x, err == nil
+			}
+			return "", false
+		}
+		x, err := filepath.Rel(filepath.Clean(root), filepath.Clean(p))
+		if err != nil {
+			return "", false
+		}
+		r = filepath.ToSlash(x)
+	default:
+		r = path.Join(w.cwd, filepath.ToSlash(p))
+	}
+	r = path.Clean(r)
+	if r == ".." || strings.HasPrefix(r, "../") || r == env.Reserved ||
+		strings.HasPrefix(r, env.Reserved+"/") {
+		return "", false
+	}
+	if sb, ok := w.dirDoor().(sandbox); ok {
+		x, err := sb.Rel(r)
+		return x, err == nil
+	}
+	return r, true
+}
+
+// inCwd is the file name a design's relative name denotes after
+// DIR_WORKINGDIR moved the working directory (unchanged at the root,
+// and for an absolute name).
+func (w *world) inCwd(name string) string {
+	if w.cwd == "." || w.cwd == "" || name == "" ||
+		filepath.IsAbs(name) || strings.HasPrefix(name, "/") {
+		return name
+	}
+	return path.Join(w.cwd, filepath.ToSlash(name))
+}
+
+// dirStat stats the root-relative path r through the door, after
+// listing the directory that holds it (so the answer is recorded).
+func (w *world) dirStat(r string) (fs.FileInfo, error) {
+	door := w.dirDoor()
+	if door == nil {
+		if r == "." {
+			return nil, nil // the root of an empty project
+		}
+		return nil, fs.ErrNotExist
+	}
+	if r != "." {
+		_, _ = door.ReadDir(path.Dir(r))
+	}
+	return door.Stat(r)
+}
+
+// dirIsDir reports whether the stat result names a directory.
+func dirIsDir(r string, fi fs.FileInfo) bool {
+	return r == "." && fi == nil || fi != nil && fi.IsDir()
+}
+
+// dirEnv evaluates a DIR_* function; ok is false for another name.
+func (m *machine) dirEnv(x *sema.Decl, args []arg, rt *eval.Type,
+) (eval.Value, bool, error) {
+	name := string(x.Name)
+	var st int64
+	switch name {
+	case "dir_open":
+		var err error
+		if st, err = m.dirOpen(x, args); err != nil {
+			return eval.Value{}, true, err
+		}
+	case "dir_itemexists", "dir_itemisdir", "dir_itemisfile":
+		return eval.Bool(m.dirItem(name, stringOf(args[0].v))), true, nil
+	case "dir_workingdir":
+		if len(args) == 0 {
+			return strValue(rt, m.w.cwd), true, nil
+		}
+		st = m.dirChdir(stringOf(args[0].v))
+	case "dir_createdir":
+		st = m.dirCreate(stringOf(args[0].v), len(args) > 1 &&
+			args[1].v.I != 0)
+	case "dir_deletedir":
+		st = m.dirDelete(stringOf(args[0].v), len(args) > 1 &&
+			args[1].v.I != 0)
+	case "dir_deletefile":
+		st = m.fileDelete(stringOf(args[0].v))
+	default:
+		return eval.Value{}, false, nil
+	}
+	return eval.Enum(rt, st), true, nil
+}
+
+// dirProc executes a DIR_* procedure: the function of the same name,
+// its status written to the last parameter; ok is false for another
+// name.
+func (m *machine) dirProc(x *sema.Decl, args []arg) (bool, error) {
+	if x.Name == "dir_close" {
+		if len(args) > 0 {
+			m.dirClose(args[0].v)
+		}
+		return true, nil
+	}
+	if len(args) == 0 {
+		return false, nil
+	}
+	last := args[len(args)-1]
+	t := last.v.T
+	if t == nil && last.formal != nil {
+		var err error
+		if t, err = m.ev.LayoutIn(last.formal.Type, m.b); err != nil {
+			return true, err
+		}
+	}
+	v, ok, err := m.dirEnv(x, args[:len(args)-1], t)
+	if !ok || err != nil {
+		return ok, err
+	}
+	return true, m.out(last, v)
+}
+
+// dirOpen is DIR_OPEN(Dir, Path): Dir is written (a null name and
+// items unless the status is STATUS_OK).
+func (m *machine) dirOpen(x *sema.Decl, args []arg) (int64, error) {
+	if len(args) < 2 || len(x.Params) == 0 {
+		return openError, unsupported(x)
+	}
+	dt, err := m.ev.LayoutIn(x.Params[0].Type, m.b)
+	if err != nil {
+		return openError, err
+	}
+	// The layouts of DIRECTORY's fields and of what they designate
+	// (an access layout leaves its designated subtype to the
+	// allocator).
+	sd := x.Params[0].Type.Base()
+	if dt.Kind != eval.KindRecord || len(dt.Fields) != 2 ||
+		len(sd.Fields) != 2 {
+		return openError, unsupported(x)
+	}
+	lt, it := dt.Fields[0].Type, dt.Fields[1].Type
+	var vt *eval.Type // LINE_VECTOR
+	if ft := sd.Fields[1].Type; ft != nil && ft.Base().Designated != nil {
+		if vt, err = m.ev.LayoutIn(ft.Base().Designated, m.b); err != nil {
+			return openError, err
+		}
+	}
+	if vt == nil || vt.Kind != eval.KindArray || vt.Elem == nil {
+		return openError, unsupported(x)
+	}
+	st, r, names := m.dirList(stringOf(args[1].v))
+	dir := eval.Record(dt, []eval.Value{{T: lt}, {T: it}})
+	if st == openOK {
+		if err := m.b.Step(int64(1 + len(names))); err != nil {
+			return openError, err
+		}
+		et := vt.Elem // LINE
+		elems := make([]eval.Value, len(names))
+		for i, n := range names {
+			elems[i] = m.w.alloc(et, eval.Str(n))
+		}
+		vec := eval.Array(vt, []eval.Range{{Left: 0,
+			Right: int64(len(names)) - 1, Dir: eval.To}}, elems)
+		dir.E[0] = m.w.alloc(lt, eval.Str(r))
+		dir.E[1] = m.w.alloc(it, vec)
+	}
+	return st, m.out(args[0], dir)
+}
+
+// dirList lists the design's path p: the status, the root-relative
+// name and the sorted item names.
+func (m *machine) dirList(p string) (int64, string, []string) {
+	r, ok := m.w.dirRel(p)
+	if !ok {
+		return openDenied, "", nil
+	}
+	fi, err := m.w.dirStat(r)
+	switch {
+	case errors.Is(err, fs.ErrPermission):
+		return openDenied, "", nil
+	case errors.Is(err, fs.ErrNotExist):
+		return openNotFound, "", nil
+	case err != nil:
+		return openError, "", nil
+	case !dirIsDir(r, fi):
+		return openNoDirectory, "", nil
+	}
+	names := []string{".", ".."}
+	if door := m.w.dirDoor(); door != nil {
+		es, err := door.ReadDir(r)
+		if err != nil {
+			return openError, "", nil
+		}
+		for _, e := range es {
+			names = append(names, e.Name())
+		}
+	}
+	slices.Sort(names)
+	return openOK, r, names
+}
+
+// dirClose is DIR_CLOSE(Dir): its name, its items and their vector are
+// deallocated.
+func (m *machine) dirClose(d eval.Value) {
+	if len(d.E) != 2 {
+		return
+	}
+	if v, err := m.w.deref(d.E[1]); err == nil {
+		for _, e := range v.E {
+			m.w.free(e)
+		}
+		m.w.free(d.E[1])
+	}
+	m.w.free(d.E[0])
+}
+
+// dirItem is DIR_ITEMEXISTS, DIR_ITEMISDIR or DIR_ITEMISFILE of the
+// design's path p.
+func (m *machine) dirItem(name, p string) bool {
+	r, ok := m.w.dirRel(p)
+	if !ok {
+		return false
+	}
+	fi, err := m.w.dirStat(r)
+	if err != nil {
+		return false
+	}
+	switch name {
+	case "dir_itemisdir":
+		return dirIsDir(r, fi)
+	case "dir_itemisfile":
+		return fi != nil && fi.Mode().IsRegular()
+	}
+	return true
+}
+
+// dirChdir is DIR_WORKINGDIR(Path): the new working directory.
+func (m *machine) dirChdir(p string) int64 {
+	r, ok := m.w.dirRel(p)
+	if !ok {
+		return openDenied
+	}
+	fi, err := m.w.dirStat(r)
+	switch {
+	case errors.Is(err, fs.ErrPermission):
+		return openDenied
+	case errors.Is(err, fs.ErrNotExist):
+		return openNotFound
+	case err != nil:
+		return openError
+	case !dirIsDir(r, fi):
+		return openNoDirectory
+	}
+	m.w.cwd = r
+	return openOK
+}
+
+// dirCreate is DIR_CREATEDIR(Path, Parents): without Parents the
+// directory holding the new one must exist.
+func (m *machine) dirCreate(p string, parents bool) int64 {
+	r, ok := m.w.dirRel(p)
+	door := m.w.dirDoor()
+	if !ok || door == nil {
+		return createDenied
+	}
+	if _, err := m.w.dirStat(r); err == nil {
+		return createExists
+	} else if errors.Is(err, fs.ErrPermission) {
+		return createDenied
+	}
+	if !parents {
+		fi, err := m.w.dirStat(path.Dir(r))
+		if err != nil || !dirIsDir(path.Dir(r), fi) {
+			return createError
+		}
+	}
+	switch err := door.MkdirAll(r, 0o755); {
+	case errors.Is(err, fs.ErrPermission):
+		return createDenied
+	case err != nil:
+		return createError
+	}
+	return createOK
+}
+
+// dirDelete is DIR_DELETEDIR(Path, Recursive): a directory that is not
+// empty goes only with Recursive, its contents first. The project root
+// is never deleted.
+func (m *machine) dirDelete(p string, recursive bool) int64 {
+	r, ok := m.w.dirRel(p)
+	door := m.w.dirDoor()
+	if !ok || r == "." {
+		return deleteDenied
+	}
+	fi, err := m.w.dirStat(r)
+	switch {
+	case errors.Is(err, fs.ErrPermission):
+		return deleteDenied
+	case err != nil || door == nil || !dirIsDir(r, fi):
+		return deleteNoDirectory
+	}
+	es, err := door.ReadDir(r)
+	if err != nil {
+		return deleteError
+	}
+	if len(es) > 0 && !recursive {
+		return deleteNotEmpty
+	}
+	if err := m.w.removeTree(door, r); err != nil {
+		if errors.Is(err, fs.ErrPermission) {
+			return deleteDenied
+		}
+		return deleteError
+	}
+	return deleteOK
+}
+
+// removeTree removes directory r and everything below it, deepest
+// first, in name order.
+func (w *world) removeTree(door env.FS, r string) error {
+	es, err := door.ReadDir(r)
+	if err != nil {
+		return err
+	}
+	for _, e := range es {
+		c := path.Join(r, e.Name())
+		if e.IsDir() {
+			err = w.removeTree(door, c)
+		} else {
+			err = w.removeFile(door, c)
+		}
+		if err != nil {
+			return err
+		}
+	}
+	return door.Remove(r)
+}
+
+// removeFile removes file r, and what the run wrote to it from the
+// world's own copy (world.disk), so it is not read back.
+func (w *world) removeFile(door env.FS, r string) error {
+	if err := door.Remove(r); err != nil {
+		return err
+	}
+	for _, k := range slices.Sorted(maps.Keys(w.disk)) {
+		if x, ok := w.dirRel(k); ok && x == r {
+			delete(w.disk, k)
+		}
+	}
+	return nil
+}
+
+// fileDelete is DIR_DELETEFILE(Path); a directory is not a file.
+func (m *machine) fileDelete(p string) int64 {
+	r, ok := m.w.dirRel(p)
+	door := m.w.dirDoor()
+	if !ok {
+		return fileDenied
+	}
+	fi, err := m.w.dirStat(r)
+	switch {
+	case errors.Is(err, fs.ErrPermission):
+		return fileDenied
+	case err != nil || door == nil || dirIsDir(r, fi):
+		return fileNoFile
+	}
+	switch err := m.w.removeFile(door, r); {
+	case errors.Is(err, fs.ErrPermission):
+		return fileDenied
+	case err != nil:
+		return fileError
+	}
+	return fileOK
+}
+
+// envDeferred reports whether d is a deferred constant of std.env
+// without a full declaration, whose value the interpreter supplies
+// (DIR_SEPARATOR).
+func envDeferred(d *sema.Decl) bool {
+	return d != nil && d.Kind == sema.DeclConstant && d.Value == nil &&
+		d.Name == "dir_separator" && unitOf(d) == "std.env"
+}
+
+// envConstant reports whether d is envDeferred and, if so, makes sure
+// its shared slot holds the value, so a sharedRef to it (sharedKey{nil,
+// d}) loads DirSeparator, a STRING(1 TO 1).
+func (m *machine) envConstant(d *sema.Decl) bool {
+	if !envDeferred(d) {
+		return false
+	}
+	k := sharedKey{nil, d}
+	if _, ok := m.w.shared[k]; ok {
+		return true
+	}
+	var t *eval.Type
+	if d.Type != nil {
+		t, _ = m.ev.LayoutIn(d.Type, m.b)
+	}
+	v := strValue(t, DirSeparator)
+	if t != nil {
+		v.T = t.ArraySubtype(eval.Range{Left: 1, Right: 1, Dir: eval.To})
+	}
+	m.w.shared[k] = slot{v: v, t: v.T}
+	return true
 }

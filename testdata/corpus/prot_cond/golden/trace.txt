@@ -1,0 +1,8 @@
+gohard-trace 1
+testbench prot_cond_tb
+end 1000000
+scope prot_cond_tb instance prot_cond_tb(sim)
+scope prot_cond_tb.dut instance prot_cond(rtl)
+process 1 prot_cond_tb.check
+process 2 prot_cond_tb.dut._p0
+1000000 0 ! assert warning prot_cond_tb.vhd:100 p1 "prot_cond: counter probe"
