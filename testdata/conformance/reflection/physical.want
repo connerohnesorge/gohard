@@ -1,0 +1,9 @@
+# gohard check --sim --seed 0 --tb physical_tb (VHDL-2019)
+exit 0
+== stdout
+physical.vhd:24:5: hint[sim/assert-note]: report note: value 250, unit 1, image 250 MM
+physical.vhd:26:5: hint[sim/assert-note]: report note: DIST: units 3, first MM, last M, m at 3, scale 3 1000, scale cm 10, length 1001, ascending true
+physical.vhd:33:5: hint[sim/assert-note]: report note: time 3000000, 3000000 FS, TIME, units 8, unit 6 SEC
+summary: 0 errors, 0 warnings, 3 hints, 1 files
+== stderr
+gohard: simulated physical_tb (seed 0): quiet

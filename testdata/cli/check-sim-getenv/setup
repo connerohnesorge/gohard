@@ -1,0 +1,3 @@
+requires interpreter
+env HOME=/home/real
+env FOO=real

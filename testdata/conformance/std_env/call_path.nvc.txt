@@ -1,0 +1,31 @@
+# NVC output of testdata/conformance/std_env/call_path.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a call_path.vhd -e call_path_tb -r
+# source sha256: 5fa0941905f73a14e698e8ad5a23b0a4e6bc5610df556406ef2a8404d91fcdaa
+# exit: 0
+** Note: 0ms+0: depth 2
+   Procedure INNER [] at call_path.vhd:10
+   Process :call_path_tb:check at call_path.vhd:32
+** Note: 0ms+0: depth 2, 0: INNER in call_path.vhd line 13
+   Procedure INNER [] at call_path.vhd:10
+   Process :call_path_tb:check at call_path.vhd:32
+** Note: 0ms+0: depth 2, 1: CHECK in call_path.vhd line 32
+   Procedure INNER [] at call_path.vhd:10
+   Process :call_path_tb:check at call_path.vhd:32
+** Note: 0ms+0: depth 3
+   Procedure INNER [] at call_path.vhd:10
+   Function OUTER [return INTEGER] at call_path.vhd:25
+   Process :call_path_tb:check at call_path.vhd:33
+** Note: 0ms+0: depth 3, 0: INNER in call_path.vhd line 13
+   Procedure INNER [] at call_path.vhd:10
+   Function OUTER [return INTEGER] at call_path.vhd:25
+   Process :call_path_tb:check at call_path.vhd:33
+** Note: 0ms+0: depth 3, 1: OUTER in call_path.vhd line 25
+   Procedure INNER [] at call_path.vhd:10
+   Function OUTER [return INTEGER] at call_path.vhd:25
+   Process :call_path_tb:check at call_path.vhd:33
+** Note: 0ms+0: depth 3, 2: CHECK in call_path.vhd line 33
+   Procedure INNER [] at call_path.vhd:10
+   Function OUTER [return INTEGER] at call_path.vhd:25
+   Process :call_path_tb:check at call_path.vhd:33

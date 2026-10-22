@@ -1,0 +1,12 @@
+# NVC output of testdata/conformance/std_env/version.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a version.vhd -e version_tb -r
+# source sha256: bc8603f5352718bc26948027b2f834c86b64be91df2c85c48b7a1dabd132ac3a
+# exit: 0
+** Note: 0ms+0: VHDL_VERSION = 2019
+   Process :version_tb:check at version.vhd:28
+** Note: 0ms+0: TOOL_TYPE = SIMULATION
+   Process :version_tb:check at version.vhd:28
+** Note: 0ms+0: TOOL_* agree with conditional analysis
+   Process :version_tb:check at version.vhd:28

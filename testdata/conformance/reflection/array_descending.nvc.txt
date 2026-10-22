@@ -1,0 +1,11 @@
+# NVC output of testdata/conformance/reflection/array_descending.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a array_descending.vhd -e array_descending_tb -r
+# source sha256: 34a388b1b2d112551d9f5c5e96667de7fd81f5ee0b3aa8e80d46d748f5691729
+# exit: 1
+** Fatal: 0ms+0: value -3 outside of NATURAL range 0 to 9223372036854775807
+     > lib/std.19/reflection-body.vhd:570
+   Function NORMALISE_INDEX [INDEX, DIMENSION return NATURAL] at lib/std.19/reflection-body.vhd:568
+   Function GET [INDEX return VALUE_MIRROR] at lib/std.19/reflection-body.vhd:587
+   Process :array_descending_tb:check at array_descending.vhd:17

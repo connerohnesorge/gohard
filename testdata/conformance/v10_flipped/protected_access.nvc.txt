@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/v10_flipped/protected_access.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a protected_access.vhd -e protected_access_tb -r
+# source sha256: 0d053c465efdee5a96dedda95386b3ad3962a0d533dfba2789d0f60e1727463f
+# exit: 0
+** Note: 0ms+0: count = 2
+   Process :protected_access_tb:_p0 at protected_access.vhd:38

@@ -1,0 +1,9 @@
+# gohard check --sim --seed 0 --tb version_tb (VHDL-2019)
+exit 0
+== stdout
+version.vhd:30:5: hint[sim/assert-note]: report note: VHDL_VERSION = 2019
+version.vhd:31:5: hint[sim/assert-note]: report note: TOOL_TYPE = SIMULATION
+version.vhd:37:5: hint[sim/assert-note]: report note: TOOL_* agree with conditional analysis
+summary: 0 errors, 0 warnings, 3 hints, 1 files
+== stderr
+gohard: simulated version_tb (seed 0): quiet

@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/v10_flipped/private_variable.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a private_variable.vhd -e private_variable_tb -r
+# source sha256: 41ad08ce7c5af83be4151b792f59b584ea5c9c956fe39e939809e1c0b5f8c5d1
+# exit: 0
+** Note: 0ms+0: n = 2
+   Process :private_variable_tb:_p0 at private_variable.vhd:32

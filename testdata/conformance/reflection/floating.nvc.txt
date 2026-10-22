@@ -1,0 +1,10 @@
+# NVC output of testdata/conformance/reflection/floating.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a floating.vhd -e floating_tb -r
+# source sha256: 63da11dcef0b29167986f4b83ba745e50b4448be6e0cd9a032a9c0b2bb91c755
+# exit: 0
+** Note: 0ms+0: value 2.5, image 2.5
+   Process :floating_tb:check at floating.vhd:9
+** Note: 0ms+0: REAL: ascending true, low is real'low true, right is real'high true
+   Process :floating_tb:check at floating.vhd:9

@@ -15,6 +15,8 @@ package sema
 // the whole evaluator; the others are cached for the frame only.
 
 import (
+	"slices"
+
 	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/eval"
 )
@@ -47,6 +49,9 @@ type shared struct {
 	// one costs more than its repetitions and is not recorded.
 	memo  map[string]memoEntry
 	fills int
+	// natives evaluates the calls of functions without a body during
+	// elaboration (natives.go); nil leaves them not static.
+	natives Natives
 }
 
 func newShared() *shared {
@@ -110,6 +115,9 @@ func (ev *Evaluator) Call(fn eval.Func, args []eval.Value, b *eval.Budget,
 			return v, err
 		}
 	}
+	if n, ok := fn.(*nativeCall); ok {
+		return ev.callNative(n, args, b)
+	}
 	d, ok := fn.(*Decl)
 	if !ok {
 		return eval.Value{}, eval.NotStatic("call")
@@ -131,7 +139,7 @@ func (ev *Evaluator) pureCall(x *Decl, args []eval.Value, b *eval.Budget,
 	if err != nil {
 		return eval.Value{}, err
 	}
-	if out.flow != flowReturn {
+	if out.flow != flowReturn || out.v.T == nil {
 		return eval.Value{}, eval.NotStatic("function " + x.Text +
 			" ended without return")
 	}
@@ -282,6 +290,9 @@ func (ev *Evaluator) declare(r *Region, b *eval.Budget) error {
 			var v eval.Value
 			if d.Value != nil {
 				if v, err = ev.value(d.Value, b); err == nil {
+					// An open constraint comes from the value
+					// (VHDL-2019 inferred constraints, LRM 6.4.2.1).
+					t = eval.InferSubtype(t, v)
 					v, err = eval.Check(v, t)
 				}
 			} else {
@@ -410,11 +421,19 @@ func (ev *Evaluator) stmt(s *SeqStmt, b *eval.Budget) (outcome, error) {
 			if !ok {
 				continue
 			}
-			v, err := ev.value(br.Value, b)
-			if err != nil {
-				return outcome{}, err
+			// LRM 10.13: an unaffected branch returns nothing and
+			// the statement does nothing; a branch with no value is
+			// a procedure's return.
+			if br.Unaffected {
+				return outcome{}, nil
 			}
-			return outcome{flow: flowReturn, v: v}, nil
+			out := outcome{flow: flowReturn}
+			if br.Value != nil {
+				if out.v, err = ev.value(br.Value, b); err != nil {
+					return outcome{}, err
+				}
+			}
+			return out, nil
 		}
 		return outcome{}, nil
 	case SeqBlock:
@@ -806,9 +825,20 @@ func assignWhole(old, v eval.Value, t *eval.Type) (eval.Value, error) {
 			return eval.Value{}, eval.LengthError(int64(len(old.E)),
 				int64(len(v.E)))
 		}
-		return eval.Value{T: old.T, B: old.B, E: v.E}, nil
+		es, err := assignElems(old.E, v.E)
+		if err != nil {
+			return eval.Value{}, err
+		}
+		return eval.Value{T: old.T, B: old.B, E: es}, nil
 	case eval.KindRecord:
-		return eval.Value{T: old.T, E: v.E}, nil
+		if len(v.E) != len(old.E) {
+			return eval.Value{}, eval.NotStatic("record assignment")
+		}
+		es, err := assignElems(old.E, v.E)
+		if err != nil {
+			return eval.Value{}, err
+		}
+		return eval.Value{T: old.T, E: es}, nil
 	case eval.KindInvalid:
 		return v, nil
 	}
@@ -816,6 +846,34 @@ func assignWhole(old, v eval.Value, t *eval.Type) (eval.Value, error) {
 		t = old.T
 	}
 	return eval.Check(v, t)
+}
+
+// assignElems assigns the elements or fields vs over olds: a composite
+// one keeps its own constraints, so a value of another length does not
+// replace an element or field whose subtype was inferred (LRM 6.4.2.1)
+// or constrained. Scalars are taken as they are.
+func assignElems(olds, vs []eval.Value) ([]eval.Value, error) {
+	if len(olds) != len(vs) {
+		return vs, nil
+	}
+	var out []eval.Value
+	for i, o := range olds {
+		if k := o.Kind(); k != eval.KindArray && k != eval.KindRecord {
+			continue
+		}
+		nv, err := assignWhole(o, vs[i], nil)
+		if err != nil {
+			return nil, err
+		}
+		if out == nil {
+			out = slices.Clone(vs)
+		}
+		out[i] = nv
+	}
+	if out == nil {
+		return vs, nil
+	}
+	return out, nil
 }
 
 // procedure interprets a procedure call statement: in parameters are

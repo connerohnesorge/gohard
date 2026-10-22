@@ -61,8 +61,12 @@ func globallyStatic(e *Expr, depth int) (static, known bool) {
 		}
 		return all(e.Args...)
 	case ExprAttr:
-		if signalAttr(e.Attr) {
+		if signalAttr(e.Attr) || isReflect(e) {
+			// A mirror is taken at evaluation time (VHDL-2019).
 			return false, true
+		}
+		if objectImage(e) {
+			return all(append([]*Expr{e.Prefix}, e.Args...)...)
 		}
 		return all(e.Args...)
 	case ExprAggregate:
@@ -81,6 +85,24 @@ func globallyStatic(e *Expr, depth int) (static, known bool) {
 		return true, true
 	}
 	return true, false
+}
+
+// objectImage reports whether e is a VHDL-2019 object'IMAGE: its value
+// is the object's, so it is as static as the object.
+func objectImage(e *Expr) bool {
+	return e.Attr == "image" && e.Decl == nil && len(e.Args) == 0 &&
+		e.Prefix != nil && e.Prefix.Kind != ExprTypeMark
+}
+
+// isReflect reports whether e is the predefined VHDL-2019 'REFLECT.
+func isReflect(e *Expr) bool {
+	return e.Attr == "reflect" && e.Decl == nil
+}
+
+// readsPrefix reports whether the attribute e reads the value of its
+// prefix object ('REFLECT, object'IMAGE) rather than only naming it.
+func readsPrefix(e *Expr) bool {
+	return e.Kind == ExprAttr && (isReflect(e) || objectImage(e))
 }
 
 // signalAttr reports whether k names a predefined signal attribute.
@@ -160,8 +182,10 @@ func locallyStatic(e *Expr, depth int, std token.Standard,
 		return all(e.Args...)
 	case ExprAttr:
 		switch {
-		case signalAttr(e.Attr):
+		case signalAttr(e.Attr) || isReflect(e):
 			return false, true
+		case objectImage(e):
+			return all(e.Prefix)
 		case e.Decl != nil:
 			return true, false // a user attribute: its specification's
 		case e.Prefix != nil && e.Prefix.Kind == ExprTypeMark:

@@ -1,0 +1,14 @@
+# NVC output of testdata/conformance/reflection/enumeration.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a enumeration.vhd -e enumeration_tb -r
+# source sha256: f5bda8bc7079752d3bb95a86478435151f64553bf95f400255d481c97e546ba0
+# exit: 0
+** Note: 0ms+0: pos 1, image green
+   Process :enumeration_tb:check at enumeration.vhd:11
+** Note: 0ms+0: COLOR: length 3, left red, right blue, low red, high blue, ascending true
+   Process :enumeration_tb:check at enumeration.vhd:11
+** Note: 0ms+0: literal 1 green, blue at 2
+   Process :enumeration_tb:check at enumeration.vhd:11
+** Note: 0ms+0: character 65 'A', bit '1' at 1
+   Process :enumeration_tb:check at enumeration.vhd:11

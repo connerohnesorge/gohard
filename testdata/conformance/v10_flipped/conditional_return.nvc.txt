@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/v10_flipped/conditional_return.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a conditional_return.vhd -e conditional_return_tb -r
+# source sha256: 65fec1c95a4996ef44c8cc85c84fb1f61cfdf5e9702ab8a41e21c117350ce5dc
+# exit: 0
+** Note: 0ms+0: clip(-5) = 0, clip(7) = 7
+   Process :conditional_return_tb:_p0 at conditional_return.vhd:22

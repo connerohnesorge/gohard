@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb physical_bounds_tb (VHDL-2019)
+exit 0
+== stdout
+physical_bounds.vhd:19:5: hint[sim/assert-note]: report note: SHORT: left 5 MM, right 50 MM, low 5 MM, high 50 MM, length 46
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated physical_bounds_tb (seed 0): quiet

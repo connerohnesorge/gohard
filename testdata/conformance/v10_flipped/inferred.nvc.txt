@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/v10_flipped/inferred.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a inferred.vhd -e inferred -r
+# source sha256: e2254188ca8f9c9afb491bd9c7824937fcd7d5d60aa6dcac8dbfc5d5d3f276c2
+# exit: 0
+** Note: 0ms+0: s'length = 4, s'left = 0
+   Process :inferred:_p0 at inferred.vhd:9

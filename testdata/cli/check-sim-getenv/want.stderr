@@ -1,0 +1,2 @@
+gohard: --env FOO=cli overrides simulation.env.vars.FOO: "cfg"
+gohard: simulated getenv_tb (seed 0): quiet

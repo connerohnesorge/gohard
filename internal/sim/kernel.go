@@ -203,7 +203,7 @@ type Kernel struct {
 	// the severities disabled by SetVhdlAssertEnable (zero: all
 	// enabled), the SetVhdlAssertFormat format of each severity
 	// ("" keeps the message) and SetVhdlReadSeverity (NoSeverity:
-	// the default, failure). Arrays, so Clone copies them by value.
+	// the default, error). Arrays, so Clone copies them by value.
 	asserts   [nSeverity]uint64
 	assertOff [nSeverity]bool
 	formats   [nSeverity]string

@@ -1,0 +1,4 @@
+getenv_tb.vhd:12:5: hint[sim/assert-note]: report note: MODE=fast
+getenv_tb.vhd:32:5: hint[sim/assert-note]: report note: FOO=cli BAR=fromcfg HOME= UNSET=[]
+getenv_tb.vhd:35:7: hint[sim/assert-note]: report note: HOME line is null
+summary: 0 errors, 0 warnings, 3 hints, 1 files

@@ -1,0 +1,11 @@
+# gohard check --sim --seed 0 --tb assert_format_tb (VHDL-2019)
+exit 0
+== stdout
+assert_format.vhd:14:5: hint[sim/assert-note]: report note: read severity error, format ""
+assert_format.vhd:17:5: hint[sim/assert-note]: report note: valid true, format "[{S}] {r}"
+assert_format.vhd:19:5: warning[sim/assert-warning]: assertion warning: [WARNING] formatted
+assert_format.vhd:21:5: hint[sim/assert-note]: report note: valid false, format "[{S}] {r}"
+assert_format.vhd:24:5: warning[sim/assert-warning]: assertion warning: plain
+summary: 0 errors, 2 warnings, 3 hints, 1 files
+== stderr
+gohard: simulated assert_format_tb (seed 0): quiet

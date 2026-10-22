@@ -1,0 +1,14 @@
+# NVC output of testdata/conformance/inferred/objects.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a objects.vhd -e inferred_tb -r
+# source sha256: a425abb7273de34ab1e48c344676e2275baecd598559bd740840087c0dacdefd
+# exit: 0
+** Note: 0ms+0: inf'length = 5, str = 1 to 3
+   Process :inferred_tb:check at objects.vhd:15
+** Note: 0ms+0: wa = 2 x 8
+   Process :inferred_tb:check at objects.vhd:15
+** Note: 0ms+0: s'length = 4, w = 4 x 3, r'right = 5
+   Process :inferred_tb:check at objects.vhd:15
+** Note: 1ns+0: s = 0101
+   Process :inferred_tb:check at objects.vhd:15

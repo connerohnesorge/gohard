@@ -92,6 +92,13 @@ func (a *analyzer) objectType(rg cst.Range, what string, t *Type,
 		}
 		return
 	}
+	if hasProtectedPart(t.Base(), 0) { // typedecl.go
+		// LRM 6.4.2.2, 6.4.2.3, 6.5.2: only variables hold protected
+		// objects, in VHDL-2019 also as subelements.
+		a.semaError(rg, what+" cannot be of the type "+t.Name()+
+			", which has a subelement of a protected type")
+		return
+	}
 	switch accessPart(t) {
 	case "access":
 		a.semaError(rg, what+" cannot be of the access type "+t.Name())
@@ -185,6 +192,10 @@ func (a *analyzer) interfaceRules(io cst.InterfaceObjectDecl, k DeclKind,
 		if class == ClassSignal {
 			a.objectType(sp, "a port", t, false)
 		}
+		if class == ClassVariable && a.std >= token.Std2019 {
+			a.variablePort(io, mode, t, hasDefault)
+			return
+		}
 		if hasDefault && mode == ModeLinkage {
 			a.semaError(io.Node.Span(), "a port of mode linkage "+
 				"cannot have a default expression")
@@ -202,6 +213,13 @@ func (a *analyzer) interfaceRules(io cst.InterfaceObjectDecl, k DeclKind,
 		}
 		if class == ClassSignal {
 			a.objectType(sp, "a signal parameter", t, false)
+		}
+		if class == ClassConstant && !t.Unknown() &&
+			(t.Base().Class == TypeProtected ||
+				hasProtectedPart(t.Base(), 0)) {
+			// LRM 6.5.2: a formal of a protected type (or holding
+			// one) is a variable.
+			a.objectType(sp, "a constant parameter", t, false)
 		}
 		switch {
 		case !hasDefault:
@@ -223,6 +241,143 @@ func (a *analyzer) interfaceRules(io cst.InterfaceObjectDecl, k DeclKind,
 				"out or inout cannot have a default expression")
 		}
 	}
+}
+
+// pureParams checks the formal parameters of pure function d under
+// VHDL-2019, which lets impure functions have parameters of any mode
+// and class (LRM 4.2.2.1): a pure function's parameters have mode in
+// and class constant, signal or file.
+func (a *analyzer) pureParams(d *Decl) {
+	if a.checksOff() || a.std < token.Std2019 {
+		return
+	}
+	for _, p := range d.Params {
+		switch {
+		case p.Mode != ModeIn && p.Class != ClassFile:
+			a.semaError(p.Span, "parameter "+p.Text+" of pure function "+
+				d.Text+" must have mode in, not "+p.Mode.text())
+		case p.Class == ClassVariable:
+			a.semaError(p.Span, "parameter "+p.Text+" of pure function "+
+				d.Text+" must be a constant, signal or file, not a "+
+				"variable")
+		}
+	}
+}
+
+// protectedCopy reports a value given to a variable of type t that
+// is or holds a protected object (LRM 5.6.1, 6.4.2.4; VHDL-2019
+// composites of protected types): such a variable has no initial value
+// and is never the target of a variable assignment, which would copy
+// the object. how is "cannot be assigned" or "cannot have an initial
+// value".
+func (a *analyzer) protectedCopy(rg cst.Range, t *Type, how string) {
+	if a.checksOff() || t.Unknown() {
+		return
+	}
+	switch b := t.Base(); {
+	case b.Class == TypeProtected:
+		a.semaError(rg, "a variable of the protected type "+t.Name()+
+			" "+how)
+	case hasProtectedPart(b, 0): // typedecl.go
+		a.semaError(rg, "a variable of the type "+t.Name()+", which "+
+			"has a subelement of a protected type, "+how)
+	}
+}
+
+// variableParam reports whether VHDL-2019 makes a formal parameter of
+// type t with no explicit class a variable (LRM 6.5.2): t is a
+// protected or access type, or a composite holding a protected object.
+func variableParam(t *Type) bool {
+	if t.Unknown() {
+		return false
+	}
+	switch b := t.Base(); b.Class {
+	case TypeProtected, TypeAccess:
+		return true
+	default:
+		return hasProtectedPart(b, 0)
+	}
+}
+
+// variablePort checks a VHDL-2019 variable port (LRM 6.5.2): it is of
+// a protected type, has mode inout and no default expression.
+func (a *analyzer) variablePort(io cst.InterfaceObjectDecl, mode Mode,
+	t *Type, hasDefault bool,
+) {
+	if !t.Unknown() && t.Base().Class != TypeProtected &&
+		t.Base().Class != TypeGeneric {
+		a.semaError(io.Subtype().Span(), "a variable port must be of "+
+			"a protected type, not "+t.Name())
+	}
+	if mode != ModeInout {
+		rg := io.Names().Span()
+		if m := io.Mode(); !m.IsZero() {
+			rg = m.Span()
+		}
+		a.semaError(rg, "a variable port must have mode inout")
+	}
+	if hasDefault {
+		a.semaError(io.Node.Span(), "a variable port cannot have a "+
+			"default expression")
+	}
+}
+
+// variableActual checks the actual of the VHDL-2019 variable port f in
+// a port map (LRM 6.5.7.3): a shared variable or a variable port of
+// the enclosing design entity, never open or an expression. e is the
+// typed actual (nil for open), n its node.
+func (a *analyzer) variableActual(f *Decl, e *Expr, n cst.Node) {
+	if a.checksOff() || f == nil || f.Kind != DeclPort ||
+		f.Class != ClassVariable || a.std < token.Std2019 {
+		return
+	}
+	if e != nil && (e.Type.Unknown() || f.Type.Unknown() ||
+		e.Type.Base() != f.Type.Base()) {
+		return // a type error, reported where it is typed
+	}
+	e = Unalias(e)
+	if e != nil && e.Kind == ExprName && e.Decl != nil &&
+		sharedObject(e.Decl.Denotes()) {
+		return
+	}
+	if e != nil && e.Kind != ExprName && sharedObject(actualObject(e)) {
+		a.semaError(n.Span(), "an element of a shared variable cannot "+
+			"be the actual of variable port "+f.Text)
+		return
+	}
+	a.semaError(n.Span(), "the actual of variable port "+f.Text+
+		" must be a shared variable or a variable port")
+}
+
+// sharedObject reports whether d is a shared variable or a variable
+// port: what a variable port may be bound to.
+func sharedObject(d *Decl) bool {
+	return d != nil && (d.Kind == DeclSharedVariable ||
+		d.Kind == DeclPort && d.Class == ClassVariable)
+}
+
+// Unalias returns the name the object alias e denotes, following
+// aliases of whole objects (alias al is sv;) to the aliased name; e
+// itself when it is not such an alias (LRM 6.6.2).
+func Unalias(e *Expr) *Expr {
+	for range 64 { // alias chains are short; never loop forever
+		if e == nil || e.Kind != ExprName || e.Decl == nil {
+			return e
+		}
+		d := e.Decl
+		for range 64 { // an alias of an alias name: its Target
+			if d.Kind != DeclAlias || d.Value != nil || d.Target == nil ||
+				d.Target == d {
+				break
+			}
+			d = d.Target
+		}
+		if d.Kind != DeclAlias || d.Value == nil {
+			return e
+		}
+		e = d.Value
+	}
+	return e
 }
 
 // paramRead reports a read of a parameter of mode out that cannot be

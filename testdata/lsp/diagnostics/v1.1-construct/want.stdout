@@ -1,1 +1,1 @@
-{"uri":"file://$WORK/protected_record.vhd","version":1,"diagnostics":[{"range":{"start":{"line":3,"character":7},"end":{"line":3,"character":13}},"severity":1,"code":"unsupported/construct","source":"gohard","message":"records of protected types is not supported yet (planned for v1.1)"}]}
+{"uri":"file://$WORK/protected_record.vhd","version":1,"diagnostics":[{"range":{"start":{"line":6,"character":33},"end":{"line":6,"character":47}},"severity":1,"code":"unsupported/construct","source":"gohard","message":"std.env DIR_* functions is not supported yet (planned for v1.1)"}]}

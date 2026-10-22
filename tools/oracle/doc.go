@@ -10,6 +10,7 @@
 //	go run ./tools/oracle --update format            # one section
 //	go run ./tools/oracle --update -design nvc semerr
 //	go run ./tools/oracle --update -design md_resolve
+//	go run ./tools/oracle --update -design protected/counter conformance
 //
 // Without --update the command only checks, without running any tool:
 // the same check runs in CI as TestRecorded (go test ./tools/oracle).
@@ -83,6 +84,17 @@
 //     The internal/stdlib tests derive the first-standard tags from
 //     them and compare the 2008 view with both 2008 sets; the check
 //     here verifies each file's provenance and source list. No hash.
+//
+//   - conformance (#18): NVC runs each #18 conformance case that has a
+//     testdata/conformance/<feature>/<case>.nvc.txt (nvc --std=STD -a
+//     <case>.vhd -e TOP -r, in a folder holding only the case), and
+//     the file records the command, NVC version, exit code, output and
+//     the case source's sha256. The check requires the recording to be
+//     of the current source and command, and NVC's report and
+//     assertion messages and pass/fail to equal the case's .want
+//     (gohard check --sim), unless the case is pending or says
+//     nvc-differs. Start a recording by creating the file empty. No
+//     hash: the source hash inside each recording makes it stale.
 //
 // Several sections may feed one hash field (oracle_sha256 covers the
 // GHDL/NVC traces and the --disp-tree output): the

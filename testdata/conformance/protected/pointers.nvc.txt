@@ -1,0 +1,10 @@
+# NVC output of testdata/conformance/protected/pointers.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a pointers.vhd -e pointers_tb -r
+# source sha256: d04acb0fff04ffc9bad53f0e00474c47ce29a26abb52b995337d45bde9ffda44
+# exit: 0
+** Note: 0ms+0: p = 6, r = 8
+   Process :pointers_tb:check at pointers.vhd:29
+** Note: 0ms+0: q is not null: true
+   Process :pointers_tb:check at pointers.vhd:29

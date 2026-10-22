@@ -1,0 +1,9 @@
+# gohard check --sim --seed 0 --tb file_tb (VHDL-2019)
+exit 0
+== stdout
+file.vhd:14:5: hint[sim/assert-note]: report note: procedure: file.vhd line 14 declared at 12
+file.vhd:24:5: hint[sim/assert-note]: report note: FILE_NAME line: file.vhd
+file.vhd:26:5: hint[sim/assert-note]: report note: FILE_LINE positive: 25
+summary: 0 errors, 0 warnings, 3 hints, 1 files
+== stderr
+gohard: simulated file_tb (seed 0): quiet

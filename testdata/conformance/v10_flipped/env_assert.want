@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb env_assert (VHDL-2019)
+exit 0
+== stdout
+env_assert.vhd:11:5: warning[sim/assert-warning]: assertion warning: probe
+env_assert.vhd:12:5: hint[sim/assert-note]: report note: count = 1
+summary: 0 errors, 1 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated env_assert (seed 0): quiet

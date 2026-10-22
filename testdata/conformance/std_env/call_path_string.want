@@ -1,0 +1,10 @@
+# gohard check --sim --seed 0 --tb call_path_string_tb (VHDL-2019)
+exit 0
+== stdout
+call_path_string.vhd:14:5: hint[sim/assert-note]: report note: pointer: call_path_string.vhd:13:INNER | call_path_string.vhd:23:CHECK
+call_path_string.vhd:15:5: hint[sim/assert-note]: report note: vector: call_path_string.vhd:13:INNER; call_path_string.vhd:23:CHECK
+call_path_string.vhd:16:5: hint[sim/assert-note]: report note: element: call_path_string.vhd:13:INNER
+call_path_string.vhd:17:5: hint[sim/assert-note]: report note: path: "."
+summary: 0 errors, 0 warnings, 4 hints, 1 files
+== stderr
+gohard: simulated call_path_string_tb (seed 0): quiet

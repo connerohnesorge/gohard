@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb pointers_tb (VHDL-2019)
+exit 0
+== stdout
+pointers.vhd:39:5: hint[sim/assert-note]: report note: p = 6, r = 8
+pointers.vhd:44:5: hint[sim/assert-note]: report note: q is not null: true
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated pointers_tb (seed 0): quiet

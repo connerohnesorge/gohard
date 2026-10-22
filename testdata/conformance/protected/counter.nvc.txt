@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/protected/counter.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2008 -a counter.vhd -e counter_tb -r
+# source sha256: cf59a4123ffc3e9e92ef6634cc4718020129136621412bec7fed67d843ca5b17
+# exit: 0
+** Note: 10ns+0: count = 13
+   Process :counter_tb:b at counter.vhd:37

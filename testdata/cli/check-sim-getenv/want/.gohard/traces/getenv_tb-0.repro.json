@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "version": "0.0.0-dev",
+  "commit": "unknown",
+  "ieee": "1076-2019 16a012320947d378611cc7457f64ed76cb52bac4",
+  "go": "unknown",
+  "standard": "2019",
+  "testbench": "getenv_tb",
+  "seed": 0,
+  "defines": {},
+  "budgets": {
+    "time": "1 ms",
+    "delta": 10000,
+    "step": 50000000
+  },
+  "models": {},
+  "config": {
+    "path": "gohard.yaml",
+    "sha256": "a886ac761ccbecebfdd914b3bb25e947d0025f8b0ced3da6f4fb0a2cf6e118af"
+  },
+  "sources": [
+    {
+      "path": "getenv_tb.vhd",
+      "sha256": "9ff19a656bdf00f2ed095826d25cde15bc0de59e4898542b1213e5912900f2dd"
+    }
+  ],
+  "env": {
+    "epoch": "2000-01-01T00:00:00Z",
+    "vars": {
+      "BAR": "fromcfg",
+      "FOO": "cli",
+      "MODE": "fast"
+    },
+    "real": false
+  }
+}

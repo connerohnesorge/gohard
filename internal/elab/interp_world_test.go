@@ -504,7 +504,7 @@ architecture a of tb is
     p := new integer'(v + 1);
     return v;
   end function;
-  function bump(variable p : inout iptr) return integer is
+  impure function bump(variable p : inout iptr) return integer is
   begin
     p.all := p.all * 2;
     return p.all;

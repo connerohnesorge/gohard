@@ -129,6 +129,7 @@ func (a *analyzer) interfaceList(l cst.InterfaceList, k DeclKind,
 			it := cst.InterfaceTypeDecl{Node: item.Node}
 			d := a.newDecl(DeclGenericType, it.Name(), item.Node)
 			d.Type = &Type{Class: TypeGeneric, Decl: d}
+			a.genericArrayClass(it.Def(), d)
 			a.declare(d)
 			a.predefined(d.Type, d)
 			out = append(out, d)
@@ -220,6 +221,11 @@ func (a *analyzer) interfaceObject(io cst.InterfaceObjectDecl,
 			class = ClassConstant
 		case k == DeclPort:
 			class = ClassSignal
+		case k == DeclParameter && a.std >= token.Std2019 &&
+			variableParam(t): // objrules.go
+			// LRM 6.5.2: VHDL-2019 assumes class variable for a
+			// formal parameter of a protected or access type.
+			class = ClassVariable
 		case mode == ModeIn:
 			class = ClassConstant
 		default:
@@ -265,12 +271,18 @@ func (a *analyzer) objectDecl(n cst.Node, k DeclKind,
 	done()
 	a.objectDeclRules(si, k, t)     // objrules.go
 	a.protectedElaborated(si, k, t) // typecheck.go
+	if v != nil && (k == DeclVariable || k == DeclSharedVariable) {
+		a.protectedCopy(value.Span(), t,
+			"cannot have an initial value") // objrules.go
+	}
 	if k == DeclSharedVariable && a.std >= token.Std2002 && !a.quiet &&
 		!t.Unknown() &&
-		t.Base().Class != TypeProtected && t.Base().Class != TypeGeneric {
+		t.Base().Class != TypeProtected && t.Base().Class != TypeGeneric &&
+		!(a.std >= token.Std2019 && hasProtectedPart(t.Base(), 0)) {
 		// LRM 6.4.2.4: from VHDL-2002 on a shared variable is of a
-		// protected type. Lenient mode (#28) keeps the VHDL-93 rule
-		// with a warning, as GHDL's -frelaxed and NVC's --relaxed do.
+		// protected type (VHDL-2019: or a composite of them). Lenient
+		// mode (#28) keeps the VHDL-93 rule with a warning, as GHDL's
+		// -frelaxed and NVC's --relaxed do.
 		problem := "the type of a shared variable must be a " +
 			"protected type, not " + t.Name()
 		if a.s.cfg.Lenient {
@@ -294,9 +306,17 @@ func (a *analyzer) objectDecl(n cst.Node, k DeclKind,
 		a.semaError(names.Node.Span(), "a constant outside a package "+
 			"declaration must have a value")
 	}
+	dt := t
+	if v != nil && a.std >= token.Std2019 &&
+		(k == DeclVariable || k == DeclSignal) &&
+		notFullyConstrained(t, 0) {
+		// LRM 6.4.2.3, 6.4.2.4: VHDL-2019 infers the constraints the
+		// subtype leaves open from the initial value.
+		dt = inferred(t, v) // typerep.go
+	}
 	for tok := range names.Names() {
 		d := a.newDecl(k, tok, n)
-		d.Type, d.Value = t, v
+		d.Type, d.Value = dt, v
 		switch k {
 		case DeclConstant:
 			d.Class = ClassConstant
@@ -308,6 +328,17 @@ func (a *analyzer) objectDecl(n cst.Node, k DeclKind,
 		}
 		a.declare(d)
 	}
+}
+
+// privateVariable reports whether d is a VHDL-2019 private variable: a
+// variable declared with `private` in a protected type declaration
+// (LRM 5.6.2). It is a member of the type's region like the methods,
+// but only the type and its body see it; a selected name from outside
+// (obj.priv) does not denote it.
+func privateVariable(d *Decl) bool {
+	return d != nil && d.Kind == DeclVariable && d.Parent != nil &&
+		d.Parent.Kind == RegionProtected &&
+		d.Node.Parent().Kind() == cst.KindPrivateVariableDecl
 }
 
 // selfScope marks names as being declared until the returned func is
@@ -571,6 +602,9 @@ func (a *analyzer) subprogramSpec(spec cst.Node, kind DeclKind) *Decl {
 	d.Params = a.interfaceList(params.List(), DeclParameter)
 	for i, p := range d.Params {
 		p.Pos = i
+	}
+	if spec.Kind() == cst.KindFunctionSpec && d.Pure {
+		a.pureParams(d) // objrules.go
 	}
 	if !ret.IsZero() {
 		d.Type = a.typeMark(ret.TypeMark().Node)

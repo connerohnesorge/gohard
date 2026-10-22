@@ -1,0 +1,10 @@
+# NVC output of testdata/conformance/cond_return/procedure.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a procedure.vhd -e procedure_tb -r
+# source sha256: 2e2aa634c782175a77beead128aebbaefdea76dc08b2bf02bbcabf0dee9baa4f
+# exit: 0
+** Note: 0ms+0: 24: x = 3, n = 3
+   Process :procedure_tb:p at procedure.vhd:18
+** Note: 0ms+0: 7: x = 7, n = 0
+   Process :procedure_tb:p at procedure.vhd:18

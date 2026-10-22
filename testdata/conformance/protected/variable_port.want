@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb vport_tb (VHDL-2019)
+exit 0
+== stdout
+variable_port.vhd:78:5: hint[sim/assert-note]: report note: a = 3, b = 2
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated vport_tb (seed 0): quiet

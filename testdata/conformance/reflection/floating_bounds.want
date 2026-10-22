@@ -1,0 +1,13 @@
+# gohard check --sim --seed 0 --tb floating_bounds_tb (VHDL-2019)
+exit 1
+== stdout
+floating_bounds.vhd:15:3: error[sim/runtime-error]: floating_bounds.vhd:40:5: value 3.0 is out of range 2.5 downto -1.5 in floating_bounds_tb.check at 0 fs
+floating_bounds.vhd:22:5: hint[sim/assert-note]: report note: fdown 2.5 -1.5 -1.5 false 1.5
+floating_bounds.vhd:25:5: hint[sim/assert-note]: report note: unit_real -1.25 0.75 0.5
+floating_bounds.vhd:27:5: hint[sim/assert-note]: report note: narrow -0.5 3.5 3.25
+floating_bounds.vhd:30:5: hint[sim/assert-note]: report note: mirror FDOWN 2.5 -1.5 -1.5 2.5 false
+floating_bounds.vhd:34:5: hint[sim/assert-note]: report note: mirror FUP -0.5 8.25 true 0.25
+floating_bounds.vhd:38:5: hint[sim/assert-note]: report note: mirror -1.25 0.75
+summary: 1 errors, 0 warnings, 6 hints, 1 files
+== stderr
+gohard: simulated floating_bounds_tb (seed 0): failed

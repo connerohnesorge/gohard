@@ -1,0 +1,12 @@
+# NVC output of testdata/conformance/int64/textio.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a textio.vhd -e textio_tb -r
+# source sha256: ff56fbf15eaee5500b6c030d3b0df3673c18003b36b9021365f4199026b1d8e6
+# exit: 0
+** Note: 0ms+0: read 1099511627776
+   Process :textio_tb:p at textio.vhd:10
+** Note: 0ms+0: read -1099511627777
+   Process :textio_tb:p at textio.vhd:10
+** Note: 0ms+0: write -2199023255554
+   Process :textio_tb:p at textio.vhd:10

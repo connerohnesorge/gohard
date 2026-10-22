@@ -1,0 +1,10 @@
+# gohard check --sim --seed 0 --tb composites_tb (VHDL-2019)
+exit 0
+== stdout
+composites.vhd:66:5: hint[sim/assert-note]: report note: bank(2) = 25, sum = 65
+composites.vhd:68:5: hint[sim/assert-note]: report note: nest = 0 7 0 10
+composites.vhd:72:5: hint[sim/assert-note]: report note: local = 0 4, pr = 3 0
+composites.vhd:78:5: hint[sim/assert-note]: report note: ps(1) = 9, ps(0) is null: true
+summary: 0 errors, 0 warnings, 4 hints, 1 files
+== stderr
+gohard: simulated composites_tb (seed 0): quiet

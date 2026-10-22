@@ -1,0 +1,11 @@
+# gohard check --sim --seed 0 --tb runtime_tb (VHDL-2019)
+exit 1
+== stdout
+runtime.vhd:37:3: error[sim/runtime-error]: runtime.vhd:49:5: length mismatch: expected 5 elements, got 2 in runtime_tb._p0 at 0 fs
+runtime.vhd:41:5: hint[sim/assert-note]: report note: wa 3 x 4 3
+runtime.vhd:43:5: hint[sim/assert-note]: report note: p 3 5 4
+runtime.vhd:45:5: hint[sim/assert-note]: report note: words 5 x 6
+runtime.vhd:48:5: hint[sim/assert-note]: report note: wa(1) 1010
+summary: 1 errors, 0 warnings, 4 hints, 1 files
+== stderr
+gohard: simulated runtime_tb (seed 0): failed

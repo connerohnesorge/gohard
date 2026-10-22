@@ -1,0 +1,20 @@
+# NVC output of testdata/conformance/cond_return/runtime.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a runtime.vhd -e runtime_tb -r
+# source sha256: 857c2880f903f5f0329757534b52a07a0f75a14a6eb026d34bf614ef712e23ad
+# exit: 0
+** Note: 0ms+0: cap sum = 69
+   Process :runtime_tb:p at runtime.vhd:33
+** Note: 0ms+0: pick = -1 8 9
+   Process :runtime_tb:p at runtime.vhd:33
+** Note: 0ms+0: first_over(0) = -1
+   Process :runtime_tb:p at runtime.vhd:33
+** Note: 0ms+0: first_over(1) = 10
+   Process :runtime_tb:p at runtime.vhd:33
+** Note: 0ms+0: first_over(2) = 5
+   Process :runtime_tb:p at runtime.vhd:33
+** Note: 0ms+0: first_over(3) = 4
+   Process :runtime_tb:p at runtime.vhd:33
+** Note: 0ms+0: first_over(4) = 3
+   Process :runtime_tb:p at runtime.vhd:33

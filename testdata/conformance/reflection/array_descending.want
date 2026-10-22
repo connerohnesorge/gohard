@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb array_descending_tb (VHDL-2019)
+exit 0
+== stdout
+array_descending.vhd:16:5: hint[sim/assert-note]: report note: bv(3) = '1', bv(0) = '0'
+array_descending.vhd:18:5: hint[sim/assert-note]: report note: a(11) = 2
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated array_descending_tb (seed 0): quiet

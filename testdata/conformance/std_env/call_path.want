@@ -1,0 +1,13 @@
+# gohard check --sim --seed 0 --tb call_path_tb (VHDL-2019)
+exit 0
+== stdout
+call_path.vhd:14:5: hint[sim/assert-note]: report note: depth 2
+call_path.vhd:14:5: hint[sim/assert-note]: report note: depth 3
+call_path.vhd:16:7: hint[sim/assert-note]: report note: depth 2, 0: INNER in call_path.vhd line 13
+call_path.vhd:16:7: hint[sim/assert-note]: report note: depth 2, 1: CHECK in call_path.vhd line 32
+call_path.vhd:16:7: hint[sim/assert-note]: report note: depth 3, 0: INNER in call_path.vhd line 13
+call_path.vhd:16:7: hint[sim/assert-note]: report note: depth 3, 1: OUTER in call_path.vhd line 25
+call_path.vhd:16:7: hint[sim/assert-note]: report note: depth 3, 2: CHECK in call_path.vhd line 33
+summary: 0 errors, 0 warnings, 7 hints, 1 files
+== stderr
+gohard: simulated call_path_tb (seed 0): quiet

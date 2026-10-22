@@ -1,0 +1,16 @@
+# NVC output of testdata/conformance/reflection/integer.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a integer.vhd -e integer_tb -r
+# source sha256: f14e885295f1d82134e1906e37480c0913bdbd233aaae99c2d5fbd21601eff6d
+# exit: 0
+** Note: 0ms+0: class class_integer
+   Process :integer_tb:check at integer.vhd:11
+** Note: 0ms+0: value 7, image 7
+   Process :integer_tb:check at integer.vhd:11
+** Note: 0ms+0: SMALL: left -3, right 10, low -3, high 10, length 14, ascending true
+   Process :integer_tb:check at integer.vhd:11
+** Note: 0ms+0: subtype SMALL of class class_integer
+   Process :integer_tb:check at integer.vhd:11
+** Note: 0ms+0: type marks INTEGER, NATURAL, 10
+   Process :integer_tb:check at integer.vhd:11

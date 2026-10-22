@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb record_tb (VHDL-2019)
+exit 0
+== stdout
+record.vhd:22:5: hint[sim/assert-note]: report note: REC: length 3, element 1 B, c at 2, subtype 0 INTEGER, subtype b BIT
+record.vhd:27:5: hint[sim/assert-note]: report note: elements 7, '1', 1.5
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated record_tb (seed 0): quiet

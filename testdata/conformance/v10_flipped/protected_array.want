@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb protected_array_tb (VHDL-2019)
+exit 0
+== stdout
+protected_array.vhd:45:5: hint[sim/assert-note]: report note: counts = 0 1 2
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated protected_array_tb (seed 0): quiet

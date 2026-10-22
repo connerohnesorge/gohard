@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/internal/elab/hier"
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/sema"
@@ -237,6 +238,19 @@ type machine struct {
 	// lastRet is the result of the function frame that just returned.
 	lastRet      eval.Value
 	lastReturned bool
+	// elab is the design object newShared elaborates, with the
+	// frame count at its start and its instance: a std.env call in its
+	// value is located in its declaration (callSite), and the shared
+	// objects it reads are those of its instance (sharedKeyOf).
+	elab elabSite
+}
+
+// elabSite is the design object newShared elaborates (d nil when
+// none), the frame count when it started, and the object's instance.
+type elabSite struct {
+	d     *sema.Decl
+	depth int
+	in    *hier.Instance
 }
 
 // suspended is a pending wait.

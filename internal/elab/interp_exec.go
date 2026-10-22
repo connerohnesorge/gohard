@@ -5,6 +5,7 @@ package elab
 
 import (
 	"errors"
+	"fmt"
 	"slices"
 
 	"github.com/connerohnesorge/gohard/internal/elab/hier"
@@ -117,6 +118,16 @@ func (m *machine) exec(n *node) (sim.Wait, bool, error) {
 			}
 			if !ok {
 				continue
+			}
+			// VHDL-2019 conditional return (LRM 10.13): the first
+			// branch whose condition holds decides. An unaffected
+			// branch does nothing; `return when c` of a procedure
+			// returns without a value.
+			if br.Unaffected {
+				break
+			}
+			if br.Value == nil {
+				return sim.Wait{}, false, m.ret(eval.Value{}, false)
 			}
 			v, err := ev.Eval(br.Value, b)
 			if err != nil {
@@ -299,13 +310,13 @@ func (m *machine) declare(r *sema.Region) error {
 		case sema.DeclVariable, sema.DeclConstant:
 			s, err := m.object(d)
 			if err != nil {
-				return errors.New(d.Text + ": " + err.Error())
+				return wrapErr(d.Text, err)
 			}
 			m.frames[len(m.frames)-1].vars[d] = s
 		case sema.DeclFile:
 			s, err := m.fileObject(d)
 			if err != nil {
-				return errors.New(d.Text + ": " + err.Error())
+				return wrapErr(d.Text, err)
 			}
 			m.frames[len(m.frames)-1].vars[d] = s
 		}
@@ -324,9 +335,10 @@ func (m *machine) object(d *sema.Decl) (slot, error) {
 		if v, err = m.ev.Eval(d.Value, m.b); err != nil {
 			return slot{}, err
 		}
-		if !t.Constrained() && v.Kind() == eval.KindArray {
-			t = t.ArraySubtype(v.B...)
-		}
+		// The value supplies the open index ranges: a constant's
+		// (LRM 6.4.2.2) and, in VHDL-2019, a variable's (inferred
+		// constraints, LRM 6.4.2.1), of elements and fields too.
+		t = eval.InferSubtype(t, v)
 		if v, err = eval.Check(v, t); err != nil {
 			return slot{}, err
 		}
@@ -447,6 +459,9 @@ func (m *machine) newShared(k sharedKey) (slot, error) {
 		m.ev = in.Evaluator().WithDynamic(m)
 		defer func() { m.ev = saved }()
 	}
+	saved := m.elab
+	m.elab = elabSite{d: k.d, depth: len(m.frames), in: k.in}
+	defer func() { m.elab = saved }()
 	var s slot
 	var err error
 	if k.d.Kind == sema.DeclFile {
@@ -455,7 +470,7 @@ func (m *machine) newShared(k sharedKey) (slot, error) {
 		s, err = m.object(k.d)
 	}
 	if err != nil {
-		return slot{}, errors.New(k.d.Text + ": " + err.Error())
+		return slot{}, wrapErr(k.d.Text, err)
 	}
 	return s, nil
 }
@@ -483,6 +498,21 @@ func (m *machine) elabShared() error {
 		}
 		m.w.shared[k] = s
 	}
+	// The variable ports that are objects of their own (open, or of
+	// the top) come after, in elaboration order.
+	for _, k := range m.w.d.ownPorts {
+		if _, ok := m.w.shared[k]; ok {
+			continue
+		}
+		s, err := m.newShared(k)
+		if err != nil {
+			if eval.CodeOf(err) == eval.ErrCodeBudget {
+				return err
+			}
+			continue
+		}
+		m.w.shared[k] = s
+	}
 	return nil
 }
 
@@ -490,7 +520,11 @@ func (m *machine) elabShared() error {
 // sees it: the innermost enclosing instance that declares it (nil for
 // a package object).
 func (m *machine) sharedKeyOf(x *sema.Decl) sharedKey {
-	for in := m.inst(); in != nil; in = m.w.d.Parent(in) {
+	start := m.inst()
+	if m.elab.d != nil {
+		start = m.elab.in // newShared: the object's own instance
+	}
+	for in := start; in != nil; in = m.w.d.Parent(in) {
 		if declares(in, x.Parent) {
 			return sharedKey{in, x}
 		}
@@ -498,11 +532,20 @@ func (m *machine) sharedKeyOf(x *sema.Decl) sharedKey {
 	return sharedKey{nil, x}
 }
 
-// newObject creates a protected object of type t: the variables of
-// its body.
+// newObject creates a protected object of type t: its variables, in
+// declaration order: the private variables of the type declaration
+// (VHDL-2019, LRM 5.6.2), then the variables of its body.
 func (m *machine) newObject(t *sema.Type) (int64, error) {
 	body := m.w.protectedBody(t)
 	if body == nil {
+		if d := t.Base().Decl; d != nil && d.Unit != nil &&
+			bundled(string(d.Unit.Library)) {
+			// A bundled protected type without a body (the
+			// std.reflection mirrors): only GoHard makes its objects,
+			// a gap to report, not the design's error.
+			return 0, &nativeError{name: unitOf(d) + "." + d.Text +
+				" object declared by the design"}
+		}
 		return 0, errors.New("no protected type body for " + t.Name())
 	}
 	h := m.w.handle()
@@ -511,12 +554,21 @@ func (m *machine) newObject(t *sema.Type) (int64, error) {
 	m.frames = append(m.frames, frame{vars: map[*sema.Decl]slot{},
 		obj: h})
 	defer func() { m.frames = m.frames[:len(m.frames)-1] }()
-	for _, d := range body.Decls {
+	var decls []*sema.Decl
+	if r := t.Base().Members; r != nil {
+		for _, d := range r.Decls {
+			if d.Kind == sema.DeclVariable {
+				decls = append(decls, d)
+			}
+		}
+	}
+	decls = append(decls, body.Decls...)
+	for _, d := range decls {
 		switch d.Kind {
 		case sema.DeclVariable, sema.DeclConstant:
 			s, err := m.object(d)
 			if err != nil {
-				return 0, errors.New(d.Text + ": " + err.Error())
+				return 0, wrapErr(d.Text, err)
 			}
 			o.vars[d] = s
 		case sema.DeclFile:
@@ -612,6 +664,14 @@ func (m *machine) placeOf(e *sema.Expr) (place, error) {
 				return place{}, err
 			}
 			return place{kind: placeShared, in: k.in, d: x}, nil
+		}
+		if x.Kind == sema.DeclPort && x.Class == sema.ClassVariable {
+			if k, ok := m.w.d.varPortKey(m.inst(), x); ok {
+				if _, err := m.shared(k); err != nil {
+					return place{}, err
+				}
+				return place{kind: placeShared, in: k.in, d: k.d}, nil
+			}
 		}
 		r, ok := m.varOf(x)
 		if !ok {
@@ -1249,4 +1309,11 @@ func stringOf(v eval.Value) string {
 		b[i] = byte(e.I)
 	}
 	return string(b)
+}
+
+// wrapErr is err in the context of the object what ("what: err"),
+// still unwrapping to err, so a missing native (*nativeError) inside
+// an object's elaboration stays one.
+func wrapErr(what string, err error) error {
+	return fmt.Errorf("%s: %w", what, err)
 }

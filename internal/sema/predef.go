@@ -165,7 +165,10 @@ func (a *analyzer) implicitOps(t *Type, d *Decl) []opSpec {
 		add(opSpec{name: name, op: op, params: []*Type{x}, ret: ret,
 			first: first})
 	}
-	if t.Class != TypeFile && t.Class != TypeProtected {
+	if t.Class != TypeFile && t.Class != TypeProtected &&
+		!hasProtectedPart(t, 0) { // typedecl.go
+		// LRM 9.2.3: no equality for a protected type, nor (VHDL-2019)
+		// for a composite holding protected objects.
 		bin(`"="`, eval.OpEq, t, t, boolean, 0)
 		bin(`"/="`, eval.OpNe, t, t, boolean, 0)
 	}
@@ -293,10 +296,13 @@ func (a *analyzer) arrayOps(t *Type, d *Decl) []opSpec {
 		bin(`"?="`, eval.OpMatchEq, t, t, e, token.Std2008)
 		bin(`"?/="`, eval.OpMatchNe, t, t, e, token.Std2008)
 	}
-	bin(`"&"`, eval.OpConcat, t, t, t, 0)
-	bin(`"&"`, eval.OpConcat, t, e, t, 0)
-	bin(`"&"`, eval.OpConcat, e, t, t, 0)
-	bin(`"&"`, eval.OpConcat, e, e, t, 0)
+	if !hasProtectedPart(t, 0) {
+		// A concatenation would copy protected objects (LRM 9.2.5).
+		bin(`"&"`, eval.OpConcat, t, t, t, 0)
+		bin(`"&"`, eval.OpConcat, t, e, t, 0)
+		bin(`"&"`, eval.OpConcat, e, t, t, 0)
+		bin(`"&"`, eval.OpConcat, e, e, t, 0)
+	}
 	if discrete {
 		bin("minimum", eval.OpMinimum, t, t, t, token.Std2008)
 		bin("maximum", eval.OpMaximum, t, t, t, token.Std2008)

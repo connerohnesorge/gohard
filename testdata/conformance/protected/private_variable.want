@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb private_tb (VHDL-2019)
+exit 0
+== stdout
+private_variable.vhd:55:5: hint[sim/assert-note]: report note: s1 = 20, s2 = 10
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated private_tb (seed 0): quiet

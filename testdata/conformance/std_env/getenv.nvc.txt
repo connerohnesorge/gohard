@@ -1,0 +1,10 @@
+# NVC output of testdata/conformance/std_env/getenv.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a getenv.vhd -e getenv_tb -r
+# source sha256: 6db598d28b0c6196cf0de4ccefd71c69acaafe02e487efaf38dd31177411d229
+# exit: 0
+** Note: 0ms+0: GETENV = ""
+   Process :getenv_tb:check at getenv.vhd:11
+** Note: 0ms+0: GETENV line is null: true
+   Process :getenv_tb:check at getenv.vhd:11

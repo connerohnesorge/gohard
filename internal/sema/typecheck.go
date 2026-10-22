@@ -389,12 +389,12 @@ func (a *analyzer) constraintFits(c cst.Node, base *Type) bool {
 	what := ""
 	switch c.Kind() {
 	case cst.KindRangeConstraint:
-		if b.IsScalar() {
+		if b.IsScalar() || genericScalar(b) {
 			return true
 		}
 		what = "a range constraint"
 	case cst.KindArrayConstraint:
-		if b.Class == TypeArray {
+		if b.Class == TypeArray || b.Class == TypeGeneric && b.Index != nil {
 			n := 0
 			for range (cst.ArrayConstraint{Node: c}).Ranges() {
 				n++
@@ -423,6 +423,26 @@ func (a *analyzer) constraintFits(c cst.Node, base *Type) bool {
 	if !a.quiet {
 		a.semaError(c.Span(), what+" cannot apply to "+base.Name()+
 			", a type of class "+b.Class.String())
+	}
+	return false
+}
+
+// genericScalar reports whether b is a VHDL-2019 generic type of a
+// scalar class (type t is <>, is (<>), is range <>, is units <>, is
+// range <>.<>; LRM 6.5.3), which takes a range constraint.
+func genericScalar(b *Type) bool {
+	if b.Class != TypeGeneric || b.Decl == nil || b.Decl.Node.IsZero() {
+		return false
+	}
+	for c := range b.Decl.Node.Nodes() {
+		switch c.Kind() {
+		case cst.KindScalarIncompleteTypeDef,
+			cst.KindDiscreteIncompleteTypeDef,
+			cst.KindIntegerIncompleteTypeDef,
+			cst.KindPhysicalIncompleteTypeDef,
+			cst.KindFloatingIncompleteTypeDef:
+			return true
+		}
 	}
 	return false
 }

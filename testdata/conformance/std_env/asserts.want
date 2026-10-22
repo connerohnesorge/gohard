@@ -1,0 +1,16 @@
+# gohard check --sim --seed 0 --tb asserts_tb (VHDL-2019)
+exit 0
+== stdout
+asserts.vhd:13:5: hint[sim/assert-note]: report note: count 0, failed false
+asserts.vhd:15:5: warning[sim/assert-warning]: assertion warning: first warning
+asserts.vhd:16:5: warning[sim/assert-warning]: assertion warning: second warning
+asserts.vhd:17:5: hint[sim/assert-note]: report note: count 2, warnings 2, errors 0, failed true, warning failed true, error failed false
+asserts.vhd:24:5: hint[sim/assert-note]: report note: warning enabled false, error enabled true
+asserts.vhd:27:5: hint[sim/assert-note]: report note: warnings 2
+asserts.vhd:29:5: warning[sim/assert-warning]: assertion warning: third warning
+asserts.vhd:30:5: hint[sim/assert-note]: report note: warnings 3
+asserts.vhd:32:5: hint[sim/assert-note]: report note: after clear 0
+asserts.vhd:34:5: hint[sim/assert-note]: report note: read severity warning
+summary: 0 errors, 3 warnings, 7 hints, 1 files
+== stderr
+gohard: simulated asserts_tb (seed 0): quiet

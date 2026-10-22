@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/v10_flipped/int64.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a int64.vhd -e int64_tb -r
+# source sha256: 2dde7aaa56258960b1c3e3127c72ea271073082d553076aa9ef1565a06597a43
+# exit: 0
+** Note: 0ms+0: big = 1099511627776
+   Process :int64_tb:_p0 at int64.vhd:14

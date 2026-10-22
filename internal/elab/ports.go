@@ -62,8 +62,12 @@ func (d *Design) ports(in *hier.Instance) {
 		if d.stopped {
 			return
 		}
+		if x.Kind == sema.DeclPort && x.Class == sema.ClassVariable {
+			d.varPort(in, parent, x)
+			continue
+		}
 		if x.Kind != sema.DeclPort || x.Class == sema.ClassConstant ||
-			x.Class == sema.ClassVariable || x.Class == sema.ClassFile {
+			x.Class == sema.ClassFile {
 			continue
 		}
 		if parent != nil {
@@ -132,6 +136,55 @@ func (d *Design) ports(in *hier.Instance) {
 		}
 		d.add(in, x, sig)
 	}
+}
+
+// varPort binds the variable port x of entity instance in (VHDL-2019,
+// LRM 6.5.2) to the shared object its actual denotes, so the port and
+// the actual are one object: a shared variable of an enclosing
+// instance or a package, or the object of a variable port of the
+// enclosing entity (bound before, as elaboration goes top down). An
+// open port, or a port of the top, is an object of its own, created
+// with the shared variables.
+func (d *Design) varPort(in, parent *hier.Instance, x *sema.Decl) {
+	k := sharedKey{in, x}
+	if a := d.actualOf(in, x); a != nil && parent != nil &&
+		a.Kind != sema.ExprOpen {
+		b, ok := d.boundVar(parent, a)
+		if !ok {
+			d.unsupported(d.declSrc(x), "variable port actual that is "+
+				"not a shared variable or a variable port")
+			return
+		}
+		k = b
+	}
+	if k.in == in && k.d == x {
+		d.ownPorts = append(d.ownPorts, k)
+	}
+	d.varPorts[sigKey{in, x}] = k
+}
+
+// boundVar returns the shared object the variable port actual a
+// denotes in instance parent.
+func (d *Design) boundVar(parent *hier.Instance, a *sema.Expr) (sharedKey,
+	bool,
+) {
+	a = sema.Unalias(a) // alias al is sv: the port is bound to sv
+	if a == nil || a.Kind != sema.ExprName || a.Decl == nil {
+		return sharedKey{}, false
+	}
+	x := a.Decl.Denotes()
+	switch {
+	case x.Kind == sema.DeclSharedVariable:
+		for p := parent; p != nil; p = d.parent[p] {
+			if declares(p, x.Parent) {
+				return sharedKey{p, x}, true
+			}
+		}
+		return sharedKey{nil, x}, true
+	case x.Kind == sema.DeclPort && x.Class == sema.ClassVariable:
+		return d.varPortKey(parent, x)
+	}
+	return sharedKey{}, false
 }
 
 // sameValues returns the operand of a type conversion actual that

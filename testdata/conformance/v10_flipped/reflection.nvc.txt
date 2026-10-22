@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/v10_flipped/reflection.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a reflection.vhd -e reflection -r
+# source sha256: 9f09c97da1f4f9e69eeaf0654e385d8a8c27eb7a8adf5b400458cbda4eee8c24
+# exit: 0
+** Note: 0ms+0: class = class_integer, value = 42
+   Process :reflection:_p0 at reflection.vhd:10

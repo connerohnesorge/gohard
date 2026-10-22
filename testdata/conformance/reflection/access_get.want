@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb access_get_tb (VHDL-2019)
+exit 0
+== stdout
+access_get.vhd:26:5: hint[sim/assert-note]: report note: then 42, now 43
+access_get.vhd:29:5: hint[sim/assert-note]: report note: second node 2
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated access_get_tb (seed 0): quiet

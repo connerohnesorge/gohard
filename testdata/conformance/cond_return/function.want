@@ -1,0 +1,11 @@
+# gohard check --sim --seed 0 --tb function_tb (VHDL-2019)
+exit 0
+== stdout
+function.vhd:29:5: hint[sim/assert-note]: report note: clip(-5) = 0
+function.vhd:30:5: hint[sim/assert-note]: report note: clip(3) = 3
+function.vhd:31:5: hint[sim/assert-note]: report note: sign = -101
+function.vhd:33:5: hint[sim/assert-note]: report note: cap = 9 4
+function.vhd:35:5: hint[sim/assert-note]: report note: c = 9
+summary: 0 errors, 0 warnings, 5 hints, 1 files
+== stderr
+gohard: simulated function_tb (seed 0): quiet

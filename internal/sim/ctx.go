@@ -377,10 +377,11 @@ func (c *Ctx) SetReadSeverity(s trace.Severity) {
 	}
 }
 
-// ReadSeverity is GetVhdlReadSeverity (failure until set).
+// ReadSeverity is GetVhdlReadSeverity: error until set, as in NVC
+// 1.23 (#18: open details follow NVC).
 func (c *Ctx) ReadSeverity() trace.Severity {
 	if c.k.readSev == trace.NoSeverity {
-		return trace.Failure
+		return trace.Error
 	}
 	return c.k.readSev
 }
@@ -418,9 +419,10 @@ var timeUnits = map[string]int64{"fs": 1, "ps": 1e3, "ns": 1e6,
 // valid on t.
 func parseFormat(f string) ([]fmtPart, error) {
 	var out []fmtPart
+	orig := f // f is cut as it is parsed; errors quote the whole
 	bad := func(why string) ([]fmtPart, error) {
 		return nil, errors.New("invalid assert format " +
-			strconv.Quote(f) + ": " + why)
+			strconv.Quote(orig) + ": " + why)
 	}
 	for f != "" {
 		i := strings.IndexByte(f, '{')

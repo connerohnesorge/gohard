@@ -235,6 +235,29 @@ func TestParseFormat(t *testing.T) {
 	}
 }
 
+// TestParseFormatErrorQuotesWhole: the error of an invalid format
+// quotes the whole format, wherever the bad replacement is (NVC: the
+// format as written), never the part left to parse.
+func TestParseFormatErrorQuotesWhole(t *testing.T) {
+	for _, tc := range []struct{ f, why string }{
+		{"CUSTOM {m}", "unknown replacement {m}"},
+		{"A {m} tail", "unknown replacement {m}"},
+		{"A {r:x5} tail", "bad width in {r:x5}"},
+		{"{r} then {", "missing }"},
+		{"{s}{t}{i} {q:1} end", "unknown replacement {q:1}"},
+	} {
+		_, err := parseFormat(tc.f)
+		if err == nil {
+			t.Errorf("parseFormat(%q) accepted", tc.f)
+			continue
+		}
+		want := "invalid assert format \"" + tc.f + "\": " + tc.why
+		if err.Error() != want {
+			t.Errorf("parseFormat(%q): %q, want %q", tc.f, err, want)
+		}
+	}
+}
+
 // TestSetAssertFormatInvalid: an invalid format is an error and keeps
 // the previous one.
 func TestSetAssertFormatInvalid(t *testing.T) {
@@ -250,7 +273,7 @@ func TestSetAssertFormatInvalid(t *testing.T) {
 	if c.SetAssertFormat(trace.NoSeverity, "x") == nil {
 		t.Error("format without a severity accepted")
 	}
-	if c.ReadSeverity() != trace.Failure {
+	if c.ReadSeverity() != trace.Error {
 		t.Errorf("default read severity %v", c.ReadSeverity())
 	}
 }

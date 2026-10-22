@@ -389,3 +389,88 @@ end package body;
 		}
 	}
 }
+
+// gtype1 is NVC's test/bounds/gtype1.vhd (test_bounds.c test_gtype1):
+// a VHDL-2019 array class generic type whose body constants use
+// A'INDEX, A'INDEX'LOW and A'INDEX'HIGH.
+const gtype1 = `package test_pkg is
+  generic (
+    type A is array(type is range <>) of type is private ;
+    function "&"(L : A'element ; R : A) return A is <> ;
+    function "+"(L : A'index ; R : integer) return A'index is <>
+   ) ;
+    function create_rt(size : natural ; init : A'element) return A ;
+    function create_recurse(size : natural ; init : A'element) return A ;
+end package ;
+
+package body test_pkg is
+    constant NULL_LOW : A'index := A'index'low when A'index'high - A'index'low > 0 else A'index'high ;
+    constant NULL_HIGH : A'index := A'index'high when A'index'high - A'index'low > 0 else A'index'low ;
+    subtype NULL_RANGE is A'index range NULL_HIGH to NULL_LOW ;
+
+    function create_rt(size : natural ; init : A'element) return A is
+        constant rv : A(A'index'low to A'index'low+size) := (others => init) ;
+        variable nullarray : A(NULL_RANGE) ;
+    begin
+        return nullarray when size = 0 else rv ;
+    end function ;
+
+    function create_recurse(size : natural ; init : A'element) return A is
+        variable nullarray : A(NULL_RANGE) ;
+    begin
+        return nullarray when size = 0 else
+               A'(A'index'low => init) when size = 1 else
+               init & create_recurse(size-1, init) ;
+    end function ;
+end package body ;
+`
+
+// TestPackageInstGenericArrayClass: the constants of a generic
+// package instance's body are evaluated with the VHDL-2019 array class
+// generic type bound to the actual, its 'INDEX and 'ELEMENT to the
+// actual's: NULLINT (40 to 25) holds neither NULL_LOW (25) nor
+// NULL_HIGH (40) in nulltest_pkg, named after its unit, while the
+// legal instances and the uninstantiated package give no error.
+func TestPackageInstGenericArrayClass(t *testing.T) {
+	arch := `entity test is
+end entity ;
+
+architecture arch of test is
+    subtype myint is integer range 25 to 40 ;
+    type myarray is array(myint range <>) of real ;
+    subtype nullint is integer range 40 to 25 ;
+    type nullarray is array(nullint range <>) of real ;
+    subtype singleint is integer range 42 downto 42 ;
+    type singlearray is array(singleint range <>) of real ;
+    package mytest_pkg is new work.test_pkg generic map(A => myarray) ;
+    package nulltest_pkg is new work.test_pkg generic map (A => nullarray) ;
+    package singletest_pkg is new work.test_pkg generic map (A => singlearray) ;
+begin
+end architecture ;
+`
+	r := analyze2019(t, map[string]string{"pkg.vhd": gtype1,
+		"test.vhd": arch})
+	want := "pkg.vhd:12:36: sema/static-error: constant NULL_LOW: value " +
+		"25 is out of range 40 to 25 in work.test(arch).nulltest_pkg\n" +
+		"pkg.vhd:13:37: sema/static-error: constant NULL_HIGH: value " +
+		"40 is out of range 40 to 25 in work.test(arch).nulltest_pkg\n"
+	if got := diagText(r); got != want {
+		t.Errorf("diagnostics:\n%s\nwant:\n%s", got, want)
+	}
+
+	// A library-level instance is named by its unit.
+	r = analyze2019(t, map[string]string{"pkg.vhd": gtype1,
+		"inst.vhd": `package types is
+  subtype nullint is integer range 40 to 25 ;
+  type nullarray is array(nullint range <>) of real ;
+end package ;
+package lib_null is new work.test_pkg
+  generic map (A => work.types.nullarray) ;
+`})
+	got := diagText(r)
+	if strings.Count(got, "\n") != 2 ||
+		!strings.Contains(got, "constant NULL_LOW: value 25 is out of "+
+			"range 40 to 25 in work.lib_null\n") {
+		t.Errorf("diagnostics:\n%s", got)
+	}
+}

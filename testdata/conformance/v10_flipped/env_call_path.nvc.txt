@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/v10_flipped/env_call_path.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a env_call_path.vhd -e env_call_path -r
+# source sha256: 426904e865db960b78b774b0ae8b418e3c447ce85309877c72cca45194719a9d
+# exit: 0
+** Note: 0ms+0: depth 1: _P0 line 11
+   Process :env_call_path:_p0 at env_call_path.vhd:8

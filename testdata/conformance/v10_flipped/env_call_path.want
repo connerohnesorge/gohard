@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb env_call_path (VHDL-2019)
+exit 0
+== stdout
+env_call_path.vhd:12:5: hint[sim/assert-note]: report note: depth 1: _P0 line 11
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated env_call_path (seed 0): quiet

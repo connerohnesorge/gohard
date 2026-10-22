@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb protected_tb (VHDL-2019)
+exit 0
+== stdout
+protected.vhd:26:5: hint[sim/assert-note]: report note: class class_protected, subtype PT, type PT of class class_protected
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated protected_tb (seed 0): quiet

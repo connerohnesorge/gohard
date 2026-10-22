@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb counter_tb (VHDL-2008)
+exit 0
+== stdout
+counter.vhd:41:5: hint[sim/assert-note]: report note: count = 13
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated counter_tb (seed 0): quiet

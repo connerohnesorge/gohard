@@ -104,7 +104,9 @@ func summarize(p *Decl, u *Unit, depth int, seen map[*Decl]bool,
 
 // walkSeq calls stmt for each statement of seq, nested ones included,
 // and expr for each expression they hold and its operands. Attribute
-// prefixes are not visited: they name an object without reading it.
+// prefixes are not visited: they name an object without reading it,
+// except those of VHDL-2019 'REFLECT and object'IMAGE, which read the
+// object's value.
 func walkSeq(seq []*SeqStmt, stmt func(*SeqStmt), expr func(*Expr)) {
 	var ex func(e *Expr, depth int)
 	ex = func(e *Expr, depth int) {
@@ -112,7 +114,7 @@ func walkSeq(seq []*SeqStmt, stmt func(*SeqStmt), expr func(*Expr)) {
 			return
 		}
 		expr(e)
-		if e.Kind != ExprAttr {
+		if e.Kind != ExprAttr || readsPrefix(e) {
 			ex(e.Prefix, depth+1)
 		}
 		for _, x := range e.Args {

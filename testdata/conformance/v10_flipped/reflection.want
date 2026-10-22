@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb reflection (VHDL-2019)
+exit 0
+== stdout
+reflection.vhd:15:5: hint[sim/assert-note]: report note: class = class_integer, value = 42
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated reflection (seed 0): quiet

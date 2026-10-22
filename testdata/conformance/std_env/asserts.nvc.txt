@@ -1,0 +1,26 @@
+# NVC output of testdata/conformance/std_env/asserts.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a asserts.vhd -e asserts_tb -r
+# source sha256: 107a463262fc56ccd3bfa7edbabf74fd75b34a869a791989935411cae92307b2
+# exit: 0
+** Note: 0ms+0: count 0, failed false
+   Process :asserts_tb:check at asserts.vhd:11
+** Warning: 0ms+0: first warning
+   Process :asserts_tb:check at asserts.vhd:11
+** Warning: 0ms+0: second warning
+   Process :asserts_tb:check at asserts.vhd:11
+** Note: 0ms+0: count 2, warnings 2, errors 0, failed true, warning failed true, error failed false
+   Process :asserts_tb:check at asserts.vhd:11
+** Note: 0ms+0: warning enabled false, error enabled true
+   Process :asserts_tb:check at asserts.vhd:11
+** Note: 0ms+0: warnings 2
+   Process :asserts_tb:check at asserts.vhd:11
+** Warning: 0ms+0: third warning
+   Process :asserts_tb:check at asserts.vhd:11
+** Note: 0ms+0: warnings 3
+   Process :asserts_tb:check at asserts.vhd:11
+** Note: 0ms+0: after clear 0
+   Process :asserts_tb:check at asserts.vhd:11
+** Note: 0ms+0: read severity warning
+   Process :asserts_tb:check at asserts.vhd:11

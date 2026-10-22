@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/reflection/physical_bounds.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a physical_bounds.vhd -e physical_bounds_tb -r
+# source sha256: 1bbd107f5d02161dc6e2c32855f7d5c2a32b07856b3e182b84943008bb3e5f42
+# exit: 0
+** Note: 0ms+0: SHORT: left 5 MM, right 50 MM, low 5 MM, high 50 MM, length 46
+   Process :physical_bounds_tb:check at physical_bounds.vhd:15

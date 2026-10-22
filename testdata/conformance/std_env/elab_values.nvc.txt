@@ -1,0 +1,14 @@
+# NVC output of testdata/conformance/std_env/elab_values.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a elab_values.vhd -e elab_values_tb -r
+# source sha256: db800caf1ca8d79774a93666f166afd029f86a319b3848bea11002bb36e55dde
+# exit: 0
+** Note: 0ms+0: sub 2019 9
+   Process :elab_values_tb:u1:_p0 at elab_values.vhd:16
+** Note: 0ms+0: sub v2019 3
+   Process :elab_values_tb:u2:_p0 at elab_values.vhd:16
+** Note: 0ms+0: 2019 2019! 5
+   Process :elab_values_tb:_p0 at elab_values.vhd:44
+** Note: 0ms+0: 30 34 []
+   Process :elab_values_tb:_p0 at elab_values.vhd:44

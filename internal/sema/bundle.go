@@ -157,14 +157,21 @@ func (s *session) firstStd(d *Decl) token.Standard {
 }
 
 // standardUnit returns std.standard.
-func (s *session) standardUnit() *Unit {
+func (s *session) standardUnit() *Unit { return s.stdUnit("standard") }
+
+// stdUnit returns the bundled primary unit std.name, or nil (while the
+// bundle is analyzed and the unit is not analyzed yet).
+func (s *session) stdUnit(name Key) *Unit {
 	var l *Library
 	if s.base != nil {
 		l = s.base.libs["std"]
 	} else {
 		l = s.libs["std"]
 	}
-	u, _ := l.Unit("standard")
+	if l == nil {
+		return nil
+	}
+	u, _ := l.Unit(name)
 	return u
 }
 
@@ -187,6 +194,25 @@ func (a *analyzer) stdType(name Key) *Type {
 	}
 	for _, d := range ds {
 		if d.Kind.IsTypeMark() {
+			return d.Type
+		}
+	}
+	return nil
+}
+
+// reflectionType returns the std.reflection type named name (VHDL-2019
+// LRM 16.3: SUBTYPE_MIRROR, VALUE_MIRROR, ...), the result types of
+// 'REFLECT, whether or not the unit names std.reflection; nil when it
+// cannot be found (the bundle analyzing itself). Its full declaration
+// is returned, never the incomplete one.
+func (a *analyzer) reflectionType(name Key) *Type {
+	u := a.s.stdUnit("reflection")
+	if u == nil || u.Region == nil || u == a.u {
+		return nil
+	}
+	for _, d := range lookupIn(u.Region, name, token.Std2019) {
+		if d.Kind.IsTypeMark() && d.Type != nil &&
+			d.Type.Base().Class != TypeIncomplete {
 			return d.Type
 		}
 	}

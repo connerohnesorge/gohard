@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb params_tb (VHDL-2019)
+exit 0
+== stdout
+params.vhd:63:5: hint[sim/assert-note]: report note: bump = 13, peek = 18, deref = 42
+params.vhd:66:5: hint[sim/assert-note]: report note: fresh = 7
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated params_tb (seed 0): quiet

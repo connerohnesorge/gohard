@@ -9,7 +9,6 @@ import (
 
 	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/eval"
 	"go.yaml.in/yaml/v3"
 )
 
@@ -124,39 +123,36 @@ func readTree(t testing.TB, dir string) []Source {
 	return srcs
 }
 
-// v11Names are the v1.1 constructs of #18 the construct fixture holds,
-// by file.
+// v11Names are the v1.1 constructs of #18 not delivered yet that the
+// construct fixture holds, by file.
 var v11Names = map[string]string{
-	"private_variable.vhd":   cPrivateVariable,
 	"protected_generics.vhd": cProtGenerics,
 	"method_alias.vhd":       cMethodAlias,
-	"conditional_return.vhd": cCondReturn,
 	"call_generic_map.vhd":   cCallGenericMap,
-	"reflection.vhd":         cReflection,
-	"env_version.vhd":        cEnvVersion,
-	"env_getenv.vhd":         cEnvGetenv,
-	"env_file.vhd":           cEnvFile,
-	"env_assert.vhd":         cEnvAssert,
-	"env_time.vhd":           cEnvTime,
 	"env_dir.vhd":            cEnvDir,
-	"env_call_path.vhd":      cEnvCallPath,
-	"inferred.vhd":           cInferred,
-	"int64.vhd":              cInt64,
-	"image_composite.vhd":    cImage,
+	"env_psl.vhd":            cEnvPSL,
 	"path_name.vhd":          cPathName,
-	"variable_port.vhd":      cVariablePort,
-	"protected_array.vhd":    cProtArray,
-	// A constrained array type is a subtype of an anonymous base.
+}
+
+// flippedDir holds the delivered constructs of the v1.0 construct
+// fixture, each now a check --sim conformance case.
+const flippedDir = "../../testdata/conformance/v10_flipped"
+
+// flippedLegacy are the flipped cases whose construct an older
+// standard reports as syntax/standard, by file.
+var flippedLegacy = map[string]string{
+	"inferred.vhd":                    cInferred,
+	"variable_port.vhd":               cVariablePort,
+	"protected_param.vhd":             cProtParam,
+	"protected_array.vhd":             cProtArray,
 	"protected_array_constrained.vhd": cProtArray,
 	"protected_record.vhd":            cProtRecord,
-	"protected_access.vhd":            cProtAccess,
-	"protected_param.vhd":             cProtParam,
 }
 
 // TestV11Constructs: each v1.1 construct, alone in a file, gives exactly
 // one unsupported/construct with the "planned for v1.1" message and
-// makes its unit opaque; the plain protected type they use stays clean
-// (testdata/cli/check-unsupported-v11, also a CLI fixture).
+// makes its unit opaque (testdata/cli/check-unsupported-v11, also a CLI
+// fixture).
 func TestV11Constructs(t *testing.T) {
 	srcs := readTree(t, "../../testdata/cli/check-unsupported-v11/in")
 	c := config.Defaults()
@@ -189,8 +185,8 @@ func TestV11Constructs(t *testing.T) {
 			t.Errorf("%s: no unit is opaque", s.Path)
 		}
 	}
-	if len(v11Names) != len(srcs)-1 {
-		t.Errorf("%d construct files, %d names", len(srcs)-1,
+	if len(v11Names) != len(srcs) {
+		t.Errorf("%d construct files, %d names", len(srcs),
 			len(v11Names))
 	}
 	if diag.ExitCode(r.Diagnostics, false, diag.NoSignal) != diag.ExitTool {
@@ -226,29 +222,80 @@ func TestV11BeforeStandard(t *testing.T) {
 	}
 }
 
+// TestV11Delivered: the delivered constructs of the v1.0 fixture are
+// analyzed under 2019 (no unsupported/construct, no opaque or
+// unchecked unit, no error), and under 2008 each one that no parser
+// or view rule catches is still syntax/standard naming the construct.
+func TestV11Delivered(t *testing.T) {
+	srcs := readTree(t, flippedDir)
+	if len(srcs) < 18 {
+		t.Fatalf("%d flipped cases", len(srcs))
+	}
+	for _, s := range srcs {
+		c := config.Defaults()
+		c.Standard = "2019"
+		r := Analyze(Input{Files: []Source{s}, Config: c})
+		for _, d := range r.Diagnostics {
+			t.Errorf("2019: %s:%d: %s: %s", d.Path, d.Line, d.Code,
+				d.Message)
+		}
+		for _, u := range r.Units {
+			if u.Opaque || u.Unchecked {
+				t.Errorf("2019: %s is opaque or unchecked", u.Label())
+			}
+		}
+		name, ok := flippedLegacy[s.Path]
+		if !ok {
+			continue
+		}
+		r = Analyze(Input{Files: []Source{s}, Config: config.Defaults()})
+		want := name + " requires VHDL-2019"
+		found := false
+		for _, d := range r.Diagnostics {
+			if d.Code == diag.UnsupportedConstruct {
+				t.Errorf("2008: %s:%d: %s", d.Path, d.Line, d.Message)
+			}
+			found = found || d.Code == diag.SyntaxStandard &&
+				strings.HasPrefix(d.Message, want)
+		}
+		if !found {
+			t.Errorf("2008: %s: no syntax/standard for %s:\n%s", s.Path,
+				name, diagText(r))
+		}
+	}
+	for p, name := range flippedLegacy {
+		if !legacy[name] || !delivered[name] {
+			t.Errorf("%s: %s is not a delivered legacy construct", p, name)
+		}
+	}
+}
+
 // TestDesignEntityGroups: a construct is reported once per design
 // entity at its first use; the architecture of an opaque entity is
 // opaque (no diagnostic, not unchecked); another entity using the
 // same construct gets its own diagnostic.
 func TestDesignEntityGroups(t *testing.T) {
 	files := map[string]string{
-		"a_ent.vhd": "use std.reflection.all;\nentity e is end;\n",
+		"a_ent.vhd": "entity e is\n" +
+			"  constant d : string := std.env.dir_workingdir;\nend;\n",
 		"b_arch.vhd": "architecture rtl of e is\n" +
-			"  signal s : bit_vector := \"01\";\n" +
-			"  signal v : value_mirror;\nbegin end;\n",
-		"c_other.vhd": "use std.reflection.all;\nentity f is end;\n" +
+			"  constant x : boolean := std.env.PslIsCovered;\n" +
+			"  constant y : string := std.env.dir_workingdir;\n" +
+			"begin end;\n",
+		"c_other.vhd": "entity f is\n" +
+			"  constant d : string := std.env.dir_workingdir;\nend;\n" +
 			"architecture rtl of f is begin end;\n",
 		"d_user.vhd": "entity g is end;\narchitecture rtl of g is\n" +
 			"begin\n  u : entity work.e;\nend;\n",
 	}
 	r := analyze(t, files, func(c *config.Config) { c.Standard = "2019" })
 	got := diagText(r)
-	want := "a_ent.vhd:1:9: unsupported/construct: std.reflection is " +
-		"not supported yet (planned for v1.1)\n" +
-		"b_arch.vhd:2:10: unsupported/construct: inferred constraints " +
-		"is not supported yet (planned for v1.1)\n" +
-		"c_other.vhd:1:9: unsupported/construct: std.reflection is " +
-		"not supported yet (planned for v1.1)\n" +
+	want := "a_ent.vhd:2:34: unsupported/construct: " + cEnvDir +
+		" is not supported yet (planned for v1.1)\n" +
+		"b_arch.vhd:2:35: unsupported/construct: " + cEnvPSL +
+		" is not supported yet (planned for v1.1)\n" +
+		"c_other.vhd:2:34: unsupported/construct: " + cEnvDir +
+		" is not supported yet (planned for v1.1)\n" +
 		"d_user.vhd:2:14: sema/unchecked-unit: work.g(rtl) was not " +
 		"checked: it depends on opaque unit work.e\n"
 	if got != want {
@@ -263,66 +310,30 @@ func TestDesignEntityGroups(t *testing.T) {
 	}
 }
 
-// TestInt64: only INTEGER values outside 32 bits are the v1.1 64-bit
-// integers; universal values in other contexts and the 32-bit extremes
-// are analyzed.
+// TestInt64: VHDL-2019 INTEGER is 64 bits, so values outside 32 bits
+// are analyzed under 2019 (no unsupported/construct, no error); under
+// 2008 they are out of range errors, never unsupported/construct.
 func TestInt64(t *testing.T) {
-	for _, tc := range []struct {
-		decl string
-		want bool
-	}{
-		{"constant a : integer := 2 ** 31 - 1;", false},
-		{"constant a : integer := -2147483648;", false},
-		{"constant a : integer := -2 ** 31;", false},
-		{"type big is range 0 to 2 ** 40;", false},
-		{"constant a : real := 1.0e12;", false},
-		{"constant a : integer := 2 ** 31;", true},
-		{"constant a : integer := 16#1_0000_0000#;", true},
-		{"constant a : natural := 3_000_000_000;", true},
-		{"constant a : boolean := integer'high = 9223372036854775807;",
-			true},
-		{"constant a : integer := 1000 * 1000 * 1000 * 10;", true},
+	for _, decl := range []string{
+		"constant a : integer := 2 ** 31 - 1;",
+		"constant a : integer := 2 ** 31;",
+		"constant a : integer := 16#1_0000_0000#;",
+		"constant a : natural := 3_000_000_000;",
+		"constant a : boolean := integer'high = 9223372036854775807;",
+		"constant a : integer := 1000 * 1000 * 1000 * 10;",
+		"type big is range 0 to 2 ** 40;",
 	} {
-		files := map[string]string{"p.vhd": "package p is\n  " +
-			tc.decl + "\nend;\n"}
+		files := map[string]string{"p.vhd": "package p is\n  " + decl +
+			"\nend;\n"}
 		r := analyze(t, files, func(c *config.Config) {
 			c.Standard = "2019"
 		})
-		got := strings.Contains(diagText(r), cInt64)
-		if got != tc.want {
-			t.Errorf("%s: 64-bit %v, want %v:\n%s", tc.decl, got,
-				tc.want, diagText(r))
+		if got := diagText(r); got != "" {
+			t.Errorf("2019: %s:\n%s", decl, got)
 		}
-	}
-}
-
-// TestFoldInt checks the 64-bit folding against direct arithmetic,
-// including overflow refusals.
-func TestFoldInt(t *testing.T) {
-	for _, tc := range []struct {
-		op   string
-		vs   []int64
-		want int64
-		ok   bool
-	}{
-		{"+", []int64{1 << 62, 1 << 62}, 0, false},
-		{"+", []int64{-5, 7}, 2, true},
-		{"-", []int64{-1 << 63, 1}, 0, false},
-		{"-", []int64{5, 7}, -2, true},
-		{"*", []int64{1 << 32, 1 << 31}, 0, false},
-		{"*", []int64{-3, 1 << 40}, -3 << 40, true},
-		{"**", []int64{2, 62}, 1 << 62, true},
-		{"**", []int64{2, 63}, 0, false},
-		{"**", []int64{1, 1000}, 1, true},
-		{"/", []int64{7, -2}, -3, true},
-		{"/", []int64{7, 0}, 0, false},
-	} {
-		ops := map[string]eval.Op{"+": eval.OpAdd, "-": eval.OpSub,
-			"*": eval.OpMul, "**": eval.OpPow, "/": eval.OpDiv}
-		got, ok := applyInt(ops[tc.op], tc.vs)
-		if ok != tc.ok || (ok && got != tc.want) {
-			t.Errorf("%d %s %d = %d %v, want %d %v", tc.vs[0], tc.op,
-				tc.vs[1], got, ok, tc.want, tc.ok)
+		r = analyze(t, files, nil)
+		if strings.Contains(diagText(r), "unsupported/construct") {
+			t.Errorf("2008: %s:\n%s", decl, diagText(r))
 		}
 	}
 }
@@ -491,11 +502,12 @@ func TestCommonDir(t *testing.T) {
 	}
 }
 
-// TestOSVVM2019Opaque: OSVVM's VHDL-2019 builds of the assert API,
-// file/line/path and language-support packages use std.env features of
-// v1.1, so they are opaque, with only unsupported/construct (planned)
-// and unchecked-unit diagnostics, never a false semantic error.
-func TestOSVVM2019Opaque(t *testing.T) {
+// TestOSVVM2019: OSVVM's VHDL-2019 builds of the assert API,
+// file/line/path and language-support packages use the std.env
+// features v1.1 delivers, so they are analyzed: no false semantic
+// error, and only still-planned constructs may make a unit opaque
+// (unsupported/construct, planned, and unchecked-unit).
+func TestOSVVM2019(t *testing.T) {
 	root := "../../testdata/libs/osvvm"
 	entries, err := os.ReadDir(root)
 	if err != nil || len(entries) == 0 {
@@ -521,18 +533,22 @@ func TestOSVVM2019Opaque(t *testing.T) {
 	c.Libraries = []config.Library{{Name: "osvvm",
 		Folders: []config.Folder{{Path: "osvvm"}}}}
 	r := Analyze(Input{Files: srcs, Config: c})
-	unsupported := 0
 	for _, d := range r.Diagnostics {
 		switch {
 		case d.Code == diag.UnsupportedConstruct &&
 			strings.HasSuffix(d.Message, "(planned for v1.1)"):
-			unsupported++
 		case d.Code == diag.SemaUnchecked:
 		default:
 			t.Errorf("%s:%d: %s: %s", d.Path, d.Line, d.Code, d.Message)
 		}
 	}
-	if unsupported == 0 {
-		t.Errorf("no unsupported construct:\n%s", diagText(r))
+	checked := 0
+	for _, u := range r.Units {
+		if !u.Opaque && !u.Unchecked {
+			checked++
+		}
+	}
+	if checked == 0 {
+		t.Errorf("no OSVVM unit is checked:\n%s", diagText(r))
 	}
 }

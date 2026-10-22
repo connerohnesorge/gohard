@@ -10,7 +10,6 @@ import (
 	"math"
 
 	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/token"
 )
 
@@ -367,11 +366,12 @@ func (a *analyzer) caseStaticError(sel *Expr) {
 // T'LEFT and T'RIGHT of literal-bounded type marks, and the predefined
 // + and - of such. ok is false when it is not of that form; over is set
 // when a step leaves 64 bits.
-func foldBound(e *Expr, depth int) (v int64, ok, over bool) {
+func foldBound(std token.Standard, e *Expr, depth int,
+) (v int64, ok, over bool) {
 	if e == nil || depth > 16 {
 		return 0, false, false
 	}
-	if v, ok := position(e); ok {
+	if v, ok := position(std, e); ok {
 		return v, true, false
 	}
 	if e.Kind != ExprCall || e.Decl == nil || !e.Decl.Implicit {
@@ -379,15 +379,15 @@ func foldBound(e *Expr, depth int) (v int64, ok, over bool) {
 	}
 	switch {
 	case len(e.Args) == 1 && e.Decl.Name == `"-"`:
-		x, ok, over := foldBound(e.Args[0], depth+1)
+		x, ok, over := foldBound(std, e.Args[0], depth+1)
 		if x == math.MinInt64 {
 			over = true
 		}
 		return -x, ok, over
 	case len(e.Args) == 2 && (e.Decl.Name == `"+"` ||
 		e.Decl.Name == `"-"`):
-		x, ok1, o1 := foldBound(e.Args[0], depth+1)
-		y, ok2, o2 := foldBound(e.Args[1], depth+1)
+		x, ok1, o1 := foldBound(std, e.Args[0], depth+1)
+		y, ok2, o2 := foldBound(std, e.Args[1], depth+1)
 		if !ok1 || !ok2 {
 			return 0, false, false
 		}
@@ -418,14 +418,13 @@ func (a *analyzer) rangeOverflow(rc *RangeCons) {
 		return
 	}
 	lo, hi, ok := int64(math.MinInt64), int64(math.MaxInt64), false
-	if b.Eval != nil && b.Eval.Kind == eval.KindInteger {
-		r := b.Eval.Range
+	if r, okr := implicitRange(a.std, b); okr {
 		lo, hi, ok = min(r.Left, r.Right), max(r.Left, r.Right), true
-	} else if l, h, _, okr := litRange(b.ScalarRange()); okr {
+	} else if l, h, _, okr := litRange(a.std, b.ScalarRange()); okr {
 		lo, hi, ok = min(l, h), max(l, h), true
 	}
 	for _, x := range []*Expr{rc.Left, rc.Right} {
-		v, okv, over := foldBound(x, 0)
+		v, okv, over := foldBound(a.std, x, 0)
 		if !okv || !ok && !over {
 			continue
 		}

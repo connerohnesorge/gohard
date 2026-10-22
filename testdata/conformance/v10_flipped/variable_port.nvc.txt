@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/v10_flipped/variable_port.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a variable_port.vhd -e variable_port_tb -r
+# source sha256: eec5bcd17583f0e0ce4d1726de04f3a105653aef506e382b063feb1b972eca20
+# exit: 0
+** Note: 1ns+0: count = 1
+   Process :variable_port_tb:_p0 at variable_port.vhd:49

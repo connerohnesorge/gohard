@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb floating_tb (VHDL-2019)
+exit 0
+== stdout
+floating.vhd:16:5: hint[sim/assert-note]: report note: value 2.5, image 2.5
+floating.vhd:17:5: hint[sim/assert-note]: report note: REAL: ascending true, low is real'low true, right is real'high true
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated floating_tb (seed 0): quiet

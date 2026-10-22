@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb overflow_tb (VHDL-2019)
+exit 1
+== stdout
+overflow.vhd:8:3: error[sim/runtime-error]: overflow.vhd:13:5: overflow in + in overflow_tb.p at 0 fs
+overflow.vhd:12:5: hint[sim/assert-note]: report note: v = 9223372036854775807
+summary: 1 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated overflow_tb (seed 0): failed

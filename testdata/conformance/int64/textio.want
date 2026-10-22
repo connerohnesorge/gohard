@@ -1,0 +1,9 @@
+# gohard check --sim --seed 0 --tb textio_tb (VHDL-2019)
+exit 0
+== stdout
+textio.vhd:18:5: hint[sim/assert-note]: report note: read 1099511627776
+textio.vhd:21:5: hint[sim/assert-note]: report note: read -1099511627777
+textio.vhd:24:5: hint[sim/assert-note]: report note: write -2199023255554
+summary: 0 errors, 0 warnings, 3 hints, 1 files
+== stderr
+gohard: simulated textio_tb (seed 0): quiet

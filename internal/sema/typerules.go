@@ -155,6 +155,42 @@ func (a *analyzer) rangeOperand(e *Expr, n cst.Node) {
 	a.semaError(n.Span(), a.text(n)+" is a range, not a value")
 }
 
+// genericArrayClass gives the VHDL-2019 generic type d of the array
+// class (type A is array (type is range <>) of type is private, LRM
+// 6.5.3) its index and element subtypes, so A'INDEX and A'ELEMENT
+// denote them. An anonymous index or element type indication is a
+// generic type of its own, bound with A's actual (Evaluator.BindType);
+// a type mark or a subtype indication stays unknown.
+func (a *analyzer) genericArrayClass(def cst.TypeDef, d *Decl) {
+	if def.Kind() != cst.KindArrayIncompleteTypeDef {
+		return
+	}
+	var parts []*Type
+	for c := range def.Nodes() {
+		t := UnknownType
+		if c.Kind() == cst.KindAnonymousTypeIndication {
+			g := a.newDecl(DeclGenericType, cst.Token{}, c)
+			g.Text = d.Text + "'element"
+			t = &Type{Class: TypeGeneric, Decl: g}
+			g.Type = t
+		}
+		parts = append(parts, t)
+	}
+	if len(parts) < 2 {
+		return
+	}
+	n := len(parts) - 1
+	for i, t := range parts[:n] {
+		if t.Decl != nil {
+			t.Decl.Text = d.Text + "'index"
+			if n > 1 {
+				t.Decl.Text += "(" + strconv.Itoa(i+1) + ")"
+			}
+		}
+	}
+	d.Type.Index, d.Type.Elem = parts[:n], parts[n]
+}
+
 // recordGenericActual records the actual subtype e of the generic type
 // f of the instance whose maps are analyzed, for the formals after it
 // (LRM 6.5.7.2: in the instance the generic type denotes its actual).
@@ -347,7 +383,7 @@ func (a *analyzer) elementLengths(e *Expr, want *Type) {
 		if as.Slice || as.Value == nil {
 			continue
 		}
-		n, ok := sliceLen(as.Value)
+		n, ok := sliceLen(a.std, as.Value)
 		if !ok {
 			continue
 		}

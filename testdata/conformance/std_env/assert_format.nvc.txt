@@ -1,0 +1,15 @@
+# NVC output of testdata/conformance/std_env/assert_format.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a assert_format.vhd -e assert_format_tb -r
+# source sha256: a94e549d3a360899737f9b63adfacc5819a44e47c4848f16ee64bb2733af424e
+# exit: 0
+** Note: 0ms+0: read severity error, format ""
+   Process :assert_format_tb:check at assert_format.vhd:11
+** Note: 0ms+0: valid true, format "[{S: <}] {r: <}"
+   Process :assert_format_tb:check at assert_format.vhd:11
+[WARNING] formatted
+** Error: 0ms+0: invalid string replacement variable 'q'
+   Process :assert_format_tb:check at assert_format.vhd:20
+** Note: 0ms+0: valid false, format "[{S: <}] {r: <}"
+   Process :assert_format_tb:check at assert_format.vhd:11

@@ -1,0 +1,10 @@
+# gohard check --sim --seed 0 --tb elab_values_tb (VHDL-2019)
+exit 0
+== stdout
+elab_values.vhd:19:5: hint[sim/assert-note]: report note: sub 2019 9
+elab_values.vhd:19:5: hint[sim/assert-note]: report note: sub v2019 3
+elab_values.vhd:46:5: hint[sim/assert-note]: report note: 2019 2019! 5
+elab_values.vhd:47:5: hint[sim/assert-note]: report note: 30 34 []
+summary: 0 errors, 0 warnings, 4 hints, 1 files
+== stderr
+gohard: simulated elab_values_tb (seed 0): quiet

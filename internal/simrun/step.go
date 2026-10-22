@@ -35,9 +35,10 @@ func Start(o Options) *Running {
 	// editor run never sees, or returns, another run's writes.
 	r.ov = env.NewOverlay(o.Env.FS, o.Env.Root)
 	r.real = o.Env.Real
+	io := interpOptions(o, r.ov)
 	code := o.Code
 	if code == nil && DefaultCode != nil {
-		code = elab.Interpreter(interpOptions(o, r.ov))
+		code = elab.Interpreter(io)
 	}
 	// Without an interpreter the design is still elaborated, so
 	// elaboration errors (and elaboration-time evaluation over
@@ -47,7 +48,7 @@ func Start(o Options) *Running {
 	elabCode := psl.Wrap(code)
 	b := eval.NewBudget(o.Sim.StepBudget)
 	d, ds := elab.Elaborate(o.Result, elab.Options{Top: o.Testbench,
-		Budget: b, Code: elabCode})
+		Budget: b, Code: elabCode, Env: io.Env})
 	out.Diagnostics = append(out.Diagnostics, ds...)
 	r.done = true
 	if d == nil || len(ds) > 0 && failed(ds) {

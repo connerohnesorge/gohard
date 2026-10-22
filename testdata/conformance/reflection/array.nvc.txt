@@ -1,0 +1,14 @@
+# NVC output of testdata/conformance/reflection/array.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a array.vhd -e array_tb -r
+# source sha256: 9ea1e6fdddddada989e2f6f3d683ab376034d8f5cc613eec1299d5820182e02f
+# exit: 0
+** Note: 0ms+0: BIT_VECTOR: dimensions 1, left 3, right 0, low 0, high 3, length 4, ascending false, element BIT, index NATURAL
+   Process :array_tb:check at array.vhd:13
+** Note: 0ms+0: STRING: 'a''c'
+   Process :array_tb:check at array.vhd:13
+** Note: 0ms+0: MAT: dimensions 2, left 2 0, right 2 1, length 2 2, index 2 COLOR, element SMALL
+   Process :array_tb:check at array.vhd:13
+** Note: 0ms+0: mm(2, green) = 4, mm(2, red) = 3
+   Process :array_tb:check at array.vhd:13

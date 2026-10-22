@@ -1,0 +1,10 @@
+# gohard check --sim --seed 0 --tb enumeration_tb (VHDL-2019)
+exit 0
+== stdout
+enumeration.vhd:18:5: hint[sim/assert-note]: report note: pos 1, image green
+enumeration.vhd:19:5: hint[sim/assert-note]: report note: COLOR: length 3, left red, right blue, low red, high blue, ascending true
+enumeration.vhd:23:5: hint[sim/assert-note]: report note: literal 1 green, blue at 2
+enumeration.vhd:25:5: hint[sim/assert-note]: report note: character 65 'A', bit '1' at 1
+summary: 0 errors, 0 warnings, 4 hints, 1 files
+== stderr
+gohard: simulated enumeration_tb (seed 0): quiet

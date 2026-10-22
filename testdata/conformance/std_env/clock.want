@@ -1,0 +1,9 @@
+# gohard check --sim --seed 0 --tb clock_tb (VHDL-2019)
+exit 0
+== stdout
+clock.vhd:13:5: hint[sim/assert-note]: report note: GMTIME = 2000-01-01T00:00:00, LOCALTIME = 2000-01-01T00:00:00, EPOCH = 946684800.0
+clock.vhd:16:5: hint[sim/assert-note]: report note: GMTIME = 2000-01-01T00:00:00.000500, EPOCH = 946684800.0005
+clock.vhd:18:5: hint[sim/assert-note]: report note: LOCALTIME(1.0e9) = 2001-09-09T01:46:40, LOCALTIME(GMTIME(1.0e9)) = 2001-09-09T01:46:40, GMTIME(GMTIME(1.0e9)) = 2001-09-09T01:46:40
+summary: 0 errors, 0 warnings, 3 hints, 1 files
+== stderr
+gohard: simulated clock_tb (seed 0): quiet

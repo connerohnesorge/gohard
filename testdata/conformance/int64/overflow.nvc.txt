@@ -1,0 +1,13 @@
+# NVC output of testdata/conformance/int64/overflow.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a overflow.vhd -e overflow_tb -r
+# source sha256: 0bfab6d71e19aee569871e50a9f9d5e4476fe8e009807101ca85ae0f1fdb8686
+# exit: 1
+** Note: 0ms+0: v = 9223372036854775807
+   Process :overflow_tb:p at overflow.vhd:8
+** Fatal: 0ms+0: result of 9223372036854775807 + 1 cannot be represented as INTEGER
+    > overflow.vhd:13
+    |
+ 13 |     v := v + 1;
+    |          ^^^^^

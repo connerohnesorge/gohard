@@ -272,6 +272,29 @@ func hasAccessPart(b *Type, depth int) bool {
 	return false
 }
 
+// hasProtectedPart reports whether the composite type b has a
+// subelement of a protected type, at any depth (VHDL-2019 composites of
+// protected types).
+func hasProtectedPart(b *Type, depth int) bool {
+	if b == nil || depth > 16 {
+		return false
+	}
+	switch b.Class {
+	case TypeProtected:
+		return depth > 0
+	case TypeArray:
+		return b.Elem != nil && hasProtectedPart(b.Elem.Base(), depth+1)
+	case TypeRecord:
+		for _, f := range b.Fields {
+			if f.Type != nil &&
+				hasProtectedPart(f.Type.Base(), depth+1) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // sameTypeLiteral reports whether r already declares a literal of
 // ld's type with ld's name.
 func sameTypeLiteral(r *Region, ld *Decl) bool {

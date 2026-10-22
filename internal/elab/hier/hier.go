@@ -133,6 +133,9 @@ type Options struct {
 	// MaxDepth bounds the nesting of instances (0: 256), so a
 	// recursive design whose recursion is not static ends.
 	MaxDepth int
+	// Natives, if set, evaluates the calls of functions without a
+	// body (sema.Evaluator.WithNatives): elaboration's std.env.
+	Natives sema.Natives
 }
 
 // Result is the hierarchy and its diagnostics.
@@ -150,8 +153,12 @@ type Result struct {
 
 // Build elaborates the hierarchy of r.
 func Build(r *sema.Result, o Options) *Result {
+	base := sema.NewEvaluator(r, o.Steps)
+	if o.Natives != nil {
+		base = base.WithNatives(o.Natives)
+	}
 	b := &builder{r: r, o: o, out: &Result{},
-		base:    sema.NewEvaluator(r, o.Steps),
+		base:    base,
 		exprs:   map[*sema.Unit]map[[2]int]*sema.Expr{},
 		indep:   map[*sema.Decl]bool{},
 		limited: map[*sema.Decl]bool{},

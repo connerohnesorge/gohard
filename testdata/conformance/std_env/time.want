@@ -1,0 +1,15 @@
+# gohard check --sim --seed 0 --tb time_tb (VHDL-2019)
+exit 0
+== stdout
+time.vhd:15:5: hint[sim/assert-note]: report note: GMTIME(0.0) = 1970-01-01T00:00:00
+time.vhd:17:5: hint[sim/assert-note]: report note: leap day = 2000-02-29T00:00:00 2000-02-29T00:00:00.25 2000-02-29T00:00:00.250000
+time.vhd:19:5: hint[sim/assert-note]: report note: weekday tuesday, day of year 59, month 1, microsecond 250000
+time.vhd:24:5: hint[sim/assert-note]: report note: plus = 2000-03-01T00:00:00.750000
+time.vhd:26:5: hint[sim/assert-note]: report note: plus = 2000-03-01T01:00:00.750000
+time.vhd:28:5: hint[sim/assert-note]: report note: minus = 2000-02-29T23:00:00.500000
+time.vhd:30:5: hint[sim/assert-note]: report note: difference = 82800.50
+time.vhd:31:5: hint[sim/assert-note]: report note: TIME_TO_SECONDS(1500 ms) = 1.5
+time.vhd:33:5: hint[sim/assert-note]: report note: SECONDS_TO_TIME(2.5) = 2500000000000000 fs
+summary: 0 errors, 0 warnings, 9 hints, 1 files
+== stderr
+gohard: simulated time_tb (seed 0): quiet

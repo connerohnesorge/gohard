@@ -1,0 +1,22 @@
+# NVC output of testdata/conformance/int64/bounds.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a bounds.vhd -e big_tb -r
+# source sha256: 6ec135f687aa59cfd5f2cf50f44d7e07a99b54652faca93f36cdd1a50f8a172a
+# exit: 0
+** Note: 0ms+0: 2**40 = 1099511627776
+   Process :big_tb:p at bounds.vhd:16
+** Note: 0ms+0: integer'high = 9223372036854775807
+   Process :big_tb:p at bounds.vhd:16
+** Note: 0ms+0: integer'low = -9223372036854775808
+   Process :big_tb:p at bounds.vhd:16
+** Note: 0ms+0: natural'high = 9223372036854775807
+   Process :big_tb:p at bounds.vhd:16
+** Note: 0ms+0: positive'low = 1
+   Process :big_tb:p at bounds.vhd:16
+** Note: 0ms+0: v = 1125899906842631
+   Process :big_tb:p at bounds.vhd:16
+** Note: 0ms+0: twice - 1 = 2199023255551
+   Process :big_tb:p at bounds.vhd:16
+** Note: 0ms+0: s = 8589934592
+   Process :big_tb:p at bounds.vhd:16

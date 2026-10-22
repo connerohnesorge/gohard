@@ -342,6 +342,9 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 		as := Association{Formal: f, Node: item.Node, Part: part}
 		v := item.Actual()
 		if v.IsZero() || v.Kind() == cst.KindOpenExpr {
+			if !v.IsZero() && k == DeclPort && !a.quiet {
+				a.variableActual(f, nil, v.Node) // objrules.go
+			}
 			out = append(out, as)
 			continue
 		}
@@ -360,6 +363,9 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 		a.recordGenericActual(f, e) // typerules.go
 		if k == DeclPort && f != nil {
 			a.unconstrainedConversion(e, want, v.Node) // typerules.go
+			if !a.quiet {
+				a.variableActual(f, e, v.Node) // objrules.go
+			}
 		}
 		as.Actual = e
 		if k == DeclPort && fnSimple(item.Formal().Node) {
@@ -903,6 +909,22 @@ func (a *analyzer) whenValue(v cst.WhenValue, t *Type) *Expr {
 	return e
 }
 
+// branchValue returns the value of a when/else branch, zero when the
+// branch has none (the VHDL-2019 `return when c`): the generated
+// accessor is positional, so it would return the condition.
+func branchValue(br cst.WhenBranch) cst.WhenValue {
+	for e := range br.Node.Elements() {
+		if e.IsToken() {
+			if e.Token.Kind() == token.KwWhen {
+				return cst.WhenValue{}
+			}
+			continue
+		}
+		return cst.WhenValue{Node: e.Node}
+	}
+	return cst.WhenValue{}
+}
+
 func (a *analyzer) whenBranches(brs func(func(cst.WhenBranch) bool),
 	t *Type,
 ) []SeqBranch {
@@ -913,7 +935,7 @@ func (a *analyzer) whenBranches(brs func(func(cst.WhenBranch) bool),
 	defer func() { a.asg = saved }()
 	var out []SeqBranch
 	for br := range brs {
-		b := SeqBranch{Value: a.whenValue(br.Value(), t)}
+		b := SeqBranch{Value: a.whenValue(branchValue(br), t)}
 		if c := whenCondition(br); !c.IsZero() {
 			b.Cond = a.condition(c)
 		}
@@ -1113,6 +1135,8 @@ func (a *analyzer) seqStmt(st cst.Node) *SeqStmt {
 		q.Kind = SeqVarAssign
 		s := cst.VariableAssignStmt{Node: st}
 		q.Target = a.targetExpr(s.Target())
+		a.protectedCopy(s.Target().Span(), q.Target.Type,
+			"cannot be assigned") // objrules.go
 		t := q.Target.Type
 		if v := s.Value(); !v.IsZero() {
 			q.Value = a.typed(v.Node, t)
@@ -1123,6 +1147,8 @@ func (a *analyzer) seqStmt(st cst.Node) *SeqStmt {
 		q.Kind = SeqCondVarAssign
 		s := cst.ConditionalVariableAssignStmt{Node: st}
 		q.Target = a.targetExpr(s.Target())
+		a.protectedCopy(s.Target().Span(), q.Target.Type,
+			"cannot be assigned") // objrules.go
 		q.Branches = a.whenBranches(s.Values().Branches(),
 			q.Target.Type)
 	case cst.KindSelectedVariableAssignStmt:
@@ -1131,6 +1157,8 @@ func (a *analyzer) seqStmt(st cst.Node) *SeqStmt {
 		q.Selector = a.typed(s.Selector().Node, nil)
 		a.caseStatic(q.Selector)
 		q.Target = a.targetExpr(s.Target())
+		a.protectedCopy(s.Target().Span(), q.Target.Type,
+			"cannot be assigned") // objrules.go
 		q.Alts = a.selectBranches(s.Values().Branches(), q.Target.Type,
 			q.Selector.Type)
 		a.selectCoverage(st, q.Selector, q.Alts)
@@ -1209,11 +1237,16 @@ func (a *analyzer) seqStmt(st cst.Node) *SeqStmt {
 		q.Kind = SeqCondReturn
 		a.asg = nil // the branch values are returned, not assigned
 		s := cst.ConditionalReturnStmt{Node: st}
+		if a.fn == nil && !a.quiet {
+			a.semaError(st.Token(token.KwReturn, 0).Span(), "a return "+
+				"statement must be inside a subprogram")
+		}
 		var want *Type
 		if a.fn != nil {
 			want = a.fn.Type
 		}
 		q.Branches = a.whenBranches(s.Values().Branches(), want)
+		a.condReturnForm(st, s, q.Branches) // forms.go
 	case cst.KindNullStmt:
 		q.Kind = SeqNull
 	case cst.KindSequentialBlockStmt:

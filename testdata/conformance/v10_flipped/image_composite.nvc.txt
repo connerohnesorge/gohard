@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/v10_flipped/image_composite.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a image_composite.vhd -e image_composite_tb -r
+# source sha256: 63c8c26ec036a5085295cbaf82be34596ec9fa5a988130ec2c80e65caa342bdf
+# exit: 0
+** Note: 0ms+0: "1010"
+   Process :image_composite_tb:_p0 at image_composite.vhd:15

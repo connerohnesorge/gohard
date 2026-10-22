@@ -12,6 +12,7 @@ package sema
 import (
 	"maps"
 	"math"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -46,6 +47,9 @@ type Evaluator struct {
 	dyn Dynamic
 	// memo enables the memoization of pure calls (memo.go).
 	memo bool
+	// std is the standard of the analysis: it picks the layout of
+	// std.standard's INTEGER, NATURAL and POSITIVE (integerLayout).
+	std token.Standard
 }
 
 type constResult struct {
@@ -54,9 +58,13 @@ type constResult struct {
 }
 
 // NewEvaluator returns an evaluator over the analyzed result r with a
-// budget of steps per evaluation (<= 0: eval.EditorSteps).
+// budget of steps per evaluation (<= 0: eval.EditorSteps). It
+// evaluates under r's standard: INTEGER is 64 bits wide under
+// VHDL-2019 and 32 bits before (eval.StdIntegers).
 func NewEvaluator(r *Result, steps int64) *Evaluator {
-	return newEvaluator(r.Library, steps)
+	ev := newEvaluator(r.Library, steps)
+	ev.std = r.Standard
+	return ev
 }
 
 func newEvaluator(libs func(Key) (*Library, bool), steps int64,
@@ -76,7 +84,7 @@ func newEvaluator(libs func(Key) (*Library, bool), steps int64,
 // design.
 func (ev *Evaluator) Fresh() *Evaluator {
 	c := newEvaluator(ev.libs, ev.steps)
-	c.sh = ev.sh
+	c.sh, c.std = ev.sh, ev.std
 	return c
 }
 
@@ -88,11 +96,32 @@ func (ev *Evaluator) Bind(d *Decl, v eval.Value) *Evaluator {
 	return c
 }
 
-// BindType returns a copy of ev in which the generic type d is t.
+// BindType returns a copy of ev in which the generic type d is t. The
+// anonymous index and element types of a VHDL-2019 array class
+// generic type (genericArrayClass) are bound to t's.
 func (ev *Evaluator) BindType(d *Decl, t *Type) *Evaluator {
 	c := ev.fork()
-	c.types[d] = t
+	c.bindType(d, t)
 	return c
+}
+
+func (ev *Evaluator) bindType(d *Decl, t *Type) {
+	ev.types[d] = t
+	g := d.Type
+	if g == nil || g.Class != TypeGeneric || t.Unknown() ||
+		t.Base().Class != TypeArray {
+		return
+	}
+	for i, x := range g.Index {
+		if i < len(t.Base().Index) && x.Class == TypeGeneric &&
+			x.Decl != nil {
+			ev.bindType(x.Decl, t.Base().Index[i])
+		}
+	}
+	if x := g.Elem; x != nil && x.Class == TypeGeneric && x.Decl != nil &&
+		t.ElemType() != nil {
+		ev.bindType(x.Decl, t.ElemType())
+	}
 }
 
 func (ev *Evaluator) fork() *Evaluator {
@@ -101,6 +130,9 @@ func (ev *Evaluator) fork() *Evaluator {
 	maps.Copy(c.types, ev.types)
 	return c
 }
+
+// Standard returns the standard ev evaluates under.
+func (ev *Evaluator) Standard() token.Standard { return ev.std }
 
 // Used returns the steps the last evaluation used.
 func (ev *Evaluator) Used() int64 { return ev.used }
@@ -703,6 +735,9 @@ func (ev *Evaluator) call(e *Expr, b *eval.Budget) (eval.Expr, error) {
 	if l, ok, err := ev.dynLower(e, b); ok {
 		return l, err
 	}
+	if l, ok, err := ev.native(e, x, b); ok {
+		return l, err
+	}
 	if x.Kind != DeclFunction || (x.Implicit && x.Op == 0) || !x.Pure {
 		return nil, eval.NotStatic("call of " + x.Text)
 	}
@@ -777,11 +812,23 @@ func (ev *Evaluator) attr(e *Expr, b *eval.Budget) (eval.Expr, error) {
 	}
 	p := e.Prefix
 	pt := p.Type
+	if k == eval.AttrImage && len(e.Args) == 0 &&
+		p.Kind != ExprTypeMark {
+		// O'IMAGE (VHDL-2019, LRM 16.2.2) images the object's value,
+		// scalar or composite: its type alone says nothing.
+		x, err := ev.lower(p, b)
+		if err != nil {
+			return nil, err
+		}
+		at.Of = x
+		return at, nil
+	}
 	// A prefix whose subtype is constrained is static through its type
 	// even when the object (a signal, a port) is not.
 	if p.Kind == ExprTypeMark || (pt != nil && pt.IsScalar()) ||
 		(pt != nil && pt.Base().Class == TypeArray &&
-			pt.Constraints() != nil) {
+			pt.Constraints() != nil &&
+			!slices.Contains(pt.Constraints(), nil)) {
 		t, err := ev.layout(pt, b)
 		if err != nil {
 			return nil, err
@@ -839,7 +886,8 @@ func (ev *Evaluator) rangeIR(rc *RangeCons, b *eval.Budget,
 	p := a.Prefix
 	pt := p.Type
 	if p.Kind == ExprTypeMark || (pt != nil && (pt.IsScalar() ||
-		pt.Constraints() != nil)) {
+		pt.Constraints() != nil &&
+			!slices.Contains(pt.Constraints(), nil))) {
 		t, err := ev.layout(pt, b)
 		if err != nil {
 			return eval.RangeExpr{}, err
@@ -872,6 +920,70 @@ func (ev *Evaluator) rangeOf(rc *RangeCons, b *eval.Budget,
 	}
 	m := &eval.Machine{Env: ev, Budget: b}
 	return m.EvalRange(r)
+}
+
+// realRangeOf evaluates the range constraint rc of a floating type or
+// subtype charging b: literal or expression bounds, a floating type
+// mark, or a scalar 'RANGE or 'REVERSE_RANGE (LRM 5.2.5).
+func (ev *Evaluator) realRangeOf(rc *RangeCons, b *eval.Budget,
+) (eval.RealRange, error) {
+	if rc == nil {
+		return eval.RealRange{}, eval.NotStatic("floating range")
+	}
+	if rc.Left != nil && rc.Right != nil {
+		l, err := ev.value(rc.Left, b)
+		if err != nil {
+			return eval.RealRange{}, err
+		}
+		r, err := ev.value(rc.Right, b)
+		if err != nil {
+			return eval.RealRange{}, err
+		}
+		if l.Kind() != eval.KindFloating || r.Kind() != eval.KindFloating {
+			return eval.RealRange{}, eval.NotStatic("floating range")
+		}
+		return eval.RealRange{Left: l.F, Right: r.F, Dir: rc.Dir}, nil
+	}
+	a := rc.Attr
+	if a == nil {
+		return eval.RealRange{}, eval.NotStatic("floating range")
+	}
+	reverse := false
+	if a.Kind == ExprAttr && a.Prefix != nil && len(a.Args) == 0 &&
+		(a.Attr == "range" || a.Attr == "reverse_range") {
+		reverse = a.Attr == "reverse_range"
+		a = a.Prefix
+	}
+	if a.Type == nil || a.Type.Unknown() || (a.Kind != ExprTypeMark &&
+		a.Kind != ExprName && a.Kind != ExprSelect) {
+		return eval.RealRange{}, eval.NotStatic("floating range")
+	}
+	t, err := ev.layout(a.Type, b)
+	if err != nil {
+		return eval.RealRange{}, err
+	}
+	if t.Kind != eval.KindFloating {
+		return eval.RealRange{}, eval.NotStatic("floating range")
+	}
+	r := t.Real
+	if reverse {
+		r = eval.RealRange{Left: r.Right, Right: r.Left, Dir: 1 - r.Dir}
+	}
+	return r, nil
+}
+
+// realCompatible checks that the bounds of the non-null floating
+// range r belong to t (LRM 5.2.1).
+func realCompatible(r eval.RealRange, t *eval.Type) error {
+	if t == nil || t.Kind != eval.KindFloating || r.Low() > r.High() {
+		return nil
+	}
+	for _, v := range []float64{r.Left, r.Right} {
+		if !t.Real.Contains(v) {
+			return eval.RangeError(eval.RealValue(t, v), t)
+		}
+	}
+	return nil
 }
 
 func (ev *Evaluator) aggregate(e *Expr, b *eval.Budget) (eval.Expr, error) {
@@ -958,7 +1070,7 @@ func (ev *Evaluator) layout(t *Type, b *eval.Budget) (*eval.Type, error) {
 		return nil, eval.NotStatic("an unknown type")
 	}
 	if t.Eval != nil {
-		return t.Eval, nil
+		return ev.integerLayout(t.Eval), nil
 	}
 	if lt, ok := ev.sh.layouts[t]; ok {
 		return lt, nil
@@ -1004,6 +1116,38 @@ func (ev *Evaluator) layout(t *Type, b *eval.Budget) (*eval.Type, error) {
 	return lt, err
 }
 
+// integerLayout returns the layout of a std.standard type under ev's
+// standard. The bundle is analyzed once for every standard, so its
+// Type.Eval holds the 32-bit INTEGER, NATURAL and POSITIVE; under
+// VHDL-2019 they are the 64-bit ones (LRM 5.2.3.2), and every type
+// derived from them follows through computeLayout. STRING and
+// BIT_VECTOR keep their index subtypes (eval.String).
+func (ev *Evaluator) integerLayout(lt *eval.Type) *eval.Type {
+	i64, n64, p64 := eval.StdIntegers(ev.std)
+	switch lt {
+	case eval.Integer:
+		return i64
+	case eval.Natural:
+		return n64
+	case eval.Positive:
+		return p64
+	}
+	return lt
+}
+
+// openIndex reports whether an index constraint is open (LRM 5.3.2.2,
+// arr(open)(...)): the index ranges stay those of the base, unknown
+// until a later constraint or an object's value (InferSubtype) gives
+// them, and only the element constraint applies.
+func openIndex(cons []*RangeCons) bool {
+	for _, rc := range cons {
+		if rc != nil {
+			return false
+		}
+	}
+	return len(cons) > 0
+}
+
 func (ev *Evaluator) computeLayout(t *Type, b *eval.Budget,
 ) (*eval.Type, error) {
 	if t.base != nil {
@@ -1018,7 +1162,15 @@ func (ev *Evaluator) computeLayout(t *Type, b *eval.Budget,
 		}
 		if t.Range != nil {
 			if base.Kind == eval.KindFloating {
-				return nil, eval.NotStatic("floating constraint")
+				r, err := ev.realRangeOf(t.Range, b)
+				if err != nil {
+					return nil, err
+				}
+				if err := realCompatible(r, base); err != nil {
+					return nil, err
+				}
+				out.Real = r
+				return &out, nil
 			}
 			r, err := ev.rangeOf(t.Range, b)
 			if err != nil {
@@ -1029,7 +1181,7 @@ func (ev *Evaluator) computeLayout(t *Type, b *eval.Budget,
 			}
 			out.Range = r
 		}
-		if t.IndexCons != nil {
+		if t.IndexCons != nil && !openIndex(t.IndexCons) {
 			var bs []eval.Range
 			for _, rc := range t.IndexCons {
 				if rc == nil {
@@ -1095,9 +1247,18 @@ func (ev *Evaluator) computeLayout(t *Type, b *eval.Budget,
 		if t.Universal {
 			return eval.UniversalReal, nil
 		}
-		return &eval.Type{Kind: eval.KindFloating, Name: name,
+		out := &eval.Type{Kind: eval.KindFloating, Name: name,
 			Real: eval.RealRange{Left: -math.MaxFloat64,
-				Right: math.MaxFloat64}}, nil
+				Right: math.MaxFloat64}}
+		if t.Range != nil {
+			// type T is range L to R (LRM 5.2.5.1).
+			r, err := ev.realRangeOf(t.Range, b)
+			if err != nil {
+				return nil, err
+			}
+			out.Real = r
+		}
+		return out, nil
 	case TypeArray:
 		out := &eval.Type{Kind: eval.KindArray, Name: name}
 		for _, it := range t.Index {
@@ -1175,6 +1336,7 @@ func (s *session) staticChecks() []string {
 	}
 	var incomplete []string
 	base := newEvaluator(libs, s.steps)
+	base.std = s.std
 	for _, u := range s.units {
 		if u.Opaque || u.Unchecked {
 			continue
@@ -1236,8 +1398,87 @@ func (s *session) staticChecks() []string {
 		if s.assignChecks(u, ev) {
 			incomplete = append(incomplete, u.Label())
 		}
+		if s.packageInstChecks(u, base) {
+			incomplete = append(incomplete, u.Label())
+		}
 	}
 	return incomplete
+}
+
+// packageInstChecks evaluates, for each package instance of unit u
+// whose generic map gives generic types, the constants of the
+// uninstantiated package and of its body with those types bound (LRM
+// 4.9: the instance elaborates a copy of both). An error that depends
+// on the actual types is reported at the constant, naming the
+// instance; one that does not is the package's own (staticChecks). It
+// reports whether one hit the step limit.
+func (s *session) packageInstChecks(u *Unit, base *Evaluator) bool {
+	insts := []*Decl{}
+	if u.Decl != nil && u.Decl.Kind == DeclPackageInst {
+		insts = append(insts, u.Decl)
+	}
+	for _, d := range u.Decls {
+		if d.Kind == DeclPackageInst && d != u.Decl && !inSubprogram(d) {
+			insts = append(insts, d)
+		}
+	}
+	limited := false
+	for _, d := range insts {
+		x := d.Target
+		if x == nil || len(d.instTypes) == 0 || x.Unit == nil ||
+			x.Unit.Decl != x || x.Region == nil {
+			continue
+		}
+		ev := base.Fresh()
+		for _, g := range x.Region.Decls {
+			if g.Kind != DeclGenericType || g.Type == nil {
+				continue
+			}
+			if t, ok := d.instTypes[g.Type]; ok && !t.Unknown() {
+				ev.bindType(g, t)
+			}
+		}
+		label := u.Label()
+		if d != u.Decl {
+			label += "." + d.Text
+		}
+		units := []*Unit{x.Unit}
+		for _, b := range s.libs[x.Unit.Library].Secondary(x.Unit.Name) {
+			if b.Kind == UnitPackageBody && !b.Duplicate {
+				units = append(units, b)
+			}
+		}
+		for _, pu := range units {
+			if pu.Opaque || pu.Unchecked {
+				continue
+			}
+			for _, c := range pu.Decls {
+				if c.Kind != DeclConstant || c.Value == nil ||
+					c.Implicit || c.File != pu.File || inSubprogram(c) {
+					continue
+				}
+				var err error
+				if !ev.Track(func() {
+					_, err = ev.constant(c, eval.NewBudget(s.steps))
+				}) || err == nil {
+					continue
+				}
+				rg := c.Value.Node.Span()
+				switch code := eval.CodeOf(err); {
+				case code == eval.ErrCodeBudget:
+					limited = true
+					u.diags = append(u.diags, at(pu.File, rg,
+						diag.New(diag.SemaEvalLimit, "constant "+c.Text+
+							" of "+label)))
+				case DesignError(code):
+					u.diags = append(u.diags, at(pu.File, rg,
+						diag.New(diag.SemaStaticError, "constant "+c.Text+
+							": "+err.Error(), label)))
+				}
+			}
+		}
+	}
+	return limited
 }
 
 // assignChecks checks the assignments of unit u's bodies (Assign) with

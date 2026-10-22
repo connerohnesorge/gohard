@@ -11,6 +11,8 @@ import (
 
 	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/internal/sim"
+	"github.com/connerohnesorge/gohard/internal/token"
 )
 
 // line returns the text of LINE value l ("" for null).
@@ -227,8 +229,7 @@ func (m *machine) textRead(x *sema.Decl, args []arg) error {
 			return err
 		}
 	} else if !ok {
-		return errors.New("textio read of " + valueKind(x) +
-			" failed on " + strconv.Quote(s))
+		return m.readFailed(x, s)
 	}
 	if !ok {
 		return nil
@@ -237,6 +238,29 @@ func (m *machine) textRead(x *sema.Decl, args []arg) error {
 		return err
 	}
 	return m.consume(l, used)
+}
+
+// readFailed handles a READ without GOOD that fails on s. In
+// VHDL-2019 it is an assertion violation of the GetVhdlReadSeverity
+// level (LRM 16.4, 16.5.4), worded as NVC 1.23 does, and the read
+// leaves the value and the line as they were; the run goes on unless
+// that level reaches simulation.stop_level. Before VHDL-2019 it stays
+// the v1.0 run-time error.
+func (m *machine) readFailed(x *sema.Decl, s string) error {
+	if m.ctx == nil || m.ev.Standard() < token.Std2019 {
+		return errors.New("textio read of " + valueKind(x) +
+			" failed on " + strconv.Quote(s))
+	}
+	var src sim.SrcRef
+	if n := m.current(); n != nil {
+		src = n.src
+	} else if ps := m.w.d.Model.Processes; m.idx >= 0 &&
+		m.idx < len(ps) {
+		src = ps[m.idx].Src
+	}
+	return m.ctx.Report(sim.Report{Assertion: true,
+		Severity: m.ctx.ReadSeverity(),
+		Message:  valueKind(x) + " read failed", Src: src})
 }
 
 func boolInt(b bool) int64 {

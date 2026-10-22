@@ -1,0 +1,23 @@
+# NVC output of testdata/conformance/reflection/floating_bounds.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a floating_bounds.vhd -e floating_bounds_tb -r
+# source sha256: 35d67e370e119fefe60b1c1b91fcfae7ffcb454fa5089db2bc2bbcb8cc101ff7
+# exit: 1
+** Note: 0ms+0: fdown 2.5 -1.5 -1.5 false 1.5
+   Process :floating_bounds_tb:check at floating_bounds.vhd:15
+** Note: 0ms+0: unit_real -1.25 0.75 0.5
+   Process :floating_bounds_tb:check at floating_bounds.vhd:15
+** Note: 0ms+0: narrow -0.5 3.5 3.25
+   Process :floating_bounds_tb:check at floating_bounds.vhd:15
+** Note: 0ms+0: mirror FDOWN 2.5 -1.5 -1.5 2.5 false
+   Process :floating_bounds_tb:check at floating_bounds.vhd:15
+** Note: 0ms+0: mirror FUP -0.5 8.25 true 0.25
+   Process :floating_bounds_tb:check at floating_bounds.vhd:15
+** Note: 0ms+0: mirror -1.25 0.75
+   Process :floating_bounds_tb:check at floating_bounds.vhd:15
+** Fatal: 0ms+0: value 3 outside of FDOWN range 2.5 downto -1.5 for variable D
+    > floating_bounds.vhd:40
+    |
+ 40 |     d := d + 1.5;
+    |          ^^^^^^^

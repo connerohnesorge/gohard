@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb env_version (VHDL-2019)
+exit 0
+== stdout
+env_version.vhd:11:5: hint[sim/assert-note]: report note: gohard 2019
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated env_version (seed 0): quiet

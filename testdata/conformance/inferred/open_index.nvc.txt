@@ -1,0 +1,16 @@
+# NVC output of testdata/conformance/inferred/open_index.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a open_index.vhd -e open_index_tb -r
+# source sha256: eff1420b2fe73a0d706ff3b65a685883e8ec1612e68cd287b3421bd792ffe58c
+# exit: 0
+** Note: 0ms+0: v 2 0 5 3
+   Process :open_index_tb:_p0 at open_index.vhd:16
+** Note: 0ms+0: w 1 2 5
+   Process :open_index_tb:_p0 at open_index.vhd:16
+** Note: 0ms+0: C 3 3
+   Process :open_index_tb:_p0 at open_index.vhd:16
+** Note: 0ms+0: s 4 3 5
+   Process :open_index_tb:_p0 at open_index.vhd:16
+** Note: 0ms+0: v(0) 111
+   Process :open_index_tb:_p0 at open_index.vhd:16

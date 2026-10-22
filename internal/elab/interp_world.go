@@ -33,14 +33,18 @@ type world struct {
 	eager bool
 	order []sharedKey
 	// prot memoizes holdsProtected by sema type; lookup only.
-	prot  map[*sema.Type]bool
-	heap  map[int64]eval.Value
-	objs  map[int64]*protObj
-	files map[int64]*fileState
+	prot map[*sema.Type]bool
+	// rtConst memoizes runtimeConst by declaration; lookup only.
+	rtConst map[*sema.Decl]bool
+	heap    map[int64]eval.Value
+	objs    map[int64]*protObj
+	files   map[int64]*fileState
 	// disk is what the design wrote, by external name: a file written
 	// and closed is read back from here.
 	disk map[string][]byte
 	next int64 // the last handle given out
+	// mirrors are the std.reflection mirror objects (interp_reflect.go).
+	mirrors mirrorState
 
 	// copy is the world the current Kernel.Clone pass copies into, and
 	// copied the processes already cloned into it: each pass clones
@@ -66,9 +70,9 @@ type protObj struct {
 func newWorld(d *Design, o InterpOptions) *world {
 	return &world{d: d, o: o, prog: newProgCache(d),
 		shared: map[sharedKey]slot{}, heap: map[int64]eval.Value{},
-		prot: map[*sema.Type]bool{},
+		prot: map[*sema.Type]bool{}, rtConst: map[*sema.Decl]bool{},
 		objs: map[int64]*protObj{}, files: map[int64]*fileState{},
-		disk: map[string][]byte{}}
+		disk: map[string][]byte{}, mirrors: newMirrorState()}
 }
 
 // fork returns the world process idx's clone uses: a copy shared by
@@ -90,6 +94,7 @@ func (w *world) fork(idx int) *world {
 			c.files[h] = &cf
 		}
 		c.disk = maps.Clone(w.disk)
+		c.mirrors = w.mirrors.clone()
 		w.copy, w.copied = &c, map[int]bool{}
 	}
 	w.copied[idx] = true
@@ -154,26 +159,33 @@ func (w *world) sharedOrder() []sharedKey {
 	for _, u := range units {
 		if (u.Kind == sema.UnitPackage || u.Kind == sema.UnitPackageBody) &&
 			!w.genericPackage(u) {
-			order = appendShared(order, nil, u.Region)
+			order = w.appendShared(order, nil, u.Region)
 		}
 	}
 	for _, in := range insts {
 		for _, r := range instRegions(in) {
-			order = appendShared(order, in, r)
+			order = w.appendShared(order, in, r)
 		}
 	}
 	w.order = order
 	return order
 }
 
-// appendShared appends the shared variables declared directly in r.
-func appendShared(ks []sharedKey, in *hier.Instance, r *sema.Region,
+// appendShared appends the shared variables declared directly in r,
+// and the constants whose value the interpreter computes
+// (runtimeConst), in declaration order.
+func (w *world) appendShared(ks []sharedKey, in *hier.Instance,
+	r *sema.Region,
 ) []sharedKey {
 	if r == nil {
 		return ks
 	}
+	ev := w.d.Top.Evaluator()
+	if in != nil {
+		ev = in.Evaluator()
+	}
 	for _, d := range r.Decls {
-		if d.Kind == sema.DeclSharedVariable {
+		if d.Kind == sema.DeclSharedVariable || w.runtimeConst(ev, d) {
 			ks = append(ks, sharedKey{in, d})
 		}
 	}

@@ -57,6 +57,11 @@ type Options struct {
 	// Code builds the behaviour of a process; nil, or a nil Code,
 	// leaves the process without code (Design.Missing lists them).
 	Code func(d *Design, p *Proc) (sim.Code, error)
+	// Env is the world the std.env functions called during
+	// elaboration see (generics, signal initial values and design
+	// constants that call TOOL_NAME, GETENV, FILE_LINE, ...): the
+	// interpreter's InterpOptions.Env of the same run.
+	Env EnvOptions
 }
 
 // Proc is one elaborated process: a process statement or a concurrent
@@ -96,6 +101,13 @@ type Design struct {
 	stopped      bool
 	// interp is the world Interpret's processes share.
 	interp *world
+	// varPorts binds each variable port (VHDL-2019 shared-variable
+	// ports of protected type) of an entity instance to the shared
+	// object it denotes; lookup only. ownPorts are the ports that are
+	// objects of their own (open, or of the top), in elaboration
+	// order.
+	varPorts map[sigKey]sharedKey
+	ownPorts []sharedKey
 }
 
 type sigKey struct {
@@ -114,14 +126,15 @@ func Elaborate(r *sema.Result, o Options) (*Design, []diag.Diagnostic) {
 	}
 	d := &Design{Model: &sim.Model{}, Budget: b, r: r,
 		sigs: map[sigKey]sim.SigID{}, byPath: map[string]sim.SigID{},
-		parent:  map[*hier.Instance]*hier.Instance{},
-		modeled: map[*hier.Instance]bool{}}
+		parent:   map[*hier.Instance]*hier.Instance{},
+		modeled:  map[*hier.Instance]bool{},
+		varPorts: map[sigKey]sharedKey{}}
 	steps := b.Limit()
 	if steps <= 0 {
 		steps = eval.EditorSteps
 	}
 	h := hier.Build(r, hier.Options{Tops: []string{o.Top}, Steps: steps,
-		TotalSteps: steps})
+		TotalSteps: steps, Natives: d.natives(o.Env)})
 	if d.charge(h.Steps, sim.SrcRef{}) {
 		return d, d.diags
 	}
@@ -181,6 +194,34 @@ func (d *Design) Signal(in *hier.Instance, x *sema.Decl) (sim.SigID,
 		}
 	}
 	return 0, false
+}
+
+// VarPort returns the object that the variable port x (a VHDL-2019
+// shared-variable port of protected type, LRM 6.5.2) denotes as seen
+// from instance in (the entity instance declaring x, or a block or
+// generate inside it): the shared variable of its actual, named by
+// its declaring instance (nil for a package) and declaration. A port
+// whose actual is a variable port of the enclosing entity is followed
+// to that port's object; an open port, or a port of the top, is an
+// object of its own: (the entity instance, x).
+func (d *Design) VarPort(in *hier.Instance, x *sema.Decl) (*hier.Instance,
+	*sema.Decl, bool,
+) {
+	k, ok := d.varPortKey(in, x)
+	return k.in, k.d, ok
+}
+
+// varPortKey is VarPort's shared object key.
+func (d *Design) varPortKey(in *hier.Instance, x *sema.Decl) (sharedKey,
+	bool,
+) {
+	for ; in != nil; in = d.parent[in] {
+		if in.Kind == hier.KindEntity {
+			k, ok := d.varPorts[sigKey{in, x}]
+			return k, ok
+		}
+	}
+	return sharedKey{}, false
 }
 
 // Parent returns the instance enclosing in (nil for the top).
@@ -437,6 +478,11 @@ func (d *Design) layout(in *hier.Instance, x *sema.Decl,
 		if d.charge(ev.Used(), src) {
 			return nil, eval.Value{}, false
 		}
+		if err == nil && d.infers(x, shape) {
+			// VHDL-2019 inferred constraints (LRM 6.4.2.1): the
+			// value supplies the open index ranges.
+			t = eval.InferSubtype(t, v)
+		}
 		if err == nil {
 			v, err = eval.Check(v, t)
 		}
@@ -456,4 +502,16 @@ func (d *Design) layout(in *hier.Instance, x *sema.Decl,
 		return nil, eval.Value{}, false
 	}
 	return t, v, true
+}
+
+// infers reports whether the signal or port x takes the open
+// constraints of its subtype from its initial value (VHDL-2019
+// inferred constraints): a signal always (sema rejects an
+// unconstrained signal before 2019), a port only under 2019 and only
+// when no actual gives it a shape.
+func (d *Design) infers(x *sema.Decl, shape *eval.Value) bool {
+	if x.Kind == sema.DeclSignal {
+		return true
+	}
+	return shape == nil && d.r != nil && d.r.Standard >= token.Std2019
 }

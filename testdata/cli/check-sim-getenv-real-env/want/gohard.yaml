@@ -1,0 +1,7 @@
+standard: "2019"
+simulation:
+  env:
+    vars:
+      FOO: "cfg"
+      BAR: "fromcfg"
+      MODE: "fast"

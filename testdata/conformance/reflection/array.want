@@ -1,0 +1,10 @@
+# gohard check --sim --seed 0 --tb array_tb (VHDL-2019)
+exit 0
+== stdout
+array.vhd:20:5: hint[sim/assert-note]: report note: BIT_VECTOR: dimensions 1, left 3, right 0, low 0, high 3, length 4, ascending false, element BIT, index NATURAL
+array.vhd:28:5: hint[sim/assert-note]: report note: STRING: 'a''c'
+array.vhd:32:5: hint[sim/assert-note]: report note: MAT: dimensions 2, left 2 0, right 2 1, length 2 2, index 2 COLOR, element SMALL
+array.vhd:37:5: hint[sim/assert-note]: report note: mm(2, green) = 4, mm(2, red) = 3
+summary: 0 errors, 0 warnings, 4 hints, 1 files
+== stderr
+gohard: simulated array_tb (seed 0): quiet

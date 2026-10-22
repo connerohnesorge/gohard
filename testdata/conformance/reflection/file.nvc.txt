@@ -1,0 +1,10 @@
+# NVC output of testdata/conformance/reflection/file.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a file.vhd -e file_tb -r
+# source sha256: 2743d129c8e07c27d6462b7b291919eefe0ec7b73bbd5162c27f7a424e3edb27
+# exit: 0
+** Note: 0ms+0: subtype IFILE, designated INTEGER
+   Process :file_tb:check at file.vhd:11
+** Note: 0ms+0: logical name data.bin, open kind write_mode
+   Process :file_tb:check at file.vhd:11

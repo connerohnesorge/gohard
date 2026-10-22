@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb access_tb (VHDL-2019)
+exit 0
+== stdout
+access.vhd:17:5: hint[sim/assert-note]: report note: null false, null pointer true, subtype IPTR, designated INTEGER
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated access_tb (seed 0): quiet

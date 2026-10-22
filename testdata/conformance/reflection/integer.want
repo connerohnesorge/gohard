@@ -1,0 +1,11 @@
+# gohard check --sim --seed 0 --tb integer_tb (VHDL-2019)
+exit 0
+== stdout
+integer.vhd:18:5: hint[sim/assert-note]: report note: class class_integer
+integer.vhd:20:5: hint[sim/assert-note]: report note: value 7, image 7
+integer.vhd:22:5: hint[sim/assert-note]: report note: SMALL: left -3, right 10, low -3, high 10, length 14, ascending true
+integer.vhd:26:5: hint[sim/assert-note]: report note: subtype SMALL of class class_integer
+integer.vhd:28:5: hint[sim/assert-note]: report note: type marks INTEGER, NATURAL, 10
+summary: 0 errors, 0 warnings, 5 hints, 1 files
+== stderr
+gohard: simulated integer_tb (seed 0): quiet

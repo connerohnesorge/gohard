@@ -7,6 +7,7 @@ import (
 
 	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/internal/token"
 )
 
 // Array aggregate shape (LRM 9.3.3.3): each element of the value an
@@ -26,7 +27,7 @@ func (a *analyzer) aggregateShape(e *Expr, want *Type) {
 		return
 	}
 	b := want.Base()
-	ctxLo, ctxHi, ctx := contextBounds(want)
+	ctxLo, ctxHi, ctx := contextBounds(a.std, want)
 	others := false
 	positional := int64(0)
 	var ivs []interval
@@ -39,7 +40,7 @@ func (a *analyzer) aggregateShape(e *Expr, want *Type) {
 		if len(as.Choices) == 0 {
 			if as.Slice {
 				// A slice gives as many elements as the value has.
-				n, ok := sliceLen(as.Value)
+				n, ok := sliceLen(a.std, as.Value)
 				if !ok {
 					return
 				}
@@ -54,7 +55,7 @@ func (a *analyzer) aggregateShape(e *Expr, want *Type) {
 		// A named slice association (VHDL-2008) gives the elements of
 		// its choice's range, like any other named association.
 		for _, c := range as.Choices {
-			l, h, ok := choiceBounds(c)
+			l, h, ok := choiceBounds(a.std, c)
 			if !ok {
 				return
 			}
@@ -89,7 +90,7 @@ func (a *analyzer) aggregateShape(e *Expr, want *Type) {
 	idx := firstIndex(b)
 	lo, hi, ok := int64(0), int64(0), false
 	if idx != nil {
-		lo, hi, ok = discreteBounds(idx)
+		lo, hi, ok = discreteBounds(a.std, idx)
 	}
 	if others && ctx {
 		lo, hi, ok = ctxLo, ctxHi, true
@@ -137,7 +138,7 @@ func (a *analyzer) shapeError(at *Expr, msg string) {
 
 // contextBounds returns the literal bounds, as positions, of the first
 // index constraint of the array subtype t, if it has one.
-func contextBounds(t *Type) (lo, hi int64, ok bool) {
+func contextBounds(std token.Standard, t *Type) (lo, hi int64, ok bool) {
 	if t.isDynamic() {
 		return 0, 0, false
 	}
@@ -148,12 +149,12 @@ func contextBounds(t *Type) (lo, hi int64, ok bool) {
 	rc := cons[0]
 	if rc.Attr != nil {
 		if rc.Attr.Kind == ExprTypeMark && !rc.Attr.Type.Unknown() {
-			return discreteBounds(rc.Attr.Type)
+			return discreteBounds(std, rc.Attr.Type)
 		}
 		return 0, 0, false
 	}
-	l, ok1 := position(rc.Left)
-	r, ok2 := position(rc.Right)
+	l, ok1 := position(std, rc.Left)
+	r, ok2 := position(std, rc.Right)
 	if !ok1 || !ok2 {
 		return 0, 0, false
 	}
@@ -204,7 +205,7 @@ func assignedToObject(n cst.Node) bool {
 // of a slice association: a string or bit-string literal's, or that
 // of an object, slice or qualified expression whose subtype has
 // literal bounds.
-func sliceLen(v *Expr) (int64, bool) {
+func sliceLen(std token.Standard, v *Expr) (int64, bool) {
 	if v == nil || v.illTyped {
 		return 0, false
 	}
@@ -214,7 +215,7 @@ func sliceLen(v *Expr) (int64, bool) {
 	case ExprName, ExprSelect, ExprSlice, ExprQualified:
 		// Their subtype is their own; an aggregate or a conditional
 		// value takes the context's.
-		if lo, hi, ok := contextBounds(v.Type); ok {
+		if lo, hi, ok := contextBounds(std, v.Type); ok {
 			return max(hi-lo+1, 0), true
 		}
 	}

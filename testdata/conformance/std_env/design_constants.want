@@ -1,0 +1,9 @@
+# gohard check --sim --seed 0 --tb design_constants_tb (VHDL-2019)
+exit 0
+== stdout
+design_constants.vhd:46:5: hint[sim/assert-note]: report note: step 10: 10 30 []
+design_constants.vhd:46:5: hint[sim/assert-note]: report note: step 1: 1 3 []
+design_constants.vhd:69:5: hint[sim/assert-note]: report note: 2019 8 59
+summary: 0 errors, 0 warnings, 3 hints, 1 files
+== stderr
+gohard: simulated design_constants_tb (seed 0): quiet

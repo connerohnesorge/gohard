@@ -60,6 +60,21 @@ func Builtins(std token.Standard, toolVersion string) []Define {
 	}
 }
 
+// Builtin returns the value of the built-in identifier name (any
+// case) under std, and whether name is one. It is the one source of
+// the values: conditional analysis reads it, and so do the std.env
+// functions VHDL_VERSION and TOOL_* in simulation (#18), so the two
+// always agree.
+func Builtin(name string, std token.Standard, toolVersion string,
+) (string, bool) {
+	for _, b := range Builtins(std, toolVersion) {
+		if strings.EqualFold(b.Name, name) {
+			return b.Value, true
+		}
+	}
+	return "", false
+}
+
 // Construct is the rules.csv construct text of the conditional-analysis
 // gate (rule condanal, #7).
 const Construct = "`if/`elsif/`else/`end/`error/`warning"
@@ -398,10 +413,8 @@ func compare(a, op, b string) bool {
 
 // value returns the value of a built-in or user identifier.
 func (a *analyzer) value(name string) (string, bool) {
-	for _, b := range Builtins(a.std, a.opts.ToolVersion) {
-		if strings.EqualFold(b.Name, name) {
-			return b.Value, true
-		}
+	if v, ok := Builtin(name, a.std, a.opts.ToolVersion); ok {
+		return v, true
 	}
 	for _, d := range a.opts.Defines {
 		if strings.EqualFold(d.Name, name) {

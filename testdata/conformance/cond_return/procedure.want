@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb procedure_tb (VHDL-2019)
+exit 0
+== stdout
+procedure.vhd:23:5: hint[sim/assert-note]: report note: 24: x = 3, n = 3
+procedure.vhd:26:5: hint[sim/assert-note]: report note: 7: x = 7, n = 0
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated procedure_tb (seed 0): quiet

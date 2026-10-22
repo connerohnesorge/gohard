@@ -1,0 +1,13 @@
+# NVC output of testdata/conformance/std_env/file.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a file.vhd -e file_tb -r
+# source sha256: 0c2c94581ed6ccacac84516836ef0dc993a9916e62266b5d9ed066cdc2d18c85
+# exit: 0
+** Note: 0ms+0: procedure: file.vhd line 14 declared at 12
+   Procedure WHERE [] at file.vhd:11
+   Process :file_tb:check at file.vhd:22
+** Note: 0ms+0: FILE_NAME line: file.vhd
+   Process :file_tb:check at file.vhd:18
+** Note: 0ms+0: FILE_LINE positive: 25
+   Process :file_tb:check at file.vhd:18

@@ -1,0 +1,23 @@
+# NVC output of testdata/conformance/std_env/read_severity.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a read_severity.vhd -e read_severity_tb -r
+# source sha256: 19f02b0320c3b54a445eb155203c985f1e449aed032fcd7bc0a24b57e08eafdc
+# exit: 0
+** Note: 0ms+0: default error
+   Process :read_severity_tb:_p0 at read_severity.vhd:13
+** Warning: 0ms+0: integer read failed
+   Procedure READ [LINE, INTEGER] at lib/std/textio-body.vhd:301
+   Process :read_severity_tb:_p0 at read_severity.vhd:21
+** Note: 0ms+0: line "abc 12"
+   Process :read_severity_tb:_p0 at read_severity.vhd:13
+** Warning: 0ms+0: bit_vector read failed
+   Procedure READ [LINE, BIT_VECTOR] at lib/std/textio-body.vhd:201
+   Process :read_severity_tb:_p0 at read_severity.vhd:23
+** Note: 0ms+0: b 0110 line "abc 12"
+   Process :read_severity_tb:_p0 at read_severity.vhd:13
+** Note: 0ms+0: integer read failed
+   Procedure READ [LINE, INTEGER] at lib/std/textio-body.vhd:301
+   Process :read_severity_tb:_p0 at read_severity.vhd:27
+** Note: 0ms+0: warnings 2
+   Process :read_severity_tb:_p0 at read_severity.vhd:13

@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb env_time (VHDL-2019)
+exit 0
+== stdout
+env_time.vhd:14:5: hint[sim/assert-note]: report note: 2000-01-01T00:00:00
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated env_time (seed 0): quiet

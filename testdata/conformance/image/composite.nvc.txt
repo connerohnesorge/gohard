@@ -1,0 +1,20 @@
+# NVC output of testdata/conformance/image/composite.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a composite.vhd -e composite_tb -r
+# source sha256: 00de01b7348cf84700f503cabc247cf9568b31491ca3b2a8cfb8d7125bf64584
+# exit: 0
+** Note: 0ms+0: record (7,'1')
+   Process :composite_tb:p at composite.vhd:24
+** Note: 0ms+0: bit_vector "1010"
+   Process :composite_tb:p at composite.vhd:24
+** Note: 0ms+0: int_vec (1,2,-99,0)
+   Process :composite_tb:p at composite.vhd:24
+** Note: 0ms+0: nested ((-3,'0'),"01",blue)
+   Process :composite_tb:p at composite.vhd:24
+** Note: 0ms+0: string (a,",b)
+   Process :composite_tb:p at composite.vhd:24
+** Note: 0ms+0: objects (7,'1') "1010" 42
+   Process :composite_tb:p at composite.vhd:24
+** Note: 0ms+0: constant (7,'1')
+   Process :composite_tb:p at composite.vhd:24

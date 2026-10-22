@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/reflection/protected.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a protected.vhd -e protected_tb -r
+# source sha256: a36ba9741830d9b3236f14c52336631668d9932bc02a938c34411364281ef37b
+# exit: 0
+** Note: 0ms+0: class class_protected, subtype PT, type PT of class class_protected
+   Process :protected_tb:check at protected.vhd:24

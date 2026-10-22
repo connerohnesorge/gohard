@@ -1,0 +1,19 @@
+# NVC output of testdata/conformance/inferred/runtime.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a runtime.vhd -e runtime_tb -r
+# source sha256: 012c23c5e21c219f27255700f0b1dd8c0a7839d761b428a0cbe623f96152607a
+# exit: 1
+** Note: 0ms+0: wa 3 x 4 3
+   Process :runtime_tb:_p0 at runtime.vhd:37
+** Note: 0ms+0: p 3 5 4
+   Process :runtime_tb:_p0 at runtime.vhd:37
+** Note: 0ms+0: words 5 x 6
+   Process :runtime_tb:_p0 at runtime.vhd:37
+** Note: 0ms+0: wa(1) 1010
+   Process :runtime_tb:_p0 at runtime.vhd:37
+** Fatal: 0ms+0: value length 2 does not match target length 5
+    > runtime.vhd:49
+    |
+ 49 |     p.data := "11";
+    |     ^^^^^^

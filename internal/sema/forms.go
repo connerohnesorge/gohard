@@ -193,6 +193,45 @@ func (a *analyzer) returnForm(st cst.Node, fn *Decl, value bool) {
 	}
 }
 
+// condReturnForm marks the unaffected branches of the VHDL-2019
+// conditional return st (brs, one per branch of s) and reports the
+// forms LRM 10.13 does not allow in its subprogram: a procedure has
+// only the plain `return when condition`, a function's every branch
+// has a value or unaffected.
+func (a *analyzer) condReturnForm(st cst.Node,
+	s cst.ConditionalReturnStmt, brs []SeqBranch,
+) {
+	i, value, bare := 0, false, false
+	for br := range s.Values().Branches() {
+		v := branchValue(br) // stmts.go
+		if v.Kind() == cst.KindUnaffectedExpr && i < len(brs) {
+			brs[i].Unaffected = true
+		}
+		if v.IsZero() {
+			bare = true
+		} else {
+			value = true
+		}
+		i++
+	}
+	fn := a.fn
+	if a.quiet || fn == nil {
+		return
+	}
+	kw := st.Token(token.KwReturn, 0).Span()
+	switch {
+	case fn.Kind == DeclFunction && bare:
+		a.returnForm(st, fn, false)
+	case fn.Kind == DeclProcedure && value:
+		a.returnForm(st, fn, true)
+	case fn.Kind == DeclProcedure && len(brs) > 1:
+		// LRM 10.13: plain_return_statement ::= return [when
+		// condition];
+		a.semaError(kw, "a conditional return in a procedure has one "+
+			"condition and no else")
+	}
+}
+
 // rangeForm reports the discrete ranges of c, a parameter
 // specification or an index constraint, that are neither a range nor a
 // subtype indication nor a name (of a type, subtype or range

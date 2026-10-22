@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/reflection/access.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a access.vhd -e access_tb -r
+# source sha256: 05f1f9ce1686b7e5b55be502996945fb179a502ac51d51d1e1cd5e691c14e3cf
+# exit: 0
+** Note: 0ms+0: null false, null pointer true, subtype IPTR, designated INTEGER
+   Process :access_tb:check at access.vhd:10

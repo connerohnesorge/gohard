@@ -502,13 +502,21 @@ func (a *analyzer) selectInValue(v *Expr, suffix cst.Token, sk Key,
 		return unknownNamed()
 	case TypeProtected:
 		ds := lookupIn(b.Members, sk, a.std)
-		if len(ds) == 0 {
+		methods := slices.DeleteFunc(slices.Clone(ds), privateMember)
+		if len(methods) == 0 {
 			if !a.quiet {
-				a.semaError(suffix.Span(), t.Name()+" has no method "+
-					suffix.Text())
+				msg := t.Name() + " has no method " + suffix.Text()
+				if len(ds) > 0 && ds[0].Kind == DeclVariable {
+					// LRM 5.6.2 (2019): a private variable is visible
+					// only inside its protected type (NVC alike).
+					msg += "; " + suffix.Text() + " is a private " +
+						"variable, visible only inside " + t.Name()
+				}
+				a.semaError(suffix.Span(), msg)
 			}
 			return unknownNamed()
 		}
+		ds = methods
 		return named{decls: ds, tok: suffix, expr: v}
 	case TypeGeneric, TypeIncomplete, TypeUnknown:
 		return named{expr: unknownExpr(suffix.Parent()), unknown: true}
@@ -516,6 +524,11 @@ func (a *analyzer) selectInValue(v *Expr, suffix cst.Token, sk Key,
 	a.notA(suffix, v, "a record")
 	return unknownNamed()
 }
+
+// privateMember reports whether the protected type member d is not a
+// method: a VHDL-2019 private variable (or a header generic), which no
+// selected name reaches.
+func privateMember(d *Decl) bool { return !d.Overloadable() }
 
 func (a *analyzer) notA(tok cst.Token, v *Expr, what string) {
 	if a.quiet {
@@ -978,10 +991,11 @@ const (
 	attrSignal                        // a signal or signal value
 	attrName                          // a string ('PATH_NAME, ...)
 	attrFunction                      // a function of an argument
+	attrReflect                       // a mirror ('REFLECT, 2019)
 )
 
-// predefinedAttrs are the predefined attributes of LRM 16.2 (VHDL-2019
-// included; the VHDL-2019 'REFLECT is v1.1, #18).
+// predefinedAttrs are the predefined attributes of LRM 16.2, VHDL-2019
+// included.
 var predefinedAttrs = map[Key]attrClass{
 	"left": attrValue, "right": attrValue, "high": attrValue,
 	"low": attrValue, "length": attrValue, "ascending": attrValue,
@@ -998,7 +1012,7 @@ var predefinedAttrs = map[Key]attrClass{
 	"driving": attrSignal, "driving_value": attrSignal,
 	"simple_name": attrName, "path_name": attrName,
 	"instance_name": attrName, "converse": attrType,
-	"reflect": attrValue, "record": attrType, "signal": attrSignal,
+	"reflect": attrReflect, "record": attrType, "signal": attrSignal,
 }
 
 // attrSince is the standard that first predefines each attribute of
@@ -1049,9 +1063,11 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		pt = pv.Type
 	}
 	if pv != nil && !pt.Unknown() && pt.Base().Class == TypeAccess &&
-		pt.Base().Designated != nil {
+		pt.Base().Designated != nil && class != attrReflect {
 		// prefix'attr of an access value is the attribute of the
-		// designated object (LRM 8.1, implicit dereference).
+		// designated object (LRM 8.1, implicit dereference); not
+		// 'REFLECT, whose mirror of an access value is an access mirror
+		// (p.all'REFLECT mirrors the designated object).
 		pt = pt.Base().Designated
 		pv = &Expr{Kind: ExprDeref, Node: pv.Node, Prefix: pv, Type: pt}
 	}
@@ -1089,7 +1105,7 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 				dtok.Text()+" must be locally static")
 			return
 		}
-		if n, ok := choiceValue(e.Args[0]); ok &&
+		if n, ok := choiceValue(a.std, e.Args[0]); ok &&
 			(n < 1 || n > int64(pt.Dims())) {
 			a.semaError(argNode.Span(), "dimension "+
 				strconv.FormatInt(n, 10)+" of '"+dtok.Text()+" is not "+
@@ -1098,6 +1114,8 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		}
 	}
 	switch class {
+	case attrReflect:
+		return a.reflectAttr(dtok, e, pv, argNode)
 	case attrRange:
 		arg(UniversalInteger)
 		dimension()
@@ -1173,7 +1191,13 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		switch dk {
 		case "image":
 			if pv != nil && argNode.IsZero() {
-				// VHDL-2019 object'IMAGE.
+				// VHDL-2019 object'IMAGE: of an object whose type has
+				// an image (LRM 16.2.2).
+				if !hasImage(pt, 0) && !a.quiet {
+					a.semaError(pn.Span(), "the prefix of '"+
+						dtok.Text()+" must be an object of "+
+						imagePrefix+", not "+a.text(pn))
+				}
 			} else {
 				arg(pt)
 			}
@@ -1197,7 +1221,7 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 	// attrValue: 'LEFT, 'RIGHT, 'HIGH, 'LOW, 'LENGTH, 'ASCENDING.
 	defer dimension()
 	if pv != nil && pt != nil && !pt.Unknown() && pt.IsScalar() &&
-		dk != "reflect" && !a.quiet {
+		!a.quiet {
 		// LRM 16.2.2/16.2.3: of a scalar only the type has these
 		// attributes; an object prefix must be an array.
 		a.semaError(pn.Span(), "the prefix of '"+dtok.Text()+" must "+
@@ -1243,7 +1267,7 @@ func (a *analyzer) attrPrefix(dtok cst.Token, class attrClass, p named,
 			" must be "+want+", not "+a.text(pn))
 		return true
 	}
-	array := class == attrRange || (class == attrValue && dk != "reflect")
+	array := class == attrRange || class == attrValue
 	if class == attrName && len(p.decls) == 0 {
 		// LRM 16.2.5: the prefix denotes a named entity, which a
 		// subelement, slice, call or attribute result is not.
@@ -1253,6 +1277,13 @@ func (a *analyzer) attrPrefix(dtok cst.Token, class attrClass, p named,
 		(pt != nil || len(p.decls) == 1) {
 		// LRM 16.2.4: the prefix is a static signal name.
 		return bad("a signal")
+	}
+	if class == attrReflect && pv == nil && pt == nil {
+		// LRM 16.2.7 (2019): a type mark or an object.
+		if len(p.decls) == 0 || p.decls[0].Overloadable() {
+			return false
+		}
+		return bad("a type or an object")
 	}
 	if pv == nil && pt == nil {
 		if !array || len(p.decls) != 1 || p.decls[0].Overloadable() {
@@ -1275,8 +1306,21 @@ func (a *analyzer) attrPrefix(dtok cst.Token, class attrClass, p named,
 		return bad("a fully declared type")
 	case c == TypeGeneric || c == TypeIncomplete || c == TypeUnknown:
 		return false
+	case class == attrReflect:
+		if pv == nil && notFullyConstrained(pt, 0) {
+			// The subtype mirror describes one subtype (NVC).
+			return bad("a fully constrained subtype")
+		}
+		return false
 	case dk == "base" && pv != nil:
 		return bad("a type or subtype")
+	case class == attrFunction && pv == nil && dk == "image" &&
+		a.std >= token.Std2019:
+		// VHDL-2019 T'IMAGE of a composite type (LRM 16.2.2).
+		if !hasImage(pt, 0) {
+			return bad(imagePrefix)
+		}
+		return false
 	case class == attrFunction && pv == nil && !pt.IsScalar():
 		return bad("a scalar type")
 	case !array:
@@ -1297,6 +1341,57 @@ func (a *analyzer) attrPrefix(dtok cst.Token, class attrClass, p named,
 		return bad("an array type")
 	}
 	return false
+}
+
+// imagePrefix is what a VHDL-2019 'IMAGE prefix type must be.
+const imagePrefix = "a scalar type or a composite type of such types"
+
+// hasImage reports whether values of subtype t have a VHDL-2019 'IMAGE:
+// t is scalar, or composite with elements whose subtypes have one
+// (recursively). Access, file and protected types have none (NVC:
+// "non-representable"). Unknown and generic types are not judged.
+func hasImage(t *Type, depth int) bool {
+	if t.Unknown() || depth > 16 {
+		return true
+	}
+	switch b := t.Base(); b.Class {
+	case TypeEnum, TypeInteger, TypeFloating, TypePhysical,
+		TypeGeneric, TypeIncomplete:
+		return true
+	case TypeArray:
+		return hasImage(t.ElemType(), depth+1)
+	case TypeRecord:
+		for _, f := range b.Fields {
+			if !hasImage(t.FieldType(f), depth+1) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
+// reflectAttr types prefix'REFLECT (VHDL-2019 LRM 16.2.7): a type mark
+// prefix gives std.reflection.SUBTYPE_MIRROR, an object prefix
+// VALUE_MIRROR (an access value is not dereferenced: its mirror is an
+// access value mirror). The attribute takes no parameter and is never
+// static: the value mirror is taken when it is evaluated.
+func (a *analyzer) reflectAttr(dtok cst.Token, e *Expr, pv *Expr,
+	argNode cst.Node,
+) named {
+	if !argNode.IsZero() {
+		if !a.quiet {
+			a.semaError(argNode.Span(), "'"+dtok.Text()+
+				" has no parameter")
+		}
+		a.expr(argNode, nil)
+	}
+	name := Key("subtype_mirror")
+	if pv != nil {
+		name = "value_mirror"
+	}
+	e.Type = orUnknown(a.reflectionType(name))
+	return named{expr: e}
 }
 
 // valParam reports a T'VAL parameter that is not of an integer type

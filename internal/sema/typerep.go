@@ -219,6 +219,37 @@ func runTime(t *Type) *Type {
 	return st
 }
 
+// inferred is the subtype of an object declared with the not fully
+// constrained subtype t and the initial value v (VHDL-2019 inferred
+// constraints, LRM 6.4.2.3, 6.4.2.4): t refined by the constraints of
+// v's subtype when that subtype is fully constrained and known during
+// analysis, otherwise a subtype of t constrained at run time.
+func inferred(t *Type, v *Expr) *Type {
+	if t.Unknown() {
+		return t
+	}
+	vt := v.Type
+	if vt.Unknown() || vt.isDynamic() || vt.Base() != t.Base() ||
+		notFullyConstrained(vt, 0) {
+		return runTime(t)
+	}
+	st := NewSubtype(t)
+	switch t.Base().Class {
+	case TypeArray:
+		st.IndexCons = vt.Constraints()
+		if notFullyConstrained(t.ElemType(), 0) {
+			st.ElemSub = vt.ElemType()
+		}
+	case TypeRecord:
+		for _, f := range t.Base().Fields {
+			st.FieldSubs = append(st.FieldSubs, vt.FieldType(f))
+		}
+	default:
+		return t
+	}
+	return st
+}
+
 // allocated is the subtype of a dereferenced access value: an object
 // created by an allocator, whose constraint an unconstrained
 // designated array subtype leaves to run time.

@@ -1,0 +1,16 @@
+# NVC output of testdata/conformance/cond_return/function.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a function.vhd -e function_tb -r
+# source sha256: 9917fc7fa364423786271e0ec19964e6a871cda96b46513f9522b8d98ef22da4
+# exit: 0
+** Note: 0ms+0: clip(-5) = 0
+   Process :function_tb:p at function.vhd:26
+** Note: 0ms+0: clip(3) = 3
+   Process :function_tb:p at function.vhd:26
+** Note: 0ms+0: sign = -101
+   Process :function_tb:p at function.vhd:26
+** Note: 0ms+0: cap = 9 4
+   Process :function_tb:p at function.vhd:26
+** Note: 0ms+0: c = 9
+   Process :function_tb:p at function.vhd:26

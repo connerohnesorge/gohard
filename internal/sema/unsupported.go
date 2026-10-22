@@ -10,17 +10,18 @@ package sema
 // with them never exits 0. This file is the extension point for the
 // construct table.
 //
-// Every VHDL-2019 feature of #18 that v1.0 does not implement is in the
-// table below (the syntactic ones by node kind) or found by meaning
-// (detectors: std.env and std.reflection names, 'REFLECT, composite
-// 'IMAGE, 64-bit INTEGER values, inferred constraints, protected-type
-// ports, composites of and pointers to protected types, protected and
-// access function parameters). A protected type whose body declares
+// Every VHDL-2019 feature of #18 that v1.1 does not implement yet is in
+// the table below (the syntactic ones by node kind) or found by meaning
+// (detectors: the std.env DIR_* and PSL names, 'PATH_NAME and
+// 'INSTANCE_NAME inside protected types). The delivered features whose
+// older-standard use no other check reports (inferred constraints,
+// variable ports, composites of protected types, protected and access
+// function parameters) are still found, to report them as
+// syntax/standard there. A protected type whose body declares
 // variables of other protected types is VHDL-2008 (OSVVM relies on it)
-// and is analyzed; #18's "protected types built from other protected
-// types" are the composites. Each construct is reported once per
-// design entity (a primary unit and its secondary units), at its first
-// use in canonical order; every unit using it is opaque, and so is every
+// and is analyzed. Each construct is reported once per design entity
+// (a primary unit and its secondary units), at its first use in
+// canonical order; every unit using it is opaque, and so is every
 // secondary unit of a primary unit made opaque by a construct (an
 // architecture cannot be analyzed without its entity). Under an older
 // standard the 2019 constructs are not "unsupported" but not allowed:
@@ -29,14 +30,12 @@ package sema
 
 import (
 	"cmp"
-	"math"
 	"path"
 	"slices"
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/token"
 )
 
@@ -53,46 +52,30 @@ type construct struct {
 }
 
 // The names of the v1.1 constructs found by meaning rather than by node
-// kind. The texts are the ones testdata/corpus/corpus.yaml expects
-// (prot_cond expected_v1_0) and #18 lists.
+// kind. The texts are the ones #18 lists.
 const (
-	cReflection      = "std.reflection"
-	cEnvVersion      = "std.env VHDL_VERSION and TOOL_* functions"
-	cEnvGetenv       = "std.env GETENV"
-	cEnvFile         = "std.env FILE_NAME/FILE_PATH/FILE_LINE"
-	cEnvAssert       = "std.env assert/PSL counter-and-format API"
-	cEnvTime         = "std.env date and time functions"
-	cEnvDir          = "std.env DIR_* functions"
-	cEnvCallPath     = "std.env GET_CALL_PATH"
-	cEnvOther        = "std.env VHDL-2019 additions"
-	cInferred        = "inferred constraints"
-	cInt64           = "64-bit integers"
-	cImage           = "'IMAGE for composite types"
-	cPathName        = "'PATH_NAME/'INSTANCE_NAME for protected types"
-	cVariablePort    = "shared-variable ports of protected type"
-	cProtArray       = "arrays of protected types"
-	cProtRecord      = "records of protected types"
-	cProtAccess      = "access types to protected types"
-	cProtParam       = "protected-type and access parameters on functions"
-	cMethodAlias     = "method aliases in protected types"
-	cProtGenerics    = "generic clauses on protected types"
-	cCondReturn      = "conditional return ... when"
-	cCallGenericMap  = "generic maps on subprogram calls"
-	cPrivateVariable = "private variable declarations"
+	cEnvDir         = "std.env DIR_* functions"
+	cEnvPSL         = "std.env PSL assert and cover API"
+	cEnvOther       = "std.env VHDL-2019 additions"
+	cPathName       = "'PATH_NAME/'INSTANCE_NAME for protected types"
+	cMethodAlias    = "method aliases in protected types"
+	cProtGenerics   = "generic clauses on protected types"
+	cCallGenericMap = "generic maps on subprogram calls"
+	cInferred       = "inferred constraints"
+	cVariablePort   = "shared-variable ports of protected type"
+	cProtArray      = "arrays of protected types"
+	cProtRecord     = "records of protected types"
+	cProtParam      = "protected-type and access parameters on functions"
 )
 
-// constructs are the legal constructs GoHard does not implement in
-// v1.0, by node kind.
+// constructs are the legal constructs GoHard does not implement, by
+// node kind.
 var constructs = []construct{
-	{kind: cst.KindPrivateVariableDecl, name: cPrivateVariable,
-		planned: true},
 	{kind: cst.KindProtectedTypeHeader, name: cProtGenerics,
 		planned: true, match: func(n cst.Node) bool {
 			return !(cst.ProtectedTypeHeader{Node: n}).Generics().IsZero()
 		}},
 	{kind: cst.KindProtectedTypeInstantiationDef, name: cProtGenerics,
-		planned: true},
-	{kind: cst.KindConditionalReturnStmt, name: cCondReturn,
 		planned: true},
 	{kind: cst.KindCallGenericMap, name: cCallGenericMap, planned: true},
 	{kind: cst.KindParameterMapAspect, name: cCallGenericMap,
@@ -113,6 +96,14 @@ var constructs = []construct{
 var legacy = map[string]bool{
 	cInferred: true, cVariablePort: true, cProtParam: true,
 	cMethodAlias: true, cProtArray: true, cProtRecord: true,
+}
+
+// delivered lists the legacy constructs v1.1 implements: under 2019
+// they are analyzed and simulated, so they are found only to report
+// them under older standards.
+var delivered = map[string]bool{
+	cInferred: true, cVariablePort: true, cProtParam: true,
+	cProtArray: true, cProtRecord: true,
 }
 
 // inProtectedDecl reports whether n is inside a protected type
@@ -502,6 +493,9 @@ func (s *session) unsupported(u *Unit,
 			}
 			continue
 		}
+		if delivered[f.name] {
+			continue
+		}
 		opaque = true
 		if reported[g][f.name] {
 			continue
@@ -565,15 +559,6 @@ func (s *session) findings(u *Unit) []finding {
 		}
 		declFindings(d, add)
 	}
-	for _, d := range u.Decls {
-		if d.File == u.File && !d.Implicit && d.Value != nil &&
-			d.Kind.IsObject() {
-			int64Findings(d.Value, d.Type, add)
-		}
-	}
-	for _, e := range u.Exprs {
-		int64Findings(e, nil, add)
-	}
 	return out
 }
 
@@ -587,18 +572,15 @@ func refDecl(ref Ref) *Decl {
 }
 
 // bundledConstruct names the v1.1 construct a reference to the bundled
-// declaration d uses: anything of std.reflection, and the VHDL-2019
-// additions to std.env.
+// declaration d uses: the VHDL-2019 additions to std.env that v1.1 does
+// not implement yet (std.reflection and the other groups are
+// implemented).
 func bundledConstruct(d *Decl) string {
 	if d == nil || d.Unit == nil || d.Unit.File == nil ||
 		!d.Unit.File.Bundled || d.Unit.Library != "std" {
 		return ""
 	}
-	switch d.Unit.Name {
-	case "reflection":
-		return cReflection
-	case "env":
-	default:
+	if d.Unit.Name != "env" {
 		return ""
 	}
 	first := d.First
@@ -612,7 +594,9 @@ func bundledConstruct(d *Decl) string {
 	return envGroup(d)
 }
 
-// envGroup sorts a VHDL-2019 std.env declaration into the #18 groups:
+// envGroup sorts a VHDL-2019 std.env declaration into the #18 groups
+// still planned (DIR_*, PSL, unknown additions), or "" for the
+// implemented ones:
 // by its name, else (implicit operations, to_string, "+") by the type
 // of its first parameter, else (record elements, enumeration literals)
 // by its type or record.
@@ -628,38 +612,43 @@ func envGroup(d *Decl) string {
 	if g == "" && d.Type != nil && d.Type.Base().Decl != nil {
 		g = envName(string(d.Type.Base().Decl.Name))
 	}
-	if g == "" {
+	switch g {
+	case "":
 		return cEnvOther
+	case envDone:
+		return ""
 	}
 	return g
 }
 
-// envName is the #18 group of a std.env name, or "".
+// envDone is the envName group of the implemented std.env additions:
+// VHDL_VERSION and TOOL_*, GETENV, FILE_NAME/FILE_PATH/FILE_LINE,
+// GET_CALL_PATH, the date and time functions and the VHDL assert API.
+const envDone = "implemented"
+
+// envName is the #18 group of a std.env name, envDone for an
+// implemented one, or "".
 func envName(name string) string {
 	n := strings.ToUpper(name)
 	switch {
-	case n == "VHDL_VERSION" || strings.HasPrefix(n, "TOOL_"):
-		return cEnvVersion
-	case n == "GETENV":
-		return cEnvGetenv
-	case n == "FILE_NAME" || n == "FILE_PATH" || n == "FILE_LINE":
-		return cEnvFile
-	case strings.Contains(n, "CALL_PATH"):
-		return cEnvCallPath
 	case strings.HasPrefix(n, "DIR") || n == "FILE_DELETE_STATUS":
 		return cEnvDir
-	case strings.Contains(n, "ASSERT") || strings.Contains(n, "PSL") ||
-		strings.Contains(n, "READSEVERITY"):
-		return cEnvAssert
-	case strings.Contains(n, "TIME_") || strings.HasSuffix(n, "TIME") ||
+	case strings.Contains(n, "PSL"):
+		return cEnvPSL
+	case n == "VHDL_VERSION" || strings.HasPrefix(n, "TOOL_") ||
+		n == "GETENV" || n == "FILE_NAME" || n == "FILE_PATH" ||
+		n == "FILE_LINE" || strings.Contains(n, "CALL_PATH") ||
+		strings.Contains(n, "ASSERT") ||
+		strings.Contains(n, "READSEVERITY") ||
+		strings.Contains(n, "TIME_") || strings.HasSuffix(n, "TIME") ||
 		n == "EPOCH" || n == "DAYOFWEEK" || n == "REAL":
-		return cEnvTime
+		return envDone
 	}
 	return ""
 }
 
-// attrFindings reports 'REFLECT, 'IMAGE of a composite type and
-// 'PATH_NAME/'INSTANCE_NAME of a name inside a protected type.
+// attrFindings reports 'PATH_NAME/'INSTANCE_NAME of a name inside a
+// protected type.
 func (s *session) attrFindings(u *Unit, an cst.AttributeName,
 	add func(cst.Range, string),
 ) {
@@ -667,12 +656,8 @@ func (s *session) attrFindings(u *Unit, an cst.AttributeName,
 	if des.IsZero() || des.Missing() {
 		return
 	}
-	k := TokenKey(des)
-	switch k {
-	case "reflect":
-		add(des.Span(), cReflection)
-		return
-	case "image", "path_name", "instance_name":
+	switch TokenKey(des) {
+	case "path_name", "instance_name":
 	default:
 		return
 	}
@@ -692,22 +677,15 @@ func (s *session) attrFindings(u *Unit, an cst.AttributeName,
 	if d == nil {
 		return
 	}
-	if k == "image" {
-		if (d.Kind.IsTypeMark() || d.Kind.IsObject()) && d.Type != nil {
-			switch d.Type.Base().Class {
-			case TypeArray, TypeRecord:
-				add(an.Span(), cImage)
-			}
-		}
-		return
-	}
 	if d.Parent != nil && (d.Parent.Kind == RegionProtected ||
 		d.Parent.Kind == RegionProtectedBody) {
 		add(an.Span(), cPathName)
 	}
 }
 
-// declFindings reports the declaration-shaped v1.1 constructs of d.
+// declFindings reports the declaration-shaped v1.1 constructs of d. All
+// of them are delivered: under 2019 they are analyzed, and they are found
+// only for the syntax/standard report of an older standard.
 func declFindings(d *Decl, add func(cst.Range, string)) {
 	switch d.Kind {
 	case DeclPort:
@@ -737,10 +715,6 @@ func declFindings(d *Decl, add func(cst.Range, string)) {
 					add(d.Span, cProtRecord)
 					break
 				}
-			}
-		case TypeAccess:
-			if protected(t.Designated) {
-				add(d.Span, cProtAccess)
 			}
 		}
 	case DeclFunction:
@@ -773,157 +747,4 @@ func unconstrained(t *Type, depth int) bool {
 		return true
 	}
 	return unconstrained(t.ElemType(), depth+1)
-}
-
-// int64Findings reports the outermost INTEGER expressions of e whose
-// static value does not fit 32 bits: VHDL-2019 makes INTEGER 64 bits,
-// which v1.0 does not implement (INTEGER is 32 bits in every view). ctx
-// is the subtype the context expects (nil when unknown), so a
-// universal_integer expression converted to INTEGER counts as INTEGER;
-// in other contexts (the range of a user-defined integer type) a large
-// universal value is legal VHDL-2008 and is analyzed.
-func int64Findings(e *Expr, ctx *Type, add func(cst.Range, string)) {
-	if e == nil {
-		return
-	}
-	if isStdInteger(e.Type) || (isStdInteger(ctx) && universalInt(e.Type)) {
-		if v, ok := foldInt(e, 0); ok && (v > math.MaxInt32 ||
-			v < math.MinInt32) {
-			add(e.Node.Span(), cInt64)
-			return
-		}
-	}
-	int64Findings(e.Prefix, nil, add)
-	for i, a := range e.Args {
-		var at *Type
-		if i < len(e.Formals) && e.Formals[i] != nil {
-			at = e.Formals[i].Type
-		}
-		int64Findings(a, at, add)
-	}
-	for _, as := range e.Assocs {
-		for _, c := range as.Choices {
-			int64Findings(c, nil, add)
-		}
-		int64Findings(as.Value, nil, add)
-	}
-	if r := e.Range; r != nil {
-		int64Findings(r.Left, nil, add)
-		int64Findings(r.Right, nil, add)
-	}
-}
-
-func universalInt(t *Type) bool {
-	b := t.Base()
-	return b != nil && b.Universal && b.Class == TypeInteger
-}
-
-// isStdInteger reports whether t is a subtype of std.standard.INTEGER.
-func isStdInteger(t *Type) bool {
-	if t == nil {
-		return false
-	}
-	b := t.Base()
-	if b == nil || b.Class != TypeInteger || b.Universal || b.Decl == nil {
-		return false
-	}
-	u := b.Decl.Unit
-	return b.Decl.Name == "integer" && u != nil && u.Library == "std" &&
-		u.Name == "standard"
-}
-
-// foldInt computes the value of an integer expression made of literals
-// and the predefined arithmetic operators, in 64 bits.
-func foldInt(e *Expr, depth int) (int64, bool) {
-	if e == nil || depth > 64 {
-		return 0, false
-	}
-	switch e.Kind {
-	case ExprLiteral:
-		if e.Lit.Kind() == token.IntegerLiteral {
-			return ParseInteger(e.Lit.Text())
-		}
-	case ExprQualified, ExprConversion:
-		if len(e.Args) == 1 {
-			return foldInt(e.Args[0], depth+1)
-		}
-	case ExprCall:
-		x := e.Decl.Denotes()
-		if x == nil || !x.Implicit || x.Op == 0 {
-			return 0, false
-		}
-		var vs []int64
-		for _, a := range e.Args {
-			v, ok := foldInt(a, depth+1)
-			if !ok {
-				return 0, false
-			}
-			vs = append(vs, v)
-		}
-		return applyInt(eval.Op(x.Op), vs)
-	}
-	return 0, false
-}
-
-func applyInt(o eval.Op, vs []int64) (int64, bool) {
-	if len(vs) == 1 {
-		x := vs[0]
-		switch o {
-		case eval.OpPlus:
-			return x, true
-		case eval.OpNeg:
-			return -x, x != math.MinInt64
-		case eval.OpAbs:
-			return max(x, -x), x != math.MinInt64
-		}
-		return 0, false
-	}
-	if len(vs) != 2 {
-		return 0, false
-	}
-	x, y := vs[0], vs[1]
-	switch o {
-	case eval.OpAdd:
-		r := x + y
-		return r, (x >= 0) != (y >= 0) || (r >= 0) == (x >= 0)
-	case eval.OpSub:
-		r := x - y
-		return r, (x >= 0) == (y >= 0) || (r >= 0) == (x >= 0)
-	case eval.OpMul:
-		return mulInt(x, y)
-	case eval.OpDiv:
-		if y == 0 || (x == math.MinInt64 && y == -1) {
-			return 0, false
-		}
-		return x / y, true
-	case eval.OpPow:
-		if y < 0 {
-			return 0, false
-		}
-		r := int64(1)
-		for range min(y, 64) {
-			var ok bool
-			if r, ok = mulInt(r, x); !ok {
-				return 0, false
-			}
-		}
-		if y > 64 && x != 0 && x != 1 && x != -1 {
-			return 0, false
-		}
-		return r, true
-	}
-	return 0, false
-}
-
-// mulInt multiplies in 64 bits; false on overflow.
-func mulInt(x, y int64) (int64, bool) {
-	if x == 0 || y == 0 {
-		return 0, true
-	}
-	r := x * y
-	if r/y != x || (x == -1 && y == math.MinInt64) ||
-		(y == -1 && x == math.MinInt64) {
-		return 0, false
-	}
-	return r, true
 }

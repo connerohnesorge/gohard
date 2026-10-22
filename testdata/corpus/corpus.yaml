@@ -596,7 +596,7 @@ designs:
           IEEE 1076-2019 conditional analysis tool directives (section
           number not verified against the LRM text). GHDL 6.0.0 lacks the
           feature, so it is not a semantic disagreement about the design.
-    trace_sha256: 1544791b18a1e94730f3417fae0950e9c4d4682e45ac056094b4b71da2a87001
+    trace_sha256: 6b21bbd3a1f3de5e1d5ff7ed787f445cdbb6fadb6ca7e599f37843d2e2b80dce
     oracle_sha256: 901f95aae64fe22e966e78ba21e7bc3a9ab8d4b5ad017afa24671f0bc16a1c62
     format_oracle_sha256: e634b69fd6b07941074a6155b26020f7aa012363fc00d3b4deb73a2581f608c8
     semerr_sha256: d1e487de6593b603e4612367a1a5bc15d7181b63a60561abd20b3b4d26e0b6ab
@@ -778,58 +778,9 @@ designs:
       exit: 2
       status: tool_error
       stop_time: none
-      # One per v1.1 construct (#18), at its first use, in #20 sorted
-      # (path, line) order. Paths sort bytewise, so prot_cond.vhd comes
-      # before prot_cond_pkg.vhd ('.' < '_').
+      # One per v1.1 construct (#18) not delivered yet, at its first use,
+      # in #20 sorted (path, line) order.
       messages:
-        - severity: error
-          code: unsupported/construct
-          path: prot_cond.vhd
-          line: 7
-          text: >-
-            shared-variable ports of protected type is not supported yet
-            (planned for v1.1)
-        - severity: error
-          code: unsupported/construct
-          path: prot_cond_pkg.vhd
-          line: 48
-          text: >-
-            conditional return ... when is not supported yet (planned for
-            v1.1)
-        - severity: error
-          code: unsupported/construct
-          path: prot_cond_tb.vhd
-          line: 6
-          text: std.reflection is not supported yet (planned for v1.1)
-        - severity: error
-          code: unsupported/construct
-          path: prot_cond_tb.vhd
-          line: 31
-          text: inferred constraints is not supported yet (planned for v1.1)
-        - severity: error
-          code: unsupported/construct
-          path: prot_cond_tb.vhd
-          line: 33
-          text: 64-bit integers is not supported yet (planned for v1.1)
-        - severity: error
-          code: unsupported/construct
-          path: prot_cond_tb.vhd
-          line: 67
-          text: >-
-            std.env VHDL_VERSION and TOOL_* functions is not supported yet
-            (planned for v1.1)
-        - severity: error
-          code: unsupported/construct
-          path: prot_cond_tb.vhd
-          line: 71
-          text: std.env GETENV is not supported yet (planned for v1.1)
-        - severity: error
-          code: unsupported/construct
-          path: prot_cond_tb.vhd
-          line: 73
-          text: >-
-            std.env FILE_NAME/FILE_PATH/FILE_LINE is not supported yet
-            (planned for v1.1)
         - severity: error
           code: unsupported/construct
           path: prot_cond_tb.vhd
@@ -837,19 +788,6 @@ designs:
           text: >-
             generic maps on subprogram calls is not supported yet (planned for
             v1.1)
-        - severity: error
-          code: unsupported/construct
-          path: prot_cond_tb.vhd
-          line: 91
-          text: >-
-            'IMAGE for composite types is not supported yet (planned for v1.1)
-        - severity: error
-          code: unsupported/construct
-          path: prot_cond_tb.vhd
-          line: 98
-          text: >-
-            std.env assert/PSL counter-and-format API is not supported yet
-            (planned for v1.1)
     features: [protected_type_ports, std_env]
     invariants:
       - seed_independent

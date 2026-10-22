@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb inferred (VHDL-2019)
+exit 0
+== stdout
+inferred.vhd:11:5: hint[sim/assert-note]: report note: s'length = 4, s'left = 0
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated inferred (seed 0): quiet

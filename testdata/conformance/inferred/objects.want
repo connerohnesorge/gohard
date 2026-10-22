@@ -1,0 +1,10 @@
+# gohard check --sim --seed 0 --tb inferred_tb (VHDL-2019)
+exit 0
+== stdout
+objects.vhd:20:5: hint[sim/assert-note]: report note: inf'length = 5, str = 1 to 3
+objects.vhd:22:5: hint[sim/assert-note]: report note: wa = 2 x 8
+objects.vhd:24:5: hint[sim/assert-note]: report note: s'length = 4, w = 4 x 3, r'right = 5
+objects.vhd:33:5: hint[sim/assert-note]: report note: s = 0101
+summary: 0 errors, 0 warnings, 4 hints, 1 files
+== stderr
+gohard: simulated inferred_tb (seed 0): quiet

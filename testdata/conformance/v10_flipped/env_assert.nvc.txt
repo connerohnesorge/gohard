@@ -1,0 +1,10 @@
+# NVC output of testdata/conformance/v10_flipped/env_assert.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a env_assert.vhd -e env_assert -r
+# source sha256: b8f1f327a77357a1e53e184bd5d487f7ec0cb0a44a2eb80ac9b2ca31f62166d9
+# exit: 0
+** Warning: 0ms+0: probe
+   Process :env_assert:_p0 at env_assert.vhd:8
+** Note: 0ms+0: count = 1
+   Process :env_assert:_p0 at env_assert.vhd:8

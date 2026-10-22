@@ -1,0 +1,10 @@
+# NVC output of testdata/conformance/protected/params.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a params.vhd -e params_tb -r
+# source sha256: 912d2b6c8e8779b06ce15e7e34a47f1f4ef37b3b7f77bd4f2e5bed37e69b0712
+# exit: 0
+** Note: 0ms+0: bump = 13, peek = 18, deref = 42
+   Process :params_tb:check at params.vhd:56
+** Note: 0ms+0: fresh = 7
+   Process :params_tb:check at params.vhd:56

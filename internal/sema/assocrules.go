@@ -215,18 +215,18 @@ func (a *analyzer) portActualStatic(f *Decl, e *Expr) {
 
 // litRange returns the bounds and direction of a range with literal
 // (or literal type attribute) bounds.
-func litRange(rc *RangeCons) (l, r int64, down, ok bool) {
+func litRange(std token.Standard, rc *RangeCons) (l, r int64, down, ok bool) {
 	if rc == nil || rc.Attr != nil {
 		return 0, 0, false, false
 	}
-	l, ok1 := position(rc.Left)
-	r, ok2 := position(rc.Right)
+	l, ok1 := position(std, rc.Left)
+	r, ok2 := position(std, rc.Right)
 	return l, r, rc.Dir == eval.Downto, ok1 && ok2
 }
 
 // litLength is the length of the one-dimensional array subtype t when
 // its index range has literal bounds.
-func litLength(t *Type) (int64, bool) {
+func litLength(std token.Standard, t *Type) (int64, bool) {
 	if t.Unknown() || t.isDynamic() || t.Base().Class != TypeArray ||
 		t.Dims() != 1 {
 		return 0, false
@@ -235,7 +235,7 @@ func litLength(t *Type) (int64, bool) {
 	if cons == nil {
 		return 0, false
 	}
-	l, r, down, ok := litRange(cons[0])
+	l, r, down, ok := litRange(std, cons[0])
 	if !ok {
 		return 0, false
 	}
@@ -254,11 +254,11 @@ func (a *analyzer) mapValue(f *Decl, e *Expr) {
 	if e == nil || e.illTyped || f.Type.Unknown() {
 		return
 	}
-	if want, ok := litLength(f.Type); ok {
+	if want, ok := litLength(a.std, f.Type); ok {
 		if e.Kind == ExprLiteral || e.Kind == ExprAggregate {
 			return // a literal or aggregate takes its context's length
 		}
-		if have, ok := litLength(e.Type); ok && have != want {
+		if have, ok := litLength(a.std, e.Type); ok && have != want {
 			a.semaError(e.Node.Span(), "the actual of "+f.Text+" has "+
 				strconv.FormatInt(have, 10)+" elements, but "+f.Text+
 				" has "+strconv.FormatInt(want, 10))
@@ -269,7 +269,7 @@ func (a *analyzer) mapValue(f *Decl, e *Expr) {
 	if !ok || !f.Type.IsDiscrete() {
 		return
 	}
-	l, r, _, ok := litRange(f.Type.ScalarRange())
+	l, r, _, ok := litRange(a.std, f.Type.ScalarRange())
 	if !ok {
 		return
 	}
@@ -292,7 +292,7 @@ func (a *analyzer) formalIndex(x Association, f *Decl) {
 	if cons == nil {
 		return
 	}
-	lo, hi, _, ok := litRange(cons[0])
+	lo, hi, _, ok := litRange(a.std, cons[0])
 	if !ok {
 		return
 	}
@@ -319,14 +319,14 @@ func (a *analyzer) formalIndex(x Association, f *Decl) {
 		}
 	case cst.KindSliceName:
 		rc := a.discreteRange(sliceRange(cst.SliceName{Node: fn.Node}), nil)
-		l, r, down, ok := litRange(rc)
+		l, r, down, ok := litRange(a.std, rc)
 		if !ok || x.Actual == nil {
 			return
 		}
 		if down {
 			l, r = r, l
 		}
-		have, ok := litLength(x.Actual.Type)
+		have, ok := litLength(a.std, x.Actual.Type)
 		if want := max(r-l+1, 0); ok && have != want &&
 			x.Actual.Kind != ExprLiteral && x.Actual.Kind != ExprAggregate {
 			a.quiet = saved

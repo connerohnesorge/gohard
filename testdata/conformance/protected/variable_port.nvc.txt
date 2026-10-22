@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/protected/variable_port.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a variable_port.vhd -e vport_tb -r
+# source sha256: 189aa44eddd31ec468dd0e523ace380736c39d098503a3490cb267283db2283d
+# exit: 0
+** Note: 1ns+0: a = 3, b = 2
+   Process :vport_tb:check at variable_port.vhd:75

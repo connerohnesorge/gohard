@@ -86,6 +86,11 @@ func (m *machine) Ref(d *sema.Decl) (eval.Ref, bool) {
 		return nil, false
 	case sema.DeclPort:
 		if d.Class == sema.ClassVariable {
+			// A shared-variable port (VHDL-2019): the object of its
+			// actual.
+			if k, ok := m.w.d.varPortKey(m.inst(), d); ok {
+				return sharedRef{k}, true
+			}
 			return m.varOf(d)
 		}
 		if p, ok := m.signalOf(d); ok {
@@ -103,7 +108,9 @@ func (m *machine) Ref(d *sema.Decl) (eval.Ref, bool) {
 			return r, true
 		}
 		if d.Kind == sema.DeclFile && d.Parent != nil &&
-			globalRegion(d.Parent) {
+			globalRegion(d.Parent) || m.w.runtimeConst(m.ev, d) {
+			// A design-region file, or a constant whose value the
+			// interpreter computes (interp_rtconst.go).
 			return sharedRef{m.sharedKeyOf(d)}, true
 		}
 		return nil, false
@@ -364,6 +371,10 @@ var signalAttrs = map[sema.Key]bool{
 func (m *machine) lowerAttr(ev *sema.Evaluator, e *sema.Expr,
 	b *eval.Budget,
 ) (eval.Expr, bool, error) {
+	if e.Attr == "reflect" {
+		// VHDL-2019 std.reflection: the mirror (interp_reflect.go).
+		return m.reflectValue(ev, e, b)
+	}
 	if !signalAttrs[e.Attr] || e.Prefix == nil {
 		return nil, false, nil
 	}

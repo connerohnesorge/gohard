@@ -1,0 +1,13 @@
+# gohard check --sim --seed 0 --tb composite_tb (VHDL-2019)
+exit 0
+== stdout
+composite.vhd:32:5: hint[sim/assert-note]: report note: record (7,'1')
+composite.vhd:33:5: hint[sim/assert-note]: report note: bit_vector "1010"
+composite.vhd:34:5: hint[sim/assert-note]: report note: int_vec (1,2,-99,0)
+composite.vhd:35:5: hint[sim/assert-note]: report note: nested ((-3,'0'),"01",blue)
+composite.vhd:36:5: hint[sim/assert-note]: report note: string (a,",b)
+composite.vhd:37:5: hint[sim/assert-note]: report note: objects (7,'1') "1010" 42
+composite.vhd:38:5: hint[sim/assert-note]: report note: constant (7,'1')
+summary: 0 errors, 0 warnings, 7 hints, 1 files
+== stderr
+gohard: simulated composite_tb (seed 0): quiet

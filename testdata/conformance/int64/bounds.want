@@ -1,0 +1,14 @@
+# gohard check --sim --seed 0 --tb big_tb (VHDL-2019)
+exit 0
+== stdout
+bounds.vhd:20:5: hint[sim/assert-note]: report note: 2**40 = 1099511627776
+bounds.vhd:21:5: hint[sim/assert-note]: report note: integer'high = 9223372036854775807
+bounds.vhd:22:5: hint[sim/assert-note]: report note: integer'low = -9223372036854775808
+bounds.vhd:23:5: hint[sim/assert-note]: report note: natural'high = 9223372036854775807
+bounds.vhd:24:5: hint[sim/assert-note]: report note: positive'low = 1
+bounds.vhd:26:5: hint[sim/assert-note]: report note: v = 1125899906842631
+bounds.vhd:28:5: hint[sim/assert-note]: report note: twice - 1 = 2199023255551
+bounds.vhd:29:5: hint[sim/assert-note]: report note: s = 8589934592
+summary: 0 errors, 0 warnings, 8 hints, 1 files
+== stderr
+gohard: simulated big_tb (seed 0): quiet

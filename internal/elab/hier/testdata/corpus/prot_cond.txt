@@ -1,0 +1,2 @@
+prot_cond_tb entity work.prot_cond_tb(sim)
+  prot_cond_tb.dut entity work.prot_cond(rtl)

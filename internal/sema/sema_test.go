@@ -542,14 +542,10 @@ func TestOpaque(t *testing.T) {
 	files := map[string]string{
 		"core.vhd": enc,
 		"pkg.vhd": `package p is
-  function f(x : integer) return integer;
-end;
-package body p is
-  function f(x : integer) return integer is
-  begin
-    return 0 when x < 0;
-    return x;
-  end function;
+  type t is protected
+    procedure inc;
+    alias bump is inc [];
+  end protected t;
 end;
 `,
 		"user.vhd": "use work.p.all;\nentity user is end;\n",
@@ -560,8 +556,8 @@ end;
 	for _, w := range []string{
 		"core.vhd:2:14: sema/encrypted-unit: work.core(rtl) is " +
 			"encrypted IP and cannot be analyzed",
-		"pkg.vhd:7:5: unsupported/construct: conditional return ... " +
-			"when is not supported yet (planned for v1.1)",
+		"pkg.vhd:4:5: unsupported/construct: method aliases in " +
+			"protected types is not supported yet (planned for v1.1)",
 	} {
 		if !strings.Contains(got, w) {
 			t.Errorf("missing %q in\n%s", w, got)
@@ -580,11 +576,6 @@ end;
 		t.Errorf("allow_opaque:\n%s", diagText(r))
 	}
 	// A dependent of an opaque unit is unchecked.
-	files["user.vhd"] = "use work.p.all;\nentity user is end;\n"
-	files["pkg.vhd"] = strings.Replace(files["pkg.vhd"],
-		"package body p is", "package body p is\n", 1)
-	files["pkg.vhd"] = "package p is\n  private variable v : integer;\n" +
-		"end;\n"
 	r = analyze(t, files, std19)
 	got = diagText(r)
 	if !strings.Contains(got, "user.vhd:2:8: sema/unchecked-unit: "+

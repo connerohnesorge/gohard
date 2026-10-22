@@ -1,0 +1,13 @@
+# gohard check --sim --seed 0 --tb read_severity_tb (VHDL-2019)
+exit 0
+== stdout
+read_severity.vhd:18:5: hint[sim/assert-note]: report note: default error
+read_severity.vhd:21:5: warning[sim/assert-warning]: assertion warning: integer read failed
+read_severity.vhd:22:5: hint[sim/assert-note]: report note: line "abc 12"
+read_severity.vhd:23:5: warning[sim/assert-warning]: assertion warning: bit_vector read failed
+read_severity.vhd:24:5: hint[sim/assert-note]: report note: b 0110 line "abc 12"
+read_severity.vhd:27:5: hint[sim/assert-note]: assertion note: integer read failed
+read_severity.vhd:28:5: hint[sim/assert-note]: report note: warnings 2
+summary: 0 errors, 2 warnings, 5 hints, 1 files
+== stderr
+gohard: simulated read_severity_tb (seed 0): quiet

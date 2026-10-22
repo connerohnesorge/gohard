@@ -1,0 +1,12 @@
+# NVC output of testdata/conformance/reflection/physical.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a physical.vhd -e physical_tb -r
+# source sha256: bee7aa0c9489c0615c054ebf55bc8f949c84da71404a671a1faeeb8a79984fa3
+# exit: 0
+** Note: 0ms+0: value 250, unit 1, image 250 MM
+   Process :physical_tb:check at physical.vhd:16
+** Note: 0ms+0: DIST: units 3, first MM, last M, m at 3, scale 3 1000, scale cm 10, length 1001, ascending true
+   Process :physical_tb:check at physical.vhd:16
+** Note: 0ms+0: time 3000000, 3000000 FS, TIME, units 8, unit 6 SEC
+   Process :physical_tb:check at physical.vhd:16

@@ -2,7 +2,7 @@ gohard-trace 1
 testbench mode_views_tb
 end 165000000
 type boolean enum false true
-type integer integer 0 2147483647
+type integer integer 0 9223372036854775807
 type std_logic logic
 type std_logic_vector array std_ulogic
 type std_ulogic logic

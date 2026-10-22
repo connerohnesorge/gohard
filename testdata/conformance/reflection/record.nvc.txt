@@ -1,0 +1,10 @@
+# NVC output of testdata/conformance/reflection/record.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a record.vhd -e record_tb -r
+# source sha256: fb33c322e8efc77dd62014dec987d2b6498f117d980aa84ac4d6c6f48c409e43
+# exit: 0
+** Note: 0ms+0: REC: length 3, element 1 B, c at 2, subtype 0 INTEGER, subtype b BIT
+   Process :record_tb:check at record.vhd:15
+** Note: 0ms+0: elements 7, '1', 1.5
+   Process :record_tb:check at record.vhd:15

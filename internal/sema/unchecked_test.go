@@ -16,8 +16,7 @@ func TestUncheckedQuiet(t *testing.T) {
 		"p.vhd": `package p is
   type pt is protected
     procedure set(v : integer);
-  private
-    variable x : integer;
+    alias put is set [integer];
   end protected;
 end;
 `,
@@ -35,7 +34,7 @@ end;
 	r := analyze(t, files, func(c *config.Config) { c.Standard = "2019" })
 	got := strings.TrimSpace(diagText(r))
 	want := []string{
-		"p.vhd:4:3: unsupported/construct",
+		"p.vhd:4:5: unsupported/construct",
 		"q.vhd:2:9: sema/unchecked-unit",
 		"r.vhd:3:28: syntax/",
 		"r.vhd:2:9: sema/unchecked-unit",

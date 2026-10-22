@@ -1,0 +1,11 @@
+# gohard check --sim --seed 0 --tb open_index_tb (VHDL-2019)
+exit 0
+== stdout
+open_index.vhd:20:5: hint[sim/assert-note]: report note: v 2 0 5 3
+open_index.vhd:22:5: hint[sim/assert-note]: report note: w 1 2 5
+open_index.vhd:24:5: hint[sim/assert-note]: report note: C 3 3
+open_index.vhd:25:5: hint[sim/assert-note]: report note: s 4 3 5
+open_index.vhd:28:5: hint[sim/assert-note]: report note: v(0) 111
+summary: 0 errors, 0 warnings, 5 hints, 1 files
+== stderr
+gohard: simulated open_index_tb (seed 0): quiet
