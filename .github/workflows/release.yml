@@ -18,6 +18,17 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # A Nix build takes its version from flake.nix, not the tag, so the
+      # two must agree before anything publishes.
+      - name: Check the flake version matches the tag
+        run: |
+          want="${GITHUB_REF_NAME#v}"
+          got=$(sed -n 's/^ *version = "\(.*\)";$/\1/p' flake.nix)
+          if [ "$got" != "$want" ]; then
+            echo "flake.nix version is '$got', tag $GITHUB_REF_NAME needs '$want'"
+            exit 1
+          fi
+
       - uses: actions/setup-go@v7
         with:
           go-version: '1.27.x'
