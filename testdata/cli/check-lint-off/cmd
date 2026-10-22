@@ -1,0 +1,2 @@
+# lint.unused_signal: off turns the rule off (#54).
+gohard check

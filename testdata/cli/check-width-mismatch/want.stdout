@@ -1,2 +1,3 @@
+design.vhd:3:9: warning[lint/unused-signal]: port d is never read
 design.vhd:18:68: error[sema/static-error]: width mismatch: port d is 10 wide, its actual is 12 in tb.dut.u1 (WIDTH=10)
-summary: 1 errors, 0 warnings, 0 hints, 1 files
+summary: 1 errors, 1 warnings, 0 hints, 1 files

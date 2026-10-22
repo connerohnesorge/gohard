@@ -5,7 +5,8 @@ elab_asserts.vhd:13:5: hint[sim/assert-note]: report note: in f 5
 elab_asserts.vhd:13:5: hint[sim/assert-note]: report note: in f 6
 elab_asserts.vhd:14:5: warning[sim/assert-warning]: assertion warning: x too small 5
 elab_asserts.vhd:14:5: warning[sim/assert-warning]: assertion warning: x too small 6
+elab_asserts.vhd:20:10: warning[lint/unused-signal]: signal s is never assigned
 elab_asserts.vhd:24:5: hint[sim/assert-note]: report note: c=6 s=7 asserts=2
-summary: 0 errors, 2 warnings, 3 hints, 1 files
+summary: 0 errors, 3 warnings, 3 hints, 1 files
 == stderr
 gohard: simulated elab_asserts_tb (seed 0): quiet

@@ -1,0 +1,6 @@
+lint.vhd:17:14: warning[lint/unused-signal]: port unused_in is never read
+lint.vhd:17:43: warning[lint/unused-signal]: port dangling is never assigned
+lint.vhd:29:10: warning[lint/unused-signal]: signal s_read_only is never assigned
+lint.vhd:30:10: warning[lint/unused-signal]: signal s_write_only is never read
+lint.vhd:31:10: warning[lint/unused-signal]: signal s_dead is never used
+summary: 0 errors, 5 warnings, 0 hints, 1 files

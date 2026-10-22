@@ -150,6 +150,10 @@ func Groups() []string {
 	return out
 }
 
+// lintLevels are the values of a lint.* key: lint findings never fail
+// a run except under --strict (#20).
+var lintLevels = []string{"off", "hint", "warning"}
+
 var standards = []string{"1993", "2002", "2008", "2019"}
 
 func boolKey(name, def, doc string, f func(*Config) *bool) Key {
@@ -332,6 +336,10 @@ var keys = []Key{
 	intKey("format.max_line_length", 40, "80",
 		"Lines longer than this are wrapped.",
 		func(c *Config) *int64 { return &c.Format.MaxLineLength }),
+	enumKey("lint.unused_signal", lintLevels, "warning",
+		"A signal never read or never assigned, an in port never read, "+
+			"an out port never assigned (`lint/unused-signal`).",
+		func(c *Config) *string { return &c.Lint.UnusedSignal }),
 	boolKey("simulation.auto_run_on_save", "false",
 		"When on, testbench candidates whose dependencies changed "+
 			"run after a short debounce on save. The code lens and "+
@@ -505,6 +513,7 @@ func (p *parser) vars(key string, n *yaml.Node) ([]Var, bool) {
 var groupDocs = map[string]string{
 	"psl":            "PSL parsing.",
 	"format":         "The formatter (`gohard fmt`, #32).",
+	"lint":           "Lint rules (#54): `off`, `hint` or `warning` each.",
 	"simulation":     "Elaboration and simulation (#35).",
 	"simulation.env": "The deterministic `std.env` environment (v1.1).",
 }

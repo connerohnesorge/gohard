@@ -1,4 +1,5 @@
+design.vhd:27:9: warning[lint/unused-signal]: port addr is never read
 design.vhd:31:30: error[sema/static-error]: constant LAST: value -3 is out of range 0 to 2147483647 in top.g(1).u (DEPTH=12, AW=4)
 design.vhd:49:25: error[sema/static-error]: slice 6 downto 0 is out of range 5 downto 0 in top.g(2).u (DEPTH=128, AW=7)
 design.vhd:52:45: error[sema/static-error]: width mismatch: port addr is 3 wide, its actual is 6 in top.w (DEPTH=8, AW=3)
-summary: 3 errors, 0 warnings, 0 hints, 1 files
+summary: 3 errors, 1 warnings, 0 hints, 1 files

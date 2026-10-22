@@ -10,6 +10,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/elab/hier"
 	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/internal/lint"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/stdlib"
 	"github.com/connerohnesorge/gohard/internal/workspace"
@@ -215,6 +216,7 @@ func analyzeSources(inv *Invocation, r *diag.Report, cfg config.Config,
 	r.Incomplete = append(r.Incomplete, res.Incomplete...)
 	h := hier.Build(res, hier.Options{})
 	keep(h.Diagnostics)
+	keep(lint.Check(res, cfg.Lint))
 	r.Incomplete = append(r.Incomplete, h.Incomplete...)
 	return res
 }

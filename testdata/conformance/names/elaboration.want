@@ -1,12 +1,15 @@
 # gohard check --sim --seed 0 --tb names_elab_tb (VHDL-2019)
 exit 0
 == stdout
+elaboration.vhd:19:10: warning[lint/unused-signal]: signal ss is never assigned
+elaboration.vhd:21:10: warning[lint/unused-signal]: signal \Ext Sig\ is never assigned
+elaboration.vhd:23:10: warning[lint/unused-signal]: signal init is never assigned
 elaboration.vhd:27:5: hint[sim/assert-note]: report note: sub :names_elab_tb(x):u@names_elab_sub(a):ss given :work:names_elab_pkg:ps :names_elab_tb:u:ss
 elaboration.vhd:28:5: hint[sim/assert-note]: report note: alias :names_elab_tb:u:al al :names_elab_tb:u:\ext sig\ \ext sig\
 elaboration.vhd:45:7: hint[sim/assert-note]: report note: enum :names_elab_tb:e(1):c
 elaboration.vhd:45:7: hint[sim/assert-note]: report note: enum :names_elab_tb:e(2):c
 elaboration.vhd:53:7: hint[sim/assert-note]: report note: char :names_elab_tb:ch(97):l :names_elab_tb(x):ch(97):lp:
 elaboration.vhd:53:7: hint[sim/assert-note]: report note: char :names_elab_tb:ch(98):l :names_elab_tb(x):ch(98):lp:
-summary: 0 errors, 0 warnings, 6 hints, 1 files
+summary: 0 errors, 3 warnings, 6 hints, 1 files
 == stderr
 gohard: simulated names_elab_tb (seed 0): quiet

@@ -48,6 +48,7 @@ type Config struct {
 	// Defines are user conditional-analysis identifiers, sorted by name.
 	Defines    []Define
 	Format     Format
+	Lint       Lint
 	Simulation Simulation
 
 	// set records the position of every key the file set validly.
@@ -66,6 +67,11 @@ type Format struct {
 	KeywordCase   string // "lower", "upper" or "preserve"
 	AlignPorts    bool
 	MaxLineLength int64
+}
+
+// Lint holds the lint.* keys (#54): each rule's severity, or "off".
+type Lint struct {
+	UnusedSignal string
 }
 
 // Simulation holds the simulation.* keys (#35).
@@ -137,6 +143,7 @@ func Defaults() Config {
 			AlignPorts:    true,
 			MaxLineLength: 80,
 		},
+		Lint: Lint{UnusedSignal: "warning"},
 		Simulation: Simulation{
 			TimeBudget:  Millisecond,
 			DeltaBudget: 10000,

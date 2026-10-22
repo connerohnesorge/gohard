@@ -142,6 +142,9 @@ const (
 	// libs: `gohard libs detect` (#1).
 	LibsUnreadable Code = "libs/unreadable"
 
+	// lint: likely RTL mistakes in legal VHDL (#54).
+	LintUnusedSignal Code = "lint/unused-signal"
+
 	// internal: GoHard's own failures (#20).
 	InternalCrash       Code = "internal/crash"
 	InternalUnknownCode Code = "internal/unknown-code"
@@ -332,7 +335,13 @@ var table = []Info{
 		Owner:   1,
 		Summary: "a detected library cannot be read as VHDL source",
 		Message: "{library} at {path} is {reason} and cannot be read",
+	}, {
+		Code: LintUnusedSignal, Severity: Warning, Class: Design,
+		Owner:   54,
+		Summary: "a signal or port is never read or never assigned",
+		Message: "{kind} {name} is never {use}",
 	},
+
 	{
 		Code: LSPReplayMismatch, Severity: Error, Class: Tool,
 		Owner:   26,

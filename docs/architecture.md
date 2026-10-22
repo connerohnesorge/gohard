@@ -123,6 +123,7 @@ wording is locked when v1.0 ships. Codes are `area/kebab-name`:
 | `library/` | #34 | `library/unmapped`, `library/duplicate-unit`, `library/import-cycle` |
 | `stdlib/` | #33 | `stdlib/integrity` |
 | `sema/` | #34 | `sema/ambiguous-overload`, `sema/eval-limit`, `sema/unchecked-unit` |
+| `lint/` | #54 | `lint/unused-signal` |
 | `unsupported/` | #20 | `unsupported/construct` ("please report") |
 | `format/` | #32 | `format/would-change` |
 | `sim/` | #35, #29 | `sim/budget-exceeded`, `sim/assert-error`, `sim/race` |

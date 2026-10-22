@@ -106,6 +106,19 @@
         }
       }
     },
+    "lint": {
+      "description": "Lint rules (#54): `off`, `hint` or `warning` each.",
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "unused_signal": {
+          "description": "A signal never read or never assigned, an in port never read, an out port never assigned (`lint/unused-signal`).",
+          "type": "string",
+          "enum": ["off", "hint", "warning"],
+          "default": "warning"
+        }
+      }
+    },
     "simulation": {
       "description": "Elaboration and simulation (#35).",
       "type": ["object", "null"],

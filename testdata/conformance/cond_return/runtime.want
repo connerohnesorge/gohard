@@ -1,6 +1,7 @@
 # gohard check --sim --seed 0 --tb runtime_tb (VHDL-2019)
 exit 0
 == stdout
+runtime.vhd:9:10: warning[lint/unused-signal]: signal limit is never assigned
 runtime.vhd:40:5: hint[sim/assert-note]: report note: cap sum = 69
 runtime.vhd:41:5: hint[sim/assert-note]: report note: pick = -1 8 9
 runtime.vhd:45:7: hint[sim/assert-note]: report note: first_over(0) = -1
@@ -8,6 +9,6 @@ runtime.vhd:45:7: hint[sim/assert-note]: report note: first_over(1) = 10
 runtime.vhd:45:7: hint[sim/assert-note]: report note: first_over(2) = 5
 runtime.vhd:45:7: hint[sim/assert-note]: report note: first_over(3) = 4
 runtime.vhd:45:7: hint[sim/assert-note]: report note: first_over(4) = 3
-summary: 0 errors, 0 warnings, 7 hints, 1 files
+summary: 0 errors, 1 warnings, 7 hints, 1 files
 == stderr
 gohard: simulated runtime_tb (seed 0): quiet

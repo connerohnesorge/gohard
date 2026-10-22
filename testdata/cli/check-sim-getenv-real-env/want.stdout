@@ -1,4 +1,5 @@
 getenv_tb.vhd:12:5: hint[sim/assert-note]: report note: MODE=fast
+getenv_tb.vhd:25:10: warning[lint/unused-signal]: signal foo is never assigned
 getenv_tb.vhd:32:5: hint[sim/assert-note]: report note: FOO=cfg BAR=fromcfg HOME=/home/real UNSET=[set]
 getenv_tb.vhd:37:7: hint[sim/assert-note]: report note: HOME line is /home/real
-summary: 0 errors, 0 warnings, 3 hints, 1 files
+summary: 0 errors, 1 warnings, 3 hints, 1 files

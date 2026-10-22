@@ -7,6 +7,7 @@ hierarchy.vhd:21:5: hint[sim/assert-note]: report note: loop :names_tb::j
 hierarchy.vhd:21:5: hint[sim/assert-note]: report note: pkg :work:names_pkg:
 hierarchy.vhd:21:5: hint[sim/assert-note]: report note: sub t
 hierarchy.vhd:21:5: hint[sim/assert-note]: report note: top :names_tb::u :names_tb: :names_tb(rtl): :names_tb(rtl):t
+hierarchy.vhd:34:10: warning[lint/unused-signal]: signal s is never assigned
 hierarchy.vhd:42:7: hint[sim/assert-note]: report note: q :names_tb:ig:u3:pr:q[integer]: :names_tb(rtl):ig:u3@names_sub(a):pr:q[integer]:w :names_tb:ig:u3:pr:q[integer]:y
 hierarchy.vhd:42:7: hint[sim/assert-note]: report note: q :names_tb:u1:pr:q[integer]: :names_tb(rtl):u1@names_sub(a):pr:q[integer]:w :names_tb:u1:pr:q[integer]:y
 hierarchy.vhd:46:5: hint[sim/assert-note]: report note: s :names_tb:ig:u3:s :names_tb(rtl):ig:u3@names_sub(a):s s
@@ -19,8 +20,9 @@ hierarchy.vhd:50:5: hint[sim/assert-note]: report note: pr :names_tb:ig:u3:pr: :
 hierarchy.vhd:50:5: hint[sim/assert-note]: report note: pr :names_tb:u1:pr: :names_tb(rtl):u1@names_sub(a):pr: pr
 hierarchy.vhd:52:5: hint[sim/assert-note]: report note: sub :names_tb:ig:u3: :names_tb(rtl):ig:u3@names_sub(a):
 hierarchy.vhd:52:5: hint[sim/assert-note]: report note: sub :names_tb:u1: :names_tb(rtl):u1@names_sub(a):
+hierarchy.vhd:74:12: warning[lint/unused-signal]: signal gs is never assigned
 hierarchy.vhd:80:9: hint[sim/assert-note]: report note: gen :names_tb:gen(0):gs :names_tb(rtl):gen(0):i :names_tb:gen(0):b:
 hierarchy.vhd:80:9: hint[sim/assert-note]: report note: gen :names_tb:gen(1):gs :names_tb(rtl):gen(1):i :names_tb:gen(1):b:
-summary: 0 errors, 0 warnings, 20 hints, 1 files
+summary: 0 errors, 2 warnings, 20 hints, 1 files
 == stderr
 gohard: simulated names_tb (seed 0): quiet

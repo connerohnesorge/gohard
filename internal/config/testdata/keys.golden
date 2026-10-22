@@ -18,6 +18,13 @@ exit 2
 gohard.yaml:2:3: error[config/unknown-key]: unknown key format.bogus
 summary: 1 errors, 0 warnings, 0 hints, 1 files
 
+== unknown key at lint
+| lint:
+|   bogus: 1
+exit 2
+gohard.yaml:2:3: error[config/unknown-key]: unknown key lint.bogus
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
 == unknown key at simulation
 | simulation:
 |   bogus: 1
@@ -137,6 +144,16 @@ exit 2
 gohard.yaml:3:3: error[config/duplicate-key]: duplicate key format.max_line_length (first set on line 2)
 summary: 1 errors, 0 warnings, 0 hints, 1 files
 set format.max_line_length = 50
+
+== duplicate lint.unused_signal
+| lint:
+|   unused_signal: "warning"
+|   unused_signal: "warning"
+exit 2
+gohard.yaml:2:18: warning[config/redundant-default]: lint.unused_signal is set to its default value warning
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key lint.unused_signal (first set on line 2)
+summary: 1 errors, 1 warnings, 0 hints, 1 files
+set lint.unused_signal = "warning"
 
 == duplicate simulation.auto_run_on_save
 | simulation:

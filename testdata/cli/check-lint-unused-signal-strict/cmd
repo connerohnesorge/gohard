@@ -1,0 +1,2 @@
+# Lint findings are warnings: they fail a run only under --strict (#54).
+gohard check --strict

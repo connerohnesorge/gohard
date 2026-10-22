@@ -1,0 +1,2 @@
+# lint/unused-signal in the editor, as gohard check reports it (#54).
+gohard lsp diagnostics --at lint.vhd:1:1

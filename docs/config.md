@@ -50,6 +50,7 @@ that loads an invalid configuration exits 2.
 | [`format.keyword_case`](#formatkeyword_case) | lower\|upper\|preserve | `lower` |
 | [`format.align_ports`](#formatalign_ports) | bool | `true` |
 | [`format.max_line_length`](#formatmax_line_length) | int >= 40 | `80` |
+| [`lint.unused_signal`](#lintunused_signal) | off\|hint\|warning | `warning` |
 | [`simulation.auto_run_on_save`](#simulationauto_run_on_save) | bool | `false` |
 | [`simulation.testbenches`](#simulationtestbenches) | list of entity names | `[]` |
 | [`simulation.seed`](#simulationseed) | uint64 | `0` |
@@ -138,6 +139,13 @@ Lines longer than this are wrapped.
 
 * Type: int >= 40
 * Default: `80`
+
+### `lint.unused_signal`
+
+A signal never read or never assigned, an in port never read, an out port never assigned (`lint/unused-signal`).
+
+* Type: off|hint|warning
+* Default: `warning`
 
 ### `simulation.auto_run_on_save`
 

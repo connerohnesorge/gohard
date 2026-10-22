@@ -15,6 +15,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/elab/hier"
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/libs"
+	"github.com/connerohnesorge/gohard/internal/lint"
 	"github.com/connerohnesorge/gohard/internal/parser"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/server"
@@ -374,6 +375,7 @@ func (p *plan) analyze() *Analysis {
 		ds = append(ds, an.Result.Diagnostics...)
 		p.a.phase("hierarchy")
 		ds = append(ds, hier.Build(an.Result, hier.Options{}).Diagnostics...)
+		ds = append(ds, lint.Check(an.Result, p.cfg.Lint)...)
 	}
 	an.Diagnostics = group(an, diag.Normalize(ds))
 	p.a.phase("analyzed")

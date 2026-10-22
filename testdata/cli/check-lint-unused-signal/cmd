@@ -1,0 +1,4 @@
+# lint/unused-signal (#54): unread, unassigned and unused signals and
+# ports; names driven through a port map, a procedure or a record
+# element are not reported.
+gohard check
