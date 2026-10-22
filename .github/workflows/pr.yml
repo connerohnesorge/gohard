@@ -164,5 +164,12 @@ jobs:
           go install \
             "github.com/connerohnesorge/gohard/cmd/gohard@$SHA"
           "$GOPATH/bin/gohard" version | tee version.txt
-          # The pseudo-version names the commit (#39).
-          grep -qx "commit ${SHA:0:12}" version.txt
+          # The pseudo-version names the commit (#39). A tagged commit
+          # resolves to its release version, which carries no commit.
+          MV=$(go list -m -f '{{.Version}}' \
+            "github.com/connerohnesorge/gohard@$SHA")
+          if grep -qE '[0-9]{14}-[0-9a-f]{12}$' <<<"$MV"; then
+            grep -qx "commit ${SHA:0:12}" version.txt
+          else
+            grep -qx "version ${MV#v}" version.txt
+          fi
