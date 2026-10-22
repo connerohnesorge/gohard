@@ -1,0 +1,5 @@
+# A legal construct GoHard v1.1 still does not implement, met in a
+# running process: unsupported/construct with the "please report"
+# message (#18, #20), exit 2, and the run stops there. Every VHDL-2019
+# construct of #18 is delivered, so nothing says "planned" any more.
+gohard check --sim --seed 0 --tb tb

@@ -2,6 +2,7 @@ package sema
 
 import (
 	"math"
+	"strconv"
 
 	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/token"
@@ -343,6 +344,19 @@ func (a *analyzer) assocMap(l cst.AssociationList, region *Region,
 			}
 		} else if i < len(formals) {
 			f = formals[i]
+		} else if i == len(formals) && len(formals) > 0 && !named &&
+			region != nil && !a.quiet {
+			// LRM 6.5.7.1: each actual is associated with a formal
+			// (NVC's wording). A unit without formals of kind k, or
+			// a positional actual after a named one, is reported
+			// as such.
+			n := strconv.Itoa(len(formals)) + " " + k.String()
+			if len(formals) != 1 {
+				n += "s"
+			}
+			a.semaError(item.Span(), "found at least "+
+				strconv.Itoa(i+1)+" positional actuals but "+
+				ownerText(region)+" has only "+n)
 		}
 		i++
 		var want *Type
@@ -1024,6 +1038,10 @@ func (a *analyzer) choices(c cst.Choices, sel *Type) ([]*Expr, bool) {
 			x := &Expr{Kind: ExprRange, Node: ch.Node, Range: rc,
 				Type: sel}
 			a.localChoice(x)
+			// Recorded as the value choices are: the simulator
+			// compiles a selected signal assignment from its
+			// syntax and finds its choices here.
+			a.u.Exprs = append(a.u.Exprs, x)
 			out = append(out, x)
 			continue
 		}

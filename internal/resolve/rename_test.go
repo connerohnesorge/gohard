@@ -109,31 +109,22 @@ func analyzeOne(t *testing.T, src string) *sema.Result {
 // TestRenameOpaque: a declaration of an opaque unit (a construct
 // GoHard does not implement) is not renamed.
 func TestRenameOpaque(t *testing.T) {
-	src := `package counter is
-  type counter_t is protected
-    procedure inc;
-  end protected counter_t;
-end package counter;
-package body counter is
-  type counter_t is protected body
-    procedure inc is
-    begin
-    end procedure inc;
-  end protected body counter_t;
-end package body counter;
-use work.counter.all;
-package protected_record is
-  type pair_t is record
-    a, b : counter_t;
-  end record pair_t;
-  constant d : boolean := std.env.PslIsCovered;
-end package protected_record;
+	src := `entity leaf is end;
+architecture rtl of leaf is begin end;
+entity top is end;
+architecture rtl of top is
+  signal pair_s : bit;
+  component leaf is end component;
+  for u1 : leaf use entity work.leaf;
+    use vunit checks;
+  end for;
+begin
+  u1 : component leaf;
+  pair_s <= '1';
+end;
 `
-	cfg := config.Defaults()
-	cfg.Standard = "2019"
-	r := sema.Analyze(sema.Input{Files: []sema.Source{{Path: "a.vhd",
-		Text: []byte(src)}}, Config: cfg})
-	o := strings.Index(src, "pair_t")
+	r := analyzeOne(t, src)
+	o := strings.Index(src, "pair_s")
 	if _, err := Rename(r, "a.vhd", o, "x"); err != ErrOpaque {
 		t.Errorf("opaque: %v", err)
 	}

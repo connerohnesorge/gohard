@@ -1,3 +1,0 @@
-# A v1.1 construct (#18) gives the same unsupported/construct
-# diagnostic as gohard check: "planned for v1.1" (#25).
-gohard lsp diagnostics --at protected_record.vhd:1:1

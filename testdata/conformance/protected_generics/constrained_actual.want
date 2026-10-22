@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb constrained_actual_tb (VHDL-2019)
+exit 0
+== stdout
+constrained_actual.vhd:28:5: hint[sim/assert-note]: report note: procedure length 4
+constrained_actual.vhd:38:5: hint[sim/assert-note]: report note: bits 3 string 3
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated constrained_actual_tb (seed 0): quiet

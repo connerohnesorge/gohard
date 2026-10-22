@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"slices"
 	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -164,19 +165,21 @@ func TestRequiredCodes(t *testing.T) {
 }
 
 func TestUnsupportedMessages(t *testing.T) {
-	d := NewVariant(UnsupportedConstruct, PlannedV11,
-		"conditional return")
-	if d.Message != "conditional return is not supported yet "+
-		"(planned for v1.1)" {
-		t.Errorf("v1.1 message = %q", d.Message)
-	}
-	d = NewVariant(UnsupportedConstruct, PleaseReport, "group template")
+	d := NewVariant(UnsupportedConstruct, PleaseReport, "group template")
 	if d.Message != "group template is not supported yet, please report" {
 		t.Errorf("report message = %q", d.Message)
 	}
 	if New(UnsupportedConstruct, "x").Message !=
 		NewVariant(UnsupportedConstruct, PleaseReport, "x").Message {
 		t.Error("default message must be the please-report variant")
+	}
+	// The v1.0 variant naming the v1.1 milestone is retired with the
+	// v1.1 release: no variant names a milestone.
+	info, _ := UnsupportedConstruct.Info()
+	for _, v := range info.Variants {
+		if strings.Contains(v.Message, "v1.") {
+			t.Errorf("variant %s: %q", v.Name, v.Message)
+		}
 	}
 }
 

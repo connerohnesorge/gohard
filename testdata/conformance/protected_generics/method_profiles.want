@@ -1,0 +1,12 @@
+# gohard check --sim --seed 0 --tb method_profiles_tb (VHDL-2019)
+exit 0
+== stdout
+method_profiles.vhd:47:5: hint[sim/assert-note]: report note: a 7 17
+method_profiles.vhd:52:5: hint[sim/assert-note]: report note: s abc!b
+method_profiles.vhd:56:7: hint[sim/assert-note]: report note: b one
+method_profiles.vhd:59:5: hint[sim/assert-note]: report note: b '0'
+method_profiles.vhd:61:5: hint[sim/assert-note]: report note: n 42 -40
+method_profiles.vhd:64:5: hint[sim/assert-note]: report note: p 48
+summary: 0 errors, 0 warnings, 6 hints, 1 files
+== stderr
+gohard: simulated method_profiles_tb (seed 0): quiet

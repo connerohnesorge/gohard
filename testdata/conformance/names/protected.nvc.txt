@@ -1,0 +1,21 @@
+# NVC output of testdata/conformance/names/protected.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a protected.vhd -e names_prot_tb -r
+# source sha256: 0d667348429a91e0686a644800ccec82b40bf701e45b1e08da2b5dd33e45ecc2
+# exit: 0
+** Note: 0ms+0: go :names_prot_tb:so:in1:hi[return string]: :names_prot_tb:so:in1:z :names_prot_tb(y):so:in1:z
+   Procedure CHECK [STRING, STRING, STRING] at protected.vhd:11
+   Process :names_prot_tb:_p0 at protected.vhd:73
+** Note: 0ms+0: name :names_prot_tb:so:name[return string]: :names_prot_tb(y):so:in1
+   Procedure CHECK [STRING, STRING, STRING] at protected.vhd:11
+   Process :names_prot_tb:_p0 at protected.vhd:75
+** Note: 0ms+0: m :names_prot_tb:sv:m[integer,bit]: :names_prot_tb(y):sv:m[integer,bit]: :names_prot_tb:sv:m[integer,bit]:lv :names_prot_tb:sv:iv :names_prot_tb(y):sv:m[integer,bit]:a
+   Procedure M [INTEGER, BIT] at protected.vhd:56
+   Process :names_prot_tb:_p0 at protected.vhd:77
+** Note: 0ms+0: m :names_prot_tb::pv:m[integer,bit]: :names_prot_tb(y)::pv:m[integer,bit]: :names_prot_tb::pv:m[integer,bit]:lv :names_prot_tb::pv:iv :names_prot_tb(y)::pv:m[integer,bit]:a
+   Procedure M [INTEGER, BIT] at protected.vhd:56
+   Process :names_prot_tb:_p0 at protected.vhd:78
+** Note: 0ms+0: new :names_prot_tb:_p0::hi[return string]: :names_prot_tb:_p0::z :names_prot_tb(y):_p0::z
+   Procedure CHECK [STRING, STRING, STRING] at protected.vhd:11
+   Process :names_prot_tb:_p0 at protected.vhd:80

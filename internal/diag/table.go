@@ -28,11 +28,11 @@ type Variant struct {
 	Message string
 }
 
-// Unsupported-construct message variants (#20).
+// Unsupported-construct message variants (#20). The v1.0 variant naming
+// the v1.1 milestone is retired: v1.1 delivers those constructs (#18,
+// #27).
 const (
-	// PlannedV11 is for constructs planned for milestone v1.1 (#18, #27).
-	PlannedV11 = "v1.1"
-	// PleaseReport is for every other unimplemented construct.
+	// PleaseReport is for every unimplemented construct.
 	PleaseReport = "report"
 )
 
@@ -594,11 +594,6 @@ var table = []Info{
 			"is opaque",
 		Message: "{construct} is not supported yet, please report",
 		Variants: []Variant{
-			{
-				Name: PlannedV11,
-				Message: "{construct} is not supported yet " +
-					"(planned for v1.1)",
-			},
 			{
 				Name:    PleaseReport,
 				Message: "{construct} is not supported yet, please report",

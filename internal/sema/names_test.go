@@ -514,16 +514,14 @@ end;
 	}
 }
 
-// TestCorpusNames: in every v1.0 oracle corpus design (each analyzes
-// without errors, TestCorpus) every simple name and selected-name
-// suffix resolves, and definition and references agree.
+// TestCorpusNames: in every oracle corpus design (each analyzes
+// without errors, TestCorpus; the v1.1 designs included since the
+// v1.1 release) every simple name and selected-name suffix resolves,
+// and definition and references agree.
 func TestCorpusNames(t *testing.T) {
 	designs, run := loadCorpus(t)
 	n := 0
 	for _, d := range designs {
-		if d.Milestone != "v1.0" {
-			continue
-		}
 		n++
 		t.Run(d.Name, func(t *testing.T) {
 			allResolve(t, run(filepath.Join("../../testdata/corpus",
@@ -531,7 +529,7 @@ func TestCorpusNames(t *testing.T) {
 		})
 	}
 	if n < 10 {
-		t.Errorf("only %d v1.0 corpus designs", n)
+		t.Errorf("only %d corpus designs", n)
 	}
 }
 

@@ -6,12 +6,14 @@ package elab
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/elab/hier"
 	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/sim"
+	"github.com/connerohnesorge/gohard/internal/trace"
 )
 
 // References the machine hands to the evaluator.
@@ -160,6 +162,57 @@ func (m *machine) GenericSubprogram(d *sema.Decl) (*sema.Decl, bool) {
 }
 
 var _ sema.GenericDynamic = (*machine)(nil)
+
+// Report implements sema.Reporter: an assertion that fails, or a
+// report, in a subprogram the static evaluator runs for the process
+// (a pure function and the procedures it calls) is reported like the
+// process's own (machine.assert), at the statement.
+func (m *machine) Report(s *sema.SeqStmt, assertion bool, sev int64,
+	msg string,
+) error {
+	if m.ctx == nil {
+		return nil
+	}
+	return m.ctx.Report(sim.Report{Assertion: assertion,
+		Severity: trace.Severity(sev + 1), Message: msg,
+		Src: m.w.d.stmtSrc(s.Node)})
+}
+
+// elabReporter receives the assertion and report statements run while
+// d is elaborated (sema.Evaluator.SetReporter): the kernel reports them
+// when it initializes (sim.Model.Init).
+type elabReporter struct{ d *Design }
+
+func (r elabReporter) Report(s *sema.SeqStmt, assertion bool, sev int64,
+	msg string,
+) error {
+	r.d.Model.Init = append(r.d.Model.Init, sim.Report{
+		Assertion: assertion, Severity: trace.Severity(sev + 1),
+		Message: msg, Src: r.d.stmtSrc(s.Node)})
+	return nil
+}
+
+var _ sema.Reporter = elabReporter{}
+
+// stmtSrc is the source place of the statement node n: its file among
+// the design's.
+func (d *Design) stmtSrc(n cst.Node) sim.SrcRef {
+	if n.IsZero() || d.r == nil {
+		return sim.SrcRef{}
+	}
+	root := n
+	for p := n.Parent(); !p.IsZero(); p = p.Parent() {
+		root = p
+	}
+	for _, f := range d.r.Files {
+		if f.Parse != nil && f.Parse.Root == root.Green() {
+			return srcOf(f, n.Span())
+		}
+	}
+	return sim.SrcRef{}
+}
+
+var _ sema.Reporter = (*machine)(nil)
 
 // globalRegion reports whether objects of r are elaborated once per
 // design (packages) or per instance (architectures, entities, blocks)
@@ -416,6 +469,9 @@ func (m *machine) lowerAttr(ev *sema.Evaluator, e *sema.Expr,
 		// VHDL-2019 std.reflection: the mirror (interp_reflect.go).
 		return m.reflectValue(ev, e, b)
 	}
+	if nameAttr(e) {
+		return m.lowerName(ev, e) // interp_names.go
+	}
 	if !signalAttrs[e.Attr] || e.Prefix == nil {
 		return nil, false, nil
 	}
@@ -430,9 +486,13 @@ func (m *machine) lowerAttr(ev *sema.Evaluator, e *sema.Expr,
 	case "stable", "quiet", "transaction", "delayed":
 		id, ok := m.prog.implicit[e]
 		if !ok {
-			return nil, true, errors.New("the attribute '" +
-				string(e.Attr) + " of a signal parameter is not " +
-				"supported in simulation")
+			// Only a process or concurrent statement has implicit
+			// signals: in a subprogram body the attribute is illegal
+			// (LRM 4.2.2.3 for a signal parameter; NVC: "implicit
+			// signal STABLE cannot be used in a subprogram body").
+			return nil, true, errors.New("the implicit signal '" +
+				strings.ToUpper(string(e.Attr)) + " cannot be used " +
+				"in a subprogram body")
 		}
 		return &eval.Load{Ref: implRef{id}}, true, nil
 	}
@@ -494,7 +554,7 @@ func (m *machine) lowerCall(ev *sema.Evaluator, e *sema.Expr,
 	fn := &callFn{x: x, body: body, e: e}
 	if !e.Type.Unknown() {
 		t, err := ev.LayoutIn(e.Type, b)
-		if err != nil {
+		if err != nil && !objectResult(e, x) { // interp_call.go
 			return nil, true, err
 		}
 		fn.ret = t

@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb generic_type_tb (VHDL-2019)
+exit 0
+== stdout
+generic_type.vhd:57:5: hint[sim/assert-note]: report note: a.total = -9223372036854775766, b.total = 50
+generic_type.vhd:59:5: hint[sim/assert-note]: report note: a.kept = 'x', b.kept = true
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated generic_type_tb (seed 0): quiet

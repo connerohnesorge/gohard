@@ -38,6 +38,20 @@ go go1.27.2
   command.
 * `gohard lsp` is the language server over stdio.
 
+## VHDL support
+
+| Standard | Analysis | Simulation |
+| --- | --- | --- |
+| VHDL-1993, 2000, 2002, 2008 | yes, with PSL in VHDL | yes |
+| VHDL-2019 (`standard: "2019"`) | yes: conditional analysis, 64-bit `INTEGER`, conditional `return ... when`, inferred constraints, generic maps on subprogram calls, composite `'IMAGE` | yes |
+| VHDL-2019 protected types | generics (on the variable, `is new`, in the header), arrays, records and pointers of protected types, nested protected types, `private` variables, method aliases, protected function parameters, shared-variable ports | yes, with `'PATH_NAME`/`'INSTANCE_NAME` of protected objects |
+| VHDL-2019 `std.env` and `std.reflection` | yes | dates and times from `simulation.env.epoch`, `GETENV` from `simulation.env.vars` or `--env`, `DIR_*`, the VHDL and PSL assert APIs, `std.reflection`; `--real-env` reads the real clock and environment |
+
+Garbage collection reclaims unreachable access-type objects. Design
+writes land in `.gohard/run/<hash>/`. A legal construct GoHard does not
+implement yet is reported as `unsupported/construct` ("... is not
+supported yet, please report", exit 2).
+
 Editor setup (Neovim plugin, Helix snippet) is in
 [docs/editors.md](docs/editors.md). Config keys are in
 [docs/config.md](docs/config.md).

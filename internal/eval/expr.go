@@ -806,6 +806,8 @@ func scalarAttr(a *Attr, t *Type, arg Value) (Value, error) {
 			return Bool(t.Real.Dir == To), nil
 		case AttrImage:
 			return Str(arg.Image()), nil
+		case AttrValue:
+			return parseValue(arg.GoString(), t)
 		}
 		return Value{}, Unsupported("'" + a.Kind.String() +
 			" of a floating type")

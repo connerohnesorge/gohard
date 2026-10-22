@@ -1,0 +1,10 @@
+# gohard check --sim --seed 0 --tb array_extremum_tb (VHDL-2008)
+exit 0
+== stdout
+array_extremum.vhd:19:5: hint[sim/assert-note]: report note: integer 2 6
+array_extremum.vhd:21:5: hint[sim/assert-note]: report note: small 3 9
+array_extremum.vhd:23:5: hint[sim/assert-note]: report note: string 'e' 'o'
+array_extremum.vhd:25:5: hint[sim/assert-note]: report note: null 100 0
+summary: 0 errors, 0 warnings, 4 hints, 1 files
+== stderr
+gohard: simulated array_extremum_tb (seed 0): quiet

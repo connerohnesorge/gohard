@@ -66,6 +66,12 @@ func (m *machine) builtinFunc(fn *callFn, obj int64, args []arg,
 			return eval.Phys(rt, 0), nil
 		}
 		return eval.Phys(rt, int64(m.ctx.Now())), nil
+	case x.Implicit:
+		// Before the unit cases: the implicit operations of a type
+		// std.env or std.reflection declares (TO_STRING of
+		// DAYOFWEEK, DIR_OPEN_STATUS, INDEX, ...) are those of any
+		// other type.
+		return m.implicitFunc(fn, args)
 	case u == "std.env":
 		return m.envFunc(x, args, rt)
 	case u == "std.reflection":
@@ -76,8 +82,6 @@ func (m *machine) builtinFunc(fn *callFn, obj int64, args []arg,
 		}
 		return strValue(rt, justify(stringOf(args[0].v),
 			args[1].v.I, args[2].v.I)), nil
-	case x.Implicit:
-		return m.implicitFunc(fn, args)
 	}
 	return eval.Value{}, unsupported(x)
 }

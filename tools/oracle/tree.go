@@ -224,8 +224,9 @@ func checkTree(x *ctx, t target, golden []goldenFile) []string {
 	text := string(golden[0].Data)
 	if d.HierarchyOracle == corpus.HandChecked {
 		if !corpus.Reached(d.Milestone) {
-			// The golden is the answer at the design's milestone;
-			// corpus.Release makes its units opaque (expected_v1_0).
+			// The golden is the answer at the design's milestone,
+			// which corpus.Release has not reached (corpus.ParseManifest
+			// rejects such a design; kept for the next milestone).
 			return nil
 		}
 		var want strings.Builder

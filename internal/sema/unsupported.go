@@ -10,17 +10,17 @@ package sema
 // with them never exits 0. This file is the extension point for the
 // construct table.
 //
-// Every VHDL-2019 feature of #18 that v1.1 does not implement yet is in
-// the table below (the syntactic ones by node kind) or found by meaning
-// (detectors: the std.env PSL names, 'PATH_NAME and 'INSTANCE_NAME
-// inside protected types). The delivered features whose older-standard
-// use no other check reports (inferred constraints, variable ports,
-// composites of protected types, protected and access function
-// parameters, method aliases in protected types) are still found, to
-// report them as syntax/standard there. A protected type whose body
-// declares variables of other protected types is VHDL-2008 (OSVVM
-// relies on it) and is analyzed. Each construct is reported once per
-// design entity (a primary unit and its secondary units), at its first
+// v1.1 implements every VHDL-2019 feature of #18. Every construct
+// still not implemented is reported with the please-report message
+// ("<construct> is not supported yet, please report"). The delivered
+// features whose older-standard use no other check reports (inferred
+// constraints, variable ports, composites of protected types,
+// protected and access function parameters, method aliases in
+// protected types) are still found, to report them as syntax/standard
+// there. A protected type whose body declares variables of other
+// protected types is VHDL-2008 (OSVVM relies on it) and is analyzed.
+// Each construct is reported once per design entity (a primary unit
+// and its secondary units), at its first
 // use in canonical order; every unit using it is opaque, and so is
 // every secondary unit of a primary unit made opaque by a construct (an
 // architecture cannot be analyzed without its entity). Under an older
@@ -43,22 +43,19 @@ import (
 type construct struct {
 	kind cst.Kind
 	name string
-	// planned marks the v1.1 constructs (#18, #27): VHDL-2019
-	// features, unsupported only when the selected standard is 2019
-	// (the parser rejects them under older standards).
-	planned bool
+	// v2019 marks the VHDL-2019 constructs (#18): under an older
+	// standard they are not unsupported but not allowed (the parser
+	// rejects most of them; legacy lists the rest).
+	v2019 bool
 	// match, when set, must also accept the node.
 	match func(n cst.Node) bool
 }
 
-// The names of the v1.1 constructs found by meaning rather than by node
-// kind. The texts are the ones #18 lists.
+// The names of the VHDL-2019 constructs found by meaning rather than by
+// node kind. The texts are the ones #18 lists.
 const (
-	cEnvPSL       = "std.env PSL assert and cover API"
 	cEnvOther     = "std.env VHDL-2019 additions"
-	cPathName     = "'PATH_NAME/'INSTANCE_NAME for protected types"
 	cMethodAlias  = "method aliases in protected types"
-	cProtGenerics = "generic clauses on protected types"
 	cInferred     = "inferred constraints"
 	cVariablePort = "shared-variable ports of protected type"
 	cProtArray    = "arrays of protected types"
@@ -69,13 +66,7 @@ const (
 // constructs are the legal constructs GoHard does not implement, by
 // node kind.
 var constructs = []construct{
-	{kind: cst.KindProtectedTypeHeader, name: cProtGenerics,
-		planned: true, match: func(n cst.Node) bool {
-			return !(cst.ProtectedTypeHeader{Node: n}).Generics().IsZero()
-		}},
-	{kind: cst.KindProtectedTypeInstantiationDef, name: cProtGenerics,
-		planned: true},
-	{kind: cst.KindAliasDecl, name: cMethodAlias, planned: true,
+	{kind: cst.KindAliasDecl, name: cMethodAlias, v2019: true,
 		match: inProtectedDecl},
 	// PSL verification units bound in a configuration (`use vunit`):
 	// legal VHDL-2008 that neither sema nor the kernel implements.
@@ -83,9 +74,9 @@ var constructs = []construct{
 		name: "verification unit bindings in configurations"},
 }
 
-// legacy lists the v1.1 constructs that an older standard does not
+// legacy lists the VHDL-2019 constructs that an older standard does not
 // allow and that no parser or name rule reports there; this file
-// reports them as syntax/standard. The other v1.1 constructs are
+// reports them as syntax/standard. The other 2019 constructs are
 // syntax the parser gates, or std.env/std.reflection names the
 // per-standard views hide (sema/undefined, library/missing-unit).
 var legacy = map[string]bool{
@@ -117,9 +108,9 @@ func inProtectedDecl(n cst.Node) bool {
 
 // finding is one use of an unimplemented construct.
 type finding struct {
-	rg      cst.Range
-	name    string
-	planned bool
+	rg    cst.Range
+	name  string
+	v2019 bool
 }
 
 // opaqueUnits marks encrypted and unsupported units opaque and their
@@ -463,7 +454,7 @@ func allowed(list []string, u *Unit) bool {
 // unsupported reports the unimplemented constructs u uses, each once
 // per design entity (reported tracks what was reported), and marks u
 // opaque when it uses one. It returns whether it did. Under a standard
-// older than 2019 the v1.1 constructs in legacy are reported as
+// older than 2019 the VHDL-2019 constructs in legacy are reported as
 // syntax/standard instead and do not make u opaque.
 func (s *session) unsupported(u *Unit,
 	reported map[groupKey]map[string]bool,
@@ -480,7 +471,7 @@ func (s *session) unsupported(u *Unit,
 	}
 	opaque := false
 	for _, f := range fs {
-		if f.planned && s.std < token.Std2019 {
+		if f.v2019 && s.std < token.Std2019 {
 			if legacy[f.name] {
 				u.diags = append(u.diags, at(u.File, f.rg,
 					diag.New(diag.SyntaxStandard, f.name,
@@ -496,12 +487,9 @@ func (s *session) unsupported(u *Unit,
 			continue
 		}
 		reported[g][f.name] = true
-		v := diag.PleaseReport
-		if f.planned {
-			v = diag.PlannedV11
-		}
 		u.diags = append(u.diags, at(u.File, f.rg,
-			diag.NewVariant(diag.UnsupportedConstruct, v, f.name)))
+			diag.NewVariant(diag.UnsupportedConstruct, diag.PleaseReport,
+				f.name)))
 	}
 	if opaque {
 		u.Opaque = true
@@ -514,7 +502,7 @@ func (s *session) unsupported(u *Unit,
 func (s *session) findings(u *Unit) []finding {
 	var out []finding
 	add := func(rg cst.Range, name string) {
-		out = append(out, finding{rg: rg, name: name, planned: true})
+		out = append(out, finding{rg: rg, name: name, v2019: true})
 	}
 	// Walk the tree with an explicit stack, pruning inactive branches
 	// on the way down: asking Inactive per node walks the ancestors,
@@ -536,11 +524,8 @@ func (s *session) findings(u *Unit) []finding {
 		for _, c := range constructs {
 			if n.Kind() == c.kind && (c.match == nil || c.match(n)) {
 				out = append(out, finding{rg: n.Span(), name: c.name,
-					planned: c.planned})
+					v2019: c.v2019})
 			}
-		}
-		if n.Kind() == cst.KindAttributeName {
-			s.attrFindings(u, cst.AttributeName{Node: n}, add)
 		}
 	}
 	for _, ref := range u.Refs {
@@ -566,10 +551,10 @@ func refDecl(ref Ref) *Decl {
 	return d.Denotes()
 }
 
-// bundledConstruct names the v1.1 construct a reference to the bundled
-// declaration d uses: the VHDL-2019 additions to std.env that v1.1 does
-// not implement yet (std.reflection and the other groups are
-// implemented, DIR_* included).
+// bundledConstruct names the unimplemented construct a reference to the
+// bundled declaration d uses: a VHDL-2019 addition to std.env outside
+// every group v1.1 implements (none of the bundled ones; the check
+// keeps a new std.env declaration from running unimplemented).
 func bundledConstruct(d *Decl) string {
 	if d == nil || d.Unit == nil || d.Unit.File == nil ||
 		!d.Unit.File.Bundled || d.Unit.Library != "std" {
@@ -589,12 +574,11 @@ func bundledConstruct(d *Decl) string {
 	return envGroup(d)
 }
 
-// envGroup sorts a VHDL-2019 std.env declaration into the #18 groups
-// still planned (PSL, unknown additions), or "" for the
-// implemented ones:
-// by its name, else (implicit operations, to_string, "+") by the type
-// of its first parameter, else (record elements, enumeration literals)
-// by its type or record.
+// envGroup returns cEnvOther for a VHDL-2019 std.env declaration outside
+// the implemented #18 groups, or "" for an implemented one: by its
+// name, else (implicit operations, to_string, "+") by the type of its
+// first parameter, else (record elements, enumeration literals) by its
+// type or record.
 func envGroup(d *Decl) string {
 	g := envName(string(d.Name))
 	if g == "" && len(d.Params) > 0 && d.Params[0].Type != nil {
@@ -607,19 +591,16 @@ func envGroup(d *Decl) string {
 	if g == "" && d.Type != nil && d.Type.Base().Decl != nil {
 		g = envName(string(d.Type.Base().Decl.Name))
 	}
-	switch g {
-	case "":
-		return cEnvOther
-	case envDone:
+	if g == envDone {
 		return ""
 	}
-	return g
+	return cEnvOther
 }
 
 // envDone is the envName group of the implemented std.env additions:
 // VHDL_VERSION and TOOL_*, GETENV, FILE_NAME/FILE_PATH/FILE_LINE,
-// GET_CALL_PATH, the date and time functions, the VHDL assert API and
-// the DIR_* directory API.
+// GET_CALL_PATH, the date and time functions, the VHDL and PSL assert
+// APIs and the DIR_* directory API.
 const envDone = "implemented"
 
 // envName is the #18 group of a std.env name, envDone for an
@@ -627,10 +608,9 @@ const envDone = "implemented"
 func envName(name string) string {
 	n := strings.ToUpper(name)
 	switch {
-	case strings.Contains(n, "PSL"):
-		return cEnvPSL
-	case strings.HasPrefix(n, "DIR") || n == "FILE_DELETE_STATUS" ||
-		n == "VHDL_VERSION" || strings.HasPrefix(n, "TOOL_") ||
+	case strings.Contains(n, "PSL") || strings.HasPrefix(n, "DIR") ||
+		n == "FILE_DELETE_STATUS" || n == "VHDL_VERSION" ||
+		strings.HasPrefix(n, "TOOL_") ||
 		n == "GETENV" || n == "FILE_NAME" || n == "FILE_PATH" ||
 		n == "FILE_LINE" || strings.Contains(n, "CALL_PATH") ||
 		strings.Contains(n, "ASSERT") ||
@@ -642,43 +622,7 @@ func envName(name string) string {
 	return ""
 }
 
-// attrFindings reports 'PATH_NAME/'INSTANCE_NAME of a name inside a
-// protected type.
-func (s *session) attrFindings(u *Unit, an cst.AttributeName,
-	add func(cst.Range, string),
-) {
-	des := an.Designator()
-	if des.IsZero() || des.Missing() {
-		return
-	}
-	switch TokenKey(des) {
-	case "path_name", "instance_name":
-	default:
-		return
-	}
-	pre := an.Prefix()
-	if pre.IsZero() {
-		return
-	}
-	last := pre.LastToken()
-	if last.IsZero() {
-		return
-	}
-	ref, ok := refAt(u.Refs, last.Span().Start)
-	if !ok {
-		return
-	}
-	d := refDecl(ref)
-	if d == nil {
-		return
-	}
-	if d.Parent != nil && (d.Parent.Kind == RegionProtected ||
-		d.Parent.Kind == RegionProtectedBody) {
-		add(an.Span(), cPathName)
-	}
-}
-
-// declFindings reports the declaration-shaped v1.1 constructs of d. All
+// declFindings reports the declaration-shaped VHDL-2019 constructs of d. All
 // of them are delivered: under 2019 they are analyzed, and they are found
 // only for the syntax/standard report of an older standard.
 func declFindings(d *Decl, add func(cst.Range, string)) {

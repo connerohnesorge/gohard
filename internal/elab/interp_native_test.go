@@ -12,21 +12,23 @@ import (
 	"github.com/connerohnesorge/gohard/internal/sim"
 )
 
-// TestNativeMissingIsUnsupported: a call of a bundled subprogram the
-// kernel has no native for (std.env.PslIsCovered, whose v1.1
-// analysis diagnostic is tolerated here) is the diagnostic
-// unsupported/construct (please report) at the call, never
+// TestUnsupportedStopsTheRun: a legal statement the interpreter does
+// not implement yet (named associations in an aggregate target; it
+// was std.env.PslIsCovered, a call without a native, until v1.1
+// delivered every std.env native) is the diagnostic
+// unsupported/construct (please report) at the statement, never
 // sim/runtime-error; the run fails there (sim.Ctx.Abort) and exits 2.
-func TestNativeMissingIsUnsupported(t *testing.T) {
+func TestUnsupportedStopsTheRun(t *testing.T) {
 	const src = `
-use std.env.all;
 entity tb is end;
 architecture a of tb is
 begin
   process
+    variable x, y : bit;
+    variable v : bit_vector(1 to 2) := "10";
   begin
     wait for 1 ns;
-    report boolean'image(PslIsCovered);
+    (1 => x, 2 => y) := v;
     report "after";
     wait;
   end process;
@@ -54,12 +56,12 @@ end;
 		t.Fatalf("unsupported diagnostics %v, want one", got)
 	}
 	d := got[0]
-	if want := "std.env.PslIsCovered is not supported yet, please " +
-		"report"; d.Message != want {
+	if want := "named associations in aggregate targets is not " +
+		"supported yet, please report"; d.Message != want {
 		t.Errorf("message %q, want %q", d.Message, want)
 	}
-	if d.Path != "t.vhd" || d.Line != 9 {
-		t.Errorf("at %s:%d, want t.vhd:9", d.Path, d.Line)
+	if d.Path != "t.vhd" || d.Line != 10 {
+		t.Errorf("at %s:%d, want t.vhd:10", d.Path, d.Line)
 	}
 	if code := diag.ExitCode(r.diags, false, diag.NoSignal); code !=
 		diag.ExitTool {
@@ -73,7 +75,8 @@ end;
 	}
 	if slices.Contains(r.out, "after") ||
 		slices.Contains(r.out, "ticker ran to the end") {
-		t.Errorf("the run went on after the unsupported call: %q", r.out)
+		t.Errorf("the run went on after the unsupported statement: %q",
+			r.out)
 	}
 }
 

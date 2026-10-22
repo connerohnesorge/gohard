@@ -1,5 +1,0 @@
-# Every VHDL-2019 construct of #18 not delivered yet is
-# unsupported/construct: exit 2, the unit is opaque, and the message
-# says "planned for v1.1". One file per construct; the delivered ones
-# are check --sim cases in testdata/conformance/v10_flipped.
-gohard check

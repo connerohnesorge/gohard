@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb names_subprogram_instance_tb (VHDL-2019)
+exit 0
+== stdout
+subprogram_instance.vhd:12:5: hint[sim/assert-note]: report note: pp :names_subprogram_instance_tb:q[integer]:w | :names_subprogram_instance_tb(sim):q[integer]:w
+subprogram_instance.vhd:28:5: hint[sim/assert-note]: report note: fi :names_subprogram_instance_tb:fi[return string]:w | :names_subprogram_instance_tb(sim):fi[return string]:w
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated names_subprogram_instance_tb (seed 0): quiet

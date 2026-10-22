@@ -1,0 +1,11 @@
+# gohard check --sim --seed 0 --tb names_prot_tb (VHDL-2019)
+exit 0
+== stdout
+protected.vhd:13:5: hint[sim/assert-note]: report note: go :names_prot_tb:so:in1:hi[return string]: :names_prot_tb:so:in1:z :names_prot_tb(y):so:in1:z
+protected.vhd:13:5: hint[sim/assert-note]: report note: name :names_prot_tb:so:name[return string]: :names_prot_tb(y):so:in1
+protected.vhd:13:5: hint[sim/assert-note]: report note: new :names_prot_tb:_p0::hi[return string]: :names_prot_tb:_p0::z :names_prot_tb(y):_p0::z
+protected.vhd:59:7: hint[sim/assert-note]: report note: m :names_prot_tb::pv:m[integer,bit]: :names_prot_tb(y)::pv:m[integer,bit]: :names_prot_tb::pv:m[integer,bit]:lv :names_prot_tb::pv:iv :names_prot_tb(y)::pv:m[integer,bit]:a
+protected.vhd:59:7: hint[sim/assert-note]: report note: m :names_prot_tb:sv:m[integer,bit]: :names_prot_tb(y):sv:m[integer,bit]: :names_prot_tb:sv:m[integer,bit]:lv :names_prot_tb:sv:iv :names_prot_tb(y):sv:m[integer,bit]:a
+summary: 0 errors, 0 warnings, 5 hints, 1 files
+== stderr
+gohard: simulated names_prot_tb (seed 0): quiet

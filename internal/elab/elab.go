@@ -31,6 +31,7 @@ package elab
 
 import (
 	"errors"
+	"fmt"
 	"slices"
 	"strconv"
 	"strings"
@@ -134,7 +135,8 @@ func Elaborate(r *sema.Result, o Options) (*Design, []diag.Diagnostic) {
 		steps = eval.EditorSteps
 	}
 	h := hier.Build(r, hier.Options{Tops: []string{o.Top}, Steps: steps,
-		TotalSteps: steps, Natives: d.natives(o.Env)})
+		TotalSteps: steps, Natives: d.natives(o.Env),
+		Reporter: elabReporter{d: d}})
 	if d.charge(h.Steps, sim.SrcRef{}) {
 		return d, d.diags
 	}
@@ -146,6 +148,14 @@ func Elaborate(r *sema.Result, o Options) (*Design, []diag.Diagnostic) {
 	d.Top = top
 	d.Model.Testbench = top.Path
 	d.Model.Src = d.declSrc(top.Entity)
+	if g := unboundGeneric(top); g != nil {
+		// No actual can bind it: the entity is not a testbench as it
+		// stands (the design's error, as NVC's "missing value for
+		// generic").
+		d.runtime(d.declSrc(g), top.Path, errors.New("the generic "+
+			g.Text+" of the testbench "+top.Path+" has no default"))
+		return d, d.diags
+	}
 	d.instance(top)
 	if d.stopped {
 		return d, d.diags
@@ -168,6 +178,17 @@ func Elaborate(r *sema.Result, o Options) (*Design, []diag.Diagnostic) {
 		d.Model.Processes[p.Index].Code = code
 	}
 	return d, d.diags
+}
+
+// unboundGeneric returns a generic constant of the top instance top
+// that has no default, nil if there is none.
+func unboundGeneric(top *hier.Instance) *sema.Decl {
+	for _, g := range top.Generics {
+		if x := g.Decl; x.Kind == sema.DeclGeneric && x.Value == nil {
+			return x
+		}
+	}
+	return nil
 }
 
 // Lookup returns the signal with the hierarchical path p (external
@@ -248,7 +269,15 @@ func (d *Design) charge(n int64, src sim.SrcRef) bool {
 	return false
 }
 
+// runtime reports an error of elaboration as sim/runtime-error, or,
+// when it is a legal construct GoHard does not evaluate yet
+// (*sema.UnsupportedError anywhere in its chain), as
+// unsupported/construct (please report, exit 2).
 func (d *Design) runtime(src sim.SrcRef, inst string, err error) {
+	if what, ok := sema.UnsupportedWhat(err); ok {
+		d.unsupported(src, what)
+		return
+	}
 	dg := diag.New(diag.SimRuntimeError, err.Error(), inst, "0 fs")
 	if src.Path != "" {
 		dg = dg.At(src.Path, src.Line, src.Col)
@@ -465,8 +494,8 @@ func (d *Design) layout(in *hier.Instance, x *sema.Decl,
 		return nil, eval.Value{}, false
 	}
 	if err != nil {
-		d.runtime(src, in.Path, errors.New("the subtype of "+x.Text+
-			": "+err.Error()))
+		d.runtime(src, in.Path, fmt.Errorf("the subtype of %s: %w",
+			x.Text, err))
 		return nil, eval.Value{}, false
 	}
 	if !t.Constrained() && shape != nil && len(shape.B) > 0 {
@@ -474,8 +503,9 @@ func (d *Design) layout(in *hier.Instance, x *sema.Decl,
 	}
 	var v eval.Value
 	if x.Value != nil {
-		v, err = ev.Value(x.Value)
-		if d.charge(ev.Used(), src) {
+		vev := hier.Named(ev, in, x.Value) // 'PATH_NAME and co.
+		v, err = vev.Value(x.Value)
+		if d.charge(vev.Used(), src) {
 			return nil, eval.Value{}, false
 		}
 		if err == nil && d.infers(x, shape) {
@@ -497,8 +527,8 @@ func (d *Design) layout(in *hier.Instance, x *sema.Decl,
 		if shape != nil && !t.Constrained() {
 			return t, *shape, true
 		}
-		d.runtime(src, in.Path, errors.New("the initial value of "+
-			x.Text+": "+err.Error()))
+		d.runtime(src, in.Path, fmt.Errorf("the initial value of %s: %w",
+			x.Text, err))
 		return nil, eval.Value{}, false
 	}
 	return t, v, true

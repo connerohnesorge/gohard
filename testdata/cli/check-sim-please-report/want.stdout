@@ -1,0 +1,2 @@
+tb.vhd:13:5: error[unsupported/construct]: 'PATH_NAME and 'INSTANCE_NAME of a declaration of a generic package is not supported yet, please report
+summary: 1 errors, 0 warnings, 0 hints, 1 files

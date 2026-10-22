@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/sweep/real_value.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2008 -a real_value.vhd -e real_value_tb -r
+# source sha256: 2bc44ac608a5dfcb0e5981a523f7f695ab3498b6582edc8ea75190a47c00ba43
+# exit: 0
+** Note: 0ms+0: value -405
+   Process :real_value_tb:_p0 at real_value.vhd:9

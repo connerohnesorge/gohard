@@ -1,0 +1,15 @@
+# gohard check --sim --seed 0 --tb psl_state_tb (VHDL-2019)
+exit 0
+== stdout
+psl_state.vhd:26:3: warning[sim/assert-warning]: assertion warning: [WARNING] y did not follow x
+psl_state.vhd:28:3: warning[sim/cover-miss]: cover saw_x was never hit
+psl_state.vhd:29:3: warning[sim/cover-miss]: cover saw_xy was never hit
+psl_state.vhd:34:7: hint[sim/assert-note]: report note: cleared again: failed false, covered false, asserts covered false, cover asserts false, warnings 1
+psl_state.vhd:34:7: hint[sim/assert-note]: report note: cleared: failed false, covered false, asserts covered false, cover asserts true, warnings 0
+psl_state.vhd:34:7: hint[sim/assert-note]: report note: cover asserts: failed false, covered true, asserts covered true, cover asserts true, warnings 0
+psl_state.vhd:34:7: hint[sim/assert-note]: report note: covered: failed false, covered true, asserts covered true, cover asserts false, warnings 0
+psl_state.vhd:34:7: hint[sim/assert-note]: report note: failed: failed true, covered false, asserts covered true, cover asserts true, warnings 1
+psl_state.vhd:34:7: hint[sim/assert-note]: report note: start: failed false, covered false, asserts covered false, cover asserts false, warnings 0
+summary: 0 errors, 3 warnings, 6 hints, 1 files
+== stderr
+gohard: simulated psl_state_tb (seed 0): stopped

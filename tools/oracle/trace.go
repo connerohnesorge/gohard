@@ -289,9 +289,9 @@ func applyDisagreements(d design, ors []*corpus.Oracle) (
 // registered interpreter there is no GoHard trace to compare; the
 // corpus harness (internal/corpus) reports that.
 func compareGoHard(x *ctx, d design, ors []*corpus.Oracle) []string {
-	// A design of a later milestone than corpus.Release only fails
-	// analysis (prot_cond): its recordings wait for the milestone
-	// that simulates it.
+	// A design of a later milestone than corpus.Release (none since
+	// the v1.1 flip: prot_cond and gc_heap are compared) waits for
+	// the milestone that simulates it.
 	if simrun.DefaultCode == nil || len(ors) == 0 ||
 		!corpus.Reached(d.Milestone) {
 		return nil

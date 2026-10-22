@@ -39,7 +39,6 @@ type Design struct {
 	Models          map[string]string `yaml:"models"`
 	Config          string            `yaml:"config"`
 	Expected        Expected          `yaml:"expected"`
-	ExpectedV10     *Expected         `yaml:"expected_v1_0"`
 	Invariants      []string          `yaml:"invariants"`
 	Oracle          string            `yaml:"oracle"`
 	HierarchyOracle string            `yaml:"hierarchy_oracle"`
@@ -48,6 +47,11 @@ type Design struct {
 	Variants        []Variant         `yaml:"variants"`
 	TraceSHA256     string            `yaml:"trace_sha256"`
 	OracleSHA256    string            `yaml:"oracle_sha256"`
+
+	// RetiredV10 is the v1.0 outcome key expected_v1_0, retired with
+	// the v1.1 release (#18, #27): a manifest that still has it is an
+	// error, since nothing would check it.
+	RetiredV10 *yaml.Node `yaml:"expected_v1_0"`
 }
 
 // File is one source file of a design or variant.
@@ -56,7 +60,7 @@ type File struct {
 	Standard string `yaml:"standard"`
 }
 
-// Expected is an expected outcome (expected, expected_v1_0).
+// Expected is an expected outcome.
 type Expected struct {
 	Exit     int       `yaml:"exit"`
 	Status   string    `yaml:"status"`
@@ -117,6 +121,16 @@ func ParseManifest(src []byte) (*Manifest, error) {
 			return nil, fmt.Errorf("%s: design %d: name, testbench "+
 				"and files are required", ManifestPath, i)
 		}
+		if !Reached(d.Milestone) {
+			return nil, fmt.Errorf("%s: %s: milestone %q is not a "+
+				"milestone at or before the release %s", ManifestPath,
+				d.Name, d.Milestone, Release)
+		}
+		if d.RetiredV10 != nil {
+			return nil, fmt.Errorf("%s: %s: expected_v1_0 is retired "+
+				"since the %s release; the design runs against "+
+				"expected", ManifestPath, d.Name, Release)
+		}
 	}
 	return &m, nil
 }
@@ -174,15 +188,11 @@ func (r Run) Name() string {
 	return r.Design.Name + "/" + r.Variant
 }
 
-// Runs returns the main run and every variant run of d. Release is
-// the milestone under test: a design of a later milestone runs
-// against its expected_v1_0 outcome.
+// Runs returns the main run and every variant run of d. Every design
+// of a parsed manifest is of a milestone the release reached, so each
+// runs against its expected outcome.
 func (d Design) Runs() []Run {
-	exp := d.Expected
-	if !Reached(d.Milestone) && d.ExpectedV10 != nil {
-		exp = *d.ExpectedV10
-	}
-	main := Run{Design: d, Standard: d.Standard, Expected: exp,
+	main := Run{Design: d, Standard: d.Standard, Expected: d.Expected,
 		Paths: d.ModelPaths()}
 	for _, f := range d.Files {
 		main.Paths = append(main.Paths, f.Path)

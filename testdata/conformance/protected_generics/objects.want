@@ -1,0 +1,9 @@
+# gohard check --sim --seed 0 --tb objects_tb (VHDL-2019)
+exit 0
+== stdout
+objects.vhd:49:5: hint[sim/assert-note]: report note: by2 = 4, width 8
+objects.vhd:51:5: hint[sim/assert-note]: report note: by5 = 5, width 3
+objects.vhd:53:5: hint[sim/assert-note]: report note: plain = 1, width 4
+summary: 0 errors, 0 warnings, 3 hints, 1 files
+== stderr
+gohard: simulated objects_tb (seed 0): quiet

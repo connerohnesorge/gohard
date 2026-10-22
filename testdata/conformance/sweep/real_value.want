@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb real_value_tb (VHDL-2008)
+exit 0
+== stdout
+real_value.vhd:18:5: hint[sim/assert-note]: report note: value -405
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated real_value_tb (seed 0): quiet

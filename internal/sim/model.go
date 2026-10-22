@@ -136,6 +136,12 @@ type Model struct {
 	Scopes []trace.Scope
 	// Src is the testbench's location, for run-level diagnostics.
 	Src SrcRef
+	// Init are the assertion violations and reports elaboration ran
+	// (the functions a constant, a generic or a signal's initial
+	// value calls), in order: the kernel reports them, counted as any
+	// other, when it initializes, before any process runs (NVC's
+	// "(init)").
+	Init []Report
 
 	implicit []implicitKey
 }

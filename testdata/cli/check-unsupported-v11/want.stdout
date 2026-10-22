@@ -1,4 +1,0 @@
-env_psl.vhd:8:24: error[unsupported/construct]: std.env PSL assert and cover API is not supported yet (planned for v1.1)
-path_name.vhd:12:14: error[unsupported/construct]: 'PATH_NAME/'INSTANCE_NAME for protected types is not supported yet (planned for v1.1)
-protected_generics.vhd:3:5: error[unsupported/construct]: generic clauses on protected types is not supported yet (planned for v1.1)
-summary: 3 errors, 0 warnings, 0 hints, 3 files

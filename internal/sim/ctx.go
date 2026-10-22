@@ -242,9 +242,10 @@ func (c *Ctx) force(t Target, v eval.Value, release, out bool) error {
 type Report struct {
 	// Assertion is true for a failed assert, false for a report.
 	Assertion bool
-	// PSL marks a failed PSL directive (internal/elab/psl): it is
-	// reported like an assertion but is not a VHDL assert, so the
-	// std.env assert counters, enables and formats ignore it.
+	// PSL marks a report the std.env assert counters, enables and
+	// formats ignore. internal/elab/psl does not set it: as in NVC
+	// 1.23, a PSL assertion violation is an assertion like a VHDL
+	// one (#18).
 	PSL      bool
 	Severity trace.Severity
 	Message  string
@@ -256,12 +257,12 @@ type Report struct {
 // run after the current process phase when the severity reaches
 // simulation.stop_level.
 //
-// The std.env assert state applies to VHDL asserts and reports (not
-// to PSL), as in NVC (#18): a severity disabled with
-// SetVhdlAssertEnable drops r entirely (no trace event, diagnostic,
-// count or halt); an enabled failed assertion is counted; a format
-// set with SetVhdlAssertFormat rewrites the diagnostic's message only,
-// the trace keeps the raw message.
+// The std.env assert state applies to asserts and reports, PSL
+// violations included, unless r.PSL is set (#18): a severity disabled
+// with SetVhdlAssertEnable drops r entirely (no trace event,
+// diagnostic, count or halt); an enabled failed assertion is counted;
+// a format set with SetVhdlAssertFormat rewrites the diagnostic's
+// message only, the trace keeps the raw message.
 func (c *Ctx) Report(r Report) error {
 	k := c.k
 	if r.Severity == trace.NoSeverity || r.Severity > trace.Failure {

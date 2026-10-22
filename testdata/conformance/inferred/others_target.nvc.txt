@@ -1,0 +1,8 @@
+# NVC output of testdata/conformance/inferred/others_target.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a others_target.vhd -e others_target_tb -r
+# source sha256: 839ca085b70be1c2ee9fb19e2bd722c84cdc39a4f43fac33e16f3ad6a9cd747a
+# exit: 0
+** Note: 1ns+0: 5 9 qzzzz 0000
+   Process :others_target_tb:_p0 at others_target.vhd:11

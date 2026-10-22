@@ -1,0 +1,15 @@
+# NVC output of testdata/conformance/sweep/no_return.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2008 -a no_return.vhd -e no_return_tb -r
+# source sha256: e268aa7c55ea343814b723c607a8975ae1f18286c8baba96ad77b8ccef7f0db1
+# exit: 1
+** Note: 0ms+0: f(11) = 1
+   Process :no_return_tb:_p0 at no_return.vhd:18
+** Fatal: 0ms+0: function F did not return a value
+    > no_return.vhd:11
+    |
+ 11 |   function f(x : integer) return integer is
+    |   ^
+   Function F [INTEGER return INTEGER] at no_return.vhd:11
+   Process :no_return_tb:_p0 at no_return.vhd:21

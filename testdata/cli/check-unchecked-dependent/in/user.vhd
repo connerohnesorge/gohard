@@ -1,5 +1,7 @@
-use work.p.all;
-
 entity user is
-  port (d : in bit_vector(k downto 0));
 end entity user;
+
+architecture rtl of user is
+begin
+  u : configuration work.top_cfg;
+end architecture rtl;

@@ -5,16 +5,46 @@ import (
 	"testing"
 )
 
-// TestReleaseIsV10 pins the switch: v1.0 designs run, v1.1 designs run
-// against expected_v1_0 until Stage 4 moves Release.
-func TestReleaseIsV10(t *testing.T) {
-	if Release != "v1.0" {
-		t.Fatalf("Release = %q, want v1.0 until the v1.1 flip", Release)
+// TestReleaseIsV11 pins the switch: since the v1.1 flip (#18, #27)
+// v1.0 and v1.1 designs run against their expected outcome; later
+// milestones are not reached.
+func TestReleaseIsV11(t *testing.T) {
+	if Release != "v1.1" {
+		t.Fatalf("Release = %q, want v1.1 after the flip", Release)
 	}
-	for m, want := range map[string]bool{"v1.0": true, "v1.1": false,
-		"v0.9": true, "v2.0": false, "": false} {
+	for m, want := range map[string]bool{"v1.0": true, "v1.1": true,
+		"v0.9": true, "v1.2": false, "v2.0": false, "": false} {
 		if got := Reached(m); got != want {
 			t.Errorf("Reached(%q) = %v, want %v", m, got, want)
+		}
+	}
+}
+
+// TestManifestRetiredKeys: a design with the retired expected_v1_0
+// outcome, or of a milestone after Release, is a manifest error (no
+// check would read it); the same design without them parses and runs
+// against expected only.
+func TestManifestRetiredKeys(t *testing.T) {
+	const base = "designs:\n  - name: x\n    testbench: tb\n" +
+		"    files: [{path: a.vhd}]\n" +
+		"    expected: {exit: 0, status: clean}\n"
+	m, err := ParseManifest([]byte(base + "    milestone: v1.1\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rs := m.Designs[0].Runs(); len(rs) != 1 ||
+		rs[0].Expected.Status != "clean" {
+		t.Errorf("runs %+v", rs)
+	}
+	for _, bad := range []string{
+		"    milestone: v1.1\n    expected_v1_0: {exit: 2}\n",
+		"    milestone: v1.2\n",
+		"    milestone: v2.0\n",
+		"    milestone: 1.1\n",
+		"",
+	} {
+		if _, err := ParseManifest([]byte(base + bad)); err == nil {
+			t.Errorf("accepted %q", bad)
 		}
 	}
 }

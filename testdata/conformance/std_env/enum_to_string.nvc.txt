@@ -1,0 +1,12 @@
+# NVC output of testdata/conformance/std_env/enum_to_string.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a enum_to_string.vhd -e enum_to_string_tb -r
+# source sha256: 4d23c2736c563b7e8887b93a55bce2c67b151ffccb7234d3ee732ed43514ee7e
+# exit: 0
+** Note: 0ms+0: day thursday friday
+   Process :enum_to_string_tb:_p0 at enum_to_string.vhd:11
+** Note: 0ms+0: open status_not_found create status_ok
+   Process :enum_to_string_tb:_p0 at enum_to_string.vhd:11
+** Note: 0ms+0: delete status_access_denied file status_ok
+   Process :enum_to_string_tb:_p0 at enum_to_string.vhd:11

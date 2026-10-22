@@ -38,6 +38,9 @@ func (w *world) runtimeExpr(ev *sema.Evaluator, e *sema.Expr, depth int,
 	if e == nil || depth > maxRuntimeDepth {
 		return false
 	}
+	if nameAttr(e) {
+		return true // 'PATH_NAME and co. (interp_names.go)
+	}
 	if e.Decl != nil {
 		x := e.Decl.Denotes()
 		switch {

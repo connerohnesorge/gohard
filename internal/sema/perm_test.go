@@ -169,7 +169,7 @@ func librarySets(t *testing.T) []permSet {
 	t.Helper()
 	var out []permSet
 	for _, f := range []struct{ dir, std string }{
-		{"check-unsupported-v11", "2019"},
+		{"check-unchecked-dependent", "2008"},
 		{"check-encrypted-standin", "2008"},
 		{"check-unmapped-library", "2008"},
 		{"check-import-cycle", "2008"},

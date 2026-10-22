@@ -145,8 +145,14 @@ func (b *builder) value(in *Instance, gen *Generic, ev, fev *sema.Evaluator,
 		gen.Err = eval.ErrBudget
 		return
 	}
-	v, err := ev.Value(e)
-	b.spend(ev)
+	// An actual is code of the parent instance, a default of in.
+	ctx := in
+	if in.parent != nil && ev == in.parent.ev {
+		ctx = in.parent
+	}
+	nev := named(ev, ctx, in, e)
+	v, err := nev.Value(e)
+	b.spend(nev)
 	if err != nil {
 		b.genericError(in, gen, err)
 		return
@@ -351,7 +357,11 @@ func (b *builder) declarations(in *Instance, r *sema.Region) {
 				}
 				node = d.Value.Node
 				var v eval.Value
+				// The design's elaboration evaluates it again
+				// (internal/elab): its reports are made there.
+				prev := ev.Mute(true)
 				v, err = ev.Value(d.Value)
+				ev.Mute(prev)
 				b.spend(ev)
 				if err == nil {
 					_, err = eval.Check(v, t)

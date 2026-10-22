@@ -1,0 +1,20 @@
+# NVC output of testdata/conformance/sweep/elab_asserts.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a elab_asserts.vhd -e elab_asserts_tb -r
+# source sha256: 648bccc348c3f781fd098fec3d47aab2da41a689b854c5062ceee4da61f74146
+# exit: 0
+** Note: (init): in f 5
+   Function F [INTEGER return INTEGER] at elab_asserts.vhd:11
+   Process (init) at elab_asserts.vhd:19
+** Warning: (init): x too small 5
+   Function F [INTEGER return INTEGER] at elab_asserts.vhd:11
+   Process (init) at elab_asserts.vhd:19
+** Note: (init): in f 6
+   Function F [INTEGER return INTEGER] at elab_asserts.vhd:11
+   Process (init) at elab_asserts.vhd:20
+** Warning: (init): x too small 6
+   Function F [INTEGER return INTEGER] at elab_asserts.vhd:11
+   Process (init) at elab_asserts.vhd:20
+** Note: 0ms+0: c=6 s=7 asserts=2
+   Process :elab_asserts_tb:_p0 at elab_asserts.vhd:22

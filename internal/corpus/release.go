@@ -6,10 +6,11 @@ import (
 )
 
 // Release is the milestone under test: the one switch every
-// milestone-dependent check reads (a design's milestone, its
-// expected_v1_0 outcome, the oracle goldens). It moves to v1.1 when
-// the v1.1 work lands (#18, #27).
-const Release = "v1.0"
+// milestone-dependent check reads (which designs the corpus may hold
+// and run, the oracle goldens). It moved to v1.1 when the v1.1 work
+// landed (#18, #27); the v1.0 outcomes of the v1.1 designs
+// (expected_v1_0) are retired with it.
+const Release = "v1.1"
 
 // Reached reports whether milestone ("vMAJOR.MINOR") is at or before
 // Release, so its designs run against their own expectations. An

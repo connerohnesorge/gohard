@@ -1,0 +1,10 @@
+# NVC output of testdata/conformance/sweep/selected_range.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2008 -a selected_range.vhd -e selected_range_tb -r
+# source sha256: d489bfeda31c54670a1267c5349ba74b62b73a313c394bb653545f1e12cd831b
+# exit: 0
+** Note: 1ns+0: a '1' b '0'
+   Process :selected_range_tb:_p1 at selected_range.vhd:13
+** Note: 3ns+0: a '0' b '1'
+   Process :selected_range_tb:_p1 at selected_range.vhd:13

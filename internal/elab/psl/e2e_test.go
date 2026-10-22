@@ -81,13 +81,14 @@ const ns = 1_000_000
 // for its VHDL processes and runs it at seed.
 func pslSimple(t *testing.T, seed uint64) (*sim.Kernel, *trace.Trace) {
 	t.Helper()
-	return pslSimpleAt(t, seed, nil)
+	return pslSimpleEnd(t, seed, nil, nil)
 }
 
-// pslSimpleAt is pslSimple with start run by the stopper process at
-// time 0, before the design's first PSL clock edge.
-func pslSimpleAt(t *testing.T, seed uint64,
-	start func(c *sim.Ctx) error,
+// pslSimpleEnd is pslSimple with start run by the stopper process at
+// time 0, before the design's first PSL clock edge, and end at 100 ns,
+// just before it finishes the run.
+func pslSimpleEnd(t *testing.T, seed uint64,
+	start func(c *sim.Ctx) error, end func(c *sim.Ctx),
 ) (*sim.Kernel, *trace.Trace) {
 	t.Helper()
 	r := analyze(t, "../../../testdata/corpus/psl_simple",
@@ -118,6 +119,9 @@ func pslSimpleAt(t *testing.T, seed uint64,
 						err = start(c)
 					}
 					return sim.Wait{For: 100 * ns, HasFor: true}, err
+				}
+				if end != nil {
+					end(c)
 				}
 				c.Stop(0, true, sim.SrcRef{})
 				return sim.Wait{}, nil
@@ -240,32 +244,38 @@ func TestPSLSimple(t *testing.T) {
 
 func itoa(n int) string { return strconv.Itoa(n) }
 
-// TestPSLIsNotAVHDLAssert (#18): the failing PSL assert of psl_simple
-// is reported but never counted by the std.env assert counters, and
-// disabling its severity with SetVhdlAssertEnable does not drop it;
-// one failing VHDL assert of the same severity is counted, and is
-// dropped once its severity is disabled.
-func TestPSLIsNotAVHDLAssert(t *testing.T) {
+// TestPSLIsAVHDLAssert (#18): as in NVC 1.23, the failing PSL assert
+// of psl_simple is an assertion violation like a VHDL one: counted by
+// the std.env assert counters (so by the re-run lens and the status
+// JSON), dropped with no diagnostic and no count once its severity is
+// disabled with SetVhdlAssertEnable, and it sets PslAssertFailed only
+// when enabled.
+func TestPSLIsAVHDLAssert(t *testing.T) {
 	vhdl := func(c *sim.Ctx) error {
 		return c.Report(sim.Report{Assertion: true,
 			Severity: trace.Error, Message: "vhdl",
 			Src: sim.SrcRef{Path: "psl_simple_tb.vhd", Line: 1, Col: 1}})
 	}
 	cases := []struct {
-		name  string
-		start func(c *sim.Ctx) error
-		count uint64 // VHDL error asserts counted
-		vhdl  bool   // the VHDL assert reported
+		name   string
+		start  func(c *sim.Ctx) error
+		count  uint64 // error asserts counted
+		psl    int    // PSL assert diagnostics
+		vhdl   bool   // the VHDL assert reported
+		failed bool   // PslAssertFailed at the end
 	}{
-		{"psl only", nil, 0, false},
-		{"psl and vhdl", vhdl, 1, true},
+		{"psl only", nil, 1, 1, false, true},
+		{"psl and vhdl", vhdl, 2, 1, true, true},
 		{"error disabled", func(c *sim.Ctx) error {
 			c.SetAssertEnable(trace.Error, false)
 			return vhdl(c)
-		}, 0, false},
+		}, 0, 0, false, false},
 	}
 	for _, tc := range cases {
-		k, _ := pslSimpleAt(t, 0, tc.start)
+		var failed bool
+		k, _ := pslSimpleEnd(t, 0, tc.start, func(c *sim.Ctx) {
+			failed = c.PSLFailed()
+		})
 		if a := k.Asserts(); a.Error != tc.count || a.Total() != tc.count {
 			t.Errorf("%s: asserts %+v, want %d error", tc.name, a,
 				tc.count)
@@ -282,9 +292,13 @@ func TestPSLIsNotAVHDLAssert(t *testing.T) {
 				v++
 			}
 		}
-		if psl != 1 || (v == 1) != tc.vhdl || v > 1 {
+		if psl != tc.psl || (v == 1) != tc.vhdl || v > 1 {
 			t.Errorf("%s: %d psl and %d vhdl assert diagnostics",
 				tc.name, psl, v)
+		}
+		if failed != tc.failed {
+			t.Errorf("%s: PslAssertFailed %v, want %v", tc.name, failed,
+				tc.failed)
 		}
 	}
 }

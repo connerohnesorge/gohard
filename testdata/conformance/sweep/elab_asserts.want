@@ -1,0 +1,11 @@
+# gohard check --sim --seed 0 --tb elab_asserts_tb (VHDL-2019)
+exit 0
+== stdout
+elab_asserts.vhd:13:5: hint[sim/assert-note]: report note: in f 5
+elab_asserts.vhd:13:5: hint[sim/assert-note]: report note: in f 6
+elab_asserts.vhd:14:5: warning[sim/assert-warning]: assertion warning: x too small 5
+elab_asserts.vhd:14:5: warning[sim/assert-warning]: assertion warning: x too small 6
+elab_asserts.vhd:24:5: hint[sim/assert-note]: report note: c=6 s=7 asserts=2
+summary: 0 errors, 2 warnings, 3 hints, 1 files
+== stderr
+gohard: simulated elab_asserts_tb (seed 0): quiet

@@ -1,0 +1,9 @@
+# gohard check --sim --seed 0 --tb enum_to_string_tb (VHDL-2019)
+exit 0
+== stdout
+enum_to_string.vhd:18:5: hint[sim/assert-note]: report note: day thursday friday
+enum_to_string.vhd:19:5: hint[sim/assert-note]: report note: open status_not_found create status_ok
+enum_to_string.vhd:20:5: hint[sim/assert-note]: report note: delete status_access_denied file status_ok
+summary: 0 errors, 0 warnings, 3 hints, 1 files
+== stderr
+gohard: simulated enum_to_string_tb (seed 0): quiet

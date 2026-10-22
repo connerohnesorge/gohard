@@ -1,0 +1,4 @@
+# A legal construct GoHard v1.1 does not implement, met while the
+# design is elaborated (#18, #20): unsupported/construct with the
+# "please report" message, exit 2, never sim/runtime-error (exit 1).
+gohard check --sim --seed 0 --tb tb

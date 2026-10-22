@@ -1,3 +1,3 @@
-p.vhd:3:5: error[unsupported/construct]: generic clauses on protected types is not supported yet (planned for v1.1)
-user.vhd:3:8: warning[sema/unchecked-unit]: work.user was not checked: it depends on opaque unit work.p
+top.vhd:22:7: error[unsupported/construct]: verification unit bindings in configurations is not supported yet, please report
+user.vhd:4:14: warning[sema/unchecked-unit]: work.user(rtl) was not checked: it depends on opaque unit work.top_cfg
 summary: 1 errors, 1 warnings, 0 hints, 2 files

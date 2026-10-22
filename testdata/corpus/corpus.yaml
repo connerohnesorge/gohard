@@ -84,9 +84,6 @@ vocabulary:
     - id: modeled_drivers_marked
       meaning: every value driven by a simulation.models stand-in is
         marked modeled in the trace
-    - id: unsupported_before_milestone
-      meaning: before its milestone, exits 2 with unsupported/construct
-        "planned for v1.1" naming each construct used
 
 designs:
   - name: assert_fail

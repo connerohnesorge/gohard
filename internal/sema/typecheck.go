@@ -500,6 +500,9 @@ func (a *analyzer) protectedElaborated(si cst.SubtypeIndication,
 		return
 	}
 	spec := t.Base().Decl
+	if in := t.Base().Inst; in != nil && in.Of != nil {
+		spec = in.Of // an instance runs its generic type's body
+	}
 	if spec == nil || spec.Unit == nil || a.u == nil {
 		return
 	}

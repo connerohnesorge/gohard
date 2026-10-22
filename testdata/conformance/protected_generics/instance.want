@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb instance_tb (VHDL-2019)
+exit 0
+== stdout
+instance.vhd:55:7: hint[sim/assert-note]: report note: t = 30, s = 110, arr(1) = 3, p = 3, f = 7
+instance.vhd:55:7: hint[sim/assert-note]: report note: t = 30, s = 110, arr(1) = 6, p = 6, f = 7
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated instance_tb (seed 0): quiet

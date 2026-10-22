@@ -17,7 +17,7 @@ func TestExitCodeTable(t *testing.T) {
 		warn     = New(WorkspaceFileTooLarge, "size", "10 MB")
 		hint     = New(SyntaxUTF8Comment).At("a.vhd", 2, 3)
 		tool     = New(CLIUsage, "bad flag")
-		opaque   = NewVariant(UnsupportedConstruct, PlannedV11, "x")
+		opaque   = NewVariant(UnsupportedConstruct, PleaseReport, "x")
 		unchk    = New(SemaUnchecked, "work.a", "work.b")
 		allowed  = New(SemaOpaqueAllowed, "unisim.x")
 		simWarn  = New(SimAssertWarning, "assert", "w")

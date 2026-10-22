@@ -1,0 +1,2 @@
+tb.vhd:18:10: error[unsupported/construct]: impure function calls during elaboration is not supported yet, please report
+summary: 1 errors, 0 warnings, 0 hints, 1 files

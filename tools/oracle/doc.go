@@ -66,7 +66,8 @@
 //     check compares its instances, generate iterations and blocks
 //     with internal/elab/hier; "none, hand-checked" keeps a
 //     hand-written golden/hierarchy.txt in hier's Dump form (generic
-//     values included), compared exactly for v1.0 designs. Hash:
+//     values included), compared exactly for every design of a
+//     milestone corpus.Release reached (all since v1.1). Hash:
 //     oracle_sha256.
 //
 //   - golden (#36): GoHard's own canonical trace at seed 0,

@@ -24,6 +24,7 @@ import (
 	"maps"
 	"slices"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/connerohnesorge/gohard/internal/diag"
@@ -182,8 +183,10 @@ func (c *code) Until(ctx *sim.Ctx) (bool, error) {
 // (sim.Ctx.Abort); the diagnostic makes the exit code 2.
 func (m *machine) native(err error) bool {
 	var ne *nativeError
-	if ue := (*sema.UnsupportedError)(nil); errors.As(err, &ue) {
-		ne = &nativeError{name: ue.What}
+	if what, ok := sema.UnsupportedWhat(err); ok {
+		ne = &nativeError{name: what}
+	} else if what, ok := notStatic(err); ok {
+		ne = &nativeError{name: "evaluating " + what + " in simulation"}
 	}
 	if err == nil || ne == nil && !errors.As(err, &ne) || m.ctx == nil {
 		return false
@@ -200,6 +203,19 @@ func (m *machine) native(err error) bool {
 		diag.PleaseReport, ne.name))
 	m.dead, m.wait = true, nil
 	return true
+}
+
+// notStatic names the value of a plain not-static error (eval
+// ErrCodeNotStatic, "X is not static") that stops a running process:
+// every value a running design needs is known, so it is a GoHard gap
+// (unsupported/construct, please report), never the design's error,
+// as sema's simErr has it for the static evaluator.
+func notStatic(err error) (string, bool) {
+	var ee *eval.Error
+	if !errors.As(err, &ee) || ee.Code != eval.ErrCodeNotStatic {
+		return "", false
+	}
+	return strings.CutSuffix(ee.Msg, " is not static")
 }
 
 // EvalStepsPerStep is the number of evaluator steps (one per IR node

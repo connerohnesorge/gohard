@@ -1,0 +1,12 @@
+# NVC output of testdata/conformance/psl_api/psl_asserts.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a psl_asserts.vhd -e psl_asserts_tb -r
+# source sha256: 433d7fcf4e24cb19da771f31aa0498200d270a5de5a0d5a9f7fcb8060d32e57e
+# exit: 1
+** Note: 32ns+0: disabled: count 0, failed false
+   Process :psl_asserts_tb:check at psl_asserts.vhd:20
+** Note: 32ns+0: enabled true
+   Process :psl_asserts_tb:check at psl_asserts.vhd:20
+** Error: 35ns+0: x is high
+   Label X_LOW at psl_asserts.vhd:18

@@ -1,0 +1,9 @@
+# gohard check --sim --seed 0 --tb index_to_string_tb (VHDL-2019)
+exit 0
+== stdout
+index_to_string.vhd:19:5: hint[sim/assert-note]: report note: index 3 5 6
+index_to_string.vhd:21:5: hint[sim/assert-note]: report note: grid dims 2 len2 4 left2 1
+index_to_string.vhd:23:5: hint[sim/assert-note]: report note: vector (5,6)
+summary: 0 errors, 0 warnings, 3 hints, 1 files
+== stderr
+gohard: simulated index_to_string_tb (seed 0): quiet

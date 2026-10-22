@@ -119,6 +119,11 @@ const (
 	// ErrCodeType: operands of the wrong class (a lowering bug or an
 	// expression sema already reported).
 	ErrCodeType
+	// ErrCodeValue: the string of a 'VALUE is no literal of the type
+	// (a run-time error of the design; analysis, which need not
+	// evaluate the call, leaves it to the simulator as GHDL and NVC
+	// do). A literal outside the type is ErrCodeRange.
+	ErrCodeValue
 )
 
 // Error is an evaluation failure.

@@ -1,0 +1,26 @@
+# gohard check --sim --seed 0 --tb names_tb (VHDL-2019)
+exit 0
+== stdout
+hierarchy.vhd:21:5: hint[sim/assert-note]: report note: alt :names_tb:alt2:as :names_tb(rtl):alt2:as :names_tb:alt2:pp:
+hierarchy.vhd:21:5: hint[sim/assert-note]: report note: f :work:names_pkg:f[integer return string]: :work:names_pkg:f[integer return string]:v :work:names_pkg:c
+hierarchy.vhd:21:5: hint[sim/assert-note]: report note: loop :names_tb::j
+hierarchy.vhd:21:5: hint[sim/assert-note]: report note: pkg :work:names_pkg:
+hierarchy.vhd:21:5: hint[sim/assert-note]: report note: sub t
+hierarchy.vhd:21:5: hint[sim/assert-note]: report note: top :names_tb::u :names_tb: :names_tb(rtl): :names_tb(rtl):t
+hierarchy.vhd:42:7: hint[sim/assert-note]: report note: q :names_tb:ig:u3:pr:q[integer]: :names_tb(rtl):ig:u3@names_sub(a):pr:q[integer]:w :names_tb:ig:u3:pr:q[integer]:y
+hierarchy.vhd:42:7: hint[sim/assert-note]: report note: q :names_tb:u1:pr:q[integer]: :names_tb(rtl):u1@names_sub(a):pr:q[integer]:w :names_tb:u1:pr:q[integer]:y
+hierarchy.vhd:46:5: hint[sim/assert-note]: report note: s :names_tb:ig:u3:s :names_tb(rtl):ig:u3@names_sub(a):s s
+hierarchy.vhd:46:5: hint[sim/assert-note]: report note: s :names_tb:u1:s :names_tb(rtl):u1@names_sub(a):s s
+hierarchy.vhd:48:5: hint[sim/assert-note]: report note: pg :names_tb:ig:u3:p :names_tb(rtl):ig:u3@names_sub(a):g
+hierarchy.vhd:48:5: hint[sim/assert-note]: report note: pg :names_tb:u1:p :names_tb(rtl):u1@names_sub(a):g
+hierarchy.vhd:49:5: hint[sim/assert-note]: report note: v :names_tb:ig:u3:pr:v :names_tb(rtl):ig:u3@names_sub(a):pr:v
+hierarchy.vhd:49:5: hint[sim/assert-note]: report note: v :names_tb:u1:pr:v :names_tb(rtl):u1@names_sub(a):pr:v
+hierarchy.vhd:50:5: hint[sim/assert-note]: report note: pr :names_tb:ig:u3:pr: :names_tb(rtl):ig:u3@names_sub(a):pr: pr
+hierarchy.vhd:50:5: hint[sim/assert-note]: report note: pr :names_tb:u1:pr: :names_tb(rtl):u1@names_sub(a):pr: pr
+hierarchy.vhd:52:5: hint[sim/assert-note]: report note: sub :names_tb:ig:u3: :names_tb(rtl):ig:u3@names_sub(a):
+hierarchy.vhd:52:5: hint[sim/assert-note]: report note: sub :names_tb:u1: :names_tb(rtl):u1@names_sub(a):
+hierarchy.vhd:80:9: hint[sim/assert-note]: report note: gen :names_tb:gen(0):gs :names_tb(rtl):gen(0):i :names_tb:gen(0):b:
+hierarchy.vhd:80:9: hint[sim/assert-note]: report note: gen :names_tb:gen(1):gs :names_tb(rtl):gen(1):i :names_tb:gen(1):b:
+summary: 0 errors, 0 warnings, 20 hints, 1 files
+== stderr
+gohard: simulated names_tb (seed 0): quiet

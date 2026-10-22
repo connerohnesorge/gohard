@@ -159,7 +159,7 @@ func TestCorpusDumps(t *testing.T) {
 				t.Fatalf("file order changes the hierarchy:\n%s\n%s",
 					got, again)
 			}
-			if d.Milestone != "v1.1" && len(h.Tops) != 1 &&
+			if len(h.Tops) != 1 &&
 				!analysisErrors(analyzeDesign(t, dirs[i], d, fwd)) {
 				t.Fatalf("testbench %s not elaborated:\n%s",
 					d.Testbench, got)
@@ -200,8 +200,7 @@ func TestCorpusDumps(t *testing.T) {
 					kept = append(kept, l)
 				}
 			}
-			if d.Milestone != "v1.1" &&
-				h.Dump() != strings.Join(kept, "") {
+			if h.Dump() != strings.Join(kept, "") {
 				t.Errorf("golden/hierarchy.txt:\n%s\ndump:\n%s", hand,
 					h.Dump())
 			}

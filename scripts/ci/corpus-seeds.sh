@@ -5,8 +5,8 @@
 # testdata/corpus/corpus.yaml, its listed variants and the generated
 # layout/case/rename/reorder variants, checking exit, status, messages
 # and stop time, byte-identical traces across seeds 0..SEEDS-1 (the
-# first differing line is printed), the golden trace and its
-# trace_sha256, and prot_cond's exit 2. Pull requests: SEEDS=4 (the
+# first differing line is printed), and the golden trace and its
+# trace_sha256. Pull requests: SEEDS=4 (the
 # plain `go test` default); nightly: SEEDS=64. A design that cannot
 # simulate yet (no sequential interpreter) fails here
 # (-corpus.require-sim) instead of being skipped. Then the recorded

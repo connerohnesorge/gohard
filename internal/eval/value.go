@@ -2,6 +2,7 @@ package eval
 
 import (
 	"cmp"
+	"errors"
 	"math"
 	"strconv"
 	"strings"
@@ -344,22 +345,53 @@ func isCharArray(t *Type) bool {
 
 // parseValue implements 'VALUE (LRM 16.2.2): the value of t whose
 // image is s, ignoring leading and trailing whitespace.
+// realLiteral reports whether s is spelled as a decimal literal with
+// an optional sign: digits, '_', '.', and an exponent.
+func realLiteral(s string) bool {
+	s = strings.TrimLeft(s, "+-")
+	if s == "" || s[0] < '0' || s[0] > '9' {
+		return false
+	}
+	for _, c := range s {
+		switch {
+		case c >= '0' && c <= '9', c == '_', c == '.', c == 'e',
+			c == 'E', c == '+', c == '-':
+		default:
+			return false
+		}
+	}
+	return true
+}
+
 func parseValue(s string, t *Type) (Value, error) {
 	s = strings.Trim(s, " \t\n\r\v\f ")
-	bad := errf(ErrCodeRange, strconv.Quote(s)+" is not a value of "+
-		t.Name)
+	msg := strconv.Quote(s) + " is not a value of " + t.Name
+	bad := errf(ErrCodeValue, msg)
+	// outside is the error of a literal too large for 64 bits.
+	outside := func(err error) error {
+		if errors.Is(err, strconv.ErrRange) {
+			return errf(ErrCodeRange, msg)
+		}
+		return bad
+	}
 	switch t.Kind {
 	case KindInteger:
 		n, err := strconv.ParseInt(strings.ReplaceAll(s, "_", ""), 10,
 			64)
 		if err != nil {
-			return Value{}, bad
+			return Value{}, outside(err)
 		}
 		return Check(Int(t, n), t)
 	case KindFloating:
+		// A decimal literal, optionally signed (LRM 16.2.2, 15.5.2):
+		// Go's spellings VHDL has no literal for (inf, nan, hex
+		// floats) are not values.
+		if !realLiteral(s) {
+			return Value{}, bad
+		}
 		f, err := strconv.ParseFloat(strings.ReplaceAll(s, "_", ""), 64)
 		if err != nil {
-			return Value{}, bad
+			return Value{}, outside(err)
 		}
 		return Check(RealValue(t, f), t)
 	case KindEnum:

@@ -1,0 +1,9 @@
+# gohard check --sim --seed 0 --tb psl_asserts_tb (VHDL-2019)
+exit 1
+== stdout
+psl_asserts.vhd:18:3: error[sim/assert-error]: assertion error: x is high
+psl_asserts.vhd:25:5: hint[sim/assert-note]: report note: disabled: count 0, failed false
+psl_asserts.vhd:28:5: hint[sim/assert-note]: report note: enabled true
+summary: 1 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated psl_asserts_tb (seed 0): halted

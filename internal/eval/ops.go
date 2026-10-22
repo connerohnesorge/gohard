@@ -142,8 +142,49 @@ func unary(b *Budget, o Op, rt *Type, x Value) (Value, error) {
 		return Bool(x.I != 0), nil
 	case OpAnd, OpOr, OpNand, OpNor, OpXor, OpXnor:
 		return reduce(b, o, rt, x)
+	case OpMinimum, OpMaximum:
+		if x.Kind() == KindArray {
+			return extremum(b, o, rt, x)
+		}
 	}
 	return Value{}, typeErr(o, x)
+}
+
+// extremum is the VHDL-2008 MINIMUM or MAXIMUM of a one-dimensional
+// array of a scalar type: its least or greatest element, or, of a
+// null array, the greatest (MINIMUM) or least (MAXIMUM) value of the
+// element subtype rt (LRM 5.3.2.4).
+func extremum(b *Budget, o Op, rt *Type, x Value) (Value, error) {
+	if err := b.Step(int64(len(x.E))); err != nil {
+		return Value{}, err
+	}
+	if len(x.E) == 0 {
+		if rt == nil {
+			return Value{}, typeErr(o, x)
+		}
+		hi := o == OpMinimum
+		if rt.Kind == KindFloating {
+			if hi {
+				return RealValue(rt, rt.Real.High()), nil
+			}
+			return RealValue(rt, rt.Real.Low()), nil
+		}
+		if hi {
+			return Value{T: rt, I: rt.Range.High()}, nil
+		}
+		return Value{T: rt, I: rt.Range.Low()}, nil
+	}
+	best := x.E[0]
+	for _, e := range x.E[1:] {
+		c := e.Compare(best)
+		if o == OpMinimum && c < 0 || o == OpMaximum && c > 0 {
+			best = e
+		}
+	}
+	if rt != nil {
+		best.T = rt
+	}
+	return best, nil
 }
 
 // reduce is the VHDL-2008 unary logical reduction of a 1-D array.

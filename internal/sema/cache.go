@@ -87,8 +87,10 @@ const (
 // cacheFormat is the version of the entry payloads written here. Bump
 // it when the analysis rules change what an entry holds for the same
 // source (2: the v1.1 Stage 1 rules, e.g. VHDL-2019 parameter classes
-// and implicit operations of protected composites).
-const cacheFormat = 2
+// and implicit operations of protected composites; 3: the v1.1 Stage 3
+// rules: name-attribute prefixes, protected-type generics and the
+// retired v1.1 unsupported/construct detectors).
+const cacheFormat = 3
 
 var schemaOnce = sync.OnceValue(func() string {
 	return codecSchema + "/" + sourcesHash() + "/" +

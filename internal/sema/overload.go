@@ -50,8 +50,9 @@ func fit(e *Expr, t *Type) (int, string) {
 	if p := e.pend; p != nil {
 		switch p.kind {
 		case pendChar, pendName:
+			sub := methodSubst(e.Prefix)
 			for _, c := range p.cands {
-				if valueFits(c, t) {
+				if valueFitsSub(c, t, sub) {
 					return 2, ""
 				}
 			}
@@ -176,6 +177,14 @@ type candidate struct {
 
 // match maps the actuals to the formals of d and scores the fit.
 func match(d *Decl, acts []actual, want *Type, proc bool) candidate {
+	return matchSub(d, acts, want, proc, nil)
+}
+
+// matchSub is match for a method whose generic types the object binds
+// as sub gives (methodsubst.go).
+func matchSub(d *Decl, acts []actual, want *Type, proc bool,
+	sub typeSubst,
+) candidate {
 	c := candidate{d: d}
 	x := d.Denotes()
 	isProc := x.Kind == DeclProcedure ||
@@ -224,12 +233,12 @@ func match(d *Decl, acts []actual, want *Type, proc bool) candidate {
 		if ac.open {
 			continue
 		}
-		s, why := fit(ac.e, partType(ac.fpart, p.Type))
+		s, why := fit(ac.e, partType(ac.fpart, sub.of(p.Type)))
 		if s == 0 {
 			c.reason = "argument " + strconv.Itoa(i+1) + " " + why
 			return c
 		}
-		if s == 1 && partType(ac.fpart, p.Type).Base().Class ==
+		if s == 1 && partType(ac.fpart, sub.of(p.Type)).Base().Class ==
 			TypeGeneric {
 			c.generic++
 		}
@@ -251,7 +260,7 @@ func match(d *Decl, acts []actual, want *Type, proc bool) candidate {
 		}
 	}
 	if !proc && want == anyComposite {
-		rt := x.Type
+		rt := sub.of(x.Type)
 		if rt == nil || (rt.Base().Class != TypeArray &&
 			rt.Base().Class != TypeRecord) {
 			c.reason = "does not return a composite value"
@@ -259,7 +268,7 @@ func match(d *Decl, acts []actual, want *Type, proc bool) candidate {
 		}
 	}
 	if !proc && !want.Unknown() {
-		rt := x.Type
+		rt := sub.of(x.Type)
 		if rt == nil {
 			c.reason = "has no result"
 			return c
@@ -285,7 +294,7 @@ func match(d *Decl, acts []actual, want *Type, proc bool) candidate {
 // returns the editor-mode result and the chosen candidate (nil when
 // none or several fit).
 func (a *analyzer) choose(name string, cands []*Decl, acts []actual,
-	want *Type, proc bool,
+	want *Type, proc bool, sub typeSubst,
 ) (*Overload, *candidate) {
 	if pr := a.s.probe; pr != nil && pr.Overload != nil && a.choosing == 0 {
 		defer pr.Overload()()
@@ -296,7 +305,7 @@ func (a *analyzer) choose(name string, cands []*Decl, acts []actual,
 	var all []candidate
 	best := 0
 	for _, d := range cands {
-		c := match(d, acts, want, proc)
+		c := matchSub(d, acts, want, proc, sub)
 		all = append(all, c)
 		cd := Candidate{Decl: d, Fits: c.score > 0, Reason: c.reason}
 		if !cd.Fits {
@@ -485,6 +494,7 @@ func (a *analyzer) call(n cst.Node, nm named, args cst.AssociationList,
 		acts = append(acts, ac)
 	}
 	a.positionalAfterNamed(acts) // typecheck.go
+	sub := methodSubst(nm.expr)
 	if len(acts) == 0 && !proc {
 		// A value: an enumeration literal or a parameterless function
 		// whose type the context may decide.
@@ -493,7 +503,7 @@ func (a *analyzer) call(n cst.Node, nm named, args cst.AssociationList,
 			x := d.Denotes()
 			if x.Kind == DeclEnumLiteral || match(d, nil, nil,
 				false).score > 0 {
-				if want.Unknown() || valueFits(d, want) {
+				if want.Unknown() || valueFitsSub(d, want, sub) {
 					fits = append(fits, d)
 				}
 			}
@@ -510,11 +520,11 @@ func (a *analyzer) call(n cst.Node, nm named, args cst.AssociationList,
 			return e
 		}
 	}
-	if x := indexAlternative(nm.decls, acts); x != nil && !proc &&
+	if x := indexAlternative(nm.decls, acts, sub); x != nil && !proc &&
 		want.Unknown() {
 		// f(args) may also index the result of a parameterless f
 		// (LRM 8.4, 9.3.4): the context decides between the readings.
-		o, _ := a.choose(nm.tok.Text(), nm.decls, acts, nil, false)
+		o, _ := a.choose(nm.tok.Text(), nm.decls, acts, nil, false, sub)
 		var fit []*Decl
 		for _, cd := range o.Candidates {
 			if cd.Fits {
@@ -550,7 +560,8 @@ type indexAlt struct {
 // one parameterless function of ds returns an array whose dimensions
 // the positional actuals index, each fitting its index type; nil
 // otherwise.
-func indexAlternative(ds []*Decl, acts []actual) *indexAlt {
+func indexAlternative(ds []*Decl, acts []actual, sub typeSubst,
+) *indexAlt {
 	if len(acts) == 0 {
 		return nil
 	}
@@ -566,7 +577,7 @@ func indexAlternative(ds []*Decl, acts []actual) *indexAlt {
 		if x.Kind != DeclFunction || required(x) > 0 || x.Type == nil {
 			continue
 		}
-		at := x.Type
+		at := sub.of(x.Type)
 		if b := at.Base(); b.Class == TypeAccess && b.Designated != nil {
 			at = b.Designated
 		}
@@ -607,7 +618,8 @@ func (a *analyzer) indexReading(n cst.Node, tok cst.Token,
 	o.Candidates = sortedCandidates(o)
 	a.refOverload(tok, editorOverload(o), RefCall) // pkginst.go
 	var v *Expr = &Expr{Kind: ExprCall, Node: n, Decl: x.fn,
-		Type: x.fn.Denotes().Type, Overload: o, Prefix: object}
+		Type: methodSubst(object).result(x.fn), Overload: o,
+		Prefix: object}
 	if v.Type.Base().Class == TypeAccess {
 		v = &Expr{Kind: ExprDeref, Node: n, Prefix: v,
 			Type: allocated(x.arr)}
@@ -640,6 +652,7 @@ func (a *analyzer) indexedCall(n cst.Node, nm named,
 		return nil
 	}
 	var zero *Decl
+	sub := methodSubst(nm.expr)
 	o := &Overload{Name: nm.tok.Text()}
 	for _, d := range nm.decls {
 		x := d.Denotes()
@@ -651,7 +664,7 @@ func (a *analyzer) indexedCall(n cst.Node, nm named,
 			strconv.Itoa(len(params)) + " arguments, not " +
 			strconv.Itoa(count)}
 		if x.Kind == DeclFunction && match(d, nil, nil, false).score > 0 &&
-			x.Type != nil && x.Type.Base().Class == TypeArray {
+			x.Type != nil && sub.of(x.Type).Base().Class == TypeArray {
 			if zero != nil {
 				return nil
 			}
@@ -667,7 +680,7 @@ func (a *analyzer) indexedCall(n cst.Node, nm named,
 	o.Candidates = sortedCandidates(o)
 	a.refOverload(nm.tok, editorOverload(o), RefCall) // pkginst.go
 	c := &Expr{Kind: ExprCall, Node: n, Decl: zero,
-		Type: zero.Denotes().Type, Overload: o, Prefix: nm.expr}
+		Type: sub.result(zero), Overload: o, Prefix: nm.expr}
 	return a.index(n, c, args)
 }
 
@@ -725,7 +738,8 @@ func (a *analyzer) finishCall(n cst.Node, tok cst.Token, name string,
 	cands []*Decl, acts []actual, want *Type, proc bool, object *Expr,
 	final bool,
 ) *Expr {
-	o, c := a.choose(name, cands, acts, want, proc)
+	sub := methodSubst(object)
+	o, c := a.choose(name, cands, acts, want, proc, sub)
 	if c == nil && !final && !proc && want.Unknown() &&
 		multipleResults(o) {
 		e := &Expr{Kind: ExprCall, Node: n, Type: UnknownType,
@@ -746,13 +760,13 @@ func (a *analyzer) finishCall(n cst.Node, tok cst.Token, name string,
 	case c != nil:
 		e.Decl = c.d
 		if !proc {
-			e.Type = orUnknown(c.d.Denotes().Type)
+			e.Type = orUnknown(sub.result(c.d))
 		}
 		e.Formals = c.formals
 		a.uninstantiatedCall(tok, c.d) // pkginst.go
 		for i, ac := range acts {
 			if f := c.formals[i]; f != nil {
-				a.settle(ac.e, partType(ac.fpart, f.Type))
+				a.settle(ac.e, partType(ac.fpart, sub.of(f.Type)))
 				if ac.formal != "" {
 					a.ref(ac.ftok, instanceFormal(c.d.Denotes(), f),
 						RefFormal)

@@ -357,7 +357,8 @@ func TestCorpus(t *testing.T) {
 	}
 }
 
-// TestCorpusRefs: in the clean corpus designs every identifier that is
+// TestCorpusRefs: in the corpus designs (all clean since the v1.1
+// release) every identifier that is
 // the name of a simple name resolves to a declaration (the LSP's
 // definition and references need every occurrence, #25).
 func TestCorpusRefs(t *testing.T) {
@@ -369,9 +370,6 @@ func TestCorpusRefs(t *testing.T) {
 		}
 	}()
 	for _, d := range designs {
-		if d.Milestone != "v1.0" {
-			continue
-		}
 		r := run(filepath.Join("../../testdata/corpus", d.Name), d)
 		for _, f := range r.Files {
 			for n := range f.Root().Descendants() {

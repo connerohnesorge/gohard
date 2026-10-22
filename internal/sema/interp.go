@@ -15,7 +15,9 @@ package sema
 // the whole evaluator; the others are cached for the frame only.
 
 import (
+	"errors"
 	"slices"
+	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/eval"
@@ -52,9 +54,18 @@ type shared struct {
 	// natives evaluates the calls of functions without a body during
 	// elaboration (natives.go); nil leaves them not static.
 	natives Natives
+	// reporter receives the assertion and report statements the
+	// evaluator runs while the design is elaborated (SetReporter);
+	// nil drops them.
+	reporter Reporter
 	// instSubs are the actuals of the generic subprograms of each
 	// subprogram instance, by generic position (instanceSubs).
 	instSubs map[*Decl][]*Decl
+	// attrSubs are the predefined attribute functions (T'IMAGE, ...)
+	// that are actuals of generic subprograms: the function stand-in
+	// instanceSubs makes for one, and the attribute it calls (an
+	// ExprAttr of a type mark, without arguments). Lookup only.
+	attrSubs map[*Decl]*Expr
 }
 
 func newShared() *shared {
@@ -154,8 +165,7 @@ func (ev *Evaluator) pureCall(x *Decl, in *Instance, args []eval.Value,
 		return eval.Value{}, err
 	}
 	if out.flow != flowReturn || out.v.T == nil {
-		return eval.Value{}, eval.NotStatic("function " + x.Text +
-			" ended without return")
+		return eval.Value{}, noReturn(x)
 	}
 	return out.v, nil
 }
@@ -371,9 +381,12 @@ func (ev *Evaluator) exec(ss []*SeqStmt, b *eval.Budget) (outcome, error) {
 
 func (ev *Evaluator) stmt(s *SeqStmt, b *eval.Budget) (outcome, error) {
 	switch s.Kind {
-	case SeqNull, SeqAssert, SeqReport:
-		// Assertions do not change values; the simulator reports them.
+	case SeqNull:
 		return outcome{}, nil
+	case SeqAssert, SeqReport:
+		// Assertions do not change values; a running design reports
+		// them (Reporter).
+		return outcome{}, ev.report(s, b)
 	case SeqVarAssign:
 		v, err := ev.value(s.Value, b)
 		if err != nil {
@@ -1086,9 +1099,207 @@ type UnsupportedError struct {
 	err  error
 }
 
-func (e *UnsupportedError) Error() string { return e.err.Error() }
+// Error is the diagnostic text of unsupported/construct (please
+// report), so an elaboration-time error that quotes it still asks for
+// the report.
+func (e *UnsupportedError) Error() string {
+	return e.What + " is not supported yet, please report"
+}
 
 func (e *UnsupportedError) Unwrap() error { return e.err }
+
+// NewUnsupported returns the UnsupportedError of the construct what,
+// unwrapping to err (the evaluation it stops); a nil err is the
+// not-static error of what.
+func NewUnsupported(what string, err error) error {
+	if err == nil {
+		err = eval.NotStatic(what)
+	}
+	return &UnsupportedError{What: what, err: err}
+}
+
+// UnsupportedWhat reports whether err stops at a legal construct
+// GoHard does not evaluate yet, and names it: an *UnsupportedError
+// anywhere in the chain, or an operation the evaluator does not
+// implement (eval.ErrCodeUnsupported: 'VALUE of a floating type, an
+// aggregate too large to build, ...). Both are the unsupported/
+// construct diagnostic (please report, exit 2), never a
+// sim/runtime-error of a design that is correct.
+func UnsupportedWhat(err error) (string, bool) {
+	if ue := (*UnsupportedError)(nil); errors.As(err, &ue) {
+		return ue.What, true
+	}
+	var ee *eval.Error
+	if errors.As(err, &ee) && ee.Code == eval.ErrCodeUnsupported {
+		what, _ := strings.CutSuffix(ee.Msg,
+			" is not supported by the evaluator yet")
+		return what, true
+	}
+	return "", false
+}
+
+// Reporter is implemented by a Dynamic whose run reports the
+// assertion and report statements of the subprograms the static
+// evaluator interprets for it (the pure functions a process calls, and
+// the procedures they call): an assertion that fails, or a report,
+// with its severity (the position of the SEVERITY_LEVEL value) and its
+// message, as the process's own statement would be (LRM 10.3, 10.4).
+type Reporter interface {
+	Report(s *SeqStmt, assertion bool, severity int64, msg string) error
+}
+
+// SetReporter makes ev, and every evaluator sharing its design state
+// (those derived from it), hand the assertion and report statements
+// they run while the design is elaborated (the pure functions a
+// constant, a generic or a signal's initial value calls) to r. Install
+// it on an elaboration evaluator (WithNatives) before evaluating.
+func (ev *Evaluator) SetReporter(r Reporter) { ev.sh.reporter = r }
+
+// report runs the assertion or report statement s for ev's Reporter:
+// the running process's, or while the design is elaborated the one
+// SetReporter installed; without one (static evaluation: analysis, the
+// editor) it does nothing. A call that reports is never memoized (the
+// read of the dynamic context), so each of its repetitions reports
+// again.
+func (ev *Evaluator) report(s *SeqStmt, b *eval.Budget) error {
+	r, ok := ev.dyn.(Reporter)
+	elab := false
+	if !ok {
+		if !ev.elaborating() || ev.sh.reporter == nil || ev.mute {
+			return nil
+		}
+		r, elab = ev.sh.reporter, true
+	}
+	if s.Kind == SeqAssert {
+		ok, err := ev.cond(s.Cond, b)
+		if err != nil || ok {
+			return err
+		}
+	}
+	msg := "Assertion violation."
+	sev := int64(2) // error
+	if s.Kind == SeqReport {
+		msg, sev = "", 0 // note
+	}
+	if s.Report != nil {
+		v, err := ev.value(s.Report, b)
+		if err != nil {
+			return err
+		}
+		buf := make([]byte, len(v.E))
+		for i, e := range v.E {
+			buf[i] = byte(e.I)
+		}
+		msg = string(buf)
+	}
+	if s.Severity != nil {
+		v, err := ev.value(s.Severity, b)
+		if err != nil {
+			return err
+		}
+		sev = v.I
+	}
+	if !elab {
+		// A running process: the call is never memoized. An
+		// elaboration-time report leaves the value it computes
+		// cached (a design constant is elaborated once, not again by
+		// each process that reads it).
+		ev.sh.dynReads++
+	}
+	return r.Report(s, s.Kind == SeqAssert, sev, msg)
+}
+
+// Mute turns off (on true) or back on the reporting of the assertion
+// and report statements ev runs while the design is elaborated
+// (SetReporter), for an evaluation that only checks what the
+// elaboration proper evaluates again; it returns the previous
+// setting. Evaluators derived from ev while it is muted are muted.
+func (ev *Evaluator) Mute(on bool) bool {
+	prev := ev.mute
+	ev.mute = on
+	return prev
+}
+
+// cElabImpure names the construct of a call of an impure function (or
+// a protected method) while the design is elaborated: in a signal's
+// initial value, a generic actual or default, a port default. They
+// run in elaboration order with the shared variables they read (LRM
+// 14.4.2), which GoHard's elaboration, evaluating before any shared
+// object exists, does not model. Design-region constants are computed
+// by the interpreter instead (elab interp_rtconst.go).
+const cElabImpure = "impure function calls during elaboration"
+
+// cElabDeref names the construct of a dereference evaluated while the
+// design is elaborated (GETENV(...).all in a signal's initial value):
+// elaboration has no heap.
+const cElabDeref = "dereferences during elaboration"
+
+// cUnboundGeneric names the construct of a run-time read of an entity
+// generic whose actual (or default) elaboration could not evaluate:
+// it calls an impure function or a std.env function that only a
+// running design answers (cElabImpure).
+const cUnboundGeneric = "generic actuals that are not static at " +
+	"elaboration"
+
+// elaborating reports whether ev evaluates for elaboration: the
+// std.env natives are installed and no process runs.
+func (ev *Evaluator) elaborating() bool {
+	return ev.sh.natives != nil && ev.dyn == nil
+}
+
+// simErr returns err for an evaluation of a running process or of
+// elaboration: a plain not-static error there is never the design's
+// (every value a running or elaborating design needs is known), so it
+// is a GoHard gap, the legal construct unsupported/construct (please
+// report) names. Static evaluation (analysis, the editor) keeps it: its
+// not-static values are left to the simulator. A not-static error with
+// its own wording (elabSignalRead) is a design error and stays.
+func (ev *Evaluator) simErr(err error) error {
+	if err == nil || eval.CodeOf(err) != eval.ErrCodeNotStatic {
+		return err
+	}
+	where := " in simulation"
+	switch {
+	case ev.dyn != nil:
+	case ev.elaborating():
+		where = " during elaboration"
+	default:
+		return err
+	}
+	var ue *UnsupportedError
+	if errors.As(err, &ue) {
+		return err
+	}
+	var ee *eval.Error
+	errors.As(err, &ee)
+	what, ok := strings.CutSuffix(ee.Msg, " is not static")
+	if !ok {
+		return err
+	}
+	return &UnsupportedError{What: "evaluating " + what + where,
+		err: err}
+}
+
+// elabSignalRead is the error of a read of the value (or an attribute)
+// of the signal d while the design is elaborated (a signal's initial
+// value or a generic actual that names a signal): GHDL rejects it
+// ("cannot use signal value during elaboration"); signals get their
+// values only when simulation starts (LRM 14.7.5.2).
+func elabSignalRead(what string) error {
+	return &eval.Error{Code: eval.ErrCodeNotStatic,
+		Msg: what + " cannot be read during elaboration"}
+}
+
+// noReturn is the error of a call of the function x that reaches the
+// end of its body without a return statement: an error of the design
+// (LRM 4.2: a function body ends with a return statement), worded as
+// the interpreter's (elab) and so never a GoHard gap for simErr or the
+// interpreter. Its code stays not static: analysis, which need not
+// evaluate the call, leaves it to the simulator, as GHDL and NVC do.
+func noReturn(x *Decl) error {
+	return &eval.Error{Code: eval.ErrCodeNotStatic,
+		Msg: "function " + x.Text + " ended without a return statement"}
+}
 
 // Instance is one call's binding of the generics of a subprogram
 // instance.
@@ -1120,11 +1331,37 @@ type Generic struct {
 // memoized instance call may read its own bindings (they are part of
 // its key), but no other.
 type instEnv struct {
+	// inst is the subprogram instance whose call binds these
+	// generics.
+	inst    *Decl
 	consts  map[*Decl]eval.Value
 	layouts map[*Decl]*eval.Type
 	subs    map[*Decl]*Decl
 	outer   *instEnv
 	reads   int
+}
+
+// RunningInstance returns the subprogram instance whose call ev
+// interprets the body of the generic subprogram g in (its spec or its
+// body), the innermost one; nil when ev runs no instance of g. The
+// name attributes of the body's declarations name the instance (LRM
+// 4.4: an instance is equivalent to a declaration with its own
+// designator).
+func (ev *Evaluator) RunningInstance(g *Decl) *Decl {
+	for e := ev.gen; e != nil; e = e.outer {
+		if SameSubprogram(InstanceOf(e.inst), g) {
+			return e.inst
+		}
+	}
+	return nil
+}
+
+// SameSubprogram reports whether a and b declare the same subprogram:
+// they are equal, or one is the other's specification.
+func SameSubprogram(a, b *Decl) bool {
+	return a != nil && b != nil &&
+		(a == b || a.Spec == b || b.Spec == a ||
+			a.Spec != nil && a.Spec == b.Spec)
 }
 
 // genConst returns the value of the generic constant d bound in ev's
@@ -1221,7 +1458,7 @@ func (ev *Evaluator) instance(x *Decl, b *eval.Budget) (*Instance, error) {
 					x.Text)}
 		}
 	}
-	env := &instEnv{consts: map[*Decl]eval.Value{},
+	env := &instEnv{inst: x, consts: map[*Decl]eval.Value{},
 		layouts: map[*Decl]*eval.Type{}, subs: map[*Decl]*Decl{},
 		outer: ev.gen}
 	in := &Instance{Of: g, Body: body, env: env}
@@ -1397,6 +1634,10 @@ func (ev *Evaluator) instanceSubs(x, g, body *Decl, specs, gens []*Decl,
 			continue
 		}
 		var cands []*Decl
+		if a := ev.attrActual(x, association(x, specs[i], d)); a != nil {
+			out[i] = a
+			continue
+		}
 		if as := association(x, specs[i], d); as != nil {
 			if as.Actual != nil && as.Actual.Decl != nil {
 				cands = append(cands, as.Actual.Decl)
@@ -1421,6 +1662,91 @@ func (ev *Evaluator) instanceSubs(x, g, body *Decl, specs, gens []*Decl,
 	}
 	ev.sh.instSubs[x] = out
 	return out
+}
+
+// attrFuncs are the predefined attributes of a type that are
+// functions of one argument (LRM 16.2): those an attribute name can
+// denote as the actual of a generic subprogram.
+var attrFuncs = map[Key]bool{"image": true, "value": true, "pos": true,
+	"val": true, "succ": true, "pred": true, "leftof": true,
+	"rightof": true}
+
+// attrActual returns the stand-in function of the association as of
+// the instance x when its actual is a predefined attribute function of
+// a type (generic map (img => integer'image)), recorded in attrSubs;
+// nil for any other actual. Its calls lower to the attribute (static.go
+// call).
+func (ev *Evaluator) attrActual(x *Decl, as *Association) *Decl {
+	if as == nil || as.Node.IsZero() || x.Unit == nil {
+		return nil
+	}
+	act := cst.AssociationElement{Node: as.Node}.Actual()
+	if act.IsZero() {
+		return nil
+	}
+	n := act.Node
+	for n.Kind() != cst.KindAttributeName {
+		var only cst.Node
+		k := 0
+		for c := range n.Nodes() {
+			only, k = c, k+1
+		}
+		if k != 1 {
+			return nil
+		}
+		n = only
+	}
+	an := cst.AttributeName{Node: n}
+	k := TokenKey(an.Designator())
+	if !attrFuncs[k] || !n.Child[cst.Expr](1).IsZero() {
+		// (Arg is the first Expr child: the prefix.)
+		return nil
+	}
+	var pt *Type
+	sp := an.Prefix().Span()
+	for _, r := range x.Unit.Refs {
+		if r.Span.Start < sp.Start || r.Span.End > sp.End ||
+			r.Decl == nil {
+			continue
+		}
+		switch r.Decl.Kind {
+		case DeclType, DeclSubtype, DeclGenericType:
+			pt = r.Decl.Type
+		}
+	}
+	if pt == nil || pt.Unknown() {
+		return nil
+	}
+	f := &Decl{Kind: DeclFunction, Name: k, Implicit: true,
+		Text: string(TokenKey(an.Prefix().Node.LastToken())) + "'" +
+			string(k), Unit: x.Unit}
+	if ev.sh.attrSubs == nil {
+		ev.sh.attrSubs = map[*Decl]*Expr{}
+	}
+	ev.sh.attrSubs[f] = &Expr{Kind: ExprAttr, Attr: k,
+		Prefix: &Expr{Kind: ExprTypeMark, Type: pt}}
+	return f
+}
+
+// implicitNative lowers the call e of x, an implicit function without
+// an evaluator operation (TO_STRING, TO_HSTRING, ...), to a call of
+// the evaluator's Natives: elaboration's answer (elab_natives.go).
+func (ev *Evaluator) implicitNative(e *Expr, x *Decl, b *eval.Budget,
+) (eval.Expr, error) {
+	args := make([]eval.Expr, 0, len(e.Args))
+	for _, a := range e.Args {
+		ax, err := ev.lower(a, b)
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, ax)
+	}
+	rt, err := ev.layout(orUnknown(x.Type), b)
+	if err != nil {
+		return nil, err
+	}
+	return &eval.Call{Fn: &nativeCall{e: e, x: x, rt: rt}, Args: args,
+		T: rt}, nil
 }
 
 // refsIn returns the subprograms the names inside span of unit u

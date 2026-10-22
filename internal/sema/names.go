@@ -600,7 +600,8 @@ func (a *analyzer) callOrIndex(c cst.CallOrIndexName, kind RefKind,
 			a.lenientArgs(args)
 			return unknownNamed()
 		}
-		if z := a.indexedResult(p.decls, args, want); z != nil {
+		sub := methodSubst(p.expr)
+		if z := a.indexedResult(p.decls, args, want, sub); z != nil {
 			o := &Overload{Name: p.tok.Text(), Chosen: z}
 			for _, d := range p.decls {
 				o.Candidates = append(o.Candidates,
@@ -608,7 +609,7 @@ func (a *analyzer) callOrIndex(c cst.CallOrIndexName, kind RefKind,
 			}
 			a.refOverload(p.tok, o, RefCall)
 			fc := &Expr{Kind: ExprCall, Node: pn, Decl: z,
-				Type: z.Denotes().Type, Overload: o, Prefix: p.expr}
+				Type: sub.result(z), Overload: o, Prefix: p.expr}
 			return named{expr: a.index(c.Node, fc, args)}
 		}
 		return named{expr: a.call(c.Node, p, args, want, false)}
@@ -633,7 +634,7 @@ func (a *analyzer) callOrIndex(c cst.CallOrIndexName, kind RefKind,
 // the overload resolution of a call decides (overload.go), which also
 // tries the index reading when no call fits.
 func (a *analyzer) indexedResult(ds []*Decl, args cst.AssociationList,
-	want *Type,
+	want *Type, sub typeSubst,
 ) *Decl {
 	n, ranges := 0, allRanges(args)
 	for item := range args.Items() {
@@ -653,13 +654,13 @@ func (a *analyzer) indexedResult(ds []*Decl, args cst.AssociationList,
 			continue
 		}
 		if !ranges && takes(x, n) && (want.Unknown() ||
-			valueFits(d, want)) {
+			valueFitsSub(d, want, sub)) {
 			return nil // the call reading fits
 		}
 		if required(x) > 0 || x.Type == nil {
 			continue
 		}
-		at := x.Type
+		at := sub.of(x.Type)
 		if b := at.Base(); b.Class == TypeAccess && b.Designated != nil {
 			at = b.Designated
 		}
@@ -962,10 +963,17 @@ func (a *analyzer) sliceName(s cst.SliceName, kind RefKind) named {
 		}
 		v = a.value(p, s.Prefix().Node, nil)
 	case p.typ != nil:
-		// T(range) as a subtype is a CallOrIndexName; a slice of a
-		// type is meaningless.
-		a.discreteRange(sliceRange(s), firstIndex(p.typ.Base()))
-		return named{typ: p.typ}
+		// T(range), parsed as a slice when the range uses TO or
+		// DOWNTO: the index-constrained subtype, as the
+		// CallOrIndexName form (indexSubtype) gives (a generic type
+		// actual bit_vector(0 to 2) keeps its constraint).
+		rc := a.discreteRange(sliceRange(s), firstIndex(p.typ.Base()))
+		if p.typ.Unknown() || p.typ.Base().Class != TypeArray {
+			return named{typ: p.typ}
+		}
+		st := NewSubtype(p.typ)
+		st.IndexCons = []*RangeCons{rc}
+		return named{typ: st}
 	default:
 		a.discreteRange(sliceRange(s), nil)
 		a.notIndexable(p, s.Node, "sliced") // indexrules.go
@@ -1083,7 +1091,8 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		pt = pv.Type
 	}
 	if pv != nil && !pt.Unknown() && pt.Base().Class == TypeAccess &&
-		pt.Base().Designated != nil && class != attrReflect {
+		pt.Base().Designated != nil && class != attrReflect &&
+		class != attrName {
 		// prefix'attr of an access value is the attribute of the
 		// designated object (LRM 8.1, implicit dereference); not
 		// 'REFLECT, whose mirror of an access value is an access mirror
@@ -1163,6 +1172,14 @@ func (a *analyzer) attributeName(an cst.AttributeName, want *Type,
 		arg(UniversalInteger)
 		return named{typ: a.typeAttr(dk, pt, pv, e.Args)}
 	case attrName:
+		// LRM 16.2.5: the prefix is the named entity itself, an
+		// alias as written (LRM 6.6.1), never its value: a name of
+		// the declaration, which the simulator turns into the
+		// entity's names (elab/interp_names.go).
+		if len(p.decls) > 0 {
+			e.Prefix = &Expr{Kind: ExprName, Node: pn,
+				Decl: p.decls[0], Type: orUnknown(pt)}
+		}
 		e.Type = orUnknown(a.stdType("string"))
 		return named{expr: e}
 	case attrSignal:

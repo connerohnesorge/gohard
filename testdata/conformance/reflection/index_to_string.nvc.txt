@@ -1,0 +1,12 @@
+# NVC output of testdata/conformance/reflection/index_to_string.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a index_to_string.vhd -e index_to_string_tb -r
+# source sha256: 05a2938edff771ada3bfa8c18eb15d652323a0d6457f45a28b71ba3e79702cd5
+# exit: 0
+** Note: 0ms+0: index 3 5 6
+   Process :index_to_string_tb:_p0 at index_to_string.vhd:12
+** Note: 0ms+0: grid dims 2 len2 4 left2 1
+   Process :index_to_string_tb:_p0 at index_to_string.vhd:12
+** Note: 0ms+0: vector (5,6)
+   Process :index_to_string_tb:_p0 at index_to_string.vhd:12

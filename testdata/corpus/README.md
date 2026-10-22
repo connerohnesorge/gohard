@@ -37,7 +37,9 @@ testdata/corpus/
   `force_ext`, `textio_env`, `assert_fail`, `budget_hang`, `vhdl93_only`,
   `mode_views`, `prot_cond`, `psl_simple`, `hier_generate`, `overload_ops`,
   `standin_model`. No other design is required for v1.0. The 15th,
-  `gc_heap` (milestone v1.1), is the #27 garbage-collection design. The
+  `gc_heap` (milestone v1.1), is the #27 garbage-collection design. Since
+  the v1.1 release both v1.1 designs (`prot_cond`, `gc_heap`) are
+  required to pass with `expected`. The
   8 vhdl-examples are demos and are not part of the corpus.
 * Simulator work files (GHDL `*.cf`/`*.o`, NVC `work/` libraries, waveform
   dumps) never enter the repo. Run the tools in a `/tmp` work dir.
@@ -128,15 +130,15 @@ by `path`) so tools rewrite the file deterministically.
 | --- | --- | --- |
 | `name` | string | Design name; equals the directory name. |
 | `standard` | `"1993"`\|`"2002"`\|`"2008"`\|`"2019"` | Minimum standard of the design (quoted, as in `gohard.yaml`, #28). It is the standard GoHard runs the design under. |
-| `milestone` | `v1.0`\|`v1.1` | Release that must pass it. `prot_cond` and `gc_heap` are `v1.1`; the other 13 are `v1.0`. |
+| `milestone` | `v1.0`\|`v1.1` | Release that must pass it. `prot_cond` and `gc_heap` are `v1.1`; the other 13 are `v1.0`. The release under test is `corpus.Release` (`v1.1`); a design of a later milestone is a manifest error. |
 | `files` | list | Every source file, in analysis order, each `{path, standard}`. `path` is relative to the design directory; `standard` is the minimum standard of that file. |
 | `top` | string | Design-under-test entity (the unit whose hierarchy and LSP sessions matter). Equals `testbench` when the testbench is the whole design. |
 | `testbench` | string | Portless testbench entity that is the elaboration root, run with `gohard check --sim --tb <testbench>` and by the oracles. |
 | `defines` | map identifier to string | `defines:` passed to GoHard and the oracles (#28). `{}` except in `mode_views`, which needs one user identifier. Built-in identifiers (`VHDL_VERSION`, `TOOL_*`) are never allowed here. |
 | `models` | map `lib.unit` to path | `simulation.models` stand-ins (#35). `{}` except in `standin_model`. Paths are relative to the design directory. A stand-in file is not listed in `files`. |
 | `config` | path | Optional. Design-local `gohard.yaml` (#28), relative to the design directory, loaded by GoHard and `tools/oracle` as the project config. Its `defines` and `simulation.models` must equal the entry's `defines` and `models`. Absent means all #28 defaults. Required whenever `defines` or `models` is non-empty, since #31 takes user identifiers only from `gohard.yaml` `defines:` or `--define`. Used by `mode_views` (`defines: {MV_PROFILE: "wide"}`), `psl_simple` (`simulation.stop_level: failure`) and `standin_model` (`allow_opaque`, `simulation.models`). |
-| `expected` | mapping | GoHard's outcome once `milestone` is reached (see below). |
-| `expected_v1_0` | mapping | Optional, only for `milestone: v1.1`. The outcome under v1.0 while the design uses a v1.1 construct not delivered yet: exit 2, status `tool_error`, one `unsupported/construct` message per such construct, each saying "planned for v1.1". Absent once every construct the design uses is delivered (`prot_cond` since v1.1 Stage 2) or when it uses none (`gc_heap`): the design then runs against `expected`. |
+| `expected` | mapping | GoHard's outcome (see below). Every design, `prot_cond` and `gc_heap` included, runs against it. |
+| `expected_v1_0` | retired | The v1.0 outcome of a v1.1 design (exit 2, `unsupported/construct`) while one of its constructs was not delivered. Retired with the v1.1 release: no design has it, and `corpus.ParseManifest` rejects a manifest that does, since nothing would check it. Its last use is in the git history. |
 | `features` | list of ids | Semantics this design exercises, from `vocabulary.features`. May be empty for designs whose purpose is an outcome (`assert_fail`, `budget_hang`, `vhdl93_only`). |
 | `invariants` | list of ids | From `vocabulary.invariants`. Every design claims `variant_stable`; every design except a deliberately racy one claims `seed_independent`. |
 | `oracle` | `ghdl`\|`nvc`\|`both`\|`none, hand-checked` | Which tool results the golden trace is compared with. `none, hand-checked` means the golden trace is hand-written and reviewed once. Quote it in YAML: `oracle: "none, hand-checked"`. |
@@ -159,7 +161,7 @@ newline, its length in decimal, a newline and its bytes.
 format exist (S5). After that CI fails on `pending` and on any hash
 mismatch, printing the first differing trace line.
 
-### `expected` and `expected_v1_0`
+### `expected`
 
 | Field | Meaning |
 | --- | --- |
@@ -314,7 +316,8 @@ labels of if/case generates, which GHDL does not print, are dropped).
 `--disp-tree` prints no generic values. Designs with `hierarchy_oracle:
 "none, hand-checked"` keep a hand-written `golden/hierarchy.txt` in
 hier's `Dump` form (generic values included; `#` lines are comments),
-compared exactly once the design's milestone is v1.0. Both files feed
+compared exactly (every design's milestone is reached since v1.1).
+Both files feed
 `oracle_sha256`.
 
 `golden/trace.txt` is GoHard's own trace at seed 0 (section `golden`,
@@ -324,9 +327,7 @@ compared exactly once the design's milestone is v1.0. Both files feed
 
 `go test ./internal/corpus` runs every design (no skips): the main run
 and each `variants` item at seeds 0..3 (`-corpus.seeds=64` nightly via
-`scripts/ci/corpus-seeds.sh`), checks `expected` (or `expected_v1_0`
-for v1.1 designs that still have one, which must give exactly its
-diagnostics), byte-identical traces across seeds (first differing line shown), and
+`scripts/ci/corpus-seeds.sh`), checks `expected`, byte-identical traces across seeds (first differing line shown), and
 `golden/trace.txt` with `trace_sha256`. Four generated variants of each
 design (#8 `variant_stable`) must give the same outcome with lines
 ignored: `layout` (doubled white space and line breaks), `case` (reserved

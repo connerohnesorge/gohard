@@ -54,6 +54,9 @@ type Evaluator struct {
 	// interprets (interp.go); its consts and layouts caches are then
 	// the call's own.
 	gen *instEnv
+	// mute drops the reports of an elaboration-time evaluation
+	// (Mute).
+	mute bool
 }
 
 type constResult struct {
@@ -272,7 +275,8 @@ func (ev *Evaluator) value(e *Expr, b *eval.Budget) (eval.Value, error) {
 		return eval.Value{}, err
 	}
 	m := &eval.Machine{Env: ev, Budget: b}
-	return m.Eval(x)
+	v, err := m.Eval(x)
+	return v, ev.simErr(err) // interp.go
 }
 
 // Load implements eval.Env: bound objects and the cells of an
@@ -290,10 +294,20 @@ func (ev *Evaluator) Load(ref eval.Ref) (eval.Value, error) {
 		if v, ok := ev.bind[d]; ok {
 			return v, nil
 		}
-		return eval.Value{}, eval.NotStatic(d.Text)
+		if ev.elaborating() && (d.Kind == DeclSignal ||
+			d.Kind == DeclPort && d.Class != ClassVariable) {
+			return eval.Value{}, elabSignalRead("the signal " + d.Text)
+		}
+		if ev.dyn != nil && d.Kind == DeclGeneric {
+			// A running design reads an entity generic elaboration
+			// left without a value (interp.go).
+			return eval.Value{}, &UnsupportedError{What: cUnboundGeneric,
+				err: eval.NotStatic(d.Text)}
+		}
+		return eval.Value{}, ev.simErr(eval.NotStatic(d.Text))
 	}
 	ev.sh.reads++
-	return eval.Value{}, eval.NotStatic("object")
+	return eval.Value{}, ev.simErr(eval.NotStatic("object"))
 }
 
 // cell returns the frame cell of d (nil outside a frame or when d is
@@ -313,8 +327,19 @@ func (ev *Evaluator) cell(d *Decl) *cell {
 
 // lower turns a typed expression into evaluator IR. Constants are
 // evaluated (once) while lowering, so the IR stays as small as the
-// expression.
+// expression. In a running process a not-static error is a GoHard gap
+// (simErr).
 func (ev *Evaluator) lower(e *Expr, b *eval.Budget) (eval.Expr, error) {
+	x, err := ev.lowerExpr(e, b)
+	if err != nil {
+		return nil, ev.simErr(err)
+	}
+	return x, nil
+}
+
+func (ev *Evaluator) lowerExpr(e *Expr, b *eval.Budget) (eval.Expr,
+	error,
+) {
 	if e == nil {
 		return nil, eval.NotStatic("missing expression")
 	}
@@ -408,6 +433,10 @@ func (ev *Evaluator) lower(e *Expr, b *eval.Budget) (eval.Expr, error) {
 	}
 	if l, ok, err := ev.dynLower(e, b); ok {
 		return l, err
+	}
+	if e.Kind == ExprDeref && ev.elaborating() {
+		return nil, &UnsupportedError{What: cElabDeref,
+			err: eval.NotStatic("dereference")}
 	}
 	return nil, eval.NotStatic("expression")
 }
@@ -753,6 +782,12 @@ func (ev *Evaluator) call(e *Expr, b *eval.Budget) (eval.Expr, error) {
 		}
 		return ev.call(de, b)
 	}
+	if at, ok := ev.sh.attrSubs[x]; ok {
+		// A predefined attribute function as the actual of a generic
+		// subprogram (interp.go attrActual): T'IMAGE(args).
+		return ev.attr(&Expr{Kind: ExprAttr, Node: e.Node, Type: e.Type,
+			Attr: at.Attr, Prefix: at.Prefix, Args: e.Args}, b)
+	}
 	if x.Kind == DeclEnumLiteral {
 		return ev.name(&Expr{Kind: ExprName, Decl: d, Type: x.Type}, b)
 	}
@@ -761,6 +796,16 @@ func (ev *Evaluator) call(e *Expr, b *eval.Budget) (eval.Expr, error) {
 	}
 	if l, ok, err := ev.native(e, x, b); ok {
 		return l, err
+	}
+	if x.Kind == DeclFunction && x.Implicit && x.Op == 0 &&
+		ev.elaborating() {
+		// TO_STRING, TO_HSTRING, ... of a signal's initial value:
+		// elaboration's natives answer them (elab_natives.go).
+		return ev.implicitNative(e, x, b)
+	}
+	if x.Kind == DeclFunction && !Pure(x) && ev.elaborating() {
+		return nil, &UnsupportedError{What: cElabImpure,
+			err: eval.NotStatic("call of " + x.Text)}
 	}
 	if x.Kind != DeclFunction || (x.Implicit && x.Op == 0) || !Pure(x) {
 		return nil, eval.NotStatic("call of " + x.Text)
@@ -806,6 +851,10 @@ func (ev *Evaluator) attr(e *Expr, b *eval.Budget) (eval.Expr, error) {
 		return l, err
 	}
 	k, ok := attrKinds[e.Attr]
+	if !ok && ev.elaborating() && signalAttr(e.Attr) {
+		return nil, elabSignalRead("the attribute '" +
+			strings.ToUpper(string(e.Attr)) + " of a signal")
+	}
 	if !ok || e.Prefix == nil {
 		return nil, eval.NotStatic("'" + string(e.Attr))
 	}
@@ -1139,7 +1188,7 @@ func (ev *Evaluator) layout(t *Type, b *eval.Budget) (*eval.Type, error) {
 		}
 		ev.fr.layouts[t] = lt
 	}
-	return lt, err
+	return lt, ev.simErr(err) // interp.go
 }
 
 // integerLayout returns the layout of a std.standard type under ev's

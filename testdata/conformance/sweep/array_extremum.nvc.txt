@@ -1,0 +1,14 @@
+# NVC output of testdata/conformance/sweep/array_extremum.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2008 -a array_extremum.vhd -e array_extremum_tb -r
+# source sha256: 0882e6b2f675b1491797934f4204dbfcb34857d425ae8f28c728cccc3e1960c8
+# exit: 0
+** Note: 0ms+0: integer 2 6
+   Process :array_extremum_tb:_p0 at array_extremum.vhd:13
+** Note: 0ms+0: small 3 9
+   Process :array_extremum_tb:_p0 at array_extremum.vhd:13
+** Note: 0ms+0: string 'e' 'o'
+   Process :array_extremum_tb:_p0 at array_extremum.vhd:13
+** Note: 0ms+0: null 100 0
+   Process :array_extremum_tb:_p0 at array_extremum.vhd:13

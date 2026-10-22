@@ -9,34 +9,23 @@ import (
 
 	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/internal/token"
 	"go.yaml.in/yaml/v3"
 )
 
 // v11Design is the part of a corpus.yaml design the v1.1 checks read.
 type v11Design struct {
-	Name        string `yaml:"name"`
-	Standard    string `yaml:"standard"`
-	Milestone   string `yaml:"milestone"`
-	Config      string `yaml:"config"`
-	Files       []struct{ Path string }
-	ExpectedV10 struct {
-		Exit     int `yaml:"exit"`
-		Messages []struct {
-			Severity string `yaml:"severity"`
-			Code     string `yaml:"code"`
-			Path     string `yaml:"path"`
-			Line     int    `yaml:"line"`
-			Text     string `yaml:"text"`
-		} `yaml:"messages"`
-	} `yaml:"expected_v1_0"`
+	Name      string `yaml:"name"`
+	Standard  string `yaml:"standard"`
+	Milestone string `yaml:"milestone"`
+	Config    string `yaml:"config"`
+	Files     []struct{ Path string }
 }
 
-// TestV11CorpusExact: every milestone-v1.1 corpus design (prot_cond,
-// gc_heap) gives exactly the diagnostics corpus.yaml records in
-// expected_v1_0, in order, and its exit code (#18, #20). Only the
-// listed messages may appear; a design without expected_v1_0 (every
-// construct it uses is delivered) analyzes with none and exit 0.
-func TestV11CorpusExact(t *testing.T) {
+// TestV11CorpusClean: every milestone-v1.1 corpus design (prot_cond,
+// gc_heap) analyzes under v1.1 with no error, no opaque or unchecked
+// unit, and exit 0 (#18, #20): every construct it uses is delivered.
+func TestV11CorpusClean(t *testing.T) {
 	b, err := os.ReadFile("../../testdata/corpus/corpus.yaml")
 	if err != nil {
 		t.Fatal(err)
@@ -72,26 +61,21 @@ func TestV11CorpusExact(t *testing.T) {
 			srcs = append(srcs, Source{Path: f.Path, Text: text})
 		}
 		r := Analyze(Input{Files: srcs, Config: c})
-		want := d.ExpectedV10.Messages
-		if len(r.Diagnostics) != len(want) {
-			t.Fatalf("%s: %d diagnostics, want %d:\n%s", d.Name,
-				len(r.Diagnostics), len(want), diagText(r))
+		for _, g := range r.Diagnostics {
+			if g.Severity == diag.Error {
+				t.Errorf("%s: %s:%d: %s: %s", d.Name, g.Path, g.Line,
+					g.Code, g.Message)
+			}
 		}
-		for i, w := range want {
-			g := r.Diagnostics[i]
-			if g.Severity.String() != w.Severity ||
-				string(g.Code) != w.Code || g.Path != w.Path ||
-				g.Line != w.Line || !strings.Contains(g.Message, w.Text) {
-				t.Errorf("%s: diagnostic %d is %s:%d %s %s %q, want "+
-					"%s:%d %s %s %q", d.Name, i, g.Path, g.Line,
-					g.Severity, g.Code, g.Message, w.Path, w.Line,
-					w.Severity, w.Code, w.Text)
+		for _, u := range r.Units {
+			if u.Opaque || u.Unchecked {
+				t.Errorf("%s: %s is opaque or unchecked", d.Name,
+					u.Label())
 			}
 		}
 		exit := diag.ExitCode(r.Diagnostics, false, diag.NoSignal)
-		if exit != d.ExpectedV10.Exit {
-			t.Errorf("%s: exit %d, want %d", d.Name, exit,
-				d.ExpectedV10.Exit)
+		if exit != 0 {
+			t.Errorf("%s: exit %d, want 0", d.Name, exit)
 		}
 	}
 	if n == 0 {
@@ -124,12 +108,117 @@ func readTree(t testing.TB, dir string) []Source {
 	return srcs
 }
 
-// v11Names are the v1.1 constructs of #18 not delivered yet that the
-// construct fixture holds, by file.
-var v11Names = map[string]string{
-	"protected_generics.vhd": cProtGenerics,
-	"env_psl.vhd":            cEnvPSL,
-	"path_name.vhd":          cPathName,
+// v11Retired are the constructs the v1.0 fixture
+// testdata/cli/check-unsupported-v11 reported as unsupported until
+// v1.1, each alone in a file. v1.1 delivers them (Stage 3), so
+// the fixture is retired; their simulation is covered by
+// testdata/conformance/{protected_generics,names,psl_api}.
+var v11Retired = map[string]string{
+	"protected_generics.vhd": `package protected_generics is
+  type t is protected
+    generic (width : natural);
+    procedure inc;
+  end protected t;
+end package protected_generics;
+package body protected_generics is
+  type t is protected body
+    variable n : natural := 0;
+    procedure inc is
+    begin
+      n := (n + 1) mod width;
+    end procedure inc;
+  end protected body t;
+end package body protected_generics;
+`,
+	"env_psl.vhd": `entity env_psl is
+end entity env_psl;
+
+architecture sim of env_psl is
+begin
+  process
+  begin
+    assert not std.env.PslAssertFailed;
+    std.env.SetPslCoverAssert(true);
+    assert std.env.PslIsCovered and std.env.PslIsAssertCovered and
+      std.env.GetPslCoverAssert;
+    std.env.ClearPslState;
+    wait;
+  end process;
+end architecture sim;
+`,
+	"path_name.vhd": `package path_name is
+  type t is protected
+    procedure show;
+  end protected t;
+end package path_name;
+
+package body path_name is
+  type t is protected body
+    variable n : integer := 0;
+    procedure show is
+    begin
+      report n'path_name & n'instance_name;
+    end procedure show;
+  end protected body t;
+end package body path_name;
+`,
+}
+
+// TestV11Retired: the constructs the v1.0 fixture reported as
+// unsupported are analyzed under 2019 (no diagnostic, no opaque or
+// unchecked unit, exit 0); under 2008 they never give
+// unsupported/construct and no unit is opaque.
+func TestV11Retired(t *testing.T) {
+	for p, text := range v11Retired {
+		files := map[string]string{p: text}
+		r := analyze(t, files, func(c *config.Config) {
+			c.Standard = "2019"
+		})
+		if got := diagText(r); got != "" {
+			t.Errorf("2019: %s:\n%s", p, got)
+		}
+		for _, u := range r.Units {
+			if u.Opaque || u.Unchecked {
+				t.Errorf("2019: %s is opaque or unchecked", u.Label())
+			}
+		}
+		r = analyze(t, files, nil)
+		for _, d := range r.Diagnostics {
+			if d.Code == diag.UnsupportedConstruct {
+				t.Errorf("2008: %s:%d: %s", d.Path, d.Line, d.Message)
+			}
+		}
+		for _, u := range r.Units {
+			if u.Opaque {
+				t.Errorf("2008: %s is opaque", u.Label())
+			}
+		}
+	}
+}
+
+// TestEnvBundledImplemented: every VHDL-2019 declaration of the bundled
+// std.env (subprograms, types, record elements, enumeration literals
+// and implicit operations) is in an implemented #18 group, so no use
+// of std.env is unsupported/construct under v1.1.
+func TestEnvBundledImplemented(t *testing.T) {
+	n := 0
+	for _, u := range Bundle().Units {
+		if u.Library != "std" || u.Name != "env" {
+			continue
+		}
+		for _, d := range u.Decls {
+			if d.First < token.Std2019 {
+				continue
+			}
+			n++
+			if g := bundledConstruct(d); g != "" {
+				t.Errorf("std.env.%s: %s", d.Text, g)
+			}
+		}
+	}
+	if n < 40 {
+		t.Errorf("%d VHDL-2019 std.env declarations", n)
+	}
 }
 
 // flippedDir holds the delivered constructs of the v1.0 construct
@@ -146,79 +235,6 @@ var flippedLegacy = map[string]string{
 	"protected_array_constrained.vhd": cProtArray,
 	"protected_record.vhd":            cProtRecord,
 	"method_alias.vhd":                cMethodAlias,
-}
-
-// TestV11Constructs: each v1.1 construct, alone in a file, gives exactly
-// one unsupported/construct with the "planned for v1.1" message and
-// makes its unit opaque (testdata/cli/check-unsupported-v11, also a CLI
-// fixture).
-func TestV11Constructs(t *testing.T) {
-	srcs := readTree(t, "../../testdata/cli/check-unsupported-v11/in")
-	c := config.Defaults()
-	c.Standard = "2019"
-	r := Analyze(Input{Files: srcs, Config: c})
-	got := map[string][]diag.Diagnostic{}
-	for _, d := range r.Diagnostics {
-		got[d.Path] = append(got[d.Path], d)
-	}
-	for _, s := range srcs {
-		name, ok := v11Names[s.Path]
-		ds := got[s.Path]
-		if !ok {
-			if len(ds) > 0 {
-				t.Errorf("%s: unexpected %v", s.Path, ds)
-			}
-			continue
-		}
-		want := name + " is not supported yet (planned for v1.1)"
-		if len(ds) != 1 || ds[0].Code != diag.UnsupportedConstruct ||
-			ds[0].Message != want {
-			t.Errorf("%s: got %v, want one %q", s.Path, ds, want)
-		}
-		f, _ := r.File(s.Path)
-		opaque := false
-		for _, u := range f.Units {
-			opaque = opaque || u.Opaque
-		}
-		if !opaque {
-			t.Errorf("%s: no unit is opaque", s.Path)
-		}
-	}
-	if len(v11Names) != len(srcs) {
-		t.Errorf("%d construct files, %d names", len(srcs),
-			len(v11Names))
-	}
-	if diag.ExitCode(r.Diagnostics, false, diag.NoSignal) != diag.ExitTool {
-		t.Error("v1.1 constructs do not exit 2")
-	}
-}
-
-// TestV11BeforeStandard: under VHDL-2008 the same files never give
-// unsupported/construct (the constructs are not legal there): the ones
-// no parser or view rule catches are syntax/standard, and no unit is
-// opaque.
-func TestV11BeforeStandard(t *testing.T) {
-	srcs := readTree(t, "../../testdata/cli/check-unsupported-v11/in")
-	r := Analyze(Input{Files: srcs, Config: config.Defaults()})
-	std := map[string]bool{}
-	for _, d := range r.Diagnostics {
-		if d.Code == diag.UnsupportedConstruct {
-			t.Errorf("2008: %s:%d: %s", d.Path, d.Line, d.Message)
-		}
-		if d.Code == diag.SyntaxStandard {
-			std[d.Path] = true
-		}
-	}
-	for _, u := range r.Units {
-		if u.Opaque {
-			t.Errorf("2008: %s is opaque", u.Label())
-		}
-	}
-	for p, name := range v11Names {
-		if legacy[name] && !std[p] {
-			t.Errorf("2008: %s: no syntax/standard for %s", p, name)
-		}
-	}
 }
 
 // TestV11Delivered: the delivered constructs of the v1.0 fixture are
@@ -270,43 +286,50 @@ func TestV11Delivered(t *testing.T) {
 }
 
 // TestDesignEntityGroups: a construct is reported once per design
-// entity at its first use; the architecture of an opaque entity is
-// opaque (no diagnostic, not unchecked); another entity using the
-// same construct gets its own diagnostic.
+// entity at its first use (two architectures of e: one diagnostic,
+// both opaque); a configuration is its own design entity and gets its
+// own diagnostic; a unit instantiating the opaque configuration is
+// unchecked. The construct is one v1.1 still does not implement, so
+// the message is the please-report variant.
 func TestDesignEntityGroups(t *testing.T) {
+	arch := func(name, vunit string) string {
+		return "architecture " + name + " of e is\n" +
+			"  component leaf is end component;\n" +
+			"  for u1 : leaf use entity work.leaf;\n" +
+			"    use vunit " + vunit + ";\n" +
+			"  end for;\n" +
+			"begin\n  u1 : component leaf;\nend;\n"
+	}
 	files := map[string]string{
-		"a_ent.vhd": "entity e is\n" +
-			"  constant d : boolean := std.env.PslIsCovered;\nend;\n",
-		"b_arch.vhd": "architecture rtl of e is\n" +
-			"  type pt is protected\n" +
-			"    generic (n : integer := 1);\n" +
-			"  end protected pt;\n" +
-			"  constant y : boolean := std.env.PslIsCovered;\n" +
-			"begin end;\n",
-		"c_other.vhd": "entity f is\n" +
-			"  constant d : boolean := std.env.PslIsCovered;\nend;\n" +
-			"architecture rtl of f is begin end;\n",
-		"d_user.vhd": "entity g is end;\narchitecture rtl of g is\n" +
-			"begin\n  u : entity work.e;\nend;\n",
+		"a_ent.vhd": "entity leaf is end;\n" +
+			"architecture rtl of leaf is begin end;\n" +
+			"entity e is end;\n",
+		"b_arch.vhd": arch("r1", "v1"),
+		"c_arch.vhd": arch("r2", "v2"),
+		"d_cfg.vhd": "configuration cfg of e is\n  for r1\n" +
+			"    for u1 : leaf\n      use vunit v3;\n    end for;\n" +
+			"  end for;\nend;\n",
+		"e_user.vhd": "entity g is end;\narchitecture rtl of g is\n" +
+			"begin\n  u : configuration work.cfg;\nend;\n",
 	}
-	r := analyze(t, files, func(c *config.Config) { c.Standard = "2019" })
-	got := diagText(r)
-	want := "a_ent.vhd:2:35: unsupported/construct: " + cEnvPSL +
-		" is not supported yet (planned for v1.1)\n" +
-		"b_arch.vhd:3:5: unsupported/construct: " + cProtGenerics +
-		" is not supported yet (planned for v1.1)\n" +
-		"c_other.vhd:2:35: unsupported/construct: " + cEnvPSL +
-		" is not supported yet (planned for v1.1)\n" +
-		"d_user.vhd:2:14: sema/unchecked-unit: work.g(rtl) was not " +
-		"checked: it depends on opaque unit work.e\n"
-	if got != want {
-		t.Errorf("got\n%s\nwant\n%s", got, want)
-	}
-	for _, u := range r.Units {
-		wantOpaque := u.Name == "e" || u.Of == "e" || u.Name == "f" ||
-			u.Of == "f"
-		if u.Opaque != wantOpaque {
-			t.Errorf("%s opaque = %v", u.Label(), u.Opaque)
+	const vu = "verification unit bindings in configurations is not " +
+		"supported yet, please report\n"
+	want := "b_arch.vhd:4:5: unsupported/construct: " + vu +
+		"d_cfg.vhd:4:7: unsupported/construct: " + vu +
+		"e_user.vhd:2:14: sema/unchecked-unit: work.g(rtl) was not " +
+		"checked: it depends on opaque unit work.cfg\n"
+	for _, std := range []string{"2008", "2019"} {
+		r := analyze(t, files, func(c *config.Config) {
+			c.Standard = std
+		})
+		if got := diagText(r); got != want {
+			t.Errorf("%s: got\n%s\nwant\n%s", std, got, want)
+		}
+		for _, u := range r.Units {
+			wantOpaque := u.Of == "e" || u.Name == "cfg"
+			if u.Opaque != wantOpaque {
+				t.Errorf("%s: %s opaque = %v", std, u.Label(), u.Opaque)
+			}
 		}
 	}
 }
@@ -506,8 +529,8 @@ func TestCommonDir(t *testing.T) {
 // TestOSVVM2019: OSVVM's VHDL-2019 builds of the assert API,
 // file/line/path and language-support packages use the std.env
 // features v1.1 delivers, so they are analyzed: no false semantic
-// error, and only still-planned constructs may make a unit opaque
-// (unsupported/construct, planned, and unchecked-unit).
+// error and no unsupported/construct: every VHDL-2019 construct they
+// use is delivered.
 func TestOSVVM2019(t *testing.T) {
 	root := "../../testdata/libs/osvvm"
 	entries, err := os.ReadDir(root)
@@ -535,13 +558,7 @@ func TestOSVVM2019(t *testing.T) {
 		Folders: []config.Folder{{Path: "osvvm"}}}}
 	r := Analyze(Input{Files: srcs, Config: c})
 	for _, d := range r.Diagnostics {
-		switch {
-		case d.Code == diag.UnsupportedConstruct &&
-			strings.HasSuffix(d.Message, "(planned for v1.1)"):
-		case d.Code == diag.SemaUnchecked:
-		default:
-			t.Errorf("%s:%d: %s: %s", d.Path, d.Line, d.Code, d.Message)
-		}
+		t.Errorf("%s:%d: %s: %s", d.Path, d.Line, d.Code, d.Message)
 	}
 	checked := 0
 	for _, u := range r.Units {

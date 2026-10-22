@@ -138,6 +138,11 @@ func (m *machine) toString(args []arg, rt *eval.Type) (eval.Value,
 	}
 	switch v.Kind() {
 	case eval.KindArray:
+		if !charArray(v.T) {
+			// VHDL-2019: an array of another scalar type is written
+			// as its 'IMAGE, (5,6) (as NVC 1.23).
+			return strValue(rt, eval.ImageOf(v)), nil
+		}
 		var sb strings.Builder
 		for _, e := range v.E {
 			sb.WriteString(charOf(e))
@@ -149,6 +154,25 @@ func (m *machine) toString(args []arg, rt *eval.Type) (eval.Value,
 		return strValue(rt, realText(v.F, 0)), nil
 	}
 	return strValue(rt, v.Image()), nil
+}
+
+// charArray reports whether t is an array of a character type (an
+// enumeration type with a character literal, LRM 5.2.2.1): its
+// TO_STRING is its characters (VHDL-2008).
+func charArray(t *eval.Type) bool {
+	if t == nil {
+		return true // a value without a layout: as before
+	}
+	e := t.BaseType().Elem
+	if e == nil || e.Kind != eval.KindEnum {
+		return false
+	}
+	for _, l := range e.BaseType().Literals {
+		if strings.HasPrefix(l, "'") {
+			return true
+		}
+	}
+	return false
 }
 
 // charOf is the text of an enumeration value: a character literal

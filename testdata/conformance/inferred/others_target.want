@@ -1,0 +1,7 @@
+# gohard check --sim --seed 0 --tb others_target_tb (VHDL-2019)
+exit 0
+== stdout
+others_target.vhd:19:5: hint[sim/assert-note]: report note: 5 9 qzzzz 0000
+summary: 0 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated others_target_tb (seed 0): quiet

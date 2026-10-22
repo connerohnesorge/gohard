@@ -8,7 +8,7 @@ package elab
 // epoch plus the simulated time in UTC, GETENV sees EnvOptions.Vars,
 // and only EnvOptions.Real reads the outside world, through its
 // doors (#18). The DIR_* natives work in the run's sandbox (below).
-// The PSL natives come later.
+// The PSL natives read and reset the kernel's PSL state (pslFunc).
 
 import (
 	"errors"
@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/connerohnesorge/gohard/internal/condanal"
+	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/sema"
@@ -95,8 +96,68 @@ func (m *machine) envFunc(x *sema.Decl, args []arg, rt *eval.Type,
 			s = m.ctx.ReadSeverity()
 		}
 		return eval.Enum(rt, int64(s)-1), nil
+	case "pslassertfailed", "psliscovered", "pslisassertcovered",
+		"getpslcoverassert":
+		return eval.Bool(m.pslFunc(name)), nil
 	}
 	return eval.Value{}, unsupported(x)
+}
+
+// pslFunc answers the PSL functions of std.env (LRM 16.5, #18; NVC
+// 1.23 does not implement them):
+//
+//   - PslAssertFailed: an enabled PSL assertion violation happened
+//     since the start or the last ClearPslState.
+//   - PslIsAssertCovered: every PSL assert directive of the design is
+//     covered: its antecedent (the left side of a top-level -> or of a
+//     suffix implication, under always or not) matched at a tick, or,
+//     for an assert that is not an implication, it was checked at a
+//     tick.
+//   - PslIsCovered: every PSL cover directive matched at least once,
+//     and with SetPslCoverAssert(TRUE) every assert directive is
+//     covered too ("cover asserts").
+//   - GetPslCoverAssert: the SetPslCoverAssert setting, FALSE until
+//     set.
+//
+// Coverage counts since the start or the last ClearPslState. A design
+// without directives of a kind has all of them covered. A directive
+// the simulator does not run (one that needs formal verification) is
+// never covered. During elaboration nothing is covered or failed.
+func (m *machine) pslFunc(name string) bool {
+	covers, asserts := m.w.d.pslDirectives()
+	c := m.ctx
+	var failed, coverAssert bool
+	var gotCovers, gotAsserts int
+	if c != nil {
+		failed, coverAssert = c.PSLFailed(), c.PSLCoverAssert()
+		gotCovers, gotAsserts = c.PSLCovered(false), c.PSLCovered(true)
+	}
+	switch name {
+	case "pslassertfailed":
+		return failed
+	case "pslisassertcovered":
+		return gotAsserts >= asserts
+	case "psliscovered":
+		return gotCovers >= covers && (!coverAssert || gotAsserts >= asserts)
+	}
+	return coverAssert // getpslcoverassert
+}
+
+// pslDirectives counts the PSL cover and assert directives of the
+// design (internal/elab/psl runs one process per directive).
+func (d *Design) pslDirectives() (covers, asserts int) {
+	for _, p := range d.Procs {
+		if p == nil || p.Stmt == nil {
+			continue
+		}
+		switch p.Stmt.Node.Kind() {
+		case cst.KindPSLCover:
+			covers++
+		case cst.KindPSLAssert:
+			asserts++
+		}
+	}
+	return covers, asserts
 }
 
 // envProc executes a std.env procedure; stop reports STOP or FINISH,
@@ -137,6 +198,16 @@ func (m *machine) envProc(n *node, x *sema.Decl, args []arg,
 		return false, ferr
 	case "setvhdlreadseverity":
 		m.ctx.SetReadSeverity(severityOf(args[0].v))
+		return false, nil
+	case "setpslcoverassert":
+		on := true // Enable : boolean := TRUE
+		if len(args) > 0 {
+			on = args[0].v.I != 0
+		}
+		m.ctx.SetPSLCoverAssert(on)
+		return false, nil
+	case "clearpslstate":
+		m.ctx.ClearPSL()
 		return false, nil
 	}
 	return false, unsupported(x)
@@ -468,6 +539,9 @@ func (m *machine) envToString(x *sema.Decl, args []arg, rt *eval.Type,
 			return eval.Value{}, err
 		}
 		v = dv
+	case "call_path_vector":
+	default:
+		return eval.Value{}, unsupported(x)
 	}
 	sep := ""
 	if len(args) > 1 {

@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb selected_range_tb (VHDL-2008)
+exit 0
+== stdout
+selected_range.vhd:17:5: hint[sim/assert-note]: report note: a '1' b '0'
+selected_range.vhd:23:5: hint[sim/assert-note]: report note: a '0' b '1'
+summary: 0 errors, 0 warnings, 2 hints, 1 files
+== stderr
+gohard: simulated selected_range_tb (seed 0): quiet

@@ -534,18 +534,23 @@ end;
 
 // TestOpaque: encrypted IP is opaque (exit 2) unless allow_opaque lists
 // it (a hint); units using an unimplemented construct are opaque with
-// unsupported/construct; their dependents are unchecked.
+// unsupported/construct (please report); their dependents are
+// unchecked. The construct table is extended here with a stand-in
+// construct (group templates), so the test does not depend on what
+// GoHard leaves unimplemented.
 func TestOpaque(t *testing.T) {
+	saved := constructs
+	constructs = append(constructs[:len(constructs):len(constructs)],
+		construct{kind: cst.KindGroupTemplateDecl,
+			name: "group templates"})
+	defer func() { constructs = saved }()
 	enc := "entity core is end;\narchitecture rtl of core is\n" +
 		"`protect begin_protected\n`protect data_block\nABCDEF==\n" +
 		"`protect end_protected\nbegin end;\n"
 	files := map[string]string{
 		"core.vhd": enc,
 		"pkg.vhd": `package p is
-  type t is protected
-    generic (n : natural);
-    procedure inc;
-  end protected t;
+  group pair is (signal, signal);
 end;
 `,
 		"user.vhd": "use work.p.all;\nentity user is end;\n",
@@ -556,8 +561,8 @@ end;
 	for _, w := range []string{
 		"core.vhd:2:14: sema/encrypted-unit: work.core(rtl) is " +
 			"encrypted IP and cannot be analyzed",
-		"pkg.vhd:3:5: unsupported/construct: generic clauses on " +
-			"protected types is not supported yet (planned for v1.1)",
+		"pkg.vhd:2:3: unsupported/construct: group templates is " +
+			"not supported yet, please report",
 	} {
 		if !strings.Contains(got, w) {
 			t.Errorf("missing %q in\n%s", w, got)
@@ -582,18 +587,12 @@ end;
 		"work.user was not checked: it depends on opaque unit work.p") {
 		t.Errorf("unchecked:\n%s", got)
 	}
-	// The other message variant, for a construct not planned for v1.1.
-	saved := constructs
-	constructs = append(constructs[:len(constructs):len(constructs)],
-		construct{kind: cst.KindGroupTemplateDecl,
-			name: "group templates"})
-	defer func() { constructs = saved }()
-	r = analyze(t, map[string]string{"g.vhd": `package g is
-  group pair is (signal, signal);
-end;
-`}, nil)
-	if !strings.Contains(diagText(r), "g.vhd:2:3: unsupported/construct:"+
-		" group templates is not supported yet, please report") {
+	// The same under VHDL-2008: the message does not depend on the
+	// standard.
+	r = analyze(t, files, nil)
+	if !strings.Contains(diagText(r), "pkg.vhd:2:3: unsupported/"+
+		"construct: group templates is not supported yet, please "+
+		"report") {
 		t.Errorf("please report:\n%s", diagText(r))
 	}
 }

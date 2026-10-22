@@ -327,8 +327,8 @@ func compareQuiet(t *testing.T, s *session, sim *simenv.Sim, when string) {
 
 // TestLSPDiagnosticsFixturesEqualCheck: every testdata/lsp/diagnostics
 // fixture prints the diagnostics `gohard check` reports for its file
-// (#25: the unsupported/construct diagnostic of a v1.1 construct is
-// identical in the editor).
+// (#25: the unsupported/construct diagnostic of a construct GoHard
+// does not implement is identical in the editor).
 func TestLSPDiagnosticsFixturesEqualCheck(t *testing.T) {
 	dir := filepath.Join(lspRoot, "diagnostics")
 	cases, err := os.ReadDir(dir)

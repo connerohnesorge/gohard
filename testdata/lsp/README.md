@@ -80,7 +80,7 @@ result; positions are zero-based UTF-8.
 | `range-format/partial-line` | a range inside one line: the indentation before it is left alone |
 | `range-format/bad-end` | a range end that is not LINE:COL is a usage error (exit 2) |
 | `diagnostics/cross-file` | `gohard lsp diagnostics --at PATH:1:1`: the syntax and semantic diagnostics published for a file using a package in another file |
-| `diagnostics/v1.1-construct` | a construct planned for v1.1 gives the same `unsupported/construct` diagnostic as `gohard check` (#25) |
+| `diagnostics/unsupported-construct` | a construct GoHard does not implement gives the same `unsupported/construct` ("please report") diagnostic as `gohard check` (#25) |
 | `completion/record-field` | after `p.` the fields of the record signal `p` |
 | `completion/library-units` | after `work.` the primary units of the library and `all` |
 | `completion/library-name` | library names (`ieee`) |
@@ -140,7 +140,7 @@ result; positions are zero-based UTF-8.
 | `rename/extended-refused` | an extended identifier keeps its spelling: refused |
 | `rename/reserved-word` | a reserved word is not a valid new name |
 | `rename/to-extended` | renaming to an extended identifier uses it verbatim at every site |
-| `rename/opaque-refused` | a declaration of an opaque unit (a v1.1 construct) is not renamed: its references are not known |
+| `rename/opaque-refused` | a declaration of an opaque unit (a construct GoHard does not implement) is not renamed: its references are not known |
 | `rename/conflict-region` | a new name already declared in the same region is refused |
 | `rename/conflict-port` | an architecture signal may not take a port name of its entity (case-insensitive) |
 | `rename/conflict-unit` | an entity may not take the name of another design unit of its library |

@@ -208,15 +208,19 @@ type Kernel struct {
 	assertOff [nSeverity]bool
 	formats   [nSeverity]string
 	readSev   trace.Severity
+	// psl is the VHDL-2019 std.env PSL state (pslstate.go), values
+	// only, so Clone copies it too.
+	psl pslState
 }
 
 // nSeverity sizes the per-severity assert state.
 const nSeverity = int(trace.Failure) + 1
 
 // Asserts are the assertion violations a run counted, per severity
-// (#18): enabled violations of assert statements and concurrent
-// assertions only, never report statements, disabled severities or
-// PSL directives. ClearVhdlAssert inside the design resets them.
+// (#18): enabled violations of assert statements, concurrent
+// assertions and PSL assert directives (as in NVC 1.23), never report
+// statements or disabled severities. ClearVhdlAssert inside the
+// design resets them.
 type Asserts struct {
 	Note, Warning, Error, Failure uint64
 }
@@ -595,6 +599,12 @@ func (k *Kernel) initialize() {
 	if err := k.beginTrace(); err != nil {
 		k.fail(err)
 		return
+	}
+	init := Ctx{k: k}
+	for _, r := range k.m.Init {
+		if err := init.Report(r); err != nil {
+			return
+		}
 	}
 	// Initial effective values (LRM 14.7.5.2): resolved nets resolve
 	// their drivers' initial values.

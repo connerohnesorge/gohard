@@ -123,7 +123,7 @@ wording is locked when v1.0 ships. Codes are `area/kebab-name`:
 | `library/` | #34 | `library/unmapped`, `library/duplicate-unit`, `library/import-cycle` |
 | `stdlib/` | #33 | `stdlib/integrity` |
 | `sema/` | #34 | `sema/ambiguous-overload`, `sema/eval-limit`, `sema/unchecked-unit` |
-| `unsupported/` | #20 | `unsupported/construct` ("planned for v1.1" / "please report") |
+| `unsupported/` | #20 | `unsupported/construct` ("please report") |
 | `format/` | #32 | `format/would-change` |
 | `sim/` | #35, #29 | `sim/budget-exceeded`, `sim/assert-error`, `sim/race` |
 | `repro/`, `trace/`, `lsp/`, `libs/`, `internal/` | #29, #36, #26, #1, #20 | `repro/source-changed`, `internal/crash` |
@@ -132,6 +132,20 @@ A `Diagnostic` has a project-relative `/` path, one-based line and
 column (UTF-8 bytes, like `--at`), an exclusive end, severity, code,
 message and related locations. Output is sorted by path, position,
 severity, code and message.
+
+Every legal construct GoHard does not implement is
+`unsupported/construct` with the message "<construct> is not supported
+yet, please report" (exit 2, the unit opaque): found during analysis
+(`sema/unsupported.go`; today only verification unit bindings in
+configurations), or met during elaboration or by a running process
+(`sema.UnsupportedError`, for example `'PATH_NAME` of a declaration in
+a generic package, named associations in aggregate targets, guarded
+signal assignments, an implicit signal of a part of a signal); the run
+stops there. No construct fails silently or with a generic "not
+static" run-time error. The v1.0 variant naming the v1.1 milestone is
+retired: v1.1 delivers every construct it named (#18, #27). Under a
+standard before 2019 the VHDL-2019 constructs are not unsupported but
+not allowed (`syntax/standard`, exit 1).
 
 Exit codes: 0 clean; 1 design problems (errors, any warning with
 `--strict`, unchecked units; hints never fail); 2 tool or setup failure or
@@ -163,11 +177,12 @@ wipes existing GitHub alerts.
 | `gohard help [COMMAND]` | | #20 |
 
 Global flags: `-p/--jobs N`, `--output FILE`, `-h/--help`. There is no
-`gohard sim`. `--env NAME=VALUE` (repeatable) overrides
+`gohard sim`: simulation is `gohard check --sim` (and `gohard lsp sim`).
+Since v1.1, `--env NAME=VALUE` (repeatable) overrides
 `simulation.env.vars` and `--real-env` lets the std.env natives read the
 real clock and environment (#18); both imply `--sim`, and under
 `--repro` both are ignored with a log line (the recorded environment
-wins). A command that is not built yet exits 2 with
+wins). The `simulation.env.*` keys (#28) take effect since v1.1. A command that is not built yet exits 2 with
 `cli/not-implemented`.
 
 ## Files GoHard writes
@@ -335,6 +350,43 @@ predefined and library names, declarations of opaque units, stand-ins
 named like an opaque unit, and extended identifiers; each use site
 keeps its letter case.
 
+## VHDL-2019 in v1.1 (#18, #27)
+
+v1.1 is the release under test (`corpus.Release`); the corpus designs
+`prot_cond` and `gc_heap` (milestone v1.1) run against their
+`expected` outcome like the v1.0 designs. Under `standard: "2019"`
+GoHard analyzes and simulates:
+
+* 64-bit `INTEGER` (`integer'low` = -2\*\*63, as NVC; older standards
+  keep 32 bits), conditional `return ... when`, inferred constraints,
+  generic maps on subprogram calls, `'IMAGE` of composite types.
+* Protected types: generic clauses (mapped when the variable is
+  declared, `type x is new pt generic map (...)`, a header generic map;
+  each object binds its own generics), arrays and records of protected
+  types and pointers to them, protected types built from others,
+  `private variable` and method aliases, protected-type and pointer
+  parameters on functions, shared-variable ports.
+* `'PATH_NAME`, `'INSTANCE_NAME` and `'SIMPLE_NAME` in simulation (LRM
+  16.2.5), protected-object prefixes included (`:tb:sv:m[integer,bit]:`;
+  an allocated object is named in the running process, `:tb:_p0::z`).
+* std.env 2019: date and time (`simulation.env.epoch` plus simulated
+  time, UTC), `GETENV` (`simulation.env.vars`, `--env`), `VHDL_VERSION`
+  and `TOOL_*`, `DIR_*` (project-relative, sorted listings), call path
+  and `FILE_*`, the VHDL assert counter and format API, and the PSL API
+  (`PslAssertFailed`, `PslIsCovered`, `PslIsAssertCovered`,
+  `Set/GetPslCoverAssert`, `ClearPslState`, an epoch per clear). PSL
+  failures count like VHDL assertions (dropped when their severity is
+  disabled, counted by `GetVhdlAssertCount`, in the status JSON
+  `asserts` key), as in NVC 1.23. `std.reflection` is complete.
+* Garbage collection of unreachable access-type objects (#27); it is not
+  visible in VHDL and never changes a trace.
+
+v1.1 changes to the v1.0 locked outputs are additive only: new
+diagnostic codes, the `asserts` key and new trace header lines; the
+trace magic stays `gohard-trace 1`. Each feature has a case under
+`testdata/conformance/<feature>/` (CST round trip and simulator output,
+with an NVC 1.23 recording where NVC supports it).
+
 ## Test data
 
 | Path | Contents | Owner |
@@ -343,6 +395,7 @@ keeps its letter case.
 | `testdata/lsp/<action>/<case>/` | `gohard lsp <action>` fixtures | #26 |
 | `testdata/parse/<rule>/` | one valid file with a tree dump, one invalid file with an error position | #31 |
 | `testdata/corpus/<name>/` + `corpus.yaml` | the 15 oracle designs (#8, #27); goldens under `golden/` | #8 |
+| `testdata/conformance/<feature>/` | the #18 VHDL-2019 cases: `<case>.vhd`, `.want`, optional `.nvc.txt` (see its README) | #18 |
 | `testdata/fuzz/<Target>/` | saved inputs for `FuzzParse`, `FuzzFormat`, `FuzzLSPReplay`, `FuzzConfig` | #30 |
 | `testdata/seeds/<pkg>/` | committed generator failures and LSP sessions, replayed by `go test` | #29 |
 | `testdata/libs/` | pinned real libraries (OSVVM, UVVM, VUnit, regression sources) as submodules | #1, #8 |

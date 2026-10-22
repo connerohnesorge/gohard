@@ -96,7 +96,8 @@ type Instance struct {
 	Alt   *sema.Alt
 	Param eval.Value
 
-	ev *sema.Evaluator
+	ev     *sema.Evaluator
+	parent *Instance
 }
 
 // Describe returns the path with the known generic values, as
@@ -136,6 +137,10 @@ type Options struct {
 	// Natives, if set, evaluates the calls of functions without a
 	// body (sema.Evaluator.WithNatives): elaboration's std.env.
 	Natives sema.Natives
+	// Reporter, if set with Natives, receives the assertion and
+	// report statements the elaboration's evaluations run
+	// (sema.Evaluator.SetReporter).
+	Reporter sema.Reporter
 }
 
 // Result is the hierarchy and its diagnostics.
@@ -156,6 +161,9 @@ func Build(r *sema.Result, o Options) *Result {
 	base := sema.NewEvaluator(r, o.Steps)
 	if o.Natives != nil {
 		base = base.WithNatives(o.Natives)
+		if o.Reporter != nil {
+			base.SetReporter(o.Reporter)
+		}
 	}
 	b := &builder{r: r, o: o, out: &Result{},
 		base:    base,
@@ -476,7 +484,7 @@ func (b *builder) stmts(in *Instance, ss []*sema.Stmt, sc scope,
 			b.instance(in, s, sc, bc, depth)
 		case sema.StmtBlock:
 			c := &Instance{Kind: KindBlock, Path: in.Path + "." +
-				label(s), Stmt: s, ev: in.ev}
+				label(s), Stmt: s, ev: in.ev, parent: in}
 			b.declarations(c, s.Region)
 			b.stmts(c, s.Body, scope{unit: sc.unit, node: s.Node},
 				bc.nested(label(s), nil), depth+1)
@@ -504,7 +512,7 @@ func (b *builder) instance(in *Instance, s *sema.Stmt, sc scope,
 	bc *blockConfig, depth int,
 ) {
 	c := &Instance{Path: in.Path + "." + label(s), Stmt: s,
-		Component: s.Component, Entity: s.Entity}
+		Component: s.Component, Entity: s.Entity, parent: in}
 	var bd *binding
 	switch {
 	case s.Config != nil && s.Config.Unit != nil:
@@ -557,7 +565,7 @@ func (b *builder) forGenerate(in *Instance, s *sema.Stmt, sc scope,
 		if perr == nil {
 			v.T = pt
 		}
-		c := &Instance{Kind: KindGenerate, Stmt: s, Param: v,
+		c := &Instance{Kind: KindGenerate, Stmt: s, Param: v, parent: in,
 			Path: in.Path + "." + label(s) + "(" + v.Image() + ")",
 			ev:   in.ev.Bind(s.Param, v)}
 		b.declarations(c, s.Region)
@@ -630,7 +638,7 @@ func (b *builder) alternative(in *Instance, s *sema.Stmt, i int,
 		path += "." + altLabel
 	}
 	c := &Instance{Kind: KindGenerate, Path: path, Stmt: s, Alt: alt,
-		ev: in.ev}
+		ev: in.ev, parent: in}
 	b.declarations(c, alt.Region)
 	nb := bc.nested(label(s), nil)
 	if altLabel != "" {

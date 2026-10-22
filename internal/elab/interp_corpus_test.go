@@ -10,10 +10,11 @@ import (
 )
 
 // interpDesigns are the corpus designs the sequential interpreter must
-// run to their recorded outcome (corpus.yaml expected).
+// run to their recorded outcome (corpus.yaml expected); the v1.1
+// designs gc_heap and prot_cond since the v1.1 flip.
 var interpDesigns = []string{"assert_fail", "budget_hang", "force_ext",
-	"hier_generate", "md_resolve", "mode_views", "overload_ops",
-	"textio_env", "wait_forms"}
+	"gc_heap", "hier_generate", "md_resolve", "mode_views",
+	"overload_ops", "prot_cond", "textio_env", "wait_forms"}
 
 func corpusRead(rel string) ([]byte, error) {
 	return os.ReadFile(filepath.Join("../..", filepath.FromSlash(rel)))

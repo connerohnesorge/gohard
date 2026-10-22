@@ -28,7 +28,7 @@ a directive; any other comment line is prose.
 | --- | --- |
 | `std: 2008` | The standard: 1993, 2000, 2002, 2008 or 2019. Default **2019**. The case runs with a `gohard.yaml` of `standard: "<std>"` (none for 2008, GoHard's default) and NVC with `--std=<std>`. |
 | `top: name` | The testbench (`--tb`, and NVC's `-e`). Default: the last `entity NAME is` in the file. |
-| `pending: construct` | The feature is still behind its `unsupported/construct` detector. While the run reports `unsupported/construct]: <construct> is not supported`, the case is skipped with a log line instead of failing. `construct` is the wording of the detector's message (for example `conditional return ... when`); a pending case that reports another unsupported construct fails, and one that runs is compared like any other case. The integrator removes the line when it removes the detector. |
+| `pending: construct` | The feature is still behind its `unsupported/construct` detector. While the run reports `unsupported/construct]: <construct> is not supported`, the case is skipped with a log line instead of failing. `construct` is the wording of the detector's message (for example `conditional return ... when`); a pending case that reports another unsupported construct fails, and one that runs is compared like any other case. The integrator removes the line when it removes the detector; since the v1.1 release no case is pending. |
 | `nvc-differs: reason` | NVC's messages or pass/fail are known to differ (an NVC bug or a decided difference); the NVC recording is then only checked for freshness. |
 
 Make the simulator output prove the feature: `report` the values the

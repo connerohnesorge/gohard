@@ -1,0 +1,4 @@
+# A construct GoHard does not implement gives the same
+# unsupported/construct diagnostic as gohard check: "please report"
+# (#25).
+gohard lsp diagnostics --at top.vhd:1:1

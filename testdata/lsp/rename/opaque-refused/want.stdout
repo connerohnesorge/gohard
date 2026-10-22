@@ -1,2 +1,2 @@
-gohard: error[cli/usage]: gohard lsp rename: cannot rename pair_t: it is declared in an opaque unit, whose references are not known; run 'gohard help' for usage
+gohard: error[cli/usage]: gohard lsp rename: cannot rename s: it is declared in an opaque unit, whose references are not known; run 'gohard help' for usage
 summary: 1 errors, 0 warnings, 0 hints, 0 files

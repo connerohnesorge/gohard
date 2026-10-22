@@ -189,15 +189,28 @@ func (a *analyzer) typeDecl(td cst.TypeDecl) {
 		t.Members = a.push(RegionProtected, d, def)
 		h := pd.Header()
 		a.interfaceList(h.Generics().List(), DeclGeneric)
-		a.genericMap(h.GenericMap().List(), nil)
+		if gm := h.GenericMap(); !gm.IsZero() {
+			// A header generic map (LRM 5.6.2) instantiates the type
+			// in place: its generics are bound, it is no generic
+			// protected type.
+			as := a.assocMap(gm.List(), t.Members, DeclGeneric)
+			a.instSubst = nil // the map's own generic types
+			a.mapRules(as, t.Members, DeclGeneric, gm.Node)
+			a.missingGenerics(as, t.Members, gm.Node) // stmts.go
+			t.Inst = &TypeInst{Of: d, Map: as}
+		}
 		a.declarativePart(pd.Decls().Node)
 		a.pop()
 		a.methodTypes(t.Members) // typecheck.go
 		a.endClause(pd.End(), d)
+	case cst.KindProtectedTypeInstantiationDef:
+		t = fill(a.protectedInstantiation(
+			cst.ProtectedTypeInstantiationDef{Node: def}))
+		d.Type = t
+		a.declare(d)
 	default:
-		// VHDL-2019 protected type instantiations and incomplete type
-		// definitions of generic types: their structure is only known
-		// per instance.
+		// VHDL-2019 incomplete type definitions of generic types:
+		// their structure is only known per instance.
 		t = fill(&Type{Class: TypeGeneric})
 		d.Type = t
 		for c := range def.Nodes() {
@@ -433,6 +446,9 @@ func (a *analyzer) subtypeIndication(si cst.SubtypeIndication) *Type {
 		}
 		return UnknownType
 	}
+	if t, ok := a.objectInstance(si, base); ok {
+		return t
+	}
 	res, cons := si.Resolution(), si.Constraint()
 	if res.IsZero() && cons.IsZero() {
 		return base
@@ -610,4 +626,113 @@ func (a *analyzer) resolution(n cst.Node, t *Type) *Resolution {
 		return res
 	}
 	return nil
+}
+
+// protectedInstantiation analyzes a VHDL-2019 protected type
+// instantiation, `type t is new pt [generic map (...)]` (LRM 5.6.4):
+// pt must be a generic protected type, and the map gives each of its
+// generics without a default an actual. The instance shares pt's
+// members; Inst names pt and holds the map.
+func (a *analyzer) protectedInstantiation(pi cst.ProtectedTypeInstantiationDef,
+) *Type {
+	tm := pi.TypeMark().Node
+	of := a.typeMark(tm)
+	gm := pi.GenericMap()
+	if of.Unknown() {
+		a.quietMap(gm)
+		return &Type{Class: TypeUnknown}
+	}
+	b := of.Base()
+	if !GenericProtected(b) {
+		if !a.quiet {
+			a.semaError(tm.Span(), a.text(tm)+" is not a generic "+
+				"protected type (LRM 5.6.4)")
+		}
+		a.quietMap(gm)
+		return &Type{Class: TypeUnknown}
+	}
+	return &Type{Class: TypeProtected, Members: b.Members,
+		Inst: a.typeInst(b, gm, pi.Node)}
+}
+
+// typeInst returns the binding of the generics of the generic
+// protected type b by the generic map gm (zero: none), reporting the
+// generics left without an actual at the map, or at the node at when
+// there is no map.
+func (a *analyzer) typeInst(b *Type, gm cst.GenericMapAspect,
+	at cst.Node,
+) *TypeInst {
+	var as []Association
+	if !gm.IsZero() {
+		as = a.assocMap(gm.List(), b.Members, DeclGeneric)
+		a.instSubst = nil // the map's own generic types
+		at = gm.Node
+		a.mapRules(as, b.Members, DeclGeneric, at) // assocrules.go
+	}
+	a.missingGenerics(as, b.Members, at) // stmts.go
+	return &TypeInst{Of: b.Decl, Map: as}
+}
+
+// quietMap analyzes the generic map gm of an erroneous instance
+// without reporting: its names still get references.
+func (a *analyzer) quietMap(gm cst.GenericMapAspect) {
+	if gm.IsZero() {
+		return
+	}
+	saved := a.quiet
+	a.quiet = true
+	a.assocMap(gm.List(), nil, DeclGeneric)
+	a.quiet = saved
+}
+
+// objectInstance handles the subtype indication si of a variable
+// declaration whose type mark denotes base (VHDL-2019, LRM 6.4.2.4).
+// A variable of a generic protected type is of an anonymous subtype of
+// it whose Inst binds its generics: the declaration's generic map, or
+// their defaults. A generic map on a variable of any other type is an
+// error. ok is false when si is no such indication.
+func (a *analyzer) objectInstance(si cst.SubtypeIndication, base *Type,
+) (*Type, bool) {
+	vd, isVar := cst.As[cst.VariableDecl](si.Node.Parent())
+	if !isVar || base.Unknown() {
+		return nil, false
+	}
+	gm := vd.GenericMap()
+	b := base.Base()
+	if !GenericProtected(b) {
+		if !gm.IsZero() {
+			if !a.quiet {
+				a.semaError(gm.Span(), a.text(si.TypeMark().Node)+
+					" is not a generic "+
+					"protected type: a variable of it cannot have a "+
+					"generic map (LRM 6.4.2.4)")
+			}
+			a.quietMap(gm)
+		}
+		return nil, false
+	}
+	if !si.Resolution().IsZero() || !si.Constraint().IsZero() {
+		return nil, false // reported as a constrained protected type
+	}
+	// An anonymous subtype: the object stays of the generic type for
+	// the formals and methods that name it.
+	t := NewSubtype(base)
+	t.Inst = a.typeInst(b, gm, si.Node)
+	return t, true
+}
+
+// GenericProtected reports whether b is a generic protected type: a
+// protected type with a generic clause and no generic map, whose
+// objects and instantiations bind its generics (VHDL-2019, LRM 5.6.2).
+func GenericProtected(b *Type) bool {
+	if b == nil || b.Class != TypeProtected || b.Inst != nil ||
+		b.Members == nil {
+		return false
+	}
+	for _, d := range b.Members.Decls {
+		if isGenericKind(d.Kind) {
+			return true
+		}
+	}
+	return false
 }

@@ -78,6 +78,13 @@ type directive struct {
 	formal string
 	unsup  string
 	ev     *sema.Evaluator
+	// ante is the antecedent of an assert whose property is an
+	// implication (under always or not): the assert is covered
+	// (PslIsAssertCovered) once ante matches. anteAll starts a match
+	// at every tick (under always), else at the first tick only. An
+	// assert without an antecedent is covered at its first tick.
+	ante    *sere
+	anteAll bool
 }
 
 type sigRef struct {
@@ -167,11 +174,45 @@ func compile(d *elab.Design, p *elab.Proc) *directive {
 	}
 	if dir.kind == dAssert {
 		dir.prop = b.prop(body)
+		dir.ante, dir.anteAll = b.antecedent(body)
 	} else {
 		dir.seq = b.sere(body)
 	}
 	b.clock(clk)
 	return dir
+}
+
+// antecedent returns the antecedent sequence of an assert's property
+// (nil when it is not an implication) and whether the implication is
+// under always: `always {s} |-> p`, `always (b -> p)`, `{s} |=> p`.
+// Its booleans are the property's own (b.boolean memoizes them).
+func (b *builder) antecedent(n cst.Node) (*sere, bool) {
+	always := false
+	for {
+		switch n.Kind() {
+		case cst.KindPSLParenProp, cst.KindPSLAlways:
+			always = always || n.Kind() == cst.KindPSLAlways
+			n = firstKid(n)
+			continue
+		case cst.KindPSLSuffixImplication:
+			return b.sere(firstKid(n)), always
+		case cst.KindPSLImplication:
+			l := firstKid(n)
+			if has(n, "<->") || l.Kind() != cst.KindPSLBoolean {
+				return nil, false
+			}
+			return boolS(b.boolean(l), false), always
+		}
+		return nil, false
+	}
+}
+
+// firstKid is n's first child node (zero when it has none).
+func firstKid(n cst.Node) cst.Node {
+	for c := range n.Nodes() {
+		return c
+	}
+	return cst.Node{}
 }
 
 // firstOf returns the first node of n's subtree of one of the kinds.

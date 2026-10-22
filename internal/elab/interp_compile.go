@@ -215,8 +215,8 @@ func (pc *progCache) node(f *sema.File, s *sema.SeqStmt) (*node, error) {
 		n.wait, e1 = pc.waitStmt(f, s)
 		err = errors.Join(err, e1)
 	case sema.SeqOther:
-		err = errors.Join(err, errors.New("the statement "+
-			firstLine(s.Node.Text())+" is not supported in simulation"))
+		err = errors.Join(err, sema.NewUnsupported("simulating the "+
+			"statement "+firstLine(s.Node.Text()), nil))
 	}
 	if err != nil {
 		delete(pc.nodes, s)
@@ -305,9 +305,9 @@ func (pc *progCache) sigStmt(f *sema.File, st cst.Node,
 				}
 				c := pc.expr(f, ch.Node)
 				if c == nil {
-					err = errors.Join(err, errors.New("the choice "+
-						ch.Node.Text()+" of a selected signal "+
-						"assignment is not supported in simulation"))
+					err = errors.Join(err, sema.NewUnsupported(
+						"the choice "+ch.Node.Text()+" of a "+
+							"selected signal assignment", nil))
 					continue
 				}
 				cs = append(cs, c)
@@ -383,12 +383,12 @@ func (pc *progCache) sigStmt(f *sema.File, st cst.Node,
 		targetOf(s.Target())
 		g.mode(s.Mode())
 	default:
-		return nil, errors.New("the signal assignment " +
-			firstLine(st.Text()) + " is not supported in simulation")
+		return nil, sema.NewUnsupported("simulating the signal "+
+			"assignment "+firstLine(st.Text()), nil)
 	}
 	if !st.Token(token.KwGuarded, 0).IsZero() {
-		err = errors.Join(err, errors.New("guarded signal assignments "+
-			"are not supported in simulation"))
+		err = errors.Join(err, sema.NewUnsupported(
+			"guarded signal assignments", nil))
 	}
 	return g, err
 }
@@ -660,8 +660,8 @@ func (pc *progCache) implicitOf(p *Proc, e *sema.Expr) (sim.SigID, bool,
 		return 0, false, nil
 	}
 	if t.First != 0 || t.N != leaves(pc.d.Model.Signals[t.Sig].Init) {
-		return 0, false, errors.New("the attribute '" + string(e.Attr) +
-			" of a part of a signal is not supported in simulation")
+		return 0, false, sema.NewUnsupported("the attribute '"+
+			string(e.Attr)+" of a part of a signal", nil)
 	}
 	var delay int64
 	if len(e.Args) > 0 {

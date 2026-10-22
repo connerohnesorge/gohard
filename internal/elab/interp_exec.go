@@ -27,7 +27,7 @@ func (m *machine) exec(n *node) (sim.Wait, bool, error) {
 	switch s.Kind {
 	case sema.SeqNull:
 	case sema.SeqVarAssign:
-		v, err := ev.Eval(s.Value, b)
+		v, err := m.evalFor(s.Value, s.Target)
 		if err != nil {
 			return sim.Wait{}, false, err
 		}
@@ -42,7 +42,7 @@ func (m *machine) exec(n *node) (sim.Wait, bool, error) {
 				if br.Value == nil {
 					break
 				}
-				v, err := ev.Eval(br.Value, b)
+				v, err := m.evalFor(br.Value, s.Target)
 				if err != nil {
 					return sim.Wait{}, false, err
 				}
@@ -55,7 +55,7 @@ func (m *machine) exec(n *node) (sim.Wait, bool, error) {
 		if err != nil || i < 0 || s.Alts[i].Value == nil {
 			return sim.Wait{}, false, err
 		}
-		v, err := ev.Eval(s.Alts[i].Value, b)
+		v, err := m.evalFor(s.Alts[i].Value, s.Target)
 		if err != nil {
 			return sim.Wait{}, false, err
 		}
@@ -554,6 +554,10 @@ func (m *machine) newObject(t *sema.Type) (int64, error) {
 	m.frames = append(m.frames, frame{vars: map[*sema.Decl]slot{},
 		obj: h})
 	defer func() { m.frames = m.frames[:len(m.frames)-1] }()
+	if err := m.bindGenerics(t, o); err != nil {
+		delete(m.w.objs, h)
+		return 0, err
+	}
 	var decls []*sema.Decl
 	if r := t.Base().Members; r != nil {
 		for _, d := range r.Decls {
@@ -582,9 +586,170 @@ func (m *machine) newObject(t *sema.Type) (int64, error) {
 	return h, nil
 }
 
+// bindGenerics binds the generics of the new protected object o of
+// subtype t (VHDL-2019, LRM 5.6.2, 6.4.2.4) in the object's frame, on
+// top of the stack: the actuals of t's generic map (ProtectedInst),
+// evaluated in the context declaring the object, else the defaults,
+// which see the generics before them. They become objects of o
+// (generic constants, read through objRef) and enter copies them into
+// the frame of each method call (objectFrame), where GenericLayout
+// finds the generic types: each object reads its own bindings, never
+// another's, and a call reading them is never memoized (they are run
+// time reads of the simulator's context, sema/memo.go).
+func (m *machine) bindGenerics(t *sema.Type, o *protObj) error {
+	gens := protectedGenerics(t)
+	if len(gens) == 0 {
+		return nil
+	}
+	var as []sema.Association
+	if in := t.ProtectedInst(); in != nil {
+		as = in.Map
+	}
+	f := &m.frames[len(m.frames)-1]
+	bind := func(d *sema.Decl, s slot) {
+		f.vars[d] = s
+		o.vars[d] = s
+	}
+	for _, g := range gens {
+		a := genericActual(as, g)
+		switch g.Kind {
+		case sema.DeclGeneric:
+			def := g.Value
+			if a != nil {
+				def = a
+			}
+			if def == nil {
+				return errors.New("generic " + g.Text + " of " +
+					t.Name() + " has no default and no actual")
+			}
+			v, err := m.ev.Eval(def, m.b)
+			if err != nil {
+				return wrapErr("generic "+g.Text, err)
+			}
+			lt, err := m.ev.LayoutIn(g.Type, m.b)
+			if err != nil {
+				return wrapErr("generic "+g.Text, err)
+			}
+			lt = eval.InferSubtype(lt, v)
+			if v, err = eval.Check(v, lt); err != nil {
+				return wrapErr("generic "+g.Text, err)
+			}
+			bind(g, slot{v: v, t: lt})
+		case sema.DeclGenericType:
+			if a == nil || a.Type.Unknown() {
+				return errors.New("generic type " + g.Text + " of " +
+					t.Name() + " has no actual")
+			}
+			if err := m.bindGenericType(g, a.Type, bind); err != nil {
+				return wrapErr("generic type "+g.Text, err)
+			}
+		case sema.DeclGenericSubprogram:
+			return &nativeError{name: cProtGenericSubprogram}
+		default:
+			return &nativeError{name: cProtGenericPackage}
+		}
+	}
+	return nil
+}
+
+// The generics of protected types the simulator does not bind yet:
+// reported as unsupported/construct (please report) when an object is
+// created.
+const (
+	cProtGenericSubprogram = "generic subprograms of protected types"
+	cProtGenericPackage    = "generic packages of protected types"
+)
+
+// bindGenericType binds the generic type g to the layout of its actual
+// subtype at and, for a VHDL-2019 array-class generic type (LRM
+// 6.5.3), its anonymous index and element types to the actual's.
+func (m *machine) bindGenericType(g *sema.Decl, at *sema.Type,
+	bind func(*sema.Decl, slot),
+) error {
+	lt, err := m.ev.LayoutIn(at, m.b)
+	if err != nil {
+		return err
+	}
+	bind(g, slot{t: lt})
+	gt := g.Type
+	if gt == nil || gt.Class != sema.TypeGeneric ||
+		at.Base().Class != sema.TypeArray {
+		return nil
+	}
+	for i, x := range gt.Index {
+		if i < len(at.Base().Index) && x.Class == sema.TypeGeneric &&
+			x.Decl != nil {
+			err := m.bindGenericType(x.Decl, at.Base().Index[i], bind)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	if x := gt.Elem; x != nil && x.Class == sema.TypeGeneric &&
+		x.Decl != nil && at.ElemType() != nil {
+		return m.bindGenericType(x.Decl, at.ElemType(), bind)
+	}
+	return nil
+}
+
+// genericActual returns the actual the generic map as gives the
+// generic g, nil when none does.
+func genericActual(as []sema.Association, g *sema.Decl) *sema.Expr {
+	for _, a := range as {
+		if a.Formal == g && a.Part == nil {
+			return a.Actual
+		}
+	}
+	return nil
+}
+
+// protectedGenerics returns the generics of the protected type of an
+// object of subtype t, in declaration order (the uninstantiated
+// type's, for an instance).
+func protectedGenerics(t *sema.Type) []*sema.Decl {
+	spec := protectedSpec(t)
+	if spec == nil || spec.Type == nil || spec.Type.Members == nil {
+		return nil
+	}
+	var out []*sema.Decl
+	for _, d := range spec.Type.Members.Decls {
+		switch d.Kind {
+		case sema.DeclGeneric, sema.DeclGenericType,
+			sema.DeclGenericSubprogram, sema.DeclGenericPackage:
+			out = append(out, d)
+		}
+	}
+	return out
+}
+
+// objectFrame copies the generics of protected object h into the
+// frame fi of a call of one of its methods (bindGenerics).
+func (m *machine) objectFrame(fi int, h int64) {
+	o := m.w.objs[h]
+	if o == nil {
+		return
+	}
+	for _, g := range protectedGenerics(o.typ) {
+		if s, ok := o.vars[g]; ok {
+			m.frames[fi].vars[g] = s
+		}
+	}
+}
+
+// protectedSpec returns the declaration of the protected type whose
+// body runs the objects of subtype t: the uninstantiated type of a
+// protected type instance (VHDL-2019, LRM 5.6.4).
+func protectedSpec(t *sema.Type) *sema.Decl {
+	b := t.Base()
+	if b.Inst != nil && b.Inst.Of != nil {
+		return b.Inst.Of
+	}
+	return b.Decl
+}
+
 // protectedBody finds the body region of protected type t.
 func (w *world) protectedBody(t *sema.Type) *sema.Region {
-	td := t.Base().Decl
+	td := protectedSpec(t)
 	if td == nil || td.Unit == nil {
 		return nil
 	}
@@ -985,14 +1150,47 @@ func (m *machine) assignAggregate(target *sema.Expr, v eval.Value,
 	}
 	for i, a := range target.Assocs {
 		if len(a.Choices) > 0 {
-			return errors.New("named associations in an aggregate " +
-				"target are not supported in simulation")
+			return sema.NewUnsupported("named associations in "+
+				"aggregate targets", nil)
 		}
 		if err := set(a.Value, v.E[i]); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+// evalFor evaluates the value e assigned to target. An aggregate with
+// others has the target's subtype as its context (LRM 9.3.3.3); when
+// sema's subtype of the target is unconstrained (an object whose
+// constraint is inferred from its initial value, LRM 6.4.2.3) the
+// constraint is the object's own, known only now.
+func (m *machine) evalFor(e, target *sema.Expr) (eval.Value, error) {
+	v, err := m.ev.Eval(e, m.b)
+	if err == nil || e == nil || target == nil ||
+		e.Kind != sema.ExprAggregate ||
+		eval.CodeOf(err) != eval.ErrCodeNotStatic {
+		return v, err
+	}
+	cur, terr := m.ev.Eval(target, m.b)
+	if terr != nil || cur.Kind() != eval.KindArray || cur.T == nil {
+		return v, err
+	}
+	t := cur.T
+	if !t.Constrained() {
+		if len(cur.B) == 0 {
+			return v, err
+		}
+		t = t.ArraySubtype(cur.B...)
+	}
+	x, lerr := m.ev.Lower(e, m.b)
+	agg, ok := x.(*eval.Aggregate)
+	if lerr != nil || !ok || agg.T == nil || agg.T.Constrained() {
+		return v, err
+	}
+	c := *agg
+	c.T = t
+	return m.ev.Machine(m.b).Eval(&c)
 }
 
 // signal executes a signal assignment, force or release.
@@ -1085,7 +1283,7 @@ func (m *machine) signal(n *node) error {
 			ws[i].Null = true
 			continue
 		}
-		v, err := ev.Eval(w.value, b)
+		v, err := m.evalFor(w.value, g.target)
 		if err != nil {
 			return err
 		}
@@ -1133,8 +1331,8 @@ func (m *machine) targetParts(e *sema.Expr) ([]sigPart, error) {
 		var out []sigPart
 		for _, a := range e.Assocs {
 			if len(a.Choices) > 0 {
-				return nil, errors.New("named associations in an " +
-					"aggregate target are not supported in simulation")
+				return nil, sema.NewUnsupported("named associations "+
+					"in aggregate targets", nil)
 			}
 			ps, err := m.targetParts(a.Value)
 			if err != nil {

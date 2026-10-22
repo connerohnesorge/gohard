@@ -399,7 +399,8 @@ var keys = []Key{
 		TypeDoc: "RFC 3339 UTC time",
 		Doc: "The wall-clock time of simulated time 0: `EPOCH`, " +
 			"`GMTIME` and `LOCALTIME` report it plus the simulated " +
-			"time, in UTC, unless `--real-env` is given (v1.1).",
+			"time, in UTC, unless `--real-env` is given (in " +
+			"effect since v1.1).",
 		acc: bind(func(c *Config) *time.Time {
 			return &c.Simulation.Env.Epoch
 		}, time.Time.Equal, (*parser).timestamp),
@@ -408,7 +409,8 @@ var keys = []Key{
 		Name: "simulation.env.vars", Type: TypeMap,
 		MapKeys: ItemVarName, Items: ItemString, Default: "{}",
 		TypeDoc: "map: name to string",
-		Doc: "The only variables `GETENV` sees (v1.1); `--env " +
+		Doc: "The only variables `GETENV` sees (in effect since " +
+			"v1.1); `--env " +
 			"NAME=VALUE` overrides an entry. `--real-env` reads the " +
 			"real environment instead.",
 		acc: bind(func(c *Config) *[]Var { return &c.Simulation.Env.Vars },

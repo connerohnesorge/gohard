@@ -320,9 +320,10 @@ func (a *analyzer) settle(e *Expr, t *Type) {
 	e.pend = nil
 	switch p.kind {
 	case pendChar, pendName:
+		sub := methodSubst(e.Prefix)
 		var fit []*Decl
 		for _, c := range p.cands {
-			if t.Unknown() || valueFits(c, t) {
+			if t.Unknown() || valueFitsSub(c, t, sub) {
 				fit = append(fit, c)
 			}
 		}
@@ -333,10 +334,10 @@ func (a *analyzer) settle(e *Expr, t *Type) {
 		}
 		o := &Overload{Name: p.tok.Text()}
 		for _, c := range p.cands {
-			cd := Candidate{Decl: c, Fits: valueFits(c, t) ||
+			cd := Candidate{Decl: c, Fits: valueFitsSub(c, t, sub) ||
 				t.Unknown()}
 			if !cd.Fits {
-				cd.Reason = "is " + orUnknown(c.Denotes().Type).Name()
+				cd.Reason = "is " + orUnknown(sub.result(c)).Name()
 			}
 			o.Candidates = append(o.Candidates, cd)
 		}
@@ -344,7 +345,7 @@ func (a *analyzer) settle(e *Expr, t *Type) {
 		switch {
 		case len(fit) == 1 || (len(fit) > 1 && sameDenotation(fit)):
 			o.Chosen = fit[0]
-			e.Decl, e.Type = fit[0], orUnknown(fit[0].Denotes().Type)
+			e.Decl, e.Type = fit[0], orUnknown(sub.result(fit[0]))
 		case len(fit) == 0:
 			if !t.Unknown() && !a.quiet {
 				e.illTyped = true
@@ -438,6 +439,12 @@ func commonType(ds []*Decl) *Type {
 // valueFits reports whether the enumeration literal or parameterless
 // function d can be a value of type t.
 func valueFits(d *Decl, t *Type) bool {
+	return valueFitsSub(d, t, nil)
+}
+
+// valueFitsSub is valueFits for a method whose generic types the
+// object binds as sub gives (methodsubst.go).
+func valueFitsSub(d *Decl, t *Type, sub typeSubst) bool {
 	x := d.Denotes()
 	if x.Type == nil {
 		return false
@@ -445,7 +452,7 @@ func valueFits(d *Decl, t *Type) bool {
 	if t.Unknown() {
 		return true
 	}
-	return Compatible(x.Type, t)
+	return Compatible(sub.of(x.Type), t)
 }
 
 // literal types a literal.

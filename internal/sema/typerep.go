@@ -96,7 +96,11 @@ type Type struct {
 	Members *Region
 	// Inst is set on a protected type instantiation (VHDL-2019,
 	// LRM 5.6.4): the uninstantiated protected type and the generic
-	// map. Nil for any other type.
+	// map; on a protected type declared with a generic map in its
+	// header (Of is the type itself); and on the anonymous subtype of
+	// a variable of a generic protected type (LRM 6.4.2.4: the
+	// variable's generic map, nil when the defaults bind them all).
+	// Nil for any other type. ProtectedInst finds it.
 	Inst *TypeInst
 	// Ops are the implicitly declared operations of a base type
 	// (predef.go), which a VHDL-2008 `use p.T` makes visible with T.
@@ -113,6 +117,19 @@ type Type struct {
 type TypeInst struct {
 	Of  *Decl
 	Map []Association
+}
+
+// ProtectedInst returns the binding of the generics of an object of
+// subtype t: the Inst of t or of the nearest subtype or type it is
+// declared from; nil for an object of a protected type without
+// generics (or of any other type).
+func (t *Type) ProtectedInst() *TypeInst {
+	for s := t; s != nil; s = s.base {
+		if s.Inst != nil {
+			return s.Inst
+		}
+	}
+	return nil
 }
 
 // RangeCons is a range constraint or a discrete range: Left Dir Right,

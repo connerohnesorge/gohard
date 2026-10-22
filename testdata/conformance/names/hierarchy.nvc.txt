@@ -1,0 +1,54 @@
+# NVC output of testdata/conformance/names/hierarchy.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a hierarchy.vhd -e names_tb -r
+# source sha256: bc62fabbe547af4bf33c4f34b268419f874fadf6ba320236cba33e500fbce047
+# exit: 0
+** Note: 0ms+0: s :names_tb:u1:s :names_tb(rtl):u1@names_sub(a):s s
+   Process :names_tb:u1:pr at hierarchy.vhd:36
+** Note: 0ms+0: pg :names_tb:u1:p :names_tb(rtl):u1@names_sub(a):g
+   Process :names_tb:u1:pr at hierarchy.vhd:36
+** Note: 0ms+0: v :names_tb:u1:pr:v :names_tb(rtl):u1@names_sub(a):pr:v
+   Process :names_tb:u1:pr at hierarchy.vhd:36
+** Note: 0ms+0: pr :names_tb:u1:pr: :names_tb(rtl):u1@names_sub(a):pr: pr
+   Process :names_tb:u1:pr at hierarchy.vhd:36
+** Note: 0ms+0: sub :names_tb:u1: :names_tb(rtl):u1@names_sub(a):
+   Process :names_tb:u1:pr at hierarchy.vhd:36
+** Note: 0ms+0: q :names_tb:u1:pr:q[integer]: :names_tb(rtl):u1@names_sub(a):pr:q[integer]:w :names_tb:u1:pr:q[integer]:y
+   Procedure Q [INTEGER] at hierarchy.vhd:39
+   Process :names_tb:u1:pr at hierarchy.vhd:53
+** Note: 0ms+0: gen :names_tb:gen(0):gs :names_tb(rtl):gen(0):i :names_tb:gen(0):b:
+   Process :names_tb:gen(0):b:_p0 at hierarchy.vhd:78
+** Note: 0ms+0: gen :names_tb:gen(1):gs :names_tb(rtl):gen(1):i :names_tb:gen(1):b:
+   Process :names_tb:gen(1):b:_p0 at hierarchy.vhd:78
+** Note: 0ms+0: s :names_tb:ig:u3:s :names_tb(rtl):ig:u3@names_sub(a):s s
+   Process :names_tb:ig:u3:pr at hierarchy.vhd:36
+** Note: 0ms+0: pg :names_tb:ig:u3:p :names_tb(rtl):ig:u3@names_sub(a):g
+   Process :names_tb:ig:u3:pr at hierarchy.vhd:36
+** Note: 0ms+0: v :names_tb:ig:u3:pr:v :names_tb(rtl):ig:u3@names_sub(a):pr:v
+   Process :names_tb:ig:u3:pr at hierarchy.vhd:36
+** Note: 0ms+0: pr :names_tb:ig:u3:pr: :names_tb(rtl):ig:u3@names_sub(a):pr: pr
+   Process :names_tb:ig:u3:pr at hierarchy.vhd:36
+** Note: 0ms+0: sub :names_tb:ig:u3: :names_tb(rtl):ig:u3@names_sub(a):
+   Process :names_tb:ig:u3:pr at hierarchy.vhd:36
+** Note: 0ms+0: q :names_tb:ig:u3:pr:q[integer]: :names_tb(rtl):ig:u3@names_sub(a):pr:q[integer]:w :names_tb:ig:u3:pr:q[integer]:y
+   Procedure Q [INTEGER] at hierarchy.vhd:39
+   Process :names_tb:ig:u3:pr at hierarchy.vhd:53
+** Note: 0ms+0: alt :names_tb:alt2:as :names_tb(rtl):alt2:as :names_tb:alt2:pp:
+   Procedure CHECK [STRING, STRING, STRING] at hierarchy.vhd:19
+   Process :names_tb:alt2:pp at hierarchy.vhd:97
+** Note: 0ms+0: top :names_tb::u :names_tb: :names_tb(rtl): :names_tb(rtl):t
+   Procedure CHECK [STRING, STRING, STRING] at hierarchy.vhd:19
+   Process :names_tb:_p0 at hierarchy.vhd:107
+** Note: 0ms+0: f :work:names_pkg:f[integer return string]: :work:names_pkg:f[integer return string]:v :work:names_pkg:c
+   Procedure CHECK [STRING, STRING, STRING] at hierarchy.vhd:19
+   Process :names_tb:_p0 at hierarchy.vhd:110
+** Note: 0ms+0: pkg :work:names_pkg:
+   Procedure CHECK [STRING, STRING, STRING] at hierarchy.vhd:19
+   Process :names_tb:_p0 at hierarchy.vhd:112
+** Note: 0ms+0: loop :names_tb::j
+   Procedure CHECK [STRING, STRING, STRING] at hierarchy.vhd:19
+   Process :names_tb:_p0 at hierarchy.vhd:114
+** Note: 0ms+0: sub t
+   Procedure CHECK [STRING, STRING, STRING] at hierarchy.vhd:19
+   Process :names_tb:_p0 at hierarchy.vhd:116

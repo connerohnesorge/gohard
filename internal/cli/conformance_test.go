@@ -169,8 +169,8 @@ func (e *pendingError) Error() string {
 // case without the header never skips; a wrong name is an error.
 func TestPendingSkip(t *testing.T) {
 	out := []byte("a.vhd:8:5: error[unsupported/construct]: " +
-		"conditional return ... when is not supported yet " +
-		"(planned for v1.1)\n")
+		"conditional return ... when is not supported yet, " +
+		"please report\n")
 	pend := corpus.ConformanceCase{Pending: "conditional return ... when"}
 	if skip, err := pendingSkip(pend, out); !skip || err != nil {
 		t.Errorf("matching construct: skip %v, %v", skip, err)

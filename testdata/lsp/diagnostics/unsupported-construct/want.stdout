@@ -1,0 +1,1 @@
+{"uri":"file://$WORK/top.vhd","version":1,"diagnostics":[{"range":{"start":{"line":21,"character":6},"end":{"line":21,"character":23}},"severity":1,"code":"unsupported/construct","source":"gohard","message":"verification unit bindings in configurations is not supported yet, please report"}]}

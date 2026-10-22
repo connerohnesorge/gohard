@@ -170,6 +170,10 @@ func (m *machine) enter(body *sema.Decl, e *sema.Expr, obj int64,
 	m.frames = append(m.frames, frame{sub: body, call: e, obj: obj,
 		vars: map[*sema.Decl]slot{}})
 	fi := len(m.frames) - 1
+	if obj != 0 {
+		// A method: its object's generics (VHDL-2019).
+		m.objectFrame(fi, obj)
+	}
 	if in != nil {
 		for _, g := range in.Generics {
 			// A generic subprogram's slot marks the frame that binds
@@ -313,6 +317,24 @@ func (m *machine) funcOuts(fn *callFn) ([]outArg, error) {
 	return outs, nil
 }
 
+// objectResult reports whether the result subtype of the call e of
+// function x is known only to x's object: x is a method of a generic
+// protected type called on an object (VHDL-2019), so its result may
+// be of a generic type the object binds (bindGenerics). The method's
+// frame checks the result (ret).
+func objectResult(e *sema.Expr, x *sema.Decl) bool {
+	if e.Prefix == nil || x.Parent == nil ||
+		x.Parent.Kind != sema.RegionProtected {
+		return false
+	}
+	for _, d := range x.Parent.Decls {
+		if d.Kind == sema.DeclGenericType {
+			return true
+		}
+	}
+	return false
+}
+
 // methodObj returns the object prefix of the method alias d (or of the
 // alias it names), nil when d is no method alias.
 func methodObj(d *sema.Decl) *sema.Expr {
@@ -340,6 +362,7 @@ func (m *machine) methodObject(outer int64, mo *sema.Expr, b *eval.Budget,
 		m.frames = append(m.frames, frame{obj: outer,
 			vars: map[*sema.Decl]slot{}})
 		defer func(n int) { m.frames = m.frames[:n] }(len(m.frames) - 1)
+		m.objectFrame(len(m.frames)-1, outer)
 	}
 	v, err := m.ev.Eval(mo, b)
 	if err != nil {

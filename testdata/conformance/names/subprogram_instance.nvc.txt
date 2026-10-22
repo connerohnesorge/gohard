@@ -1,0 +1,11 @@
+# NVC output of testdata/conformance/names/subprogram_instance.vhd
+# recorded by: go run ./tools/oracle --update conformance
+# nvc: 1.23.0
+# command: nvc --std=2019 -a subprogram_instance.vhd -e names_subprogram_instance_tb -r
+# source sha256: 3dd521d8c2e77702a963a64a2c2633f634bd9f5297a0c7c0e7c4b4ef6651616d
+# exit: 0
+** Note: 0ms+0: pp :names_subprogram_instance_tb:q[integer]:w | :names_subprogram_instance_tb(sim):q[integer]:w
+   Procedure Q at subprogram_instance.vhd:15
+   Process :names_subprogram_instance_tb:main at subprogram_instance.vhd:27
+** Note: 0ms+0: fi :names_subprogram_instance_tb:fi[return string]:w | :names_subprogram_instance_tb(sim):fi[return string]:w
+   Process :names_subprogram_instance_tb:main at subprogram_instance.vhd:25

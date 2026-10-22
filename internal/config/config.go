@@ -84,8 +84,8 @@ type Simulation struct {
 	Env    SimEnv
 }
 
-// SimEnv holds the simulation.env.* keys (validated in v1.0, used in
-// v1.1, #18).
+// SimEnv holds the simulation.env.* keys (validated since v1.0, in
+// effect since v1.1, #18).
 type SimEnv struct {
 	Epoch time.Time // always UTC
 	// Vars are the variables GETENV sees, sorted by name.

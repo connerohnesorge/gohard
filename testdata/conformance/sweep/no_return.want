@@ -1,0 +1,8 @@
+# gohard check --sim --seed 0 --tb no_return_tb (VHDL-2008)
+exit 1
+== stdout
+no_return.vhd:18:3: error[sim/runtime-error]: no_return.vhd:21:5: function f ended without a return statement in no_return_tb._p0 at 0 fs
+no_return.vhd:20:5: hint[sim/assert-note]: report note: f(11) = 1
+summary: 1 errors, 0 warnings, 1 hints, 1 files
+== stderr
+gohard: simulated no_return_tb (seed 0): failed
