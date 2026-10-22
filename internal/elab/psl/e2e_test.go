@@ -81,6 +81,15 @@ const ns = 1_000_000
 // for its VHDL processes and runs it at seed.
 func pslSimple(t *testing.T, seed uint64) (*sim.Kernel, *trace.Trace) {
 	t.Helper()
+	return pslSimpleAt(t, seed, nil)
+}
+
+// pslSimpleAt is pslSimple with start run by the stopper process at
+// time 0, before the design's first PSL clock edge.
+func pslSimpleAt(t *testing.T, seed uint64,
+	start func(c *sim.Ctx) error,
+) (*sim.Kernel, *trace.Trace) {
+	t.Helper()
 	r := analyze(t, "../../../testdata/corpus/psl_simple",
 		"psl_simple.vhd", "psl_simple_tb.vhd")
 	var d *elab.Design
@@ -104,7 +113,11 @@ func pslSimple(t *testing.T, seed uint64) (*sim.Kernel, *trace.Trace) {
 		case "stopper":
 			return &fn{f: func(c *sim.Ctx, n int) (sim.Wait, error) {
 				if n == 1 {
-					return sim.Wait{For: 100 * ns, HasFor: true}, nil
+					var err error
+					if start != nil {
+						err = start(c)
+					}
+					return sim.Wait{For: 100 * ns, HasFor: true}, err
 				}
 				c.Stop(0, true, sim.SrcRef{})
 				return sim.Wait{}, nil
@@ -226,6 +239,55 @@ func TestPSLSimple(t *testing.T) {
 }
 
 func itoa(n int) string { return strconv.Itoa(n) }
+
+// TestPSLIsNotAVHDLAssert (#18): the failing PSL assert of psl_simple
+// is reported but never counted by the std.env assert counters, and
+// disabling its severity with SetVhdlAssertEnable does not drop it;
+// one failing VHDL assert of the same severity is counted, and is
+// dropped once its severity is disabled.
+func TestPSLIsNotAVHDLAssert(t *testing.T) {
+	vhdl := func(c *sim.Ctx) error {
+		return c.Report(sim.Report{Assertion: true,
+			Severity: trace.Error, Message: "vhdl",
+			Src: sim.SrcRef{Path: "psl_simple_tb.vhd", Line: 1, Col: 1}})
+	}
+	cases := []struct {
+		name  string
+		start func(c *sim.Ctx) error
+		count uint64 // VHDL error asserts counted
+		vhdl  bool   // the VHDL assert reported
+	}{
+		{"psl only", nil, 0, false},
+		{"psl and vhdl", vhdl, 1, true},
+		{"error disabled", func(c *sim.Ctx) error {
+			c.SetAssertEnable(trace.Error, false)
+			return vhdl(c)
+		}, 0, false},
+	}
+	for _, tc := range cases {
+		k, _ := pslSimpleAt(t, 0, tc.start)
+		if a := k.Asserts(); a.Error != tc.count || a.Total() != tc.count {
+			t.Errorf("%s: asserts %+v, want %d error", tc.name, a,
+				tc.count)
+		}
+		psl, v := 0, 0
+		for _, d := range k.Diagnostics() {
+			if d.Code != diag.SimAssertError {
+				continue
+			}
+			if strings.HasSuffix(d.Message, "a and b high in the "+
+				"same cycle") {
+				psl++
+			} else {
+				v++
+			}
+		}
+		if psl != 1 || (v == 1) != tc.vhdl || v > 1 {
+			t.Errorf("%s: %d psl and %d vhdl assert diagnostics",
+				tc.name, psl, v)
+		}
+	}
+}
 
 const formsSrc = `library ieee;
 use ieee.std_logic_1164.all;

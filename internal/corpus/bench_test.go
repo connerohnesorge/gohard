@@ -12,15 +12,15 @@ import (
 	"github.com/connerohnesorge/gohard/internal/simrun"
 )
 
-// simRuns returns the main runs of the v1.0 corpus designs with their
-// sources.
+// simRuns returns the main runs of the corpus designs of a reached
+// milestone (Release) with their sources.
 func simRuns(tb testing.TB) ([]Run, []map[string][]byte) {
 	tb.Helper()
 	m, read := loadManifest(tb)
 	var runs []Run
 	var srcs []map[string][]byte
 	for _, d := range m.Designs {
-		if d.Milestone != "v1.0" {
+		if !Reached(d.Milestone) {
 			continue
 		}
 		r := d.Runs()[0]

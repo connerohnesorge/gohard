@@ -234,6 +234,10 @@ func (p *parser) item(key string, item Item, n *yaml.Node) (string,
 
 func nonEmpty(s string) bool { return s != "" }
 
+// IsVarName reports whether s is a valid simulation.env.vars (and
+// --env) name: non-empty, without '=' or NUL.
+func IsVarName(s string) bool { return isVarName(s) }
+
 func isVarName(s string) bool {
 	return s != "" && !strings.ContainsAny(s, "=\x00")
 }
@@ -393,8 +397,9 @@ var keys = []Key{
 		Name: "simulation.env.epoch", Type: TypeTimestamp,
 		Default: `"2000-01-01T00:00:00Z"`,
 		TypeDoc: "RFC 3339 UTC time",
-		Doc: "The fixed wall-clock time `std.env` reports. " +
-			"Validated in v1.0, used from v1.1.",
+		Doc: "The wall-clock time of simulated time 0: `EPOCH`, " +
+			"`GMTIME` and `LOCALTIME` report it plus the simulated " +
+			"time, in UTC, unless `--real-env` is given (v1.1).",
 		acc: bind(func(c *Config) *time.Time {
 			return &c.Simulation.Env.Epoch
 		}, time.Time.Equal, (*parser).timestamp),
@@ -403,8 +408,9 @@ var keys = []Key{
 		Name: "simulation.env.vars", Type: TypeMap,
 		MapKeys: ItemVarName, Items: ItemString, Default: "{}",
 		TypeDoc: "map: name to string",
-		Doc: "The only variables `GETENV` sees. Validated in v1.0, " +
-			"used from v1.1.",
+		Doc: "The only variables `GETENV` sees (v1.1); `--env " +
+			"NAME=VALUE` overrides an entry. `--real-env` reads the " +
+			"real environment instead.",
 		acc: bind(func(c *Config) *[]Var { return &c.Simulation.Env.Vars },
 			empty[Var], (*parser).vars),
 	},

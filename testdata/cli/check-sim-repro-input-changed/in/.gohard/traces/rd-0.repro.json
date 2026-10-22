@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "version": "0.0.0-dev",
+  "commit": "unknown",
+  "ieee": "1076-2019 16a012320947d378611cc7457f64ed76cb52bac4",
+  "go": "unknown",
+  "standard": "2008",
+  "testbench": "rd",
+  "seed": 0,
+  "defines": {},
+  "budgets": {
+    "time": "1 ms",
+    "delta": 10000,
+    "step": 50000000
+  },
+  "models": {},
+  "config": null,
+  "sources": [
+    {
+      "path": "rd.vhd",
+      "sha256": "554059c50aeee45641c761c073223e8fe3672ed49a6e44563a68799d300ca600"
+    }
+  ],
+  "env": {
+    "epoch": "2000-01-01T00:00:00Z",
+    "vars": {},
+    "real": false
+  },
+  "inputs": [
+    {
+      "path": "data/in.txt",
+      "sha256": "5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03"
+    }
+  ]
+}

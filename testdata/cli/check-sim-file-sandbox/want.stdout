@@ -1,0 +1,7 @@
+tb.vhd:15:5: hint[sim/assert-note]: report note: ../escape.txt: name_error
+tb.vhd:15:5: hint[sim/assert-note]: report note: .gohard/mine.txt: name_error
+tb.vhd:15:5: hint[sim/assert-note]: report note: .gohard/traces/tb-0.trace: name_error
+tb.vhd:15:5: hint[sim/assert-note]: report note: /gohard-outside-root/abs.txt: name_error
+tb.vhd:15:5: hint[sim/assert-note]: report note: inside.txt: open_ok
+tb.vhd:15:5: hint[sim/assert-note]: report note: sub/../../escape.txt: name_error
+summary: 0 errors, 0 warnings, 6 hints, 1 files

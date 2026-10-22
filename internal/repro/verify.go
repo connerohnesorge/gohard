@@ -14,27 +14,38 @@ import (
 // Check is the result of comparing a header with the project as it is
 // now.
 type Check struct {
-	// Changed lists, sorted, every recorded source or gohard.yaml whose
-	// content differs or that is gone, and gohard.yaml if it appeared.
+	// Changed lists, sorted, every recorded source, input or
+	// gohard.yaml whose content differs or that is gone, an input
+	// recorded as absent that now exists, and gohard.yaml if it
+	// appeared.
 	Changed []string
 	// Recorded and Current are the recording and the running gohard
 	// versions.
 	Recorded, Current string
+	// Real reports that the run was recorded with --real-env (#18): it
+	// read the real clock or environment and is never replayed.
+	Real bool
 }
 
-// OK reports whether the sources match, so the run can be replayed.
-func (c Check) OK() bool { return len(c.Changed) == 0 }
+// OK reports whether the sources match and the run is reproducible,
+// so it can be replayed.
+func (c Check) OK() bool { return len(c.Changed) == 0 && !c.Real }
 
 // VersionMismatch reports whether another gohard version recorded the
 // run: the run is replayed with a warning and its trace diffed (#29).
 func (c Check) VersionMismatch() bool { return c.Recorded != c.Current }
 
 // Diagnostics returns the findings for the repro file named file:
-// repro/source-changed (tool class, exit 2) listing the changed files,
-// and the repro/version-mismatch warning.
+// repro/non-reproducible for a --real-env recording and
+// repro/source-changed listing the changed files (both tool class,
+// exit 2), and the repro/version-mismatch warning.
 func (c Check) Diagnostics(file string) []diag.Diagnostic {
 	var ds []diag.Diagnostic
-	if !c.OK() {
+	if c.Real {
+		ds = append(ds, diag.New(diag.ReproNonReproducible,
+			file).At(file, 0, 0))
+	}
+	if len(c.Changed) > 0 {
 		ds = append(ds, diag.New(diag.ReproSourceChanged,
 			strings.Join(c.Changed, ", ")).At(file, 0, 0))
 	}
@@ -51,13 +62,15 @@ func Invalid(file string, err error) diag.Diagnostic {
 	return diag.New(diag.ReproInvalid, file, err.Error()).At(file, 0, 0)
 }
 
-// Verify hashes the files h recorded under root and compares them, and
-// version, with the recording. A file that cannot be read for a reason
+// Verify hashes the files h recorded under root (sources, gohard.yaml
+// and the design's inputs) and compares them, and version, with the
+// recording. An input that cannot be read is changed. A file that cannot be read for a reason
 // other than not existing is an error.
 func Verify(fsys env.FS, root string, h Header, version string) (
 	Check, error,
 ) {
-	c := Check{Recorded: h.Version, Current: version}
+	c := Check{Recorded: h.Version, Current: version,
+		Real: h.Env != nil && h.Env.Real}
 	want := slices.Clone(h.Sources)
 	if h.Config != nil {
 		want = append(want, *h.Config)
@@ -71,6 +84,20 @@ func Verify(fsys env.FS, root string, h Header, version string) (
 		case err != nil:
 			return Check{}, err
 		case Hash(data) != f.SHA256:
+			c.Changed = append(c.Changed, f.Path)
+		}
+	}
+	for _, f := range h.Inputs {
+		name := filepath.Join(root, filepath.FromSlash(f.Path))
+		if f.SHA256 == "" {
+			if _, err := fsys.Stat(name); !errors.Is(err,
+				fs.ErrNotExist) {
+				c.Changed = append(c.Changed, f.Path)
+			}
+			continue
+		}
+		data, err := readRegular(fsys, name)
+		if err != nil || Hash(data) != f.SHA256 {
 			c.Changed = append(c.Changed, f.Path)
 		}
 	}

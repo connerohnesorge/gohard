@@ -45,6 +45,12 @@ type Options struct {
 	// none. Each analysis restores what it can from it and stores the
 	// rest; it never changes a result.
 	Cache func(root string, cfg config.Config) sema.Cache
+	// Files is the project as the editor's simulation runs read it
+	// (#18), the same view gohard check --sim gives a design: files
+	// below the snapshot's root, never .gohard. A run's writes are
+	// dropped. Nil means the runs find no project file (a session
+	// replay, whose recorded root is not on this disk).
+	Files env.FS
 }
 
 // phase reports the start of an analysis phase to the probe.

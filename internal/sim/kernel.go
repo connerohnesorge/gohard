@@ -197,6 +197,40 @@ type Kernel struct {
 	budget    *eval.Budget
 	diags     []diag.Diagnostic
 	ctx       Ctx
+
+	// The VHDL-2019 assert state of std.env (#18), indexed by
+	// trace.Severity: the enabled violations counted per severity,
+	// the severities disabled by SetVhdlAssertEnable (zero: all
+	// enabled), the SetVhdlAssertFormat format of each severity
+	// ("" keeps the message) and SetVhdlReadSeverity (NoSeverity:
+	// the default, failure). Arrays, so Clone copies them by value.
+	asserts   [nSeverity]uint64
+	assertOff [nSeverity]bool
+	formats   [nSeverity]string
+	readSev   trace.Severity
+}
+
+// nSeverity sizes the per-severity assert state.
+const nSeverity = int(trace.Failure) + 1
+
+// Asserts are the assertion violations a run counted, per severity
+// (#18): enabled violations of assert statements and concurrent
+// assertions only, never report statements, disabled severities or
+// PSL directives. ClearVhdlAssert inside the design resets them.
+type Asserts struct {
+	Note, Warning, Error, Failure uint64
+}
+
+// Total is the sum over every severity.
+func (a Asserts) Total() uint64 {
+	return a.Note + a.Warning + a.Error + a.Failure
+}
+
+// Asserts returns the assert counts so far.
+func (k *Kernel) Asserts() Asserts {
+	c := k.asserts
+	return Asserts{Note: c[trace.Note], Warning: c[trace.Warning],
+		Error: c[trace.Error], Failure: c[trace.Failure]}
 }
 
 // New builds the kernel for m. The model must not change afterwards.
@@ -451,7 +485,7 @@ func (k *Kernel) addDriver(p, n int32, init eval.Value) int32 {
 // identically. The copy has no trace Writer (SetWriter gives it one)
 // and its own step budget with the same count.
 func (k *Kernel) Clone() *Kernel {
-	c := *k
+	c := *k // the assert counters, enables and formats are arrays
 	c.opts.Writer = nil
 	b := *k.budget
 	c.budget = &b
@@ -1232,6 +1266,7 @@ func (k *Kernel) finish(s Status) {
 	}
 	k.status = s
 	k.finishCodes(s) // finish.go
+	k.closeCodes()
 	if w := k.opts.Writer; w != nil && k.inited {
 		if err := w.End(k.now); err != nil && k.err == nil {
 			k.err = err

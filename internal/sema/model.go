@@ -342,6 +342,16 @@ type Decl struct {
 	// operations, 0 (always) otherwise. A declaration newer than the
 	// analyzed standard is not visible.
 	First token.Standard
+	// Generics are the generic associations, in written order, of a
+	// subprogram instance: an implicit instance of a VHDL-2019 call
+	// with a generic map (LRM 9.3.4) or a VHDL-2008 subprogram
+	// instantiation declaration (LRM 4.4). Nil otherwise.
+	Generics []Association
+	// MethodObj is the object prefix of an alias of a protected
+	// method (VHDL-2019 aliases in a protected declaration, LRM
+	// 6.6.1): the object whose method the alias denotes. Nil
+	// otherwise.
+	MethodObj *Expr
 
 	// sigAlias marks an alias with a signature: it denotes a
 	// subprogram or literal, so it is overloadable even when its target

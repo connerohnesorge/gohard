@@ -3,6 +3,8 @@ package eval
 import (
 	"math"
 	"strconv"
+
+	"github.com/connerohnesorge/gohard/internal/token"
 )
 
 // Kind is the class of a VHDL type.
@@ -102,6 +104,21 @@ func (r Range) Len() int64 {
 		return math.MaxInt64
 	}
 	return int64(d) + 1
+}
+
+// CheckedLen returns the number of values in the range, or an overflow
+// error when the count does not fit in 64 bits: INTEGER'RANGE of
+// VHDL-2019 has 2**64 values, which Len would saturate.
+func (r Range) CheckedLen() (int64, error) {
+	if r.Null() {
+		return 0, nil
+	}
+	d := uint64(r.High()) - uint64(r.Low())
+	if d >= math.MaxInt64 {
+		return 0, errf(ErrCodeOverflow, "the length of "+r.String()+
+			" does not fit in 64 bits")
+	}
+	return int64(d) + 1, nil
 }
 
 // Contains reports whether v is in the range.
@@ -271,8 +288,11 @@ var (
 
 // Standard types built the way std.standard declares them. Sema maps
 // the declarations of std.standard to these values so every evaluator
-// user shares one layout. INTEGER is 32 bits in v1.0 (64-bit integers
-// are a VHDL-2019 feature planned for v1.1, #18), like GHDL and NVC.
+// user shares one layout. Integer, Natural and Positive are the 32-bit
+// INTEGER of VHDL-1993 to -2008; VHDL-2019 uses Integer64, Natural64
+// and Positive64 instead (see StdIntegers). STRING and BIT_VECTOR keep
+// their 32-bit index subtypes in every standard so that their identity
+// (Str, concatenation) is shared.
 var (
 	Boolean = &Type{Kind: KindEnum, Name: "BOOLEAN",
 		Literals: []string{"false", "true"}, Range: Range{0, 1, To}}
@@ -296,11 +316,93 @@ var (
 		}}
 	Natural  = Integer.Subtype(Range{0, math.MaxInt32, To})
 	Positive = Integer.Subtype(Range{1, math.MaxInt32, To})
-	String   = &Type{Kind: KindArray, Name: "STRING",
+	// Integer64 is the INTEGER of VHDL-2019: the full 64-bit range
+	// (LRM 5.2.3.2). It is named "INTEGER" like Integer, so messages
+	// and traces name it the same way.
+	Integer64 = &Type{Kind: KindInteger, Name: "INTEGER",
+		Range: Range{math.MinInt64, math.MaxInt64, To}}
+	Natural64  = Integer64.Subtype(Range{0, math.MaxInt64, To})
+	Positive64 = Integer64.Subtype(Range{1, math.MaxInt64, To})
+	String     = &Type{Kind: KindArray, Name: "STRING",
 		Index: []*Type{Positive}, Elem: Character}
 	BitVector = &Type{Kind: KindArray, Name: "BIT_VECTOR",
 		Index: []*Type{Natural}, Elem: Bit}
 )
+
+// StdIntegers returns the layouts of std.standard's INTEGER, NATURAL
+// and POSITIVE under the standard std: the 64-bit triple for VHDL-2019
+// and later, the 32-bit one before.
+func StdIntegers(std token.Standard) (integer, natural, positive *Type) {
+	if std >= token.Std2019 {
+		return Integer64, Natural64, Positive64
+	}
+	return Integer, Natural, Positive
+}
+
+// InferSubtype returns the subtype of an object of subtype t whose
+// constraint comes from its value v (VHDL-2019 inferred constraints,
+// LRM 6.4.2.1): the index ranges of an unconstrained array from v's
+// bounds, and recursively the open element constraints of arrays (from
+// the first element) and of record fields (from each field). A fully
+// constrained t, or a v that cannot supply a constraint (a null array
+// for its element subtype, a value of another class), leaves that part
+// as it is; t itself is returned when nothing is inferred. Checking v
+// against the result stays the caller's job (Check).
+func InferSubtype(t *Type, v Value) *Type {
+	if t == nil || FullyConstrained(t) || v.Kind() != t.Kind {
+		return t
+	}
+	switch t.Kind {
+	case KindArray:
+		s := *t
+		s.Base = t.BaseType()
+		if s.Bounds == nil {
+			n := len(t.BaseType().Index)
+			if len(v.B) == n {
+				s.Bounds = append([]Range(nil), v.B...)
+			} else if n == 1 && len(v.B) == 0 {
+				s.Bounds = []Range{{Left: 0,
+					Right: int64(len(v.E)) - 1}}
+			}
+		}
+		if s.Elem != nil && len(v.E) > 0 {
+			s.Elem = InferSubtype(s.Elem, v.E[0])
+		}
+		return &s
+	case KindRecord:
+		if len(v.E) != len(t.Fields) {
+			return t
+		}
+		s := *t
+		s.Base = t.BaseType()
+		s.Fields = make([]Field, len(t.Fields))
+		for i, f := range t.Fields {
+			s.Fields[i] = Field{Name: f.Name,
+				Type: InferSubtype(f.Type, v.E[i])}
+		}
+		return &s
+	}
+	return t
+}
+
+// FullyConstrained reports whether t has no open constraint anywhere:
+// arrays with index ranges and fully constrained elements, records
+// whose fields are all fully constrained, and every scalar, access,
+// file and protected type.
+func FullyConstrained(t *Type) bool {
+	switch t.Kind {
+	case KindArray:
+		return t.Bounds != nil &&
+			(t.Elem == nil || FullyConstrained(t.Elem))
+	case KindRecord:
+		for _, f := range t.Fields {
+			if f.Type != nil && !FullyConstrained(f.Type) {
+				return false
+			}
+		}
+	}
+	return true
+}
 
 // characterLiterals returns the 256 images of CHARACTER in position
 // order, as std.standard declares them (ISO 8859-1).

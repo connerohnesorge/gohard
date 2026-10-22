@@ -713,12 +713,22 @@ func (a *Attr) eval(m *Machine) (Value, error) {
 		if err != nil {
 			return Value{}, err
 		}
+		if a.Kind == AttrImage && a.Arg == nil {
+			// O'IMAGE of an object prefix (VHDL-2019).
+			return imageAttr(m, v)
+		}
 		return arrayAttr(a, dim(v, a.Dim))
 	}
 	t := a.Type
 	if t == nil {
 		return Value{}, errf(ErrCodeType, "'"+a.Kind.String()+
 			" without a prefix")
+	}
+	if a.Kind == AttrImage &&
+		(t.Kind == KindArray || t.Kind == KindRecord) {
+		// T'IMAGE of a composite type (VHDL-2019) also takes an
+		// unconstrained array type: the bounds come from the value.
+		return imageAttr(m, arg)
 	}
 	if t.Kind == KindArray {
 		if t.Bounds == nil || a.Dim >= len(t.Bounds) {
@@ -728,6 +738,27 @@ func (a *Attr) eval(m *Machine) (Value, error) {
 		return arrayAttr(a, t.Bounds[a.Dim])
 	}
 	return scalarAttr(a, t, arg)
+}
+
+// imageAttr is 'IMAGE of any value: one step per scalar written, so
+// the image of a large composite is bounded by the budget.
+func imageAttr(m *Machine, v Value) (Value, error) {
+	if err := m.Budget.Step(scalars(v)); err != nil {
+		return Value{}, err
+	}
+	return Str(ImageOf(v)), nil
+}
+
+// scalars counts the scalar subelements of v (1 for a scalar).
+func scalars(v Value) int64 {
+	if k := v.Kind(); k != KindArray && k != KindRecord {
+		return 1
+	}
+	var n int64
+	for _, e := range v.E {
+		n += scalars(e)
+	}
+	return n
 }
 
 func arrayAttr(a *Attr, r Range) (Value, error) {
@@ -745,7 +776,11 @@ func arrayAttr(a *Attr, r Range) (Value, error) {
 	case AttrLow:
 		return Value{T: rt, I: r.Low()}, nil
 	case AttrLength:
-		return Value{T: rt, I: r.Len()}, nil
+		n, err := r.CheckedLen()
+		if err != nil {
+			return Value{}, err
+		}
+		return Value{T: rt, I: n}, nil
 	case AttrAscending:
 		return Bool(r.Dir == To), nil
 	}
@@ -788,7 +823,11 @@ func scalarAttr(a *Attr, t *Type, arg Value) (Value, error) {
 	case AttrAscending:
 		return Bool(r.Dir == To), nil
 	case AttrLength:
-		return Value{T: rt, I: r.Len()}, nil
+		n, err := r.CheckedLen()
+		if err != nil {
+			return Value{}, err
+		}
+		return Value{T: rt, I: n}, nil
 	case AttrPos:
 		return Check(Value{T: rt, I: arg.I}, rt)
 	case AttrVal:
@@ -800,7 +839,12 @@ func scalarAttr(a *Attr, t *Type, arg Value) (Value, error) {
 			(a.Kind == AttrRightof && r.Dir == Downto) {
 			step = -1
 		}
-		v := arg.I + step
+		v, err := intArith(OpAdd, arg.I, step)
+		if err != nil {
+			// 'SUCC of the last value of a 64-bit type.
+			return Value{}, RangeError(Value{T: t, I: arg.I},
+				t.BaseType())
+		}
 		bt := t.BaseType()
 		if a.Kind == AttrLeftof || a.Kind == AttrRightof {
 			bt = t

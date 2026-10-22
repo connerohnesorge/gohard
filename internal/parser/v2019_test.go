@@ -101,6 +101,8 @@ var ruleSnippets = map[string]string{
 		"(n : natural); end protected; end package;",
 	"prot_inst": "package p is type t2 is new t generic map (n => 1); " +
 		"end package;",
+	"var_generic_map": "package p is shared variable v : t " +
+		"generic map (n => 1); end package;",
 }
 
 // ruleFired reports whether r reports syntax/standard for rule.
@@ -383,6 +385,36 @@ func Test2019Errors(t *testing.T) {
 		got := problemCodes(r)
 		if len(got) == 0 || got[0] != c.want {
 			t.Errorf("%q: %q, want %s first", c.src, got, c.want)
+		}
+	}
+}
+
+// TestGenericMapVariablesOnly: under 2019 a generic map after the
+// subtype indication belongs to variable declarations (plain, shared,
+// private, LRM 6.4.2.4) only; a signal or constant declaration with
+// one is a syntax error.
+func TestGenericMapVariablesOnly(t *testing.T) {
+	const pre = "package p is "
+	for _, decl := range []string{
+		"signal s : t generic map (n => 1);",
+		"constant c : t generic map (n => 1) := x;",
+	} {
+		src := pre + decl + " end package;"
+		r := checkInvariants(t, src, []byte(src),
+			Options{Standard: token.Std2019})
+		got := problemCodes(r)
+		if len(got) == 0 || !strings.HasPrefix(got[0], "syntax/error@") {
+			t.Errorf("%q: %q, want a syntax error", decl, got)
+		}
+	}
+	for _, decl := range []string{
+		"shared variable v : t generic map (n => 1);",
+	} {
+		src := pre + decl + " end package;"
+		r := checkInvariants(t, src, []byte(src),
+			Options{Standard: token.Std2019})
+		if got := problemCodes(r); len(got) != 0 {
+			t.Errorf("%q: %q, want no problem", decl, got)
 		}
 	}
 }

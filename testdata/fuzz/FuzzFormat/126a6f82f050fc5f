@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- test: kind=VariableDecl,GenericMapAspect\narchitecture a of e is\n  shared variable sv : pt generic map (n => 4);\nbegin\n  process is\n    variable v1 : pt generic map (n => 8, t => integer);\n    variable v2 : pt generic map (16) := init;\n  begin\n    wait;\n  end process;\nend;\n")

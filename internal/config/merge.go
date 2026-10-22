@@ -100,3 +100,51 @@ func OverrideMessage(key string) string {
 	return "gohard.yaml sets " + key + "; the editor setting " + key +
 		" is ignored"
 }
+
+// ApplyEnvVars applies --env NAME=VALUE arguments (#18) in
+// command-line order to simulation.env.vars and returns the result.
+// An --env replaces the entry with the same name (names compare
+// exactly, as POSIX does) and gives one log line for stderr, as a later
+// --env for the same name does. A malformed argument (no '=', or a name
+// simulation.env.vars would reject) is cli/usage, exit 2. c is not
+// modified; the vars stay sorted by name.
+func ApplyEnvVars(c Config, args []string) (Config, []string,
+	[]diag.Diagnostic,
+) {
+	var logs []string
+	var ds []diag.Diagnostic
+	vars := slices.Clone(c.Simulation.Env.Vars)
+	given := map[string]string{} // name -> the --env that set it
+	for _, arg := range args {
+		name, value, ok := strings.Cut(arg, "=")
+		if !ok || !IsVarName(name) {
+			ds = append(ds, diag.New(diag.CLIUsage, "--env "+
+				strconv.Quote(arg)+" must be NAME=VALUE with a "+
+				"non-empty NAME"))
+			continue
+		}
+		i := slices.IndexFunc(vars, func(v Var) bool {
+			return v.Name == name
+		})
+		switch {
+		case i < 0:
+			vars = append(vars, Var{Name: name, Value: value})
+		case given[name] != "":
+			logs = append(logs, "--env "+arg+" overrides --env "+
+				given[name])
+		default:
+			logs = append(logs, "--env "+arg+
+				" overrides simulation.env.vars."+name+": "+
+				strconv.Quote(vars[i].Value))
+		}
+		if i >= 0 {
+			vars[i].Value = value
+		}
+		given[name] = arg
+	}
+	slices.SortStableFunc(vars, func(a, b Var) int {
+		return strings.Compare(a.Name, b.Name)
+	})
+	c.Simulation.Env.Vars = vars
+	return c, logs, diag.Normalize(ds)
+}

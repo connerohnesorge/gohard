@@ -201,6 +201,12 @@ func ParseTimestamp(s string) (time.Time, bool) {
 	return t.UTC(), true
 }
 
+// FormatTimestamp is the RFC 3339 UTC text of t that ParseTimestamp
+// reads back: the form simulation.env.epoch is recorded in.
+func FormatTimestamp(t time.Time) string {
+	return t.UTC().Format(time.RFC3339Nano)
+}
+
 // IsIdentifier reports whether s is a VHDL basic identifier: a letter,
 // then letters, digits and single underscores, not ending in one.
 func IsIdentifier(s string) bool {

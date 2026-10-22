@@ -8,6 +8,8 @@ import (
 
 	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/internal/repro"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/server"
 	"github.com/connerohnesorge/gohard/internal/simrun"
@@ -115,12 +117,20 @@ func (a *Analyzer) Simulate(snap *server.Snapshot, tb string,
 ) server.Task[server.SimResult] {
 	return server.Chain(a.Analysis(snap),
 		func(an *Analysis) server.Task[server.SimResult] {
-			return an.simulate(tb, seed)
+			return an.simulate(tb, seed, a.opts.ToolVersion,
+				a.opts.Files)
 		})
 }
 
-func (an *Analysis) simulate(tb string,
-	seed uint64,
+// simulate runs tb at seed. The editor's world is simulation.env.*
+// only (no --env, no --real-env, #18). The run reads the project below
+// the snapshot's root through files as gohard check --sim does, each
+// file once (readOnce), so the same testbench reads the same stimulus
+// in the editor and on the command line and the editor's repro file
+// replays it; its writes are dropped: gohard check --sim is where
+// design writes reach .gohard/run/<hash>/.
+func (an *Analysis) simulate(tb string, seed uint64,
+	toolVersion string, files env.FS,
 ) server.Task[server.SimResult] {
 	var all []diag.Diagnostic
 	for _, fd := range an.Diagnostics {
@@ -145,8 +155,12 @@ func (an *Analysis) simulate(tb string,
 		return notRun(append(all, diag.New(diag.SimUnknownTestbench,
 			tb, list)))
 	}
+	w := simrun.Env{ToolVersion: toolVersion}
+	if files != nil && an.Snap.Root != "" {
+		w.Root, w.FS = an.Snap.Root, newReadOnce(files)
+	}
 	opts := simrun.Options{Result: an.Result, Sim: cfg.Simulation,
-		Testbench: name, Seed: seed}
+		Testbench: name, Seed: seed, Env: w}
 	return simTask{opts: opts, base: all, sh: &simShared{}}
 }
 
@@ -223,12 +237,16 @@ func (t simTask) result(out simrun.Outcome) server.SimResult {
 	}
 	seed := out.Seed
 	end := ""
-	r := server.SimResult{Ran: true, Run: ds, Write: !tool}
+	r := server.SimResult{Ran: true, Run: ds, Write: !tool,
+		Inputs: repro.InputFiles(out.Inputs)}
 	if out.Trace != nil {
 		end = config.Time(out.Trace.Header.End).String()
 		r.Trace = trace.Encode(out.Trace)
 	}
 	r.Report = server.NewSimReport(out.Testbench, &seed,
 		out.Status.String(), end, append(slices.Clone(t.base), ds...))
+	a := out.Asserts
+	r.Report.Asserts = &server.SimAsserts{Note: a.Note,
+		Warning: a.Warning, Error: a.Error, Failure: a.Failure}
 	return r
 }

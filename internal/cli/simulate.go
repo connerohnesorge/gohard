@@ -2,12 +2,15 @@ package cli
 
 import (
 	"bytes"
+	"context"
 	"errors"
+	"io/fs"
 	"maps"
 	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/diag"
@@ -78,6 +81,72 @@ func (rp *reproRun) apply(inv *Invocation, l *config.Loaded) (
 	return append(ds, dds...), false
 }
 
+// applyEnv sets the std.env environment of the run (#18) on in.cfg:
+// --env NAME=VALUE over simulation.env.vars (each override logged),
+// then, under --repro, the recorded epoch and variables, so a replay
+// sees exactly the recorded world. A malformed --env is cli/usage.
+func applyEnv(inv *Invocation, in *simInput) []diag.Diagnostic {
+	var args []string
+	if inv.IsSet("env") {
+		args = inv.Strings("env")
+	}
+	cfg, logs, ds := config.ApplyEnvVars(in.cfg, args)
+	h := in.repro.header
+	if h != nil && len(args) > 0 && len(ds) == 0 {
+		// The recorded environment wins, like the recorded defines:
+		// say so instead of logging overrides that never apply.
+		logs = []string{"--env is ignored: --repro replays the " +
+			"recorded environment"}
+	}
+	for _, l := range logs {
+		inv.Logf("%s", l)
+	}
+	if h != nil {
+		cfg.Simulation.Env = h.Env.Apply(cfg.Simulation.Env)
+	}
+	in.cfg = cfg
+	return ds
+}
+
+// realEnv returns the run environment's doors under --real-env: the
+// real environment, and the wall clock frozen at the start of the
+// run, so the race re-run at seed 0 sees the same time and reports no
+// false race. Under --repro the recorded environment wins (a recording
+// made with --real-env is refused before), so --real-env is ignored
+// and a reproducible recording is never rewritten as non-reproducible.
+func realEnv(inv *Invocation, in simInput) simrun.Env {
+	if !inv.IsSet("real-env") || !inv.Bool("real-env") {
+		return simrun.Env{}
+	}
+	if h := in.repro.header; h != nil {
+		inv.Logf("%s", "--real-env is ignored: --repro replays the "+
+			"recorded environment")
+		return simrun.Env{}
+	}
+	return simrun.Env{Real: true, Getenv: inv.Env.Getenv,
+		Clock: frozenClock{inv.Env.Clock.Now()}}
+}
+
+// frozenClock is a Clock stopped at t: the --real-env clock of one
+// run.
+type frozenClock struct{ t time.Time }
+
+func (c frozenClock) Now() time.Time { return c.t }
+
+func (frozenClock) Sleep(ctx context.Context, _ time.Duration) error {
+	return ctx.Err()
+}
+
+func (c frozenClock) NewTimer(time.Duration) env.Timer {
+	return stoppedTimer{}
+}
+
+// stoppedTimer never fires.
+type stoppedTimer struct{}
+
+func (stoppedTimer) C() <-chan time.Time { return nil }
+func (stoppedTimer) Stop() bool          { return false }
+
 type simInput struct {
 	root  string
 	cfg   config.Config
@@ -140,6 +209,7 @@ func testbenches(inv *Invocation, in simInput) ([]string,
 // env.FS. Design errors from analysis skip simulation: the run already
 // fails.
 func simulate(inv *Invocation, r *diag.Report, in simInput) {
+	r.Diagnostics = append(r.Diagnostics, applyEnv(inv, &in)...)
 	if in.res == nil || slices.ContainsFunc(r.Diagnostics,
 		func(d diag.Diagnostic) bool { return d.Severity == diag.Error }) {
 		return
@@ -150,17 +220,24 @@ func simulate(inv *Invocation, r *diag.Report, in simInput) {
 	}
 	tbs, ds := testbenches(inv, in)
 	r.Diagnostics = append(r.Diagnostics, ds...)
+	world := realEnv(inv, in)
+	world.ToolVersion, world.Root, world.FS = Version, in.root,
+		inv.Env.FS
 	for _, tb := range tbs {
+		h, herr := header(inv, in, tb, seed, world.Real)
+		w := world
+		w.RunDir = repro.RunDir(h)
 		opts := simrun.Options{Result: in.res,
-			Sim: in.cfg.Simulation, Testbench: tb, Seed: seed,
+			Sim: in.cfg.Simulation, Testbench: tb, Seed: seed, Env: w,
 			Cancelled: func() bool { return inv.Ctx.Err() != nil }}
 		out := simrun.Run(opts)
+		h.Inputs = repro.InputFiles(out.Inputs)
 		r.Diagnostics = append(r.Diagnostics, out.Diagnostics...)
 		if !hasTool(out.Diagnostics) {
 			r.Diagnostics = append(r.Diagnostics,
 				races(inv, opts, out)...)
 			r.Diagnostics = append(r.Diagnostics,
-				writeRun(inv, in, out)...)
+				writeRun(inv, in, out, w.RunDir, h, herr)...)
 			inv.Logf("simulated %s (%s): %s", out.Testbench,
 				simrun.SeedText(out.Seed), out.Status)
 		}
@@ -184,14 +261,19 @@ func races(inv *Invocation, o simrun.Options,
 }
 
 // writeRun writes the trace (diffed against the recorded one under a
-// version-mismatched --repro) and the repro file of one run.
-func writeRun(inv *Invocation, in simInput,
-	out simrun.Outcome,
+// version-mismatched --repro), the files the design wrote (below the
+// run directory runDir, #18) and the repro file h of one run; herr is
+// the error of building h.
+func writeRun(inv *Invocation, in simInput, out simrun.Outcome,
+	runDir string, h repro.Header, herr error,
 ) []diag.Diagnostic {
 	fsys := inv.Env.FS
 	failed := func(name string, err error) []diag.Diagnostic {
 		return []diag.Diagnostic{diag.New(diag.CLIOutputFailed, name,
 			errReason(err))}
+	}
+	if ds := flushRun(inv, in.root, runDir, out); ds != nil {
+		return ds
 	}
 	if out.Trace != nil {
 		name := trace.FileName(out.Testbench, out.Seed)
@@ -208,9 +290,8 @@ func writeRun(inv *Invocation, in simInput,
 			return failed(name, err)
 		}
 	}
-	h, err := header(inv, in, out)
-	if err != nil {
-		return failed(repro.FileName(out.Testbench, out.Seed), err)
+	if herr != nil {
+		return failed(repro.FileName(out.Testbench, out.Seed), herr)
 	}
 	if _, err := repro.Write(fsys, in.root, h); err != nil {
 		return failed(repro.FileName(out.Testbench, out.Seed), err)
@@ -218,16 +299,74 @@ func writeRun(inv *Invocation, in simInput,
 	return nil
 }
 
-// header is the repro header of one run (#29).
-func header(inv *Invocation, in simInput, out simrun.Outcome) (
-	repro.Header, error,
-) {
+// flushRun replaces root/runDir with the directories and files the
+// design of out created (#18), each file through a temporary file and
+// a rename. What an earlier run left there is removed first, so the
+// directory holds exactly this run's output. It is called once per
+// run: the race re-run and the editor's runs never flush.
+func flushRun(inv *Invocation, root, runDir string,
+	out simrun.Outcome,
+) []diag.Diagnostic {
+	fsys := inv.Env.FS
+	base := filepath.Join(root, filepath.FromSlash(runDir))
+	if err := removeTree(fsys, base); err != nil {
+		return []diag.Diagnostic{diag.New(diag.CLIOutputFailed,
+			runDir, errReason(err))}
+	}
+	for _, d := range out.Dirs {
+		name := filepath.Join(base, filepath.FromSlash(d))
+		if err := fsys.MkdirAll(name, 0o755); err != nil {
+			return []diag.Diagnostic{diag.New(diag.CLIOutputFailed,
+				runDir+"/"+d, errReason(err))}
+		}
+	}
+	for _, f := range out.Files {
+		name := filepath.Join(base, filepath.FromSlash(f.Path))
+		if err := trace.WriteFile(fsys, name, f.Data); err != nil {
+			return []diag.Diagnostic{diag.New(diag.CLIOutputFailed,
+				runDir+"/"+f.Path, errReason(err))}
+		}
+	}
+	return nil
+}
+
+// removeTree removes name and everything below it, if it exists. A
+// symbolic link is removed, never followed.
+func removeTree(fsys env.FS, name string) error {
+	fi, err := fsys.Lstat(name)
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if fi.IsDir() {
+		es, err := fsys.ReadDir(name)
+		if err != nil {
+			return err
+		}
+		for _, e := range es {
+			if err := removeTree(fsys, filepath.Join(name,
+				e.Name())); err != nil {
+				return err
+			}
+		}
+	}
+	return fsys.Remove(name)
+}
+
+// header is the repro header of the run of tb at seed (#29), with the
+// std.env environment in effect (#18).
+func header(inv *Invocation, in simInput, tb string, seed uint64,
+	real bool,
+) (repro.Header, error) {
 	s := in.cfg.Simulation
 	b := inv.build()
 	h := repro.Header{Version: b.Version, Commit: b.Commit, IEEE: b.IEEE,
 		Go: b.Go, Standard: in.cfg.Standard,
-		Testbench: out.Testbench, Seed: out.Seed,
-		Defines: map[string]string{}, Models: map[string]string{}}
+		Testbench: strings.ToLower(tb), Seed: seed,
+		Defines: map[string]string{}, Models: map[string]string{},
+		Env: repro.NewEnv(s.Env, real)}
 	h.Budgets.Time, h.Budgets.Delta, h.Budgets.Step = simrun.Budgets(s)
 	for _, d := range in.cfg.Defines {
 		h.Defines[d.Name] = d.Value

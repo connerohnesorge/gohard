@@ -186,14 +186,14 @@
           "additionalProperties": false,
           "properties": {
             "epoch": {
-              "description": "The fixed wall-clock time `std.env` reports. Validated in v1.0, used from v1.1.",
+              "description": "The wall-clock time of simulated time 0: `EPOCH`, `GMTIME` and `LOCALTIME` report it plus the simulated time, in UTC, unless `--real-env` is given (v1.1).",
               "type": "string",
               "format": "date-time",
               "pattern": "[Zz]$",
               "default": "2000-01-01T00:00:00Z"
             },
             "vars": {
-              "description": "The only variables `GETENV` sees. Validated in v1.0, used from v1.1.",
+              "description": "The only variables `GETENV` sees (v1.1); `--env NAME=VALUE` overrides an entry. `--real-env` reads the real environment instead.",
               "type": "object",
               "propertyNames": {
                 "type": "string",

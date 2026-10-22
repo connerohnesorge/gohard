@@ -1,0 +1,3 @@
+requires interpreter
+symlink gh .gohard
+symlink data/ok.txt ../in.txt

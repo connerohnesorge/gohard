@@ -5,8 +5,9 @@
 //
 // A header names everything a run depends on: the gohard version,
 // commit and Go toolchain, the bundled IEEE library, the standard, the testbench, the seed, the defines, the budgets and
-// models in effect, and the sha256 of every source file and of
-// gohard.yaml. Encoding is canonical (fixed key order, sorted maps and
+// models in effect, the sha256 of every source file and of
+// gohard.yaml, and the std.env environment (epoch, variables and
+// --real-env, #18). Encoding is canonical (fixed key order, sorted maps and
 // sources), so the same run always writes the same bytes, and reading
 // then writing a file reproduces it byte for byte.
 //
@@ -79,6 +80,84 @@ type Header struct {
 	Config *File `json:"config"`
 	// Sources are the hashes of every source file, sorted by path.
 	Sources []File `json:"sources"`
+	// Env is the std.env environment of the run (#18): the epoch, the
+	// variables GETENV saw and whether --real-env was given. Every
+	// v1.1 recording writes it; a file recorded before v1.1 has no
+	// "env" key and replays with the defaults.
+	Env *Env `json:"env,omitempty"`
+	// Inputs are the project files the design read while it ran (#18),
+	// sorted by path, with the hash of what it read; an empty SHA256
+	// records a file it looked for and did not find. A replay whose
+	// inputs differ is repro/source-changed, like a changed source.
+	// The key is omitted when the design read no file, so a v1.0 file
+	// reads and writes back byte for byte.
+	Inputs []File `json:"inputs,omitempty"`
+}
+
+// Env is the recorded std.env environment. Field order is the JSON key
+// order.
+type Env struct {
+	// Epoch is simulation.env.epoch, RFC 3339 UTC.
+	Epoch string `json:"epoch"`
+	// Vars are simulation.env.vars after --env overrides.
+	Vars map[string]string `json:"vars"`
+	// Real is --real-env: the run read the real clock and
+	// environment, so it cannot be replayed (repro/non-reproducible).
+	Real bool `json:"real"`
+}
+
+// NewEnv records the environment of a run from the simulation.env.*
+// values in effect (after --env) and --real-env.
+func NewEnv(e config.SimEnv, real bool) *Env {
+	out := &Env{Epoch: config.FormatTimestamp(e.Epoch),
+		Vars: map[string]string{}, Real: real}
+	for _, v := range e.Vars {
+		out.Vars[v.Name] = v.Value
+	}
+	return out
+}
+
+// Apply returns s with the recorded epoch and variables, the
+// environment a --repro replays. A nil Env is the pre-v1.1 default:
+// s is returned unchanged.
+func (e *Env) Apply(s config.SimEnv) config.SimEnv {
+	if e == nil {
+		return s
+	}
+	if t, ok := config.ParseTimestamp(e.Epoch); ok {
+		s.Epoch = t
+	}
+	s.Vars = make([]config.Var, 0, len(e.Vars))
+	for _, k := range slices.Sorted(maps.Keys(e.Vars)) {
+		s.Vars = append(s.Vars, config.Var{Name: k, Value: e.Vars[k]})
+	}
+	return s
+}
+
+// RunDirPrefix holds the run directories, relative to the project
+// root: a run's design writes land in RunDirPrefix/<hash>/ (#18).
+const RunDirPrefix = ".gohard/run"
+
+// RunDir is the run directory of the run h records, relative to the
+// project root and slash-separated: RunDirPrefix/<hash>, where <hash>
+// is the first 16 hex digits of the sha256 of the run's identity: the
+// standard, testbench, seed, defines, budgets, models, the hashes of
+// gohard.yaml and every source, and the environment. The gohard
+// build (version, commit, IEEE, Go) is not part of it, so a --repro
+// replay by another version writes to the same directory.
+func RunDir(h Header) string {
+	h = canonical(h)
+	id := h
+	id.Schema, id.Version, id.Commit, id.IEEE, id.Go = 0, "", "", "", ""
+	// The inputs are known only once the run ended, and the run
+	// directory is needed before it starts; the directory is replaced
+	// whole by every run, so it never mixes the output of two runs.
+	id.Inputs = nil
+	data, err := encodeJSON(id, "")
+	if err != nil {
+		panic(err) // plain strings, numbers and maps always encode
+	}
+	return RunDirPrefix + "/" + Hash(data)[:16]
 }
 
 // Budgets are the `simulation.*_budget` values of #28.
@@ -93,6 +172,19 @@ type Budgets struct {
 type File struct {
 	Path   string `json:"path"`
 	SHA256 string `json:"sha256"`
+}
+
+// InputFiles are the Inputs of a header for the files a run read
+// (env.Overlay.Inputs), in the same order.
+func InputFiles(in []env.Input) []File {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]File, len(in))
+	for i, f := range in {
+		out[i] = File{Path: f.Path, SHA256: f.SHA256}
+	}
+	return out
 }
 
 // Hash returns the lowercase hex sha256 of data.
@@ -156,6 +248,21 @@ func canonical(h Header) Header {
 	slices.SortFunc(h.Sources, func(a, b File) int {
 		return cmp.Compare(a.Path, b.Path)
 	})
+	if len(h.Inputs) == 0 {
+		h.Inputs = nil // the key is omitted
+	} else {
+		h.Inputs = slices.Clone(h.Inputs)
+		slices.SortFunc(h.Inputs, func(a, b File) int {
+			return cmp.Compare(a.Path, b.Path)
+		})
+	}
+	if h.Env != nil {
+		e := *h.Env
+		if e.Vars == nil {
+			e.Vars = map[string]string{}
+		}
+		h.Env = &e
+	}
 	return h
 }
 
@@ -195,6 +302,18 @@ func Validate(h Header) error {
 				h.Config.Path, ConfigFile)
 		}
 	}
+	if e := h.Env; e != nil {
+		if _, ok := config.ParseTimestamp(e.Epoch); !ok {
+			return fmt.Errorf("env.epoch %q is not an RFC 3339 UTC "+
+				"time", e.Epoch)
+		}
+		for _, name := range slices.Sorted(maps.Keys(e.Vars)) {
+			if !config.IsVarName(name) {
+				return fmt.Errorf("env.vars: %q is not a variable name",
+					name)
+			}
+		}
+	}
 	seen := make(map[string]bool, len(h.Sources))
 	for _, f := range h.Sources {
 		if err := validFile(f); err != nil {
@@ -204,6 +323,23 @@ func Validate(h Header) error {
 			return fmt.Errorf("source %s is listed twice", f.Path)
 		}
 		seen[f.Path] = true
+	}
+	inputs := make(map[string]bool, len(h.Inputs))
+	for _, f := range h.Inputs {
+		g := f
+		if g.SHA256 == "" {
+			g.SHA256 = Hash(nil) // absent: only the path to check
+		}
+		if err := validFile(g); err != nil {
+			return fmt.Errorf("input: %w", err)
+		}
+		if strings.HasPrefix(f.Path, "../") {
+			return fmt.Errorf("input %s is outside the project", f.Path)
+		}
+		if inputs[f.Path] {
+			return fmt.Errorf("input %s is listed twice", f.Path)
+		}
+		inputs[f.Path] = true
 	}
 	return nil
 }

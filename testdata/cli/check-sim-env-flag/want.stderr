@@ -1,0 +1,3 @@
+gohard: --env FOO=cli overrides simulation.env.vars.FOO: "yaml"
+gohard: --env FOO=last overrides --env FOO=cli
+gohard: simulated env_tb (seed 0): quiet

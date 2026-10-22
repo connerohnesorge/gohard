@@ -430,14 +430,14 @@ func (p *Parser) parseObjectDecl() {
 		p.open(cst.KindVariableDecl)
 		p.eatKw(token.KwShared)
 		p.expectKw(token.KwVariable)
-		p.objectRest()
+		p.objectRest(true)
 		p.close()
 		return
 	}
 	file := p.atKw(token.KwFile)
 	p.bump()
 	if !file {
-		p.objectRest()
+		p.objectRest(false)
 		p.close()
 		return
 	}
@@ -462,11 +462,19 @@ func (p *Parser) parseObjectDecl() {
 }
 
 // objectRest parses `names : subtype [register|bus] [:= expr];` after
-// the object class keyword.
-func (p *Parser) objectRest() {
+// the object class keyword. A variable (variable) may have a
+// VHDL-2019 generic map aspect after its subtype, for an object of a
+// generic protected type (LRM 6.4.2.4).
+func (p *Parser) objectRest(variable bool) {
 	p.declIdentList()
 	p.expect(token.Colon)
 	p.declSubtype()
+	if variable && p.atKw(token.KwGeneric) &&
+		p.nthIsKw(1, token.KwMap) {
+		s, e := p.curSpan()
+		p.gateRule("var_generic_map", s, e)
+		p.parseGenericMapAspect()
+	}
 	if p.atKw(token.KwRegister) || p.atKw(token.KwBus) {
 		p.bump()
 	}

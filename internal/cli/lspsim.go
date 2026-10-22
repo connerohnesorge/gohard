@@ -7,6 +7,7 @@ import (
 
 	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/server"
+	"github.com/connerohnesorge/gohard/internal/sim"
 	"github.com/connerohnesorge/gohard/internal/simrun"
 )
 
@@ -52,6 +53,7 @@ func runLSPSim(inv *Invocation) Result {
 		}
 		out = server.NewSimReport(o.Testbench, &o.Seed,
 			o.Status.String(), end, r.Diagnostics)
+		out.Asserts = simAsserts(o.Asserts)
 	} else {
 		out = server.NewSimReport("", nil, "", "", r.Diagnostics)
 	}
@@ -62,4 +64,10 @@ func runLSPSim(inv *Invocation) Result {
 		panic(err) // plain strings and numbers always encode
 	}
 	return Result{Stdout: b.Bytes(), Exit: r.Exit()}
+}
+
+// simAsserts are a run's assert counts as the status JSON shows them.
+func simAsserts(a sim.Asserts) *server.SimAsserts {
+	return &server.SimAsserts{Note: a.Note, Warning: a.Warning,
+		Error: a.Error, Failure: a.Failure}
 }

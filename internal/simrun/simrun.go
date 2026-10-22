@@ -6,7 +6,12 @@
 //
 // Run is a pure function of its options: no clock, no randomness (a
 // non-zero seed permutes in-delta order through env.SeedOrder), no
-// file access.
+// file writes. The design reads project files only through the
+// Env.FS door, and sees the real clock and environment only under
+// --real-env (Env.Real, through the doors the shell passes). Every
+// file the design writes is kept in an env.Overlay of its own run and
+// returned in Outcome.Files; the shell writes them to the run
+// directory (Env.RunDir) once, after the run.
 package simrun
 
 import (
@@ -26,9 +31,13 @@ import (
 // CodeFunc builds a process's behaviour: the sequential interpreter.
 type CodeFunc = func(*elab.Design, *elab.Proc) (sim.Code, error)
 
-// DefaultCode is the interpreter Run uses when Options.Code is nil:
-// the sequential interpreter (internal/elab). A run with a nil one is
-// cli/not-implemented (a tool error), never a pass.
+// DefaultCode registers the sequential interpreter (internal/elab):
+// when Options.Code is nil and DefaultCode is set, Start runs the
+// design with elab.Interpreter and the run's environment (Options.Env,
+// simulation.env.*). Callers that pass DefaultCode as Options.Code get
+// it with default options (no environment). With DefaultCode nil a
+// run without Code is cli/not-implemented (a tool error), never a
+// pass.
 var DefaultCode CodeFunc = elab.Interpret
 
 // Slice is the number of kernel cycles between cancellation checks.
@@ -57,13 +66,41 @@ type Options struct {
 	// Testbench is the entity or configuration to run.
 	Testbench string
 	Seed      uint64
-	// Code is the interpreter; nil means DefaultCode.
+	// Code is the interpreter; nil means the registered interpreter
+	// with Env (see DefaultCode).
 	Code CodeFunc
+	// Env is the world of the std.env natives and the design's files
+	// (#18); simulation.env.epoch and .vars come from Sim.
+	Env Env
 	// Cancelled is polled between slices (nil: never).
 	Cancelled func() bool
 	// Orders, when set, records the run orders for race detection
 	// (Races).
 	Orders *sim.OrderLog
+}
+
+// Env is what a run sees of the world besides its options (#18). The
+// zero value is a deterministic run with no project files to read.
+type Env struct {
+	// ToolVersion is TOOL_VERSION, the gohard release, as conditional
+	// analysis sees it.
+	ToolVersion string
+	// Root is the absolute project root; FS reads the project below it
+	// (nil: the design finds no file it did not write).
+	Root string
+	FS   env.FS
+	// RunDir is the run directory, relative to Root and
+	// slash-separated (repro.RunDir): where the shell writes
+	// Outcome.Files, and where relative directory operations of the
+	// design happen.
+	RunDir string
+	// Real is --real-env: the natives read Clock and Getenv, and the
+	// trace is marked non-reproducible. Both doors must then be set,
+	// and should be frozen at the start of the run (a race re-run must
+	// see the same world).
+	Real   bool
+	Clock  env.Clock
+	Getenv env.Getenv
 }
 
 // Outcome is one finished run.
@@ -78,6 +115,38 @@ type Outcome struct {
 	Trace *trace.Trace
 	// Model is the elaborated model; nil when elaboration failed.
 	Model *sim.Model
+	// Asserts are the assertion violations the kernel counted (#18):
+	// the counts of the status JSON and the re-run code lens.
+	Asserts sim.Asserts
+	// Files and Dirs are what the design wrote and created, relative
+	// to the project root, sorted; the shell writes them below
+	// Env.RunDir.
+	Files []env.Written
+	Dirs  []string
+	// Inputs are the project files the design read, with the hash of
+	// what it read ("" for a file it did not find), sorted: the repro
+	// header records them so a replay with other input data is
+	// refused (repro/source-changed, #29).
+	Inputs []env.Input
+}
+
+// interpOptions are the interpreter options of a run with its own
+// overlay ov.
+func interpOptions(o Options, ov *env.Overlay) elab.InterpOptions {
+	e := elab.EnvOptions{ToolVersion: o.Env.ToolVersion,
+		Epoch: o.Sim.Env.Epoch, Vars: map[string]string{},
+		Root: o.Env.Root, RunDir: o.Env.RunDir, Real: o.Env.Real,
+		FS: ov}
+	if o.Result != nil {
+		e.Standard = o.Result.Standard
+	}
+	for _, v := range o.Sim.Env.Vars {
+		e.Vars[v.Name] = v.Value
+	}
+	if o.Env.Real {
+		e.Clock, e.Getenv = o.Env.Clock, o.Env.Getenv
+	}
+	return elab.InterpOptions{FS: ov, Env: e}
 }
 
 // Candidates returns the testbench candidates of #35: every portless

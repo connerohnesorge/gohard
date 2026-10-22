@@ -1,0 +1,3 @@
+gohard: --env is ignored: --repro replays the recorded environment
+gohard: --real-env is ignored: --repro replays the recorded environment
+gohard: simulated env_tb (seed 0): quiet

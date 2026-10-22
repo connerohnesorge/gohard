@@ -1,0 +1,6 @@
+simulation:
+  env:
+    epoch: "2026-10-21T08:30:00Z"
+    vars:
+      HOME: "/home/sim"
+      MODE: "fast"

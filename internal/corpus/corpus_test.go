@@ -235,6 +235,9 @@ func checkGolden(t *testing.T, r Run, read ReadFunc, res *Result) {
 		t.Errorf("%s: %v", d.Name, Missing(rel, err))
 		return
 	}
+	if err := AnswerKey(want); err != nil {
+		t.Errorf("%s: %s: %v", d.Name, rel, err)
+	}
 	if h := FieldHash(map[string][]byte{"trace.txt": want}); h !=
 		d.TraceSHA256 {
 		t.Errorf("%s: %s hashes to %s, corpus.yaml has %s", d.Name, rel,

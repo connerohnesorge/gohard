@@ -1,0 +1,5 @@
+gohard-trace 1
+testbench tb
+end 0
+scope tb instance tb(sim)
+process 1 tb._p0

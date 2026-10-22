@@ -49,3 +49,4 @@ seq_selected_sig,selected signal assignment in process,2008,2008 §10.5.4,"with 
 cond_var,conditional variable assignment,2008,2008 §10.6.3,v := a when c else b;,conditional variable assignments require VHDL-2008,parser,added by #31 (statement builder; not in #7),false
 prot_generics,generic clause on a protected type,2019,2019 §5.6.2,type t is protected generic (n : natural); end protected;,generics on protected types require VHDL-2019,parser,added by #31 (2019 builder; not in #7),false
 prot_inst,protected type instantiation,2019,2019 §5.6.2,type t2 is new t generic map (n => 1);,protected type instantiations require VHDL-2019,parser,added by #31 (2019 builder; not in #7),false
+var_generic_map,generic map in a variable declaration,2019,2019 §6.4.2.4,variable v : t generic map (n => 1);,generic map aspects in variable declarations require VHDL-2019,parser,added by #18 (v1.1 stage 0; NVC has no oracle),false

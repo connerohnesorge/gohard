@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "version": "0.0.0-dev",
+  "commit": "unknown",
+  "ieee": "1076-2019 16a012320947d378611cc7457f64ed76cb52bac4",
+  "go": "unknown",
+  "standard": "2008",
+  "testbench": "env_tb",
+  "seed": 0,
+  "defines": {},
+  "budgets": {
+    "time": "1 ms",
+    "delta": 10000,
+    "step": 50000000
+  },
+  "models": {},
+  "config": null,
+  "sources": [
+    {
+      "path": "env_tb.vhd",
+      "sha256": "0672c130ee14b5288645ef764538909011b6a9b52e8a7765db021c79f1b3b128"
+    }
+  ],
+  "env": {
+    "epoch": "2010-05-06T07:08:09Z",
+    "vars": {
+      "SEED_FILE": "stim.txt",
+      "Z": ""
+    },
+    "real": false
+  }
+}

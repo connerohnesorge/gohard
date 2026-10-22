@@ -149,6 +149,18 @@ func randomHeader(g *env.SplitMix64) Header {
 	if env.Intn(g, 2) == 0 {
 		h.Config = &File{Path: ConfigFile, SHA256: Hash([]byte(str()))}
 	}
+	if env.Intn(g, 2) == 0 {
+		epochs := []string{"2000-01-01T00:00:00Z",
+			"2026-10-21T12:34:56.789Z", "1970-01-01T00:00:00Z"}
+		h.Env = &Env{Epoch: epochs[env.Intn(g, len(epochs))],
+			Real: env.Intn(g, 2) == 0}
+		if env.Intn(g, 2) == 0 {
+			h.Env.Vars = map[string]string{}
+			for range env.Intn(g, 4) {
+				h.Env.Vars[str()+"V"] = str()
+			}
+		}
+	}
 	for i := range env.Intn(g, 6) {
 		h.Sources = append(h.Sources, File{
 			Path:   fmt.Sprintf("d%d/f%d.vhd", env.Intn(g, 3), i),
@@ -159,6 +171,14 @@ func randomHeader(g *env.SplitMix64) Header {
 		j := env.Intn(g, i+1)
 		h.Sources[i], h.Sources[j] = h.Sources[j], h.Sources[i]
 	}
+	for i := range env.Intn(g, 4) {
+		f := File{Path: fmt.Sprintf("data/in%d.txt", i)}
+		if env.Intn(g, 3) != 0 {
+			f.SHA256 = Hash([]byte(str()))
+		}
+		h.Inputs = append(h.Inputs, f)
+	}
+	slices.Reverse(h.Inputs)
 	return h
 }
 

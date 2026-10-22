@@ -7,6 +7,7 @@ import (
 	"errors"
 	"slices"
 
+	"github.com/connerohnesorge/gohard/internal/elab/hier"
 	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/sim"
@@ -15,6 +16,11 @@ import (
 
 // exec executes one statement; susp reports a wait.
 func (m *machine) exec(n *node) (sim.Wait, bool, error) {
+	if !m.w.eager {
+		if err := m.elabShared(); err != nil {
+			return sim.Wait{}, false, err
+		}
+	}
 	s := n.s
 	ev, b := m.ev, m.b
 	switch s.Kind {
@@ -258,8 +264,9 @@ func (m *machine) ret(v eval.Value, has bool) error {
 	return nil
 }
 
-// leave pops a finished subprogram frame: a procedure's out and inout
-// variable parameters are assigned to their actuals.
+// leave pops a finished subprogram frame: its out and inout variable
+// parameters (a procedure's, or a VHDL-2019 function's) are assigned
+// to their actuals.
 func (m *machine) leave() error {
 	fi := len(m.frames) - 1
 	f := m.frames[fi]
@@ -267,7 +274,6 @@ func (m *machine) leave() error {
 	if f.fn {
 		// callFunction reads the result.
 		m.lastRet, m.lastReturned = f.ret, f.returned
-		return nil
 	}
 	for _, o := range f.outs {
 		if err := m.assignPlace(o.dst, f.vars[o.formal].v); err != nil {
@@ -280,6 +286,11 @@ func (m *machine) leave() error {
 // declare elaborates the declarations of region r into the current
 // frame, in order (LRM 14.4).
 func (m *machine) declare(r *sema.Region) error {
+	if !m.w.eager {
+		if err := m.elabShared(); err != nil {
+			return err
+		}
+	}
 	for _, d := range r.Decls {
 		if err := m.b.Step(1); err != nil {
 			return err
@@ -324,34 +335,167 @@ func (m *machine) object(d *sema.Decl) (slot, error) {
 			return slot{}, err
 		}
 	}
-	if t.Kind == eval.KindProtected {
-		h, err := m.newObject(d.Type)
-		if err != nil {
-			return slot{}, err
-		}
-		v = eval.Value{T: t, I: h}
+	if v, err = m.instantiate(v, d.Type); err != nil {
+		return slot{}, err
 	}
 	return slot{v: v, t: t}, nil
 }
 
-// shared returns the shared variable or package file d, elaborating
-// it on first use.
-func (m *machine) shared(d *sema.Decl) (slot, error) {
-	if s, ok := m.w.shared[d]; ok {
+// instantiate returns v, a new object of sema subtype st, with a new
+// protected object for each protected leaf: the object itself, the
+// elements of an array and the fields of a record (VHDL-2019
+// composites of protected types). Access values stay null.
+func (m *machine) instantiate(v eval.Value, st *sema.Type,
+) (eval.Value, error) {
+	if !m.w.holdsProtected(st) {
+		return v, nil
+	}
+	switch b := st.Base(); b.Class {
+	case sema.TypeProtected:
+		h, err := m.newObject(st)
+		if err != nil {
+			return eval.Value{}, err
+		}
+		v.I = h
+	case sema.TypeArray:
+		et := st.ElemType()
+		e := make([]eval.Value, len(v.E))
+		for i := range v.E {
+			x, err := m.instantiate(v.E[i], et)
+			if err != nil {
+				return eval.Value{}, err
+			}
+			e[i] = x
+		}
+		v.E = e
+	case sema.TypeRecord:
+		e := slices.Clone(v.E)
+		for i, f := range b.Fields {
+			if i >= len(e) {
+				break
+			}
+			x, err := m.instantiate(e[i], st.FieldType(f))
+			if err != nil {
+				return eval.Value{}, err
+			}
+			e[i] = x
+		}
+		v.E = e
+	}
+	return v, nil
+}
+
+// holdsProtected reports whether an object of subtype st is or holds
+// a protected object (not through an access value).
+func (w *world) holdsProtected(st *sema.Type) bool {
+	if st == nil || st.Unknown() {
+		return false
+	}
+	if p, ok := w.prot[st]; ok {
+		return p
+	}
+	w.prot[st] = false // a (malformed) cycle ends here
+	p := false
+	switch b := st.Base(); b.Class {
+	case sema.TypeProtected:
+		p = true
+	case sema.TypeArray:
+		p = w.holdsProtected(st.ElemType())
+	case sema.TypeRecord:
+		for _, f := range b.Fields {
+			if w.holdsProtected(st.FieldType(f)) {
+				p = true
+				break
+			}
+		}
+	}
+	w.prot[st] = p
+	return p
+}
+
+// shared returns the shared variable or global file k, elaborating it
+// on first use.
+func (m *machine) shared(k sharedKey) (slot, error) {
+	if s, ok := m.w.shared[k]; ok {
 		return s, nil
+	}
+	if !m.w.eager {
+		if err := m.elabShared(); err != nil {
+			return slot{}, err
+		}
+		if s, ok := m.w.shared[k]; ok {
+			return s, nil
+		}
+	}
+	s, err := m.newShared(k)
+	if err != nil {
+		return slot{}, err
+	}
+	m.w.shared[k] = s
+	return s, nil
+}
+
+// newShared elaborates the shared object k with its instance's
+// evaluator (generics bound), or the top's for a package object.
+func (m *machine) newShared(k sharedKey) (slot, error) {
+	in := k.in
+	if in == nil {
+		in = m.w.d.Top
+	}
+	if in != nil && in.Evaluator() != nil {
+		saved := m.ev
+		m.ev = in.Evaluator().WithDynamic(m)
+		defer func() { m.ev = saved }()
 	}
 	var s slot
 	var err error
-	if d.Kind == sema.DeclFile {
-		s, err = m.fileObject(d)
+	if k.d.Kind == sema.DeclFile {
+		s, err = m.fileObject(k.d)
 	} else {
-		s, err = m.object(d)
+		s, err = m.object(k.d)
 	}
 	if err != nil {
-		return slot{}, errors.New(d.Text + ": " + err.Error())
+		return slot{}, errors.New(k.d.Text + ": " + err.Error())
 	}
-	m.w.shared[d] = s
 	return s, nil
+}
+
+// elabShared creates every shared variable of the design before the
+// first process runs, in sharedOrder, so their protected objects get
+// the same handles whatever the schedule. One that fails is left to
+// its first use, which reports the error where the design reads it;
+// only a budget error ends the process now.
+func (m *machine) elabShared() error {
+	if m.w.eager {
+		return nil
+	}
+	m.w.eager = true
+	for _, k := range m.w.sharedOrder() {
+		if _, ok := m.w.shared[k]; ok {
+			continue
+		}
+		s, err := m.newShared(k)
+		if err != nil {
+			if eval.CodeOf(err) == eval.ErrCodeBudget {
+				return err
+			}
+			continue
+		}
+		m.w.shared[k] = s
+	}
+	return nil
+}
+
+// sharedKeyOf returns the key of the shared object x as the process
+// sees it: the innermost enclosing instance that declares it (nil for
+// a package object).
+func (m *machine) sharedKeyOf(x *sema.Decl) sharedKey {
+	for in := m.inst(); in != nil; in = m.w.d.Parent(in) {
+		if declares(in, x.Parent) {
+			return sharedKey{in, x}
+		}
+	}
+	return sharedKey{nil, x}
 }
 
 // newObject creates a protected object of type t: the variables of
@@ -424,6 +568,7 @@ type place struct {
 	kind  placeKind
 	frame int
 	obj   int64
+	in    *hier.Instance // placeShared: the declaring instance
 	d     *sema.Decl
 	path  []step
 	alias bool
@@ -462,10 +607,11 @@ func (m *machine) placeOf(e *sema.Expr) (place, error) {
 			return m.placeOf(x.Value)
 		}
 		if x.Kind == sema.DeclSharedVariable {
-			if _, err := m.shared(x); err != nil {
+			k := m.sharedKeyOf(x)
+			if _, err := m.shared(k); err != nil {
 				return place{}, err
 			}
-			return place{kind: placeShared, d: x}, nil
+			return place{kind: placeShared, in: k.in, d: x}, nil
 		}
 		r, ok := m.varOf(x)
 		if !ok {
@@ -569,7 +715,7 @@ func (m *machine) root(p place) (eval.Value, *eval.Type, error) {
 		s := m.w.objs[p.obj].vars[p.d]
 		return s.v, s.t, nil
 	case placeShared:
-		s, err := m.shared(p.d)
+		s, err := m.shared(sharedKey{p.in, p.d})
 		return s.v, s.t, err
 	}
 	v, err := m.w.deref(eval.Value{I: p.obj})
@@ -588,9 +734,10 @@ func (m *machine) setRoot(p place, v eval.Value) {
 		s.v = v
 		o.vars[p.d] = s
 	case placeShared:
-		s := m.w.shared[p.d]
+		k := sharedKey{p.in, p.d}
+		s := m.w.shared[k]
 		s.v = v
-		m.w.shared[p.d] = s
+		m.w.shared[k] = s
 	case placeHeap:
 		m.w.heap[p.obj] = v
 	}

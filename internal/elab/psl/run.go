@@ -237,7 +237,7 @@ func (r *runner) message() string {
 }
 
 func (r *runner) fail(c *sim.Ctx) error {
-	return c.Report(sim.Report{Assertion: true,
+	return c.Report(sim.Report{Assertion: true, PSL: true,
 		Severity: r.dir.severity, Message: r.message(), Src: r.dir.src})
 }
 

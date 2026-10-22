@@ -31,8 +31,9 @@ func init() { lookup("lsp").Run = runLSP }
 // twice).
 //
 // With useCache the analyses use the on-disk analysis cache of the
-// session's project root (#37); a replay does not, since its root is
-// the recorded one.
+// session's project root (#37) and simulation runs read the project's
+// files (#18); a replay does neither, since its root is the recorded
+// one.
 var newAnalyzer = func(inv *Invocation, useCache bool) (server.Analyzer,
 	server.Simulator,
 ) {
@@ -40,6 +41,7 @@ var newAnalyzer = func(inv *Invocation, useCache bool) (server.Analyzer,
 		Limit: inv.Jobs, Libraries: libsHost(inv)}
 	if useCache {
 		o.Cache = inv.cacheOpener()
+		o.Files = inv.Env.FS
 	}
 	an := ide.New(o)
 	return server.WithFormatting(an, Version), an

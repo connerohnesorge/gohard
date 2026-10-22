@@ -1,0 +1,7 @@
+gohard-trace 1
+testbench env_tb
+end 0
+reproducible no
+scope env_tb instance env_tb(sim)
+process 1 env_tb._p0
+0 0 ! assert warning env_tb.vhd:15 p1 "probe"

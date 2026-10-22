@@ -1,0 +1,2 @@
+invalid.vhd:5:21: error[syntax/standard]: generic map in a variable declaration requires VHDL-2019 or later (standard is 2008)
+summary: 1 errors, 0 warnings, 0 hints, 1 files

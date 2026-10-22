@@ -18,6 +18,9 @@ func Encode(t *Trace) []byte {
 	b.WriteString(Magic + "\n")
 	line(&b, "testbench", tok(t.Header.Testbench))
 	line(&b, "end", strconv.FormatUint(uint64(t.Header.End), 10))
+	if t.Header.NonReproducible {
+		line(&b, "reproducible", "no")
+	}
 	for i := range t.Types {
 		encodeType(&b, &t.Types[i])
 	}
@@ -268,6 +271,13 @@ func decode(data []byte) (*Trace, error) {
 			return nil, p.errf("empty line")
 		}
 		p.f, p.k = f, 1
+		if i == len(heads) && f[0] == "reproducible" {
+			if len(f) != 2 || f[1] != "no" {
+				return nil, p.errf("want reproducible no")
+			}
+			p.t.Header.NonReproducible = true
+			continue
+		}
 		if i < len(heads) {
 			if f[0] != heads[i] {
 				return nil, p.errf("want %s", heads[i])

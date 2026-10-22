@@ -2,7 +2,10 @@ package sim
 
 import (
 	"errors"
+	"math/big"
 	"strconv"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/eval"
@@ -239,19 +242,36 @@ func (c *Ctx) force(t Target, v eval.Value, release, out bool) error {
 type Report struct {
 	// Assertion is true for a failed assert, false for a report.
 	Assertion bool
-	Severity  trace.Severity
-	Message   string
-	Src       SrcRef
+	// PSL marks a failed PSL directive (internal/elab/psl): it is
+	// reported like an assertion but is not a VHDL assert, so the
+	// std.env assert counters, enables and formats ignore it.
+	PSL      bool
+	Severity trace.Severity
+	Message  string
+	Src      SrcRef
 }
 
 // Report records r in the trace and as a diagnostic (#35: error and
 // failure are errors, warning a warning, note a hint) and halts the
 // run after the current process phase when the severity reaches
 // simulation.stop_level.
+//
+// The std.env assert state applies to VHDL asserts and reports (not
+// to PSL), as in NVC (#18): a severity disabled with
+// SetVhdlAssertEnable drops r entirely (no trace event, diagnostic,
+// count or halt); an enabled failed assertion is counted; a format
+// set with SetVhdlAssertFormat rewrites the diagnostic's message only,
+// the trace keeps the raw message.
 func (c *Ctx) Report(r Report) error {
 	k := c.k
-	if r.Severity == trace.NoSeverity {
+	if r.Severity == trace.NoSeverity || r.Severity > trace.Failure {
 		r.Severity = trace.Note
+	}
+	if !r.PSL && k.assertOff[r.Severity] {
+		return nil
+	}
+	if r.Assertion && !r.PSL {
+		k.asserts[r.Severity]++
 	}
 	kind := trace.Report
 	word := "report"
@@ -268,6 +288,11 @@ func (c *Ctx) Report(r Report) error {
 			return err
 		}
 	}
+	msg := r.Message
+	if f := k.formats[r.Severity]; f != "" && !r.PSL {
+		parts, _ := parseFormat(f) // validated when set
+		msg = k.applyFormat(parts, r)
+	}
 	code := diag.SimAssertError
 	switch r.Severity {
 	case trace.Note:
@@ -275,15 +300,242 @@ func (c *Ctx) Report(r Report) error {
 	case trace.Warning:
 		code = diag.SimAssertWarning
 	}
-	args := []string{word, r.Severity.String(), r.Message}
+	args := []string{word, r.Severity.String(), msg}
 	if code != diag.SimAssertError {
-		args = []string{word, r.Message}
+		args = []string{word, msg}
 	}
 	k.report(r.Src, diag.New(code, args...))
 	if r.Severity >= k.opts.StopLevel && k.stopReq == Running {
 		k.stopReq = Halted
 	}
 	return nil
+}
+
+// severity reports whether s is one of note .. failure.
+func severity(s trace.Severity) bool {
+	return s >= trace.Note && s <= trace.Failure
+}
+
+// AssertCount is GetVhdlAssertCount: the enabled assertion violations
+// of severity s counted so far, or of every severity for
+// trace.NoSeverity.
+func (c *Ctx) AssertCount(s trace.Severity) uint64 {
+	if s == trace.NoSeverity {
+		return c.k.Asserts().Total()
+	}
+	if !severity(s) {
+		return 0
+	}
+	return c.k.asserts[s]
+}
+
+// ClearAsserts is ClearVhdlAssert: every count back to zero.
+func (c *Ctx) ClearAsserts() { c.k.asserts = [nSeverity]uint64{} }
+
+// SetAssertEnable is SetVhdlAssertEnable for one severity
+// (trace.NoSeverity: every severity).
+func (c *Ctx) SetAssertEnable(s trace.Severity, on bool) {
+	for x := trace.Note; x <= trace.Failure; x++ {
+		if s == trace.NoSeverity || s == x {
+			c.k.assertOff[x] = !on
+		}
+	}
+}
+
+// AssertEnabled is GetVhdlAssertEnable.
+func (c *Ctx) AssertEnabled(s trace.Severity) bool {
+	return severity(s) && !c.k.assertOff[s]
+}
+
+// SetAssertFormat is SetVhdlAssertFormat: an invalid format is an
+// error (the Valid out parameter is false) and keeps the old one; ""
+// restores the plain message. See parseFormat for the syntax.
+func (c *Ctx) SetAssertFormat(s trace.Severity, f string) error {
+	if !severity(s) {
+		return errors.New("assert format of severity " + s.String())
+	}
+	if _, err := parseFormat(f); err != nil {
+		return err
+	}
+	c.k.formats[s] = f
+	return nil
+}
+
+// AssertFormat is GetVhdlAssertFormat ("" when none is set).
+func (c *Ctx) AssertFormat(s trace.Severity) string {
+	if !severity(s) {
+		return ""
+	}
+	return c.k.formats[s]
+}
+
+// SetReadSeverity is SetVhdlReadSeverity: the severity of textio
+// read failures.
+func (c *Ctx) SetReadSeverity(s trace.Severity) {
+	if severity(s) {
+		c.k.readSev = s
+	}
+}
+
+// ReadSeverity is GetVhdlReadSeverity (failure until set).
+func (c *Ctx) ReadSeverity() trace.Severity {
+	if c.k.readSev == trace.NoSeverity {
+		return trace.Failure
+	}
+	return c.k.readSev
+}
+
+// Abort reports d at src and ends the run as Failed after the current
+// process phase, whatever stop or halt was requested before: the
+// outcome of a construct the run cannot continue past, such as a
+// built-in subprogram without a native.
+func (c *Ctx) Abort(src SrcRef, d diag.Diagnostic) {
+	c.k.report(src, d)
+	c.k.stopReq = Failed
+}
+
+// fmtPart is one part of a parsed assert format: literal text, or a
+// replacement {v[:spec]} of variable v.
+type fmtPart struct {
+	lit   string
+	v     byte // 0 for a literal
+	fill  rune
+	align byte // '<', '>', '^' or 0
+	width int
+	unit  string // {t:.unit}: the time unit, "" for fs
+}
+
+// timeUnits are the units of a {t:.unit} replacement, in fs.
+var timeUnits = map[string]int64{"fs": 1, "ps": 1e3, "ns": 1e6,
+	"us": 1e9, "ms": 1e12, "sec": 1e15, "min": 60e15, "hr": 3600e15}
+
+// parseFormat parses an assert format (NVC 1.23, #18): literal text
+// with replacements {v[:[[fill]align][width][.unit]]}. The variables
+// are s and S (the severity in lower and upper case), r (the message),
+// t (the simulated time; .unit picks fs, ps, ns, us, ms, sec, min or
+// hr, else fs) and i (the instance path of the process). align is <
+// (left, the default), > (right) or ^ (centre); a precision is only
+// valid on t.
+func parseFormat(f string) ([]fmtPart, error) {
+	var out []fmtPart
+	bad := func(why string) ([]fmtPart, error) {
+		return nil, errors.New("invalid assert format " +
+			strconv.Quote(f) + ": " + why)
+	}
+	for f != "" {
+		i := strings.IndexByte(f, '{')
+		if i < 0 {
+			out = append(out, fmtPart{lit: f})
+			break
+		}
+		if i > 0 {
+			out = append(out, fmtPart{lit: f[:i]})
+		}
+		j := strings.IndexByte(f[i:], '}')
+		if j < 0 {
+			return bad("missing }")
+		}
+		body := f[i+1 : i+j]
+		f = f[i+j+1:]
+		if body == "" || !strings.ContainsRune("sSrti", rune(body[0])) {
+			return bad("unknown replacement {" + body + "}")
+		}
+		p := fmtPart{v: body[0], fill: ' '}
+		spec := body[1:]
+		if spec != "" {
+			if spec[0] != ':' {
+				return bad("unknown replacement {" + body + "}")
+			}
+			spec = spec[1:]
+		}
+		rs := []rune(spec)
+		isAlign := func(r rune) bool { return strings.ContainsRune("<>^", r) }
+		switch {
+		case len(rs) >= 2 && isAlign(rs[1]):
+			p.fill, p.align = rs[0], byte(rs[1])
+			spec = string(rs[2:])
+		case len(rs) >= 1 && isAlign(rs[0]):
+			p.align = byte(rs[0])
+			spec = string(rs[1:])
+		}
+		w, unit, dot := strings.Cut(spec, ".")
+		if w != "" {
+			n, err := strconv.Atoi(w)
+			if err != nil || n < 0 || n > 1000 {
+				return bad("bad width in {" + body + "}")
+			}
+			p.width = n
+		}
+		if dot {
+			if p.v != 't' {
+				return bad("a precision is only valid on {t}")
+			}
+			if _, ok := timeUnits[unit]; !ok {
+				return bad("unknown time unit " + strconv.Quote(unit))
+			}
+			p.unit = unit
+		}
+		out = append(out, p)
+	}
+	return out, nil
+}
+
+// applyFormat expands parts for the report r of the running process.
+func (k *Kernel) applyFormat(parts []fmtPart, r Report) string {
+	var b strings.Builder
+	for _, p := range parts {
+		if p.v == 0 {
+			b.WriteString(p.lit)
+			continue
+		}
+		var s string
+		switch p.v {
+		case 's':
+			s = r.Severity.String()
+		case 'S':
+			s = strings.ToUpper(r.Severity.String())
+		case 'r':
+			s = r.Message
+		case 't':
+			s = formatTime(k.now, p.unit)
+		case 'i':
+			if k.current >= 0 {
+				s = k.m.Processes[k.current].Path
+			}
+		}
+		b.WriteString(pad(s, p))
+	}
+	return b.String()
+}
+
+// formatTime writes t in unit ("" or "fs": whole femtoseconds), as a
+// decimal with at most 15 fraction digits, trailing zeros dropped.
+func formatTime(t Time, unit string) string {
+	if unit == "" {
+		unit = "fs"
+	}
+	q := new(big.Rat).SetFrac64(int64(t), timeUnits[unit])
+	s := q.FloatString(15)
+	if strings.Contains(s, ".") {
+		s = strings.TrimRight(strings.TrimRight(s, "0"), ".")
+	}
+	return s + " " + unit
+}
+
+// pad aligns s in the width of p.
+func pad(s string, p fmtPart) string {
+	n := p.width - utf8.RuneCountInString(s)
+	if n <= 0 {
+		return s
+	}
+	fill := func(m int) string { return strings.Repeat(string(p.fill), m) }
+	switch p.align {
+	case '>':
+		return fill(n) + s
+	case '^':
+		return fill(n/2) + s + fill(n-n/2)
+	}
+	return s + fill(n)
 }
 
 // Stop is std.env.stop (finish false) or std.env.finish: the run ends

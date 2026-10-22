@@ -1,0 +1,12 @@
+gohard-trace 1
+testbench tb
+end 0
+scope tb instance tb(sim)
+process 1 tb._p0
+0 0 ! report note tb.vhd:17 p1 "gh/traces/tb-0.trace: name_error"
+0 0 ! report note tb.vhd:17 p1 "gh/new.txt: name_error"
+0 0 ! report note tb.vhd:17 p1 "data/ok.txt: open_ok"
+0 0 ! report note tb.vhd:20 p1 "data/ok.txt read: stimulus"
+0 0 ! report note tb.vhd:17 p1 "data: name_error"
+0 0 ! report note tb.vhd:17 p1 "data: name_error"
+0 0 ! report note tb.vhd:17 p1 ": name_error"

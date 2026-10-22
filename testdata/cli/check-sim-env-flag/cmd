@@ -1,0 +1,1 @@
+gohard check --sim --env FOO=cli --env NEW=1 --env FOO=last

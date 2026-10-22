@@ -331,6 +331,11 @@ type Header struct {
 	Seed uint64
 	// End is the simulated time the run stopped at.
 	End Time
+	// NonReproducible marks a --real-env run (#18): it read the real
+	// clock or environment, so the same design and seed need not give
+	// the same bytes, and the trace can never be a corpus answer key.
+	// It is encoded as the optional header line "reproducible no".
+	NonReproducible bool
 }
 
 // Trace is a complete native trace. Every slice is in canonical order:

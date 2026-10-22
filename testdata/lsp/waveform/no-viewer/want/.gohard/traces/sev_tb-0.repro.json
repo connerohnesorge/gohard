@@ -20,5 +20,10 @@
       "path": "sev_tb.vhd",
       "sha256": "6ba1a4f8dafba1721d2a57ebc0a9276dd9f07e5b63fe2f75834858780b7ea93d"
     }
-  ]
+  ],
+  "env": {
+    "epoch": "2000-01-01T00:00:00Z",
+    "vars": {},
+    "real": false
+  }
 }

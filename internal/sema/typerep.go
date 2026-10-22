@@ -94,6 +94,10 @@ type Type struct {
 	Content    *Type
 	// Members is a protected type's declaration region.
 	Members *Region
+	// Inst is set on a protected type instantiation (VHDL-2019,
+	// LRM 5.6.4): the uninstantiated protected type and the generic
+	// map. Nil for any other type.
+	Inst *TypeInst
 	// Ops are the implicitly declared operations of a base type
 	// (predef.go), which a VHDL-2008 `use p.T` makes visible with T.
 	Ops []*Decl
@@ -101,6 +105,14 @@ type Type struct {
 	// Eval is the evaluated layout when it is known without an
 	// instance (std.standard types, static user types); see static.go.
 	Eval *eval.Type
+}
+
+// TypeInst is the instantiation part of a protected type
+// instantiation: Of is the uninstantiated protected type's
+// declaration and Map the generic associations in written order.
+type TypeInst struct {
+	Of  *Decl
+	Map []Association
 }
 
 // RangeCons is a range constraint or a discrete range: Left Dir Right,

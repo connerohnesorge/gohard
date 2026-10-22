@@ -1,0 +1,3 @@
+gohard: error[cli/usage]: --env "=v" must be NAME=VALUE with a non-empty NAME; run 'gohard help' for usage
+gohard: error[cli/usage]: --env "NOEQUALS" must be NAME=VALUE with a non-empty NAME; run 'gohard help' for usage
+summary: 2 errors, 0 warnings, 0 hints, 1 files

@@ -1,0 +1,11 @@
+gohard-trace 1
+testbench tb
+end 0
+scope tb instance tb(sim)
+process 1 tb._p0
+0 0 ! report note tb.vhd:15 p1 "../escape.txt: name_error"
+0 0 ! report note tb.vhd:15 p1 "sub/../../escape.txt: name_error"
+0 0 ! report note tb.vhd:15 p1 "/gohard-outside-root/abs.txt: name_error"
+0 0 ! report note tb.vhd:15 p1 ".gohard/traces/tb-0.trace: name_error"
+0 0 ! report note tb.vhd:15 p1 ".gohard/mine.txt: name_error"
+0 0 ! report note tb.vhd:15 p1 "inside.txt: open_ok"

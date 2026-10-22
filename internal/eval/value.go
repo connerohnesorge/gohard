@@ -177,6 +177,119 @@ func (v Value) Image() string {
 	return "<invalid>"
 }
 
+// ImageOf returns T'IMAGE(v) for a value of any type, in the form
+// NVC 1.23 gives under VHDL-2019 (LRM 16.2.2). A scalar is its Image.
+// A composite is written without spaces:
+//
+//   - a one-dimensional array of an enumeration type whose literals
+//     are all character literals (BIT_VECTOR, STD_ULOGIC_VECTOR) is a
+//     string literal of its characters: "1010", with no quote doubling;
+//   - another array is a positional aggregate of its element images,
+//     (1,-2,3); an element that is a character literal is written bare
+//     (STRING "ab" gives (a,b)), as NVC does; the rows of a
+//     multi-dimensional array nest, ((1,2),(3,4));
+//   - a record is a positional aggregate of its field images, where
+//     character literals keep their quotes: (7,'1').
+//
+// An access value is null or access, never its handle. A null array is
+// "" or (). Image is unchanged: messages keep using it.
+func ImageOf(v Value) string {
+	var b strings.Builder
+	writeImage(&b, v, false)
+	return b.String()
+}
+
+// writeImage writes the ImageOf v; bare drops the quotes of a
+// character literal (an array element).
+func writeImage(b *strings.Builder, v Value, bare bool) {
+	switch v.Kind() {
+	case KindArray:
+		bt := v.T.BaseType()
+		bs := v.B
+		if len(bs) == 0 || len(bs) < len(bt.Index) {
+			bs = []Range{{Left: 0, Right: int64(len(v.E)) - 1}}
+		}
+		writeArray(b, v, bs, charEnum(bt.Elem))
+	case KindRecord:
+		b.WriteByte('(')
+		for i, e := range v.E {
+			if i > 0 {
+				b.WriteByte(',')
+			}
+			writeImage(b, e, false)
+		}
+		b.WriteByte(')')
+	case KindAccess:
+		// A handle is never printed (it depends on allocation order
+		// only, but is no part of the design's values).
+		if v.I == 0 {
+			b.WriteString("null")
+		} else {
+			b.WriteString("access")
+		}
+	default:
+		s := v.Image()
+		if bare && len(s) == 3 && s[0] == '\'' && s[2] == '\'' {
+			s = s[1:2]
+		}
+		b.WriteString(s)
+	}
+}
+
+// writeArray writes the array elements v.E over the index ranges bs
+// (row-major), as a string literal when the last dimension is of a
+// character enumeration (str), else as nested aggregates.
+func writeArray(b *strings.Builder, v Value, bs []Range, str bool) {
+	if len(bs) == 1 {
+		if str {
+			b.WriteByte('"')
+			b.WriteString(charText(v))
+			b.WriteByte('"')
+			return
+		}
+		b.WriteByte('(')
+		for i, e := range v.E {
+			if i > 0 {
+				b.WriteByte(',')
+			}
+			writeImage(b, e, true)
+		}
+		b.WriteByte(')')
+		return
+	}
+	n := bs[0].Len()
+	row := int64(0)
+	if n > 0 {
+		row = int64(len(v.E)) / n
+	}
+	b.WriteByte('(')
+	for i := range n {
+		if i > 0 {
+			b.WriteByte(',')
+		}
+		r := v
+		r.E = v.E[i*row : (i+1)*row]
+		writeArray(b, r, bs[1:], str)
+	}
+	b.WriteByte(')')
+}
+
+// charEnum reports whether t is an enumeration type all of whose
+// literals are character literals, like BIT or STD_ULOGIC (but not
+// CHARACTER, which has identifiers such as NUL).
+func charEnum(t *Type) bool {
+	if t == nil || t.Kind != KindEnum {
+		return false
+	}
+	lits := t.BaseType().Literals
+	for _, l := range lits {
+		if !strings.HasPrefix(l, "'") {
+			return false
+		}
+	}
+	return len(lits) > 0
+}
+
 func realImage(f float64) string {
 	switch {
 	case math.IsInf(f, 1):

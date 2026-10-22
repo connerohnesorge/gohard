@@ -80,11 +80,15 @@ type SeqStmt struct {
 
 // SeqBranch is one branch of an if statement (Cond, Body) or of a
 // conditional assignment or return (Value, Cond; Cond nil for the
-// final else).
+// final else). Unaffected marks a branch of a VHDL-2019 conditional
+// return whose value is written `unaffected` (LRM 10.13): no return
+// happens, which tells it apart from the plain `return when c` of a
+// procedure (Value nil, Unaffected false).
 type SeqBranch struct {
-	Cond  *Expr
-	Value *Expr
-	Body  []*SeqStmt
+	Cond       *Expr
+	Value      *Expr
+	Body       []*SeqStmt
+	Unaffected bool
 }
 
 // SeqAlt is one alternative of a case statement (Body) or of a

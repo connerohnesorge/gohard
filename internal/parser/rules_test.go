@@ -11,12 +11,13 @@ import (
 
 // TestRulesTable checks the rules.csv data: the 46 rows of #7 plus the
 // 4 parser gates #31 added (seq_selected_sig, cond_var, prot_generics,
-// prot_inst), unique ids, a known gate kind, and the lexer and prepass
-// gates use the table's construct text.
+// prot_inst), the one #18 added (var_generic_map), unique ids, a known
+// gate kind, and the lexer and prepass gates use the table's construct
+// text.
 func TestRulesTable(t *testing.T) {
 	rs := Rules()
-	if len(rs) != 50 {
-		t.Fatalf("%d rules, want 50", len(rs))
+	if len(rs) != 51 {
+		t.Fatalf("%d rules, want 51", len(rs))
 	}
 	seen := map[string]bool{}
 	for _, r := range rs {

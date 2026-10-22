@@ -795,6 +795,11 @@ func (n VariableDecl) Subtype() SubtypeIndication {
 	return n.Node.Child[SubtypeIndication](0)
 }
 
+// GenericMap returns the GenericMapAspect child (field generic_map), or the zero value.
+func (n VariableDecl) GenericMap() GenericMapAspect {
+	return n.Node.Child[GenericMapAspect](0)
+}
+
 // Value returns the Expr child (field value), or the zero value.
 func (n VariableDecl) Value() Expr {
 	return n.Node.Child[Expr](0)

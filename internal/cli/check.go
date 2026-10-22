@@ -228,7 +228,8 @@ func searched(args []string) string {
 }
 
 func simRequested(inv *Invocation) bool {
-	for _, f := range []string{"sim", "tb", "seed", "repro"} {
+	for _, f := range []string{"sim", "tb", "seed", "repro", "env",
+		"real-env"} {
 		if inv.IsSet(f) {
 			return true
 		}

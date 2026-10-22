@@ -174,12 +174,12 @@ func (r Run) Name() string {
 	return r.Design.Name + "/" + r.Variant
 }
 
-// Runs returns the main run and every variant run of d. Milestone
-// v1.0 is the release under test: a v1.1 design runs against its
-// expected_v1_0 outcome.
+// Runs returns the main run and every variant run of d. Release is
+// the milestone under test: a design of a later milestone runs
+// against its expected_v1_0 outcome.
 func (d Design) Runs() []Run {
 	exp := d.Expected
-	if d.Milestone == "v1.1" && d.ExpectedV10 != nil {
+	if !Reached(d.Milestone) && d.ExpectedV10 != nil {
 		exp = *d.ExpectedV10
 	}
 	main := Run{Design: d, Standard: d.Standard, Expected: exp,

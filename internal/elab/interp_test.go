@@ -12,6 +12,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/sim"
+	"github.com/connerohnesorge/gohard/internal/token"
 	"github.com/connerohnesorge/gohard/internal/trace"
 )
 
@@ -28,12 +29,22 @@ type runOpts struct {
 	steps int64
 	until sim.Time // time budget (0: 1 ms)
 	in    []byte
+	// std is the VHDL standard of the analysis and the run ("":
+	// 2008).
+	std string
 }
 
 func simulate(t *testing.T, src, top string, o runOpts) run {
 	t.Helper()
 	cfg := config.Defaults()
 	cfg.Standard = "2008"
+	if o.std != "" {
+		cfg.Standard = o.std
+	}
+	std, ok := token.ParseStandard(cfg.Standard)
+	if !ok {
+		t.Fatalf("unknown standard %q", cfg.Standard)
+	}
 	r := sema.Analyze(sema.Input{Config: cfg, Files: []sema.Source{{
 		Path: "t.vhd", Text: []byte(src)}}})
 	for _, d := range r.Diagnostics {
@@ -44,7 +55,8 @@ func simulate(t *testing.T, src, top string, o runOpts) run {
 	}
 	var out []string
 	code := Interpreter(InterpOptions{Input: o.in,
-		Output: func(l string) { out = append(out, l) }})
+		Output: func(l string) { out = append(out, l) },
+		Env:    EnvOptions{Standard: std}})
 	b := eval.NewBudget(o.steps)
 	d, ds := Elaborate(r, Options{Top: top, Budget: b, Code: code})
 	if d == nil {

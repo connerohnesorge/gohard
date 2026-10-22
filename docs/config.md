@@ -204,14 +204,14 @@ Maps an opaque unit to the user's own plain VHDL model. GoHard checks that the s
 
 ### `simulation.env.epoch`
 
-The fixed wall-clock time `std.env` reports. Validated in v1.0, used from v1.1.
+The wall-clock time of simulated time 0: `EPOCH`, `GMTIME` and `LOCALTIME` report it plus the simulated time, in UTC, unless `--real-env` is given (v1.1).
 
 * Type: RFC 3339 UTC time
 * Default: `"2000-01-01T00:00:00Z"`
 
 ### `simulation.env.vars`
 
-The only variables `GETENV` sees. Validated in v1.0, used from v1.1.
+The only variables `GETENV` sees (v1.1); `--env NAME=VALUE` overrides an entry. `--real-env` reads the real environment instead.
 
 * Type: map: name to string
 * Default: `{}`

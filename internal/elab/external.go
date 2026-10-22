@@ -151,23 +151,7 @@ func (d *Design) object(in *hier.Instance, name string,
 	class sema.ObjClass, text string,
 ) (External, error) {
 	key := sema.Key(name)
-	var regions []*sema.Region
-	switch in.Kind {
-	case hier.KindEntity:
-		regions = append(regions, in.Entity.Region)
-		if in.Arch != nil {
-			regions = append(regions, in.Arch.Region)
-		}
-	case hier.KindBlock:
-		regions = append(regions, in.Stmt.Region)
-	case hier.KindGenerate:
-		if in.Alt != nil {
-			regions = append(regions, in.Alt.Region)
-		} else {
-			regions = append(regions, in.Stmt.Region)
-		}
-	}
-	for _, r := range regions {
+	for _, r := range instRegions(in) {
 		if r == nil {
 			continue
 		}
@@ -201,4 +185,46 @@ func (d *Design) object(in *hier.Instance, name string,
 		}
 	}
 	return External{}, extErr(text, "no object "+name+" in "+in.Path)
+}
+
+// instRegions returns the declarative regions instance in elaborates
+// itself, in order: an entity's and its architecture's, a block's, a
+// generate iteration's (the chosen alternative's). Entries may be nil.
+func instRegions(in *hier.Instance) []*sema.Region {
+	switch in.Kind {
+	case hier.KindEntity:
+		if in.Arch != nil {
+			return []*sema.Region{in.Entity.Region, in.Arch.Region}
+		}
+		return []*sema.Region{in.Entity.Region}
+	case hier.KindBlock:
+		return []*sema.Region{in.Stmt.Region}
+	case hier.KindGenerate:
+		if in.Alt != nil {
+			return []*sema.Region{in.Alt.Region}
+		}
+		return []*sema.Region{in.Stmt.Region}
+	}
+	return nil
+}
+
+// declares reports whether r is one of the regions instance in
+// elaborates itself (see instRegions).
+func declares(in *hier.Instance, r *sema.Region) bool {
+	if r == nil {
+		return false
+	}
+	switch in.Kind {
+	case hier.KindEntity:
+		return in.Entity != nil && r == in.Entity.Region ||
+			in.Arch != nil && r == in.Arch.Region
+	case hier.KindBlock:
+		return in.Stmt != nil && r == in.Stmt.Region
+	case hier.KindGenerate:
+		if in.Alt != nil {
+			return r == in.Alt.Region
+		}
+		return in.Stmt != nil && r == in.Stmt.Region
+	}
+	return false
 }

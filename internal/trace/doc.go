@@ -23,7 +23,10 @@
 // race-free design gives the same bytes for every seed, and marks the
 // values of stand-in model processes as modeled. A trace contains no
 // wall time, host name or other run-dependent field: the same design
-// and seed always give the same bytes (P1).
+// and seed always give the same bytes (P1). The one exception is a
+// --real-env run (#18), which may read the real clock and environment
+// through the std.env natives: its header carries "reproducible no"
+// (Header.NonReproducible), so it is never taken for an answer key.
 //
 // # Canonical text form
 //
@@ -36,6 +39,7 @@
 //	trace    = magic header {type} {scope} {signal} {process} {entry}
 //	magic    = "gohard-trace 1" NL
 //	header   = "testbench" SP tok NL "end" SP uint NL
+//	           ["reproducible" SP "no" NL]       (--real-env runs)
 //	type     = "type" SP name SP typedef NL
 //	typedef  = "logic"
 //	         | "enum" {SP literal}               (position order)

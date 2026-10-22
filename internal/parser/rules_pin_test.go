@@ -64,6 +64,8 @@ var pinnedFirst = map[string]string{
 	"cond_var":         "2008",
 	"prot_generics":    "2019",
 	"prot_inst":        "2019",
+	// added by #18
+	"var_generic_map": "2019",
 }
 
 // TestRulesFirstPinned checks rules.csv's ids and first standards

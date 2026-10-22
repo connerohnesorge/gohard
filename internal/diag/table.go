@@ -128,6 +128,7 @@ const (
 
 	// repro: --repro replay (#29).
 	ReproInvalid         Code = "repro/invalid"
+	ReproNonReproducible Code = "repro/non-reproducible"
 	ReproSourceChanged   Code = "repro/source-changed"
 	ReproVersionMismatch Code = "repro/version-mismatch"
 
@@ -342,6 +343,13 @@ var table = []Info{
 		Code: ReproInvalid, Severity: Error, Class: Tool, Owner: 29,
 		Summary: "the repro file cannot be read",
 		Message: "invalid repro file {path}: {reason}",
+	},
+	{
+		Code: ReproNonReproducible, Severity: Error, Class: Tool,
+		Owner:   18,
+		Summary: "the repro was recorded with --real-env",
+		Message: "{path} was recorded with --real-env and cannot be " +
+			"replayed; rerun it without --real-env",
 	},
 	{
 		Code: ReproSourceChanged, Severity: Error, Class: Tool,

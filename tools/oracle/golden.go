@@ -27,7 +27,7 @@ var goldenSection = &section{
 		var ts []target
 		for _, d := range x.man.Designs {
 			if d.Expected.StopTime == "" || d.Expected.StopTime == "none" ||
-				d.Milestone != "v1.0" {
+				!corpus.Reached(d.Milestone) {
 				continue
 			}
 			ts = append(ts, target{
@@ -44,9 +44,15 @@ var goldenSection = &section{
 		if err != nil {
 			return nil, err
 		}
+		if err := corpus.AnswerKey(b); err != nil {
+			return nil, err
+		}
 		return []goldenFile{{Name: "trace.txt", Data: b}}, nil
 	},
 	check: func(x *ctx, t target, golden []goldenFile) []string {
+		if err := corpus.AnswerKey(golden[0].Data); err != nil {
+			return []string{"trace.txt: " + err.Error()}
+		}
 		b, err := gohardTrace(x, t.Ref.Name)
 		if err != nil {
 			return []string{err.Error()}

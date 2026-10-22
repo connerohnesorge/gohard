@@ -151,20 +151,24 @@ wipes existing GitHub alerts.
 
 | Command | Purpose | Owner |
 | --- | --- | --- |
-| `gohard check [PATH...]` | parse and analyze; `--sim`, `--tb`, `--seed N\|random`, `--repro FILE`, `--strict`, `--define`, `--allow-empty` | #20, #34, #35, #29 |
+| `gohard check [PATH...]` | parse and analyze; `--sim`, `--tb`, `--seed N\|random`, `--repro FILE`, `--strict`, `--define`, `--allow-empty`, `--env NAME=VALUE`, `--real-env` | #20, #34, #35, #29, #18 |
 | `gohard fmt [--check] [PATH...]` | format in place (temp file + rename) or check; `gohard fmt [--check] -` formats stdin to stdout with the `gohard.yaml` of the current directory's project | #32, #42 |
 | `gohard parse --dump FILE` | stable tree dump | #31 |
 | `gohard config check\|schema` | config diagnostics; JSON schema | #28 |
 | `gohard lsp` | stdio LSP 3.17 server; `--record DIR` | #25 |
-| `gohard lsp <action> --at PATH:LINE:COL` | one LSP action on the server's code path; `lsp sim`, `lsp replay FILE` | #26 |
+| `gohard lsp <action> --at PATH:LINE:COL` | one LSP action on the server's code path; `lsp sim` (with `--env`, `--real-env`), `lsp replay FILE` | #26, #18 |
 | `gohard trace export --format vcd\|fst` | export a native trace | #36 |
 | `gohard libs detect [--write]` | find vendor library sources | #1 |
 | `gohard version` | prints `version`, `commit`, `ieee` (bundled IEEE tag and commit) and `go` lines; `unknown` when not known | #20, #39 |
 | `gohard help [COMMAND]` | | #20 |
 
 Global flags: `-p/--jobs N`, `--output FILE`, `-h/--help`. There is no
-`gohard sim`; `--env` and `--real-env` are v1.1 (#18). A command that is
-not built yet exits 2 with `cli/not-implemented`.
+`gohard sim`. `--env NAME=VALUE` (repeatable) overrides
+`simulation.env.vars` and `--real-env` lets the std.env natives read the
+real clock and environment (#18); both imply `--sim`, and under
+`--repro` both are ignored with a log line (the recorded environment
+wins). A command that is not built yet exits 2 with
+`cli/not-implemented`.
 
 ## Files GoHard writes
 
@@ -176,6 +180,32 @@ not built yet exits 2 with `cli/not-implemented`.
   Upper-case letters in `<tb>` are escaped like other unsafe bytes
   (`\Foo\` is `%5C%46oo%5C`), so names never collide on a
   case-insensitive file system.
+  Since v1.1 a repro header also has `env` (the std.env epoch, the
+  variables and `real`) and, when the design read project files,
+  `inputs`: the sha256 of every file it read, or `""` for one it looked
+  for and did not find. `--repro` refuses a recording whose inputs
+  differ (`repro/source-changed`) or that was made with `--real-env`
+  (`repro/non-reproducible`). A `--real-env` trace has the header line
+  `reproducible no` after `end` (the magic stays `gohard-trace 1`), and
+  `corpus`/`tools/oracle` refuse it as an answer key.
+* `.gohard/run/<hash>/` holds the files a design wrote during a
+  `gohard check --sim` run (#18), at their project-relative paths.
+  `<hash>` is the first 16 hex digits of the sha256 of the run's
+  identity (standard, testbench, seed, defines, budgets, models, the
+  gohard.yaml and source hashes, the environment), without the gohard
+  build, so a `--repro` by another version writes to the same folder.
+  The writes stay in memory (`env.Overlay`) until the run ended,
+  failed and cancelled runs included (files the design never closed
+  are closed implicitly); the folder is then replaced whole, so it
+  holds exactly that run's output. The race re-run and editor runs
+  never write it.
+* The design's file sandbox (#18): a design reads the project below the
+  root (its own writes first) and writes only to the run folder. A name
+  outside the root, inside `.gohard`, reached through a symbolic link
+  that leaves the root or enters `.gohard`, or naming a directory, is
+  `NAME_ERROR` at `FILE_OPEN` in every mode. Editor runs read the same
+  project view (each file once per run) and drop their writes; `lsp
+  replay` runs read no project file.
 * `.gohard/crash/<hash>.txt` on an internal crash (#20).
 * `.gohard/cache/` under the project root: the on-disk analysis cache
   (#37, see below), written by `gohard check` and the language server

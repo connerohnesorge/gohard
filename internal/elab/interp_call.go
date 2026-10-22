@@ -105,7 +105,7 @@ func (m *machine) procedure(n *node) (sim.Wait, bool, error) {
 		return sim.Wait{}, false, err
 	}
 	if body == nil {
-		stop, err := m.builtinProc(n, x, args)
+		stop, err := m.builtinProc(n, x, obj, args)
 		if err != nil || !stop {
 			return sim.Wait{}, false, err
 		}
@@ -166,6 +166,10 @@ func (m *machine) enter(body *sema.Decl, e *sema.Expr, obj int64,
 				dt = t.ArraySubtype(v.B...)
 			}
 			if d, err := eval.Default(m.b, dt); err == nil {
+				if d, err = m.instantiate(d, p.Type); err != nil {
+					m.frames = m.frames[:fi]
+					return nil, err
+				}
 				v = d
 			}
 		}
@@ -215,7 +219,11 @@ func (m *machine) callFunction(fn *callFn, vals []eval.Value,
 		}
 	}
 	if fn.body == nil {
-		return m.builtinFunc(fn, args)
+		return m.builtinFunc(fn, obj, args)
+	}
+	outs, err := m.funcOuts(fn)
+	if err != nil {
+		return eval.Value{}, err
 	}
 	base := len(m.frames)
 	f, err := m.enter(fn.body, fn.e, obj, args)
@@ -223,6 +231,7 @@ func (m *machine) callFunction(fn *callFn, vals []eval.Value,
 		return eval.Value{}, err
 	}
 	f.fn = true
+	f.outs = outs
 	m.sync++
 	_, _, err = m.run(base)
 	m.sync--
@@ -237,4 +246,35 @@ func (m *machine) callFunction(fn *callFn, vals []eval.Value,
 	v := m.lastRet
 	m.lastRet, m.lastReturned = eval.Value{}, false
 	return v, nil
+}
+
+// funcOuts returns the out and inout variable parameters of the
+// function call fn (VHDL-2019) with their actuals' places, resolved
+// in the caller's frame before the call; leave assigns them when the
+// function returns.
+func (m *machine) funcOuts(fn *callFn) ([]outArg, error) {
+	var outs []outArg
+	var acts []*sema.Expr
+	for i, p := range fn.x.Params {
+		if p.Class == sema.ClassSignal || p.Class == sema.ClassFile ||
+			p.Mode != sema.ModeOut && p.Mode != sema.ModeInout {
+			continue
+		}
+		if acts == nil {
+			var err error
+			if acts, err = actualsOf(fn.e, fn.x); err != nil {
+				return nil, err
+			}
+		}
+		if i >= len(acts) || acts[i] == nil || acts[i] == p.Value ||
+			i >= len(fn.body.Params) {
+			continue
+		}
+		dst, err := m.placeOf(acts[i])
+		if err != nil {
+			return nil, err
+		}
+		outs = append(outs, outArg{formal: fn.body.Params[i], dst: dst})
+	}
+	return outs, nil
 }

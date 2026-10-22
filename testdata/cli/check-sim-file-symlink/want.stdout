@@ -1,0 +1,7 @@
+tb.vhd:17:5: hint[sim/assert-note]: report note: : name_error
+tb.vhd:17:5: hint[sim/assert-note]: report note: data/ok.txt: open_ok
+tb.vhd:17:5: hint[sim/assert-note]: report note: data: name_error
+tb.vhd:17:5: hint[sim/assert-note]: report note: gh/new.txt: name_error
+tb.vhd:17:5: hint[sim/assert-note]: report note: gh/traces/tb-0.trace: name_error
+tb.vhd:20:7: hint[sim/assert-note]: report note: data/ok.txt read: stimulus
+summary: 0 errors, 0 warnings, 6 hints, 1 files

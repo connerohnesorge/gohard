@@ -9,7 +9,7 @@ import "github.com/connerohnesorge/gohard/internal/token"
 // endings normalized to LF): a component of the on-disk analysis
 // cache key (#37), so a cache written by another kind table is
 // never read.
-const KindsHash = "a1f045020ecfd7a282b2a17983ad9e2d789f45c08e91c175b66480264067db99"
+const KindsHash = "70e3b37142a65dcc4b839cfba921f23c0802343f9766e714130500af118453ba"
 
 // Node kinds (kinds.yaml, append only).
 const (
@@ -69,7 +69,7 @@ const (
 	KindSubtypeDecl        Kind = 36
 	KindConstantDecl       Kind = 37
 	KindSignalDecl         Kind = 38
-	// KindVariableDecl: [shared] variable names : subtype [:= expr];.
+	// KindVariableDecl: [shared] variable names : subtype [generic map] [:= expr];.
 	KindVariableDecl Kind = 39
 	// KindPrivateVariableDecl: private variable declaration in a protected type.
 	KindPrivateVariableDecl Kind = 40

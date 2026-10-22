@@ -69,18 +69,55 @@ type SimResult struct {
 	// Write reports that the trace and repro file are written (no tool
 	// error), as gohard check --sim does.
 	Write bool
+	// Inputs are the project files the design read (repro.Header
+	// Inputs), recorded in the run's repro file.
+	Inputs []repro.File
 }
 
 // SimReport is the JSON object of gohard lsp sim (#35); field order
 // is the key order. The editor's run command answers with it.
 type SimReport struct {
-	Testbench   string    `json:"testbench"`
-	Seed        *uint64   `json:"seed"`
-	Status      string    `json:"status"`
-	End         string    `json:"end"`
-	Trace       string    `json:"trace"`
-	Repro       string    `json:"repro"`
-	Diagnostics []SimDiag `json:"diagnostics"`
+	Testbench string  `json:"testbench"`
+	Seed      *uint64 `json:"seed"`
+	Status    string  `json:"status"`
+	End       string  `json:"end"`
+	Trace     string  `json:"trace"`
+	Repro     string  `json:"repro"`
+	// Asserts are the assertion violations the run counted (#18);
+	// null when nothing ran.
+	Asserts     *SimAsserts `json:"asserts"`
+	Diagnostics []SimDiag   `json:"diagnostics"`
+}
+
+// SimAsserts are the per-severity assert counts of a run: enabled
+// assertion violations only, never report statements (#18). Field
+// order is the key order.
+type SimAsserts struct {
+	Note    uint64 `json:"note"`
+	Warning uint64 `json:"warning"`
+	Error   uint64 `json:"error"`
+	Failure uint64 `json:"failure"`
+}
+
+// Summary is the counts as lens text, most severe first and zero
+// counts left out: "1 error, 2 warnings"; "" when nothing failed.
+func (a SimAsserts) Summary() string {
+	var parts []string
+	for _, c := range []struct {
+		n    uint64
+		word string
+	}{{a.Failure, "failure"}, {a.Error, "error"},
+		{a.Warning, "warning"}, {a.Note, "note"}} {
+		if c.n == 0 {
+			continue
+		}
+		w := c.word
+		if c.n != 1 {
+			w += "s"
+		}
+		parts = append(parts, strconv.FormatUint(c.n, 10)+" "+w)
+	}
+	return strings.Join(parts, ", ")
 }
 
 // SimDiag is one diagnostic of a SimReport.
@@ -138,6 +175,19 @@ func RerunTitle(seed uint64) string {
 	return "▶ Re-run · seed " + strconv.FormatUint(seed, 10)
 }
 
+// RerunAssertsTitle is the lens title after a run at seed that counted
+// asserts a (nil: none counted): RerunTitle, then the counts, as in
+// "▶ Re-run · seed 3 · 1 error, 2 warnings".
+func RerunAssertsTitle(seed uint64, a *SimAsserts) string {
+	t := RerunTitle(seed)
+	if a != nil {
+		if sum := a.Summary(); sum != "" {
+			t += " · " + sum
+		}
+	}
+	return t
+}
+
 // AutoRunDelay is the debounce of simulation.auto_run_on_save in
 // virtual time: saves within it start one round of runs.
 const AutoRunDelay = 300 * time.Millisecond
@@ -171,6 +221,8 @@ type simRun struct {
 	deps  string
 	uri   string
 	diags []diag.Diagnostic
+	// asserts are the run's assert counts (nil: none recorded).
+	asserts *SimAsserts
 }
 
 // Results of simulation work, handled by simFinished.
@@ -434,13 +486,16 @@ func (s *State) simDone(o *out, w work, d simDone) {
 		seed = *rep.Seed
 	}
 	run := simRun{seed: seed, deps: d.deps, uri: d.uri,
-		diags: d.res.Run, repro: repro.FileName(d.tb, seed)}
+		diags: d.res.Run, repro: repro.FileName(d.tb, seed),
+		asserts: rep.Asserts}
 	if d.res.Write && s.root != "" {
 		if d.res.Trace != nil {
 			run.trace = rep.Trace
 		}
+		h := s.reproHeader(d.tb, seed)
+		h.Inputs = slices.Clone(d.res.Inputs)
 		o.do(WriteRun{Root: s.root, Trace: run.trace, Data: d.res.Trace,
-			Header: s.reproHeader(d.tb, seed)})
+			Header: h})
 	}
 	s.runs = cloneSet(s.runs, d.tb, run)
 	s.log(o, LogInfo, "simulated "+d.tb+" (seed "+
@@ -503,6 +558,8 @@ func (s *State) reproHeader(tb string, seed uint64) repro.Header {
 		Testbench: tb, Seed: seed, Defines: map[string]string{},
 		Models: map[string]string{}}
 	sm := c.Simulation
+	// The editor has no --env or --real-env: simulation.env.* only.
+	h.Env = repro.NewEnv(sm.Env, false)
 	h.Budgets.Time = sm.TimeBudget.String()
 	h.Budgets.Delta, h.Budgets.Step = sm.DeltaBudget, sm.StepBudget
 	for _, d := range c.Defines {
@@ -641,7 +698,7 @@ func simLenses(r Range, b Testbench, last simRun, ran, busy bool,
 	case busy:
 		title = titleRunning
 	case ran:
-		title = RerunTitle(last.seed)
+		title = RerunAssertsTitle(last.seed, last.asserts)
 		seed := last.seed
 		args.Seed = &seed
 	}

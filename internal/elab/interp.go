@@ -24,11 +24,14 @@ import (
 	"maps"
 	"slices"
 	"strconv"
+	"time"
 
+	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/sim"
+	"github.com/connerohnesorge/gohard/internal/token"
 )
 
 // InterpOptions configure the sequential interpreter.
@@ -43,6 +46,44 @@ type InterpOptions struct {
 	Output func(line string)
 	// Input is the content of std.textio.INPUT.
 	Input []byte
+	// Env is the world the VHDL-2019 std.env natives see (#18). The
+	// zero value is a deterministic, empty world.
+	Env EnvOptions
+}
+
+// EnvOptions is the world of the VHDL-2019 std.env natives (#18):
+// tool and version queries, the deterministic clock, environment
+// variables and directories. A run reads the outside world only
+// through the doors (Clock, Getenv, FS), and only when Real is set;
+// otherwise every answer is a function of the other fields and the
+// simulated time.
+type EnvOptions struct {
+	// Standard is the run's VHDL standard. VHDL_VERSION answers the
+	// standard of the calling file (the value conditional analysis
+	// sees); Standard is used where no file is known.
+	Standard token.Standard
+	// ToolVersion is TOOL_VERSION, the same value conditional
+	// analysis sees.
+	ToolVersion string
+	// Epoch is simulation.env.epoch: EPOCH, GMTIME and LOCALTIME
+	// answer it plus the simulated time, in UTC.
+	Epoch time.Time
+	// Vars are simulation.env.vars (and --env K=V), the variables
+	// GETENV sees when Real is false. Read by key only.
+	Vars map[string]string
+	// Root is the project root; RunDir the run's own directory (under
+	// .gohard/run/), where relative directory operations happen.
+	Root   string
+	RunDir string
+	// Real (--real-env) lets the natives read the real world through
+	// the doors below; the run is then marked non-reproducible.
+	Real bool
+	// Clock is the wall clock read when Real is set.
+	Clock env.Clock
+	// Getenv reads real environment variables when Real is set.
+	Getenv env.Getenv
+	// FS is the door of the directory and file natives (DIR_*).
+	FS env.FS
 }
 
 // Interpret builds the code of process p with default options: no
@@ -92,8 +133,18 @@ func (c *code) Resume(ctx *sim.Ctx) (sim.Wait, error) {
 	defer func() { m.ctx, m.b = nil, nil }()
 	return metered(ctx.Budget(), func(b *eval.Budget) (sim.Wait, error) {
 		m.b = b
-		return m.resume()
+		w, err := m.resume()
+		if m.native(err) {
+			return sim.Wait{}, nil
+		}
+		return w, err
 	})
+}
+
+// Close implements sim.Closer: the files still open at the end of the
+// run are closed (the first process closes those of the whole world).
+func (c *code) Close(*sim.Ctx) error {
+	return c.m.w.closeAll()
 }
 
 // Until implements sim.Condition: the condition of the current wait,
@@ -104,8 +155,36 @@ func (c *code) Until(ctx *sim.Ctx) (bool, error) {
 	defer func() { m.ctx, m.b = nil, nil }()
 	return metered(ctx.Budget(), func(b *eval.Budget) (bool, error) {
 		m.b = b
-		return m.until()
+		ok, err := m.until()
+		if m.native(err) {
+			return false, nil
+		}
+		return ok, err
 	})
+}
+
+// native reports err if it is a call of a built-in subprogram without
+// a native (*nativeError): the diagnostic unsupported/construct
+// (please report) at the statement, or else at the process. The
+// process ends and the run fails after the current phase
+// (sim.Ctx.Abort); the diagnostic makes the exit code 2.
+func (m *machine) native(err error) bool {
+	var ne *nativeError
+	if err == nil || !errors.As(err, &ne) || m.ctx == nil {
+		return false
+	}
+	var src sim.SrcRef
+	if i := m.ctx.Process(); i >= 0 && i < len(m.w.d.Model.Processes) {
+		src = m.w.d.Model.Processes[i].Src
+	}
+	var le *locError
+	if errors.As(err, &le) && le.src.Path != "" {
+		src = le.src
+	}
+	m.ctx.Abort(src, diag.NewVariant(diag.UnsupportedConstruct,
+		diag.PleaseReport, ne.name))
+	m.dead, m.wait = true, nil
+	return true
 }
 
 // EvalStepsPerStep is the number of evaluator steps (one per IR node
@@ -261,6 +340,9 @@ func (m *machine) resume() (sim.Wait, error) {
 }
 
 func (m *machine) until() (bool, error) {
+	if m.dead {
+		return false, nil
+	}
 	w := m.wait
 	if w == nil {
 		return true, nil

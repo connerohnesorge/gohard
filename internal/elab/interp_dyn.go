@@ -26,8 +26,9 @@ type (
 		obj int64
 		d   *sema.Decl
 	}
-	// sharedRef is a shared variable or a package-level file.
-	sharedRef struct{ d *sema.Decl }
+	// sharedRef is a shared variable or a package or architecture
+	// file of one instance.
+	sharedRef struct{ k sharedKey }
 	// sigRef is the current value of a signal part.
 	sigRef struct{ p sigPart }
 	// attrRef is a signal attribute of a part.
@@ -58,6 +59,8 @@ type (
 	allocFn struct {
 		t   *eval.Type // the access type
 		def *eval.Type // the designated subtype of `new T`
+		// st is def's sema subtype: its protected parts get objects.
+		st *sema.Type
 	}
 )
 
@@ -101,11 +104,11 @@ func (m *machine) Ref(d *sema.Decl) (eval.Ref, bool) {
 		}
 		if d.Kind == sema.DeclFile && d.Parent != nil &&
 			globalRegion(d.Parent) {
-			return sharedRef{d}, true
+			return sharedRef{m.sharedKeyOf(d)}, true
 		}
 		return nil, false
 	case sema.DeclSharedVariable:
-		return sharedRef{d}, true
+		return sharedRef{m.sharedKeyOf(d)}, true
 	}
 	return nil, false
 }
@@ -174,7 +177,7 @@ func (m *machine) Load(ref eval.Ref) (eval.Value, error) {
 		}
 		return eval.Value{}, errors.New(r.d.Text + " is not elaborated")
 	case sharedRef:
-		s, err := m.shared(r.d)
+		s, err := m.shared(r.k)
 		return s.v, err
 	case sigRef:
 		return m.sigValue(r.p)
@@ -297,7 +300,8 @@ func (m *machine) Lower(ev *sema.Evaluator, e *sema.Expr, b *eval.Budget,
 			}
 			return &eval.Load{Ref: sigRef{p}}, true, nil
 		case x.Decl != nil && x.Decl.Kind == sema.DeclSharedVariable:
-			return &eval.Load{Ref: sharedRef{x.Decl}}, true, nil
+			return &eval.Load{Ref: sharedRef{sharedKey{x.Inst, x.Decl}}},
+				true, nil
 		case x.Decl != nil:
 			iev := ev
 			if x.Inst != nil {
@@ -327,17 +331,22 @@ func (m *machine) Lower(ev *sema.Evaluator, e *sema.Expr, b *eval.Budget,
 		}
 		fn := allocFn{t: t}
 		var args []eval.Expr
-		if len(e.Args) > 0 {
+		if len(e.Args) > 0 && e.Args[0].Kind != sema.ExprTypeMark {
 			x, err := ev.Lower(e.Args[0], b)
 			if err != nil {
 				return nil, true, err
 			}
 			args = append(args, x)
 		} else {
+			// new T (a type mark operand) or new subtype_indication.
 			dt := e.Type.Base().Designated
+			if len(e.Args) > 0 && !e.Args[0].Type.Unknown() {
+				dt = e.Args[0].Type
+			}
 			if fn.def, err = ev.LayoutIn(dt, b); err != nil {
 				return nil, true, err
 			}
+			fn.st = dt
 		}
 		return &eval.Call{Fn: fn, Args: args}, true, nil
 	}
@@ -385,7 +394,10 @@ func (m *machine) lowerAttr(ev *sema.Evaluator, e *sema.Expr,
 }
 
 // runsHere reports whether the interpreter (not the static evaluator)
-// runs calls of x.
+// runs calls of x: impure functions, protected methods, and functions
+// with a signal or file parameter, a parameter of a protected or
+// access type (whose objects live in the world), or an out or inout
+// variable parameter (written back to its actual).
 func runsHere(x *sema.Decl) bool {
 	if !x.Pure {
 		return true
@@ -396,6 +408,15 @@ func runsHere(x *sema.Decl) bool {
 	for _, p := range x.Params {
 		if p.Class == sema.ClassSignal || p.Class == sema.ClassFile {
 			return true
+		}
+		if p.Mode == sema.ModeOut || p.Mode == sema.ModeInout {
+			return true
+		}
+		if p.Type != nil && !p.Type.Unknown() {
+			switch p.Type.Base().Class {
+			case sema.TypeProtected, sema.TypeAccess:
+				return true
+			}
 		}
 	}
 	return false
@@ -478,6 +499,12 @@ func (m *machine) Call(fn eval.Func, args []eval.Value, b *eval.Budget,
 		}
 		v, err := eval.Default(b, f.def)
 		if err != nil {
+			return eval.Value{}, true, err
+		}
+		if m.b == nil {
+			m.b = b
+		}
+		if v, err = m.instantiate(v, f.st); err != nil {
 			return eval.Value{}, true, err
 		}
 		return m.w.alloc(f.t, v), true, nil

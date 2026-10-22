@@ -37,6 +37,20 @@ var seedFlag = Flag{
 	Usage: "simulation seed; 0 keeps declaration order",
 }
 
+// envFlag and realEnvFlag set the std.env environment of a simulation
+// (#18).
+var envFlag = Flag{
+	Name: "env", Kind: Strings, Value: "NAME=VALUE",
+	Usage: "set a variable GETENV sees in simulation " +
+		"(overrides simulation.env.vars)",
+}
+
+var realEnvFlag = Flag{
+	Name: "real-env", Kind: Bool,
+	Usage: "let simulation read the real clock and environment; " +
+		"the run is marked non-reproducible",
+}
+
 var tbFlag = Flag{
 	Name: "tb", Kind: String, Value: "NAME",
 	Usage: "run only the testbench NAME",
@@ -54,7 +68,9 @@ var commands = []Command{
 				Usage: "exit 0 when no VHDL files are found",
 			},
 			defineFlag,
+			envFlag,
 			formatFlag,
+			realEnvFlag,
 			{
 				Name: "repro", Kind: String, Value: "FILE",
 				Usage: "rerun the simulation recorded in a " +
@@ -131,6 +147,8 @@ var commands = []Command{
 				Name: "dry-run", Kind: Bool,
 				Usage: "rename: print the edit plan, write nothing",
 			},
+			envFlag,
+			realEnvFlag,
 			{
 				Name: "record", Kind: String, Value: "DIR",
 				Usage: "record every session to DIR/<n>.jsonl",

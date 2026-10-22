@@ -321,11 +321,12 @@ nodes:
       - {name: signal_kind, tokens: [KwRegister, KwBus]}
       - {name: value, node: Expr}
   - name: VariableDecl
-    doc: "[shared] variable names : subtype [:= expr];"
+    doc: "[shared] variable names : subtype [generic map] [:= expr];"
     fields:
       - {name: shared, token: KwShared}
       - {name: names, node: IdentifierList}
       - {name: subtype, node: SubtypeIndication}
+      - {name: generic_map, node: GenericMapAspect}
       - {name: value, node: Expr}
   - name: PrivateVariableDecl
     std: "2019"

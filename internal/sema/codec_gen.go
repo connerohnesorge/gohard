@@ -17,7 +17,7 @@ import (
 )
 
 // codecSchema is the hash of the code below.
-const codecSchema = "3294caae025e226a68a70d884e934b5fad3ff482e1d6b8a5e228d369720c73eb"
+const codecSchema = "3869277e9e30fa4ebb4f21d6e8fe6d6335edd7180aa9ec66229af056852a73ef"
 
 // encTables and decTables hold one table per pointer type.
 type encTables struct {
@@ -32,6 +32,7 @@ type encTables struct {
 	p_Type        encTable[Type]
 	p_Resolution  encTable[Resolution]
 	p_RangeCons   encTable[RangeCons]
+	p_TypeInst    encTable[TypeInst]
 	p_eval_Type   encTable[eval.Type]
 	p_Overload    encTable[Overload]
 	p_pending     encTable[pending]
@@ -55,6 +56,7 @@ type decTables struct {
 	p_Type        decTable[Type]
 	p_Resolution  decTable[Resolution]
 	p_RangeCons   decTable[RangeCons]
+	p_TypeInst    decTable[TypeInst]
 	p_eval_Type   decTable[eval.Type]
 	p_Overload    decTable[Overload]
 	p_pending     decTable[pending]
@@ -109,6 +111,10 @@ func (d *decoder) p_Resolution() *Resolution { return d.t.p_Resolution.ref(d, d.
 func (e *encoder) p_RangeCons(p *RangeCons) { e.t.p_RangeCons.ref(e, p, e.s_RangeCons) }
 
 func (d *decoder) p_RangeCons() *RangeCons { return d.t.p_RangeCons.ref(d, d.s_RangeCons) }
+
+func (e *encoder) p_TypeInst(p *TypeInst) { e.t.p_TypeInst.ref(e, p, e.s_TypeInst) }
+
+func (d *decoder) p_TypeInst() *TypeInst { return d.t.p_TypeInst.ref(d, d.s_TypeInst) }
 
 func (e *encoder) p_eval_Type(p *eval.Type) { e.t.p_eval_Type.ref(e, p, e.s_eval_Type) }
 
@@ -733,30 +739,39 @@ func (e *encoder) s_Decl(v *Decl) {
 	e.bool(bool(v.Pure))
 	e.int(int64(v.Pos))
 	e.uint(uint64(v.First))
+	if v.Generics == nil {
+		e.uint(0)
+	} else {
+		e.uint(uint64(len(v.Generics)) + 1)
+		for i99 := range v.Generics {
+			e.s_Association(&v.Generics[i99])
+		}
+	}
+	e.p_Expr(v.MethodObj)
 	e.bool(bool(v.sigAlias))
 	e.later = append(e.later, func() {
 		if v.instTypes == nil {
 			e.uint(0)
 		} else {
 			e.uint(uint64(len(v.instTypes)) + 1)
-			n101 := 0
-			l102 := len(e.t.p_Type.list)
-			for _, k99 := range e.t.p_Type.list {
-				if _, ok := v.instTypes[k99]; !ok {
+			n104 := 0
+			l105 := len(e.t.p_Type.list)
+			for _, k102 := range e.t.p_Type.list {
+				if _, ok := v.instTypes[k102]; !ok {
 					continue
 				}
-				n101++
-				v100 := v.instTypes[k99]
-				e.p_Type(k99)
-				e.p_Type(v100)
+				n104++
+				v103 := v.instTypes[k102]
+				e.p_Type(k102)
+				e.p_Type(v103)
 			}
-			for _, k99 := range extraKeys(e, &e.t.p_Type, v.instTypes, l102, n101) {
-				n101++
-				v100 := v.instTypes[k99]
-				e.p_Type(k99)
-				e.p_Type(v100)
+			for _, k102 := range extraKeys(e, &e.t.p_Type, v.instTypes, l105, n104) {
+				n104++
+				v103 := v.instTypes[k102]
+				e.p_Type(k102)
+				e.p_Type(v103)
 			}
-			if n101 != len(v.instTypes) {
+			if n104 != len(v.instTypes) {
 				panic("sema: codec: map key unreachable")
 			}
 		}
@@ -766,8 +781,8 @@ func (e *encoder) s_Decl(v *Decl) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.attrs)) + 1)
-		for i106 := range v.attrs {
-			e.p_Decl(v.attrs[i106])
+		for i109 := range v.attrs {
+			e.p_Decl(v.attrs[i109])
 		}
 	}
 }
@@ -807,24 +822,31 @@ func (d *decoder) s_Decl(v *Decl) {
 	v.Pure = bool(d.bool())
 	v.Pos = int(d.int())
 	v.First = token.Standard(d.uint())
+	if n100, ok := d.count(); ok {
+		v.Generics = make([]Association, n100)
+		for i101 := range v.Generics {
+			d.s_Association(&v.Generics[i101])
+		}
+	}
+	v.MethodObj = d.p_Expr()
 	v.sigAlias = bool(d.bool())
 	d.later = append(d.later, func() {
-		if n103, ok := d.count(); ok {
-			v.instTypes = make(map[*Type]*Type, n103)
-			for range n103 {
-				var k104 *Type
-				var v105 *Type
-				k104 = d.p_Type()
-				v105 = d.p_Type()
-				v.instTypes[k104] = v105
+		if n106, ok := d.count(); ok {
+			v.instTypes = make(map[*Type]*Type, n106)
+			for range n106 {
+				var k107 *Type
+				var v108 *Type
+				k107 = d.p_Type()
+				v108 = d.p_Type()
+				v.instTypes[k107] = v108
 			}
 		}
 	})
 	v.paramRange = d.p_RangeCons()
-	if n107, ok := d.count(); ok {
-		v.attrs = make([]*Decl, n107)
-		for i108 := range v.attrs {
-			v.attrs[i108] = d.p_Decl()
+	if n110, ok := d.count(); ok {
+		v.attrs = make([]*Decl, n110)
+		for i111 := range v.attrs {
+			v.attrs[i111] = d.p_Decl()
 		}
 	}
 }
@@ -849,42 +871,42 @@ func (e *encoder) s_Region(v *Region) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Decls)) + 1)
-		for i109 := range v.Decls {
-			e.p_Decl(v.Decls[i109])
+		for i112 := range v.Decls {
+			e.p_Decl(v.Decls[i112])
 		}
 	}
 	if v.Uses == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Uses)) + 1)
-		for i112 := range v.Uses {
-			e.p_Use(v.Uses[i112])
+		for i115 := range v.Uses {
+			e.p_Use(v.Uses[i115])
 		}
 	}
 	if v.Children == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Children)) + 1)
-		for i115 := range v.Children {
-			e.p_Region(v.Children[i115])
+		for i118 := range v.Children {
+			e.p_Region(v.Children[i118])
 		}
 	}
 	if v.Libs == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Libs)) + 1)
-		for _, k118 := range slices.Sorted(maps.Keys(v.Libs)) {
-			v119 := v.Libs[k118]
-			e.str(string(k118))
-			e.p_Decl(v119)
+		for _, k121 := range slices.Sorted(maps.Keys(v.Libs)) {
+			v122 := v.Libs[k121]
+			e.str(string(k121))
+			e.p_Decl(v122)
 		}
 	}
 	if v.Includes == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Includes)) + 1)
-		for i123 := range v.Includes {
-			e.p_Region(v.Includes[i123])
+		for i126 := range v.Includes {
+			e.p_Region(v.Includes[i126])
 		}
 	}
 	e.p_Unit(v.Unit)
@@ -892,23 +914,23 @@ func (e *encoder) s_Region(v *Region) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Assigns)) + 1)
-		for i126 := range v.Assigns {
-			e.p_Assign(v.Assigns[i126])
+		for i129 := range v.Assigns {
+			e.p_Assign(v.Assigns[i129])
 		}
 	}
 	if v.names == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.names)) + 1)
-		for _, k129 := range slices.Sorted(maps.Keys(v.names)) {
-			v130 := v.names[k129]
-			e.str(string(k129))
-			if v130 == nil {
+		for _, k132 := range slices.Sorted(maps.Keys(v.names)) {
+			v133 := v.names[k132]
+			e.str(string(k132))
+			if v133 == nil {
 				e.uint(0)
 			} else {
-				e.uint(uint64(len(v130)) + 1)
-				for i131 := range v130 {
-					e.p_Decl(v130[i131])
+				e.uint(uint64(len(v133)) + 1)
+				for i134 := range v133 {
+					e.p_Decl(v133[i134])
 				}
 			}
 		}
@@ -921,60 +943,60 @@ func (d *decoder) s_Region(v *Region) {
 	v.Parent = d.p_Region()
 	v.File = d.p_File()
 	d.s_cst_Range(&v.Span)
-	if n110, ok := d.count(); ok {
-		v.Decls = make([]*Decl, n110)
-		for i111 := range v.Decls {
-			v.Decls[i111] = d.p_Decl()
-		}
-	}
 	if n113, ok := d.count(); ok {
-		v.Uses = make([]*Use, n113)
-		for i114 := range v.Uses {
-			v.Uses[i114] = d.p_Use()
+		v.Decls = make([]*Decl, n113)
+		for i114 := range v.Decls {
+			v.Decls[i114] = d.p_Decl()
 		}
 	}
 	if n116, ok := d.count(); ok {
-		v.Children = make([]*Region, n116)
-		for i117 := range v.Children {
-			v.Children[i117] = d.p_Region()
+		v.Uses = make([]*Use, n116)
+		for i117 := range v.Uses {
+			v.Uses[i117] = d.p_Use()
 		}
 	}
-	if n120, ok := d.count(); ok {
-		v.Libs = make(map[Key]*Decl, n120)
-		for range n120 {
-			var k121 Key
-			var v122 *Decl
-			k121 = Key(d.str())
-			v122 = d.p_Decl()
-			v.Libs[k121] = v122
+	if n119, ok := d.count(); ok {
+		v.Children = make([]*Region, n119)
+		for i120 := range v.Children {
+			v.Children[i120] = d.p_Region()
 		}
 	}
-	if n124, ok := d.count(); ok {
-		v.Includes = make([]*Region, n124)
-		for i125 := range v.Includes {
-			v.Includes[i125] = d.p_Region()
+	if n123, ok := d.count(); ok {
+		v.Libs = make(map[Key]*Decl, n123)
+		for range n123 {
+			var k124 Key
+			var v125 *Decl
+			k124 = Key(d.str())
+			v125 = d.p_Decl()
+			v.Libs[k124] = v125
+		}
+	}
+	if n127, ok := d.count(); ok {
+		v.Includes = make([]*Region, n127)
+		for i128 := range v.Includes {
+			v.Includes[i128] = d.p_Region()
 		}
 	}
 	v.Unit = d.p_Unit()
-	if n127, ok := d.count(); ok {
-		v.Assigns = make([]*Assign, n127)
-		for i128 := range v.Assigns {
-			v.Assigns[i128] = d.p_Assign()
+	if n130, ok := d.count(); ok {
+		v.Assigns = make([]*Assign, n130)
+		for i131 := range v.Assigns {
+			v.Assigns[i131] = d.p_Assign()
 		}
 	}
-	if n132, ok := d.count(); ok {
-		v.names = make(map[Key][]*Decl, n132)
-		for range n132 {
-			var k133 Key
-			var v134 []*Decl
-			k133 = Key(d.str())
-			if n135, ok := d.count(); ok {
-				v134 = make([]*Decl, n135)
-				for i136 := range v134 {
-					v134[i136] = d.p_Decl()
+	if n135, ok := d.count(); ok {
+		v.names = make(map[Key][]*Decl, n135)
+		for range n135 {
+			var k136 Key
+			var v137 []*Decl
+			k136 = Key(d.str())
+			if n138, ok := d.count(); ok {
+				v137 = make([]*Decl, n138)
+				for i139 := range v137 {
+					v137[i139] = d.p_Decl()
 				}
 			}
-			v.names[k133] = v134
+			v.names[k136] = v137
 		}
 	}
 }
@@ -989,8 +1011,8 @@ func (e *encoder) s_Use(v *Use) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Decls)) + 1)
-		for i137 := range v.Decls {
-			e.p_Decl(v.Decls[i137])
+		for i140 := range v.Decls {
+			e.p_Decl(v.Decls[i140])
 		}
 	}
 	e.bool(bool(v.Broken))
@@ -1002,10 +1024,10 @@ func (d *decoder) s_Use(v *Use) {
 	v.All = bool(d.bool())
 	v.Region = d.p_Region()
 	v.Library = d.p_Library()
-	if n138, ok := d.count(); ok {
-		v.Decls = make([]*Decl, n138)
-		for i139 := range v.Decls {
-			v.Decls[i139] = d.p_Decl()
+	if n141, ok := d.count(); ok {
+		v.Decls = make([]*Decl, n141)
+		for i142 := range v.Decls {
+			v.Decls[i142] = d.p_Decl()
 		}
 	}
 	v.Broken = bool(d.bool())
@@ -1019,33 +1041,33 @@ func (e *encoder) s_Library(v *Library) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Folders)) + 1)
-		for i140 := range v.Folders {
-			e.str(string(v.Folders[i140]))
+		for i143 := range v.Folders {
+			e.str(string(v.Folders[i143]))
 		}
 	}
 	if v.units == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.units)) + 1)
-		for _, k143 := range slices.Sorted(maps.Keys(v.units)) {
-			v144 := v.units[k143]
-			e.str(string(k143))
-			e.p_Unit(v144)
+		for _, k146 := range slices.Sorted(maps.Keys(v.units)) {
+			v147 := v.units[k146]
+			e.str(string(k146))
+			e.p_Unit(v147)
 		}
 	}
 	if v.secondary == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.secondary)) + 1)
-		for _, k148 := range slices.Sorted(maps.Keys(v.secondary)) {
-			v149 := v.secondary[k148]
-			e.str(string(k148))
-			if v149 == nil {
+		for _, k151 := range slices.Sorted(maps.Keys(v.secondary)) {
+			v152 := v.secondary[k151]
+			e.str(string(k151))
+			if v152 == nil {
 				e.uint(0)
 			} else {
-				e.uint(uint64(len(v149)) + 1)
-				for i150 := range v149 {
-					e.p_Unit(v149[i150])
+				e.uint(uint64(len(v152)) + 1)
+				for i153 := range v152 {
+					e.p_Unit(v152[i153])
 				}
 			}
 		}
@@ -1054,8 +1076,8 @@ func (e *encoder) s_Library(v *Library) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.order)) + 1)
-		for i156 := range v.order {
-			e.p_Unit(v.order[i156])
+		for i159 := range v.order {
+			e.p_Unit(v.order[i159])
 		}
 	}
 	e.later = append(e.later, func() {
@@ -1063,24 +1085,24 @@ func (e *encoder) s_Library(v *Library) {
 			e.uint(0)
 		} else {
 			e.uint(uint64(len(v.replaced)) + 1)
-			n161 := 0
-			l162 := len(e.t.p_Unit.list)
-			for _, k159 := range e.t.p_Unit.list {
-				if _, ok := v.replaced[k159]; !ok {
+			n164 := 0
+			l165 := len(e.t.p_Unit.list)
+			for _, k162 := range e.t.p_Unit.list {
+				if _, ok := v.replaced[k162]; !ok {
 					continue
 				}
-				n161++
-				v160 := v.replaced[k159]
-				e.p_Unit(k159)
-				e.p_Unit(v160)
+				n164++
+				v163 := v.replaced[k162]
+				e.p_Unit(k162)
+				e.p_Unit(v163)
 			}
-			for _, k159 := range extraKeys(e, &e.t.p_Unit, v.replaced, l162, n161) {
-				n161++
-				v160 := v.replaced[k159]
-				e.p_Unit(k159)
-				e.p_Unit(v160)
+			for _, k162 := range extraKeys(e, &e.t.p_Unit, v.replaced, l165, n164) {
+				n164++
+				v163 := v.replaced[k162]
+				e.p_Unit(k162)
+				e.p_Unit(v163)
 			}
-			if n161 != len(v.replaced) {
+			if n164 != len(v.replaced) {
 				panic("sema: codec: map key unreachable")
 			}
 		}
@@ -1091,52 +1113,52 @@ func (d *decoder) s_Library(v *Library) {
 	v.Name = Key(d.str())
 	v.Decl = d.p_Decl()
 	v.Bundled = bool(d.bool())
-	if n141, ok := d.count(); ok {
-		v.Folders = make([]string, n141)
-		for i142 := range v.Folders {
-			v.Folders[i142] = string(d.str())
+	if n144, ok := d.count(); ok {
+		v.Folders = make([]string, n144)
+		for i145 := range v.Folders {
+			v.Folders[i145] = string(d.str())
 		}
 	}
-	if n145, ok := d.count(); ok {
-		v.units = make(map[Key]*Unit, n145)
-		for range n145 {
-			var k146 Key
-			var v147 *Unit
-			k146 = Key(d.str())
-			v147 = d.p_Unit()
-			v.units[k146] = v147
+	if n148, ok := d.count(); ok {
+		v.units = make(map[Key]*Unit, n148)
+		for range n148 {
+			var k149 Key
+			var v150 *Unit
+			k149 = Key(d.str())
+			v150 = d.p_Unit()
+			v.units[k149] = v150
 		}
 	}
-	if n151, ok := d.count(); ok {
-		v.secondary = make(map[Key][]*Unit, n151)
-		for range n151 {
-			var k152 Key
-			var v153 []*Unit
-			k152 = Key(d.str())
-			if n154, ok := d.count(); ok {
-				v153 = make([]*Unit, n154)
-				for i155 := range v153 {
-					v153[i155] = d.p_Unit()
+	if n154, ok := d.count(); ok {
+		v.secondary = make(map[Key][]*Unit, n154)
+		for range n154 {
+			var k155 Key
+			var v156 []*Unit
+			k155 = Key(d.str())
+			if n157, ok := d.count(); ok {
+				v156 = make([]*Unit, n157)
+				for i158 := range v156 {
+					v156[i158] = d.p_Unit()
 				}
 			}
-			v.secondary[k152] = v153
+			v.secondary[k155] = v156
 		}
 	}
-	if n157, ok := d.count(); ok {
-		v.order = make([]*Unit, n157)
-		for i158 := range v.order {
-			v.order[i158] = d.p_Unit()
+	if n160, ok := d.count(); ok {
+		v.order = make([]*Unit, n160)
+		for i161 := range v.order {
+			v.order[i161] = d.p_Unit()
 		}
 	}
 	d.later = append(d.later, func() {
-		if n163, ok := d.count(); ok {
-			v.replaced = make(map[*Unit]*Unit, n163)
-			for range n163 {
-				var k164 *Unit
-				var v165 *Unit
-				k164 = d.p_Unit()
-				v165 = d.p_Unit()
-				v.replaced[k164] = v165
+		if n166, ok := d.count(); ok {
+			v.replaced = make(map[*Unit]*Unit, n166)
+			for range n166 {
+				var k167 *Unit
+				var v168 *Unit
+				k167 = d.p_Unit()
+				v168 = d.p_Unit()
+				v.replaced[k167] = v168
 			}
 		}
 	})
@@ -1148,8 +1170,8 @@ func (e *encoder) s_Assign(v *Assign) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Values)) + 1)
-		for i166 := range v.Values {
-			e.p_Expr(v.Values[i166])
+		for i169 := range v.Values {
+			e.p_Expr(v.Values[i169])
 		}
 	}
 	e.bool(bool(v.Seq))
@@ -1157,10 +1179,10 @@ func (e *encoder) s_Assign(v *Assign) {
 
 func (d *decoder) s_Assign(v *Assign) {
 	v.Target = d.p_Expr()
-	if n167, ok := d.count(); ok {
-		v.Values = make([]*Expr, n167)
-		for i168 := range v.Values {
-			v.Values[i168] = d.p_Expr()
+	if n170, ok := d.count(); ok {
+		v.Values = make([]*Expr, n170)
+		for i171 := range v.Values {
+			v.Values[i171] = d.p_Expr()
 		}
 	}
 	v.Seq = bool(d.bool())
@@ -1176,24 +1198,24 @@ func (e *encoder) s_Expr(v *Expr) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Args)) + 1)
-		for i169 := range v.Args {
-			e.p_Expr(v.Args[i169])
+		for i172 := range v.Args {
+			e.p_Expr(v.Args[i172])
 		}
 	}
 	if v.Formals == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Formals)) + 1)
-		for i172 := range v.Formals {
-			e.p_Decl(v.Formals[i172])
+		for i175 := range v.Formals {
+			e.p_Decl(v.Formals[i175])
 		}
 	}
 	if v.Assocs == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Assocs)) + 1)
-		for i175 := range v.Assocs {
-			e.s_Assoc(&v.Assocs[i175])
+		for i178 := range v.Assocs {
+			e.s_Assoc(&v.Assocs[i178])
 		}
 	}
 	e.p_RangeCons(v.Range)
@@ -1210,22 +1232,22 @@ func (d *decoder) s_Expr(v *Expr) {
 	v.Type = d.p_Type()
 	v.Decl = d.p_Decl()
 	v.Prefix = d.p_Expr()
-	if n170, ok := d.count(); ok {
-		v.Args = make([]*Expr, n170)
-		for i171 := range v.Args {
-			v.Args[i171] = d.p_Expr()
-		}
-	}
 	if n173, ok := d.count(); ok {
-		v.Formals = make([]*Decl, n173)
-		for i174 := range v.Formals {
-			v.Formals[i174] = d.p_Decl()
+		v.Args = make([]*Expr, n173)
+		for i174 := range v.Args {
+			v.Args[i174] = d.p_Expr()
 		}
 	}
 	if n176, ok := d.count(); ok {
-		v.Assocs = make([]Assoc, n176)
-		for i177 := range v.Assocs {
-			d.s_Assoc(&v.Assocs[i177])
+		v.Formals = make([]*Decl, n176)
+		for i177 := range v.Formals {
+			v.Formals[i177] = d.p_Decl()
+		}
+	}
+	if n179, ok := d.count(); ok {
+		v.Assocs = make([]Assoc, n179)
+		for i180 := range v.Assocs {
+			d.s_Assoc(&v.Assocs[i180])
 		}
 	}
 	v.Range = d.p_RangeCons()
@@ -1247,8 +1269,8 @@ func (e *encoder) s_Type(v *Type) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.IndexCons)) + 1)
-		for i178 := range v.IndexCons {
-			e.p_RangeCons(v.IndexCons[i178])
+		for i181 := range v.IndexCons {
+			e.p_RangeCons(v.IndexCons[i181])
 		}
 	}
 	e.p_Type(v.ElemSub)
@@ -1256,8 +1278,8 @@ func (e *encoder) s_Type(v *Type) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.FieldSubs)) + 1)
-		for i181 := range v.FieldSubs {
-			e.p_Type(v.FieldSubs[i181])
+		for i184 := range v.FieldSubs {
+			e.p_Type(v.FieldSubs[i184])
 		}
 	}
 	e.bool(bool(v.dynamic))
@@ -1265,24 +1287,24 @@ func (e *encoder) s_Type(v *Type) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Literals)) + 1)
-		for i184 := range v.Literals {
-			e.p_Decl(v.Literals[i184])
+		for i187 := range v.Literals {
+			e.p_Decl(v.Literals[i187])
 		}
 	}
 	if v.Units == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Units)) + 1)
-		for i187 := range v.Units {
-			e.p_Decl(v.Units[i187])
+		for i190 := range v.Units {
+			e.p_Decl(v.Units[i190])
 		}
 	}
 	if v.Index == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Index)) + 1)
-		for i190 := range v.Index {
-			e.p_Type(v.Index[i190])
+		for i193 := range v.Index {
+			e.p_Type(v.Index[i193])
 		}
 	}
 	e.p_Type(v.Elem)
@@ -1290,19 +1312,20 @@ func (e *encoder) s_Type(v *Type) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Fields)) + 1)
-		for i193 := range v.Fields {
-			e.p_Decl(v.Fields[i193])
+		for i196 := range v.Fields {
+			e.p_Decl(v.Fields[i196])
 		}
 	}
 	e.p_Type(v.Designated)
 	e.p_Type(v.Content)
 	e.p_Region(v.Members)
+	e.p_TypeInst(v.Inst)
 	if v.Ops == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Ops)) + 1)
-		for i196 := range v.Ops {
-			e.p_Decl(v.Ops[i196])
+		for i199 := range v.Ops {
+			e.p_Decl(v.Ops[i199])
 		}
 	}
 	e.p_eval_Type(v.Eval)
@@ -1315,52 +1338,53 @@ func (d *decoder) s_Type(v *Type) {
 	v.Universal = bool(d.bool())
 	v.Resolution = d.p_Resolution()
 	v.Range = d.p_RangeCons()
-	if n179, ok := d.count(); ok {
-		v.IndexCons = make([]*RangeCons, n179)
-		for i180 := range v.IndexCons {
-			v.IndexCons[i180] = d.p_RangeCons()
+	if n182, ok := d.count(); ok {
+		v.IndexCons = make([]*RangeCons, n182)
+		for i183 := range v.IndexCons {
+			v.IndexCons[i183] = d.p_RangeCons()
 		}
 	}
 	v.ElemSub = d.p_Type()
-	if n182, ok := d.count(); ok {
-		v.FieldSubs = make([]*Type, n182)
-		for i183 := range v.FieldSubs {
-			v.FieldSubs[i183] = d.p_Type()
+	if n185, ok := d.count(); ok {
+		v.FieldSubs = make([]*Type, n185)
+		for i186 := range v.FieldSubs {
+			v.FieldSubs[i186] = d.p_Type()
 		}
 	}
 	v.dynamic = bool(d.bool())
-	if n185, ok := d.count(); ok {
-		v.Literals = make([]*Decl, n185)
-		for i186 := range v.Literals {
-			v.Literals[i186] = d.p_Decl()
-		}
-	}
 	if n188, ok := d.count(); ok {
-		v.Units = make([]*Decl, n188)
-		for i189 := range v.Units {
-			v.Units[i189] = d.p_Decl()
+		v.Literals = make([]*Decl, n188)
+		for i189 := range v.Literals {
+			v.Literals[i189] = d.p_Decl()
 		}
 	}
 	if n191, ok := d.count(); ok {
-		v.Index = make([]*Type, n191)
-		for i192 := range v.Index {
-			v.Index[i192] = d.p_Type()
+		v.Units = make([]*Decl, n191)
+		for i192 := range v.Units {
+			v.Units[i192] = d.p_Decl()
+		}
+	}
+	if n194, ok := d.count(); ok {
+		v.Index = make([]*Type, n194)
+		for i195 := range v.Index {
+			v.Index[i195] = d.p_Type()
 		}
 	}
 	v.Elem = d.p_Type()
-	if n194, ok := d.count(); ok {
-		v.Fields = make([]*Decl, n194)
-		for i195 := range v.Fields {
-			v.Fields[i195] = d.p_Decl()
+	if n197, ok := d.count(); ok {
+		v.Fields = make([]*Decl, n197)
+		for i198 := range v.Fields {
+			v.Fields[i198] = d.p_Decl()
 		}
 	}
 	v.Designated = d.p_Type()
 	v.Content = d.p_Type()
 	v.Members = d.p_Region()
-	if n197, ok := d.count(); ok {
-		v.Ops = make([]*Decl, n197)
-		for i198 := range v.Ops {
-			v.Ops[i198] = d.p_Decl()
+	v.Inst = d.p_TypeInst()
+	if n200, ok := d.count(); ok {
+		v.Ops = make([]*Decl, n200)
+		for i201 := range v.Ops {
+			v.Ops[i201] = d.p_Decl()
 		}
 	}
 	v.Eval = d.p_eval_Type()
@@ -1374,8 +1398,8 @@ func (e *encoder) s_Resolution(v *Resolution) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Fields)) + 1)
-		for i199 := range v.Fields {
-			e.p_Resolution(v.Fields[i199])
+		for i202 := range v.Fields {
+			e.p_Resolution(v.Fields[i202])
 		}
 	}
 }
@@ -1384,10 +1408,10 @@ func (d *decoder) s_Resolution(v *Resolution) {
 	v.Node = d.node()
 	v.Func = d.p_Decl()
 	v.Elem = d.p_Resolution()
-	if n200, ok := d.count(); ok {
-		v.Fields = make([]*Resolution, n200)
-		for i201 := range v.Fields {
-			v.Fields[i201] = d.p_Resolution()
+	if n203, ok := d.count(); ok {
+		v.Fields = make([]*Resolution, n203)
+		for i204 := range v.Fields {
+			v.Fields[i204] = d.p_Resolution()
 		}
 	}
 }
@@ -1410,6 +1434,42 @@ func (d *decoder) s_RangeCons(v *RangeCons) {
 	v.Type = d.p_Type()
 }
 
+func (e *encoder) s_TypeInst(v *TypeInst) {
+	e.p_Decl(v.Of)
+	if v.Map == nil {
+		e.uint(0)
+	} else {
+		e.uint(uint64(len(v.Map)) + 1)
+		for i205 := range v.Map {
+			e.s_Association(&v.Map[i205])
+		}
+	}
+}
+
+func (d *decoder) s_TypeInst(v *TypeInst) {
+	v.Of = d.p_Decl()
+	if n206, ok := d.count(); ok {
+		v.Map = make([]Association, n206)
+		for i207 := range v.Map {
+			d.s_Association(&v.Map[i207])
+		}
+	}
+}
+
+func (e *encoder) s_Association(v *Association) {
+	e.p_Decl(v.Formal)
+	e.p_Expr(v.Actual)
+	e.node(v.Node)
+	e.p_Expr(v.Part)
+}
+
+func (d *decoder) s_Association(v *Association) {
+	v.Formal = d.p_Decl()
+	v.Actual = d.p_Expr()
+	v.Node = d.node()
+	v.Part = d.p_Expr()
+}
+
 func (e *encoder) s_eval_Type(v *eval.Type) {
 	e.uint(uint64(v.Kind))
 	e.str(string(v.Name))
@@ -1420,24 +1480,24 @@ func (e *encoder) s_eval_Type(v *eval.Type) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Literals)) + 1)
-		for i202 := range v.Literals {
-			e.str(string(v.Literals[i202]))
+		for i208 := range v.Literals {
+			e.str(string(v.Literals[i208]))
 		}
 	}
 	if v.Units == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Units)) + 1)
-		for i205 := range v.Units {
-			e.s_eval_Unit(&v.Units[i205])
+		for i211 := range v.Units {
+			e.s_eval_Unit(&v.Units[i211])
 		}
 	}
 	if v.Index == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Index)) + 1)
-		for i208 := range v.Index {
-			e.p_eval_Type(v.Index[i208])
+		for i214 := range v.Index {
+			e.p_eval_Type(v.Index[i214])
 		}
 	}
 	e.p_eval_Type(v.Elem)
@@ -1445,16 +1505,16 @@ func (e *encoder) s_eval_Type(v *eval.Type) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Bounds)) + 1)
-		for i211 := range v.Bounds {
-			e.s_eval_Range(&v.Bounds[i211])
+		for i217 := range v.Bounds {
+			e.s_eval_Range(&v.Bounds[i217])
 		}
 	}
 	if v.Fields == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Fields)) + 1)
-		for i214 := range v.Fields {
-			e.s_eval_Field(&v.Fields[i214])
+		for i220 := range v.Fields {
+			e.s_eval_Field(&v.Fields[i220])
 		}
 	}
 }
@@ -1465,35 +1525,35 @@ func (d *decoder) s_eval_Type(v *eval.Type) {
 	v.Base = d.p_eval_Type()
 	d.s_eval_Range(&v.Range)
 	d.s_eval_RealRange(&v.Real)
-	if n203, ok := d.count(); ok {
-		v.Literals = make([]string, n203)
-		for i204 := range v.Literals {
-			v.Literals[i204] = string(d.str())
-		}
-	}
-	if n206, ok := d.count(); ok {
-		v.Units = make([]eval.Unit, n206)
-		for i207 := range v.Units {
-			d.s_eval_Unit(&v.Units[i207])
-		}
-	}
 	if n209, ok := d.count(); ok {
-		v.Index = make([]*eval.Type, n209)
-		for i210 := range v.Index {
-			v.Index[i210] = d.p_eval_Type()
+		v.Literals = make([]string, n209)
+		for i210 := range v.Literals {
+			v.Literals[i210] = string(d.str())
 		}
 	}
-	v.Elem = d.p_eval_Type()
 	if n212, ok := d.count(); ok {
-		v.Bounds = make([]eval.Range, n212)
-		for i213 := range v.Bounds {
-			d.s_eval_Range(&v.Bounds[i213])
+		v.Units = make([]eval.Unit, n212)
+		for i213 := range v.Units {
+			d.s_eval_Unit(&v.Units[i213])
 		}
 	}
 	if n215, ok := d.count(); ok {
-		v.Fields = make([]eval.Field, n215)
-		for i216 := range v.Fields {
-			d.s_eval_Field(&v.Fields[i216])
+		v.Index = make([]*eval.Type, n215)
+		for i216 := range v.Index {
+			v.Index[i216] = d.p_eval_Type()
+		}
+	}
+	v.Elem = d.p_eval_Type()
+	if n218, ok := d.count(); ok {
+		v.Bounds = make([]eval.Range, n218)
+		for i219 := range v.Bounds {
+			d.s_eval_Range(&v.Bounds[i219])
+		}
+	}
+	if n221, ok := d.count(); ok {
+		v.Fields = make([]eval.Field, n221)
+		for i222 := range v.Fields {
+			d.s_eval_Field(&v.Fields[i222])
 		}
 	}
 }
@@ -1547,8 +1607,8 @@ func (e *encoder) s_Assoc(v *Assoc) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Choices)) + 1)
-		for i217 := range v.Choices {
-			e.p_Expr(v.Choices[i217])
+		for i223 := range v.Choices {
+			e.p_Expr(v.Choices[i223])
 		}
 	}
 	e.p_Expr(v.Value)
@@ -1557,10 +1617,10 @@ func (e *encoder) s_Assoc(v *Assoc) {
 }
 
 func (d *decoder) s_Assoc(v *Assoc) {
-	if n218, ok := d.count(); ok {
-		v.Choices = make([]*Expr, n218)
-		for i219 := range v.Choices {
-			v.Choices[i219] = d.p_Expr()
+	if n224, ok := d.count(); ok {
+		v.Choices = make([]*Expr, n224)
+		for i225 := range v.Choices {
+			v.Choices[i225] = d.p_Expr()
 		}
 	}
 	v.Value = d.p_Expr()
@@ -1575,8 +1635,8 @@ func (e *encoder) s_Overload(v *Overload) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Candidates)) + 1)
-		for i220 := range v.Candidates {
-			e.s_Candidate(&v.Candidates[i220])
+		for i226 := range v.Candidates {
+			e.s_Candidate(&v.Candidates[i226])
 		}
 	}
 }
@@ -1584,10 +1644,10 @@ func (e *encoder) s_Overload(v *Overload) {
 func (d *decoder) s_Overload(v *Overload) {
 	v.Name = string(d.str())
 	v.Chosen = d.p_Decl()
-	if n221, ok := d.count(); ok {
-		v.Candidates = make([]Candidate, n221)
-		for i222 := range v.Candidates {
-			d.s_Candidate(&v.Candidates[i222])
+	if n227, ok := d.count(); ok {
+		v.Candidates = make([]Candidate, n227)
+		for i228 := range v.Candidates {
+			d.s_Candidate(&v.Candidates[i228])
 		}
 	}
 }
@@ -1612,8 +1672,8 @@ func (e *encoder) s_pending(v *pending) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.cands)) + 1)
-		for i223 := range v.cands {
-			e.p_Decl(v.cands[i223])
+		for i229 := range v.cands {
+			e.p_Decl(v.cands[i229])
 		}
 	}
 	e.token(v.tok)
@@ -1621,8 +1681,8 @@ func (e *encoder) s_pending(v *pending) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.acts)) + 1)
-		for i226 := range v.acts {
-			e.s_actual(&v.acts[i226])
+		for i232 := range v.acts {
+			e.s_actual(&v.acts[i232])
 		}
 	}
 	e.str(string(v.name))
@@ -1631,8 +1691,8 @@ func (e *encoder) s_pending(v *pending) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.fitting)) + 1)
-		for i229 := range v.fitting {
-			e.p_Decl(v.fitting[i229])
+		for i235 := range v.fitting {
+			e.p_Decl(v.fitting[i235])
 		}
 	}
 	e.p_Type(v.made)
@@ -1641,25 +1701,25 @@ func (e *encoder) s_pending(v *pending) {
 
 func (d *decoder) s_pending(v *pending) {
 	v.kind = pendKind(d.uint())
-	if n224, ok := d.count(); ok {
-		v.cands = make([]*Decl, n224)
-		for i225 := range v.cands {
-			v.cands[i225] = d.p_Decl()
+	if n230, ok := d.count(); ok {
+		v.cands = make([]*Decl, n230)
+		for i231 := range v.cands {
+			v.cands[i231] = d.p_Decl()
 		}
 	}
 	v.tok = d.token()
-	if n227, ok := d.count(); ok {
-		v.acts = make([]actual, n227)
-		for i228 := range v.acts {
-			d.s_actual(&v.acts[i228])
+	if n233, ok := d.count(); ok {
+		v.acts = make([]actual, n233)
+		for i234 := range v.acts {
+			d.s_actual(&v.acts[i234])
 		}
 	}
 	v.name = string(d.str())
 	v.object = d.p_Expr()
-	if n230, ok := d.count(); ok {
-		v.fitting = make([]*Decl, n230)
-		for i231 := range v.fitting {
-			v.fitting[i231] = d.p_Decl()
+	if n236, ok := d.count(); ok {
+		v.fitting = make([]*Decl, n236)
+		for i237 := range v.fitting {
+			v.fitting[i237] = d.p_Decl()
 		}
 	}
 	v.made = d.p_Type()
@@ -1704,8 +1764,8 @@ func (e *encoder) s_View(v *View) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Elements)) + 1)
-		for i232 := range v.Elements {
-			e.p_ViewElement(v.Elements[i232])
+		for i238 := range v.Elements {
+			e.p_ViewElement(v.Elements[i238])
 		}
 	}
 }
@@ -1714,10 +1774,10 @@ func (d *decoder) s_View(v *View) {
 	v.Decl = d.p_Decl()
 	v.Of = d.p_Type()
 	v.Converse = bool(d.bool())
-	if n233, ok := d.count(); ok {
-		v.Elements = make([]*ViewElement, n233)
-		for i234 := range v.Elements {
-			v.Elements[i234] = d.p_ViewElement()
+	if n239, ok := d.count(); ok {
+		v.Elements = make([]*ViewElement, n239)
+		for i240 := range v.Elements {
+			v.Elements[i240] = d.p_ViewElement()
 		}
 	}
 }
@@ -1751,24 +1811,24 @@ func (e *encoder) s_SeqStmt(v *SeqStmt) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Branches)) + 1)
-		for i235 := range v.Branches {
-			e.s_SeqBranch(&v.Branches[i235])
+		for i241 := range v.Branches {
+			e.s_SeqBranch(&v.Branches[i241])
 		}
 	}
 	if v.Else == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Else)) + 1)
-		for i238 := range v.Else {
-			e.p_SeqStmt(v.Else[i238])
+		for i244 := range v.Else {
+			e.p_SeqStmt(v.Else[i244])
 		}
 	}
 	if v.Alts == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Alts)) + 1)
-		for i241 := range v.Alts {
-			e.s_SeqAlt(&v.Alts[i241])
+		for i247 := range v.Alts {
+			e.s_SeqAlt(&v.Alts[i247])
 		}
 	}
 	e.bool(bool(v.Matching))
@@ -1779,8 +1839,8 @@ func (e *encoder) s_SeqStmt(v *SeqStmt) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Body)) + 1)
-		for i244 := range v.Body {
-			e.p_SeqStmt(v.Body[i244])
+		for i250 := range v.Body {
+			e.p_SeqStmt(v.Body[i250])
 		}
 	}
 	e.p_Region(v.Region)
@@ -1797,32 +1857,32 @@ func (d *decoder) s_SeqStmt(v *SeqStmt) {
 	v.Call = d.p_Expr()
 	v.Report = d.p_Expr()
 	v.Severity = d.p_Expr()
-	if n236, ok := d.count(); ok {
-		v.Branches = make([]SeqBranch, n236)
-		for i237 := range v.Branches {
-			d.s_SeqBranch(&v.Branches[i237])
-		}
-	}
-	if n239, ok := d.count(); ok {
-		v.Else = make([]*SeqStmt, n239)
-		for i240 := range v.Else {
-			v.Else[i240] = d.p_SeqStmt()
-		}
-	}
 	if n242, ok := d.count(); ok {
-		v.Alts = make([]SeqAlt, n242)
-		for i243 := range v.Alts {
-			d.s_SeqAlt(&v.Alts[i243])
+		v.Branches = make([]SeqBranch, n242)
+		for i243 := range v.Branches {
+			d.s_SeqBranch(&v.Branches[i243])
+		}
+	}
+	if n245, ok := d.count(); ok {
+		v.Else = make([]*SeqStmt, n245)
+		for i246 := range v.Else {
+			v.Else[i246] = d.p_SeqStmt()
+		}
+	}
+	if n248, ok := d.count(); ok {
+		v.Alts = make([]SeqAlt, n248)
+		for i249 := range v.Alts {
+			d.s_SeqAlt(&v.Alts[i249])
 		}
 	}
 	v.Matching = bool(d.bool())
 	v.Param = d.p_Decl()
 	v.Range = d.p_RangeCons()
 	v.Loop = d.p_Decl()
-	if n245, ok := d.count(); ok {
-		v.Body = make([]*SeqStmt, n245)
-		for i246 := range v.Body {
-			v.Body[i246] = d.p_SeqStmt()
+	if n251, ok := d.count(); ok {
+		v.Body = make([]*SeqStmt, n251)
+		for i252 := range v.Body {
+			v.Body[i252] = d.p_SeqStmt()
 		}
 	}
 	v.Region = d.p_Region()
@@ -1835,21 +1895,23 @@ func (e *encoder) s_SeqBranch(v *SeqBranch) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Body)) + 1)
-		for i247 := range v.Body {
-			e.p_SeqStmt(v.Body[i247])
+		for i253 := range v.Body {
+			e.p_SeqStmt(v.Body[i253])
 		}
 	}
+	e.bool(bool(v.Unaffected))
 }
 
 func (d *decoder) s_SeqBranch(v *SeqBranch) {
 	v.Cond = d.p_Expr()
 	v.Value = d.p_Expr()
-	if n248, ok := d.count(); ok {
-		v.Body = make([]*SeqStmt, n248)
-		for i249 := range v.Body {
-			v.Body[i249] = d.p_SeqStmt()
+	if n254, ok := d.count(); ok {
+		v.Body = make([]*SeqStmt, n254)
+		for i255 := range v.Body {
+			v.Body[i255] = d.p_SeqStmt()
 		}
 	}
+	v.Unaffected = bool(d.bool())
 }
 
 func (e *encoder) s_SeqAlt(v *SeqAlt) {
@@ -1857,8 +1919,8 @@ func (e *encoder) s_SeqAlt(v *SeqAlt) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Choices)) + 1)
-		for i250 := range v.Choices {
-			e.p_Expr(v.Choices[i250])
+		for i256 := range v.Choices {
+			e.p_Expr(v.Choices[i256])
 		}
 	}
 	e.bool(bool(v.Others))
@@ -1867,25 +1929,25 @@ func (e *encoder) s_SeqAlt(v *SeqAlt) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Body)) + 1)
-		for i253 := range v.Body {
-			e.p_SeqStmt(v.Body[i253])
+		for i259 := range v.Body {
+			e.p_SeqStmt(v.Body[i259])
 		}
 	}
 }
 
 func (d *decoder) s_SeqAlt(v *SeqAlt) {
-	if n251, ok := d.count(); ok {
-		v.Choices = make([]*Expr, n251)
-		for i252 := range v.Choices {
-			v.Choices[i252] = d.p_Expr()
+	if n257, ok := d.count(); ok {
+		v.Choices = make([]*Expr, n257)
+		for i258 := range v.Choices {
+			v.Choices[i258] = d.p_Expr()
 		}
 	}
 	v.Others = bool(d.bool())
 	v.Value = d.p_Expr()
-	if n254, ok := d.count(); ok {
-		v.Body = make([]*SeqStmt, n254)
-		for i255 := range v.Body {
-			v.Body[i255] = d.p_SeqStmt()
+	if n260, ok := d.count(); ok {
+		v.Body = make([]*SeqStmt, n260)
+		for i261 := range v.Body {
+			v.Body[i261] = d.p_SeqStmt()
 		}
 	}
 }
@@ -1918,16 +1980,16 @@ func (e *encoder) s_Stmt(v *Stmt) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Generics)) + 1)
-		for i256 := range v.Generics {
-			e.s_Association(&v.Generics[i256])
+		for i262 := range v.Generics {
+			e.s_Association(&v.Generics[i262])
 		}
 	}
 	if v.Ports == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Ports)) + 1)
-		for i259 := range v.Ports {
-			e.s_Association(&v.Ports[i259])
+		for i265 := range v.Ports {
+			e.s_Association(&v.Ports[i265])
 		}
 	}
 	e.p_Decl(v.Param)
@@ -1937,16 +1999,16 @@ func (e *encoder) s_Stmt(v *Stmt) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Alts)) + 1)
-		for i262 := range v.Alts {
-			e.s_Alt(&v.Alts[i262])
+		for i268 := range v.Alts {
+			e.s_Alt(&v.Alts[i268])
 		}
 	}
 	if v.Body == nil {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Body)) + 1)
-		for i265 := range v.Body {
-			e.p_Stmt(v.Body[i265])
+		for i271 := range v.Body {
+			e.p_Stmt(v.Body[i271])
 		}
 	}
 	e.p_Region(v.Region)
@@ -1954,8 +2016,8 @@ func (e *encoder) s_Stmt(v *Stmt) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Seq)) + 1)
-		for i268 := range v.Seq {
-			e.p_SeqStmt(v.Seq[i268])
+		for i274 := range v.Seq {
+			e.p_SeqStmt(v.Seq[i274])
 		}
 	}
 }
@@ -1968,54 +2030,40 @@ func (d *decoder) s_Stmt(v *Stmt) {
 	v.Arch = Key(d.str())
 	v.Component = d.p_Decl()
 	v.Config = d.p_Decl()
-	if n257, ok := d.count(); ok {
-		v.Generics = make([]Association, n257)
-		for i258 := range v.Generics {
-			d.s_Association(&v.Generics[i258])
+	if n263, ok := d.count(); ok {
+		v.Generics = make([]Association, n263)
+		for i264 := range v.Generics {
+			d.s_Association(&v.Generics[i264])
 		}
 	}
-	if n260, ok := d.count(); ok {
-		v.Ports = make([]Association, n260)
-		for i261 := range v.Ports {
-			d.s_Association(&v.Ports[i261])
+	if n266, ok := d.count(); ok {
+		v.Ports = make([]Association, n266)
+		for i267 := range v.Ports {
+			d.s_Association(&v.Ports[i267])
 		}
 	}
 	v.Param = d.p_Decl()
 	v.Range = d.p_RangeCons()
 	v.Selector = d.p_Expr()
-	if n263, ok := d.count(); ok {
-		v.Alts = make([]Alt, n263)
-		for i264 := range v.Alts {
-			d.s_Alt(&v.Alts[i264])
+	if n269, ok := d.count(); ok {
+		v.Alts = make([]Alt, n269)
+		for i270 := range v.Alts {
+			d.s_Alt(&v.Alts[i270])
 		}
 	}
-	if n266, ok := d.count(); ok {
-		v.Body = make([]*Stmt, n266)
-		for i267 := range v.Body {
-			v.Body[i267] = d.p_Stmt()
+	if n272, ok := d.count(); ok {
+		v.Body = make([]*Stmt, n272)
+		for i273 := range v.Body {
+			v.Body[i273] = d.p_Stmt()
 		}
 	}
 	v.Region = d.p_Region()
-	if n269, ok := d.count(); ok {
-		v.Seq = make([]*SeqStmt, n269)
-		for i270 := range v.Seq {
-			v.Seq[i270] = d.p_SeqStmt()
+	if n275, ok := d.count(); ok {
+		v.Seq = make([]*SeqStmt, n275)
+		for i276 := range v.Seq {
+			v.Seq[i276] = d.p_SeqStmt()
 		}
 	}
-}
-
-func (e *encoder) s_Association(v *Association) {
-	e.p_Decl(v.Formal)
-	e.p_Expr(v.Actual)
-	e.node(v.Node)
-	e.p_Expr(v.Part)
-}
-
-func (d *decoder) s_Association(v *Association) {
-	v.Formal = d.p_Decl()
-	v.Actual = d.p_Expr()
-	v.Node = d.node()
-	v.Part = d.p_Expr()
 }
 
 func (e *encoder) s_Alt(v *Alt) {
@@ -2025,8 +2073,8 @@ func (e *encoder) s_Alt(v *Alt) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Choices)) + 1)
-		for i271 := range v.Choices {
-			e.p_Expr(v.Choices[i271])
+		for i277 := range v.Choices {
+			e.p_Expr(v.Choices[i277])
 		}
 	}
 	e.bool(bool(v.Others))
@@ -2034,8 +2082,8 @@ func (e *encoder) s_Alt(v *Alt) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Body)) + 1)
-		for i274 := range v.Body {
-			e.p_Stmt(v.Body[i274])
+		for i280 := range v.Body {
+			e.p_Stmt(v.Body[i280])
 		}
 	}
 	e.p_Region(v.Region)
@@ -2044,17 +2092,17 @@ func (e *encoder) s_Alt(v *Alt) {
 func (d *decoder) s_Alt(v *Alt) {
 	v.Label = d.p_Decl()
 	v.Cond = d.p_Expr()
-	if n272, ok := d.count(); ok {
-		v.Choices = make([]*Expr, n272)
-		for i273 := range v.Choices {
-			v.Choices[i273] = d.p_Expr()
+	if n278, ok := d.count(); ok {
+		v.Choices = make([]*Expr, n278)
+		for i279 := range v.Choices {
+			v.Choices[i279] = d.p_Expr()
 		}
 	}
 	v.Others = bool(d.bool())
-	if n275, ok := d.count(); ok {
-		v.Body = make([]*Stmt, n275)
-		for i276 := range v.Body {
-			v.Body[i276] = d.p_Stmt()
+	if n281, ok := d.count(); ok {
+		v.Body = make([]*Stmt, n281)
+		for i282 := range v.Body {
+			v.Body[i282] = d.p_Stmt()
 		}
 	}
 	v.Region = d.p_Region()
@@ -2085,8 +2133,8 @@ func (e *encoder) s_diag_Diagnostic(v *diag.Diagnostic) {
 		e.uint(0)
 	} else {
 		e.uint(uint64(len(v.Related)) + 1)
-		for i277 := range v.Related {
-			e.s_diag_Related(&v.Related[i277])
+		for i283 := range v.Related {
+			e.s_diag_Related(&v.Related[i283])
 		}
 	}
 }
@@ -2100,10 +2148,10 @@ func (d *decoder) s_diag_Diagnostic(v *diag.Diagnostic) {
 	v.Severity = diag.Severity(d.uint())
 	v.Code = diag.Code(d.str())
 	v.Message = string(d.str())
-	if n278, ok := d.count(); ok {
-		v.Related = make([]diag.Related, n278)
-		for i279 := range v.Related {
-			d.s_diag_Related(&v.Related[i279])
+	if n284, ok := d.count(); ok {
+		v.Related = make([]diag.Related, n284)
+		for i285 := range v.Related {
+			d.s_diag_Related(&v.Related[i285])
 		}
 	}
 }

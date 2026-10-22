@@ -6,6 +6,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/elab"
 	"github.com/connerohnesorge/gohard/internal/elab/psl"
+	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/sim"
 	"github.com/connerohnesorge/gohard/internal/trace"
@@ -19,6 +20,8 @@ type Running struct {
 	out  Outcome
 	k    *sim.Kernel
 	rec  *trace.Recorder
+	ov   *env.Overlay
+	real bool
 	done bool
 }
 
@@ -28,9 +31,13 @@ func Start(o Options) *Running {
 	r := &Running{out: Outcome{Testbench: strings.ToLower(o.Testbench),
 		Seed: o.Seed}}
 	out := &r.out
+	// Every run gets an overlay of its own: a race re-run or a rebuilt
+	// editor run never sees, or returns, another run's writes.
+	r.ov = env.NewOverlay(o.Env.FS, o.Env.Root)
+	r.real = o.Env.Real
 	code := o.Code
-	if code == nil {
-		code = DefaultCode
+	if code == nil && DefaultCode != nil {
+		code = elab.Interpreter(interpOptions(o, r.ov))
 	}
 	// Without an interpreter the design is still elaborated, so
 	// elaboration errors (and elaboration-time evaluation over
@@ -121,9 +128,21 @@ func (r *Running) end() {
 	r.done = true
 	r.out.Status = r.k.Status()
 	r.out.Diagnostics = append(r.out.Diagnostics, r.k.Diagnostics()...)
+	r.out.Asserts = r.k.Asserts()
+	r.out.Files, r.out.Dirs = r.ov.Files(), r.ov.Dirs()
+	r.out.Inputs = r.ov.Inputs()
 	if t, err := r.rec.Trace(); err == nil {
+		t.Header.NonReproducible = r.real
 		r.out.Trace = t
 	}
+}
+
+// Asserts are the assertion violations counted so far.
+func (r *Running) Asserts() sim.Asserts {
+	if r.k == nil {
+		return sim.Asserts{}
+	}
+	return r.k.Asserts()
 }
 
 // Outcome is the finished run; call it once Done.

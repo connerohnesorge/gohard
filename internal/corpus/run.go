@@ -175,6 +175,9 @@ func Execute(r Run, src map[string][]byte, o Options) (*Result, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%s: trace: %w", r.Name(), err)
 	}
+	if err := answerKey(t); err != nil {
+		return nil, fmt.Errorf("%s: %w", r.Name(), err)
+	}
 	out.Trace, out.Text = t, trace.Encode(t)
 	ds = append(ds, timed(k.Diagnostics(), t)...)
 	return out, nil
