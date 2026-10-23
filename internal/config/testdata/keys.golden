@@ -145,6 +145,16 @@ gohard.yaml:3:3: error[config/duplicate-key]: duplicate key format.max_line_leng
 summary: 1 errors, 0 warnings, 0 hints, 1 files
 set format.max_line_length = 50
 
+== duplicate lint.sensitivity_list
+| lint:
+|   sensitivity_list: "warning"
+|   sensitivity_list: "warning"
+exit 2
+gohard.yaml:2:21: warning[config/redundant-default]: lint.sensitivity_list is set to its default value warning
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key lint.sensitivity_list (first set on line 2)
+summary: 1 errors, 1 warnings, 0 hints, 1 files
+set lint.sensitivity_list = "warning"
+
 == duplicate lint.unused_signal
 | lint:
 |   unused_signal: "warning"

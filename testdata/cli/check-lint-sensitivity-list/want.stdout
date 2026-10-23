@@ -1,0 +1,3 @@
+sens.vhd:14:18: warning[lint/sensitivity-list]: b is read in the process but is not in its sensitivity list
+sens.vhd:16:12: warning[lint/sensitivity-list]: v is read in the process but is not in its sensitivity list
+summary: 0 errors, 2 warnings, 0 hints, 1 files

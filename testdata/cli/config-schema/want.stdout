@@ -111,6 +111,12 @@
       "type": ["object", "null"],
       "additionalProperties": false,
       "properties": {
+        "sensitivity_list": {
+          "description": "A combinational process reads a signal its sensitivity list does not name (`lint/sensitivity-list`).",
+          "type": "string",
+          "enum": ["off", "hint", "warning"],
+          "default": "warning"
+        },
         "unused_signal": {
           "description": "A signal never read or never assigned, an in port never read, an out port never assigned (`lint/unused-signal`).",
           "type": "string",

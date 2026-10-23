@@ -650,6 +650,71 @@ exit 2
 gohard.yaml:2:20: error[config/range]: format.max_line_length must be between 40 and 9223372036854775807, not 9223372036854775808
 summary: 1 errors, 0 warnings, 0 hints, 1 files
 
+== lint.sensitivity_list: {a: 1}
+| lint:
+|   sensitivity_list: {a: 1}
+exit 2
+gohard.yaml:2:21: error[config/type]: lint.sensitivity_list must be a string, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lint.sensitivity_list: [1, 2]
+| lint:
+|   sensitivity_list: [1, 2]
+exit 2
+gohard.yaml:2:21: error[config/type]: lint.sensitivity_list must be a string, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lint.sensitivity_list: ~
+| lint:
+|   sensitivity_list: ~
+exit 2
+gohard.yaml:2:21: error[config/type]: lint.sensitivity_list must be a string, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lint.sensitivity_list: *x
+| x: &x 1
+| lint:
+|   sensitivity_list: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:21: error[config/type]: lint.sensitivity_list must be a string, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== lint.sensitivity_list: !!int 5
+| lint:
+|   sensitivity_list: !!int 5
+exit 2
+gohard.yaml:2:21: error[config/type]: lint.sensitivity_list must be a string, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lint.sensitivity_list: nope
+| lint:
+|   sensitivity_list: nope
+exit 2
+gohard.yaml:2:21: error[config/enum]: lint.sensitivity_list must be one of "off", "hint" or "warning", not nope
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lint.sensitivity_list: "NOPE"
+| lint:
+|   sensitivity_list: "NOPE"
+exit 2
+gohard.yaml:2:21: error[config/enum]: lint.sensitivity_list must be one of "off", "hint" or "warning", not "NOPE"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lint.sensitivity_list: 2008
+| lint:
+|   sensitivity_list: 2008
+exit 2
+gohard.yaml:2:21: error[config/enum]: lint.sensitivity_list must be one of "off", "hint" or "warning", not 2008
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== lint.sensitivity_list: yes
+| lint:
+|   sensitivity_list: yes
+exit 2
+gohard.yaml:2:21: error[config/enum]: lint.sensitivity_list must be one of "off", "hint" or "warning", not yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
 == lint.unused_signal: {a: 1}
 | lint:
 |   unused_signal: {a: 1}

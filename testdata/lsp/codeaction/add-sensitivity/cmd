@@ -1,0 +1,2 @@
+# A signal missing from a sensitivity list gets a fix that appends it (#54).
+gohard lsp codeaction --at sens.vhd:14:18

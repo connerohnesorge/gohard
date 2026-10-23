@@ -21,6 +21,9 @@ func Check(res *sema.Result, cfg config.Lint) []diag.Diagnostic {
 	if sev, on := severity(cfg.UnusedSignal); on {
 		ds = append(ds, unusedSignals(res, sev)...)
 	}
+	if sev, on := severity(cfg.SensitivityList); on {
+		ds = append(ds, sensitivity(res, sev)...)
+	}
 	return ds
 }
 
@@ -41,6 +44,17 @@ func severity(v string) (sev diag.Severity, on bool) {
 // references that would silence a finding.
 func trusted(u *sema.Unit, bad map[string]bool) bool {
 	return !u.Opaque && !u.Unchecked && !bad[u.File.Path]
+}
+
+// errorFiles returns the paths of the files with errors.
+func errorFiles(res *sema.Result) map[string]bool {
+	bad := map[string]bool{}
+	for _, d := range res.Diagnostics {
+		if d.Severity == diag.Error {
+			bad[d.Path] = true
+		}
+	}
+	return bad
 }
 
 func at(f *sema.File, rg cst.Range, d diag.Diagnostic) diag.Diagnostic {

@@ -19,12 +19,7 @@ type use struct{ read, written bool }
 // shortcut: package signals are not checked, add them once the whole
 // design's readers are known to be in the analysis.
 func unusedSignals(res *sema.Result, sev diag.Severity) []diag.Diagnostic {
-	bad := map[string]bool{}
-	for _, d := range res.Diagnostics {
-		if d.Severity == diag.Error {
-			bad[d.Path] = true
-		}
-	}
+	bad := errorFiles(res)
 	uses := map[*sema.Decl]*use{}
 	type name struct{ lib, entity sema.Key }
 	archs := map[name][]*sema.Unit{}

@@ -31,7 +31,9 @@ func (a *Analyzer) CodeActions(q server.Query, r server.Span,
 //     search of `gohard libs detect`);
 //   - sema/undefined: add `use LIB.PKG.all;` (and `library LIB;` when
 //     the unit does not name LIB yet) for every package that declares
-//     the name, project libraries first, then std and ieee.
+//     the name, project libraries first, then std and ieee;
+//   - lint/sensitivity-list: add the signal to the process's
+//     sensitivity list (#54).
 func (an *Analysis) QuickFixes(uri string, r server.Span,
 ) []server.CodeAction {
 	path, ok := an.Path(uri)
@@ -61,6 +63,8 @@ func (an *Analysis) QuickFixes(uri string, r server.Span,
 				as = an.mapLibrary(path, s)
 			case diag.SemaUndefined:
 				as = an.addUse(path, uri, doc.Text(), s, e)
+			case diag.LintSensitivityList:
+				as = an.addSensitivity(path, uri, doc.Text(), s, e)
 			}
 			for _, a := range as {
 				if !seen[a.Title] {
@@ -195,6 +199,38 @@ func (an *Analysis) addUse(path, uri string, text []byte, s, e int,
 		})
 	}
 	return out
+}
+
+// addSensitivity is the fix of a signal read at [s, e) that the
+// enclosing process's sensitivity list does not name: append it.
+func (an *Analysis) addSensitivity(path, uri string, text []byte, s, e int,
+) []server.CodeAction {
+	f, ok := an.Result.File(path)
+	if !ok || e <= s || e > len(text) {
+		return nil
+	}
+	for n := range f.Root().Covering(s, e).Ancestors() {
+		if n.Kind() != cst.KindProcessStmt {
+			continue
+		}
+		var last cst.Token
+		for t := range (cst.ProcessStmt{Node: n}).Sensitivity().Tokens() {
+			last = t
+		}
+		if last.Kind() != token.RParen {
+			return nil
+		}
+		name := string(text[s:e])
+		at := last.Span().Start
+		return []server.CodeAction{{
+			Title: "Add " + name + " to the sensitivity list",
+			Kind:  "quickfix", Preferred: true,
+			Edits: []server.FileEdit{{URI: uri, Edits: []server.Edit{{
+				Span: server.Span{Start: at, End: at}, NewText: ", " + name,
+			}}}},
+		}}
+	}
+	return nil
 }
 
 func boolCmp(a, b bool) int {

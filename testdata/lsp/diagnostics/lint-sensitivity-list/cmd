@@ -1,0 +1,2 @@
+# lint/sensitivity-list in the editor, as gohard check reports it (#54).
+gohard lsp diagnostics --at sens.vhd:1:1

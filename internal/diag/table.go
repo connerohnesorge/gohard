@@ -143,7 +143,8 @@ const (
 	LibsUnreadable Code = "libs/unreadable"
 
 	// lint: likely RTL mistakes in legal VHDL (#54).
-	LintUnusedSignal Code = "lint/unused-signal"
+	LintSensitivityList Code = "lint/sensitivity-list"
+	LintUnusedSignal    Code = "lint/unused-signal"
 
 	// internal: GoHard's own failures (#20).
 	InternalCrash       Code = "internal/crash"
@@ -335,6 +336,13 @@ var table = []Info{
 		Owner:   1,
 		Summary: "a detected library cannot be read as VHDL source",
 		Message: "{library} at {path} is {reason} and cannot be read",
+	}, {
+		Code: LintSensitivityList, Severity: Warning, Class: Design,
+		Owner: 54,
+		Summary: "a combinational process reads a signal its " +
+			"sensitivity list does not name",
+		Message: "{name} is read in the process but is not in its " +
+			"sensitivity list",
 	}, {
 		Code: LintUnusedSignal, Severity: Warning, Class: Design,
 		Owner:   54,

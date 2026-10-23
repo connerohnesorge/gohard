@@ -1,0 +1,4 @@
+# lint/sensitivity-list (#54): signals a combinational process reads
+# but does not list; a complete list, a clocked process and an
+# attribute prefix (v'left) give no finding.
+gohard check

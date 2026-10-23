@@ -336,6 +336,10 @@ var keys = []Key{
 	intKey("format.max_line_length", 40, "80",
 		"Lines longer than this are wrapped.",
 		func(c *Config) *int64 { return &c.Format.MaxLineLength }),
+	enumKey("lint.sensitivity_list", lintLevels, "warning",
+		"A combinational process reads a signal its sensitivity list "+
+			"does not name (`lint/sensitivity-list`).",
+		func(c *Config) *string { return &c.Lint.SensitivityList }),
 	enumKey("lint.unused_signal", lintLevels, "warning",
 		"A signal never read or never assigned, an in port never read, "+
 			"an out port never assigned (`lint/unused-signal`).",

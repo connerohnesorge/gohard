@@ -71,7 +71,8 @@ type Format struct {
 
 // Lint holds the lint.* keys (#54): each rule's severity, or "off".
 type Lint struct {
-	UnusedSignal string
+	SensitivityList string
+	UnusedSignal    string
 }
 
 // Simulation holds the simulation.* keys (#35).
@@ -143,7 +144,7 @@ func Defaults() Config {
 			AlignPorts:    true,
 			MaxLineLength: 80,
 		},
-		Lint: Lint{UnusedSignal: "warning"},
+		Lint: Lint{SensitivityList: "warning", UnusedSignal: "warning"},
 		Simulation: Simulation{
 			TimeBudget:  Millisecond,
 			DeltaBudget: 10000,
