@@ -1,0 +1,3 @@
+latch.vhd:16:7: warning[lint/latch]: y is not assigned on every path through the process, so it infers a latch
+latch.vhd:25:22: warning[lint/latch]: w is not assigned on every path through the process, so it infers a latch
+summary: 0 errors, 2 warnings, 0 hints, 1 files

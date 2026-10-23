@@ -81,6 +81,14 @@ gohard.yaml:2:20: warning[config/redundant-default]: format.max_line_length is s
 summary: 0 errors, 1 warnings, 0 hints, 1 files
 set format.max_line_length = 80
 
+== lint.latch
+| lint:
+|   latch: warning
+exit 0
+gohard.yaml:2:10: warning[config/redundant-default]: lint.latch is set to its default value warning
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set lint.latch = "warning"
+
 == lint.sensitivity_list
 | lint:
 |   sensitivity_list: warning

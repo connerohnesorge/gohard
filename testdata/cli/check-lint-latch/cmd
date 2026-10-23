@@ -1,0 +1,4 @@
+# lint/latch (#54): an if without else and a case alternative that
+# miss a signal infer latches; a default assignment, a complete case
+# and an if/elsif/else that all assign do not.
+gohard check

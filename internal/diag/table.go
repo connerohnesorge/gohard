@@ -143,6 +143,7 @@ const (
 	LibsUnreadable Code = "libs/unreadable"
 
 	// lint: likely RTL mistakes in legal VHDL (#54).
+	LintLatch           Code = "lint/latch"
 	LintSensitivityList Code = "lint/sensitivity-list"
 	LintUnusedSignal    Code = "lint/unused-signal"
 
@@ -336,6 +337,13 @@ var table = []Info{
 		Owner:   1,
 		Summary: "a detected library cannot be read as VHDL source",
 		Message: "{library} at {path} is {reason} and cannot be read",
+	}, {
+		Code: LintLatch, Severity: Warning, Class: Design,
+		Owner: 54,
+		Summary: "a combinational process does not assign a signal " +
+			"on every path, so it infers a latch",
+		Message: "{name} is not assigned on every path through the " +
+			"process, so it infers a latch",
 	}, {
 		Code: LintSensitivityList, Severity: Warning, Class: Design,
 		Owner: 54,

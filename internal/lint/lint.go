@@ -21,6 +21,9 @@ func Check(res *sema.Result, cfg config.Lint) []diag.Diagnostic {
 	if sev, on := severity(cfg.UnusedSignal); on {
 		ds = append(ds, unusedSignals(res, sev)...)
 	}
+	if sev, on := severity(cfg.Latch); on {
+		ds = append(ds, latches(res, sev)...)
+	}
 	if sev, on := severity(cfg.SensitivityList); on {
 		ds = append(ds, sensitivity(res, sev)...)
 	}

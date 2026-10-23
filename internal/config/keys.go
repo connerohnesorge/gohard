@@ -336,6 +336,10 @@ var keys = []Key{
 	intKey("format.max_line_length", 40, "80",
 		"Lines longer than this are wrapped.",
 		func(c *Config) *int64 { return &c.Format.MaxLineLength }),
+	enumKey("lint.latch", lintLevels, "warning",
+		"A combinational process does not assign a signal on every "+
+			"path, so it infers a latch (`lint/latch`).",
+		func(c *Config) *string { return &c.Lint.Latch }),
 	enumKey("lint.sensitivity_list", lintLevels, "warning",
 		"A combinational process reads a signal its sensitivity list "+
 			"does not name (`lint/sensitivity-list`).",

@@ -134,12 +134,20 @@ func associated(root cst.Node, rg cst.Range) bool {
 	return false
 }
 
-// targeted reports whether the name at rg is inside an assignment
-// target, as the prefix of a written record element.
+// targeted reports whether the name at rg begins an assignment
+// target (or an element of an aggregate target): the prefix of a
+// written record element, not a name read in the target's index.
 func targeted(root cst.Node, rg cst.Range) bool {
-	for n := range root.Covering(rg.Start, rg.End).Ancestors() {
-		if n.Kind() == cst.KindTarget {
+	n := root.Covering(rg.Start, rg.End)
+	for p := range n.Ancestors() {
+		switch p.Kind() {
+		case cst.KindTarget:
 			return true
+		case cst.KindAggregate, cst.KindElementAssociation:
+			continue
+		}
+		if p.Span().Start != rg.Start {
+			return false
 		}
 	}
 	return false

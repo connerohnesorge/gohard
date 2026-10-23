@@ -1,0 +1,2 @@
+# lint/latch in the editor, as gohard check reports it (#54).
+gohard lsp diagnostics --at latch.vhd:1:1

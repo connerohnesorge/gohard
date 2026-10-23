@@ -111,6 +111,12 @@
       "type": ["object", "null"],
       "additionalProperties": false,
       "properties": {
+        "latch": {
+          "description": "A combinational process does not assign a signal on every path, so it infers a latch (`lint/latch`).",
+          "type": "string",
+          "enum": ["off", "hint", "warning"],
+          "default": "warning"
+        },
         "sensitivity_list": {
           "description": "A combinational process reads a signal its sensitivity list does not name (`lint/sensitivity-list`).",
           "type": "string",

@@ -50,6 +50,7 @@ that loads an invalid configuration exits 2.
 | [`format.keyword_case`](#formatkeyword_case) | lower\|upper\|preserve | `lower` |
 | [`format.align_ports`](#formatalign_ports) | bool | `true` |
 | [`format.max_line_length`](#formatmax_line_length) | int >= 40 | `80` |
+| [`lint.latch`](#lintlatch) | off\|hint\|warning | `warning` |
 | [`lint.sensitivity_list`](#lintsensitivity_list) | off\|hint\|warning | `warning` |
 | [`lint.unused_signal`](#lintunused_signal) | off\|hint\|warning | `warning` |
 | [`simulation.auto_run_on_save`](#simulationauto_run_on_save) | bool | `false` |
@@ -140,6 +141,13 @@ Lines longer than this are wrapped.
 
 * Type: int >= 40
 * Default: `80`
+
+### `lint.latch`
+
+A combinational process does not assign a signal on every path, so it infers a latch (`lint/latch`).
+
+* Type: off|hint|warning
+* Default: `warning`
 
 ### `lint.sensitivity_list`
 
