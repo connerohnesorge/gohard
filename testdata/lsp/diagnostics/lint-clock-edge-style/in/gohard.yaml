@@ -1,0 +1,2 @@
+lint:
+  clock_edge_style: warning

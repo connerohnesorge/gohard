@@ -1,0 +1,3 @@
+# lint/clock-edge-style (#54), turned on: a clk'event edge test in a
+# design that also uses rising_edge.
+gohard check

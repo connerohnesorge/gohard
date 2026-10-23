@@ -1,0 +1,2 @@
+# lint/clock-edge-style is off by default (#54).
+gohard check

@@ -336,6 +336,10 @@ var keys = []Key{
 	intKey("format.max_line_length", 40, "80",
 		"Lines longer than this are wrapped.",
 		func(c *Config) *int64 { return &c.Format.MaxLineLength }),
+	enumKey("lint.clock_edge_style", lintLevels, "off",
+		"A clk'event edge test in a design that also uses rising_edge "+
+			"or falling_edge (`lint/clock-edge-style`).",
+		func(c *Config) *string { return &c.Lint.ClockEdgeStyle }),
 	enumKey("lint.latch", lintLevels, "warning",
 		"A combinational process does not assign a signal on every "+
 			"path, so it infers a latch (`lint/latch`).",

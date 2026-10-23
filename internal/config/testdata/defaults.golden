@@ -81,6 +81,14 @@ gohard.yaml:2:20: warning[config/redundant-default]: format.max_line_length is s
 summary: 0 errors, 1 warnings, 0 hints, 1 files
 set format.max_line_length = 80
 
+== lint.clock_edge_style
+| lint:
+|   clock_edge_style: off
+exit 0
+gohard.yaml:2:21: warning[config/redundant-default]: lint.clock_edge_style is set to its default value off
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set lint.clock_edge_style = "off"
+
 == lint.latch
 | lint:
 |   latch: warning

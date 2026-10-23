@@ -111,6 +111,12 @@
       "type": ["object", "null"],
       "additionalProperties": false,
       "properties": {
+        "clock_edge_style": {
+          "description": "A clk'event edge test in a design that also uses rising_edge or falling_edge (`lint/clock-edge-style`).",
+          "type": "string",
+          "enum": ["off", "hint", "warning"],
+          "default": "off"
+        },
         "latch": {
           "description": "A combinational process does not assign a signal on every path, so it infers a latch (`lint/latch`).",
           "type": "string",

@@ -1,0 +1,2 @@
+edges.vhd:19:12: warning[lint/clock-edge-style]: this edge test uses 'event; the design also uses rising_edge or falling_edge
+summary: 0 errors, 1 warnings, 0 hints, 1 files

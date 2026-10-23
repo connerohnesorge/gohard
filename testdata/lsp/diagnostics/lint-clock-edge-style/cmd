@@ -1,0 +1,2 @@
+# lint/clock-edge-style in the editor, as gohard check reports it (#54).
+gohard lsp diagnostics --at edges.vhd:1:1

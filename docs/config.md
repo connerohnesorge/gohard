@@ -50,6 +50,7 @@ that loads an invalid configuration exits 2.
 | [`format.keyword_case`](#formatkeyword_case) | lower\|upper\|preserve | `lower` |
 | [`format.align_ports`](#formatalign_ports) | bool | `true` |
 | [`format.max_line_length`](#formatmax_line_length) | int >= 40 | `80` |
+| [`lint.clock_edge_style`](#lintclock_edge_style) | off\|hint\|warning | `off` |
 | [`lint.latch`](#lintlatch) | off\|hint\|warning | `warning` |
 | [`lint.sensitivity_list`](#lintsensitivity_list) | off\|hint\|warning | `warning` |
 | [`lint.unused_signal`](#lintunused_signal) | off\|hint\|warning | `warning` |
@@ -141,6 +142,13 @@ Lines longer than this are wrapped.
 
 * Type: int >= 40
 * Default: `80`
+
+### `lint.clock_edge_style`
+
+A clk'event edge test in a design that also uses rising_edge or falling_edge (`lint/clock-edge-style`).
+
+* Type: off|hint|warning
+* Default: `off`
 
 ### `lint.latch`
 

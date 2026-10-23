@@ -145,6 +145,15 @@ gohard.yaml:3:3: error[config/duplicate-key]: duplicate key format.max_line_leng
 summary: 1 errors, 0 warnings, 0 hints, 1 files
 set format.max_line_length = 50
 
+== duplicate lint.clock_edge_style
+| lint:
+|   clock_edge_style: "warning"
+|   clock_edge_style: "warning"
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key lint.clock_edge_style (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set lint.clock_edge_style = "warning"
+
 == duplicate lint.latch
 | lint:
 |   latch: "warning"

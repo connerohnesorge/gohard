@@ -143,6 +143,7 @@ const (
 	LibsUnreadable Code = "libs/unreadable"
 
 	// lint: likely RTL mistakes in legal VHDL (#54).
+	LintClockEdgeStyle  Code = "lint/clock-edge-style"
 	LintLatch           Code = "lint/latch"
 	LintSensitivityList Code = "lint/sensitivity-list"
 	LintUnusedSignal    Code = "lint/unused-signal"
@@ -337,6 +338,13 @@ var table = []Info{
 		Owner:   1,
 		Summary: "a detected library cannot be read as VHDL source",
 		Message: "{library} at {path} is {reason} and cannot be read",
+	}, {
+		Code: LintClockEdgeStyle, Severity: Warning, Class: Design,
+		Owner: 54,
+		Summary: "a 'event edge test in a design that also uses " +
+			"rising_edge or falling_edge",
+		Message: "this edge test uses 'event; the design also uses " +
+			"rising_edge or falling_edge",
 	}, {
 		Code: LintLatch, Severity: Warning, Class: Design,
 		Owner: 54,

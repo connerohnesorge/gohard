@@ -1,0 +1,1 @@
+{"uri":"file://$WORK/edges.vhd","version":1,"diagnostics":[{"range":{"start":{"line":18,"character":11},"end":{"line":18,"character":16}},"severity":2,"code":"lint/clock-edge-style","source":"gohard","message":"this edge test uses 'event; the design also uses rising_edge or falling_edge"}]}
