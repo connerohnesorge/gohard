@@ -43,7 +43,7 @@ func interpreter() CodeFunc {
 }
 
 // BenchmarkSim is the simulation throughput benchmark (#35, #14): every
-// v1.0 corpus design run the way `gohard check --sim` runs it, from
+// v1.1 corpus design run the way `gohard check --sim` runs it, from
 // analysis to the end of the trace, at seed 0. The nightly job records
 // it (scripts/ci/bench.sh) and never fails on it. A design that cannot
 // simulate yet (no interpreter, a process without code) is skipped.

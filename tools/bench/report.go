@@ -132,8 +132,9 @@ func report(header string, rs []result) string {
 				fmtMS(g.P95MS), res)
 		}
 		if missed > 0 {
-			fmt.Fprintf(&b, "\n%d gate(s) missed: by #19 the on-disk "+
-				"cache #37 moves into v1.0.\n", missed)
+			fmt.Fprintf(&b, "\n%d gate(s) missed: the #25 limits "+
+				"above are recorded in #19, not gated in CI.\n",
+				missed)
 		} else {
 			b.WriteString("\nEvery gate holds.\n")
 		}
