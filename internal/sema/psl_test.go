@@ -117,3 +117,23 @@ vunit v2(mwe(behavioral))
 }
 `}})
 }
+
+// TestVunitBindingScope: an inline vunit bound to e(arch) sees the
+// bound architecture and entity declarations.
+func TestVunitBindingScope(t *testing.T) {
+	checkMarked(t, []markedCase{{name: "psl", std: "2008", src: `
+entity dut is
+  port (clk : in bit; a, b : in bit);
+end entity;
+architecture rtl of dut is
+  signal s : bit := '0';
+begin
+end architecture;
+vunit v_dut(dut(rtl)) {
+  default clock is clk'event and clk = '1';
+  assert always (a -> b);
+  assert always (s = '0');
+  assert always (nope = '0'); --E
+}
+`}})
+}

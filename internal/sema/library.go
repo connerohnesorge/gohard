@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/token"
 )
 
@@ -202,12 +203,55 @@ func (s *session) linkDeps() {
 				}
 			}
 		}
+		if u.Kind == UnitVunit {
+			if l, ok := s.library(u, Work); ok {
+				ent, arch := vunitBinding(u)
+				if ent != "" {
+					if d, ok := l.UnitFrom(ent, u); ok {
+						add(d)
+						for _, sec := range l.Secondary(ent) {
+							if sec.Kind == UnitArchitecture &&
+								sec.Name == arch {
+								add(sec)
+								break
+							}
+						}
+					}
+				}
+			}
+		}
 		slices.SortFunc(deps, func(a, b *Unit) int {
 			return cmp.Compare(a.Index, b.Index)
 		})
 		u.Deps = deps
 	}
 	s.linkAllDeps()
+}
+
+// vunitBinding returns the entity and architecture names of an inline
+// vunit binding vunit v(entity(arch)).
+func vunitBinding(u *Unit) (entity, arch Key) {
+	if u == nil || u.Lib.Kind() != cst.KindPSLVunit {
+		return "", ""
+	}
+	for c := range u.Lib.Nodes() {
+		if c.Kind() != cst.KindPSLHierarchicalName {
+			continue
+		}
+		var names []cst.Node
+		for n := range (cst.PSLHierarchicalName{Node: c}).Names() {
+			names = append(names, n.Node)
+		}
+		if len(names) == 0 {
+			return "", ""
+		}
+		entity = simpleKey(names[0])
+		if len(names) > 1 {
+			arch = simpleKey(names[1])
+		}
+		return entity, arch
+	}
+	return "", ""
 }
 
 // linkAllDeps adds the dependencies a use clause L.all implies: each

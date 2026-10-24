@@ -1546,6 +1546,7 @@ func (a *analyzer) vunit(lu cst.Node) {
 	d := a.newDecl(DeclVunit, lu.TokenIn(nameTokens, 0), lu)
 	a.u.Decl = d
 	a.declare(d)
+	ctx := a.cur
 	a.u.Region = a.push(RegionVunit, d, lu)
 	for c := range lu.Nodes() {
 		switch {
@@ -1553,7 +1554,9 @@ func (a *analyzer) vunit(lu cst.Node) {
 			for n := range (cst.PSLHierarchicalName{Node: c}).Names() {
 				a.lenientName(n.Node)
 			}
-			a.vunitArch(c) // psl.go
+			if r := a.vunitArch(c); r != nil && ctx != nil {
+				ctx.Parent = r
+			}
 		case c.Kind() == cst.KindPSLInheritSpec:
 			for n := range (cst.PSLInheritSpec{Node: c}).Names() {
 				a.lenientName(n.Node)
