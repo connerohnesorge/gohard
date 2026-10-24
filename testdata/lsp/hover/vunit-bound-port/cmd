@@ -1,0 +1,2 @@
+# clk in an inline vunit bound to dut(rtl): hover shows dut's port.
+gohard lsp hover --at props.vhd:2:32

@@ -1,0 +1,2 @@
+# clk in an inline vunit bound to dut(rtl): definition is dut's port.
+gohard lsp definition --at props.vhd:2:32

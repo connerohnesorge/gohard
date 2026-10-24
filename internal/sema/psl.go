@@ -331,15 +331,16 @@ func (a *analyzer) pslClock(c cst.Node) {
 // vunitArch checks the architecture of a verification unit binding
 // vunit v(e(arch)): e's architecture arch exists (IEEE 1850 7.2, LRM
 // 2008 Annex: the binding names a design unit), checked once every
-// unit is analyzed.
-func (a *analyzer) vunitArch(h cst.Node) {
+// unit is analyzed. It returns the bound region visible from the vunit
+// body: the architecture's when found, else the entity's.
+func (a *analyzer) vunitArch(h cst.Node) *Region {
 	var first cst.Node
 	for n := range (cst.PSLHierarchicalName{Node: h}).Names() {
 		first = n.Node
 		break
 	}
 	if first.IsZero() {
-		return
+		return nil
 	}
 	var arch cst.Token
 	after := false
@@ -352,19 +353,27 @@ func (a *analyzer) vunitArch(h cst.Node) {
 		}
 	}
 	if arch.IsZero() {
-		return
+		return nil
 	}
 	if first.Kind() != cst.KindSimpleName {
-		return
+		return nil
 	}
 	// The unit is named in the working library (the vunit's own).
 	l := a.s.libs[a.u.Library]
 	if l == nil {
-		return
+		return nil
 	}
 	k := TokenKey(cst.SimpleName{Node: first}.Ident())
 	if u, ok := l.UnitFrom(k, a.u); ok && u.Decl != nil &&
 		u.Decl.Kind == DeclEntity {
 		a.lateArch(arch, u.Decl)
+		for _, sec := range l.Secondary(u.Name) {
+			if sec.Kind == UnitArchitecture && sec.Name == TokenKey(arch) &&
+				sec.Region != nil {
+				return sec.Region
+			}
+		}
+		return u.Decl.Region
 	}
+	return nil
 }

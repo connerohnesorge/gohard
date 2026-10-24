@@ -1,0 +1,1 @@
+{"contents":{"kind":"markdown","value":"```vhdl\nport clk : STD_LOGIC\n```"},"range":{"start":{"line":1,"character":31},"end":{"line":1,"character":34}}}
