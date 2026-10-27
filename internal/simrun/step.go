@@ -66,9 +66,15 @@ func Start(o Options) *Running {
 	}
 	if len(d.Missing) > 0 {
 		out.Status = sim.Failed
-		out.Diagnostics = append(out.Diagnostics, diag.New(
-			diag.UnsupportedConstruct, "process "+d.Missing[0]+
-				" (no interpreter code)"))
+		dg := diag.New(diag.UnsupportedConstruct, "process "+
+			d.Missing[0]+" (no interpreter code)")
+		for _, p := range d.Model.Processes {
+			if p.Path == d.Missing[0] && p.Src.Path != "" {
+				dg = dg.At(p.Src.Path, p.Src.Line, p.Src.Col)
+				break
+			}
+		}
+		out.Diagnostics = append(out.Diagnostics, dg)
 		return r
 	}
 	r.rec = trace.NewRecorder(o.Sim.DumpScope)

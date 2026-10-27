@@ -1,0 +1,2 @@
+t.vhd:10:10: error[sim/assert-error]: assertion error: assertion x failed
+summary: 1 errors, 0 warnings, 0 hints, 1 files

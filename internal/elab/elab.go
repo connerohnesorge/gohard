@@ -416,8 +416,12 @@ func (d *Design) body(in *hier.Instance, ss []*sema.Stmt, f *sema.File) {
 		if d.stopped {
 			return
 		}
-		switch s.Kind {
-		case sema.StmtProcess, sema.StmtOther:
+		switch {
+		case pslDecl(s.Node):
+			// A `-- psl` declaration in the statement part
+			// (psl.comments) declares, it does not run: no process and
+			// no _pN number, as NVC numbers them.
+		case s.Kind == sema.StmtProcess, s.Kind == sema.StmtOther:
 			name := ""
 			if s.Label != nil {
 				name = string(s.Label.Name)
@@ -440,6 +444,17 @@ func (d *Design) body(in *hier.Instance, ss []*sema.Stmt, f *sema.File) {
 			}
 		}
 	}
+}
+
+// pslDecl reports whether n is a PSL default clock, property, sequence
+// or endpoint declaration.
+func pslDecl(n cst.Node) bool {
+	switch n.Kind() {
+	case cst.KindPSLDefaultClock, cst.KindPSLPropertyDecl,
+		cst.KindPSLSequenceDecl, cst.KindPSLEndpointDecl:
+		return true
+	}
+	return false
 }
 
 func (d *Design) process(in *hier.Instance, s *sema.Stmt, f *sema.File,

@@ -1,0 +1,4 @@
+# psl.comments (#109): the `-- psl` default clock in t.vhd clocks the
+# `-- psl` assert after it.
+psl:
+  comments: true
