@@ -141,8 +141,12 @@ yet, please report" (exit 2, the unit opaque): found during analysis
 configurations), or met during elaboration or by a running process
 (`sema.UnsupportedError`, for example `'PATH_NAME` of a declaration in
 a generic package, named associations in aggregate targets, guarded
-signal assignments, an implicit signal of a part of a signal); the run
-stops there. No construct fails silently or with a generic "not
+signal assignments, an implicit signal of a part of a signal, a PSL
+`vunit` bound to an elaborated design entity); the run stops there.
+Inside a `vunit`, `vmode` or `vprop` bound to `e(a)` (or `e`) the
+names of `e` and `a` are visible, context clauses included (#110), so
+`gohard check` analyzes it; only its simulation waits for #66. No
+construct fails silently or with a generic "not
 static" run-time error. The v1.0 variant naming the v1.1 milestone is
 retired: v1.1 delivers every construct it named (#18, #27). Under a
 standard before 2019 the VHDL-2019 constructs are not unsupported but

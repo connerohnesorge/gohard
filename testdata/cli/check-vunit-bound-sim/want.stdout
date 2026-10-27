@@ -1,0 +1,2 @@
+props.vhd:1:7: error[unsupported/construct]: simulating PSL verification units is not supported yet, please report
+summary: 1 errors, 0 warnings, 0 hints, 3 files

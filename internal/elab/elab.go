@@ -109,6 +109,8 @@ type Design struct {
 	// order.
 	varPorts map[sigKey]sharedKey
 	ownPorts []sharedKey
+	// vunits are the design's PSL verification units (boundVunit).
+	vunits []*sema.Unit
 }
 
 type sigKey struct {
@@ -155,6 +157,11 @@ func Elaborate(r *sema.Result, o Options) (*Design, []diag.Diagnostic) {
 		d.runtime(d.declSrc(g), top.Path, errors.New("the generic "+
 			g.Text+" of the testbench "+top.Path+" has no default"))
 		return d, d.diags
+	}
+	for _, u := range r.Units {
+		if u.Kind == sema.UnitVunit {
+			d.vunits = append(d.vunits, u)
+		}
 	}
 	d.instance(top)
 	if d.stopped {
@@ -317,6 +324,9 @@ func (d *Design) instance(in *hier.Instance) {
 	d.standIn(in)
 	switch in.Kind {
 	case hier.KindEntity:
+		if d.boundVunit(in) {
+			return
+		}
 		unit := in.Entity.Text
 		if in.Arch != nil {
 			unit += "(" + string(in.Arch.Name) + ")"
@@ -356,6 +366,26 @@ func (d *Design) instance(in *hier.Instance) {
 		}
 	}
 }
+
+// boundVunit stops elaboration at a PSL verification unit bound to the
+// design entity of in (#110): GoHard does not simulate verification
+// units yet (#66), so the run ends with one unsupported/construct at
+// the vunit rather than passing without its directives.
+func (d *Design) boundVunit(in *hier.Instance) bool {
+	for _, u := range d.vunits {
+		if u.Decl == nil || !u.Binds(in.Entity.Unit, in.Arch) {
+			continue
+		}
+		d.unsupported(d.declSrc(u.Decl), cVunitSim)
+		d.stopped = true
+		return true
+	}
+	return false
+}
+
+// cVunitSim names the PSL verification units the simulator does not
+// run yet.
+const cVunitSim = "simulating PSL verification units"
 
 // fileOf returns the source file of a block or generate instance.
 func (d *Design) fileOf(in *hier.Instance) *sema.File {

@@ -1,0 +1,5 @@
+# The bound vunit of check-vunit-bound under --sim (#110): GoHard does
+# not simulate verification units yet (#66), so elaborating dut(rtl)
+# stops with one unsupported/construct at the vunit (exit 2) instead of
+# a pass without its assertion.
+gohard check --sim --seed 0 --tb tb
