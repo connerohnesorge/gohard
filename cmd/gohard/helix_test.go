@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"slices"
 	"strconv"
@@ -232,18 +233,25 @@ func fileURI(p string) string {
 	return "file://" + p
 }
 
-// TestHelixStdio is the Helix connection test of #38: the built gohard
-// binary runs as `gohard lsp` over real OS pipes, a scripted client
-// runs Helix's initialize handshake with Helix's client capabilities,
-// opens a file of a two-file project, gets its diagnostics (equal to
-// `gohard check` on the same project), then shuts down and exits 0.
-func TestHelixStdio(t *testing.T) {
-	bin := buildGohard(t)
-	dir := t.TempDir()
-	copyTree(t, filepath.Join("..", "..", "testdata", "lsp",
-		"diagnostics", "cross-file", "in"), dir)
+// stdioSession is how an editor starts `gohard lsp` and talks to it,
+// up to the diagnostics of the first file it opens.
+type stdioSession struct {
+	args []string // the arguments after the gohard binary
+	dir  string   // the server's working directory, the project folder
+	// initialize holds the initialize params.
+	initialize map[string]any
+	// settings, when not nil, is sent in a
+	// workspace/didChangeConfiguration after initialized.
+	settings   json.RawMessage
+	open       string // the file opened, a path in dir
+	languageID string
+	encoding   string // the position encoding the server must choose
+}
 
-	// What gohard check says about the same project.
+// checkDiagnostics runs `gohard check` in dir and returns its
+// diagnostics for the file rel as 0-based "line:col code message".
+func checkDiagnostics(t *testing.T, bin, dir, rel string) []string {
+	t.Helper()
 	chk := exec.Command(bin, "check", "--format", "json")
 	chk.Dir = dir
 	chkOut, _ := chk.Output()
@@ -258,19 +266,33 @@ func TestHelixStdio(t *testing.T) {
 	if err := json.Unmarshal(chkOut, &want); err != nil {
 		t.Fatalf("check: %v\n%s", err, chkOut)
 	}
-	var wantTop []string
+	var out []string
 	for _, d := range want.Diagnostics {
-		if d.Path == "top.vhd" {
-			wantTop = append(wantTop, fmt.Sprintf("%d:%d %s %s",
+		if d.Path == rel {
+			out = append(out, fmt.Sprintf("%d:%d %s %s",
 				d.Line-1, d.Col-1, d.Code, d.Message))
 		}
 	}
-	if len(wantTop) == 0 {
-		t.Fatalf("check reports nothing for top.vhd:\n%s", chkOut)
+	if len(out) == 0 {
+		t.Fatalf("check reports nothing for %s:\n%s", rel, chkOut)
 	}
+	return out
+}
 
-	cmd := exec.Command(bin, "lsp")
-	cmd.Dir = dir
+// runStdio starts bin with s.args over real OS pipes, runs the
+// session's handshake, opens s.open and checks that its diagnostics
+// equal `gohard check` in s.dir. Then it shuts the server down and
+// checks that it exits 0.
+func runStdio(t *testing.T, bin string, s stdioSession) {
+	t.Helper()
+	rel, err := filepath.Rel(s.dir, s.open)
+	if err != nil {
+		t.Fatal(err)
+	}
+	wantDiags := checkDiagnostics(t, bin, s.dir, filepath.ToSlash(rel))
+
+	cmd := exec.Command(bin, s.args...)
+	cmd.Dir = s.dir
 	in, err := cmd.StdinPipe()
 	if err != nil {
 		t.Fatal(err)
@@ -299,18 +321,7 @@ func TestHelixStdio(t *testing.T) {
 		}
 	}()
 
-	root := fileURI(dir)
-	var caps any
-	if err := json.Unmarshal([]byte(helixCapabilities), &caps); err != nil {
-		t.Fatal(err)
-	}
-	res := c.request("initialize", map[string]any{
-		"processId": os.Getpid(), "rootPath": dir, "rootUri": root,
-		"workspaceFolders": []any{map[string]any{"uri": root,
-			"name": filepath.Base(dir)}},
-		"initializationOptions": nil, "capabilities": caps,
-		"clientInfo": map[string]any{"name": "helix",
-			"version": "25.07.1"}})
+	res := c.request("initialize", s.initialize)
 	var init struct {
 		Capabilities struct {
 			PositionEncoding string
@@ -321,31 +332,31 @@ func TestHelixStdio(t *testing.T) {
 	if err := json.Unmarshal(res, &init); err != nil {
 		t.Fatal(err)
 	}
-	if init.Capabilities.PositionEncoding != "utf-8" {
-		t.Errorf("position encoding %q, want utf-8 (Helix offers it)",
-			init.Capabilities.PositionEncoding)
+	if init.Capabilities.PositionEncoding != s.encoding {
+		t.Errorf("position encoding %q, want %s",
+			init.Capabilities.PositionEncoding, s.encoding)
 	}
 	if len(init.Capabilities.TextDocumentSync) == 0 {
 		t.Error("no textDocumentSync capability")
 	}
 	c.notify("initialized", map[string]any{})
-	// Helix sends its language-server config (none here) next.
-	c.notify("workspace/didChangeConfiguration",
-		map[string]any{"settings": nil})
+	if s.settings != nil {
+		c.notify("workspace/didChangeConfiguration",
+			map[string]any{"settings": s.settings})
+	}
 
-	top := filepath.Join(dir, "top.vhd")
-	text, err := os.ReadFile(top)
+	text, err := os.ReadFile(s.open)
 	if err != nil {
 		t.Fatal(err)
 	}
-	uri := fileURI(top)
+	uri := fileURI(s.open)
 	c.notify(
 		"textDocument/didOpen",
 		map[string]any{"textDocument": map[string]any{
-			"uri": uri, "languageId": "vhdl", "version": 0,
+			"uri": uri, "languageId": s.languageID, "version": 0,
 			"text": string(text)}},
 	)
-	m := c.await("diagnostics for top.vhd", func(
+	m := c.await("diagnostics for "+rel, func(
 		m map[string]json.RawMessage,
 	) bool {
 		var method string
@@ -373,9 +384,9 @@ func TestHelixStdio(t *testing.T) {
 		got = append(got, fmt.Sprintf("%d:%d %s %s", d.Range.Start.Line,
 			d.Range.Start.Character, d.Code, d.Message))
 	}
-	if !slices.Equal(got, wantTop) {
+	if !slices.Equal(got, wantDiags) {
 		t.Fatalf("diagnostics\n%s\nwant (gohard check)\n%s",
-			strings.Join(got, "\n"), strings.Join(wantTop, "\n"))
+			strings.Join(got, "\n"), strings.Join(wantDiags, "\n"))
 	}
 
 	if r := c.request("shutdown", nil); string(r) != "null" {
@@ -392,5 +403,106 @@ func TestHelixStdio(t *testing.T) {
 		}
 	case <-time.After(30 * time.Second):
 		t.Fatal("gohard lsp did not exit after exit")
+	}
+}
+
+// upstream is the folder of the configs proposed to the editors'
+// own repositories (#65).
+var upstream = filepath.Join("..", "..", "editors", "upstream")
+
+// helixEntry returns the command and arguments of the gohard language
+// server that editors/upstream/helix/gohard.diff adds to Helix's
+// languages.toml. It fails the test if the entry sets a config (the
+// test would have to send it) or the vhdl language sets roots (the
+// test sends the root Helix picks without them).
+func helixEntry(t *testing.T) (string, []string) {
+	t.Helper()
+	b, err := os.ReadFile(filepath.Join(upstream, "helix", "gohard.diff"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := regexp.MustCompile(`(?m)^\+gohard = \{ command = ("[^"]+")` +
+		`, args = \[([^\]]*)\] \}$`).FindSubmatch(b)
+	if m == nil {
+		t.Fatalf("gohard.diff adds no line of the form "+
+			"gohard = { command = \"...\", args = [...] }:\n%s", b)
+	}
+	command, err := strconv.Unquote(string(m[1]))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var args []string
+	for a := range strings.SplitSeq(string(m[2]), ",") {
+		if a = strings.TrimSpace(a); a == "" {
+			continue
+		}
+		u, err := strconv.Unquote(a)
+		if err != nil {
+			t.Fatalf("argument %s: %v", a, err)
+		}
+		args = append(args, u)
+	}
+	if !regexp.MustCompile(`(?m)^\+language-servers = \[.*"gohard".*\]$`).
+		Match(b) {
+		t.Error("gohard.diff does not add gohard to the vhdl language")
+	}
+	if regexp.MustCompile(`(?m)^[ +]roots = `).Match(b) {
+		t.Error("gohard.diff sets roots; send the root Helix picks " +
+			"from them")
+	}
+	return command, args
+}
+
+// TestHelixStdio is the Helix connection test of #38 and #65: the
+// built gohard binary runs over real OS pipes with the command line of
+// the upstream Helix entry (editors/upstream/helix/gohard.diff), a
+// scripted client runs Helix's initialize handshake with Helix's
+// client capabilities, opens a file of a two-file project, gets its
+// diagnostics (equal to `gohard check` on the same project), then
+// shuts down and exits 0. The vhdl language has no roots, so Helix
+// sends the folder holding .git as the root; with no .git it sends no
+// root and no workspace folder, only rootPath, the folder it was
+// started in. Helix sends no initialization options and no
+// didChangeConfiguration when the entry has no config.
+func TestHelixStdio(t *testing.T) {
+	command, args := helixEntry(t)
+	if command != "gohard" {
+		t.Fatalf("the Helix entry runs %q, want gohard", command)
+	}
+	bin := buildGohard(t)
+	var caps any
+	if err := json.Unmarshal([]byte(helixCapabilities), &caps); err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range []struct {
+		name string
+		git  bool // the folder holds .git
+	}{{"git", true}, {"cwd", false}} {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			copyTree(t, filepath.Join("..", "..", "testdata", "lsp",
+				"diagnostics", "cross-file", "in"), dir)
+			init := map[string]any{
+				"processId": os.Getpid(), "rootPath": dir,
+				"rootUri": nil, "workspaceFolders": []any{},
+				"capabilities": caps,
+				"clientInfo": map[string]any{"name": "helix",
+					"version": "25.07.1"}}
+			if tc.git {
+				if err := os.Mkdir(filepath.Join(dir, ".git"),
+					0o755); err != nil {
+					t.Fatal(err)
+				}
+				root := fileURI(dir)
+				init["rootUri"] = root
+				init["workspaceFolders"] = []any{map[string]any{
+					"uri": root, "name": filepath.Base(dir)}}
+			}
+			runStdio(t, bin, stdioSession{
+				args: args, dir: dir, initialize: init,
+				open:       filepath.Join(dir, "top.vhd"),
+				languageID: "vhdl", encoding: "utf-8",
+			})
+		})
 	}
 }

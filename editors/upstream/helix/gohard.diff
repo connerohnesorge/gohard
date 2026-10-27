@@ -1,0 +1,30 @@
+--- a/book/src/generated/lang-support.md
++++ b/book/src/generated/lang-support.md
+@@ -320,7 +320,7 @@
+ | varlink | ✓ |  |  |  |  | `varlink-language-server` |
+ | vento | ✓ |  |  |  |  |  |
+ | verilog | ✓ | ✓ |  |  |  | `verible-verilog-ls` |
+-| vhdl | ✓ |  |  |  |  | `vhdl_ls` |
++| vhdl | ✓ |  |  |  |  | `vhdl_ls`, `gohard` |
+ | vhs | ✓ |  |  |  |  |  |
+ | vim | ✓ |  |  |  | ✓ |  |
+ | vue | ✓ | ✓ | ✓ |  |  | `vue-language-server` |
+--- a/languages.toml
++++ b/languages.toml
+@@ -62,6 +62,7 @@
+ gleam = { command = "gleam", args = ["lsp"] }
+ glsl_analyzer = { command = "glsl_analyzer" }
+ glsld = { command = "glsld", args = ["--stdio"] }
++gohard = { command = "gohard", args = ["lsp"] }
+ graphql-language-service = { command = "graphql-lsp", args = ["server", "-m", "stream"] }
+ hare-lsp = { command = "hare-lsp", args = ["-S"] }
+ harper-ls = { command = "harper-ls", args = ["--stdio"] }
+@@ -3766,7 +3767,7 @@
+ scope = "source.vhdl"
+ file-types = ["vhd", "vhdl"]
+ comment-token = "--"
+-language-servers = [ "vhdl_ls" ]
++language-servers = [ "vhdl_ls", "gohard" ]
+ indent = { tab-width = 2, unit = "  " }
+ injection-regex = "vhdl"
+ 
