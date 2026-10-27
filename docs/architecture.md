@@ -52,7 +52,7 @@ Env, maps SIGINT/SIGTERM to 130/143, and calls `cli.Run`.
 | 0 | `internal/env/realenv` | the OS doors; with `cmd/` the only code that touches the world | #29 |
 | 0 | `internal/env/simenv` | seeded simulated doors with fault injection (P6) | #29 |
 | 0 | `internal/span` | file IDs, byte spans, line index, UTF-8/16/32 positions | #20 |
-| 0 | `internal/diag` | the diagnostic table, `Diagnostic`, sorting, exit codes, text/JSON/SARIF renderers | #20 |
+| 0 | `internal/diag` | the diagnostic table, `Diagnostic`, sorting, exit codes, text/JSON/SARIF/JUnit renderers; `diag/junittest` checks JUnit XML against the committed `junit-10.xsd` | #20, #61 |
 | 1 | `internal/config` | `gohard.yaml` via `yaml.Node`; project root; the key table that generates the schema and `docs/config.md` | #28 |
 | 1 | `internal/text` | immutable document text and incremental edits | #25 |
 | 1 | `internal/gen/vhdlgen` | seeded generator of small, legal, bounded VHDL designs (entities, generics, processes, waits, resolved signals) for `FuzzElab`, `FuzzSim` and property tests; a pure function of (seed, bytes) | #58 |

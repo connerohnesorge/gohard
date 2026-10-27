@@ -44,3 +44,25 @@ func TestCIExampleSkipsSARIFOnExit2(t *testing.T) {
 		t.Fatal("docs/ci.md: the job does not fail on a non-zero exit")
 	}
 }
+
+// TestCIExampleJUnit pins the documented JUnit examples (#61): GitLab
+// reads the file through artifacts:reports:junit even when the job
+// fails, and the GitHub Actions report step runs after a failure too.
+func TestCIExampleJUnit(t *testing.T) {
+	raw, err := os.ReadFile("../../docs/ci.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	doc := strings.ReplaceAll(string(raw), "\r\n", "\n")
+	for _, want := range []string{
+		"gohard check --sim --format junit --output gohard-junit.xml",
+		"    when: always\n",
+		"    reports:\n      junit: gohard-junit.xml\n",
+		"      - if: always()\n        uses: mikepenz/action-junit-report",
+		"          report_paths: gohard-junit.xml\n",
+	} {
+		if !strings.Contains(doc, want) {
+			t.Errorf("docs/ci.md lacks %q", want)
+		}
+	}
+}
