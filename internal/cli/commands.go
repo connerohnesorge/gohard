@@ -124,6 +124,12 @@ var commands = []Command{
 		// Run is set in init: runHelp reads this table.
 	},
 	{
+		Name: "import", Args: "FILE",
+		Summary: "write gohard.yaml from a ModelSim .do, Vivado .xpr " +
+			"or Quartus .qsf file",
+		Flags: []Flag{formatFlag},
+	},
+	{
 		Name: "libs", Args: "detect",
 		Summary: "find vendor libraries and print gohard.yaml lines",
 		Subs:    []string{"detect"},

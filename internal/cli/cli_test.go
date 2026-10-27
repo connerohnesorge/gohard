@@ -123,8 +123,8 @@ func TestParseArgs(t *testing.T) {
 }
 
 func TestCommandTable(t *testing.T) {
-	want := []string{"check", "config", "fmt", "help", "libs", "lsp",
-		"parse", "trace", "version"}
+	want := []string{"check", "config", "fmt", "help", "import", "libs",
+		"lsp", "parse", "trace", "version"}
 	var got []string
 	for _, c := range commands {
 		got = append(got, c.Name)

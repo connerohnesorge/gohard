@@ -1,0 +1,2 @@
+p.xpr:6:1: error[import/syntax]: not a valid Vivado .xpr project: XML syntax error on line 6: unexpected EOF
+summary: 1 errors, 0 warnings, 0 hints, 0 files

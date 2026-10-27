@@ -1,0 +1,2 @@
+counter.qsf:9:1: hint[import/ignored]: SDC_FILE counter.sdc ignored: not a VHDL_FILE assignment
+summary: 0 errors, 0 warnings, 1 hints, 3 files

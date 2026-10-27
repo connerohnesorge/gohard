@@ -1,0 +1,4 @@
+set_global_assignment -name VHDL_FILE rtl/pkg.vhd -library mylib -hdl_version VHDL_2008
+set_global_assignment -name VHDL_FILE rtl/old.vhd -hdl_version VHDL_1993
+set_global_assignment -name VHDL_FILE rtl/pkg.vhd -library other
+set_global_assignment -name QIP_FILE ip/pll.qip

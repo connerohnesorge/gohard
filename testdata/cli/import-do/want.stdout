@@ -1,0 +1,4 @@
+sim/compile.do:7:1: hint[import/ignored]: vsim ignored: gohard import reads only vlib, vmap and vcom
+sim/compile.do:8:1: hint[import/ignored]: run ignored: gohard import reads only vlib, vmap and vcom
+sim/compile.do:9:1: hint[import/ignored]: quit ignored: gohard import reads only vlib, vmap and vcom
+summary: 0 errors, 0 warnings, 3 hints, 3 files

@@ -1,0 +1,8 @@
+# Written by gohard import from counter.qsf.
+standard: "1993"
+libraries:
+  mylib:
+    - src/pkg.vhd
+  work:
+    - src/top.vhd
+    - tb/tb_top.vhd

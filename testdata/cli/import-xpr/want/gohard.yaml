@@ -1,0 +1,7 @@
+# Written by gohard import from proj/counter.xpr.
+libraries:
+  mylib:
+    - src/pkg.vhd
+  xil_defaultlib:
+    - src/top.vhd
+    - tb/tb_top.vhd

@@ -1,0 +1,2 @@
+compile.do:2:12: error[import/missing-file]: source file src/gone.vhd does not exist
+summary: 1 errors, 0 warnings, 0 hints, 0 files

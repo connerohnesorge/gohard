@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "status": "clean",
+  "exit": 0,
+  "summary": {
+    "errors": 0,
+    "warnings": 1,
+    "hints": 2,
+    "files": 2
+  },
+  "diagnostics": [
+    {
+      "path": "de10.qsf",
+      "line": 2,
+      "col": 39,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "hint",
+      "code": "import/standard",
+      "message": "VHDL-1993 files: 1, the first one here; gohard.yaml has one standard for every file, 2008",
+      "related": []
+    },
+    {
+      "path": "de10.qsf",
+      "line": 3,
+      "col": 39,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "warning",
+      "code": "import/library-conflict",
+      "message": "rtl/pkg.vhd is listed in library mylib and in library other; gohard.yaml maps it to mylib",
+      "related": [
+        {
+          "path": "de10.qsf",
+          "line": 1,
+          "col": 39,
+          "end_line": 0,
+          "end_col": 0,
+          "message": "first listed here"
+        }
+      ]
+    },
+    {
+      "path": "de10.qsf",
+      "line": 4,
+      "col": 1,
+      "end_line": 0,
+      "end_col": 0,
+      "severity": "hint",
+      "code": "import/ignored",
+      "message": "QIP_FILE ip/pll.qip ignored: not a VHDL_FILE assignment",
+      "related": []
+    }
+  ],
+  "incomplete": []
+}

@@ -1,0 +1,2 @@
+gohard.yaml:1:1: error[import/config-exists]: gohard.yaml already exists; gohard import does not change an existing configuration
+summary: 1 errors, 0 warnings, 0 hints, 0 files

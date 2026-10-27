@@ -1,0 +1,2 @@
+gohard: error[cli/usage]: gohard import reads .do, .qsf and .xpr files, not build.tcl; run 'gohard help' for usage
+summary: 1 errors, 0 warnings, 0 hints, 0 files

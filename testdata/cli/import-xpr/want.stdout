@@ -1,0 +1,3 @@
+proj/counter.xpr:18:7: hint[import/standard]: VHDL-1993 files: 1, the first one here; gohard.yaml has one standard for every file, 2008
+proj/counter.xpr:24:7: hint[import/ignored]: $PPRDIR/../src/blink.v ignored: not a VHDL file
+summary: 0 errors, 0 warnings, 2 hints, 3 files

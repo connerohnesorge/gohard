@@ -1,0 +1,6 @@
+# Written by gohard import from de10.qsf.
+libraries:
+  mylib:
+    - rtl/pkg.vhd
+  work:
+    - rtl/old.vhd
