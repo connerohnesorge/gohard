@@ -1,6 +1,7 @@
 package sema
 
 import (
+	"fmt"
 	"slices"
 	"strings"
 	"testing"
@@ -158,6 +159,29 @@ begin
   q <= a and b;
 end architecture;
 `,
+}
+
+// vunitManyDesign has eight vunits of one file bound to one
+// architecture, so they share a level and the real job pool analyzes
+// them together (TestParallelJobs). Their directives read the file's
+// PSL map while analyzing it: an @ clock, a range count and a union
+// (pslClock, pslCount, the union check).
+var vunitManyDesign = map[string]string{
+	"dut.vhd": vunitDesign["dut.vhd"],
+	"props.vhd": func() string {
+		var b strings.Builder
+		for i := range 8 {
+			fmt.Fprintf(&b, "vunit v%d(dut(rtl)) {\n", i)
+			for range 10 {
+				b.WriteString("  assert always (a -> b) " +
+					"@ rising_edge(clk);\n" +
+					"  cover {a[*2 to 3]; b} @ rising_edge(clk);\n" +
+					"  cover {(a union b) = '1'};\n")
+			}
+			b.WriteString("}\n")
+		}
+		return b.String()
+	}(),
 }
 
 // TestVunitBoundNames: inside a verification unit bound to e(arch),

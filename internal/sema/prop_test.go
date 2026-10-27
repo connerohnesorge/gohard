@@ -78,7 +78,7 @@ end;
 		"d1.vhd": "entity twice is end;",
 		"d2.vhd": "entity twice is end;",
 	},
-	vunitDesign, // psl_test.go
+	vunitDesign, vunitManyDesign, // psl_test.go
 }
 
 // permute returns the sources of files in the order given by seed.

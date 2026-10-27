@@ -38,6 +38,14 @@ func (f *File) PSLExpr(n cst.Node) *Expr {
 	return f.PSL[n.Span()]
 }
 
+// pslTyped is File.PSLExpr for analysis: the jobs of one level write
+// the file's PSL map together, so the read takes pslMu as well.
+func (a *analyzer) pslTyped(n cst.Node) *Expr {
+	a.s.pslMu.Lock()
+	defer a.s.pslMu.Unlock()
+	return a.f.PSLExpr(n)
+}
+
 // pslDeclName reports whether n is a name, or a call with actuals, of
 // a visible PSL declaration (IEEE 1850 6.1.1.1, 6.2.4: a named
 // sequence or property is instantiated by its name), recording the
@@ -252,7 +260,7 @@ func (a *analyzer) pslForm(n cst.Node) {
 		}
 	case cst.KindPSLUnion:
 		u := cst.PSLUnion{Node: n}
-		l, r := a.f.PSLExpr(u.Lhs().Node), a.f.PSLExpr(u.Rhs().Node)
+		l, r := a.pslTyped(u.Lhs().Node), a.pslTyped(u.Rhs().Node)
 		if l != nil && r != nil && !l.illTyped && !r.illTyped &&
 			!l.Type.Unknown() && !r.Type.Unknown() &&
 			!Compatible(l.Type, r.Type) && !Compatible(r.Type, l.Type) {
@@ -298,7 +306,7 @@ func (a *analyzer) pslCount(n cst.Node) {
 	}
 	var bounds []int64
 	for c := range n.Nodes() {
-		e := a.f.PSLExpr(c)
+		e := a.pslTyped(c)
 		if e == nil {
 			return
 		}
@@ -317,7 +325,7 @@ func (a *analyzer) pslCount(n cst.Node) {
 // pslClock reports a clock expression that is not a PSL Boolean
 // (BOOLEAN, BIT or STD_ULOGIC in the VHDL flavor).
 func (a *analyzer) pslClock(c cst.Node) {
-	e := a.f.PSLExpr(c)
+	e := a.pslTyped(c)
 	if e == nil || e.illTyped || e.Type.Unknown() {
 		return
 	}

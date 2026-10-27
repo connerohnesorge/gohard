@@ -249,10 +249,10 @@ type session struct {
 	cache Cache
 	uc    *unitCache
 	popts parser.Options
-	// pslMu guards File.PSL, which the jobs of one level write
-	// together when a file has several units with PSL code (vunits).
-	// Each job writes its own spans, so the result is the same in any
-	// order.
+	// pslMu guards File.PSL, which the jobs of one level write and
+	// read together when a file has several units with PSL code
+	// (vunits): pslExpr writes, pslTyped reads. Each job writes its
+	// own spans, so the result is the same in any order.
 	pslMu sync.Mutex
 }
 
