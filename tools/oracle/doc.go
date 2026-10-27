@@ -50,8 +50,9 @@
 //     --dump-arrays) run the main run of each design with a trace
 //     oracle (the design's `oracle` field), the opaque IEEE 1735
 //     files left out (the stand-in replaces them), with the design's
-//     stop_level as --assert-level/--exit-severity and the expected
-//     stop_time as --stop-time for a "bounded" tool result. The dumps
+//     stop_level as --assert-level/--exit-severity, -fpsl/--psl when
+//     it sets psl.comments, and the expected stop_time as --stop-time
+//     for a "bounded" tool result. The dumps
 //     become golden/oracle.{ghdl,nvc}.txt (corpus.Oracle: settled
 //     values per time under GoHard's hierarchical paths, the first
 //     corpus.OracleLines changes plus a digest of all). The check

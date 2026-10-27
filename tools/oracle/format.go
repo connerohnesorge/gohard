@@ -27,27 +27,30 @@ const fieldFormat = "format_oracle_sha256"
 // formatting (the corpus does not test it).
 const toolVersion = "0.0.0-dev"
 
-// analyzer is how one tool analyzes one file.
+// analyzer is how one tool analyzes one file; psl is psl.comments.
 type analyzer struct {
 	tool   string
 	golden string
-	args   func(std token.Standard, defs []config.Define,
+	args   func(std token.Standard, defs []config.Define, psl bool,
 		file string) []string
 	parse func(out, file string) []toolDiag
 }
 
 var analyzers = []analyzer{
 	{tool: "ghdl", golden: "format.ghdl.txt",
-		args: func(std token.Standard, _ []config.Define,
+		args: func(std token.Standard, _ []config.Define, psl bool,
 			file string) []string {
 			// GHDL has no user conditional-analysis identifiers.
-			return []string{"-a", "--std=" + ghdlStd(std), file}
+			a := append([]string{"-a", "--std=" + ghdlStd(std)},
+				pslFlags("ghdl", psl)...)
+			return append(a, file)
 		},
 		parse: parseGHDL},
 	{tool: "nvc", golden: "format.nvc.txt",
-		args: func(std token.Standard, defs []config.Define,
+		args: func(std token.Standard, defs []config.Define, psl bool,
 			file string) []string {
-			a := []string{"--std=" + std.String(), "-a"}
+			a := append([]string{"--std=" + std.String(), "-a"},
+				pslFlags("nvc", psl)...)
 			for _, d := range defs {
 				a = append(a, "-D", d.Name+"="+d.Value)
 			}
@@ -117,6 +120,7 @@ type fmtRun struct {
 type fmtPlan struct {
 	opts    format.Options
 	defines []config.Define
+	psl     bool // psl.comments
 	runs    []fmtRun
 }
 
@@ -146,7 +150,8 @@ func planFormat(x *ctx, name string) (*fmtPlan, error) {
 		}
 		cfg = c
 	}
-	p := &fmtPlan{opts: format.FromConfig(cfg), defines: cfg.Defines}
+	p := &fmtPlan{opts: format.FromConfig(cfg), defines: cfg.Defines,
+		psl: cfg.PSL.Comments}
 	cache := map[string]*fmtFile{}
 	file := func(e fileEntry) (*fmtFile, error) {
 		std, ok := token.ParseStandard(e.Standard)
@@ -231,6 +236,9 @@ func (p *fmtPlan) runLine(r fmtRun) string {
 	s := "run " + r.name + " std=" + r.std.String()
 	for _, d := range p.defines {
 		s += " define=" + d.Name + "=" + d.Value
+	}
+	if p.psl {
+		s += " psl"
 	}
 	return s
 }
@@ -401,7 +409,7 @@ func (p *fmtPlan) analyzeAll(a analyzer, tt *tool, r fmtRun,
 	defer w.close()
 	var out []fileResult
 	for _, f := range r.files {
-		text, code, err := tt.run(w.dir, a.args(r.std, p.defines,
+		text, code, err := tt.run(w.dir, a.args(r.std, p.defines, p.psl,
 			f.path)...)
 		if err != nil {
 			return nil, err

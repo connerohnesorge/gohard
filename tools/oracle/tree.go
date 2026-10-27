@@ -76,17 +76,24 @@ func recordTree(x *ctx, tl *toolset, t target) ([]goldenFile, error) {
 		return nil, err
 	}
 	std, _ := token.ParseStandard(d.Standard)
+	cfg, err := designConfig(x, d)
+	if err != nil {
+		return nil, err
+	}
+	psl := pslFlags("ghdl", cfg.PSL.Comments)
 	w, err := newWorkDir(files, order)
 	if err != nil {
 		return nil, err
 	}
 	defer w.close()
-	a := append([]string{"-a", "--std=" + ghdlStd(std)}, order...)
+	a := append([]string{"-a", "--std=" + ghdlStd(std)}, psl...)
+	a = append(a, order...)
 	if out, code, err := tt.run(w.dir, a...); err != nil || code != 0 {
 		return nil, fmt.Errorf("ghdl -a: exit %d %v\n%s", code, err, out)
 	}
-	out, _, err := tt.run(w.dir, "--elab-run", "--std="+ghdlStd(std),
-		d.Testbench, "--disp-tree=inst", "--stop-time=0fs")
+	r := append([]string{"--elab-run", "--std=" + ghdlStd(std)}, psl...)
+	r = append(r, d.Testbench, "--disp-tree=inst", "--stop-time=0fs")
+	out, _, err := tt.run(w.dir, r...)
 	if err != nil {
 		return nil, err
 	}

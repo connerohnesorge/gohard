@@ -105,17 +105,31 @@ func sourcesHash(x *ctx, d design) (string, error) {
 	return goldenHash(gs)[:16], nil
 }
 
-// stopLevel is the design's simulation.stop_level.
-func stopLevel(x *ctx, d design) (string, error) {
+// designConfig is the design's project configuration (#28 defaults
+// when it has none).
+func designConfig(x *ctx, d design) (config.Config, error) {
 	cfg := config.Defaults()
 	if d.Config != "" {
 		b, err := readRepo(x.root, path.Join(d.dir(), d.Config))
 		if err != nil {
-			return "", err
+			return cfg, err
 		}
 		cfg, _ = config.Parse(config.FileName, b)
 	}
-	return cfg.Simulation.StopLevel, nil
+	return cfg, nil
+}
+
+// pslFlags are the options that make GHDL (-fpsl) or NVC (--psl, an
+// analysis option) parse `-- psl` comments, as psl.comments makes
+// GoHard (#109); none when psl is false.
+func pslFlags(tool string, psl bool) []string {
+	switch {
+	case !psl:
+		return nil
+	case tool == "ghdl":
+		return []string{"-fpsl"}
+	}
+	return []string{"--psl"}
 }
 
 // toolStop is the bounded --stop-time of a tool whose recorded result
@@ -146,10 +160,11 @@ func simulate(x *ctx, tl *toolset, d design, tool string) ([]byte,
 	if !ok {
 		return nil, "", fmt.Errorf("bad standard %q", d.Standard)
 	}
-	lvl, err := stopLevel(x, d)
+	cfg, err := designConfig(x, d)
 	if err != nil {
 		return nil, "", err
 	}
+	lvl, psl := cfg.Simulation.StopLevel, pslFlags(tool, cfg.PSL.Comments)
 	w, err := newWorkDir(files, order)
 	if err != nil {
 		return nil, "", err
@@ -159,15 +174,17 @@ func simulate(x *ctx, tl *toolset, d design, tool string) ([]byte,
 	var steps [][]string
 	switch tool {
 	case "ghdl":
-		a := append([]string{"-a", "--std=" + ghdlStd(std)}, order...)
-		r := []string{"--elab-run", "--std=" + ghdlStd(std), d.Testbench,
-			"--vcd=dump.vcd", "--assert-level=" + lvl}
+		a := append([]string{"-a", "--std=" + ghdlStd(std)}, psl...)
+		a = append(a, order...)
+		r := append([]string{"--elab-run", "--std=" + ghdlStd(std)},
+			psl...)
+		r = append(r, d.Testbench, "--vcd=dump.vcd", "--assert-level="+lvl)
 		if stop != "" {
 			r = append(r, "--stop-time="+stop)
 		}
 		steps = [][]string{a, r}
 	default:
-		a := []string{"--std=" + std.String(), "-a"}
+		a := append([]string{"--std=" + std.String(), "-a"}, psl...)
 		for _, k := range sortedKeys(d.Defines) {
 			a = append(a, "-D", k+"="+d.Defines[k])
 		}
