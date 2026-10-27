@@ -1,0 +1,16 @@
+neorv32: rtl/core/neorv32_bootrom.vhd:28:5: lint/unused-signal: port req_ben_i is never read
+neorv32: rtl/core/neorv32_cfs.vhd:28:5: lint/unused-signal: port req_ben_i is never read
+neorv32: rtl/core/neorv32_cfs.vhd:37:5: lint/unused-signal: port cfs_in_i is never read
+neorv32: rtl/core/neorv32_cpu_alu_bitmanip.vhd:336:27: lint/sensitivity-list: shifter_cnt_max is read in the process but is not in its sensitivity list
+neorv32: rtl/core/neorv32_cpu_regfile.vhd:215:11: lint/latch: regfile is not assigned on every path through the process, so it infers a latch
+neorv32: rtl/core/neorv32_debug_auth.vhd:26:5: lint/unused-signal: port re_i is never read
+neorv32: sim/psram_model.vhd:54:10: lint/unused-signal: signal is_write is never read
+open-logic: src/base/vhdl/olo_base_cc_status.vhd:58:12: lint/unused-signal: signal RstOutI_Sync is never read
+corpus/postponed_attrs: postponed_attrs_tb.vhd:11:10: lint/unused-signal: signal never is never assigned
+corpus/postponed_attrs: postponed_attrs_tb.vhd:177:17: lint/sensitivity-list: q_ev75 is read in the process but is not in its sensitivity list
+corpus/postponed_attrs: postponed_attrs_tb.vhd:177:7: lint/latch: q_ev75 is not assigned on every path through the process, so it infers a latch
+corpus/postponed_attrs: postponed_attrs_tb.vhd:45:15: lint/sensitivity-list: n_tx is read in the process but is not in its sensitivity list
+corpus/postponed_attrs: postponed_attrs_tb.vhd:45:7: lint/latch: n_tx is not assigned on every path through the process, so it infers a latch
+corpus/postponed_attrs: postponed_attrs_tb.vhd:53:17: lint/sensitivity-list: g_lows is read in the process but is not in its sensitivity list
+corpus/postponed_attrs: postponed_attrs_tb.vhd:53:7: lint/latch: g_lows is not assigned on every path through the process, so it infers a latch
+corpus/vhdl93_only: vhdl93_only.vhd:25:7: lint/latch: protected is not assigned on every path through the process, so it infers a latch
