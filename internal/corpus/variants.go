@@ -187,7 +187,11 @@ func declaredObjects(src []byte, o parser.Options, names map[string]bool) {
 // body whose statement part has no tool directive: concurrent
 // statements are independent, so their order must not matter. A
 // statement written in a `-- psl` comment moves with its `-- psl`
-// marker (#109).
+// marker (#109). A `-- psl` declaration in the statement part (default
+// clock, property, sequence, endpoint) stays in place and only the
+// statements between two of them are reversed: a `-- psl default
+// clock` clocks the directives after it, so moving it would change
+// which directives it clocks (#109).
 func reorder(src []byte, o parser.Options) []byte {
 	res := parser.Parse(src, o)
 	if len(res.Problems) > 0 {
@@ -201,26 +205,30 @@ func reorder(src []byte, o parser.Options) []byte {
 		if !ok {
 			continue
 		}
-		var items []span
-		for it := range a.Stmts().Items() {
-			r := it.Span()
-			if m, ok := marker[r.Start]; ok {
-				r.Start = m
-			}
-			items = append(items, span{r.Start, r.End})
-		}
-		if len(items) < 2 {
-			continue
-		}
 		r := a.Stmts().Span()
 		if bytes.IndexByte(src[r.Start:r.End], '`') >= 0 {
 			continue
 		}
-		parts = append(parts, items)
+		var run []span
+		for it := range a.Stmts().Items() {
+			if pslDecl(it.Node) {
+				parts, run = append(parts, run), nil
+				continue
+			}
+			r := it.Span()
+			if m, ok := marker[r.Start]; ok {
+				r.Start = m
+			}
+			run = append(run, span{r.Start, r.End})
+		}
+		parts = append(parts, run)
 	}
 	var b bytes.Buffer
 	at := 0
 	for _, items := range parts {
+		if len(items) < 2 {
+			continue
+		}
 		for k, it := range items {
 			from := items[len(items)-1-k]
 			b.Write(src[at:it.start])
@@ -230,6 +238,17 @@ func reorder(src []byte, o parser.Options) []byte {
 	}
 	b.Write(src[at:])
 	return b.Bytes()
+}
+
+// pslDecl reports whether n is a PSL default clock, property, sequence
+// or endpoint declaration.
+func pslDecl(n cst.Node) bool {
+	switch n.Kind() {
+	case cst.KindPSLDefaultClock, cst.KindPSLPropertyDecl,
+		cst.KindPSLSequenceDecl, cst.KindPSLEndpointDecl:
+		return true
+	}
+	return false
 }
 
 // pslMarkers maps the start of each token that opens a `-- psl`

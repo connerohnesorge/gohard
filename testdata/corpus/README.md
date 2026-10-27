@@ -336,9 +336,12 @@ design (#8 `variant_stable`) must give the same outcome with lines
 ignored: `layout` (doubled white space and line breaks), `case` (reserved
 words and identifiers in upper case), `rename` (every declared signal,
 variable and constant gets `_rn`, consistently in all files, `-- psl`
-lines included) and
-`reorder` (the concurrent statements of each architecture without tool
-directives, reversed; a `-- psl` statement moves with its marker). A design that cannot simulate yet for want of
+lines included) and `reorder` (the concurrent statements of each
+architecture without tool directives, reversed; a `-- psl` statement
+moves with its marker, and a `-- psl` default clock, property, sequence
+or endpoint declaration stays in place while the statements on each side
+of it are reversed, since GHDL and NVC clock only the directives after a
+`-- psl default clock`). A design that cannot simulate yet for want of
 an interpreter is logged under plain `go test` and fails under
 `-corpus.require-sim`.
 

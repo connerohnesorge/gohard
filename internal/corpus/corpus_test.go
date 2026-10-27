@@ -385,21 +385,26 @@ func TestTransformsKeepTokens(t *testing.T) {
 
 // TestTransformsPSLComments (#109): under psl.comments, rename renames
 // the objects a `-- psl` line names, and reorder moves each `-- psl`
-// statement with its marker.
+// statement with its marker. A `-- psl default clock` stays in place
+// and reorder reverses the statements on each side of it, so it still
+// clocks the same directives.
 func TestTransformsPSLComments(t *testing.T) {
 	src := []byte("entity e is end;\narchitecture a of e is\n" +
-		"  signal s, t : bit;\nbegin\n  s <= '1';\n" +
+		"  signal s, t : bit;\nbegin\n  s <= '1';\n  t <= '0';\n" +
 		"  -- psl default clock is rising_edge(s);\n" +
-		"  -- psl x : assert always t;\nend;\n")
+		"  -- psl x : assert always t;\n" +
+		"  -- psl y : cover {s};\nend;\n")
 	po := parser.Options{Standard: token.Std2008, PSLComments: true}
 	in := map[string][]byte{"a.vhd": src}
 	want := map[string]string{
-		"rename": "  s_rn <= '1';\n" +
+		"rename": "  s_rn <= '1';\n  t_rn <= '0';\n" +
 			"  -- psl default clock is rising_edge(s_rn);\n" +
-			"  -- psl x : assert always t_rn;\n",
-		"reorder": "  -- psl x : assert always t;\n" +
+			"  -- psl x : assert always t_rn;\n" +
+			"  -- psl y : cover {s_rn};\n",
+		"reorder": "  t <= '0';\n  s <= '1';\n" +
 			"  -- psl default clock is rising_edge(s);\n" +
-			"  s <= '1';\n",
+			"  -- psl y : cover {s};\n" +
+			"  -- psl x : assert always t;\n",
 	}
 	for _, tr := range Transforms {
 		out := tr.Apply(in, po)["a.vhd"]
