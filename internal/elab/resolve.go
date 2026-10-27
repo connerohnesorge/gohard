@@ -36,6 +36,10 @@ func (f *FuncResolver) Resolve(b *eval.Budget, drivers []eval.Value) (
 	eval.Value, error,
 ) {
 	if f.native && len(drivers) > 0 {
+		if pr, ok := b.Observer().(*sema.Profile); ok {
+			pr.Enter(f.Fn) // the #35 measure, as for ev.Call
+			defer pr.Exit()
+		}
 		if p, ok := ieeenative.Resolve(drivers); ok {
 			// The steps of the native call on its array argument.
 			_, err := metered(b, func(sb *eval.Budget) (struct{}, error) {

@@ -2,6 +2,7 @@ package corpus
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 	"path"
@@ -16,6 +17,12 @@ import (
 	"github.com/connerohnesorge/gohard/internal/simrun"
 	"github.com/connerohnesorge/gohard/internal/trace"
 )
+
+// interpretedBodies runs the benchmarks with every ieee body
+// interpreted from source: the "before" of the native-body measure
+// (#59, docs/native-bodies.md).
+var interpretedBodies = flag.Bool("corpus.interpreted", false,
+	"benchmarks: interpret every ieee body (no native bodies)")
 
 // simRuns returns the main runs of the corpus designs of a reached
 // milestone (Release) with their sources.
@@ -78,7 +85,8 @@ func benchRun(b *testing.B, r Run, src map[string][]byte,
 	for b.Loop() {
 		var start time.Duration
 		res, err := Execute(r, src, Options{Code: interpreter(),
-			Profile: p, Simulating: func() { start = b.Elapsed() }})
+			Profile: p, Simulating: func() { start = b.Elapsed() },
+			InterpretedBodies: *interpretedBodies})
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -166,11 +174,14 @@ func BenchmarkSimNEORV32(b *testing.B) {
 
 // BenchmarkSimIEEE runs the corpus designs (and the NEORV32
 // testbench, when checked out, as "neorv32") like BenchmarkSim with
-// every interpreted call's CPU time labelled by the unit that runs
-// (pprof label "unit": "ieee.numeric_std", ..., "-" outside calls),
-// so a CPU profile splits kernel time by IEEE package: the measurement
-// of the #35 native-body rule. scripts/ci/bench.sh runs it per design
-// with -cpuprofile and records `go tool pprof -tags`.
+// every function call's CPU time labelled by the unit that declares
+// the function (pprof label "unit": "ieee.numeric_std", ...; native
+// bodies count for their package, #59), and the simulation's time
+// outside calls labelled "-", so a CPU profile splits kernel time by
+// IEEE package: the measurement of the #35 native-body rule.
+// scripts/ci/bench.sh runs it per design with -cpuprofile and records
+// `go tool pprof -tags`; -corpus.interpreted measures the interpreted
+// bodies instead.
 func BenchmarkSimIEEE(b *testing.B) {
 	runs, srcs := simRuns(b)
 	if r, src, ok := neorv32Run(b, neorv32Budget); ok {
@@ -193,9 +204,14 @@ func BenchmarkSimIEEE(b *testing.B) {
 				pprof.SetGoroutineLabels(c)
 			}
 			defer pprof.SetGoroutineLabels(ctx)
+			// The kernel's time outside every call is "-" from the
+			// start of the simulation, whether or not a call ran yet.
+			outside := func() { p.OnSwitch(sema.Outside) }
 			for b.Loop() {
 				res, err := Execute(r, srcs[i],
-					Options{Code: interpreter(), Profile: p})
+					Options{Code: interpreter(), Profile: p,
+						Simulating:        outside,
+						InterpretedBodies: *interpretedBodies})
 				if err != nil {
 					b.Fatal(err)
 				}

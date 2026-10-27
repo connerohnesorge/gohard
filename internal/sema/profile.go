@@ -71,6 +71,14 @@ func (p *Profile) Total() int64 {
 	return n
 }
 
+// Enter attributes what follows to the unit of the subprogram x until
+// the matching Exit: a call the simulator runs itself (a function with
+// a signal parameter, a native resolution function, #59).
+func (p *Profile) Enter(x *Decl) { p.enter(x) }
+
+// Exit ends the attribution of the matching Enter.
+func (p *Profile) Exit() { p.exit() }
+
 func (p *Profile) enter(x *Decl) {
 	name := "?"
 	if x.Unit != nil {

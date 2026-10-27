@@ -260,6 +260,12 @@ func (m *machine) callFunction(fn *callFn, vals []eval.Value,
 	if fn.body == nil {
 		return m.builtinFunc(fn, obj, args)
 	}
+	if pr, ok := b.Observer().(*sema.Profile); ok {
+		// The function's unit runs (the #35 measure), as for the
+		// functions the evaluator interprets.
+		pr.Enter(fn.x)
+		defer pr.Exit()
+	}
 	if fn.edge != 0 {
 		if v, ok, err := m.edge(fn, args, b); ok {
 			return v, err
