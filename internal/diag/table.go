@@ -142,6 +142,15 @@ const (
 	// libs: `gohard libs detect` (#1).
 	LibsUnreadable Code = "libs/unreadable"
 
+	// import: `gohard import` of other tools' project files (#2).
+	ImportConfigExists    Code = "import/config-exists"
+	ImportIgnored         Code = "import/ignored"
+	ImportLibraryConflict Code = "import/library-conflict"
+	ImportMissingFile     Code = "import/missing-file"
+	ImportNoFiles         Code = "import/no-files"
+	ImportStandard        Code = "import/standard"
+	ImportSyntax          Code = "import/syntax"
+
 	// lint: likely RTL mistakes in legal VHDL (#54).
 	LintClockEdgeStyle  Code = "lint/clock-edge-style"
 	LintLatch           Code = "lint/latch"
@@ -286,6 +295,48 @@ var table = []Info{
 		Owner:   32,
 		Summary: "the formatted file could not be written",
 		Message: "cannot write formatted file: {reason}",
+	},
+	{
+		Code: ImportConfigExists, Severity: Error, Class: Tool,
+		Owner:   2,
+		Summary: "gohard import found a gohard.yaml at the project root",
+		Message: "{path} already exists; gohard import does not " +
+			"change an existing configuration",
+	},
+	{
+		Code: ImportIgnored, Severity: Hint, Class: Design, Owner: 2,
+		Summary: "a line of the project file was not imported",
+		Message: "{item} ignored: {reason}",
+	},
+	{
+		Code: ImportLibraryConflict, Severity: Warning, Class: Design,
+		Owner:   2,
+		Summary: "the project file lists a file in two libraries",
+		Message: "{path} is listed in library {first} and in " +
+			"library {second}; gohard.yaml maps it to {first}",
+	},
+	{
+		Code: ImportMissingFile, Severity: Error, Class: Tool,
+		Owner:   2,
+		Summary: "a source file the project file lists does not exist",
+		Message: "source file {path} does not exist",
+	},
+	{
+		Code: ImportNoFiles, Severity: Error, Class: Tool, Owner: 2,
+		Summary: "the project file lists no VHDL source file",
+		Message: "{path} lists no VHDL source file; nothing to import",
+	},
+	{
+		Code: ImportStandard, Severity: Hint, Class: Design, Owner: 2,
+		Summary: "the project mixes VHDL standards, gohard.yaml has one",
+		Message: "VHDL-{standard} files: {count}, the first one " +
+			"here; gohard.yaml has one standard for every file, " +
+			"{chosen}",
+	},
+	{
+		Code: ImportSyntax, Severity: Error, Class: Tool, Owner: 2,
+		Summary: "the project file cannot be read",
+		Message: "not a valid {format}: {reason}",
 	},
 	{
 		Code: InternalCrash, Severity: Error, Class: Tool, Owner: 20,

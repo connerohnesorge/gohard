@@ -20,6 +20,7 @@ TARGETS=(
 	"FuzzConfig ./internal/config root"
 	"FuzzElab ./internal/elab local"
 	"FuzzFormat ./internal/format root"
+	"FuzzImport ./internal/importer local"
 	"FuzzIndex ./internal/span local"
 	"FuzzLSPReplay ./internal/server root"
 	"FuzzParse ./internal/parser root"
