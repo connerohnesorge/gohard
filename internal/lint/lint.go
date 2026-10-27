@@ -19,7 +19,9 @@ import (
 // Check returns the lint findings of res under cfg. Each design unit's
 // lint runs under a budget of eval.EditorSteps steps (P7); a unit that
 // uses it up gets one sema/eval-limit warning in place of its
-// findings.
+// findings. lint/clock-edge-style depends on every unit: when a unit
+// over budget leaves it undecided, the other units with an edge test
+// get a sema/eval-limit warning for that rule (edgeStyle).
 func Check(res *sema.Result, cfg config.Lint) []diag.Diagnostic {
 	return check(res, cfg, newMeter(eval.EditorSteps))
 }
@@ -51,20 +53,20 @@ func check(res *sema.Result, cfg config.Lint, m *meter,
 	}
 	for _, u := range res.Units {
 		if m.over(u) {
-			ds = append(ds, limited(u))
+			ds = append(ds, limited(u, "the lint rules in"))
 		}
 	}
 	return ds
 }
 
-// limited is the warning of a unit over its lint budget, at the unit's
-// name.
-func limited(u *sema.Unit) diag.Diagnostic {
-	what, rg := string(u.Name), u.Node.Span()
+// limited is the warning, at the unit's name, that what (the lint rules
+// in, or one rule in) unit u could not be computed within the budget.
+func limited(u *sema.Unit, what string) diag.Diagnostic {
+	name, rg := string(u.Name), u.Node.Span()
 	if u.Decl != nil {
-		what, rg = u.Decl.Kind.String()+" "+u.Decl.Text, u.Decl.Span
+		name, rg = u.Decl.Kind.String()+" "+u.Decl.Text, u.Decl.Span
 	}
-	w := diag.New(diag.SemaEvalLimit, "the lint rules in "+what)
+	w := diag.New(diag.SemaEvalLimit, what+" "+name)
 	return at(u.File, rg, w)
 }
 

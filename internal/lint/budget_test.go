@@ -154,3 +154,81 @@ func TestDeterministic(t *testing.T) {
 		}
 	}
 }
+
+// edgy is an architecture of entity name with n concurrent signal
+// assignments and one clocked process using rising_edge, first or
+// last.
+func edgy(name string, n int, first bool) string {
+	clocked := "  c : process (clk) begin\n" +
+		"    if rising_edge(clk) then q <= a; end if;\n" +
+		"  end process;\n"
+	var b strings.Builder
+	b.WriteString(header + "entity " + name + " is\n" +
+		"  port (clk, a : in std_logic; q : out std_logic);\nend;\n" +
+		"architecture a of " + name + " is\n")
+	b.WriteString("  signal s : std_logic_vector(0 to " +
+		strconv.Itoa(n-1) + ");\nbegin\n")
+	if first {
+		b.WriteString(clocked)
+	}
+	for i := range n {
+		b.WriteString("  s(" + strconv.Itoa(i) + ") <= a;\n")
+	}
+	if !first {
+		b.WriteString(clocked)
+	}
+	b.WriteString("end;\n")
+	return b.String()
+}
+
+// tick is a design whose only edge test is clk'event.
+const tick = header + `entity small is
+  port (clk, a : in std_logic; q : out std_logic);
+end;
+architecture a of small is
+begin
+  p : process (clk) begin
+    if clk'event and clk = '1' then q <= a; end if;
+  end process;
+end;
+`
+
+// TestEdgeBudget: lint/clock-edge-style depends on the whole design.
+// When the unit holding the design's only rising_edge runs out of
+// budget before the scan reaches it, the other units' 'event tests
+// get a sema/eval-limit warning for the rule, not silence; when the
+// scan reached a rising_edge first, they keep their findings.
+func TestEdgeBudget(t *testing.T) {
+	cfg := config.Lint{ClockEdgeStyle: "warning"}
+	finding := "small.vhd:8:12: lint/clock-edge-style: this edge test " +
+		"uses 'event; the design also uses rising_edge or falling_edge"
+	bigLimit := "big.vhd:5:14: sema/eval-limit: the lint rules in " +
+		"architecture a could not be computed within 1,000,000 " +
+		"evaluation steps"
+	smallLimit := "small.vhd:5:14: sema/eval-limit: lint/clock-edge-" +
+		"style in architecture a could not be computed within " +
+		"1,000,000 evaluation steps"
+	for _, c := range []struct {
+		first bool
+		want  []string
+	}{
+		{first: false, want: []string{bigLimit, smallLimit}},
+		{first: true, want: []string{bigLimit, finding}},
+	} {
+		r := analyze(t, map[string]string{
+			"big.vhd":   edgy("big", 300, c.first),
+			"small.vhd": tick,
+		})
+		big := unitOf(r, sema.UnitArchitecture, "big")
+		m := newMeter(eval.EditorSteps)
+		if got := shows(check(r, cfg, m)); !slices.Equal(got,
+			[]string{finding}) {
+			t.Fatalf("first %v, full budget: %q", c.first, got)
+		}
+		got := shows(check(r, cfg, newMeter(m.used[big]/2)))
+		if !slices.Equal(got, c.want) {
+			t.Errorf("first %v, half budget:\n%q\nwant\n%q", c.first,
+				got, c.want)
+		}
+	}
+}
