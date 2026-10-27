@@ -1,0 +1,4 @@
+# lint/clock-edge-style (#54), turned on, negative: edges tested with
+# rising_edge only; 'event in a function and in an assertion is not an
+# edge test.
+gohard check

@@ -1,0 +1,4 @@
+# lint/sensitivity-list (#54), negative: complete lists (one names a
+# signal through an alias), process(all), a clocked process, attribute
+# prefixes and a generic need nothing more.
+gohard check

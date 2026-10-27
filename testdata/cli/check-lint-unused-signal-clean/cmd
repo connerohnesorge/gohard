@@ -1,0 +1,3 @@
+# lint/unused-signal (#54), negative: every signal and port is used,
+# through an alias, a record field, a port map or a procedure.
+gohard check

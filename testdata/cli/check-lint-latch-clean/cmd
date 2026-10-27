@@ -1,0 +1,4 @@
+# lint/latch (#54), negative: defaults first, complete if and case,
+# an if on a generic (the same path on every run), a procedure that
+# only reads a signal, and a clocked process infer no latch.
+gohard check
