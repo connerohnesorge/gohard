@@ -1,9 +1,12 @@
 package server
 
 import (
+	"bytes"
+	"path/filepath"
 	"strconv"
 	"testing"
 
+	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
 )
 
@@ -77,4 +80,111 @@ func TestEndAnswersEveryRequest(t *testing.T) {
 			}
 		}
 	}
+}
+
+// TestAdoptsFolderOfFirstFile: a client that names no workspace folder
+// gets the folder of the first file it opens as its project folder
+// (#48), loaded like a workspace folder: a request waits for the load
+// and is answered from it. Later files and other URIs do not move it.
+func TestAdoptsFolderOfFirstFile(t *testing.T) {
+	sub := filepath.FromSlash("/work/sub")
+	cases := []struct {
+		name string
+		msgs []string
+		want string // the project root after the session
+	}{
+		{"first file", []string{initNoFolder, initialized,
+			openURI("file:///work/sub/a.vhd"),
+			openURI("file:///other/b.vhd")}, sub},
+		{"untitled first", []string{initNoFolder, initialized,
+			openURI("untitled:Untitled-1"),
+			openURI("file:///work/sub/a.vhd")}, sub},
+		{"before initialized", []string{initNoFolder,
+			openURI("file:///work/sub/a.vhd"), initialized}, sub},
+		{"workspace folder wins", []string{
+			`{"jsonrpc":"2.0","id":1,"method":"initialize",` +
+				`"params":{"rootUri":"file:///work","capabilities":{}}}`,
+			initialized, openURI("file:///work/sub/a.vhd")},
+			filepath.FromSlash("/work")},
+		{"after shutdown", []string{initNoFolder, initialized,
+			`{"jsonrpc":"2.0","id":9,"method":"shutdown"}`,
+			openURI("file:///work/sub/a.vhd")}, ""},
+	}
+	for _, c := range cases {
+		h := newHarness(t, slow{hover: 1, diags: 1})
+		for _, m := range c.msgs {
+			h.client("%s", m)
+		}
+		h.hover(2, "file:///work/sub/a.vhd")
+		h.drain()
+		if h.s.root != c.want || !h.s.loaded {
+			t.Errorf("%s: root %q (loaded %v), want %q", c.name,
+				h.s.root, h.s.loaded, c.want)
+		}
+		if c.want == sub && h.s.Snapshot().Root != sub {
+			t.Errorf("%s: snapshot root %q", c.name,
+				h.s.Snapshot().Root)
+		}
+		if rs := h.responses()["2"]; len(rs) != 1 {
+			t.Errorf("%s: hover answered %d times", c.name, len(rs))
+		}
+	}
+}
+
+// TestScanFolderAgreesWithServer: for any order of initialize requests
+// (with and without a folder, invalid), initialized, didOpen of files,
+// other URIs and invalid params, shutdown and exit, the folder
+// SessionFolder computes for a recording is the folder the server
+// works in (#29, #48), so a recorded session replays against the same
+// project.
+func TestScanFolderAgreesWithServer(t *testing.T) {
+	alphabet := []string{
+		initNoFolder,
+		`{"jsonrpc":"2.0","id":1,"method":"initialize",` +
+			`"params":{"rootUri":"file:///w","capabilities":{}}}`,
+		`{"jsonrpc":"2.0","id":1,"method":"initialize",` +
+			`"params":{"rootUri":5}}`,
+		initialized,
+		openURI("file:///a/x.vhd"),
+		openURI("file:///b/c/y.vhd"),
+		openURI("untitled:1"),
+		openURI(""),
+		`{"jsonrpc":"2.0","method":"textDocument/didOpen","params":5}`,
+		`{"jsonrpc":"2.0","id":7,"method":"textDocument/didOpen",` +
+			`"params":{"textDocument":{"uri":"file:///r/z.vhd"}}}`,
+		`{"jsonrpc":"2.0","id":9,"method":"shutdown"}`,
+		`{"jsonrpc":"2.0","method":"exit"}`,
+	}
+	r := &rng{env.SplitMix64{State: 48}}
+	for i := range 2000 {
+		h := newHarness(t, Nop{})
+		var bodies [][]byte
+		for range 1 + r.n(8) {
+			m := alphabet[r.n(len(alphabet))]
+			bodies = append(bodies, []byte(m))
+			h.client("%s", m)
+		}
+		h.drain()
+		got, known := ScanFolder(bodies)
+		if got != h.s.folder {
+			t.Fatalf("case %d: ScanFolder %q, server %q\n%s", i, got,
+				h.s.folder, bytes.Join(bodies, []byte("\n")))
+		}
+		if known && got == "" && h.s.phase == phaseRunning {
+			t.Fatalf("case %d: known without a folder while running\n%s",
+				i, bytes.Join(bodies, []byte("\n")))
+		}
+	}
+}
+
+const (
+	initNoFolder = `{"jsonrpc":"2.0","id":1,"method":"initialize",` +
+		`"params":{"capabilities":{}}}`
+	initialized = `{"jsonrpc":"2.0","method":"initialized","params":{}}`
+)
+
+func openURI(u string) string {
+	return `{"jsonrpc":"2.0","method":"textDocument/didOpen","params":` +
+		`{"textDocument":{"uri":"` + u + `","languageId":"vhdl",` +
+		`"version":1,"text":"x"}}}`
 }

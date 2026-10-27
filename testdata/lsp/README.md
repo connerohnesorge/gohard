@@ -57,6 +57,7 @@ that both runs agree and keep the invariants; the nightly
 | `editor-override` | `gohard.yaml` wins over an editor setting, reported in `window/logMessage` (#28) |
 | `config-diagnostics` | `gohard.yaml` problems published for `gohard.yaml` |
 | `definition-cross-file` | a workspace query answered from a file that is not open |
+| `no-workspace-folder` | initialize names no workspace folder (#48): the folder of the first file opened becomes the project folder, so the same workspace query works |
 | `lifecycle` | errors before initialize, a second initialize, invalid JSON-RPC, unknown methods, requests after shutdown |
 | `exit-without-shutdown` | exit code 1 |
 | `format-document` | whole-file formatting (#32) in a utf-16 session; formatted text gets no edits; a project file that is not open is formatted from disk; a file that does not parse and a document that is not VHDL get no edits |
@@ -234,6 +235,7 @@ covers a `gohard.yaml` edited and saved mid-session, and
 | `editor-session` | an editor session with edits, hover and cancel |
 | `request-before-initialize` | a request, a notification and a body that is not JSON before initialize: the header still hashes the folder initialize names, and a save of `gohard.yaml` reloads it from the recording |
 | `invalid-body` | bodies that are not JSON-RPC objects (not JSON, a batch, a `"$gohard"` look-alike) are answered live and kept in the recording |
+| `no-workspace-folder` | initialize names no workspace folder (#48): the header waits for the first didOpen and hashes the project of that file's folder (its `gohard.yaml` and sources), not the current directory |
 
 ## Updating
 

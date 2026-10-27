@@ -42,12 +42,48 @@ func (s *State) didOpen(o *out, params json.RawMessage) {
 		s.log(o, LogWarning, "didOpen: invalid params")
 		return
 	}
+	if s.folder == "" &&
+		(s.phase == phaseInitialized || s.phase == phaseRunning) {
+		if dir, ok := openedFolder(params); ok {
+			s.adoptFolder(o, dir)
+		}
+	}
 	t := p.TextDocument
 	d := newDocument(t.URI, s.root, []byte(t.Text))
 	d.Version, d.Open, d.LanguageID = t.Version, true, t.LanguageID
 	s.open = cloneSet(s.open, d.key, d)
 	s.edits++
 	s.newSnapshot(o)
+}
+
+// openedFolder returns the folder of the file a didOpen opens; ok is
+// false for invalid params and for a document that is not a file.
+func openedFolder(params json.RawMessage) (string, bool) {
+	var p struct {
+		TextDocument textDocumentItem `json:"textDocument"`
+	}
+	if json.Unmarshal(params, &p) != nil {
+		return "", false
+	}
+	path, ok := URIToPath(p.TextDocument.URI)
+	if !ok {
+		return "", false
+	}
+	return filepath.Dir(path), true
+}
+
+// adoptFolder makes dir the workspace folder of a session whose
+// client named none (#48): the folder of the first file it opens, as
+// the CLI uses the current directory. The project is then loaded as
+// for a workspace folder, and requests wait for it.
+func (s *State) adoptFolder(o *out, dir string) {
+	s.folder, s.root = dir, dir
+	if s.phase != phaseRunning {
+		return // initialized loads it
+	}
+	s.loaded = false
+	s.registerWatchers(o)
+	o.do(LoadConfig{Folder: dir})
 }
 
 func (s *State) didChange(o *out, params json.RawMessage) {

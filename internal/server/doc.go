@@ -44,7 +44,10 @@
 //     are loaded wait for them.
 //   - The project root comes from the first workspace folder (else
 //     rootUri, else rootPath) through config.Load, the single root rule
-//     of #28. gohard.yaml wins over the editor settings
+//     of #28. A client that sends none gets the folder of the first
+//     file it opens (#48); until then only open documents are seen,
+//     and requests after that didOpen wait for the project load.
+//     gohard.yaml wins over the editor settings
 //     (initializationOptions and didChangeConfiguration, the "gohard"
 //     object or the whole settings object); each overridden key is
 //     reported in a window/logMessage (config.MergeEditor).
@@ -74,7 +77,8 @@
 // (a save of gohard.yaml reloads it) and every request the transport
 // skipped unread, which the core answers with InvalidRequest; the
 // session folder is the one the first accepted initialize request
-// names, wherever it is in the session. A fatal framing error is
+// names (or, when it names none, the folder of the first file opened
+// after it), wherever it is in the session. A fatal framing error is
 // logged on stderr before Serve returns 1. Serve is
 // the stdio shell on jsonrpc2.Conn, whose
 // reader and writer are the only goroutines (#4 P8). RunAction runs

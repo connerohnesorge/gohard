@@ -94,9 +94,10 @@ func serveLSP(inv *Invocation) Result {
 // which keeps bodies that are not JSON, the core step each input
 // reached it at, and every gohard.yaml the server read, so the session
 // replays byte for byte. The header hashes the project of the session
-// folder, which the first initialize request names, so the lines up to
-// that request (anything a client sends before initialize) wait in
-// memory until it arrives or the session ends.
+// folder (server.SessionFolder): the one the first initialize request
+// names or, when it names none, the folder of the first file opened.
+// The lines up to the message that settles it wait in memory until it
+// arrives or the session ends.
 type recording struct {
 	inv     *Invocation
 	dir     string
@@ -121,7 +122,7 @@ func (r *recording) record(a server.Arrival) error {
 	}
 	r.pending = append(r.pending, line)
 	r.bodies = append(r.bodies, a.Body)
-	if _, init := server.IsInitialize(a.Body); init ||
+	if _, known := server.ScanFolder(r.bodies); known ||
 		a.Body == nil && a.Rejected == nil {
 		r.err = r.flush()
 	}

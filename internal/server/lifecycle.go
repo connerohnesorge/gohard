@@ -50,7 +50,8 @@ func Negotiate(offered []string) span.Encoding {
 
 // Folder returns the workspace folder of the initialize params: the
 // first workspace folder, else rootUri, else rootPath. ok is false when
-// the client sent none (a single-file session).
+// the client sent none; the server then takes the folder of the first
+// file opened (adoptFolder).
 func (p *initializeParams) Folder() (string, bool) {
 	for _, f := range p.WorkspaceFolders {
 		if path, ok := URIToPath(f.URI); ok {
@@ -78,7 +79,7 @@ func FolderOf(initialize json.RawMessage) (string, bool) {
 
 // IsInitialize reports whether body is an initialize request the
 // server accepts (its params decode) and returns its workspace folder
-// ("" for a single-file session).
+// ("" when it names none).
 func IsInitialize(body []byte) (folder string, ok bool) {
 	msg, err := jsonrpc2.Decode(body)
 	m, isReq := msg.(*jsonrpc2.Request)
@@ -130,8 +131,8 @@ func (s *State) initialized(o *out) {
 	}
 	s.phase = phaseRunning
 	if s.folder == "" {
-		// A single-file session: no project, defaults and open
-		// documents only.
+		// No workspace folder: defaults and open documents only
+		// until the first file is opened (adoptFolder).
 		s.loaded = true
 		s.newSnapshot(o)
 		s.unpark(o)

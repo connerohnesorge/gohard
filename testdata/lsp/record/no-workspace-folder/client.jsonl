@@ -1,0 +1,11 @@
+# A client that names no workspace folder (#48): the session folder is
+# the folder of the first file opened, so the header written when that
+# didOpen arrives hashes /work, not the current directory.
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":null,"capabilities":{"general":{"positionEncodings":["utf-8"]}}}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+{"jsonrpc":"2.0","id":2,"method":"workspace/symbol","params":{"query":""}}
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///work/top.vhd","languageId":"vhdl","version":1,"text":"entity top is\nend entity;\n"}}}
+{"jsonrpc":"2.0","id":3,"method":"workspace/symbol","params":{"query":""}}
+{"jsonrpc":"2.0","id":4,"method":"textDocument/formatting","params":{"textDocument":{"uri":"file:///work/top.vhd"},"options":{"tabSize":2,"insertSpaces":true}}}
+{"jsonrpc":"2.0","id":5,"method":"shutdown"}
+{"jsonrpc":"2.0","method":"exit"}

@@ -7,7 +7,9 @@ project root (#28). The project root is the nearest ancestor directory,
 starting from the current directory (CLI) or the workspace folder
 (language server), that contains `gohard.yaml`; if none does, the
 nearest ancestor containing `.git`; if none does, the current
-directory or workspace folder itself. A missing `gohard.yaml`
+directory or workspace folder itself. When the editor sends no
+workspace folder, the language server uses the folder of the first file
+opened instead. A missing `gohard.yaml`
 means every key takes its default, with no diagnostic.
 
 Every problem is reported with the line and column of the offending key

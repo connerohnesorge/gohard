@@ -22,17 +22,53 @@ import (
 // SessionFolder is the folder a session works in: the workspace
 // folder of the first initialize request among bodies that the server
 // accepts (wherever it is: requests before initialize are answered
-// with an error and read nothing), else dir (the current directory).
+// with an error and read nothing, but an exit ends the session); when
+// that request names none, the folder of the first file opened after
+// it and before shutdown or exit (the folder the server adopts, #48);
+// else dir (the current directory).
 func SessionFolder(bodies [][]byte, dir string) string {
-	for _, b := range bodies {
-		if f, ok := IsInitialize(b); ok {
-			if f != "" {
-				return f
-			}
-			break
-		}
+	if f, _ := ScanFolder(bodies); f != "" {
+		return f
 	}
 	return dir
+}
+
+// ScanFolder applies the rule of SessionFolder to the bodies received
+// so far. known is true once later bodies can no longer change the
+// answer: the folder is found, or the session can no longer get one
+// (an exit, or a shutdown after an initialize that names none). folder
+// is "" when there is none (yet).
+func ScanFolder(bodies [][]byte) (folder string, known bool) {
+	init := false
+	for _, b := range bodies {
+		msg, err := jsonrpc2.Decode(b)
+		if err != nil {
+			continue
+		}
+		switch m := msg.(type) {
+		case *jsonrpc2.Notification:
+			switch {
+			case m.Method == "exit":
+				return "", true
+			case init && m.Method == "textDocument/didOpen":
+				if f, ok := openedFolder(m.Params); ok {
+					return f, true
+				}
+			}
+		case *jsonrpc2.Request:
+			switch {
+			case !init:
+				f, ok := IsInitialize(b)
+				if ok && f != "" {
+					return f, true
+				}
+				init = ok
+			case m.Method == "shutdown":
+				return "", true
+			}
+		}
+	}
+	return "", false
 }
 
 // SessionHeader builds the header of a recorded session (#29): the
