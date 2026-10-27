@@ -125,7 +125,11 @@ the manifest to `connerohnesorge/scoop-bucket` with the
 repos; without it goreleaser skips both pushes). Last, `actions/attest`
 signs build provenance for every archive and `checksums.txt`, which
 needs the `id-token: write` and `attestations: write` permissions;
-`docs/install.md` shows how to verify it. Local check (the second form
+`docs/install.md` shows how to verify it. That step runs even when
+goreleaser exits non-zero, as long as `dist/checksums.txt` exists:
+goreleaser publishes the release before the cask and manifest pushes
+and reports a failed push only at the end, so a release would
+otherwise stay public without attestations. Local check (the second form
 builds from the committed HEAD, not the working tree):
 
 ```

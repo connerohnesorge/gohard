@@ -64,7 +64,13 @@ jobs:
 
       # Signed SLSA build provenance for every archive and checksums.txt,
       # verifiable with `gh attestation verify` (docs/install.md).
-      - uses: actions/attest@v4
+      # goreleaser publishes the release before it pushes the cask and
+      # the Scoop manifest, and a failed push still makes it exit 1, so
+      # this step runs whenever goreleaser got as far as checksums.txt;
+      # the job still fails on goreleaser's exit status.
+      - name: Attest build provenance
+        if: ${{ !cancelled() && hashFiles('dist/checksums.txt') != '' }}
+        uses: actions/attest@v4
         with:
           subject-path: |
             dist/*.tar.gz

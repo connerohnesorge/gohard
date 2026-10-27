@@ -127,3 +127,53 @@ func TestInstallPathsListed(t *testing.T) {
 		}
 	}
 }
+
+// TestReleaseAttestsAfterPublishError pins the attest step of the
+// release workflow (#69). goreleaser publishes the GitHub release
+// before it pushes the Homebrew cask and the Scoop manifest, and a
+// failed push still makes it exit non-zero, so the attest step must
+// not depend on goreleaser's exit status: it runs whenever goreleaser
+// wrote dist/checksums.txt, unless the run was cancelled.
+func TestReleaseAttestsAfterPublishError(t *testing.T) {
+	raw, err := os.ReadFile("../../.github/workflows/release.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	lines := strings.Split(strings.ReplaceAll(string(raw), "\r\n", "\n"),
+		"\n")
+	// The steps are list items at one indentation; collect the one
+	// that uses actions/attest.
+	const item = "      - "
+	var step []string
+	for i, l := range lines {
+		if !strings.Contains(l, "uses: actions/attest@") {
+			continue
+		}
+		start := i
+		for start > 0 && !strings.HasPrefix(lines[start], item) {
+			start--
+		}
+		end := i + 1
+		for end < len(lines) && !strings.HasPrefix(lines[end], item) {
+			end++
+		}
+		step = lines[start:end]
+		break
+	}
+	if step == nil {
+		t.Fatal("release.yml: no actions/attest step")
+	}
+	var guard string
+	for _, l := range step {
+		if f := strings.TrimPrefix(strings.TrimSpace(l), "- "); strings.
+			HasPrefix(f, "if:") {
+			guard = f
+		}
+	}
+	for _, want := range []string{"!cancelled()",
+		"hashFiles('dist/checksums.txt') != ''"} {
+		if !strings.Contains(guard, want) {
+			t.Errorf("attest step guard %q lacks %q", guard, want)
+		}
+	}
+}
