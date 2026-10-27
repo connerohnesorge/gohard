@@ -248,18 +248,22 @@ func words(n cst.Node) []string {
 }
 
 // defaultClock finds the default clock declaration of the innermost
-// region enclosing the directive n.
+// region enclosing the directive n. Only a declaration written before n
+// counts: a `-- psl default clock` in the statement part (psl.comments)
+// clocks the later directives only, as GHDL and NVC read it (#109).
 func defaultClock(n cst.Node) cst.Node {
+	at := n.Span().Start
 	for a := range n.Ancestors() {
 		for c := range a.Nodes() {
+			if c.Span().Start >= at {
+				break
+			}
 			if c.Kind() == cst.KindPSLDefaultClock {
 				return clockExpr(c)
 			}
-			if c.Equal(n) {
-				continue
-			}
 			for g := range c.Nodes() {
-				if g.Kind() == cst.KindPSLDefaultClock {
+				if g.Kind() == cst.KindPSLDefaultClock &&
+					g.Span().Start < at {
 					return clockExpr(g)
 				}
 			}

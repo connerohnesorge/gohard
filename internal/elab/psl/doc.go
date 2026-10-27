@@ -31,9 +31,11 @@
 //     sim/needs-formal once, at time 0, and do not run.
 //
 // The clock is the directive's @ clause or the innermost default clock
-// declaration; rising_edge(s), falling_edge(s) and s'event and c are
-// edges of s, any other boolean ticks when it holds after a change of
-// one of its signals.
+// declaration written before the directive (a `-- psl default clock` in
+// the statement part clocks only the later directives, #109);
+// rising_edge(s), falling_edge(s) and s'event and c are edges of s, any
+// other boolean ticks when it holds after a change of one of its
+// signals.
 //
 // Invariants (tests): the derivative matcher agrees with a direct
 // reference matcher on random sequences and words; progression agrees
