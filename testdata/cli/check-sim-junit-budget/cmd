@@ -1,0 +1,3 @@
+# JUnit XML (#61): a testbench over its budget is a
+# sim/budget-exceeded <failure>.
+gohard check --sim --tb budget_hang --format junit

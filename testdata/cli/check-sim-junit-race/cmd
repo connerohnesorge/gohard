@@ -1,0 +1,3 @@
+# JUnit XML (#61): without --strict the race warning of a racy
+# testbench (#29) is in system-out and the case passes.
+gohard check --sim --seed 1 --format junit

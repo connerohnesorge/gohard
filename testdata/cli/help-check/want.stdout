@@ -7,7 +7,7 @@ Flags:
       --allow-empty        exit 0 when no VHDL files are found
       --define NAME=VALUE  define a conditional-analysis identifier (overrides defines:); repeatable
       --env NAME=VALUE     set a variable GETENV sees in simulation (overrides simulation.env.vars); repeatable
-      --format FORMAT      diagnostic output format: text, json or sarif (default text)
+      --format FORMAT      diagnostic output format: text, json, sarif or junit (default text)
       --real-env           let simulation read the real clock and environment; the run is marked non-reproducible
       --repro FILE         rerun the simulation recorded in a repro file
       --seed N|random      simulation seed; 0 keeps declaration order

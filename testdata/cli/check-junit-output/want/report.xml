@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="gohard" tests="2" failures="1" errors="0" time="0">
+  <testsuite name="gohard" tests="2" failures="1" errors="0" skipped="0" time="0">
+    <testcase name="top.vhd" classname="gohard.check" time="0">
+      <failure type="sema/ambiguous-overload" message="ambiguous =: &quot;=&quot; [length, length return BOOLEAN] from units_si; &quot;=&quot; [length, length return BOOLEAN] from units_us">top.vhd:9:32: error[sema/ambiguous-overload]: ambiguous =: &quot;=&quot; [length, length return BOOLEAN] from units_si; &quot;=&quot; [length, length return BOOLEAN] from units_us
+  units.vhd:4:8: note: candidate &quot;=&quot; [length, length return BOOLEAN] from units_si, predefined for the type declared here
+  units.vhd:10:8: note: candidate &quot;=&quot; [length, length return BOOLEAN] from units_us, predefined for the type declared here
+top.vhd:11:29: error[sema/ambiguous-overload]: ambiguous scale: scale [INTEGER return INTEGER] from units_si; scale [INTEGER return INTEGER] from units_us
+  units.vhd:5:12: note: candidate scale [INTEGER return INTEGER] from units_si
+  units.vhd:11:12: note: candidate scale [INTEGER return INTEGER] from units_us
+top.vhd:17:5: error[sema/ambiguous-overload]: ambiguous log: log [INTEGER] from units_si; log [INTEGER] from units_us
+  units.vhd:6:13: note: candidate log [INTEGER] from units_si
+  units.vhd:12:13: note: candidate log [INTEGER] from units_us</failure>
+    </testcase>
+    <testcase name="units.vhd" classname="gohard.check" time="0"/>
+  </testsuite>
+</testsuites>

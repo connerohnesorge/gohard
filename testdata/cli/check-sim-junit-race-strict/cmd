@@ -1,0 +1,3 @@
+# JUnit XML (#61): under --strict the race warning fails the
+# testbench case, and the lint warning fails the file's case.
+gohard check --sim --seed 1 --strict --format junit

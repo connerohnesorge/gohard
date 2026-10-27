@@ -1,0 +1,4 @@
+# JUnit XML (#61): a passing testbench is a test case without
+# failure; its notes, seed, status, end time and repro path are in
+# system-out, and the facts are suite properties too.
+gohard check --sim --format junit

@@ -68,6 +68,9 @@ func runCheck(inv *Invocation) Result {
 	})
 	r.Diagnostics = append(r.Diagnostics, found.Diagnostics...)
 	r.Files = len(found.Files)
+	for _, f := range found.Files {
+		r.Checked = append(r.Checked, f.Path)
+	}
 	srcs, ds := workspace.Read(inv.Env.Jobs, inv.Jobs, fsys, found.Files,
 		0)
 	r.Diagnostics = append(r.Diagnostics, ds...)

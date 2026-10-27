@@ -1,1 +1,1 @@
-gohard check --format junit
+gohard check --format xml

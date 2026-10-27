@@ -70,7 +70,7 @@ func TestCheckDeterministic(t *testing.T) {
 		e, _, _ := newEnv(t)
 		dir, _ := e.FS.Getwd()
 		paths := project(t, dir, seed)
-		format := []string{"text", "json", "sarif"}[seed%3]
+		format := []string{"text", "json", "sarif", "junit"}[seed%4]
 		var args []string
 		if seed%2 == 1 {
 			args = paths

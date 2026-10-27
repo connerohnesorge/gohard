@@ -1,0 +1,3 @@
+# JUnit XML (#61) of an interrupted run: only cli/interrupted,
+# no partial test cases.
+gohard check --format junit

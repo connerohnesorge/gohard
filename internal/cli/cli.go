@@ -287,6 +287,7 @@ func interrupted(inv *Invocation, res Result, intr env.Interrupt) []byte {
 	r.Diagnostics = []diag.Diagnostic{
 		diag.New(diag.CLIInterrupted, intr.Signal),
 	}
+	r.Checked, r.Testbenches = nil, nil
 	r.Signal = diag.SIGINT
 	if intr.Exit == diag.ExitTerminated {
 		r.Signal = diag.SIGTERM

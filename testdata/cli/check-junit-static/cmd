@@ -1,0 +1,3 @@
+# JUnit XML (#61) without --sim: one test case per checked file,
+# failing where the file has errors.
+gohard check --format junit

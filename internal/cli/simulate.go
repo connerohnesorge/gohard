@@ -233,19 +233,38 @@ func simulate(inv *Invocation, r *diag.Report, in simInput) {
 		out := simrun.Run(opts)
 		h.Inputs = repro.InputFiles(out.Inputs)
 		h.Listings = repro.InputFiles(out.Listings)
-		r.Diagnostics = append(r.Diagnostics, out.Diagnostics...)
+		run := testbenchRun(out)
 		if !hasTool(out.Diagnostics) {
-			r.Diagnostics = append(r.Diagnostics,
+			run.Diagnostics = append(run.Diagnostics,
 				races(inv, opts, out)...)
-			r.Diagnostics = append(r.Diagnostics,
-				writeRun(inv, in, out, w.RunDir, h, herr)...)
+			wds := writeRun(inv, in, out, w.RunDir, h, herr)
+			run.Diagnostics = append(run.Diagnostics, wds...)
+			if len(wds) == 0 {
+				run.Repro = repro.FileName(out.Testbench, out.Seed)
+			}
 			inv.Logf("simulated %s (%s): %s", out.Testbench,
 				simrun.SeedText(out.Seed), out.Status)
 		}
+		r.Diagnostics = append(r.Diagnostics, run.Diagnostics...)
+		r.Testbenches = append(r.Testbenches, run)
 		if inv.simRuns != nil {
 			*inv.simRuns = append(*inv.simRuns, out)
 		}
 	}
+}
+
+// testbenchRun is the report entry of one testbench run (#61): its
+// facts and, so far, its elaboration and simulation diagnostics.
+func testbenchRun(out simrun.Outcome) diag.Testbench {
+	run := diag.Testbench{Name: out.Testbench, Seed: out.Seed,
+		Diagnostics: slices.Clone(out.Diagnostics)}
+	if out.Status.Done() {
+		run.Status = out.Status.String()
+	}
+	if out.Trace != nil {
+		run.End = config.Time(out.Trace.Header.End).String()
+	}
+	return run
 }
 
 // races compares a run at a non-zero seed with the declaration-order

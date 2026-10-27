@@ -1,0 +1,3 @@
+# JUnit XML (#61) of an exit-2 run inside a testbench: the
+# unsupported construct is an <error> of the testbench case.
+gohard check --sim --seed 0 --tb tb --format junit

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="gohard" tests="2" failures="1" errors="0" time="0">
+  <testsuite name="gohard" tests="2" failures="1" errors="0" skipped="0" time="0">
+    <properties>
+      <property name="sev_tb.seed" value="0"/>
+      <property name="sev_tb.status" value="halted"/>
+      <property name="sev_tb.end" value="1 ns"/>
+      <property name="sev_tb.repro" value=".gohard/traces/sev_tb-0.repro.json"/>
+    </properties>
+    <testcase name="sev_tb.vhd" classname="gohard.check" time="0"/>
+    <testcase name="sev_tb" classname="gohard.sim" time="0">
+      <failure type="sim/assert-error" message="assertion error: boom">sev_tb.vhd:9:5: error[sim/assert-error]: assertion error: boom</failure>
+      <system-out>seed: 0
+status: halted
+end: 1 ns
+repro: .gohard/traces/sev_tb-0.repro.json
+sev_tb.vhd:10:5: hint[sim/assert-note]: report note: after</system-out>
+    </testcase>
+  </testsuite>
+</testsuites>

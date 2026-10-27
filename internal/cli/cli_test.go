@@ -86,7 +86,7 @@ func TestParseArgs(t *testing.T) {
 		},
 		{
 			args:    []string{"check", "--format", "xml"},
-			problem: `--format must be one of text, json, sarif, not "xml"`,
+			problem: `--format must be one of text, json, sarif, junit, not "xml"`,
 		},
 		{
 			args:    []string{"check", "--sim=yes"},
@@ -153,7 +153,7 @@ func TestCommandTable(t *testing.T) {
 func TestExitCodesDefined(t *testing.T) {
 	words := []string{"check", "fmt", "parse", "config", "lsp", "trace",
 		"libs", "version", "help", "nope", "--strict", "--format",
-		"json", "sarif", "xml", "-p", "3", "-h", "--help", "--",
+		"json", "sarif", "junit", "xml", "-p", "3", "-h", "--help", "--",
 		"a.vhd", "check", "schema", "export", "detect", "--output",
 		"--define", "--sim=maybe", "-"}
 	s := uint64(1)

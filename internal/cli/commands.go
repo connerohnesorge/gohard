@@ -21,6 +21,14 @@ var formatFlag = Flag{
 	Usage: "diagnostic output format: text, json or sarif",
 }
 
+// checkFormatFlag is formatFlag plus JUnit XML, which only check
+// writes (#61).
+var checkFormatFlag = Flag{
+	Name: "format", Kind: String, Value: "FORMAT", Default: "text",
+	Enum:  []string{"text", "json", "sarif", "junit"},
+	Usage: "diagnostic output format: text, json, sarif or junit",
+}
+
 var strictFlag = Flag{
 	Name: "strict", Kind: Bool,
 	Usage: "exit 1 on any warning (hints never fail a run)",
@@ -69,7 +77,7 @@ var commands = []Command{
 			},
 			defineFlag,
 			envFlag,
-			formatFlag,
+			checkFormatFlag,
 			realEnvFlag,
 			{
 				Name: "repro", Kind: String, Value: "FILE",

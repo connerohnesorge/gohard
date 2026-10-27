@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="gohard" tests="2" failures="1" errors="0" time="0">
+  <testsuite name="gohard" tests="2" failures="1" errors="0" skipped="0" time="0">
+    <properties>
+      <property name="budget_hang.seed" value="0"/>
+      <property name="budget_hang.status" value="budget-exceeded"/>
+      <property name="budget_hang.end" value="100 ns"/>
+      <property name="budget_hang.repro" value=".gohard/traces/budget_hang-0.repro.json"/>
+    </properties>
+    <testcase name="budget_hang.vhd" classname="gohard.check" time="0"/>
+    <testcase name="budget_hang" classname="gohard.sim" time="0">
+      <failure type="sim/budget-exceeded" message="time budget of 100 ns exceeded at 100 ns">budget_hang.vhd:1:8: error[sim/budget-exceeded]: time budget of 100 ns exceeded at 100 ns</failure>
+      <system-out>seed: 0
+status: budget-exceeded
+end: 100 ns
+repro: .gohard/traces/budget_hang-0.repro.json</system-out>
+    </testcase>
+  </testsuite>
+</testsuites>

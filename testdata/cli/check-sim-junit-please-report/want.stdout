@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="gohard" tests="2" failures="0" errors="1" time="0">
+  <testsuite name="gohard" tests="2" failures="0" errors="1" skipped="0" time="0">
+    <properties>
+      <property name="tb.seed" value="0"/>
+      <property name="tb.status" value="failed"/>
+      <property name="tb.end" value="0 fs"/>
+    </properties>
+    <testcase name="tb.vhd" classname="gohard.check" time="0"/>
+    <testcase name="tb" classname="gohard.sim" time="0">
+      <error type="unsupported/construct" message="&apos;PATH_NAME and &apos;INSTANCE_NAME of a declaration of a generic package is not supported yet, please report">tb.vhd:13:5: error[unsupported/construct]: &apos;PATH_NAME and &apos;INSTANCE_NAME of a declaration of a generic package is not supported yet, please report</error>
+      <system-out>seed: 0
+status: failed
+end: 0 fs</system-out>
+    </testcase>
+  </testsuite>
+</testsuites>

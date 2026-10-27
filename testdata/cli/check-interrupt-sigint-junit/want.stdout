@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="gohard" tests="1" failures="0" errors="1" time="0">
+  <testsuite name="gohard" tests="1" failures="0" errors="1" skipped="0" time="0">
+    <testcase name="gohard" classname="gohard.check" time="0">
+      <error type="cli/interrupted" message="interrupted by SIGINT">gohard: error[cli/interrupted]: interrupted by SIGINT</error>
+    </testcase>
+  </testsuite>
+</testsuites>

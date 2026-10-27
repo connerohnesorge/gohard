@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="gohard" tests="2" failures="2" errors="0" time="0">
+  <testsuite name="gohard" tests="2" failures="2" errors="0" skipped="0" time="0">
+    <properties>
+      <property name="tb.seed" value="1"/>
+      <property name="tb.status" value="quiet"/>
+      <property name="tb.end" value="0 fs"/>
+      <property name="tb.repro" value=".gohard/traces/tb-1.repro.json"/>
+    </properties>
+    <testcase name="tb.vhd" classname="gohard.check" time="0">
+      <failure type="lint/unused-signal" message="signal s is never read">tb.vhd:6:10: warning[lint/unused-signal]: signal s is never read</failure>
+    </testcase>
+    <testcase name="tb" classname="gohard.sim" time="0">
+      <failure type="sim/race" message="race between tb.w and tb.r: traces differ between seed 0 and seed 1">tb.vhd:1:8: warning[sim/race]: race between tb.w and tb.r: traces differ between seed 0 and seed 1</failure>
+      <system-out>seed: 1
+status: quiet
+end: 0 fs
+repro: .gohard/traces/tb-1.repro.json</system-out>
+    </testcase>
+  </testsuite>
+</testsuites>

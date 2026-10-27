@@ -1,0 +1,3 @@
+# JUnit XML (#61) with --output: the XML goes to the file, stdout
+# stays empty.
+gohard check --format junit --output report.xml
