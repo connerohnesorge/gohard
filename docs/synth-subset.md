@@ -60,9 +60,11 @@ NEORV32 recordings in `testdata/synth/neorv32/` (see
 ## Scope
 
 The rules apply to RTL only: the user's units, not the `std` and
-`ieee` packages (the body of `rising_edge` reads `'last_value`). Three
-scope rules come first, because without them the NEORV32 verdicts
-below fail:
+`ieee` packages (the body of `rising_edge` reads `'last_value`). Four
+scope rules come first. Without the synthesis-off, synthesis
+elaboration and testbench rules the NEORV32 verdicts below fail;
+without the elaboration-only rule common `clog2` and ROM helpers are
+reported:
 
 - **Synthesis-off regions.** Code between `-- rtl_synthesis off` and
   `-- rtl_synthesis on` (1076.6 7.2), or between the GHDL-documented
@@ -77,6 +79,15 @@ below fail:
   simulation, because its `or true` sits in a translate-off region, and
   the `if is_simulation_c generate` bodies hold the simulation-only
   logging.
+- **Elaboration-only code.** A subprogram whose every call is in a
+  constant, generic, range or other static expression runs only while
+  elaborating, and synthesis folds it to a value. Its declarations and
+  statements are not checked by `time-now`, `access-type`, `file-io`,
+  `real-signal` and `dynamic-loop`: a `clog2` helper with a `real` or
+  `time` variable or a `while` loop, or a function that reads a ROM
+  file, is fine. Examples: `file-init-ok` (a file and a `line`
+  variable), `elab-function-ok` (`time` and `real` variables and
+  `while` loops), both GHDL exit 0.
 - **Testbenches.** Testbenches are not checked: entities listed in
   `simulation.testbenches`, entities without ports, and every unit
   reachable only through them. Ports alone are not enough: NEORV32's
@@ -106,14 +117,15 @@ outside plain edge-triggered flip-flops).
 | `init-as-reset` | 8.4.3, 6.1 | differs | accepted; initial value kept on the register |
 | `guarded` | 8.9.1, 8.4.3, 8.5.3 | differs | `guarded-block`: accepted, guard dropped; `guarded-signal`: internal error (exit 2) |
 | `history-attr` | 8.14.1, 6.1 | no hardware | rejected: `last_value attribute not allowed`; `edge-stable`: `signal attribute not supported` |
-| `edge-else` | 6.1 | differs | accepted; the edge becomes a data signal |
+| `edge-else` | 6.1 | differs | accepted; the edge becomes a data signal (`edge-else`, `edge-else-when`) |
 | `two-edges` | 6.1 | cells | accepted; a `gate_mdff` dual-edge cell |
 | `latch` | 6.2 | cells | rejected: `latch infered for net "q" (use --latches)` |
 | `dynamic-loop` | 8.8.9 | no hardware | rejected: `loop condition must be static` |
 
 Accepted counterparts, all GHDL exit 0: `wait-until-ok`,
-`edge-event-ok`, `file-init-ok` (GHDL builds a ROM from the file),
-`real-const-ok`, `static-loop-ok`, `pragma-off-ok`.
+`edge-event-ok`, `edge-when-ok`, `file-init-ok` (GHDL builds a ROM
+from the file), `elab-function-ok`, `real-const-ok`, `static-loop-ok`,
+`static-while-ok`, `pragma-off-ok`.
 
 ### wait-for
 
@@ -150,9 +162,12 @@ constant.
 A call of `now`, or a signal or variable of type `time` (or another
 physical type), in RTL. Constants and generics of type `time` stay
 allowed when they are folded while elaborating, for example to compute
-a cycle count from a clock period. Example: a register that stores
-`now` and a comparison against `100 ns`. GHDL rejects the comparison
-of the stored time; it does not report the call of `now` itself.
+a cycle count from a clock period, and so do variables in
+elaboration-only subprograms (see [Scope](#scope); `elab-function-ok`
+counts clock periods in a `time` variable). Example: a register that
+stores `now` and a comparison against `100 ns`. GHDL rejects the
+comparison of the stored time; it does not report the call of `now`
+itself.
 
 ### sim-control
 
@@ -163,14 +178,17 @@ synthesis can't judge the example: it stops with an internal error.
 ### access-type
 
 An access type, an object of an access type, an allocator (`new`), or
-`deallocate` in RTL. This includes `line` from TEXTIO. Example: a
+`deallocate` in RTL. This includes `line` from TEXTIO. Not reported:
+the same inside an elaboration-only subprogram (see [Scope](#scope)),
+such as the `line` variable of `file-init-ok`. Example: a
 process variable of type `access std_ulogic`. GHDL rejects the
 variable, then stops with an internal error.
 
 ### file-io
 
 A file type, a file object, or a TEXTIO call that runs after
-elaboration in RTL. Examples: `file-io` writes a TEXTIO log from a
+elaboration in RTL, that is, outside an elaboration-only subprogram
+(see [Scope](#scope)). Examples: `file-io` writes a TEXTIO log from a
 clocked process (GHDL rejects the `line` variable first, then stops
 with an internal error); `file-io-binary` writes a `file of bit` (GHDL
 stops with an internal error: it can't judge it). Not reported:
@@ -182,7 +200,8 @@ constant while elaborating; GHDL accepts it and reports a ROM.
 A signal, variable or port of type `real` (or another floating-point
 type) in RTL. Not reported: `real-const-ok`, where `real` appears only
 in constant expressions folded while elaborating (`ceil(log2(...))` for
-a width).
+a width), and `elab-function-ok`, where a `real` variable lives in an
+elaboration-only `clog2` (see [Scope](#scope)).
 
 ### shared-variable
 
@@ -225,13 +244,27 @@ them too, and `rising_edge` is the fix. Not reported: `edge-event-ok`
 
 ### edge-else
 
-An `if` whose condition is a clock edge and that has an `else` or
-`elsif` branch after the edge branch, or a clock edge used as a value
-outside an `if` condition. Synthesis has no hardware for "not at the
-edge": GHDL accepts the example and turns the edge into a data signal
-(`n2 <= '1' when rising_edge (wrap_clk) else '0'`, then a mux). The
-asynchronous-reset shape, where the edge is the last `elsif`, is not
-reported.
+A clock edge (`rising_edge`, `falling_edge`, or the `'event`
+spelling) is an edge condition in three places: the condition of an
+`if` or `elsif`, the condition of a `wait until`, and the condition
+of a conditional signal assignment (`q <= d when rising_edge(clk);`,
+the concurrent register form of 1076.6 6.1). Reported:
+
+- an edge condition with a branch after the edge branch: an `else` or
+  `elsif` after it in an `if`, or an `else` after it in a conditional
+  assignment;
+- a clock edge outside these three conditions: assigned to a signal
+  or variable, passed as an actual, or as a `case` or
+  selected-assignment expression.
+
+Synthesis has no hardware for "not at the edge": GHDL accepts both
+examples and turns the edge into a data signal (`edge-else`, an `if`
+with `else`: `n2 <= '1' when rising_edge (wrap_clk) else '0'`, then a
+mux; `edge-else-when`, `q <= d when rising_edge(clk) else '0'`:
+the same shape). Not reported: `wait-until-ok` (`wait until
+rising_edge(clk)`), `edge-when-ok` (`q <= d when rising_edge(clk);`,
+a plain flip-flop in the netlist), `edge-event-ok`, and the
+asynchronous-reset shape, where the edge is the last `elsif`.
 
 ### two-edges
 
@@ -253,11 +286,17 @@ synthesized units once inference lands (#106 Q5).
 
 ### dynamic-loop
 
-A loop whose iteration count depends on signal or port values: a
-`while` loop, or a `for` loop whose range is not static after
-elaboration. Example: count trailing zeros with a `while` loop. Not
-reported: `static-loop-ok`, the same function as a `for` loop over a
-constant range with `exit`.
+A loop whose iteration count depends on values that change at run
+time: a `while` loop whose condition reads a signal or port, or a
+variable that depends on one, or a `for` loop whose range is not
+static after elaboration. GHDL unrolls loops and rejects one whose
+condition is not a constant on some unrolled iteration. Example: count
+trailing zeros with `while i < 8 and x(i) = '0'`. Not reported:
+`static-loop-ok`, the same function as a `for` loop over a constant
+range with an `exit` that reads the input; `static-while-ok`, a
+`while i < W` loop in a process that sets `i` only from constants,
+and a `clog2` helper with a `while` loop; and loops in
+elaboration-only subprograms (see [Scope](#scope)).
 
 ## Left out
 
