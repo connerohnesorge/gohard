@@ -5,8 +5,12 @@ on:
     tags:
       - 'v*'
 
+# contents: the release itself. id-token and attestations: the build
+# provenance attestations of the archives and checksums.txt (#69).
 permissions:
   contents: write
+  id-token: write
+  attestations: write
 
 jobs:
   goreleaser:
@@ -54,3 +58,15 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pushes the Homebrew cask and the Scoop manifest (#69). When
+          # the secret is not set, .goreleaser.yaml skips both uploads.
+          PACKAGES_GITHUB_TOKEN: ${{ secrets.PACKAGES_GITHUB_TOKEN }}
+
+      # Signed SLSA build provenance for every archive and checksums.txt,
+      # verifiable with `gh attestation verify` (docs/install.md).
+      - uses: actions/attest@v4
+        with:
+          subject-path: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/checksums.txt

@@ -113,9 +113,20 @@ and fails if one lacks the binary, `internal/stdlib/LICENSE` or
 #40), or the root `LICENSE` and `AUTHORS.md` once those files exist
 (#38), or if an entry lacks the file info `.goreleaser.yaml` pins:
 owner `root:root` with uid and gid 0 (tar only), mode 0755 for the
-binary and 0644 for the rest, and the commit time as mtime. Only then
-does it run the real `goreleaser release --clean`. Local check (the
-second form builds from the committed HEAD, not the working tree):
+binary and 0644 for the rest, and the commit time as mtime. It also
+fails unless the Homebrew cask (`dist/homebrew/Casks/gohard.rb`) and
+the Scoop manifest (`dist/scoop/gohard.json`) exist, are byte-identical
+across the two clones, name only hashes from `checksums.txt` (four and
+two), and the cask removes the macOS quarantine attribute (#69). Only
+then does it run the real `goreleaser release --clean`, which publishes
+the release and pushes the cask to `connerohnesorge/homebrew-tap` and
+the manifest to `connerohnesorge/scoop-bucket` with the
+`PACKAGES_GITHUB_TOKEN` secret (a token with contents write on both
+repos; without it goreleaser skips both pushes). Last, `actions/attest`
+signs build provenance for every archive and `checksums.txt`, which
+needs the `id-token: write` and `attestations: write` permissions;
+`docs/install.md` shows how to verify it. Local check (the second form
+builds from the committed HEAD, not the working tree):
 
 ```
 nix run nixpkgs#goreleaser -- release --snapshot --clean
