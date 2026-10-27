@@ -16,7 +16,7 @@ every pull request on Linux, macOS and Windows under plain `go test`.
 | --- | --- | --- |
 | `client.jsonl` | yes | The client messages, one JSON-RPC body per line, in arrival order. Blank lines and lines starting with `#` are skipped; each line is compacted before it is sent. |
 | `in/` | no | The project tree, placed at `/work` of a simulated Env (`internal/env/simenv`); the session's workspace folder is `file:///work`. |
-| `analyzer` | no | `nop` (the default), `format` (`server.WithFormatting` over `nop`, the formatting of `gohard lsp`, #32) or `echo`, a test analyzer that makes the server's view visible: it publishes one hint per open document holding its version and text, hovers name the word and byte offset under the cursor, and definition finds `entity <word>` in any document of the snapshot (a cross-file query). |
+| `analyzer` | no | `nop` (the default), `format` (`server.WithFormatting` over `nop`, the formatting of `gohard lsp`, #32), `words` (the semantic tokens test analyzer, see the `semantic-tokens` case) or `echo`, a test analyzer that makes the server's view visible: it publishes one hint per open document holding its version and text, hovers name the word and byte offset under the cursor, and definition finds `entity <word>` in any document of the snapshot (a cross-file query). |
 | `want.jsonl` | yes | Every message the server sent, one body per line, byte for byte as written to the client (without the `Content-Length` framing). |
 | `want.exit` | yes | The session's exit code and a newline: 0 after shutdown and exit, else 1. |
 
@@ -62,6 +62,7 @@ that both runs agree and keep the invariants; the nightly
 | `exit-without-shutdown` | exit code 1 |
 | `format-document` | whole-file formatting (#32) in a utf-16 session; formatted text gets no edits; a project file that is not open is formatted from disk; a file that does not parse and a document that is not VHDL get no edits |
 | `format-range` | range formatting with the `format.*` keys of `gohard.yaml`: edits only inside whole-line and part-line ranges, none for an empty range, the new text after an edit |
+| `semantic-tokens` | semantic tokens (#55) with the `words` test analyzer (every word a variable token, readonly when upper case; every `--` and `/* */` comment a comment token) in a utf-16 session: full with a result ID, a block comment split per line, a range (the overlapping tokens, whole), a delta after an edit, a delta with no edits, a delta against an old result ID (the full result), a range without a range (InvalidParams), and the base dropped on close |
 
 ## `<action>/<case>/`
 
@@ -159,6 +160,11 @@ result; positions are zero-based UTF-8.
 | `waveform/gtkwave` | only GTKWave on `PATH` |
 | `repro/default` | `gohard lsp repro`: Copy repro, the `gohard check --repro FILE` command |
 | `codelens/testbench` | the "▶ Run sev_tb" lens on a portless entity |
+| `semantic-tokens/full` | `gohard lsp semantic-tokens --at PATH:1:1`: the semantic tokens of the whole file (#55): names typed by what they denote, with declaration, readonly, static and defaultLibrary modifiers, keywords, literals and comments |
+| `semantic-tokens/range` | `range 24:1-27:1`: the slice of the full result that overlaps the range |
+| `semantic-tokens/inactive-branch` | `full`: each line of the inactive `` `elsif `` and `` `else `` branches is one comment token with the inactive modifier |
+| `semantic-tokens/non-ascii` | Latin-1 identifiers, an extended identifier, comments and a string with emoji; `TestSemanticTokensEncodings` checks the same tokens under utf-16 and utf-32 |
+| `semantic-tokens/bad-range` | a range that is not `LINE:COL-LINE:COL` is a usage error (exit 2) |
 
 The `waveform/` cases replace the Executor with a simulated one through
 the `viewers [NAME...]` setup directive (see `testdata/cli/README.md`).
@@ -190,6 +196,18 @@ that case. `TestNavCorpus`, `TestNavOSVVM`, `TestNavUVVM` and
 `TestNavNEORV32` (`internal/ide`) check definition, references and
 hover at every name occurrence, and `TestRenameCorpus` renames every
 renamable declaration of the corpus and re-analyzes it.
+
+`gohard lsp semantic-tokens --at PATH:1:1 [full|range L:C-L:C]`
+prints the result of `textDocument/semanticTokens/full` (the
+default), or of `/range` for the half-open range from `L:C` to `L:C`
+(one-based, columns in bytes); `--at` only names the file. The data
+is the LSP encoding: five numbers per token (line delta, start delta,
+length, type, modifiers) in UTF-8 bytes. Delta results are not a CLI
+action: the `session/semantic-tokens` case and
+`TestSemanticTokensCorpus` (`internal/ide`) check them. That test
+also checks, on every corpus file, that a range result is the slice
+of the full result overlapping the range and that a delta applied to
+the result it names gives the full result.
 
 `gohard lsp range-format --at PATH:LINE:COL END_LINE:END_COL` formats
 the half-open range from `--at` to the end position (both one-based,

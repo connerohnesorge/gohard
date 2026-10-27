@@ -1,0 +1,5 @@
+# Non-ASCII text (#55): identifiers with Latin-1 letters, an extended
+# identifier with an emoji, comments and a string. Columns and lengths
+# count UTF-8 bytes here; TestSemanticTokensEncodings (internal/ide)
+# checks the same tokens under utf-16 and utf-32.
+gohard lsp semantic-tokens --at top.vhd:1:1

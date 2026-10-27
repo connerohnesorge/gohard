@@ -1,0 +1,3 @@
+# Semantic tokens of the whole file (#55): names typed by what they
+# denote, keywords, literals and comments. --at names the document.
+gohard lsp semantic-tokens --at top.vhd:1:1

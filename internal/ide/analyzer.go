@@ -97,6 +97,9 @@ func (a *Analyzer) Features() server.Features {
 	if f.Has(server.FeatureCompletion) {
 		f.CompletionTriggers = []string{"."}
 	}
+	if f.Has(server.FeatureSemanticTokens) {
+		f.TokenTypes, f.TokenModifiers = TokenTypes, TokenModifiers
+	}
 	return f
 }
 

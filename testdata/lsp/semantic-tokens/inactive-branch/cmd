@@ -1,0 +1,4 @@
+# The inactive `elsif and `else branches: each of their lines is one
+# comment token with the inactive modifier (bit 4, 16), from its first
+# to its last non-blank byte; the active branch keeps its tokens.
+gohard lsp semantic-tokens --at top.vhd:1:1 full

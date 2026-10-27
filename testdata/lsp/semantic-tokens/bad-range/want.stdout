@@ -1,0 +1,2 @@
+gohard: error[cli/usage]: gohard lsp semantic-tokens: the range must be LINE:COL-LINE:COL with lines and columns of at least 1, not "2:1"; run 'gohard help' for usage
+summary: 1 errors, 0 warnings, 0 hints, 0 files

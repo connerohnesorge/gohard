@@ -1,0 +1,2 @@
+# A range that is not LINE:COL-LINE:COL is a usage error (exit 2).
+gohard lsp semantic-tokens --at top.vhd:1:1 range 2:1
