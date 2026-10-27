@@ -24,6 +24,18 @@ type SrcRef struct {
 	Path       string
 	Start, End int
 	Line, Col  int
+	// Bundled is the bundle path ("ieee/numeric_std-body.vhdl") of a
+	// place in a bundled std/ieee file, whose Path is empty: trace
+	// events name it, diagnostics have no position (#59).
+	Bundled string
+}
+
+// TraceFile is the file a trace event at s names: Path, or Bundled.
+func (s SrcRef) TraceFile() string {
+	if s.Path == "" {
+		return s.Bundled
+	}
+	return s.Path
 }
 
 // ImplicitKind is the kind of an implicit signal (LRM 16.2.3).

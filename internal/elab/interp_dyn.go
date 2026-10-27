@@ -195,7 +195,8 @@ func (r elabReporter) Report(s *sema.SeqStmt, assertion bool, sev int64,
 var _ sema.Reporter = elabReporter{}
 
 // stmtSrc is the source place of the statement node n: its file among
-// the design's.
+// the design's, or for a statement of a bundled std/ieee body (an
+// assertion of numeric_std) its bundle path in Bundled.
 func (d *Design) stmtSrc(n cst.Node) sim.SrcRef {
 	if n.IsZero() || d.r == nil {
 		return sim.SrcRef{}
@@ -207,6 +208,15 @@ func (d *Design) stmtSrc(n cst.Node) sim.SrcRef {
 	for _, f := range d.r.Files {
 		if f.Parse != nil && f.Parse.Root == root.Green() {
 			return srcOf(f, n.Span())
+		}
+	}
+	if d.r.Bundle != nil {
+		for _, f := range d.r.Bundle.Files {
+			if f.Parse != nil && f.Parse.Root == root.Green() {
+				s := srcOf(f, n.Span())
+				s.Path, s.Bundled = "", f.Path
+				return s
+			}
 		}
 	}
 	return sim.SrcRef{}

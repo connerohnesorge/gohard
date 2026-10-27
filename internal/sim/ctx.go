@@ -281,7 +281,7 @@ func (c *Ctx) Report(r Report) error {
 	}
 	if w := k.opts.Writer; w != nil {
 		err := w.Event(trace.Event{Time: k.now, Delta: k.delta,
-			Kind: kind, Severity: r.Severity, File: r.Src.Path,
+			Kind: kind, Severity: r.Severity, File: r.Src.TraceFile(),
 			Line: r.Src.Line, Process: int(k.current) + 1,
 			Message: r.Message})
 		if err != nil {
@@ -569,7 +569,8 @@ func (c *Ctx) TraceEvent(kind trace.EventKind, msg string, src SrcRef) error {
 		return nil
 	}
 	err := w.Event(trace.Event{Time: k.now, Delta: k.delta, Kind: kind,
-		File: src.Path, Line: src.Line, Process: int(k.current) + 1,
+		File: src.TraceFile(), Line: src.Line,
+		Process: int(k.current) + 1,
 		Message: msg})
 	if err != nil {
 		k.fail(err)
