@@ -9,7 +9,7 @@ import (
 )
 
 // JUnit XML output (#61), valid against the Jenkins junit-10.xsd
-// schema (a copy is in testdata/junit-10.xsd).
+// schema (a copy is in internal/diag/junittest/junit-10.xsd).
 //
 // The root <testsuites> holds one <testsuite> per run. Its test cases
 // are, in order: one per checked file and per other path with a
