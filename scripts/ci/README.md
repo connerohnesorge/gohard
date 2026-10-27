@@ -99,17 +99,27 @@ Local dry run:
 
 ## Release workflow (`release.yml`)
 
-Triggers: `v*` tags. It first runs `goreleaser release --snapshot
---clean` and `archive-check.sh dist`, which lists every archive and
-fails if one lacks the binary, `internal/stdlib/LICENSE` or
+Triggers: `v*` tags. It first installs goreleaser and runs
+`release-repro.sh`, which clones HEAD twice and runs `goreleaser
+release --snapshot --clean` in each clone. The second clone is made
+after the first build, under umask 077, with every file's mtime set to
+2000-01-01. The script fails unless both builds write the same archive
+names and byte-identical archives and `checksums.txt` (#50), and runs
+`archive-check.sh` on both dists. `archive-check.sh` lists every archive
+and fails if one lacks the binary, `internal/stdlib/LICENSE` or
 `internal/stdlib/AUTHORS.md` (the IEEE-P1076 license the binary embeds,
 #40), or the root `LICENSE` and `AUTHORS.md` once those files exist
-(#38). Only then does it run the real `goreleaser release --clean`.
-Local check:
+(#38), or if an entry lacks the file info `.goreleaser.yaml` pins:
+owner `root:root` with uid and gid 0 (tar only), mode 0755 for the
+binary and 0644 for the rest, and the commit time as mtime. Only then
+does it run the real `goreleaser release --clean`. Local check (the
+second form builds from the committed HEAD, not the working tree):
 
 ```
 nix run nixpkgs#goreleaser -- release --snapshot --clean
 bash scripts/ci/archive-check.sh
+GORELEASER=$(nix build nixpkgs#goreleaser --no-link --print-out-paths)/bin/goreleaser \
+  nix develop -c bash scripts/ci/release-repro.sh
 ```
 
 ## Rules (#30)

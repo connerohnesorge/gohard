@@ -66,6 +66,9 @@ nix develop -c go test -p 4 ./...
 Releases are built by goreleaser on `v*` tags
 (`.goreleaser.yaml`, `.github/workflows/release.yml`). Try it locally
 with `nix run nixpkgs#goreleaser -- release --snapshot --clean`.
+The archives are reproducible: two clones of the same commit give
+byte-identical archives and `checksums.txt`, which the release job
+checks with `scripts/ci/release-repro.sh` before it publishes.
 
 ## License
 

@@ -34,16 +34,18 @@ jobs:
           go-version: '1.27.x'
           check-latest: false
 
-      # Build the archives first and check each one carries the license
-      # files (#40), so a broken file list never publishes.
+      # Build snapshot archives first, twice from two fresh clones, and
+      # check they are byte-identical (#50) and that each one carries the
+      # license files (#40), so neither a broken file list nor an archive
+      # that depends on the checkout ever publishes.
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: '~> v2'
-          args: release --snapshot --clean
+          install-only: true
 
-      - name: Check the archive contents
-        run: bash scripts/ci/archive-check.sh dist
+      - name: Check the archives are reproducible and complete
+        run: bash scripts/ci/release-repro.sh
 
       - uses: goreleaser/goreleaser-action@v6
         with:
