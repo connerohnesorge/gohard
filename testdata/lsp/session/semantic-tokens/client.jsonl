@@ -1,0 +1,27 @@
+# Semantic tokens (#55) in a utf-16 session, with the words test
+# analyzer: every word a variable (readonly when upper case), every
+# comment a comment. On line 0 the word é😀 is 3 units (é 1, 😀 2), so
+# x starts at unit 4 (byte 7); the block comment spans lines 1 and 2
+# and is sent as one token per line.
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":null,"rootUri":"file:///work","capabilities":{"general":{"positionEncodings":["utf-16"]}}}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///work/top.vhd","languageId":"vhdl","version":1,"text":"é😀 x -- c\nentity TOP is /* a\nb */ end;\n"}}}
+# Full: result ID 1, the base of the next delta.
+{"jsonrpc":"2.0","id":2,"method":"textDocument/semanticTokens/full","params":{"textDocument":{"uri":"file:///work/top.vhd"}}}
+# Range over line 1 up to unit 16 (inside "/* a"): the tokens that
+# overlap it, whole, and no result ID.
+{"jsonrpc":"2.0","id":3,"method":"textDocument/semanticTokens/range","params":{"textDocument":{"uri":"file:///work/top.vhd"},"range":{"start":{"line":1,"character":0},"end":{"line":1,"character":16}}}}
+# TOP becomes top: a delta against 1 is one edit (the modifier).
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///work/top.vhd","version":2},"contentChanges":[{"range":{"start":{"line":1,"character":7},"end":{"line":1,"character":10}},"text":"top"}]}}
+{"jsonrpc":"2.0","id":4,"method":"textDocument/semanticTokens/full/delta","params":{"textDocument":{"uri":"file:///work/top.vhd"},"previousResultId":"1"}}
+# No change since 2: a delta with no edits.
+{"jsonrpc":"2.0","id":5,"method":"textDocument/semanticTokens/full/delta","params":{"textDocument":{"uri":"file:///work/top.vhd"},"previousResultId":"2"}}
+# 1 is no longer the base: the full result.
+{"jsonrpc":"2.0","id":6,"method":"textDocument/semanticTokens/full/delta","params":{"textDocument":{"uri":"file:///work/top.vhd"},"previousResultId":"1"}}
+# A range request without a range is invalid.
+{"jsonrpc":"2.0","id":7,"method":"textDocument/semanticTokens/range","params":{"textDocument":{"uri":"file:///work/top.vhd"}}}
+# Closing the document drops its base; it is gone from the snapshot.
+{"jsonrpc":"2.0","method":"textDocument/didClose","params":{"textDocument":{"uri":"file:///work/top.vhd"}}}
+{"jsonrpc":"2.0","id":8,"method":"textDocument/semanticTokens/full/delta","params":{"textDocument":{"uri":"file:///work/top.vhd"},"previousResultId":"3"}}
+{"jsonrpc":"2.0","id":99,"method":"shutdown"}
+{"jsonrpc":"2.0","method":"exit"}

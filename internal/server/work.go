@@ -143,7 +143,9 @@ func (s *State) slice(o *out, id uint64) {
 		if s.simFinished(o, w, res) {
 			return
 		}
-		if f, ok := res.(failure); ok && w.isReq {
+		if r, ok := res.(tokenResult); ok && w.isReq {
+			s.answerTokens(o, w.reqID, r)
+		} else if f, ok := res.(failure); ok && w.isReq {
 			s.fail(o, w.reqID, jsonrpc2.CodeRequestFailed, f.msg)
 		} else if w.isReq {
 			s.respond(o, w.reqID, res)

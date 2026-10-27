@@ -1,0 +1,18 @@
+{"jsonrpc":"2.0","id":1,"result":{"capabilities":{"positionEncoding":"utf-16","semanticTokensProvider":{"full":{"delta":true},"legend":{"tokenModifiers":["readonly"],"tokenTypes":["variable","comment"]},"range":true},"textDocumentSync":{"change":2,"openClose":true,"save":{"includeText":false}},"workspace":{"workspaceFolders":{"supported":true}}},"serverInfo":{"name":"gohard","version":"0.0.0-test"}}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":0,"id":1}}
+{"jsonrpc":"2.0","id":2,"result":{"resultId":"1","data":[0,0,3,0,0,0,4,1,0,0,0,2,4,1,0,1,0,6,0,0,0,7,3,0,1,0,4,2,0,0,0,3,4,1,0,1,0,4,1,0,0,5,3,0,0]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":2,"id":2}}
+{"jsonrpc":"2.0","id":3,"result":{"data":[1,0,6,0,0,0,7,3,0,1,0,4,2,0,0,0,3,4,1,0]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":2,"id":3}}
+{"jsonrpc":"2.0","id":4,"result":{"resultId":"2","edits":[{"start":24,"deleteCount":1,"data":[0]}]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":3,"id":4}}
+{"jsonrpc":"2.0","id":5,"result":{"resultId":"3","edits":[]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":3,"id":5}}
+{"jsonrpc":"2.0","id":6,"result":{"resultId":"4","data":[0,0,3,0,0,0,4,1,0,0,0,2,4,1,0,1,0,6,0,0,0,7,3,0,0,0,4,2,0,0,0,3,4,1,0,1,0,4,1,0,0,5,3,0,0]}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":3,"id":6}}
+{"jsonrpc":"2.0","id":7,"error":{"code":-32602,"message":"missing range"}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":3,"id":7}}
+{"jsonrpc":"2.0","id":8,"error":{"code":-32602,"message":"unknown document file:///work/top.vhd"}}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":4,"id":8}}
+{"jsonrpc":"2.0","id":99,"result":null}
+{"jsonrpc":"2.0","method":"$/gohard/snapshot","params":{"snapshot":4,"id":99}}

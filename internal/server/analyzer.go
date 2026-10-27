@@ -56,6 +56,12 @@ type Analyzer interface {
 	// range r of the document q.URI (q.Offset is r.Start): add a
 	// missing use, map an unmapped library (#25, #34).
 	CodeActions(q Query, r Span) Task[[]CodeAction]
+	// SemanticTokens returns the semantic tokens of the whole
+	// document uri, sorted by position and not overlapping (#55); a
+	// token may span lines. The server splits them per line, encodes
+	// them in the negotiated position encoding and answers range and
+	// delta requests from them.
+	SemanticTokens(snap *Snapshot, uri string) Task[[]SemToken]
 }
 
 // Feature is one optional language feature.
@@ -78,6 +84,7 @@ const (
 	FeatureCodeLens
 	FeatureCommands
 	FeatureCodeActions
+	FeatureSemanticTokens
 )
 
 // Features is what an Analyzer provides.
@@ -87,6 +94,10 @@ type Features struct {
 	Commands []string
 	// CompletionTriggers are extra completion trigger characters.
 	CompletionTriggers []string
+	// TokenTypes and TokenModifiers are the semantic tokens legend
+	// (FeatureSemanticTokens): SemToken.Type indexes TokenTypes and bit
+	// i of SemToken.Mods stands for TokenModifiers[i].
+	TokenTypes, TokenModifiers []string
 }
 
 // Has reports whether f includes every feature in want.
@@ -201,6 +212,15 @@ type CodeAction struct {
 	Edits     []FileEdit
 }
 
+// SemToken is one semantic token: Span in one document, Type an index
+// into Features.TokenTypes, Mods a set of Features.TokenModifiers
+// (bit i for TokenModifiers[i]).
+type SemToken struct {
+	Span Span
+	Type int
+	Mods uint32
+}
+
 // Nop is the Analyzer of a server without analysis: it provides no
 // features and every task finishes at once with an empty result.
 type Nop struct{}
@@ -281,4 +301,9 @@ func (Nop) Command(*Snapshot, string,
 // CodeActions implements Analyzer.
 func (Nop) CodeActions(Query, Span) Task[[]CodeAction] {
 	return Done[[]CodeAction](nil)
+}
+
+// SemanticTokens implements Analyzer.
+func (Nop) SemanticTokens(*Snapshot, string) Task[[]SemToken] {
+	return Done[[]SemToken](nil)
 }

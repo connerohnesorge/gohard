@@ -86,6 +86,8 @@ func analyzerNamed(name string) (server.Analyzer, bool) {
 	switch name {
 	case "echo":
 		return echo{}, true
+	case "words":
+		return words{}, true
 	case "format":
 		return server.WithFormatting(server.Nop{}, testVersion), true
 	case "nop", "":

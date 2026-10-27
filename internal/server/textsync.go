@@ -144,6 +144,9 @@ func (s *State) didClose(o *out, params json.RawMessage) {
 		return
 	}
 	key := docKey(p.TextDocument.URI)
+	if _, ok := s.tokens[key]; ok {
+		s.tokens = cloneDelete(s.tokens, key)
+	}
 	if _, ok := s.open[key]; !ok {
 		return
 	}

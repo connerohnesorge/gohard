@@ -83,3 +83,60 @@ func (echo) Definition(q server.Query) server.Task[[]server.Location] {
 	}
 	return server.Done[[]server.Location](nil)
 }
+
+// words is the analyzer of the semantic tokens fixtures (#55): every
+// word is a variable token, readonly when it has no lower-case letter,
+// and every -- and /* */ comment a comment token (a block comment may
+// span lines).
+type words struct{ server.Nop }
+
+func (words) Features() server.Features {
+	return server.Features{Set: server.FeatureSemanticTokens,
+		TokenTypes:     []string{"variable", "comment"},
+		TokenModifiers: []string{"readonly"}}
+}
+
+func (words) SemanticTokens(snap *server.Snapshot, uri string,
+) server.Task[[]server.SemToken] {
+	d, ok := snap.Document(uri)
+	if !ok {
+		return server.Done[[]server.SemToken](nil)
+	}
+	text := d.Text()
+	var out []server.SemToken
+	for i := 0; i < len(text); {
+		rest := string(text[i:])
+		var end int
+		switch {
+		case strings.HasPrefix(rest, "--"):
+			end = i + len(rest)
+			if j := strings.IndexByte(rest, '\n'); j >= 0 {
+				end = i + j
+			}
+			out = append(out, server.SemToken{
+				Span: server.Span{Start: i, End: end}, Type: 1})
+		case strings.HasPrefix(rest, "/*"):
+			end = i + len(rest)
+			if j := strings.Index(rest[2:], "*/"); j >= 0 {
+				end = i + 2 + j + 2
+			}
+			out = append(out, server.SemToken{
+				Span: server.Span{Start: i, End: end}, Type: 1})
+		default:
+			w := word(text, i)
+			if w.Start != i || w.End == i {
+				i++
+				continue
+			}
+			end = w.End
+			s := string(text[w.Start:w.End])
+			var mods uint32
+			if strings.ToUpper(s) == s && strings.ToLower(s) != s {
+				mods = 1
+			}
+			out = append(out, server.SemToken{Span: w, Mods: mods})
+		}
+		i = end
+	}
+	return server.Done(out)
+}

@@ -26,6 +26,8 @@ type docParams struct {
 	// workspace/executeCommand
 	Command   string            `json:"command"`
 	Arguments []json.RawMessage `json:"arguments"`
+	// textDocument/semanticTokens/full/delta
+	PreviousResultID string `json:"previousResultId"`
 }
 
 // methods maps every feature request to the feature that serves it.
@@ -45,6 +47,9 @@ var methods = map[string]Feature{
 	"textDocument/codeLens":          FeatureCodeLens,
 	"workspace/executeCommand":       FeatureCommands,
 	"textDocument/codeAction":        FeatureCodeActions,
+	methodTokensFull:                 FeatureSemanticTokens,
+	methodTokensDelta:                FeatureSemanticTokens,
+	methodTokensRange:                FeatureSemanticTokens,
 }
 
 // Methods returns the feature request methods, sorted.
@@ -104,6 +109,11 @@ func (s *State) begin(o *out, m call, id uint64) {
 		s.fail(o, m.id, jsonrpc2.CodeInvalidParams, "missing position")
 		return
 	}
+	if m.method == methodTokensRange && p.Range == nil {
+		s.dropWork(id)
+		s.fail(o, m.id, jsonrpc2.CodeInvalidParams, "missing range")
+		return
+	}
 	q := Query{Snap: snap, URI: uri}
 	if hasDoc && p.Position != nil {
 		q.Offset = offset(doc.index, *p.Position, s.enc)
@@ -146,7 +156,8 @@ func takesPosition(method string) bool {
 	switch method {
 	case "textDocument/documentSymbol", "textDocument/formatting",
 		"textDocument/rangeFormatting", "textDocument/foldingRange",
-		"textDocument/codeLens", "textDocument/codeAction":
+		"textDocument/codeLens", "textDocument/codeAction",
+		methodTokensFull, methodTokensDelta, methodTokensRange:
 		return false
 	}
 	return true
@@ -213,6 +224,17 @@ func (s *State) runner(method string, q Query, p docParams,
 	case "textDocument/codeLens":
 		return runTask(an.CodeLens(snap, uri), func(ls []Lens) any {
 			return c.lenses(uri, ls)
+		})
+	case methodTokensFull, methodTokensDelta, methodTokensRange:
+		var r *Span
+		if d, ok := snap.Document(uri); ok && p.Range != nil &&
+			method == methodTokensRange {
+			sp := toSpan(d.index, *p.Range, s.enc)
+			r = &sp
+		}
+		return runTask(an.SemanticTokens(snap, uri), func(ts []SemToken,
+		) any {
+			return c.tokens(uri, ts, r, method, p.PreviousResultID)
 		})
 	default: // workspace/executeCommand
 		return runTask(an.Command(snap, p.Command, p.Arguments),

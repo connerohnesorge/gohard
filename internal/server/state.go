@@ -102,6 +102,12 @@ type State struct {
 	anDiags     []FileDiagnostics
 	saves       uint64
 	lensRefresh bool
+
+	// tokens is the last full or delta semantic tokens result of each
+	// document (by docKey; copy on write), the base of the next delta
+	// request; nextTokens numbers the result IDs (semtokens.go).
+	tokens     map[string]storedTokens
+	nextTokens uint64
 }
 
 // New returns the state of a server that has not been initialized.

@@ -327,6 +327,8 @@ func (s *State) capabilities() map[string]any {
 		map[string]any{"resolveProvider": false})
 	set(FeatureCodeActions, "codeActionProvider",
 		map[string]any{"codeActionKinds": []string{"quickfix"}})
+	set(FeatureSemanticTokens, "semanticTokensProvider",
+		tokensCapability(f))
 	cmds := slices.Clone(f.Commands)
 	if cmds == nil {
 		cmds = []string{}

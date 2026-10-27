@@ -20,6 +20,9 @@ type Action struct {
 	Summary string
 	// Args is the synopsis of extra positional arguments, if any.
 	Args string
+	// MethodOf, when set, picks the method from the extra arguments
+	// (semantic-tokens sends a range request for `range L:C-L:C`).
+	MethodOf func(args []string) string
 	// Params builds the request params for the document uri and the
 	// zero-based UTF-8 position pos, with the extra arguments.
 	Params func(uri string, pos Position, args []string) (any, error)
@@ -226,6 +229,10 @@ func RunAction(e env.Env, o Options, jobs int, folder string, a Action,
 	if err != nil {
 		return nil, err
 	}
+	method := a.Method
+	if a.MethodOf != nil {
+		method = a.MethodOf(args)
+	}
 	var got *jsonrpc2.Response
 	var published json.RawMessage
 	d := NewDriver(o, e, jobs, func(s Send) error {
@@ -261,12 +268,12 @@ func RunAction(e env.Env, o Options, jobs int, folder string, a Action,
 			Params: marshal(struct{}{})},
 		&jsonrpc2.Notification{Method: "textDocument/didOpen",
 			Params: marshal(open)},
-		&jsonrpc2.Request{ID: jsonrpc2.IntID(2), Method: a.Method,
+		&jsonrpc2.Request{ID: jsonrpc2.IntID(2), Method: method,
 			Params: marshal(params)},
 		&jsonrpc2.Request{ID: jsonrpc2.IntID(3), Method: "shutdown"},
 		&jsonrpc2.Notification{Method: "exit"},
 	}
-	diags := a.Method == publishMethod
+	diags := method == publishMethod
 	if diags {
 		if o.Analyzer == nil ||
 			!o.Analyzer.Features().Has(FeatureDiagnostics) {
@@ -283,7 +290,7 @@ func RunAction(e env.Env, o Options, jobs int, folder string, a Action,
 		}
 	}
 	if got == nil {
-		return nil, errors.New("no response to " + a.Method)
+		return nil, errors.New("no response to " + method)
 	}
 	if got.Error != nil && got.Error.Code == jsonrpc2.CodeMethodNotFound {
 		return got, ErrNotProvided
