@@ -3,8 +3,9 @@
 # copies a passing and a failing corpus testbench, the cross-file LSP
 # fixture and the semantic tokens fixture into a temporary folder and
 # runs e2e.lua in `nvim --headless --clean`, then runs it again with
-# vim.lsp.enable in a folder with no root markers (#48). Needs go and
-# nvim on PATH:
+# vim.lsp.enable in a folder with no root markers (#48), once with the
+# plugin's lsp/gohard.lua and once with the nvim-lspconfig one (#65).
+# Needs go and nvim on PATH:
 #   nix develop -c bash editors/nvim/test/run.sh
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -34,3 +35,6 @@ timeout 300 nvim --headless --clean -l "$here/e2e.lua" \
 # vim.lsp.enable('gohard') without setup() (skipped before 0.11).
 timeout 300 nvim --headless --clean -l "$here/e2e.lua" \
 	"$here/.." "$tmp/gohard" "$tmp/bare" enable
+# The same with the nvim-lspconfig file of editors/upstream (#65).
+timeout 300 nvim --headless --clean -l "$here/e2e.lua" \
+	"$here/.." "$tmp/gohard" "$tmp/bare" upstream

@@ -5,7 +5,9 @@
 -- require('gohard').setup(); MODE enable uses vim.lsp.enable('gohard')
 -- and the shipped lsp/gohard.lua instead (Neovim 0.11+, #48), in a
 -- WORK with no gohard.yaml or .git, and only runs the wait_forms
--- testbench there.
+-- testbench there. MODE upstream does the same with the nvim-lspconfig
+-- file of editors/upstream as the only lsp/gohard.lua (#65); the
+-- plugin's Lua modules serve the test only.
 -- WORK holds copies of a passing and a failing corpus testbench
 -- (wait_forms, assert_fail) and the cross-file fixture. The test opens
 -- each testbench, runs its "▶ Run" code lens, waits for the run to end
@@ -16,9 +18,13 @@
 -- semantic token highlights of testdata/lsp/semantic-tokens/full (#55).
 
 local plugin, bin, work, mode = arg[1], arg[2], arg[3], arg[4] or 'setup'
-assert(plugin and bin and work and (mode == 'setup' or mode == 'enable'),
-  'usage: e2e.lua PLUGIN_DIR GOHARD_BIN WORK [setup|enable]')
-vim.opt.runtimepath:prepend(plugin)
+assert(plugin and bin and work and (mode == 'setup' or mode == 'enable' or
+  mode == 'upstream'),
+  'usage: e2e.lua PLUGIN_DIR GOHARD_BIN WORK [setup|enable|upstream]')
+local upstream = vim.fn.simplify(plugin .. '/../upstream/nvim-lspconfig')
+if mode ~= 'upstream' then
+  vim.opt.runtimepath:prepend(plugin)
+end
 vim.opt.swapfile = false
 vim.opt.shortmess:append('A')
 
@@ -48,22 +54,43 @@ local function wait(ms, cond)
   return ok
 end
 
+if mode ~= 'setup' and vim.fn.has('nvim-0.11') == 0 then
+  log('SKIP vim.lsp.enable needs Neovim 0.11 or later')
+  os.exit(0)
+end
+if mode == 'upstream' then
+  -- The upstream file alone on the runtime path, resolved before the
+  -- plugin's modules can be required: it must be self-contained.
+  vim.opt.runtimepath:prepend(upstream)
+  local files = vim.api.nvim_get_runtime_file('lsp/gohard.lua', true)
+  check(#files == 1 and files[1] == upstream .. '/lsp/gohard.lua',
+    'the only lsp/gohard.lua is the upstream one (%s)',
+    table.concat(files, ', '))
+  local ok, cfg = pcall(function()
+    return vim.lsp.config.gohard
+  end)
+  check(ok and cfg and vim.deep_equal(cfg.cmd, { 'gohard', 'lsp' }) and
+    vim.deep_equal(cfg.root_markers, { 'gohard.yaml', '.git' }),
+    'the upstream config loads on its own: %s', vim.inspect(cfg))
+  package.path = plugin .. '/lua/?.lua;' .. plugin .. '/lua/?/init.lua;' ..
+    package.path
+end
 local gohard = require('gohard')
 local commands = require('gohard.commands')
 local compat = require('gohard.compat')
-if mode == 'enable' then
-  -- The native config exactly as shipped (#48): no setup(), no
-  -- overrides, gohard found on PATH, the plugin file sourced as at
-  -- startup.
-  if vim.fn.has('nvim-0.11') == 0 then
-    log('SKIP vim.lsp.enable needs Neovim 0.11 or later')
-    os.exit(0)
-  end
-  vim.env.PATH = vim.fs.dirname(bin) .. ':' .. vim.env.PATH
-  vim.cmd.runtime('plugin/gohard.lua')
-  vim.lsp.enable('gohard')
-else
+if mode == 'setup' then
   gohard.setup({ cmd = { bin, 'lsp' } })
+else
+  -- The native config exactly as shipped (#48, #65): no setup(), no
+  -- overrides, gohard found on PATH, the plugin file sourced as at
+  -- startup (in upstream mode only for the commands the test runs).
+  vim.env.PATH = vim.fs.dirname(bin) .. ':' .. vim.env.PATH
+  if mode == 'upstream' then
+    dofile(plugin .. '/plugin/gohard.lua')
+  else
+    vim.cmd.runtime('plugin/gohard.lua')
+  end
+  vim.lsp.enable('gohard')
 end
 
 --- open edits path and waits for an initialized gohard client.
@@ -477,8 +504,9 @@ local function semantic_tokens()
 end
 
 -- GOHARD_E2E_ONLY=name runs one part: cross-file, bundle,
--- semantic-tokens, wait_forms, assert_fail or (in enable mode) enable.
--- GOHARD_E2E_LOG=1 writes the LSP log at debug level.
+-- semantic-tokens, wait_forms, assert_fail, (in enable mode) enable or
+-- (in upstream mode) upstream. GOHARD_E2E_LOG=1 writes the LSP log at
+-- debug level.
 local only = vim.env.GOHARD_E2E_ONLY
 if vim.env.GOHARD_E2E_LOG == '1' then
   vim.lsp.log.set_level('debug')
@@ -490,7 +518,8 @@ local function part(name, fn, ...)
   end
 end
 --- enable: vim.lsp.enable('gohard') in a folder with no gohard.yaml
---- and no .git (#48). Neovim attaches with no root and no workspace
+--- and no .git (#48), with the plugin's or (#65) the upstream
+--- lsp/gohard.lua. Neovim attaches with no root and no workspace
 --- folder; the server takes the folder of the first opened file as the
 --- project root, so the testbench lens is there and runs.
 local function enable()
@@ -511,8 +540,8 @@ local function enable()
 end
 
 local ok, e = pcall(function()
-  if mode == 'enable' then
-    part('enable', enable)
+  if mode ~= 'setup' then
+    part(mode, enable)
     return
   end
   part('cross-file', cross_file)
