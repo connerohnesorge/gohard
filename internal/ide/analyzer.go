@@ -304,6 +304,20 @@ func (a *Analyzer) cached(key string) *Analysis {
 	return nil
 }
 
+// latest returns the sema result of the newest stored analysis, which
+// the next analysis reuses for what its edit cannot change (#53); nil
+// when there is none.
+func (a *Analyzer) latest() *sema.Result {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	for i := len(a.results) - 1; i >= 0; i-- {
+		if r := a.results[i].Result; r != nil {
+			return r
+		}
+	}
+	return nil
+}
+
 func (a *Analyzer) tree(key string) *parser.Result {
 	a.mu.Lock()
 	defer a.mu.Unlock()
@@ -362,7 +376,8 @@ func (p *plan) analyze() *Analysis {
 	if len(p.srcs) > 0 {
 		in := sema.Input{Config: p.cfg, ToolVersion: p.a.opts.ToolVersion,
 			Jobs: p.a.opts.Jobs, Limit: p.a.opts.Limit,
-			Probe: p.a.opts.Probe, Cache: p.a.diskCache(p)}
+			Probe: p.a.opts.Probe, Cache: p.a.diskCache(p),
+			Prev: p.a.latest()}
 		for i, s := range p.srcs {
 			t := p.trees[i]
 			if t == nil { // the trees came from a stored analysis

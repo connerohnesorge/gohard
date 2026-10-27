@@ -114,55 +114,72 @@ type finding struct {
 }
 
 // opaqueUnits marks encrypted and unsupported units opaque and their
-// dependents unchecked.
-func (s *session) opaqueUnits() {
+// dependents unchecked. It decides every flag first and then sets them;
+// in a session that reuses an earlier result (incr.go), whose reused
+// units are never written, it sets none and reports false when any
+// unit would get one.
+func (s *session) opaqueUnits() bool {
 	if s.base == nil {
-		return // the bundle is never opaque
+		return true // the bundle is never opaque
 	}
+	o := &opacity{opaque: map[*Unit]bool{}, modeled: map[*Unit]bool{}}
 	for _, f := range s.files {
-		s.encryptedFile(f)
+		s.encryptedFile(f, o)
 	}
 	reported := map[groupKey]map[string]bool{}
 	byConstruct := map[*Unit]bool{}
 	for _, u := range s.units {
-		s.encrypted(u)
-		if s.unsupported(u, reported) {
+		s.encrypted(u, o)
+		if s.unsupported(u, reported, o) {
 			byConstruct[u] = true
 		}
 	}
 	// A secondary unit of a primary unit made opaque by a construct is
 	// opaque too: its declarations extend the primary unit's.
 	for _, u := range s.units {
-		if u.Opaque || u.Kind.Primary() {
+		if o.opaque[u] || u.Kind.Primary() {
 			continue
 		}
 		if p := s.primaryOf(u); p != nil && byConstruct[p] {
-			u.Opaque = true
-		}
-	}
-	for _, u := range s.units {
-		if u.Opaque {
-			u.diags = keepOpaque(u.diags)
+			o.opaque[u] = true
 		}
 	}
 	standIns := s.standInOriginals()
 	bound := s.boundEntities()
+	unchecked := map[*Unit]*Unit{}
 	for _, u := range s.units {
-		if u.Opaque {
+		if o.opaque[u] {
 			continue
 		}
-		if o := opaqueDep(u, standIns, bound); o != nil {
-			u.Unchecked = true
+		if d := opaqueDep(u, standIns, bound, o); d != nil {
 			// Its semantic errors may only be consequences of the
 			// opaque unit it reads (a name the unit declares that
 			// GoHard could not see): the unit is reported as not
-			// checked instead. Syntax and library errors stay.
-			u.diags = dropSema(u.diags)
-			u.diags = append(u.diags, at(u.File, unitRange(u),
-				diag.New(diag.SemaUnchecked, u.Label(), o.Label())))
+			// checked instead (unitDiagnostics). Syntax and library
+			// errors stay.
+			unchecked[u] = d
 		}
 	}
+	if s.prev != nil && (len(o.opaque) > 0 || len(unchecked) > 0) {
+		return false
+	}
+	for i, u := range s.units {
+		if s.fresh[i] {
+			u.Opaque, u.Modeled = o.opaque[u], o.modeled[u]
+			u.Unchecked = unchecked[u] != nil
+		}
+	}
+	s.unchecked = unchecked
+	return true
 }
+
+// opacity holds the opaque and modeled units opaqueUnits found.
+type opacity struct {
+	opaque, modeled map[*Unit]bool
+}
+
+// uncheckedBy returns the opaque unit that made u unchecked.
+func (s *session) uncheckedBy(u *Unit) *Unit { return s.unchecked[u] }
 
 // groupKey names a design entity: a primary unit with its secondary
 // units.
@@ -230,7 +247,7 @@ func dropSema(ds []diag.Diagnostic) []diag.Diagnostic {
 // whose encrypted original is not allowed counts as the original
 // (except for the stand-in's own units, which are plain VHDL).
 func opaqueDep(u *Unit, standIns map[*Unit]*Unit,
-	bound map[*Unit][]*Unit) *Unit {
+	bound map[*Unit][]*Unit, op *opacity) *Unit {
 	seen := map[*Unit]bool{u: true}
 	queue := []*Unit{u}
 	for len(queue) > 0 {
@@ -241,11 +258,11 @@ func opaqueDep(u *Unit, standIns map[*Unit]*Unit,
 				continue
 			}
 			seen[d] = true
-			if d.Opaque && !d.Modeled {
+			if op.opaque[d] && !op.modeled[d] {
 				return d
 			}
-			if o := standIns[d]; o != nil && o.Opaque && !o.Modeled &&
-				d.File != u.File {
+			if o := standIns[d]; o != nil && op.opaque[o] &&
+				!op.modeled[o] && d.File != u.File {
 				return o
 			}
 			queue = append(queue, d)
@@ -299,7 +316,7 @@ func (s *session) boundEntities() map[*Unit][]*Unit {
 // followed by its encrypted architecture, the envelope belongs to the
 // design unit before it, which becomes opaque. An envelope before any
 // unit names the file.
-func (s *session) encryptedFile(f *File) {
+func (s *session) encryptedFile(f *File, o *opacity) {
 	var toks []cst.Token
 	for du := range (cst.DesignFile{Node: f.Root()}).Units() {
 		toks = append(toks, du.FirstToken())
@@ -321,7 +338,7 @@ func (s *session) encryptedFile(f *File) {
 					diag.New(diag.SemaEncryptedUnit,
 						"an encrypted block in "+f.Path)))
 			} else {
-				s.markEncrypted(prev)
+				s.markEncrypted(prev, o)
 			}
 			return
 		}
@@ -330,23 +347,22 @@ func (s *session) encryptedFile(f *File) {
 
 // markEncrypted marks u opaque as encrypted IP, or reports the
 // allow_opaque downgrade (naming the stand-in when there is one).
-func (s *session) markEncrypted(u *Unit) {
-	if u.Opaque {
+func (s *session) markEncrypted(u *Unit, o *opacity) {
+	if o.opaque[u] {
 		return
 	}
-	u.Opaque = true
+	o.opaque[u] = true
 	rg := unitRange(u)
 	if allowed(s.cfg.AllowOpaque, u) {
 		dg := diag.New(diag.SemaOpaqueAllowed, u.Label())
 		if st := s.standIn(u); st != nil {
-			u.Modeled = true
+			o.modeled[u] = true
 			dg = dg.WithRelated(standInNote(u, st))
 		}
-		u.diags = append(u.diags, at(u.File, rg, dg))
+		s.note(u, at(u.File, rg, dg))
 		return
 	}
-	u.diags = append(u.diags, at(u.File, rg,
-		diag.New(diag.SemaEncryptedUnit, u.Label())))
+	s.note(u, at(u.File, rg, diag.New(diag.SemaEncryptedUnit, u.Label())))
 }
 
 // standInNote is the related location of an allow_opaque hint: the
@@ -422,7 +438,15 @@ func (s *session) standInOriginals() map[*Unit]*Unit {
 }
 
 // encrypted marks u opaque when an encrypted envelope is inside it.
-func (s *session) encrypted(u *Unit) {
+func (s *session) encrypted(u *Unit, o *opacity) {
+	if memoized(u, "envelope", func() bool { return hasEnvelope(u) }) {
+		s.markEncrypted(u, o)
+	}
+}
+
+// hasEnvelope reports whether an encrypted envelope is inside u (after
+// its first token, whose leading trivia are encryptedFile's).
+func hasEnvelope(u *Unit) bool {
 	first := true
 	for t := range u.Node.DescendantTokens() {
 		lead := t.Leading()
@@ -430,13 +454,12 @@ func (s *session) encrypted(u *Unit) {
 			first, lead = false, nil // encryptedFile's
 		}
 		for _, tr := range lead {
-			if tr.Kind != token.ProtectedData {
-				continue
+			if tr.Kind == token.ProtectedData {
+				return true
 			}
-			s.markEncrypted(u)
-			return
 		}
 	}
+	return false
 }
 
 // allowed reports whether allow_opaque lists u as lib.unit.
@@ -457,7 +480,7 @@ func allowed(list []string, u *Unit) bool {
 // older than 2019 the VHDL-2019 constructs in legacy are reported as
 // syntax/standard instead and do not make u opaque.
 func (s *session) unsupported(u *Unit,
-	reported map[groupKey]map[string]bool,
+	reported map[groupKey]map[string]bool, o *opacity,
 ) bool {
 	fs := s.findings(u)
 	slices.SortStableFunc(fs, func(a, b finding) int {
@@ -473,9 +496,8 @@ func (s *session) unsupported(u *Unit,
 	for _, f := range fs {
 		if f.v2019 && s.std < token.Std2019 {
 			if legacy[f.name] {
-				u.diags = append(u.diags, at(u.File, f.rg,
-					diag.New(diag.SyntaxStandard, f.name,
-						token.Std2019.String(), s.std.String())))
+				s.note(u, at(u.File, f.rg, diag.New(diag.SyntaxStandard,
+					f.name, token.Std2019.String(), s.std.String())))
 			}
 			continue
 		}
@@ -487,12 +509,11 @@ func (s *session) unsupported(u *Unit,
 			continue
 		}
 		reported[g][f.name] = true
-		u.diags = append(u.diags, at(u.File, f.rg,
-			diag.NewVariant(diag.UnsupportedConstruct, diag.PleaseReport,
-				f.name)))
+		s.note(u, at(u.File, f.rg, diag.NewVariant(
+			diag.UnsupportedConstruct, diag.PleaseReport, f.name)))
 	}
 	if opaque {
-		u.Opaque = true
+		o.opaque[u] = true
 	}
 	return opaque
 }
@@ -500,10 +521,29 @@ func (s *session) unsupported(u *Unit,
 // findings lists every use of an unimplemented construct in u, in no
 // particular order.
 func (s *session) findings(u *Unit) []finding {
-	var out []finding
+	out := slices.Clone(memoized(u, "findings", func() []finding {
+		return treeFindings(u)
+	}))
 	add := func(rg cst.Range, name string) {
 		out = append(out, finding{rg: rg, name: name, v2019: true})
 	}
+	for _, ref := range u.Refs {
+		if name := bundledConstruct(refDecl(ref)); name != "" {
+			add(ref.Span, name)
+		}
+	}
+	for _, d := range u.Decls {
+		if d.File != u.File || d.Implicit {
+			continue
+		}
+		declFindings(d, add)
+	}
+	return out
+}
+
+// treeFindings lists the constructs of the construct table in u's tree.
+func treeFindings(u *Unit) []finding {
+	var out []finding
 	// Walk the tree with an explicit stack, pruning inactive branches
 	// on the way down: asking Inactive per node walks the ancestors,
 	// which is quadratic on a long operator chain (a left-nested tree
@@ -527,17 +567,6 @@ func (s *session) findings(u *Unit) []finding {
 					v2019: c.v2019})
 			}
 		}
-	}
-	for _, ref := range u.Refs {
-		if name := bundledConstruct(refDecl(ref)); name != "" {
-			add(ref.Span, name)
-		}
-	}
-	for _, d := range u.Decls {
-		if d.File != u.File || d.Implicit {
-			continue
-		}
-		declFindings(d, add)
 	}
 	return out
 }

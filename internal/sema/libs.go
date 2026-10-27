@@ -286,7 +286,7 @@ func (s *session) libraryDiagnostics() {
 		if second.Decl != nil {
 			rg = second.Decl.Span
 		}
-		second.diags = append(second.diags, at(second.File, rg, dg))
+		s.note(second, at(second.File, rg, dg))
 	}
 	for _, comp := range s.cycles {
 		path := cyclePath(comp)
@@ -299,9 +299,8 @@ func (s *session) libraryDiagnostics() {
 		for _, c := range path {
 			names = append(names, c.Label())
 		}
-		u.diags = append(u.diags, at(u.File, rg,
-			diag.New(diag.LibraryImportCycle,
-				strings.Join(names, " -> "))))
+		s.note(u, at(u.File, rg, diag.New(diag.LibraryImportCycle,
+			strings.Join(names, " -> "))))
 	}
 }
 
@@ -370,10 +369,12 @@ func (a *analyzer) lateArch(tok cst.Token, entity *Decl) {
 }
 
 // resolveLate resolves the deferred architecture references of every
-// unit, in canonical order, after all units are analyzed.
+// unit this session made, in canonical order, after all units are
+// analyzed; it records the architectures each looked up (incr.go: a
+// reused unit's references stand while those are reused too).
 func (s *session) resolveLate() {
-	for _, u := range s.units {
-		if len(u.late) == 0 {
+	for i, u := range s.units {
+		if len(u.late) == 0 || !s.fresh[i] {
 			continue
 		}
 		for _, lr := range u.late {
@@ -391,6 +392,9 @@ func (s *session) resolveLate() {
 			k := TokenKey(lr.tok)
 			var found *Unit
 			for _, sec := range l.Secondary(eu.Name) {
+				if j := s.pos(sec); j >= 0 {
+					s.lates[i] = append(s.lates[i], j)
+				}
 				if sec.Kind == UnitArchitecture && sec.Name == k &&
 					sec.Decl != nil {
 					found = sec

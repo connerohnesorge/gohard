@@ -61,6 +61,10 @@ type shared struct {
 	// instSubs are the actuals of the generic subprograms of each
 	// subprogram instance, by generic position (instanceSubs).
 	instSubs map[*Decl][]*Decl
+	// saw, when set, is told every unit whose subprogram bodies or
+	// deferred constants the evaluator looks into (static checks
+	// record what a unit's evaluation read, incr.go).
+	saw func(*Unit)
 	// attrSubs are the predefined attribute functions (T'IMAGE, ...)
 	// that are actuals of generic subprograms: the function stand-in
 	// instanceSubs makes for one, and the attribute it calls (an
@@ -300,6 +304,9 @@ func (ev *Evaluator) body(x *Decl) *Decl {
 }
 
 func (ev *Evaluator) bodyIn(u *Unit, x *Decl) *Decl {
+	if ev.sh.saw != nil {
+		ev.sh.saw(u)
+	}
 	idx, ok := ev.sh.bodies[u]
 	if !ok {
 		idx = map[*Decl]*Decl{}

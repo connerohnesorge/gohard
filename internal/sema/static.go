@@ -756,6 +756,9 @@ func (ev *Evaluator) fullConstant(d *Decl) *Decl {
 		return nil
 	}
 	for _, u := range l.Secondary(pkg.Name) {
+		if ev.sh.saw != nil {
+			ev.sh.saw(u)
+		}
 		if u.Kind != UnitPackageBody || u.Region == nil {
 			continue
 		}
@@ -1402,85 +1405,116 @@ func compatible(r eval.Range, t *eval.Type) error {
 
 // staticChecks evaluates the constants of every project unit that need
 // no instance and reports values out of range, bad indices and width
-// mismatches (sema/static-error) and the step limit (sema/eval-limit).
-// It returns the incomplete entries.
-func (s *session) staticChecks() []string {
+// mismatches (sema/static-error) and the step limit (sema/eval-limit),
+// into stat. Each unit is checked with an evaluator of its own, so its
+// result is a function of the unit and of what the evaluation read
+// (stat.reads), never of the units checked before it: a session that
+// reuses an earlier result (incr.go) keeps the result of a reused unit
+// whose reads are reused too.
+func (s *session) staticChecks() {
 	if s.base == nil {
-		return nil
+		return
 	}
 	libs := func(k Key) (*Library, bool) {
 		l, ok := s.libs[k]
 		return l, ok
 	}
-	var incomplete []string
-	base := newEvaluator(libs, s.steps)
-	base.std = s.std
-	for _, u := range s.units {
-		if u.Opaque || u.Unchecked {
+	for i, u := range s.units {
+		if !s.fresh[i] && s.prev != nil && !s.anyFresh(s.prev.stat[i].reads) {
+			s.stat[i] = s.prev.stat[i]
 			continue
 		}
-		ev := base.Fresh()
-		for _, d := range u.Decls {
-			if d.Implicit || d.File != u.File || inSubprogram(d) {
-				continue
-			}
-			var err error
-			rg := d.Full
-			switch {
-			case d.Kind == DeclConstant && d.Value != nil:
-				_, err = ev.constant(d, eval.NewBudget(s.steps))
-				rg = d.Value.Node.Span()
-			case d.Kind == DeclSignal || d.Kind == DeclSharedVariable:
-				rg, err = ev.signalCheck(d, eval.NewBudget(s.steps))
-			case d.Kind == DeclType || d.Kind == DeclSubtype:
-				// A range or index constraint incompatible with the
-				// subtype it constrains (LRM 5.2.1, 5.3.2.2).
-				_, err = ev.layout(d.Type, eval.NewBudget(s.steps))
-				err = designOnly(err)
-			case d.Kind == DeclVariable && inProcess(d):
-				// A process variable is elaborated once, with its
-				// unit: its subtype and initial value are static
-				// checks like a signal's (LRM 14.4.2.5).
-				rg, err = ev.signalCheck(d, eval.NewBudget(s.steps))
-				err = designOnly(err)
-			default:
-				continue
-			}
-			if err == nil {
-				continue
-			}
-			switch c := eval.CodeOf(err); {
-			case c == eval.ErrCodeBudget:
-				u.diags = append(u.diags, at(u.File, rg,
-					diag.New(diag.SemaEvalLimit, d.Kind.String()+" "+
-						d.Text)))
-				incomplete = append(incomplete, u.Label())
-			case DesignError(c):
-				u.diags = append(u.diags, at(u.File, rg,
-					diag.New(diag.SemaStaticError, err.Error(),
-						u.Label())))
-			}
-		}
-		u.diags = append(u.diags, targetChecks(u)...)
-		for _, tok := range bigLiterals(u.Node) {
-			u.diags = append(u.diags, at(u.File, tok.Span(),
-				diag.New(diag.SemaStaticError, "integer literal "+
-					tok.Text()+" is outside the range of "+
-					"universal_integer", u.Label())))
-		}
-		ev.processChecks(u.Body, s.steps, func(n cst.Node, err error) {
-			u.diags = append(u.diags, at(u.File, n.Span(),
-				diag.New(diag.SemaStaticError, err.Error(),
-					u.Label())))
-		})
-		if s.assignChecks(u, ev) {
-			incomplete = append(incomplete, u.Label())
-		}
-		if s.packageInstChecks(u, base) {
-			incomplete = append(incomplete, u.Label())
+		s.stat[i] = s.unitStaticChecks(u, libs)
+	}
+}
+
+// anyFresh reports whether a unit at one of the positions js was made
+// by this session.
+func (s *session) anyFresh(js []int) bool {
+	for _, j := range js {
+		if s.fresh[j] {
+			return true
 		}
 	}
-	return incomplete
+	return false
+}
+
+// unitStaticChecks runs the static checks of unit u.
+func (s *session) unitStaticChecks(u *Unit,
+	libs func(Key) (*Library, bool),
+) unitStatic {
+	var st unitStatic
+	if u.Opaque || u.Unchecked {
+		return st
+	}
+	base := newEvaluator(libs, s.steps)
+	base.std = s.std
+	self := s.pos(u)
+	base.sh.saw = func(x *Unit) {
+		if j := s.pos(x); j >= 0 && j != self {
+			st.reads = append(st.reads, j)
+		}
+	}
+	report := func(d diag.Diagnostic) { st.diags = append(st.diags, d) }
+	ev := base.Fresh()
+	for _, d := range u.Decls {
+		if d.Implicit || d.File != u.File || inSubprogram(d) {
+			continue
+		}
+		var err error
+		rg := d.Full
+		switch {
+		case d.Kind == DeclConstant && d.Value != nil:
+			_, err = ev.constant(d, eval.NewBudget(s.steps))
+			rg = d.Value.Node.Span()
+		case d.Kind == DeclSignal || d.Kind == DeclSharedVariable:
+			rg, err = ev.signalCheck(d, eval.NewBudget(s.steps))
+		case d.Kind == DeclType || d.Kind == DeclSubtype:
+			// A range or index constraint incompatible with the
+			// subtype it constrains (LRM 5.2.1, 5.3.2.2).
+			_, err = ev.layout(d.Type, eval.NewBudget(s.steps))
+			err = designOnly(err)
+		case d.Kind == DeclVariable && inProcess(d):
+			// A process variable is elaborated once, with its
+			// unit: its subtype and initial value are static
+			// checks like a signal's (LRM 14.4.2.5).
+			rg, err = ev.signalCheck(d, eval.NewBudget(s.steps))
+			err = designOnly(err)
+		default:
+			continue
+		}
+		if err == nil {
+			continue
+		}
+		switch c := eval.CodeOf(err); {
+		case c == eval.ErrCodeBudget:
+			report(at(u.File, rg, diag.New(diag.SemaEvalLimit,
+				d.Kind.String()+" "+d.Text)))
+			st.incomplete = append(st.incomplete, u.Label())
+		case DesignError(c):
+			report(at(u.File, rg, diag.New(diag.SemaStaticError,
+				err.Error(), u.Label())))
+		}
+	}
+	st.diags = append(st.diags, targetChecks(u)...)
+	for _, tok := range bigLiterals(u.Node) {
+		report(at(u.File, tok.Span(), diag.New(diag.SemaStaticError,
+			"integer literal "+tok.Text()+" is outside the range of "+
+				"universal_integer", u.Label())))
+	}
+	ev.processChecks(u.Body, s.steps, func(n cst.Node, err error) {
+		report(at(u.File, n.Span(), diag.New(diag.SemaStaticError,
+			err.Error(), u.Label())))
+	})
+	if s.assignChecks(u, ev, report) {
+		st.incomplete = append(st.incomplete, u.Label())
+	}
+	if s.packageInstChecks(u, base, report) {
+		st.incomplete = append(st.incomplete, u.Label())
+	}
+	slices.Sort(st.reads)
+	st.reads = slices.Compact(st.reads)
+	return st
 }
 
 // packageInstChecks evaluates, for each package instance of unit u
@@ -1490,7 +1524,9 @@ func (s *session) staticChecks() []string {
 // on the actual types is reported at the constant, naming the
 // instance; one that does not is the package's own (staticChecks). It
 // reports whether one hit the step limit.
-func (s *session) packageInstChecks(u *Unit, base *Evaluator) bool {
+func (s *session) packageInstChecks(u *Unit, base *Evaluator,
+	report func(diag.Diagnostic),
+) bool {
 	insts := []*Decl{}
 	if u.Decl != nil && u.Decl.Kind == DeclPackageInst {
 		insts = append(insts, u.Decl)
@@ -1522,6 +1558,9 @@ func (s *session) packageInstChecks(u *Unit, base *Evaluator) bool {
 		}
 		units := []*Unit{x.Unit}
 		for _, b := range s.libs[x.Unit.Library].Secondary(x.Unit.Name) {
+			if ev.sh.saw != nil {
+				ev.sh.saw(b)
+			}
 			if b.Kind == UnitPackageBody && !b.Duplicate {
 				units = append(units, b)
 			}
@@ -1545,13 +1584,11 @@ func (s *session) packageInstChecks(u *Unit, base *Evaluator) bool {
 				switch code := eval.CodeOf(err); {
 				case code == eval.ErrCodeBudget:
 					limited = true
-					u.diags = append(u.diags, at(pu.File, rg,
-						diag.New(diag.SemaEvalLimit, "constant "+c.Text+
-							" of "+label)))
+					report(at(pu.File, rg, diag.New(diag.SemaEvalLimit,
+						"constant "+c.Text+" of "+label)))
 				case DesignError(code):
-					u.diags = append(u.diags, at(pu.File, rg,
-						diag.New(diag.SemaStaticError, "constant "+c.Text+
-							": "+err.Error(), label)))
+					report(at(pu.File, rg, diag.New(diag.SemaStaticError,
+						"constant "+c.Text+": "+err.Error(), label)))
 				}
 			}
 		}
@@ -1561,7 +1598,9 @@ func (s *session) packageInstChecks(u *Unit, base *Evaluator) bool {
 
 // assignChecks checks the assignments of unit u's bodies (Assign) with
 // the unit's evaluator and reports whether one hit the step limit.
-func (s *session) assignChecks(u *Unit, ev *Evaluator) bool {
+func (s *session) assignChecks(u *Unit, ev *Evaluator,
+	report func(diag.Diagnostic),
+) bool {
 	limited := false
 	var walk func(r *Region)
 	walk = func(r *Region) {
@@ -1581,14 +1620,13 @@ func (s *session) assignChecks(u *Unit, ev *Evaluator) bool {
 			switch c := eval.CodeOf(err); {
 			case c == eval.ErrCodeBudget:
 				limited = true
-				u.diags = append(u.diags, at(u.File, n.Span(),
-					diag.New(diag.SemaEvalLimit, "assignment to "+
-						u.File.text(as.Target.Node))))
+				report(at(u.File, n.Span(), diag.New(diag.SemaEvalLimit,
+					"assignment to "+u.File.text(as.Target.Node))))
 			case DesignError(c):
-				u.diags = append(u.diags, at(u.File, n.Span(),
-					diag.New(diag.SemaStaticError, "assignment to "+
+				report(at(u.File, n.Span(), diag.New(
+					diag.SemaStaticError, "assignment to "+
 						u.File.text(as.Target.Node)+": "+err.Error(),
-						u.Label())))
+					u.Label())))
 			}
 		}
 		for _, c := range r.Children {

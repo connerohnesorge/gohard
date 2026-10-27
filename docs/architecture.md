@@ -301,6 +301,48 @@ nothing.
   and `TestDiskCache` (ide) compare cached and uncached results on
   every corpus file.
 
+## Incremental analysis (#53)
+
+The language server analyzes the whole project on every edit and
+passes the previous result as `sema.Input.Prev`; `internal/sema/incr.go`
+reuses what the edit cannot change.
+
+* P3 decision: the `File`, `Unit` and `Library` objects of a result,
+  decoded or analyzed, are immutable once its analysis returns, so
+  later results share them read-only. An analysis that reuses an
+  earlier result writes only objects it made; every result is still a
+  complete value of its own snapshot, and no result for an older
+  snapshot is ever published. The peak RSS of the large project's warm
+  session (`tools/bench`) may grow at most 1.5x.
+* Reuse needs the same file paths, configuration, tool version and
+  step limit, the same unit graph (libraries, `Deps`, levels,
+  duplicates and cycles, built on fresh shells of every unit and
+  compared) and no opaque, unchecked or modeled unit; anything else is
+  a full analysis. The units of the edited files are dirty, and so,
+  up to a fixed point, is every unit that depends on a dirty one:
+  through `Deps`, a unit its job read, an architecture its late
+  references looked up, a unit of the same file (a file's units share
+  its `File`), or a library its `use L.all` names that holds a dirty
+  unit. Clean units, their files and libraries are the previous
+  result's objects; dirty units are restored from the on-disk cache or
+  analyzed, and not stored (full analyses write the entries).
+* The checks across units run on every unit every time and write
+  per-session tables, never a unit. Static checks run per unit with
+  the unit's own evaluator caches, so a unit's result depends only on
+  the unit and what its evaluation read; a clean unit whose static
+  reads (package bodies, deferred constants) are clean keeps its
+  result.
+* A body-only edit (an architecture or a package body) re-checks the
+  edited file's units and the few units that point into them; an edit
+  of a declaration other units see re-checks those units too.
+* `TestIncrementalEdits` (sema) and `TestIncrementalAnalyzer` (ide)
+  replay random edit sequences on the corpus and NEORV32 and compare
+  every result with a full analysis of the same snapshot (sema:
+  diagnostics byte for byte and the whole object graph, and the
+  previous result unchanged). `FuzzLSPReplay` compares every file's
+  diagnostics after an edit stream; its `sig-*` inputs change
+  declarations that other files see.
+
 ## Language server (#25, #26)
 
 `internal/server` is `Step(State, Event) -> (State, []Effect)` with a

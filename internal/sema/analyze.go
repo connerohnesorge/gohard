@@ -55,6 +55,11 @@ type Input struct {
 	// results and analyzed units are restored from it and stored in
 	// it. It never changes the result (cache.go).
 	Cache Cache
+	// Prev, when set, is an earlier result whose files, units and
+	// libraries Analyze may reuse for what the edit cannot change
+	// (incr.go, #53). It is read, never modified, and it never
+	// changes the result: Analyze returns what it returns without it.
+	Prev *Result
 }
 
 // Probe observes an analysis without changing it: Phase is called as
@@ -100,7 +105,20 @@ type Result struct {
 
 	byPath map[string]*File
 	libs   map[Key]*Library
-	refsOf map[*Decl][]Ref // lookup only
+	refsOf map[*Decl][]Ref // lookup only; the bundle's
+	// refs indexes a project result's references on first use.
+	refs *refIndex `codec:"-"`
+	// inc is what a later analysis needs to reuse this one (incr.go);
+	// nil for the bundle.
+	inc *incState `codec:"-"`
+}
+
+// refIndex is the reference index of a project result, built on first
+// use: References is a query, and building it on every keystroke
+// would cost as much as the rest of an incremental analysis.
+type refIndex struct {
+	once sync.Once
+	m    map[*Decl][]Ref
 }
 
 // File returns the project or bundled file at path.
@@ -163,12 +181,30 @@ func (r *Result) References(d *Decl) []Ref {
 	if r == nil || d == nil {
 		return nil
 	}
-	return r.refsOf[d]
+	if r.refs == nil {
+		return r.refsOf[d]
+	}
+	r.refs.once.Do(func() { r.refs.m = indexRefs(r.Units) })
+	return r.refs.m[d]
+}
+
+// indexRefs maps every declaration to its occurrences in us, in unit
+// order.
+func indexRefs(us []*Unit) map[*Decl][]Ref {
+	m := map[*Decl][]Ref{}
+	for _, u := range us {
+		for _, ref := range u.Refs {
+			if ref.Decl != nil {
+				m[ref.Decl] = append(m[ref.Decl], ref)
+			}
+		}
+	}
+	return m
 }
 
 // Analyze analyzes the snapshot in. It never panics on any tree the
 // parser produces, and its result does not depend on the order of
-// in.Files, map iteration order or the job runner (#34).
+// in.Files, map iteration order, the job runner or in.Prev (#34, #53).
 func Analyze(in Input) *Result {
 	jobs := in.Jobs
 	if jobs == nil {
@@ -180,29 +216,44 @@ func Analyze(in Input) *Result {
 	}
 	srcs := canonicalSources(in.Files)
 	popts := parser.FromConfig(in.Config, in.ToolVersion)
-	files := env.Map(jobs, in.Limit, srcs, func(s Source) *File {
-		p := s.Parse
-		switch {
-		case p != nil:
-		case in.Cache != nil:
-			p = parseCached(in.Cache, s.Path, s.Text, popts)
-		default:
-			p = parser.Parse(s.Text, popts)
+	newSession := func(files []*File) *session {
+		return &session{
+			std: std, cfg: in.Config, jobs: jobs, limit: in.Limit,
+			files: files, base: Bundle(), steps: cmp.Or(in.Steps,
+				int64(eval.EditorSteps)), stop: in.Stop,
+			probe: in.Probe, cache: in.Cache, popts: popts,
+			toolVersion: in.ToolVersion,
 		}
-		return &File{Path: s.Path, Text: s.Text, Parse: p,
-			Lines:   span.NewIndex(s.Text),
-			Library: LibraryOf(in.Config, s.Path)}
-	})
-	s := &session{
-		std: std, cfg: in.Config, jobs: jobs, limit: in.Limit,
-		files: files, base: Bundle(), steps: cmp.Or(in.Steps,
-			int64(eval.EditorSteps)), stop: in.Stop,
-		probe: in.Probe, cache: in.Cache, popts: popts,
 	}
+	if in.Prev != nil {
+		if r, ok := analyzeIncremental(in.Prev, srcs, newSession); ok {
+			return r
+		}
+	}
+	files := env.Map(jobs, in.Limit, srcs, func(s Source) *File {
+		return newFile(in, s, popts)
+	})
+	s := newSession(files)
 	if s.stopped() {
 		return nil
 	}
 	return s.run()
+}
+
+// newFile returns the File of source src, parsing it unless it comes
+// parsed.
+func newFile(in Input, src Source, popts parser.Options) *File {
+	p := src.Parse
+	switch {
+	case p != nil:
+	case in.Cache != nil:
+		p = parseCached(in.Cache, src.Path, src.Text, popts)
+	default:
+		p = parser.Parse(src.Text, popts)
+	}
+	return &File{Path: src.Path, Text: src.Text, Parse: p,
+		Lines:   span.NewIndex(src.Text),
+		Library: LibraryOf(in.Config, src.Path)}
 }
 
 // stopped reports whether the caller asked to stop.
@@ -254,6 +305,27 @@ type session struct {
 	// (vunits): pslExpr writes, pslTyped reads. Each job writes its
 	// own spans, so the result is the same in any order.
 	pslMu sync.Mutex
+	// toolVersion is Input.ToolVersion (part of incState.key).
+	toolVersion string
+
+	// The per-unit state below is indexed by a unit's position in
+	// units (incr.go). fresh marks the units whose objects this
+	// session made: the others are reused from prev, an earlier
+	// result, and are never written. post holds the diagnostics of
+	// the checks across units, which are recomputed every run and so
+	// never stored in a unit; stat holds the static checks' results.
+	// reads and lates are what a unit's job and its late architecture
+	// references looked at, for the next run's reuse.
+	prev      *incState
+	fresh     []bool
+	post      [][]diag.Diagnostic
+	stat      []unitStatic
+	reads     [][]int
+	lates     [][]int
+	fileDiags [][]diag.Diagnostic
+	// unchecked maps each unchecked unit to the opaque unit it reads
+	// (unsupported.go).
+	unchecked map[*Unit]*Unit
 }
 
 func (s *session) run() *Result {
@@ -261,9 +333,36 @@ func (s *session) run() *Result {
 	for _, f := range s.files {
 		f.Units = scanFile(f)
 		s.units = append(s.units, f.Units...)
-		s.diags = append(s.diags, f.Parse.Diagnostics(f.Path)...)
-		s.diags = append(s.diags, directiveRules(f, s.std)...) // lexrules.go
 	}
+	s.fileDiags = make([][]diag.Diagnostic, len(s.files))
+	for i, f := range s.files {
+		s.fileDiags[i] = fileDiagnostics(f, s.std)
+	}
+	s.indexUnits()
+	s.buildLibraries()
+	s.applyStandIns() // libs.go
+	s.linkDeps()
+	s.levelize()
+	s.initUnits(true)
+	if s.cache != nil && s.base != nil {
+		s.uc = newUnitCache(s.cache, s, s.popts)
+	}
+	if !s.analyzeUnits() {
+		return nil
+	}
+	r, _ := s.finish()
+	return r
+}
+
+// fileDiagnostics are the diagnostics of a file of its own: syntax
+// and the conditional-analysis directives.
+func fileDiagnostics(f *File, std token.Standard) []diag.Diagnostic {
+	return append(f.Parse.Diagnostics(f.Path),
+		directiveRules(f, std)...) // lexrules.go
+}
+
+// indexUnits numbers the units in canonical order, after the bundle's.
+func (s *session) indexUnits() {
 	offset := 0
 	if s.base != nil {
 		offset = len(s.base.allUnits())
@@ -271,35 +370,69 @@ func (s *session) run() *Result {
 	for i, u := range s.units {
 		u.Index = offset + i
 	}
-	s.buildLibraries()
-	s.applyStandIns() // libs.go
-	s.linkDeps()
-	s.levelize()
-	if s.cache != nil && s.base != nil {
-		s.uc = newUnitCache(s.cache, s, s.popts)
+}
+
+// initUnits allocates the per-unit state of the session, every unit
+// marked fresh or none.
+func (s *session) initUnits(fresh bool) {
+	n := len(s.units)
+	s.fresh = make([]bool, n)
+	for i := range s.fresh {
+		s.fresh[i] = fresh
 	}
-	if !s.analyzeUnits() {
-		return nil
+	s.post = make([][]diag.Diagnostic, n)
+	s.stat = make([]unitStatic, n)
+	s.reads = make([][]int, n)
+	s.lates = make([][]int, n)
+}
+
+// pos returns the position of project unit u in s.units, or -1 for a
+// bundled unit of a project analysis.
+func (s *session) pos(u *Unit) int {
+	off := 0
+	if s.base != nil {
+		off = len(s.base.allUnits())
 	}
+	if i := u.Index - off; i >= 0 && i < len(s.units) && s.units[i] == u {
+		return i
+	}
+	return -1
+}
+
+// note records diagnostic d of a check across units for unit u.
+func (s *session) note(u *Unit, d diag.Diagnostic) {
+	if i := s.pos(u); i >= 0 {
+		s.post[i] = append(s.post[i], d)
+	}
+}
+
+// finish runs the checks across units and builds the result; false
+// means the analysis cannot reuse prev after all (opaqueUnits).
+func (s *session) finish() (*Result, bool) {
 	s.phase("cross-file")
 	s.resolveLate()        // libs.go
 	s.missingBodies()      // units.go
 	s.configurationRules() // config.go
 	s.calledBeforeBody()   // units.go
 	s.libraryDiagnostics() // libs.go
-	s.opaqueUnits()        // unsupported.go
+	if !s.opaqueUnits() {  // unsupported.go
+		return nil, false
+	}
 	s.phase("static")
-	inc := s.staticChecks() // static.go
+	s.staticChecks() // static.go
 	s.phase("done")
-	return s.result(inc)
+	return s.result(), true
 }
 
-// analyzeUnits runs the unit jobs level by level; false means the
-// caller stopped the analysis.
+// analyzeUnits runs the unit jobs level by level, of the units this
+// session made; false means the caller stopped the analysis.
 func (s *session) analyzeUnits() bool {
 	byLevel := map[int][]*Unit{}
 	maxLevel := 0
-	for _, u := range s.units {
+	for i, u := range s.units {
+		if !s.fresh[i] {
+			continue
+		}
 		byLevel[u.Level] = append(byLevel[u.Level], u)
 		maxLevel = max(maxLevel, u.Level)
 	}
@@ -342,6 +475,10 @@ func (s *session) readable(from, to *Unit) bool {
 	if s.uc != nil {
 		s.uc.record(from, to)
 	}
+	if i, j := s.pos(from), s.pos(to); i >= 0 && j >= 0 &&
+		s.reads != nil {
+		s.reads[i] = append(s.reads[i], j) // only from's job writes it
+	}
 	return true
 }
 
@@ -354,33 +491,56 @@ func (r *Result) allUnits() []*Unit {
 	return append(r.Bundle.allUnits(), r.Units...)
 }
 
-func (s *session) result(incomplete []string) *Result {
+func (s *session) result() *Result {
 	r := &Result{
 		Standard: s.std, Files: s.files, Units: s.units,
 		Libraries: s.libOrder, Bundle: s.base, libs: s.libs,
-		byPath: map[string]*File{}, refsOf: map[*Decl][]Ref{},
+		byPath: map[string]*File{},
 	}
 	for _, f := range s.files {
 		r.byPath[f.Path] = f
 	}
 	ds := slices.Clone(s.diags)
-	for _, u := range s.units {
-		ds = append(ds, u.diags...)
-		for _, ref := range u.Refs {
-			if ref.Decl != nil {
-				r.refsOf[ref.Decl] = append(r.refsOf[ref.Decl], ref)
-			}
-		}
+	for _, fd := range s.fileDiags {
+		ds = append(ds, fd...)
+	}
+	var incomplete []string
+	for i, u := range s.units {
+		ds = append(ds, s.unitDiagnostics(i, u)...)
+		incomplete = append(incomplete, s.stat[i].incomplete...)
 	}
 	if s.base != nil {
 		for _, d := range s.base.Diagnostics {
 			ds = append(ds, bundledInternal(d))
 		}
+		r.refs = &refIndex{}
+		r.inc = s.incState()
+	} else {
+		r.refsOf = indexRefs(s.units)
 	}
 	r.Diagnostics = diag.Normalize(ds)
 	slices.Sort(incomplete)
 	r.Incomplete = slices.Compact(incomplete)
 	return r
+}
+
+// unitDiagnostics returns the diagnostics of the unit at position i:
+// its job's, those of the checks across units (an opaque unit keeps
+// only its opacity, an unchecked one only its syntax and library
+// diagnostics, unsupported.go) and its static checks'.
+func (s *session) unitDiagnostics(i int, u *Unit) []diag.Diagnostic {
+	ds := slices.Concat(u.diags, s.post[i])
+	if u.Opaque {
+		ds = keepOpaque(ds)
+	}
+	if u.Unchecked {
+		ds = dropSema(ds)
+		if o := s.uncheckedBy(u); o != nil {
+			ds = append(ds, at(u.File, unitRange(u),
+				diag.New(diag.SemaUnchecked, u.Label(), o.Label())))
+		}
+	}
+	return append(ds, s.stat[i].diags...)
 }
 
 // at locates d at the byte range rg of file f.

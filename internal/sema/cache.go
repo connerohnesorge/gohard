@@ -318,6 +318,11 @@ type unitCache struct {
 
 	hashOnce []sync.Once
 	hashes   [][32]byte
+
+	// noStore is set when the session reuses an earlier result
+	// (incr.go): its misses are analyzed but not stored, and their
+	// extra units are their readable() reads.
+	noStore bool
 }
 
 type pslEntry struct {
@@ -1178,6 +1183,20 @@ func (s *session) analyzeCached(us []*Unit) {
 		}
 	}
 	level := us[0].Level
+	if uc.noStore {
+		s.jobs.Run(s.limit, len(miss), func(k int) {
+			s.analyzeUnit(s.units[miss[k]])
+		})
+		for _, i := range idx {
+			if uc.hit[i] {
+				uc.restorePSL(i)
+			} else {
+				uc.extra[i] = s.readsOutsideDeps(i)
+			}
+			uc.keys[i] = uc.finalKey(i)
+		}
+		return
+	}
 	if uc.failed && level > uc.failLevel {
 		// A lower unit could not be stored: its objects have no
 		// numbers, so no unit above it is stored either.
@@ -1206,17 +1225,35 @@ func (s *session) analyzeCached(us []*Unit) {
 	for _, i := range idx {
 		uc.rec[i] = false
 		if uc.hit[i] {
-			f := s.units[i].File
-			for _, p := range uc.psl[i] {
-				if f.PSL == nil {
-					f.PSL = map[cst.Range]*Expr{}
-				}
-				f.PSL[p.at] = p.e
-			}
-			uc.psl[i] = nil
+			uc.restorePSL(i)
 		} else if !uc.finish(i) && !uc.failed {
 			uc.failed, uc.failLevel = true, level
 		}
 		uc.keys[i] = uc.finalKey(i)
 	}
+}
+
+// restorePSL adds the PSL expressions of restored unit i to its file.
+func (uc *unitCache) restorePSL(i int) {
+	f := uc.s.units[i].File
+	for _, p := range uc.psl[i] {
+		if f.PSL == nil {
+			f.PSL = map[cst.Range]*Expr{}
+		}
+		f.PSL[p.at] = p.e
+	}
+	uc.psl[i] = nil
+}
+
+// readsOutsideDeps returns the project units unit i's job read that
+// are not among its Deps, sorted.
+func (s *session) readsOutsideDeps(i int) []int {
+	var out []int
+	for _, j := range s.reads[i] {
+		if j != i && !slices.Contains(s.units[i].Deps, s.units[j]) {
+			out = append(out, j)
+		}
+	}
+	slices.Sort(out)
+	return slices.Compact(out)
 }

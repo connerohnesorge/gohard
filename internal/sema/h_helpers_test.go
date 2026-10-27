@@ -49,13 +49,15 @@ func hAnalyze(t testing.TB, std string, files map[string]string,
 	s.applyStandIns()
 	s.linkDeps()
 	s.levelize()
+	s.initUnits(true)
 	s.analyzeUnits()
 	s.resolveLate()
 	s.missingBodies()
 	s.configurationRules()
 	s.calledBeforeBody()
 	s.libraryDiagnostics()
-	return s.result(s.staticChecks())
+	s.staticChecks()
+	return s.result()
 }
 
 // hAttrs returns the predefined attribute expressions attr in the

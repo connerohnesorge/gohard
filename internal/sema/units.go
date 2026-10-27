@@ -93,7 +93,9 @@ func (s *session) missingBodies() {
 		if u.Duplicate || u.File == nil || u.File.Bundled {
 			continue
 		}
-		foreign := foreignNames(u.Node)
+		foreign := memoized(u, "foreignNames", func() map[Key]bool {
+			return foreignNames(u.Node)
+		})
 		for _, d := range u.Decls {
 			if d.Kind == DeclType && d.Type != nil &&
 				d.Type.Class == TypeProtected && d.Type.Members != nil &&
@@ -103,9 +105,8 @@ func (s *session) missingBodies() {
 				// LRM 5.6.1, 5.6.3: a protected type declaration has its
 				// body in the same declarative region (or in the package
 				// body of its package).
-				u.diags = append(u.diags, at(u.File, d.Span,
-					diag.New(diag.SemaError, "missing body for protected "+
-						"type "+d.Text)))
+				s.note(u, at(u.File, d.Span, diag.New(diag.SemaError,
+					"missing body for protected type "+d.Text)))
 				continue
 			}
 			if !d.Kind.IsSubprogram() || d.Implicit || bodied[d] ||
@@ -117,9 +118,9 @@ func (s *session) missingBodies() {
 			if !s.needsBody(u, d.Parent, protBodies, nestedBodies) {
 				continue
 			}
-			u.diags = append(u.diags, at(u.File, d.Span,
-				diag.New(diag.SemaError, "missing body for "+
-					d.Kind.String()+" "+d.Text+" "+Signature(d))))
+			s.note(u, at(u.File, d.Span, diag.New(diag.SemaError,
+				"missing body for "+d.Kind.String()+" "+d.Text+" "+
+					Signature(d))))
 		}
 	}
 }
@@ -233,13 +234,17 @@ func (s *session) inheritedRefs(u *Unit) []unitRef {
 			}
 		}
 	}
-	own := libraryNames(u.Node)
+	own := memoized(u, "libraryNames", func() map[Key]bool {
+		return libraryNames(u.Node)
+	})
 	extra := map[Key]bool{}
 	for _, p := range outer {
 		if p == nil || p.Lib.IsZero() || p.File == nil || p.File.Bundled {
 			continue
 		}
-		for k := range libraryNames(p.Node) {
+		for k := range memoized(p, "libraryNames", func() map[Key]bool {
+			return libraryNames(p.Node)
+		}) {
 			if !own[k] {
 				extra[k] = true
 			}
@@ -249,14 +254,28 @@ func (s *session) inheritedRefs(u *Unit) []unitRef {
 		return nil
 	}
 	var out []unitRef
-	for n := range u.Node.Descendants() {
+	for _, r := range memoized(u, "selectedNames", func() []unitRef {
+		return selectedNames(u.Node)
+	}) {
+		if extra[r.lib] {
+			out = append(out, r)
+		}
+	}
+	return out
+}
+
+// selectedNames returns every selected name L.U in n with a simple
+// prefix and a suffix other than all.
+func selectedNames(n cst.Node) []unitRef {
+	var out []unitRef
+	for n := range n.Descendants() {
 		sel, ok := cst.As[cst.SelectedName](n)
 		if !ok {
 			continue
 		}
 		lib := simpleKey(sel.Prefix().Node)
 		unit := TokenKey(sel.Suffix())
-		if extra[lib] && unit != "" && unit != "all" {
+		if unit != "" && unit != "all" {
 			out = append(out, unitRef{lib: lib, unit: unit, node: n})
 		}
 	}
@@ -318,10 +337,9 @@ func (s *session) calledBeforeBody() {
 			if !elaboratedHere(root.TokenAt(r.Span.Start)) {
 				continue
 			}
-			u.diags = append(u.diags, at(u.File, r.Span,
-				diag.New(diag.SemaError, "function "+d.Text+" is "+
-					"called before its body is elaborated "+
-					"(LRM 14.4.1)")))
+			s.note(u, at(u.File, r.Span, diag.New(diag.SemaError,
+				"function "+d.Text+" is called before its body is "+
+					"elaborated (LRM 14.4.1)")))
 		}
 	}
 }

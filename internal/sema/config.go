@@ -317,8 +317,7 @@ func (s *session) blockConfigRules(u *Unit, bc cst.BlockConfiguration,
 	owner cst.Node,
 ) {
 	report := func(tok cst.Token, msg string) {
-		u.diags = append(u.diags, at(u.File, tok.Span(),
-			diag.New(diag.SemaError, msg)))
+		s.note(u, at(u.File, tok.Span(), diag.New(diag.SemaError, msg)))
 	}
 	where := ownerName(owner)
 	insts := directInstances(owner)
@@ -436,7 +435,7 @@ func (s *session) fullyBound(u *Unit, cc cst.ComponentConfiguration,
 		}
 		if named && !bound[k] {
 			tok := nb.Spec().Node.FirstToken()
-			u.diags = append(u.diags, at(u.File, tok.Span(),
+			s.note(u, at(u.File, tok.Span(),
 				diag.New(diag.SemaError, "instance "+instLabel(st)+
 					" is not fully bound (no entity aspect binds it), "+
 					"so it cannot hold the block configuration "+

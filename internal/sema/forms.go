@@ -343,7 +343,7 @@ func (s *session) nestedBlockSpec(u *Unit, cc cst.ComponentConfiguration) {
 		TokenKey(tok) == TokenKey(archTok) {
 		return
 	}
-	u.diags = append(u.diags, at(u.File, tok.Span(),
+	s.note(u, at(u.File, tok.Span(),
 		diag.New(diag.SemaError, "the block specification "+tok.Text()+
 			" is not the architecture "+archTok.Text()+" the entity "+
 			"aspect binds")))

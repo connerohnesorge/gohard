@@ -55,13 +55,15 @@ func analyzeOpen(t testing.TB, std, src string) *Result {
 	ss.applyStandIns()
 	ss.linkDeps()
 	ss.levelize()
+	ss.initUnits(true)
 	ss.analyzeUnits()
 	ss.resolveLate()
 	ss.missingBodies()
 	ss.configurationRules()
 	ss.calledBeforeBody()
 	ss.libraryDiagnostics()
-	return ss.result(ss.staticChecks())
+	ss.staticChecks()
+	return ss.result()
 }
 
 // errorLines returns "line: message" for every error of r, sorted by

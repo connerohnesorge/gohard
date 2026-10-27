@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/token"
 )
 
@@ -241,11 +242,9 @@ func (s *session) linkAllDeps() {
 			continue
 		}
 		var cands []*Unit
-		for t := range u.Node.DescendantTokens() {
-			if t.Kind() != token.Identifier {
-				continue
-			}
-			k := TokenKey(t)
+		for _, k := range memoized(u, "identifiers", func() []Key {
+			return identifiers(u.Node)
+		}) {
 			for _, lk := range libs {
 				l, ok := s.libs[lk]
 				if !ok {
@@ -268,6 +267,23 @@ func (s *session) linkAllDeps() {
 			return cmp.Compare(a.Index, b.Index)
 		})
 	}
+}
+
+// identifiers returns the keys of the identifiers in n, each once, in
+// order of first appearance.
+func identifiers(n cst.Node) []Key {
+	var out []Key
+	seen := map[Key]bool{}
+	for t := range n.DescendantTokens() {
+		if t.Kind() != token.Identifier {
+			continue
+		}
+		if k := TokenKey(t); !seen[k] {
+			seen[k] = true
+			out = append(out, k)
+		}
+	}
+	return out
 }
 
 // reaches reports whether unit from depends on unit to, transitively.
