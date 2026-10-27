@@ -109,6 +109,10 @@ const MethodWorkspaceApplyEdit = "workspace/applyEdit"
 // (server to client). Result: null.
 const MethodWorkspaceCodeLensRefresh = "workspace/codeLens/refresh"
 
+// MethodWorkspaceInlayHintRefresh is the "workspace/inlayHint/refresh" request
+// (server to client). Result: null.
+const MethodWorkspaceInlayHintRefresh = "workspace/inlayHint/refresh"
+
 // MethodTextDocumentDidOpen is the "textDocument/didOpen" notification (client
 // to server). Params: DidOpenTextDocumentParams.
 const MethodTextDocumentDidOpen = "textDocument/didOpen"
@@ -195,6 +199,15 @@ const MethodCodeLensResolve = "codeLens/resolve"
 // MethodTextDocumentCodeAction is the "textDocument/codeAction" request (client
 // to server). Params: CodeActionParams. Result: []CommandOrCodeAction or null.
 const MethodTextDocumentCodeAction = "textDocument/codeAction"
+
+// MethodTextDocumentSignatureHelp is the "textDocument/signatureHelp" request
+// (client to server). Params: SignatureHelpParams. Result: SignatureHelp or
+// null.
+const MethodTextDocumentSignatureHelp = "textDocument/signatureHelp"
+
+// MethodTextDocumentInlayHint is the "textDocument/inlayHint" request (client
+// to server). Params: InlayHintParams. Result: []InlayHint or null.
+const MethodTextDocumentInlayHint = "textDocument/inlayHint"
 
 // DocumentURI is a document URI (LSP DocumentUri).
 type DocumentURI string
@@ -415,6 +428,17 @@ const (
 	FoldingRangeKindRegion FoldingRangeKind = "region"
 )
 
+// InlayHintKind: Inlay hint kinds.
+type InlayHintKind uint32
+
+// The InlayHintKind values.
+const (
+	// InlayHintKindType: An inlay hint that for a type annotation.
+	InlayHintKindType InlayHintKind = 1
+	// InlayHintKindParameter: An inlay hint that is for a parameter.
+	InlayHintKindParameter InlayHintKind = 2
+)
+
 // InsertTextFormat: Defines whether the insert text in a completion item should
 // be interpreted as plain text or a snippet.
 type InsertTextFormat uint32
@@ -538,6 +562,22 @@ const (
 	// ResourceOperationKindDelete: Supports deleting existing files and
 	// folders.
 	ResourceOperationKindDelete ResourceOperationKind = "delete"
+)
+
+// SignatureHelpTriggerKind: How a signature help was triggered.
+type SignatureHelpTriggerKind uint32
+
+// The SignatureHelpTriggerKind values.
+const (
+	// SignatureHelpTriggerKindInvoked: Signature help was invoked manually
+	// by the user or by a command.
+	SignatureHelpTriggerKindInvoked SignatureHelpTriggerKind = 1
+	// SignatureHelpTriggerKindTriggerCharacter: Signature help was
+	// triggered by a trigger character.
+	SignatureHelpTriggerKindTriggerCharacter SignatureHelpTriggerKind = 2
+	// SignatureHelpTriggerKindContentChange: Signature help was triggered
+	// by the cursor moving or by the document content changing.
+	SignatureHelpTriggerKindContentChange SignatureHelpTriggerKind = 3
 )
 
 // SymbolKind: A symbol kind.
@@ -2302,6 +2342,131 @@ type InitializeResultServerInfo struct {
 // InitializedParams.
 type InitializedParams struct{}
 
+// InlayHint: Inlay hint information.
+type InlayHint struct {
+	// The position of this hint.
+	Position Position `json:"position"`
+
+	// The label of this hint. A human readable string or an array of
+	// InlayHintLabelPart label parts.
+	Label StringOrInlayHintLabelParts `json:"label"`
+
+	// The kind of this hint. Can be omitted in which case the client should
+	// fall back to a reasonable default.
+	Kind InlayHintKind `json:"kind,omitempty"`
+
+	// Optional text edits that are performed when accepting this inlay
+	// hint.
+	TextEdits []TextEdit `json:"textEdits,omitempty"`
+
+	// The tooltip text when you hover over this item.
+	Tooltip StringOrMarkupContent `json:"tooltip,omitzero"`
+
+	// Render padding before the hint.
+	PaddingLeft *bool `json:"paddingLeft,omitempty"`
+
+	// Render padding after the hint.
+	PaddingRight *bool `json:"paddingRight,omitempty"`
+
+	// A data entry field that is preserved on an inlay hint between a
+	// `textDocument/inlayHint` and a `inlayHint/resolve` request.
+	Data LSPAny `json:"data,omitempty"`
+}
+
+// InlayHintClientCapabilities: Inlay hint client capabilities.
+type InlayHintClientCapabilities struct {
+	// Whether inlay hints support dynamic registration.
+	DynamicRegistration *bool `json:"dynamicRegistration,omitempty"`
+
+	// Indicates which properties a client can resolve lazily on an inlay
+	// hint.
+	ResolveSupport *InlayHintClientCapabilitiesResolveSupport `json:"resolveSupport,omitempty"`
+}
+
+// InlayHintClientCapabilitiesResolveSupport.
+type InlayHintClientCapabilitiesResolveSupport struct {
+	// The properties that a client can resolve lazily.
+	Properties []string `json:"properties"`
+}
+
+// MarshalJSON writes a nil required list as an empty one.
+func (x InlayHintClientCapabilitiesResolveSupport) MarshalJSON() (
+	[]byte, error,
+) {
+	type plain InlayHintClientCapabilitiesResolveSupport
+	p := plain(x)
+	if p.Properties == nil {
+		p.Properties = []string{}
+	}
+	return json.Marshal(p)
+}
+
+// InlayHintLabelPart: An inlay hint label part allows for interactive and
+// composite labels of inlay hints.
+type InlayHintLabelPart struct {
+	// The value of this label part.
+	Value string `json:"value"`
+
+	// The tooltip text when you hover over this label part. Depending on
+	// the client capability `inlayHint.resolveSupport` clients might
+	// resolve this property late using the resolve request.
+	Tooltip StringOrMarkupContent `json:"tooltip,omitzero"`
+
+	// An optional source code location that represents this label part.
+	Location *Location `json:"location,omitempty"`
+
+	// An optional command for this label part.
+	Command *Command `json:"command,omitempty"`
+}
+
+// InlayHintOptions: Inlay hint options used during static registration.
+type InlayHintOptions struct {
+	WorkDoneProgress *bool `json:"workDoneProgress,omitempty"`
+
+	// The server provides support to resolve additional information for an
+	// inlay hint item.
+	ResolveProvider *bool `json:"resolveProvider,omitempty"`
+}
+
+// InlayHintParams: A parameter literal used in inlay hint requests.
+type InlayHintParams struct {
+	// An optional token that a server can use to report work done progress.
+	WorkDoneToken ProgressToken `json:"workDoneToken,omitzero"`
+
+	// The text document.
+	TextDocument TextDocumentIdentifier `json:"textDocument"`
+
+	// The document range for which inlay hints should be computed.
+	Range Range `json:"range"`
+}
+
+// InlayHintRegistrationOptions: Inlay hint options used during static or
+// dynamic registration.
+type InlayHintRegistrationOptions struct {
+	WorkDoneProgress *bool `json:"workDoneProgress,omitempty"`
+
+	// The server provides support to resolve additional information for an
+	// inlay hint item.
+	ResolveProvider *bool `json:"resolveProvider,omitempty"`
+
+	// A document selector to identify the scope of the registration. If set
+	// to null the document selector provided on the client side will be
+	// used.
+	DocumentSelector DocumentSelector `json:"documentSelector"`
+
+	// The id used to register the request. The id can be used to deregister
+	// the request again. See also Registration#id.
+	ID string `json:"id,omitempty"`
+}
+
+// InlayHintWorkspaceClientCapabilities: Client workspace capabilities specific
+// to inlay hints.
+type InlayHintWorkspaceClientCapabilities struct {
+	// Whether the client implementation supports a refresh request sent
+	// from the server to the client.
+	RefreshSupport *bool `json:"refreshSupport,omitempty"`
+}
+
 // InsertReplaceEdit: A special text edit to provide an insert and a replace
 // operation.
 type InsertReplaceEdit struct {
@@ -2456,6 +2621,17 @@ type OptionalVersionedTextDocumentIdentifier struct {
 	// unknown and the content on disk is the truth (as specified with
 	// document content ownership).
 	Version *int32 `json:"version"`
+}
+
+// ParameterInformation: Represents a parameter of a callable-signature. A
+// parameter can have a label and a doc-comment.
+type ParameterInformation struct {
+	// The label of this parameter information.
+	Label StringOrTuple `json:"label"`
+
+	// The human-readable doc-comment of this parameter. Will be shown in
+	// the UI but can be omitted.
+	Documentation StringOrMarkupContent `json:"documentation,omitzero"`
 }
 
 // Position: Position in a text document expressed as zero-based line and
@@ -2945,6 +3121,9 @@ type ServerCapabilities struct {
 	// The server provides hover support.
 	HoverProvider BoolOrHoverOptions `json:"hoverProvider,omitzero"`
 
+	// The server provides signature help support.
+	SignatureHelpProvider *SignatureHelpOptions `json:"signatureHelpProvider,omitempty"`
+
 	// The server provides goto definition support.
 	DefinitionProvider BoolOrDefinitionOptions `json:"definitionProvider,omitzero"`
 
@@ -2987,6 +3166,9 @@ type ServerCapabilities struct {
 
 	// The server provides semantic tokens support.
 	SemanticTokensProvider SemanticTokensOptionsOrSemanticTokensRegistrationOptions `json:"semanticTokensProvider,omitzero"`
+
+	// The server provides inlay hints.
+	InlayHintProvider BoolOrInlayHintOptionsOrInlayHintRegistrationOptions `json:"inlayHintProvider,omitzero"`
 
 	// Workspace specific server capabilities.
 	Workspace *ServerCapabilitiesWorkspace `json:"workspace,omitempty"`
@@ -3047,6 +3229,153 @@ type ShowMessageRequestParams struct {
 
 	// The message action items to present.
 	Actions []MessageActionItem `json:"actions,omitempty"`
+}
+
+// SignatureHelp: Signature help represents the signature of something callable.
+// There can be multiple signature but only one active and only one active
+// parameter.
+type SignatureHelp struct {
+	// One or more signatures.
+	Signatures []SignatureInformation `json:"signatures"`
+
+	// The active signature. If omitted or the value lies outside the range
+	// of `signatures` the value defaults to zero or is ignored if the
+	// `SignatureHelp` has no signatures.
+	ActiveSignature *uint32 `json:"activeSignature,omitempty"`
+
+	// The active parameter of the active signature. If omitted or the value
+	// lies outside the range of `signatures[activeSignature].parameters`
+	// defaults to 0 if the active signature has parameters. If the active
+	// signature has no parameters it is ignored. In future version of the
+	// protocol this property might become mandatory to better express the
+	// active parameter if the active signature does have any.
+	ActiveParameter *uint32 `json:"activeParameter,omitempty"`
+}
+
+// MarshalJSON writes a nil required list as an empty one.
+func (x SignatureHelp) MarshalJSON() ([]byte, error) {
+	type plain SignatureHelp
+	p := plain(x)
+	if p.Signatures == nil {
+		p.Signatures = []SignatureInformation{}
+	}
+	return json.Marshal(p)
+}
+
+// SignatureHelpClientCapabilities: Client Capabilities for a
+// SignatureHelpRequest.
+type SignatureHelpClientCapabilities struct {
+	// Whether signature help supports dynamic registration.
+	DynamicRegistration *bool `json:"dynamicRegistration,omitempty"`
+
+	// The client supports the following `SignatureInformation` specific
+	// properties.
+	SignatureInformation *SignatureHelpClientCapabilitiesSignatureInformation `json:"signatureInformation,omitempty"`
+
+	// The client supports to send additional context information for a
+	// `textDocument/signatureHelp` request. A client that opts into
+	// contextSupport will also support the `retriggerCharacters` on
+	// `SignatureHelpOptions`.
+	ContextSupport *bool `json:"contextSupport,omitempty"`
+}
+
+// SignatureHelpClientCapabilitiesSignatureInformation.
+type SignatureHelpClientCapabilitiesSignatureInformation struct {
+	// Client supports the following content formats for the documentation
+	// property. The order describes the preferred format of the client.
+	DocumentationFormat []MarkupKind `json:"documentationFormat,omitempty"`
+
+	// Client capabilities specific to parameter information.
+	ParameterInformation *SignatureHelpClientCapabilitiesSignatureInformationParameterInformation `json:"parameterInformation,omitempty"`
+
+	// The client supports the `activeParameter` property on
+	// `SignatureInformation` literal.
+	ActiveParameterSupport *bool `json:"activeParameterSupport,omitempty"`
+}
+
+// SignatureHelpClientCapabilitiesSignatureInformationParameterInformation.
+type SignatureHelpClientCapabilitiesSignatureInformationParameterInformation struct {
+	// The client supports processing label offsets instead of a simple
+	// label string.
+	LabelOffsetSupport *bool `json:"labelOffsetSupport,omitempty"`
+}
+
+// SignatureHelpContext: Additional information about the context in which a
+// signature help request was triggered.
+type SignatureHelpContext struct {
+	// Action that caused signature help to be triggered.
+	TriggerKind SignatureHelpTriggerKind `json:"triggerKind"`
+
+	// Character that caused signature help to be triggered.
+	TriggerCharacter string `json:"triggerCharacter,omitempty"`
+
+	// `true` if signature help was already showing when it was triggered.
+	IsRetrigger bool `json:"isRetrigger"`
+
+	// The currently active `SignatureHelp`.
+	ActiveSignatureHelp *SignatureHelp `json:"activeSignatureHelp,omitempty"`
+}
+
+// SignatureHelpOptions: Server Capabilities for a SignatureHelpRequest.
+type SignatureHelpOptions struct {
+	WorkDoneProgress *bool `json:"workDoneProgress,omitempty"`
+
+	// List of characters that trigger signature help automatically.
+	TriggerCharacters []string `json:"triggerCharacters,omitempty"`
+
+	// List of characters that re-trigger signature help.
+	RetriggerCharacters []string `json:"retriggerCharacters,omitempty"`
+}
+
+// SignatureHelpParams: Parameters for a SignatureHelpRequest.
+type SignatureHelpParams struct {
+	// The text document.
+	TextDocument TextDocumentIdentifier `json:"textDocument"`
+
+	// The position inside the text document.
+	Position Position `json:"position"`
+
+	// An optional token that a server can use to report work done progress.
+	WorkDoneToken ProgressToken `json:"workDoneToken,omitzero"`
+
+	// The signature help context. This is only available if the client
+	// specifies to send this using the client capability
+	// `textDocument.signatureHelp.contextSupport === true`
+	Context *SignatureHelpContext `json:"context,omitempty"`
+}
+
+// SignatureHelpRegistrationOptions: Registration options for a
+// SignatureHelpRequest.
+type SignatureHelpRegistrationOptions struct {
+	// A document selector to identify the scope of the registration. If set
+	// to null the document selector provided on the client side will be
+	// used.
+	DocumentSelector DocumentSelector `json:"documentSelector"`
+	WorkDoneProgress *bool            `json:"workDoneProgress,omitempty"`
+
+	// List of characters that trigger signature help automatically.
+	TriggerCharacters []string `json:"triggerCharacters,omitempty"`
+
+	// List of characters that re-trigger signature help.
+	RetriggerCharacters []string `json:"retriggerCharacters,omitempty"`
+}
+
+// SignatureInformation: Represents the signature of something callable. A
+// signature can have a label, like a function-name, a doc-comment, and a set of
+// parameters.
+type SignatureInformation struct {
+	// The label of this signature. Will be shown in the UI.
+	Label string `json:"label"`
+
+	// The human-readable doc-comment of this signature. Will be shown in
+	// the UI but can be omitted.
+	Documentation StringOrMarkupContent `json:"documentation,omitzero"`
+
+	// The parameters of this signature.
+	Parameters []ParameterInformation `json:"parameters,omitempty"`
+
+	// The index of the active parameter.
+	ActiveParameter *uint32 `json:"activeParameter,omitempty"`
 }
 
 // StaleRequestSupportOptions.
@@ -3123,6 +3452,9 @@ type TextDocumentClientCapabilities struct {
 	// Capabilities specific to the `textDocument/hover` request.
 	Hover *HoverClientCapabilities `json:"hover,omitempty"`
 
+	// Capabilities specific to the `textDocument/signatureHelp` request.
+	SignatureHelp *SignatureHelpClientCapabilities `json:"signatureHelp,omitempty"`
+
 	// Capabilities specific to the `textDocument/definition` request.
 	Definition *DefinitionClientCapabilities `json:"definition,omitempty"`
 
@@ -3160,6 +3492,9 @@ type TextDocumentClientCapabilities struct {
 
 	// Capabilities specific to the various semantic token request.
 	SemanticTokens *SemanticTokensClientCapabilities `json:"semanticTokens,omitempty"`
+
+	// Capabilities specific to the `textDocument/inlayHint` request.
+	InlayHint *InlayHintClientCapabilities `json:"inlayHint,omitempty"`
 }
 
 // TextDocumentContentChangePartial.
@@ -3483,6 +3818,10 @@ type WorkspaceClientCapabilities struct {
 	// Capabilities specific to the code lens requests scoped to the
 	// workspace.
 	CodeLens *CodeLensWorkspaceClientCapabilities `json:"codeLens,omitempty"`
+
+	// Capabilities specific to the inlay hint requests scoped to the
+	// workspace.
+	InlayHint *InlayHintWorkspaceClientCapabilities `json:"inlayHint,omitempty"`
 }
 
 // WorkspaceEdit: A workspace edit represents changes to many resources managed
@@ -3958,6 +4297,50 @@ func (o *BoolOrHoverOptions) UnmarshalJSON(b []byte) error {
 var altsBoolOrHoverOptions = []alt{
 	{kinds: kBool, decode: as[bool]},
 	{kinds: kObject, shape: shapeHoverOptions, decode: as[HoverOptions]},
+}
+
+// BoolOrInlayHintOptionsOrInlayHintRegistrationOptions is one of bool,
+// InlayHintOptions, InlayHintRegistrationOptions.
+type BoolOrInlayHintOptionsOrInlayHintRegistrationOptions struct {
+	// Value is nil (null) or a value of one of the types above, not a
+	// pointer to one.
+	Value any
+}
+
+// MarshalJSON writes Value; nil is null.
+func (o BoolOrInlayHintOptionsOrInlayHintRegistrationOptions) MarshalJSON() (
+	[]byte, error,
+) {
+	return marshalOr(o.Value)
+}
+
+// UnmarshalJSON reads the alternative that matches the JSON.
+func (o *BoolOrInlayHintOptionsOrInlayHintRegistrationOptions) UnmarshalJSON(
+	b []byte,
+) error {
+	v, err := unmarshalOr(
+		b, altsBoolOrInlayHintOptionsOrInlayHintRegistrationOptions,
+		"BoolOrInlayHintOptionsOrInlayHintRegistrationOptions",
+	)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+var altsBoolOrInlayHintOptionsOrInlayHintRegistrationOptions = []alt{
+	{kinds: kBool, decode: as[bool]},
+	{
+		kinds:  kObject,
+		shape:  shapeInlayHintOptions,
+		decode: as[InlayHintOptions],
+	},
+	{
+		kinds:  kObject,
+		shape:  shapeInlayHintRegistrationOptions,
+		decode: as[InlayHintRegistrationOptions],
+	},
 }
 
 // BoolOrReferenceOptions is one of bool, ReferenceOptions.
@@ -4921,6 +5304,44 @@ var altsStringOrBool = []alt{
 	{kinds: kBool, decode: as[bool]},
 }
 
+// StringOrInlayHintLabelParts is one of string, []InlayHintLabelPart.
+type StringOrInlayHintLabelParts struct {
+	// Value is nil (null) or a value of one of the types above, not a
+	// pointer to one.
+	Value any
+}
+
+// MarshalJSON writes Value; nil is null.
+func (o StringOrInlayHintLabelParts) MarshalJSON() ([]byte, error) {
+	return marshalOr(o.Value)
+}
+
+// UnmarshalJSON reads the alternative that matches the JSON.
+func (o *StringOrInlayHintLabelParts) UnmarshalJSON(b []byte) error {
+	v, err := unmarshalOr(
+		b, altsStringOrInlayHintLabelParts,
+		"StringOrInlayHintLabelParts",
+	)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+var altsStringOrInlayHintLabelParts = []alt{
+	{kinds: kString, decode: as[string]},
+	{
+		kinds: kArray,
+		elem: &alt{
+			kinds:  kObject,
+			shape:  shapeInlayHintLabelPart,
+			decode: as[InlayHintLabelPart],
+		},
+		decode: as[[]InlayHintLabelPart],
+	},
+}
+
 // StringOrMarkupContent is one of string, MarkupContent.
 type StringOrMarkupContent struct {
 	// Value is nil (null) or a value of one of the types above, not a
@@ -5011,6 +5432,33 @@ var altsStringOrStrings = []alt{
 		elem:   &alt{kinds: kString, decode: as[string]},
 		decode: as[[]string],
 	},
+}
+
+// StringOrTuple is one of string, [2]uint32.
+type StringOrTuple struct {
+	// Value is nil (null) or a value of one of the types above, not a
+	// pointer to one.
+	Value any
+}
+
+// MarshalJSON writes Value; nil is null.
+func (o StringOrTuple) MarshalJSON() ([]byte, error) {
+	return marshalOr(o.Value)
+}
+
+// UnmarshalJSON reads the alternative that matches the JSON.
+func (o *StringOrTuple) UnmarshalJSON(b []byte) error {
+	v, err := unmarshalOr(b, altsStringOrTuple, "StringOrTuple")
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+var altsStringOrTuple = []alt{
+	{kinds: kString, decode: as[string]},
+	{kinds: kArray, decode: as[[2]uint32]},
 }
 
 // SymbolInformationsOrDocumentSymbols is one of []SymbolInformation,
@@ -5462,6 +5910,22 @@ var shapeFoldingRangeRegistrationOptions = &shape{
 
 var shapeHoverOptions = &shape{
 	known: []string{"workDoneProgress"},
+}
+
+var shapeInlayHintLabelPart = &shape{
+	req:   []string{"value"},
+	known: []string{"value", "tooltip", "location", "command"},
+}
+
+var shapeInlayHintOptions = &shape{
+	known: []string{"workDoneProgress", "resolveProvider"},
+}
+
+var shapeInlayHintRegistrationOptions = &shape{
+	req: []string{"documentSelector"},
+	known: []string{
+		"workDoneProgress", "resolveProvider", "documentSelector", "id",
+	},
 }
 
 var shapeInsertReplaceEdit = &shape{

@@ -65,7 +65,7 @@ var Methods = []string{
 	"workspace/didChangeWatchedFiles",
 	"workspace/didChangeWorkspaceFolders", "workspace/workspaceFolders",
 	"workspace/symbol", "workspace/executeCommand", "workspace/applyEdit",
-	"workspace/codeLens/refresh",
+	"workspace/codeLens/refresh", "workspace/inlayHint/refresh",
 	// Text synchronization and diagnostics.
 	"textDocument/didOpen", "textDocument/didChange",
 	"textDocument/didClose", "textDocument/didSave",
@@ -78,7 +78,8 @@ var Methods = []string{
 	"textDocument/formatting", "textDocument/rangeFormatting",
 	"textDocument/foldingRange", "textDocument/documentHighlight",
 	"textDocument/codeLens", "codeLens/resolve",
-	"textDocument/codeAction",
+	"textDocument/codeAction", "textDocument/signatureHelp",
+	"textDocument/inlayHint",
 }
 
 // Extra are types needed beyond the closure of Methods: the
@@ -152,17 +153,17 @@ var Names = map[string]string{
 // Skip are properties left out ("Parent.property", Parent being the
 // Go name of the structure or literal): the client and server
 // capabilities of features GoHard does not have (#11: no notebooks,
-// inlay hints, signature help, pull diagnostics, hierarchies and the
-// like; semantic tokens came in v2, #55). Decoding ignores unknown
-// keys, so a client that sends them is still read correctly.
+// pull diagnostics, hierarchies and the like; semantic tokens came in
+// v2, #55, signature help and inlay hints in #56). Decoding ignores
+// unknown keys, so a client that sends them is still read correctly.
 var Skip = map[string]bool{}
 
 func init() {
 	notV1 := []string{"declaration", "typeDefinition", "implementation",
-		"signatureHelp", "documentLink", "colorProvider",
+		"documentLink", "colorProvider",
 		"onTypeFormatting", "selectionRange", "linkedEditingRange",
 		"callHierarchy", "moniker", "typeHierarchy",
-		"inlineValue", "inlayHint", "diagnostic"}
+		"inlineValue", "diagnostic"}
 	for _, f := range notV1 {
 		Skip["TextDocumentClientCapabilities."+f] = true
 		p := f
@@ -177,7 +178,6 @@ func init() {
 	for _, f := range []string{"ClientCapabilities.notebookDocument",
 		"ServerCapabilities.notebookDocumentSync",
 		"WorkspaceClientCapabilities.inlineValue",
-		"WorkspaceClientCapabilities.inlayHint",
 		"WorkspaceClientCapabilities.diagnostics",
 		"WorkspaceClientCapabilities.fileOperations",
 		"ServerCapabilitiesWorkspace.fileOperations",
