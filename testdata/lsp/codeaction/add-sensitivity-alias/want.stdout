@@ -1,0 +1,1 @@
+[{"title":"Add b to the sensitivity list","kind":"quickfix","isPreferred":true,"edit":{"changes":{"file://$WORK/alias.vhd":[{"range":{"start":{"line":9,"character":16},"end":{"line":9,"character":16}},"newText":", b"}]}}}]

@@ -93,6 +93,8 @@ result; positions are zero-based UTF-8.
 | `highlight/signal` | the declaration (text), assignment targets (write) and reads of a signal in the file |
 | `codeaction/add-use` | `gohard lsp codeaction`: one "add use" quick fix per bundled package declaring the undefined name |
 | `codeaction/add-use-work` | a project package: `use work.util.all;` after the unit's last context clause |
+| `codeaction/add-sensitivity` | a signal a combinational process reads but does not list: the fix appends it to the sensitivity list (#54) |
+| `codeaction/add-sensitivity-alias` | a read through an alias declared in the process: the fix appends the signal, since the alias is not visible in the list |
 | `codeaction/map-library` | an unmapped library: the `libraries` line written into `gohard.yaml`, with the folder declaring the unit (the search of `gohard libs detect`, #34) |
 | `codeaction/map-library-new-yaml` | without `gohard.yaml` the fix adds a `libraries` block |
 | `hover/doc-comment` | a signal: its declaration and doc comment |

@@ -8,6 +8,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/libs"
+	"github.com/connerohnesorge/gohard/internal/lint"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/server"
 	"github.com/connerohnesorge/gohard/internal/token"
@@ -202,7 +203,9 @@ func (an *Analysis) addUse(path, uri string, text []byte, s, e int,
 }
 
 // addSensitivity is the fix of a signal read at [s, e) that the
-// enclosing process's sensitivity list does not name: append it.
+// enclosing process's sensitivity list does not name: append the name
+// the finding names (lint.ListName), the signal's for an alias
+// declared in the process.
 func (an *Analysis) addSensitivity(path, uri string, text []byte, s, e int,
 ) []server.CodeAction {
 	f, ok := an.Result.File(path)
@@ -221,6 +224,9 @@ func (an *Analysis) addSensitivity(path, uri string, text []byte, s, e int,
 			return nil
 		}
 		name := string(text[s:e])
+		if ref, ok := an.Result.RefAt(path, s); ok && ref.Decl != nil {
+			name = lint.ListName(f, n, ref.Decl)
+		}
 		at := last.Span().Start
 		return []server.CodeAction{{
 			Title: "Add " + name + " to the sensitivity list",

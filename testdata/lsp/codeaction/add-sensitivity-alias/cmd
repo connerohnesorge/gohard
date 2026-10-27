@@ -1,0 +1,3 @@
+# A read through an alias declared in the process adds the signal: the
+# alias is not visible in the sensitivity list (#54).
+gohard lsp codeaction --at alias.vhd:13:16

@@ -14,7 +14,7 @@ import (
 // clock, so only combinational processes are checked. Reads in a
 // procedure call's arguments and attribute prefixes (s'length) are not
 // counted. A read through an alias is a read of its signal; the
-// finding names the alias as written, which the quick fix adds. The
+// finding names what the quick fix adds to the list (ListName). The
 // rule works on whole signals: an element or field in the list covers
 // reads of every element or field of that signal, so listing r.x and
 // reading r.w gives no finding.
@@ -53,13 +53,30 @@ func sensitivity(res *sema.Result, m *meter, sev diag.Severity,
 					continue
 				}
 				listed[d] = true // one finding per signal, at its first read
-				f := diag.New(diag.LintSensitivityList, r.Decl.Text)
+				f := diag.New(diag.LintSensitivityList,
+					ListName(u.File, n, r.Decl))
 				f.Severity = sev
 				out = append(out, finding{u, at(u.File, r.Span, f)})
 			}
 		}
 	}
 	return out
+}
+
+// ListName returns the name to add to the sensitivity list of process
+// proc in file f for a read of a name declared by d: d's name as
+// written, or for an alias declared in the process, which the list
+// cannot see, the name of the object it stands for.
+func ListName(f *sema.File, proc cst.Node, d *sema.Decl) string {
+	if d.Kind == sema.DeclAlias && d.File == f {
+		if p := proc.Span(); p.Start <= d.Span.Start &&
+			d.Span.End <= p.End {
+			if o := object(d); o != nil {
+				return o.Text
+			}
+		}
+	}
+	return d.Text
 }
 
 // clocked reports whether process p tests a clock edge: it calls

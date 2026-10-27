@@ -424,6 +424,30 @@ end;
 			"a.vhd:14:15: lint/sensitivity-list: as_a is read in the " +
 				"process but is not in its sensitivity list",
 		},
+	}, {
+		// An alias declared in the process is not visible in its
+		// sensitivity list, so the finding names the signal.
+		name: "alias declared in the process",
+		src: header + `entity e is
+  port (a, b, c : in std_logic; y : out std_logic);
+end;
+architecture a of e is
+  alias as_c is c;
+begin
+  p : process (a)
+    alias lb is b;
+    alias lc is as_c;
+  begin
+    y <= a and lb and lc;
+  end process;
+end;
+`,
+		want: []string{
+			"a.vhd:12:16: lint/sensitivity-list: b is read in the " +
+				"process but is not in its sensitivity list",
+			"a.vhd:12:23: lint/sensitivity-list: c is read in the " +
+				"process but is not in its sensitivity list",
+		},
 	}})
 }
 
