@@ -103,6 +103,7 @@ func init() {
 	for _, b := range binops {
 		add(lib1164, b.name, cLogic, logicScalar(b.op), cLogic, cLogic)
 		add(lib1164, b.name, cVec, logicVector(b.op), cVec, cVec)
+		add(lib1164, b.name, cLogic, reduce(b.op), cVec)
 	}
 	add(lib1164, "not", cLogic, notScalar, cLogic)
 	add(lib1164, "not", cVec, notVector, cVec)
@@ -180,6 +181,32 @@ func logicVector(op binop) Func {
 			pos[i] = op.apply(a, b)
 		}
 		return vector(rt, upto(len(l)), pos), true
+	}
+}
+
+// reduce is a reduction operator (VHDL-2008, l : STD_ULOGIC_VECTOR
+// return STD_ULOGIC): the table folded over l from its right end,
+// starting at '1' for and and nand, '0' for the others, the result
+// negated for nand, nor and xnor.
+func reduce(op binop) Func {
+	start := int64(l0)
+	if op.t == &andTable {
+		start = l1
+	}
+	return func(args []eval.Value, rt *eval.Type) (eval.Value, bool) {
+		l := args[0].E
+		r := start
+		for i := len(l) - 1; i >= 0; i-- {
+			p, ok := logicPos(l[i])
+			if !ok {
+				return eval.Value{}, false
+			}
+			r = op.t[p][r]
+		}
+		if op.neg {
+			r = notTable[r]
+		}
+		return scalar(rt, r)
 	}
 }
 
