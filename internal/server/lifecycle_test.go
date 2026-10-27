@@ -3,11 +3,14 @@ package server
 import (
 	"bytes"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"testing"
 
 	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/internal/env/simenv"
 	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/internal/stdlib"
 )
 
 // TestEndAnswersEveryRequest: when shutdown or exit arrives, every
@@ -85,7 +88,8 @@ func TestEndAnswersEveryRequest(t *testing.T) {
 // TestAdoptsFolderOfFirstFile: a client that names no workspace folder
 // gets the folder of the first file it opens as its project folder
 // (#48), loaded like a workspace folder: a request waits for the load
-// and is answered from it. Later files and other URIs do not move it.
+// and is answered from it. Later files and other URIs do not move it,
+// and a cached bundled std/ieee file does not set it.
 func TestAdoptsFolderOfFirstFile(t *testing.T) {
 	sub := filepath.FromSlash("/work/sub")
 	cases := []struct {
@@ -98,6 +102,10 @@ func TestAdoptsFolderOfFirstFile(t *testing.T) {
 			openURI("file:///other/b.vhd")}, sub},
 		{"untitled first", []string{initNoFolder, initialized,
 			openURI("untitled:Untitled-1"),
+			openURI("file:///work/sub/a.vhd")}, sub},
+		{"cached bundled file first", []string{initNoFolder, initialized,
+			openURI(PathToURI(filepath.Join(sub, "gohard", "bundle",
+				stdlib.CacheKey(), "ieee", "numeric_std.vhdl"))),
 			openURI("file:///work/sub/a.vhd")}, sub},
 		{"before initialized", []string{initNoFolder,
 			openURI("file:///work/sub/a.vhd"), initialized}, sub},
@@ -131,13 +139,23 @@ func TestAdoptsFolderOfFirstFile(t *testing.T) {
 	}
 }
 
-// TestScanFolderAgreesWithServer: for any order of initialize requests
+// TestFolderScanAgreesWithServer: for any order of initialize requests
 // (with and without a folder, invalid), initialized, didOpen of files,
-// other URIs and invalid params, shutdown and exit, the folder
-// SessionFolder computes for a recording is the folder the server
-// works in (#29, #48), so a recorded session replays against the same
-// project.
-func TestScanFolderAgreesWithServer(t *testing.T) {
+// of cached bundled files, of other URIs and with invalid params,
+// shutdown and exit, the folder SessionFolder computes for a recording
+// is the folder the server works in (#29, #48), both in the live
+// session and in its replay, which has another cache root, so a
+// recorded session replays against the same project. The bodies go
+// through the Driver, which maps cached files to bundle URIs (#33).
+func TestFolderScanAgreesWithServer(t *testing.T) {
+	live := filepath.FromSlash("/home/u/.cache")
+	root, err := stdlib.CacheRoot(func(k string) (string, bool) {
+		return live, k == "XDG_CACHE_HOME"
+	}, runtime.GOOS)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cached := PathToURI(filepath.Join(root, "ieee", "std_logic_1164.vhdl"))
 	alphabet := []string{
 		initNoFolder,
 		`{"jsonrpc":"2.0","id":1,"method":"initialize",` +
@@ -147,6 +165,7 @@ func TestScanFolderAgreesWithServer(t *testing.T) {
 		initialized,
 		openURI("file:///a/x.vhd"),
 		openURI("file:///b/c/y.vhd"),
+		openURI(cached),
 		openURI("untitled:1"),
 		openURI(""),
 		`{"jsonrpc":"2.0","method":"textDocument/didOpen","params":5}`,
@@ -155,24 +174,43 @@ func TestScanFolderAgreesWithServer(t *testing.T) {
 		`{"jsonrpc":"2.0","id":9,"method":"shutdown"}`,
 		`{"jsonrpc":"2.0","method":"exit"}`,
 	}
+	caches := []string{live, filepath.FromSlash("/gohard-cache")}
 	r := &rng{env.SplitMix64{State: 48}}
 	for i := range 2000 {
-		h := newHarness(t, Nop{})
 		var bodies [][]byte
 		for range 1 + r.n(8) {
-			m := alphabet[r.n(len(alphabet))]
-			bodies = append(bodies, []byte(m))
-			h.client("%s", m)
+			bodies = append(bodies, []byte(alphabet[r.n(len(alphabet))]))
 		}
-		h.drain()
-		got, known := ScanFolder(bodies)
-		if got != h.s.folder {
-			t.Fatalf("case %d: ScanFolder %q, server %q\n%s", i, got,
-				h.s.folder, bytes.Join(bodies, []byte("\n")))
+		var scan FolderScan
+		known := false
+		for _, b := range bodies {
+			known = scan.Add(b)
 		}
-		if known && got == "" && h.s.phase == phaseRunning {
-			t.Fatalf("case %d: known without a folder while running\n%s",
-				i, bytes.Join(bodies, []byte("\n")))
+		got := scan.Folder("")
+		if want := SessionFolder(bodies, ""); got != want {
+			t.Fatalf("case %d: FolderScan %q, SessionFolder %q", i, got,
+				want)
+		}
+		for _, cache := range caches {
+			d := NewDriver(Options{Analyzer: Nop{}, Version: "t"},
+				simenv.New(simenv.Options{Dir: filepath.FromSlash("/w"),
+					Vars: map[string]string{"XDG_CACHE_HOME": cache},
+				}).Env(), 1, func(Send) error { return nil })
+			for _, b := range bodies {
+				d.Push(b)
+			}
+			if err := d.Run(); err != nil {
+				t.Fatal(err)
+			}
+			if got != d.State.folder {
+				t.Fatalf("case %d, cache %s: FolderScan %q, server %q\n%s",
+					i, cache, got, d.State.folder,
+					bytes.Join(bodies, []byte("\n")))
+			}
+			if known && got == "" && d.State.phase == phaseRunning {
+				t.Fatalf("case %d: known without a folder while "+
+					"running\n%s", i, bytes.Join(bodies, []byte("\n")))
+			}
 		}
 	}
 }

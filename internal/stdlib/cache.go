@@ -137,3 +137,17 @@ func CachePath(root, name string) (string, bool) {
 	_, ok := Lookup(p)
 	return p, ok
 }
+
+// InAnyCache is CachePath for a cache root it finds in name itself:
+// the last directory gohard/bundle/<CacheKey> above it, whatever the
+// base directory (#48). It needs no environment, so a session replayed
+// with another cache root sees the same files as cached.
+func InAnyCache(name string) (string, bool) {
+	p := filepath.ToSlash(name)
+	mark := "/gohard/bundle/" + cacheKey + "/"
+	i := strings.LastIndex(p, mark)
+	if i < 0 {
+		return "", false
+	}
+	return CachePath(filepath.FromSlash(p[:i+len(mark)-1]), name)
+}

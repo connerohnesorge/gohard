@@ -24,51 +24,69 @@ import (
 // accepts (wherever it is: requests before initialize are answered
 // with an error and read nothing, but an exit ends the session); when
 // that request names none, the folder of the first file opened after
-// it and before shutdown or exit (the folder the server adopts, #48);
-// else dir (the current directory).
+// it and before shutdown or exit, leaving out cached bundled files
+// (the folder the server adopts, #48); else dir (the current
+// directory).
 func SessionFolder(bodies [][]byte, dir string) string {
-	if f, _ := ScanFolder(bodies); f != "" {
-		return f
+	var f FolderScan
+	for _, b := range bodies {
+		if f.Add(b) {
+			break
+		}
 	}
-	return dir
+	return f.Folder(dir)
 }
 
-// ScanFolder applies the rule of SessionFolder to the bodies received
-// so far. known is true once later bodies can no longer change the
-// answer: the folder is found, or the session can no longer get one
-// (an exit, or a shutdown after an initialize that names none). folder
-// is "" when there is none (yet).
-func ScanFolder(bodies [][]byte) (folder string, known bool) {
-	init := false
-	for _, b := range bodies {
-		msg, err := jsonrpc2.Decode(b)
-		if err != nil {
-			continue
+// FolderScan applies the rule of SessionFolder one body at a time, so
+// a recording looks at each body once, as it arrives. The zero value
+// has seen no body.
+type FolderScan struct {
+	init   bool // an initialize request that names no folder was seen
+	known  bool
+	folder string
+}
+
+// Add scans the next body. It reports whether later bodies can no
+// longer change the answer: the folder is found, or the session can
+// no longer get one (an exit, or a shutdown after an initialize that
+// names none). Bodies added after that are ignored.
+func (f *FolderScan) Add(body []byte) (known bool) {
+	if f.known {
+		return true
+	}
+	msg, err := jsonrpc2.Decode(body)
+	if err != nil {
+		return false
+	}
+	switch m := msg.(type) {
+	case *jsonrpc2.Notification:
+		switch {
+		case m.Method == "exit":
+			f.known = true
+		case f.init && m.Method == "textDocument/didOpen":
+			f.folder, f.known = openedFolder(m.Params)
 		}
-		switch m := msg.(type) {
-		case *jsonrpc2.Notification:
-			switch {
-			case m.Method == "exit":
-				return "", true
-			case init && m.Method == "textDocument/didOpen":
-				if f, ok := openedFolder(m.Params); ok {
-					return f, true
-				}
+	case *jsonrpc2.Request:
+		switch {
+		case !f.init:
+			folder, ok := IsInitialize(body)
+			f.init = ok
+			if ok && folder != "" {
+				f.folder, f.known = folder, true
 			}
-		case *jsonrpc2.Request:
-			switch {
-			case !init:
-				f, ok := IsInitialize(b)
-				if ok && f != "" {
-					return f, true
-				}
-				init = ok
-			case m.Method == "shutdown":
-				return "", true
-			}
+		case m.Method == "shutdown":
+			f.known = true
 		}
 	}
-	return "", false
+	return f.known
+}
+
+// Folder returns the folder found so far, else dir.
+func (f *FolderScan) Folder(dir string) string {
+	if f.folder != "" {
+		return f.folder
+	}
+	return dir
 }
 
 // SessionHeader builds the header of a recorded session (#29): the

@@ -97,15 +97,16 @@ func serveLSP(inv *Invocation) Result {
 // folder (server.SessionFolder): the one the first initialize request
 // names or, when it names none, the folder of the first file opened.
 // The lines up to the message that settles it wait in memory until it
-// arrives or the session ends.
+// arrives or the session ends; each body is scanned once, as it
+// arrives (server.FolderScan).
 type recording struct {
 	inv     *Invocation
 	dir     string
 	w       io.WriteCloser
 	r       *repro.Recorder
 	err     error
-	pending [][]byte // lines before the header is written
-	bodies  [][]byte // their bodies, to find the session folder
+	pending [][]byte          // lines before the header is written
+	folder  server.FolderScan // of their bodies
 }
 
 func (r *recording) record(a server.Arrival) error {
@@ -121,8 +122,7 @@ func (r *recording) record(a server.Arrival) error {
 		return r.err
 	}
 	r.pending = append(r.pending, line)
-	r.bodies = append(r.bodies, a.Body)
-	if _, known := server.ScanFolder(r.bodies); known ||
+	if r.folder.Add(a.Body) ||
 		a.Body == nil && a.Rejected == nil {
 		r.err = r.flush()
 	}
@@ -139,7 +139,7 @@ func (r *recording) flush() error {
 			return err
 		}
 	}
-	r.pending, r.bodies = nil, nil
+	r.pending = nil
 	return nil
 }
 
@@ -149,7 +149,7 @@ func (r *recording) open() error {
 	if err != nil {
 		return err
 	}
-	folder := server.SessionFolder(r.bodies, wd)
+	folder := r.folder.Folder(wd)
 	h, err := server.SessionHeader(r.inv.Env, folder, Version)
 	if err != nil {
 		return err

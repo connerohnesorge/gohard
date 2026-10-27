@@ -9,6 +9,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
 	"github.com/connerohnesorge/gohard/internal/span"
+	"github.com/connerohnesorge/gohard/internal/stdlib"
 )
 
 // Text synchronization is incremental only (#25): didChange carries
@@ -57,7 +58,12 @@ func (s *State) didOpen(o *out, params json.RawMessage) {
 }
 
 // openedFolder returns the folder of the file a didOpen opens; ok is
-// false for invalid params and for a document that is not a file.
+// false for invalid params, for a document that is not a file and for
+// a cached bundled std/ieee file. The Driver maps a cached file of its
+// own cache root to a bundle URI before the core sees it, but a
+// recording keeps the URI the client sent and its replay has another
+// cache root, so the core skips a cached file of any root: the live
+// session, its replay and SessionFolder then agree (#48).
 func openedFolder(params json.RawMessage) (string, bool) {
 	var p struct {
 		TextDocument textDocumentItem `json:"textDocument"`
@@ -67,6 +73,9 @@ func openedFolder(params json.RawMessage) (string, bool) {
 	}
 	path, ok := URIToPath(p.TextDocument.URI)
 	if !ok {
+		return "", false
+	}
+	if _, cached := stdlib.InAnyCache(path); cached {
 		return "", false
 	}
 	return filepath.Dir(path), true

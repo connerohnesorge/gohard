@@ -45,8 +45,10 @@
 //   - The project root comes from the first workspace folder (else
 //     rootUri, else rootPath) through config.Load, the single root rule
 //     of #28. A client that sends none gets the folder of the first
-//     file it opens (#48); until then only open documents are seen,
-//     and requests after that didOpen wait for the project load.
+//     file it opens (#48), not counting cached bundled std/ieee files
+//     (of any cache root, so a replay agrees); until then only open
+//     documents are seen, and requests after that didOpen wait for
+//     the project load.
 //     gohard.yaml wins over the editor settings
 //     (initializationOptions and didChangeConfiguration, the "gohard"
 //     object or the whole settings object); each overridden key is
