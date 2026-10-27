@@ -3,6 +3,9 @@
 GoHard is licensed under the Mozilla Public License 2.0. Contributions
 are accepted under the same license, and each contributor keeps the
 copyright to their own work. There is no contributor license agreement.
+The Zed extension in `editors/zed` is the one exception: it is
+Apache-2.0 (Zed's extension registry does not accept MPL-2.0), and
+contributions to it are accepted under that license.
 
 Every commit must carry a `Signed-off-by` line certifying the Developer
 Certificate of Origin below. `git commit -s` adds it:

@@ -1,0 +1,14 @@
+id = "gohard-lsp"
+name = "GoHard"
+description = "VHDL language server: diagnostics, navigation, formatting and testbench code lenses from gohard lsp."
+version = "0.1.0"
+schema_version = 1
+authors = ["Conner Ohnesorge <proohnesorgeco@gmail.com>"]
+repository = "https://github.com/connerohnesorge/gohard"
+
+# The VHDL language (its grammar and file types) comes from the "vhdl"
+# extension; this one only adds the server.
+[language_servers.gohard]
+name = "GoHard"
+languages = ["VHDL"]
+language_ids = { "VHDL" = "vhdl" }

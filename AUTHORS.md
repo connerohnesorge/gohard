@@ -10,6 +10,10 @@ The bundled IEEE VHDL packages in `internal/stdlib` are Apache-2.0 and
 keep their own [LICENSE](internal/stdlib/LICENSE) and
 [AUTHORS.md](internal/stdlib/AUTHORS.md).
 
+The Zed extension in `editors/zed` is Apache-2.0
+([LICENSE](editors/zed/LICENSE)), because Zed's extension registry
+does not accept MPL-2.0 (#65).
+
 ## Contributors
 
 - Conner Ohnesorge
