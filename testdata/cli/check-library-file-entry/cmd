@@ -1,0 +1,4 @@
+# special names the file src/p.vhd inside the folder of biglib: the
+# file entry wins (#2), so special.p resolves and biglib.q stays in
+# biglib.
+gohard check

@@ -435,6 +435,32 @@ end;
 	}
 }
 
+// TestLibraryOfFileEntry: a libraries: entry naming one file (#2) beats
+// a folder holding the file, whichever library comes first; the other
+// files of the folder stay in the folder's library.
+func TestLibraryOfFileEntry(t *testing.T) {
+	c := config.Defaults()
+	c.Libraries = []config.Library{
+		{Name: "biglib", Folders: []config.Folder{{Path: "src"}}},
+		{Name: "special", Folders: []config.Folder{{Path: "src/p.vhd"}}},
+		{Name: "aaa", Folders: []config.Folder{{Path: "src/deep/q.vhd"}}},
+		{Name: "zzz", Folders: []config.Folder{{Path: "src/deep"}}},
+	}
+	for p, want := range map[string]Key{
+		"src/p.vhd":       "special",
+		"./src/p.vhd":     "special",
+		"src/other.vhd":   "biglib",
+		"src/deep/q.vhd":  "aaa",
+		"src/deep/r.vhd":  "zzz",
+		"src/p.vhd.bak":   "biglib",
+		"elsewhere/p.vhd": Work,
+	} {
+		if got := LibraryOf(c, p); got != want {
+			t.Errorf("LibraryOf(%q) = %q, want %q", p, got, want)
+		}
+	}
+}
+
 // TestViews: the bundled packages per standard (#33): 1993 hides the
 // 2008 additions (UNRESOLVED_UNSIGNED, fixed_pkg, std_logic_textio,
 // to_string) while UNSIGNED and its operations stay usable.

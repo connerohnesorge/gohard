@@ -1,0 +1,3 @@
+libraries:
+  biglib: [src]
+  special: [src/p.vhd]
