@@ -135,6 +135,31 @@ jobs:
             nix develop -c bash scripts/ci/nvim.sh
           fi
 
+  # GHDL's ghwdump reads every GHW export (#60). ghwdump comes with
+  # GHDL from the flake's dev shell; `check` runs the same test without
+  # it and skips the ghwdump part.
+  ghwdump:
+    name: ghwdump (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ghwdump on every GHW export
+        env:
+          GOHARD_MEMCAP: '0'
+        run: nix develop -c bash scripts/ci/ghwdump.sh
+
   install:
     name: go install (ubuntu-latest)
     runs-on: ubuntu-latest

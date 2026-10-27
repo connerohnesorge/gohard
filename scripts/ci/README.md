@@ -35,6 +35,7 @@ Triggers: `pull_request`, pushes to `main` and `v1`, manual dispatch.
 | Liveness with the analyzer of `gohard lsp` | `go test` | wired: `TestLSPLivenessRealAnalyzer` in `internal/cli` |
 | Headless Neovim end-to-end test (Linux) | `nvim.sh` (job `editors`, `nix develop` provides Neovim) | wired (#38): `editors/nvim/test/run.sh` |
 | Helix stdio connection test | `go test` (`TestHelixStdio` in `cmd/gohard`, real pipes) | wired (#38) |
+| GHW exports read back by GHDL's `ghwdump` (Linux) | `ghwdump.sh` (job `ghwdump`, `nix develop` provides GHDL); plain `go test` skips the ghwdump part of `TestGhwdump` when `ghwdump` is not on PATH | wired (#60): every corpus golden, the sample, the shapes trace and random traces |
 | `docs/libraries.md` examples | new step | later: #1 |
 
 Formatting scope: every tracked or untracked, non-ignored `*.go` file,
@@ -126,9 +127,11 @@ GORELEASER=$(nix build nixpkgs#goreleaser --no-link --print-out-paths)/bin/gorel
 
 * CI downloads nothing beyond checking out submodules and the Go module
   cache (the pinned golines comes from the module proxy).
-  The one exception is the `editors` job, which installs Nix and
-  takes Neovim from the flake's dev shell (#38). GHDL and NVC
-  never run in CI; hashes recorded by `tools/oracle` are compared.
+  The exceptions are the `editors` job, which installs Nix and
+  takes Neovim from the flake's dev shell (#38), and the `ghwdump`
+  job, which takes GHDL's `ghwdump` from the same dev shell to read
+  the GHW exports (#60). GHDL and NVC never simulate or analyze in
+  CI; hashes recorded by `tools/oracle` are compared.
 * A missing submodule must fail with a message naming
   `git submodule update --init`; nothing is skipped.
 * Release gate: a green `pr` run on all three OSes and a green `nightly`
