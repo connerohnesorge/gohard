@@ -16,8 +16,9 @@ var doStandards = map[string]string{
 // vcomValued are the vcom options that take a value. Their values are
 // skipped; -work and -f are handled on their own.
 var vcomValued = []string{
-	"-cover", "-coveropt", "-error", "-fatal", "-l", "-modelsimini",
-	"-note", "-outf", "-pslfile", "-suppress", "-warning",
+	"-cover", "-coveropt", "-error", "-fatal", "-just", "-l",
+	"-modelsimini", "-note", "-outf", "-pslfile", "-reportprogress",
+	"-skip", "-suppress", "-warning",
 }
 
 // substReason is the import/ignored reason of a command that uses Tcl

@@ -47,6 +47,7 @@ vsim -c work.tb; run -all
 if {$gui} {
   vcom hidden.vhd
 }
+vcom -reportprogress 300 -just e -skip b -work work last.vhd
 `
 	want := `5:24 mylib ../src/pkg.vhd "2008"
 6:45 mylib src/util.vhd ""
@@ -54,6 +55,7 @@ if {$gui} {
 8:6 work tb top.vhdl "1993"
 8:20 work braced.vhd "1993"
 9:36 other o.vhd "2019"
+18:53 work last.vhd ""
 9:18 hint[import/ignored]: vcom -f args.txt ignored: argument files are not read
 10:1 hint[import/ignored]: vlog ignored: gohard import reads only vlib, vmap and vcom
 11:1 hint[import/ignored]: vcom ignored: it uses Tcl substitution ($ or [...]), which gohard import does not evaluate
