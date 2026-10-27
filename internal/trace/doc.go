@@ -1,7 +1,7 @@
 // Package trace is the native simulation trace (#36): the lossless
 // record of one run that is the source of truth for goldens, value
 // lookup in the language server, the race check (#29) and the viewer
-// exports in the subpackages vcd and fst.
+// exports in the subpackages vcd, fst and ghw.
 //
 // # Model
 //
@@ -91,7 +91,8 @@
 //
 // # Exports
 //
-// An Exporter (vcd.Exporter, fst.Exporter) converts a Trace into a
-// viewer format. Exports keep only the value each signal settles on at
-// each time (Settle), so deltas and zero-width glitches do not appear.
+// An Exporter (vcd.Exporter, fst.Exporter, ghw.Exporter) converts a
+// Trace into a viewer format. Exports keep only the value each signal
+// settles on at each time (Settle), so deltas and zero-width glitches
+// do not appear.
 package trace
