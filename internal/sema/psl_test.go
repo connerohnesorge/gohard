@@ -146,6 +146,18 @@ vunit v_typo(dut(rtl)) {
   default clock is rising_edge(clk);
   assert always (a -> bb); --E
 }
+vunit a(dut(rtl)) {
+  default clock is rising_edge(clk);
+  assert always (a -> b);
+}
+vunit width(dut(rtl)) {
+  default clock is rising_edge(clk);
+  assert always (q -> width = 4);
+}
+vunit q(dut) {
+  default clock is rising_edge(clk);
+  assert always (q -> a); --E
+}
 `,
 	"dut.vhd": `library ieee;
 use ieee.std_logic_1164.all;
@@ -219,6 +231,10 @@ func TestVunitBoundNames(t *testing.T) {
 		{0, "clk", DeclPort, 5}, {0, "a -> b", DeclPort, 5},
 		{0, "q ->", DeclSignal, 8}, {0, "width", DeclGeneric, 4},
 		{1, "clk", DeclPort, 5}, {3, "clk", DeclPort, 5},
+		// A vunit's own name does not hide a declaration of the
+		// bound unit (vunit a, port a).
+		{4, "a -> b", DeclPort, 5}, {2, "q ->", DeclSignal, 8},
+		{2, "width", DeclGeneric, 4},
 	} {
 		off := nthOffset(src, c.name, c.at)
 		ref, ok := r.RefAt("a_props.vhd", off)

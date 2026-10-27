@@ -196,12 +196,13 @@ func lookup(r *Region, f *File, off int, k Key,
 			if !visibleIn(d, std) || off >= 0 && !before(d, f, off) {
 				continue
 			}
-			if d.Kind == DeclArchitecture &&
+			if (d.Kind == DeclArchitecture || d.Kind == DeclVunit) &&
 				reg.Kind == RegionContext && reg.Parent != nil {
-				// The architecture's own name sits in its context
-				// region, which is searched before the entity's: it
-				// must not hide a port or generic of the same name
-				// (architecture a of e, port a).
+				// The architecture's or vunit's own name sits in its
+				// context region, which is searched before the
+				// entity's or bound unit's: it must not hide a port,
+				// generic or signal of the same name (architecture a
+				// of e, port a; vunit a(e(arch)), port a).
 				late = append(late, d)
 				continue
 			}
