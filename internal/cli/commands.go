@@ -127,7 +127,14 @@ var commands = []Command{
 		Name: "import", Args: "FILE",
 		Summary: "write gohard.yaml from a ModelSim .do, Vivado .xpr " +
 			"or Quartus .qsf file",
-		Flags: []Flag{formatFlag},
+		Flags: []Flag{
+			{
+				Name: "dir", Kind: String, Value: "DIR",
+				Usage: "the folder vsim runs a .do script from " +
+					"(default: the current folder)",
+			},
+			formatFlag,
+		},
 	},
 	{
 		Name: "libs", Args: "detect",

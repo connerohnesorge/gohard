@@ -29,8 +29,9 @@ import (
 // Entry is one VHDL source file a project file lists.
 type Entry struct {
 	// Path is the file as the project names it, with '/' separators:
-	// absolute, or relative to the folder of the project file. After
-	// the CLI resolves it, relative to the project root.
+	// absolute, or relative to the folder of the project file (for a
+	// Script, the folder it runs from). After the CLI resolves it,
+	// relative to the project root.
 	Path string
 	// Library is the library the file is compiled into, as written.
 	Library string
@@ -59,11 +60,17 @@ type Format struct {
 	// (the path diagnostics use; the Vivado project name comes from
 	// it).
 	Parse func(name string, src []byte) Project
+	// Script reports a script the tool runs from a folder of the
+	// user's choosing (ModelSim .do): relative paths are relative to
+	// that folder, not to the file's, and a file path may hold the
+	// wildcards *, ? and [...], which the tool expands (vcom does).
+	Script bool
 }
 
 // Formats is every format gohard import reads, by extension.
 var Formats = []Format{
-	{Ext: ".do", Name: "ModelSim .do script", Parse: ParseDo},
+	{Ext: ".do", Name: "ModelSim .do script", Parse: ParseDo,
+		Script: true},
 	{Ext: ".qsf", Name: "Quartus .qsf file", Parse: ParseQSF},
 	{Ext: ".xpr", Name: "Vivado .xpr project", Parse: ParseXPR},
 }

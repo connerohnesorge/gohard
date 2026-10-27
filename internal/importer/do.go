@@ -34,7 +34,8 @@ type vmapping struct{ name, dir string }
 // absent; a vmap logical name, or a library folder whose last element
 // is the name) and -87, -93, -2002, -2008 or -2019 the standard (none
 // when absent: the tool's default comes from modelsim.ini, which is not
-// read). Relative paths are relative to the folder of the script.
+// read). Relative paths are relative to the folder vsim runs the
+// script from, and a path may hold wildcards; the CLI resolves both.
 // Every other command, and a vlib, vmap or vcom that uses Tcl
 // substitution, is skipped with an import/ignored hint naming its
 // line; other vcom options are skipped silently.

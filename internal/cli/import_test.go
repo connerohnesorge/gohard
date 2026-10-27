@@ -12,15 +12,20 @@ import (
 )
 
 // TestImportThenCheck is the #2 acceptance check: for a ModelSim .do
-// script, a Vivado .xpr project and a Quartus .qsf file, gohard import
-// writes a gohard.yaml with which gohard check passes. The design needs
-// the mapping: top.vhd uses library mylib, which only the imported
-// libraries: entry provides.
+// script (one run from its own folder, one run from the project folder
+// with vcom wildcards), a Vivado .xpr project and a Quartus .qsf file,
+// gohard import writes a gohard.yaml with which gohard check passes.
+// The design needs the mapping: it uses library mylib, which only the
+// imported libraries: entry provides.
 func TestImportThenCheck(t *testing.T) {
-	for _, tc := range []struct{ fixture, file string }{
-		{"import-do", "sim/compile.do"},
-		{"import-xpr", "proj/counter.xpr"},
-		{"import-qsf", "counter.qsf"},
+	for _, tc := range []struct {
+		fixture string
+		args    []string
+	}{
+		{"import-do", []string{"--dir", "sim", "sim/compile.do"}},
+		{"import-do-glob", []string{"scripts/compile.do"}},
+		{"import-xpr", []string{"proj/counter.xpr"}},
+		{"import-qsf", []string{"counter.qsf"}},
 	} {
 		t.Run(tc.fixture, func(t *testing.T) {
 			dir := t.TempDir()
@@ -33,7 +38,8 @@ func TestImportThenCheck(t *testing.T) {
 				code := cli.Run(context.Background(), e, args)
 				return code, stdout.String() + stderr.String()
 			}
-			if code, out := run("import", tc.file); code != 0 {
+			if code, out := run(append([]string{"import"},
+				tc.args...)...); code != 0 {
 				t.Fatalf("gohard import: exit %d\n%s", code, out)
 			}
 			code, out := run("check")

@@ -1,0 +1,2 @@
+scripts/compile.do:6:1: hint[import/ignored]: vsim ignored: gohard import reads only vlib, vmap and vcom
+summary: 0 errors, 0 warnings, 1 hints, 3 files

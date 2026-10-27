@@ -181,7 +181,7 @@ wipes existing GitHub alerts.
 | `gohard lsp` | stdio LSP 3.17 server; `--record DIR` | #25 |
 | `gohard lsp <action> --at PATH:LINE:COL` | one LSP action on the server's code path; `lsp sim` (with `--env`, `--real-env`), `lsp replay FILE` | #26, #18 |
 | `gohard trace export --format vcd\|fst` | export a native trace | #36 |
-| `gohard import FILE` | write `gohard.yaml` from a ModelSim `.do`, Vivado `.xpr` or Quartus `.qsf` file (`--format`) | #2 |
+| `gohard import FILE` | write `gohard.yaml` from a ModelSim `.do`, Vivado `.xpr` or Quartus `.qsf` file (`--dir`, `--format`) | #2 |
 | `gohard libs detect [--write]` | find vendor library sources | #1 |
 | `gohard version` | prints `version`, `commit`, `ieee` (bundled IEEE tag and commit) and `go` lines; `unknown` when not known | #20, #39 |
 | `gohard help [COMMAND]` | | #20 |

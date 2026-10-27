@@ -1,0 +1,2 @@
+gohard: error[cli/usage]: --dir applies to .do scripts; paths in a Vivado .xpr project are relative to its folder; run 'gohard help' for usage
+summary: 1 errors, 0 warnings, 0 hints, 0 files

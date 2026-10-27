@@ -1,0 +1,7 @@
+# Written by gohard import from scripts/compile.do.
+libraries:
+  mylib:
+    - lib/x/pkg.vhd
+  work:
+    - src/a.vhd
+    - src/top.vhd

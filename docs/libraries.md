@@ -620,7 +620,7 @@ libraries and their VHDL standard there. `gohard import` reads that
 file and writes `gohard.yaml` at the project root:
 
 ```sh
-gohard import sim/compile.do
+gohard import --dir sim sim/compile.do
 gohard import proj/counter.xpr
 gohard import counter.qsf
 ```
@@ -635,7 +635,7 @@ vcom -2008 ../src/top.vhd ../tb/tb_top.vhd
 vsim -c work.tb_top
 ```
 
-in `sim/`, it writes
+in `sim/`, run from there (`cd sim; vsim -do compile.do`), it writes
 
 ```yaml
 # Written by gohard import from sim/compile.do.
@@ -653,15 +653,21 @@ It reads only these parts of each format and never runs anything:
 
 | Format | Files | Library | Standard |
 | --- | --- | --- | --- |
-| ModelSim/Questa `.do` | the file arguments of `vcom` | `vcom -work NAME` (a `vmap` name, or the last element of a library folder); `work` when absent | `-87` or `-93` (both read as 1993), `-2002`, `-2008`, `-2019`; none when absent |
+| ModelSim/Questa `.do` | the file arguments of `vcom`, with wildcards (`*`, `?`, `[...]`) expanded | `vcom -work NAME` (a `vmap` name, or the last element of a library folder); `work` when absent | `-87` or `-93` (both read as 1993), `-2002`, `-2008`, `-2019`; none when absent |
 | Vivado `.xpr` | the `File` entries of the `DesignSrcs` and `SimulationSrcs` filesets (`sources_1`, `sim_1`) | the `Library` attribute; `xil_defaultlib` when absent | the file type: `VHDL` is 1993, `VHDL 2008`, `VHDL 2019` |
 | Quartus `.qsf` | `set_global_assignment -name VHDL_FILE` | `-library NAME`; `work` when absent | `-hdl_version` (`VHDL_1987` reads as 1993, `VHDL_1993`, `VHDL_2008`, `VHDL_2019`), else the global `VHDL_INPUT_VERSION`; none when neither is set |
 
-* Paths are relative to the folder of the project file, as the tools
-  read them (in a `.xpr`, `$PPRDIR` is that folder and `$PSRCDIR`,
-  `$PGENDIR` and `$PIPUSERFILESDIR` are its `NAME.srcs`, `NAME.gen`
-  and `NAME.ip_user_files` folders). `gohard.yaml` gets them relative
-  to the project root.
+* Paths in a `.xpr` or `.qsf` are relative to the folder of the
+  project file, as Vivado and Quartus read them (in a `.xpr`,
+  `$PPRDIR` is that folder and `$PSRCDIR`, `$PGENDIR` and
+  `$PIPUSERFILESDIR` are its `NAME.srcs`, `NAME.gen` and
+  `NAME.ip_user_files` folders). Paths in a `.do` script are relative
+  to the folder vsim runs it from, not to the script's folder: give
+  that folder with `--dir DIR`; without it, the current folder. A
+  script kept in `scripts/` and run from the project folder
+  (`vsim -do scripts/compile.do`) imports with
+  `gohard import scripts/compile.do` from the project folder.
+  `gohard.yaml` gets the paths relative to the project root.
 * `gohard.yaml` has one `standard` for every file. Import writes the
   newest standard any file names, and leaves the key out when that is
   2008 (the default) or no file names one. Files of an older standard
@@ -681,11 +687,12 @@ It reads only these parts of each format and never runs anything:
   `.dbs`, Vivado or Quartus databases), only sources.
 
 Import writes nothing and exits 2 when a listed source file does not
-exist (`import/missing-file`, at the line that lists it), the project
-file cannot be read (`import/syntax`), lists no VHDL file
-(`import/no-files`) or the project root already has a `gohard.yaml`
-(`import/config-exists`). Diagnostics print in the `--format` chosen
-(text, JSON or SARIF), located in the project file.
+exist or a `vcom` wildcard matches no file (`import/missing-file`, at
+the line that lists it), the project file cannot be read
+(`import/syntax`), lists no VHDL file (`import/no-files`) or the
+project root already has a `gohard.yaml` (`import/config-exists`).
+Diagnostics print in the `--format` chosen (text, JSON or SARIF),
+located in the project file.
 
 The project root is found as for every command
 ([config.md](config.md)): the nearest folder with `gohard.yaml`, else
