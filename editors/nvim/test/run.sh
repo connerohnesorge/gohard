@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Headless Neovim end-to-end test of editors/nvim (#38). Builds gohard,
-# copies a passing and a failing corpus testbench and the cross-file
-# LSP fixture into a temporary folder and runs e2e.lua in
-# `nvim --headless --clean`, then runs it again with vim.lsp.enable in
-# a folder with no root markers (#48). Needs go and nvim on PATH:
+# copies a passing and a failing corpus testbench, the cross-file LSP
+# fixture and the semantic tokens fixture into a temporary folder and
+# runs e2e.lua in `nvim --headless --clean`, then runs it again with
+# vim.lsp.enable in a folder with no root markers (#48). Needs go and
+# nvim on PATH:
 #   nix develop -c bash editors/nvim/test/run.sh
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -18,6 +19,7 @@ for d in wait_forms assert_fail md_resolve; do
 	rm -rf "$tmp/work/$d/golden"
 done
 cp -R "$root/testdata/lsp/diagnostics/cross-file/in" "$tmp/work/cross-file"
+cp -R "$root/testdata/lsp/semantic-tokens/full/in" "$tmp/work/semantic-tokens"
 # A folder with no gohard.yaml and no .git for vim.lsp.enable (#48).
 mkdir -p "$tmp/bare"
 cp -R "$root/testdata/corpus/wait_forms" "$tmp/bare/wait_forms"

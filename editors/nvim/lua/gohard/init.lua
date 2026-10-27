@@ -3,10 +3,11 @@
 -- "◉ Running…", then "▶ Re-run · seed 42" and "Copy repro") and adds
 -- the GoHard commands. Everything else (diagnostics, hover,
 -- definition, references, rename, completion, symbols, formatting,
--- folding, highlights, code actions such as "Open waveform") is plain
--- LSP that Neovim already speaks, so the plugin adds no client-side
--- logic for it. There is no viewer option: the server picks the
--- waveform viewer itself (#36).
+-- folding, highlights, semantic tokens, code actions such as "Open
+-- waveform") is plain LSP that Neovim already speaks, so the plugin
+-- adds no client-side logic for it; it only links the highlight groups
+-- of the two token types LSP has no name for (signal, port). There is
+-- no viewer option: the server picks the waveform viewer itself (#36).
 --
 -- Usage:
 --   require('gohard').setup()            -- defaults
@@ -133,6 +134,19 @@ local function root_dir(bufnr)
   return found and vim.fs.dirname(found) or vim.fs.dirname(fname)
 end
 
+-- The semantic token types GoHard adds to the LSP ones (#55) and the
+-- groups they default to; a colour scheme may set its own.
+M.token_links = {
+  ['@lsp.type.signal.vhdl'] = '@lsp.type.variable',
+  ['@lsp.type.port.vhdl'] = '@lsp.type.parameter',
+}
+
+local function link_tokens()
+  for group, to in pairs(M.token_links) do
+    vim.api.nvim_set_hl(0, group, { link = to, default = true })
+  end
+end
+
 --- setup starts gohard for every buffer of a configured filetype.
 ---@param opts? gohard.Options
 function M.setup(opts)
@@ -145,6 +159,11 @@ function M.setup(opts)
   vim.filetype.add({ extension = { vhd = 'vhdl', vhdl = 'vhdl' } })
   local cfg = M.config()
   vim.api.nvim_clear_autocmds({ group = augroup })
+  link_tokens()
+  vim.api.nvim_create_autocmd('ColorScheme', {
+    group = augroup,
+    callback = link_tokens,
+  })
   vim.api.nvim_create_autocmd('FileType', {
     group = augroup,
     pattern = M.options.filetypes,

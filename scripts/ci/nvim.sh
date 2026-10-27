@@ -3,7 +3,8 @@
 # Headless Neovim end-to-end test of editors/nvim (#38, #25): a passing
 # and a failing corpus testbench run through the code lens, their
 # gohard-sim diagnostics checked, plus cross-file hover, definition,
-# references and rename. Linux; needs nvim (nix develop provides it).
+# references and rename, and semantic token highlights (#55). Linux;
+# needs nvim (nix develop provides it).
 . "$(dirname "$0")/lib.sh"
 
 command -v nvim >/dev/null ||

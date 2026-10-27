@@ -11,8 +11,9 @@
 -- each testbench, runs its "▶ Run" code lens, waits for the run to end
 -- (the lens turns into "▶ Re-run · seed N") and checks the gohard-sim
 -- diagnostics against `gohard lsp sim` on the same project; then it
--- checks hover, definition, references and rename across files, and
--- go-to-definition into the bundled ieee sources (md_resolve).
+-- checks hover, definition, references and rename across files,
+-- go-to-definition into the bundled ieee sources (md_resolve), and the
+-- semantic token highlights of testdata/lsp/semantic-tokens/full (#55).
 
 local plugin, bin, work, mode = arg[1], arg[2], arg[3], arg[4] or 'setup'
 assert(plugin and bin and work and (mode == 'setup' or mode == 'enable'),
@@ -390,9 +391,94 @@ local function bundle()
     err and vim.inspect(err) or htext)
 end
 
--- GOHARD_E2E_ONLY=name runs one part: cross-file, bundle, wait_forms,
--- assert_fail or (in enable mode) enable. GOHARD_E2E_LOG=1 writes the
--- LSP log at debug level.
+--- semantic_tokens: Neovim requests the semantic tokens itself and
+--- highlights each name by what it denotes (#55): the token type and
+--- modifiers at a few names of the fixture, the highlight group
+--- Neovim puts there and that the group has a colour.
+local function semantic_tokens()
+  log('-- semantic token highlights')
+  local buf, client = open(work .. '/semantic-tokens/top.vhd')
+  if not client then
+    return
+  end
+  local caps = client.server_capabilities.semanticTokensProvider
+  check(caps ~= nil and caps.full and caps.full.delta and caps.range,
+    'the server advertises full, delta and range semantic tokens')
+  local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+  --- pos returns the 0-based row and byte column of name after pre.
+  local function pos(pre, name)
+    for i, l in ipairs(lines) do
+      local c = l:find(pre .. name, 1, true)
+      if c then
+        return i - 1, c - 1 + #pre
+      end
+    end
+  end
+  local cases = {
+    { 'signal ', 'st', 'signal', { 'declaration' } },
+    { '    ', 'clk', 'port', { 'declaration', 'readonly' } },
+    { ':= ', 'inc', 'function', {} },
+    { ':= ', 'IDLE', 'enumMember', {} },
+    { 'p.', 'first', 'property', {} },
+    { 'generic (', 'N', 'variable', { 'declaration', 'readonly', 'static' } },
+    { '', '-- The token types', 'comment', {} },
+    { '', 'architecture', 'keyword', {} },
+  }
+  local r0, c0 = pos('signal ', 'st')
+  wait(20000, function()
+    return #vim.lsp.semantic_tokens.get_at_pos(buf, r0, c0) > 0
+  end)
+  for _, c in ipairs(cases) do
+    local row, col = pos(c[1], c[2])
+    local toks = row and vim.lsp.semantic_tokens.get_at_pos(buf, row, col)
+      or {}
+    local t = toks[1]
+    local mods = {}
+    for m, on in pairs(t and t.modifiers or {}) do
+      if on then
+        table.insert(mods, m)
+      end
+    end
+    table.sort(mods)
+    local want = vim.deepcopy(c[4])
+    table.sort(want)
+    check(t ~= nil and t.type == c[3] and vim.deep_equal(mods, want),
+      '%s is a %s token {%s} (got %s {%s})', c[2], c[3],
+      table.concat(want, ','), t and t.type or 'none',
+      table.concat(mods, ','))
+  end
+  -- The highlight Neovim applies: the token type's group, linked by
+  -- the plugin for signal, with a colour in the default scheme.
+  -- The highlights are extmarks Neovim sets when it draws the window
+  -- (the highlighter's on_win). Headless Neovim 0.10 never draws, so
+  -- the test calls on_win as drawing would.
+  local row, col = pos('signal ', 'st')
+  local groups = {}
+  wait(5000, function()
+    if #vim.inspect_pos(buf, row, col).semantic_tokens == 0 then
+      local hl = vim.lsp.semantic_tokens.__STHighlighter.active[buf]
+      if hl then
+        hl:on_win(0, #lines)
+      end
+    end
+    groups = {}
+    for _, st in ipairs(vim.inspect_pos(buf, row, col).semantic_tokens) do
+      table.insert(groups, st.opts.hl_group)
+    end
+    return #groups > 0
+  end)
+  check(vim.list_contains(groups, '@lsp.type.signal.vhdl'),
+    'st is highlighted with @lsp.type.signal.vhdl (%s)',
+    table.concat(groups, ', '))
+  local hl = vim.api.nvim_get_hl(0, { name = '@lsp.type.signal.vhdl',
+    link = false })
+  check(hl.fg ~= nil, '@lsp.type.signal.vhdl has a colour (%s)',
+    vim.inspect(hl))
+end
+
+-- GOHARD_E2E_ONLY=name runs one part: cross-file, bundle,
+-- semantic-tokens, wait_forms, assert_fail or (in enable mode) enable.
+-- GOHARD_E2E_LOG=1 writes the LSP log at debug level.
 local only = vim.env.GOHARD_E2E_ONLY
 if vim.env.GOHARD_E2E_LOG == '1' then
   vim.lsp.log.set_level('debug')
@@ -431,6 +517,7 @@ local ok, e = pcall(function()
   end
   part('cross-file', cross_file)
   part('bundle', bundle)
+  part('semantic-tokens', semantic_tokens)
   part('wait_forms', testbench, 'wait_forms', 0)
   part('assert_fail', testbench, 'assert_fail', 1)
 end)
