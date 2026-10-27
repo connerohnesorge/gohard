@@ -68,10 +68,17 @@ from the signal's `'EVENT`, value and `'LAST_VALUE`, in the body's
 short-circuit order. `elab.Options.InterpretedBodies` runs every body
 from source.
 
-A native call charges one step plus one per element of its arguments,
-which is fewer steps than the interpreted body. Native bodies change
-step counts, never a value or a trace: a run that ends on
-`simulation.step_budget` stops later with them.
+A native call charges one step plus one per element of its arguments
+and of its result, as the evaluator charges a step for every element
+it builds. That is fewer steps than the interpreted body, but a body
+that builds a large result from scalars (`TO_UNSIGNED(0, 1000000)`,
+`RESIZE`) is charged for it, so the step budget still bounds the work
+and memory of a run (P7). The charge comes after the call; the bodies
+decline a result over 2^20 elements beyond their arguments, which
+bounds what one call builds before the budget sees it. Native bodies
+change step counts, never a value or a trace of a run that ends within
+its budget: a run that ends on `simulation.step_budget` stops later
+with them.
 
 The checks:
 
@@ -127,7 +134,7 @@ Throughput, same machine at a load average under 3:
 | `BenchmarkSimNEORV32` (first 2 us), cycles/s | 19.4-20.0 | 22.3-23.5 |
 | `gohard check --sim --tb neorv32_tb`, 1 us to 10 us, cycles/s | 28 | 33 |
 | `BenchmarkSim/budget_hang`, simulated us per wall second | 244 | 394 |
-| `BenchmarkSim/budget_hang`, steps | 21,266,676 | 4,700,078 |
+| `BenchmarkSim/budget_hang`, steps | 21,266,676 | 4,800,076 |
 | `BenchmarkSim/assert_fail`, simulated us per wall second | 33 | 162 |
 
 The `gohard check` row is the rate between a 1 us and a 10 us run (the

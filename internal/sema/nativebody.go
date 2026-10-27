@@ -6,9 +6,10 @@ package sema
 // elaboration and simulation). A native body returns the value the
 // interpreted body would; a call it declines (a numeric_std metavalue
 // that the body warns about, a null argument, ...) is interpreted as
-// before. A native call charges ieeenative.Cost steps, which differs
-// from the interpreted body's count: native bodies change step counts,
-// never a value or a trace.
+// before. A native call charges ieeenative.Cost steps (a step per
+// element of its arguments and result), which differs from the
+// interpreted body's count: native bodies change step counts, never a
+// value or a trace of a run within its budget.
 
 import (
 	"github.com/connerohnesorge/gohard/internal/eval"
@@ -52,7 +53,7 @@ func (ev *Evaluator) nativeBody(x *Decl, args []eval.Value,
 	if !ok {
 		return eval.Value{}, false, nil
 	}
-	return v, true, b.Step(ieeenative.Cost(args))
+	return v, true, b.Step(ieeenative.Cost(args, v))
 }
 
 // nativeOf returns the native body of x, looked up once per

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/sema"
@@ -153,5 +154,41 @@ func TestNativeResolver(t *testing.T) {
 	}
 	if t.Failed() {
 		t.Logf("%d driver lists", len(lists))
+	}
+}
+
+// TestNativeBodiesBudget: a loop of TO_UNSIGNED calls that build a
+// million elements each from scalar arguments ends in
+// sim/budget-exceeded with native bodies as it does with interpreted
+// ones: a native call is charged for the elements it builds (P7). The
+// budget, 16M evaluation steps, covers 16 of the 100 calls.
+func TestNativeBodiesBudget(t *testing.T) {
+	src := prelude + `
+entity tb is end entity;
+architecture a of tb is
+  function len_of(x : unsigned) return natural is
+  begin
+    return x'length;
+  end function;
+begin
+  p : process
+    variable n : natural := 0;
+  begin
+    for i in 1 to 100 loop
+      n := n + len_of(to_unsigned(0, 1000000));
+    end loop;
+    report integer'image(n);
+    wait;
+  end process;
+end architecture;
+`
+	for _, interpreted := range []bool{false, true} {
+		r := simulate(t, src, "tb", runOpts{steps: 1_000_000,
+			interpreted: interpreted})
+		if len(r.diags) != 1 ||
+			r.diags[0].Code != diag.SimBudgetExceeded {
+			t.Errorf("interpreted %v: diagnostics %v", interpreted,
+				r.diags)
+		}
 	}
 }

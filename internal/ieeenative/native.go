@@ -179,11 +179,14 @@ func Lookup(unit, name string, params []*eval.Type, rt *eval.Type) Func {
 	return bodies[s]
 }
 
-// Cost is the evaluation steps a native call on args charges: one,
-// plus one per scalar element of the arguments, so a call stays
-// bounded by its input like the interpreted body (P7).
-func Cost(args []eval.Value) int64 {
-	n := int64(1)
+// Cost is the evaluation steps a native call on args that returned v
+// charges: one, plus one per scalar element of the arguments and of
+// the result. The evaluator charges a step for every element it builds
+// (aggregates, defaults, assignments), so a native body that builds a
+// result larger than its arguments (TO_UNSIGNED, RESIZE) is charged
+// for it too and the step budget bounds its work and memory (P7).
+func Cost(args []eval.Value, v eval.Value) int64 {
+	n := 1 + int64(len(v.E))
 	for _, a := range args {
 		n += int64(len(a.E))
 	}

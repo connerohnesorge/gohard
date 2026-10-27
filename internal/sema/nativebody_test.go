@@ -320,7 +320,8 @@ func checkNative(t *testing.T, e *nativeEnv, d *Decl, nb nbody,
 	name := fmt.Sprintf("%s.%s(%s)", d.Unit.Name, d.Text, showArgs(args))
 	e.ilog.got, e.nlog.got = nil, nil
 	want, werr := e.interp.Call(d, args, eval.NewBudget(50_000_000))
-	got, gerr := e.native.Call(d, args, eval.NewBudget(50_000_000))
+	nbud := eval.NewBudget(50_000_000)
+	got, gerr := e.native.Call(d, args, nbud)
 	if (werr == nil) != (gerr == nil) {
 		t.Errorf("%s: error %v, interpreted %v", name, gerr, werr)
 		return false
@@ -353,10 +354,83 @@ func checkNative(t *testing.T, e *nativeEnv, d *Decl, nb nbody,
 			"fails (%v) or reports on (%v)", name, werr, e.ilog.got)
 		return true
 	}
+	// The call is charged at least a step per element of its
+	// arguments and of its result, as the evaluator charges for the
+	// elements it builds (P7).
+	elems := int64(len(v.E))
+	for _, a := range args {
+		elems += int64(len(a.E))
+	}
+	if nbud.Used() <= elems {
+		t.Errorf("%s: native call charged %d steps for %d elements",
+			name, nbud.Used(), elems)
+	}
 	if v, err := eval.Check(v, nb.rt); err != nil {
 		t.Errorf("%s: native result check: %v", name, err)
 	} else if diff := sameValue(v, want); diff != "" {
 		t.Errorf("%s: native %s", name, diff)
 	}
 	return true
+}
+
+// TestNativeCostCoversResult: a native body that builds a result much
+// larger than its arguments (TO_UNSIGNED, TO_SIGNED and RESIZE to a
+// million elements) is charged a step per result element, so the step
+// budget stops a loop of such calls as it stops the interpreted body
+// (P7).
+func TestNativeCostCoversResult(t *testing.T) {
+	const size = 1_000_000
+	e := loadNative(t, "2008")
+	calls := 0
+	for _, d := range e.fns {
+		name := strings.ToLower(d.Text)
+		if d.Unit.Name != "numeric_std" || len(d.Params) != 2 ||
+			name != "to_unsigned" && name != "to_signed" &&
+				name != "resize" {
+			continue
+		}
+		nb, _ := e.native.nativeOf(d, eval.NewBudget(0))
+		var arg eval.Value
+		switch pt := nb.params[0]; pt.Kind {
+		case eval.KindInteger:
+			arg = eval.Int(pt, 0)
+		case eval.KindArray:
+			if pt.Index[0].Kind != eval.KindInteger {
+				continue
+			}
+			r := eval.Range{Left: 0, Right: 0, Dir: eval.Downto}
+			arg = eval.Array(pt.ArraySubtype(r), []eval.Range{r},
+				[]eval.Value{eval.Enum(pt.Elem, 3)})
+		default:
+			continue
+		}
+		if nb.params[1].Kind != eval.KindInteger {
+			continue
+		}
+		args := []eval.Value{arg, eval.Int(nb.params[1], size)}
+		if _, ok := nb.fn(args, nb.rt); !ok {
+			t.Fatalf("%s(%s): the native body declined", d.Text,
+				showArgs(args))
+		}
+		calls++
+		b := eval.NewBudget(0)
+		v, err := e.native.Call(d, args, b)
+		if err != nil {
+			t.Fatalf("%s: %v", d.Text, err)
+		}
+		if len(v.E) != size || b.Used() <= size {
+			t.Errorf("%s(%s): %d elements for %d steps, want %d "+
+				"elements for more than %d steps", d.Text,
+				showArgs(args[:1]), len(v.E), b.Used(), size, size)
+		}
+		if _, err := e.native.Call(d, args,
+			eval.NewBudget(size/2)); err != eval.ErrBudget {
+			t.Errorf("%s: under a budget of %d steps: %v, want %v",
+				d.Text, size/2, err, eval.ErrBudget)
+		}
+	}
+	if calls < 3 {
+		t.Errorf("%d calls checked, want TO_UNSIGNED, TO_SIGNED and "+
+			"RESIZE", calls)
+	}
 }
