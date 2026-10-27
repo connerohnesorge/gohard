@@ -8,8 +8,10 @@ references, rename, completion, document and workspace symbols,
 formatting, folding, highlights, the simulation code lens and the
 "Open waveform" code action. v2 adds semantic tokens (#55, see
 [Semantic tokens](#semantic-tokens)). Neovim is the editor CI checks end to end
-(#38). Helix works with no extension. VS Code support is planned for
-v2 (#3).
+(#38). Helix works with no extension. Zed has an extension in
+`editors/zed` (#65). VS Code support is planned for v2 (#3). The
+configs proposed to nvim-lspconfig, Helix and Zed's extension registry
+are listed under [Upstream configs](#upstream-configs).
 
 Install `gohard` on your `PATH` first. Use any of these:
 
@@ -70,6 +72,14 @@ require('gohard').setup({
 On Neovim 0.11 or later you can skip `setup()`. Put `editors/nvim` on
 the runtime path, then call `vim.lsp.enable('gohard')`. The plugin's
 `lsp/gohard.lua` holds the same configuration that `setup()` uses.
+
+Without the plugin, `editors/upstream/nvim-lspconfig/lsp/gohard.lua`
+is the self-contained config proposed to nvim-lspconfig (`cmd`,
+`filetypes` and `root_markers` only). Once nvim-lspconfig ships it,
+`vim.lsp.enable('gohard')` works with nvim-lspconfig installed and no
+GoHard plugin. Lenses then show where Neovim fetches them (on 0.12,
+`vim.lsp.codelens.enable()`), and `vim.lsp.codelens.run()` runs one;
+the plugin adds the refresh and the `:GoHard*` commands.
 
 The two differ for files with no `gohard.yaml` and no `.git` above
 them. There `setup()` sends the file's folder as the workspace folder
@@ -154,15 +164,23 @@ Neovim (`nvim --headless --clean`) through `editors/nvim/test/e2e.lua`:
    copy of `wait_forms` with no `gohard.yaml` or `.git` above it. The
    client has no root and no workspace folder; the "▶ Run" lens must
    still appear and the run must pass the checks of step 2 and 4.
+7. A third run does the same with
+   `editors/upstream/nvim-lspconfig/lsp/gohard.lua` as the only
+   `lsp/gohard.lua` on the runtime path. The config must load before
+   the plugin's Lua modules are reachable, so it cannot depend on
+   them (#65). The plugin's commands are used only to drive the test.
 
 CI runs it on Linux (`scripts/ci/nvim.sh`). Run it locally with
 `nix develop -c bash editors/nvim/test/run.sh`.
 
 ## Helix
 
-Helix connects over stdio with no extension. Add this to
-`~/.config/helix/languages.toml`, or to `.helix/languages.toml` in the
-project:
+Helix connects over stdio with no extension. The change proposed to
+Helix's own `languages.toml` (`editors/upstream/helix/gohard.diff`)
+defines the `gohard` server and lists it after `vhdl_ls` for VHDL.
+Once Helix ships it, installing `gohard` is enough. Until then, add
+this to `~/.config/helix/languages.toml`, or to `.helix/languages.toml`
+in the project:
 
 ```toml
 [language-server.gohard]
@@ -184,17 +202,87 @@ language-servers = ["gohard"]
 auto-format = false
 ```
 
+The upstream entry sets no `roots`, so Helix sends the folder holding
+`.git` as the root, or with no `.git` the folder it was started in,
+and the server looks for `gohard.yaml` from there upward. If your
+`gohard.yaml` sits in a folder below the `.git` folder, keep the
+`roots` line of the snippet.
+
 Run `hx --health vhdl` to check that Helix finds `gohard`. Run a
 testbench lens from the picker of `:lsp-workspace-command`, or from
 the shell with `gohard lsp sim --tb NAME`. Helix offers "Open
 waveform" with the other code actions (`space a`).
 
 CI does not launch Helix. Instead, `TestHelixStdio` in `cmd/gohard`
-builds the `gohard` binary and starts `gohard lsp` over real OS pipes.
-It sends the initialize handshake with Helix's own client capabilities
-and opens a file of a two-file project. The diagnostics it gets back
-must equal `gohard check` on the same project. Then it shuts the
-server down and checks that it exits 0.
+builds the `gohard` binary and starts it over real OS pipes with the
+command and arguments it reads from the upstream entry in
+`editors/upstream/helix/gohard.diff`. It sends the initialize
+handshake with Helix's own client capabilities, once with the root
+and workspace folder Helix sends for a folder holding `.git` and once
+with only `rootPath` (no `.git`), and no configuration, as Helix does
+for an entry without `config`. It opens a file of a two-file project.
+The diagnostics it gets back must equal `gohard check` on the same
+project. Then it shuts the server down and checks that it exits 0.
+
+## Zed
+
+The extension in `editors/zed` adds the `gohard` language server to
+Zed's VHDL language. The language itself (grammar, file types) comes
+from Zed's "vhdl" extension, so install that one first, from
+`zed: extensions`. Until the GoHard extension is in Zed's registry,
+install it with `zed: install dev extension` and pick `editors/zed` of
+a GoHard checkout; Zed builds it, which needs Rust from rustup.
+
+The extension starts `gohard lsp` with the `gohard` it finds on the
+`PATH` of the project's shell. Settings go in Zed's `settings.json`:
+
+```json
+{
+  "lsp": {
+    "gohard": {
+      // Optional: a gohard that is not on PATH.
+      "binary": { "path": "/full/path/to/gohard" },
+      // Editor settings, the gohard.yaml keys under "gohard";
+      // gohard.yaml wins.
+      "settings": { "gohard": {} }
+    }
+  },
+  "languages": {
+    // Optional: only GoHard, not vhdl_ls, for VHDL.
+    "VHDL": { "language_servers": ["gohard", "!vhdl_ls", "..."] }
+  }
+}
+```
+
+Zed sends the opened folder as the root, and the server looks for
+`gohard.yaml` from there upward. Open the folder that holds
+`gohard.yaml`, or one below it. Zed shows the testbench lenses when
+code lenses are on (`"code_lens": "on"`), and offers "Open waveform"
+with the other code actions.
+
+CI does not run Zed. `TestZedStdio` in `cmd/gohard` reads the server
+name and arguments from `editors/zed/src/lib.rs` and the VHDL language
+ID from `editors/zed/extension.toml`. It starts `gohard` over real OS
+pipes and runs Zed's handshake: Zed's client capabilities, which offer
+only utf-16 positions, the folder as root and workspace folder, no
+initialization options, and an empty `workspace/didChangeConfiguration`
+(the extension's configuration when no `lsp.gohard.settings` is set).
+The diagnostics of the opened file must equal `gohard check`, as in
+`TestHelixStdio`.
+
+## Upstream configs
+
+These are proposed to the editors' own repositories (#65). Each
+submission is sent by hand; the pull request links and the upstream
+answers are recorded on #65.
+
+| Editor | Proposed config | Upstream |
+| --- | --- | --- |
+| Neovim | `editors/upstream/nvim-lspconfig/lsp/gohard.lua` | `lsp/gohard.lua` in neovim/nvim-lspconfig |
+| Helix | `editors/upstream/helix/gohard.diff` | `languages.toml` in helix-editor/helix |
+| Zed | `editors/zed` | the extension `gohard-lsp` in zed-industries/extensions |
+
+`editors/upstream/README.md` describes each submission.
 
 ## Semantic tokens
 
@@ -238,7 +326,7 @@ the full or range result for a file (`--at` names the file).
   `gohard`, set `cmd = { '/full/path/to/gohard', 'lsp' }`. The same
   applies to finding `surfer`. Homebrew's `gtkwave` cask is also
   found, as long as `gtkwave` is on `PATH`.
-* **Windows:** the binary is `gohard.exe`. Neovim and Helix both find
+* **Windows:** the binary is `gohard.exe`. Neovim, Helix and Zed find
   it on `PATH` without the extension. Paths in diagnostics and
   locations are `file:///C:/...` URIs. To use `Copy repro`, Neovim needs a
   clipboard provider for the `+` register (`win32yank` or the

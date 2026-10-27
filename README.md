@@ -55,7 +55,7 @@ writes land in `.gohard/run/<hash>/`. A legal construct GoHard does not
 implement yet is reported as `unsupported/construct` ("... is not
 supported yet, please report", exit 2).
 
-Editor setup (Neovim plugin, Helix snippet) is in
+Editor setup (Neovim plugin, Helix snippet, Zed extension) is in
 [docs/editors.md](docs/editors.md). Config keys are in
 [docs/config.md](docs/config.md).
 

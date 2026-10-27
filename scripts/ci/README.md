@@ -33,8 +33,9 @@ Triggers: `pull_request`, pushes to `main` and `v1`, manual dispatch.
 | `testdata/lsp` and `testdata/parse` fixtures | `go test` | `testdata/lsp` wired (#25, see its README); `testdata/parse` later (#31) |
 | Liveness workload (60 s virtual, 5 s no-progress rule) | `go test` | wired: `TestLiveness` and `TestNoProgressRule` in `internal/server` |
 | Liveness with the analyzer of `gohard lsp` | `go test` | wired: `TestLSPLivenessRealAnalyzer` in `internal/cli` |
-| Headless Neovim end-to-end test (Linux) | `nvim.sh` (job `editors`, `nix develop` provides Neovim) | wired (#38): `editors/nvim/test/run.sh` |
-| Helix stdio connection test | `go test` (`TestHelixStdio` in `cmd/gohard`, real pipes) | wired (#38) |
+| Headless Neovim end-to-end test (Linux) | `nvim.sh` (job `editors`, `nix develop` provides Neovim) | wired (#38): `editors/nvim/test/run.sh`, including the nvim-lspconfig file of `editors/upstream` (#65) |
+| Helix stdio connection test | `go test` (`TestHelixStdio` in `cmd/gohard`, real pipes) | wired (#38); command line from the upstream entry `editors/upstream/helix/gohard.diff` (#65) |
+| Zed stdio connection test | `go test` (`TestZedStdio` in `cmd/gohard`, real pipes; Zed itself is not run) | wired (#65): command line from `editors/zed/src/lib.rs` |
 | GHW exports read back by GHDL's `ghwdump` (Linux) | `ghwdump.sh` (job `ghwdump`, `nix develop` provides GHDL); plain `go test` skips the ghwdump part of `TestGhwdump` when `ghwdump` is not on PATH | wired (#60): every corpus golden, the sample, the shapes trace and random traces |
 | `docs/libraries.md` examples | new step | later: #1 |
 
