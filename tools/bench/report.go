@@ -14,6 +14,17 @@ func col(ss []Sample, f func(Sample) float64) []float64 {
 	return out
 }
 
+// ofKind returns the samples of edits of one kind.
+func ofKind(ss []Sample, kind string) []Sample {
+	var out []Sample
+	for _, s := range ss {
+		if s.Kind == kind {
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
 func p95(xs []float64) float64 { return Percentile(xs, 95) }
 func p50(xs []float64) float64 { return Percentile(xs, 50) }
 
@@ -63,7 +74,9 @@ func report(header string, rs []result) string {
 		"server publishes once, after every check; that is the " +
 		"\"published\" row. Self is the check's own time. Overloads " +
 		"run inside the names phase; their self time is summed over " +
-		"the job workers.\n\n")
+		"the job workers. Body edits land in an architecture or a " +
+		"package body, signature edits in a primary unit (an entity " +
+		"or a package) whose declarations other units see.\n\n")
 	var sim *result
 	for i, r := range rs {
 		if r.SimOnly {
@@ -77,24 +90,33 @@ func report(header string, rs []result) string {
 			simTable(&b, r)
 			continue
 		}
-		fmt.Fprintf(&b, "### %s (%d files; %d cold, %d warm samples)\n\n",
-			r.Project, r.Files, len(r.Cold), len(r.Warm.Samples))
-		b.WriteString("| Check | Cold p95 ready | Warm p50 ready | " +
-			"Warm p95 ready | Warm p95 self |\n|---|---|---|---|---|\n")
+		body := ofKind(r.Warm.Samples, KindBody)
+		sig := ofKind(r.Warm.Samples, KindSignature)
+		fmt.Fprintf(&b, "### %s (%d files; %d cold, %d+%d warm samples)"+
+			"\n\n", r.Project, r.Files, len(r.Cold), len(body), len(sig))
+		b.WriteString("| Check | Cold p95 ready | Body p50 ready | " +
+			"Body p95 ready | Body p95 self | Signature p50 ready | " +
+			"Signature p95 ready |\n|---|---|---|---|---|---|---|\n")
 		for _, c := range Checks {
 			ready := func(s Sample) float64 { return s.Ready[c] }
 			self := func(s Sample) float64 { return s.Self[c] }
-			fmt.Fprintf(&b, "| %s | %s | %s | %s | %s |\n", c,
+			fmt.Fprintf(&b, "| %s | %s | %s | %s | %s | %s | %s |\n", c,
 				fmtMS(p95(col(r.Cold, ready))),
-				fmtMS(p50(col(r.Warm.Samples, ready))),
-				fmtMS(p95(col(r.Warm.Samples, ready))),
-				fmtMS(p95(col(r.Warm.Samples, self))))
+				fmtMS(p50(col(body, ready))),
+				fmtMS(p95(col(body, ready))),
+				fmtMS(p95(col(body, self))),
+				fmtMS(p50(col(sig, ready))),
+				fmtMS(p95(col(sig, ready))))
 		}
 		pub := func(s Sample) float64 { return s.Publish }
-		fmt.Fprintf(&b, "| published | %s | %s | %s | |\n\n",
+		fmt.Fprintf(&b, "| published | %s | %s | %s | | %s | %s |\n\n",
 			fmtMS(p95(col(r.Cold, pub))),
-			fmtMS(p50(col(r.Warm.Samples, pub))),
-			fmtMS(p95(col(r.Warm.Samples, pub))))
+			fmtMS(p50(col(body, pub))), fmtMS(p95(col(body, pub))),
+			fmtMS(p50(col(sig, pub))), fmtMS(p95(col(sig, pub))))
+		if r.WarmPeakRSSMB > 0 {
+			fmt.Fprintf(&b, "Peak RSS of the warm session: %.0f MB.\n\n",
+				r.WarmPeakRSSMB)
+		}
 		simTable(&b, r)
 		if r.Warm.Reused > 0 {
 			fmt.Fprintf(&b, "\n%d warm keystrokes restored a text "+
@@ -112,12 +134,14 @@ func report(header string, rs []result) string {
 			continue
 		}
 		b.WriteString("### Tiers (warm p95 ready on the large " +
-			"project, 50 ms rule)\n\n| Check | Warm p95 | Tier |\n" +
-			"|---|---|---|\n")
+			"project, 50 ms rule)\n\n| Check | Body edits p95 | Tier | " +
+			"Signature edits p95 | Tier |\n|---|---|---|---|---|\n")
 		for _, c := range Checks {
-			x := p95(col(r.Warm.Samples,
-				func(s Sample) float64 { return s.Ready[c] }))
-			fmt.Fprintf(&b, "| %s | %s | %s |\n", c, fmtMS(x), Tier(x))
+			ready := func(s Sample) float64 { return s.Ready[c] }
+			x := p95(col(ofKind(r.Warm.Samples, KindBody), ready))
+			y := p95(col(ofKind(r.Warm.Samples, KindSignature), ready))
+			fmt.Fprintf(&b, "| %s | %s | %s | %s | %s |\n", c, fmtMS(x),
+				Tier(x), fmtMS(y), Tier(y))
 		}
 		b.WriteString("\n### #25 gates (large project)\n\n" +
 			"| Gate | p95 | Result |\n|---|---|---|\n")

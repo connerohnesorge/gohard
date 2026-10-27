@@ -102,25 +102,33 @@ func runChild(a childArgs) (childOut, error) {
 		defer f.Close()
 		defer pprof.StopCPUProfile()
 	}
-	// Two warm-up keystrokes, then n measured ones (n even, so the
-	// text is the original again for the queries).
+	// Per edit kind, two warm-up keystrokes, then n measured ones (n
+	// even, so the text is the original again after each kind and for
+	// the queries): body edits first, then signature edits.
 	n := a.n + a.n%2
-	edits := Keystrokes(text, a.seed, n+2)
 	v := 1
 	cur := text
-	for i, e := range edits {
-		v++
-		cur = Apply(cur, e)
-		s, ok, err := c.keystroke(uri, v, e, a.keystrokeTO)
-		switch {
-		case err != nil:
-			out.Notes = append(out.Notes, err.Error())
-			out.Skipped++
-		case i < 2:
-		case !ok:
-			out.Reused++
-		default:
-			out.Samples = append(out.Samples, s)
+	for _, kind := range []string{KindBody, KindSignature} {
+		edits := KeystrokesIn(text, kind, a.seed, n+2)
+		if edits == nil {
+			out.Notes = append(out.Notes, "the target has no "+kind+
+				" lines")
+		}
+		for i, e := range edits {
+			v++
+			cur = Apply(cur, e)
+			s, ok, err := c.keystroke(uri, v, e, a.keystrokeTO)
+			s.Kind = kind
+			switch {
+			case err != nil:
+				out.Notes = append(out.Notes, err.Error())
+				out.Skipped++
+			case i < 2:
+			case !ok:
+				out.Reused++
+			default:
+				out.Samples = append(out.Samples, s)
+			}
 		}
 	}
 	pos := Names(cur, a.seed^0x9e3779b97f4a7c15, a.n)

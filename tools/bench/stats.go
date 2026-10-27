@@ -24,6 +24,9 @@ func Percentile(xs []float64, p float64) float64 {
 // Tier is the #19 rule for one check from its warm p95 on the large
 // project.
 func Tier(p95 float64) string {
+	if math.IsNaN(p95) {
+		return "n/a"
+	}
 	if p95 < Budget {
 		return "as you type"
 	}

@@ -11,7 +11,10 @@ var Checks = []string{"parse", "names", "overloads", "static",
 // (the time the check and the checks it needs took, from the
 // didChange); Self[c] is the check's own time. Publish is the time to
 // the published diagnostics (every check runs before the one publish).
+// Kind is the edit's kind (KindBody, KindSignature; "" for a cold
+// keystroke on any code line).
 type Sample struct {
+	Kind        string `json:",omitempty"`
 	Ready, Self map[string]float64
 	Publish     float64
 }

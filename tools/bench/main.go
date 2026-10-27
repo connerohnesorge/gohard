@@ -128,7 +128,10 @@ type result struct {
 	First []float64
 	Warm  childOut
 	Sim   childOut
-	Notes []string
+	// WarmPeakRSSMB is the peak resident set size of the warm
+	// session's process in MiB (0: not known on this OS).
+	WarmPeakRSSMB float64 `json:",omitempty"`
+	Notes         []string
 }
 
 // load returns the 1-minute load average (Linux; -1 elsewhere).
@@ -158,9 +161,18 @@ func (d *driver) quiet() {
 func (d *driver) spawn(mode, dir string, p Project, n int, seed uint64,
 	extra ...string,
 ) (childOut, time.Time, error) {
+	out, t0, _, err := d.spawnRSS(mode, dir, p, n, seed, extra...)
+	return out, t0, err
+}
+
+// spawnRSS is spawn that also returns the child's peak RSS in MiB (0
+// when the OS does not report it).
+func (d *driver) spawnRSS(mode, dir string, p Project, n int,
+	seed uint64, extra ...string,
+) (childOut, time.Time, float64, error) {
 	self, err := os.Executable()
 	if err != nil {
-		return childOut{}, time.Time{}, err
+		return childOut{}, time.Time{}, 0, err
 	}
 	args := append([]string{"-child", mode, "-dir", dir, "-project",
 		p.Name, "-n", strconv.Itoa(n), "-seed",
@@ -170,12 +182,12 @@ func (d *driver) spawn(mode, dir string, p Project, n int, seed uint64,
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr
 	t0 := time.Now()
 	if err := cmd.Run(); err != nil {
-		return childOut{}, t0, fmt.Errorf("%s %s: %v: %s", p.Name, mode,
-			err, stderr.Bytes())
+		return childOut{}, t0, 0, fmt.Errorf("%s %s: %v: %s", p.Name,
+			mode, err, stderr.Bytes())
 	}
 	var out childOut
 	err = json.Unmarshal(stdout.Bytes(), &out)
-	return out, t0, err
+	return out, t0, peakRSS(cmd.ProcessState), err
 }
 
 func (d *driver) measure(p Project) (result, error) {
@@ -212,8 +224,8 @@ func (d *driver) measure(p Project) (result, error) {
 		extra = []string{"-cpuprofile", d.cpuprofile}
 	}
 	if !p.SimOnly {
-		r.Warm, _, err = d.spawn("warm", dir, p, d.warm, d.seed,
-			extra...)
+		r.Warm, _, r.WarmPeakRSSMB, err = d.spawnRSS("warm", dir, p,
+			d.warm, d.seed, extra...)
 		if err != nil {
 			return r, err
 		}

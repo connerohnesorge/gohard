@@ -67,6 +67,48 @@ func TestKeystrokes(t *testing.T) {
 	}
 }
 
+// KeystrokesIn edits only the lines of units of its kind: the entity
+// (with its context clause) for signature edits, the architecture for
+// body edits; together they are every code line.
+func TestKeystrokesIn(t *testing.T) {
+	text := []byte(sample)
+	body := map[int]bool{}
+	for _, l := range linesOf(text, KindBody) {
+		body[l] = true
+	}
+	sig := map[int]bool{}
+	for _, l := range linesOf(text, KindSignature) {
+		sig[l] = true
+		if body[l] {
+			t.Errorf("line %d is of both kinds", l)
+		}
+	}
+	// Lines 0, 1 (context), 4-6 (entity); 8-12 (architecture).
+	for _, l := range []int{0, 1, 4, 5, 6} {
+		if !sig[l] {
+			t.Errorf("line %d: want a signature line", l)
+		}
+	}
+	for _, l := range []int{8, 9, 10, 11, 12} {
+		if !body[l] {
+			t.Errorf("line %d: want a body line", l)
+		}
+	}
+	if len(body)+len(sig) != len(codeLines(text)) {
+		t.Errorf("%d body + %d signature lines, want %d code lines",
+			len(body), len(sig), len(codeLines(text)))
+	}
+	for _, kind := range []string{KindBody, KindSignature} {
+		for seed := range uint64(16) {
+			for _, e := range KeystrokesIn(text, kind, seed, 8) {
+				if (kind == KindBody) != body[e.Line] {
+					t.Fatalf("%s edit on line %d", kind, e.Line)
+				}
+			}
+		}
+	}
+}
+
 // Names picks positions inside non-keyword names, deterministically.
 func TestNames(t *testing.T) {
 	text := []byte(sample)
@@ -205,6 +247,10 @@ func TestProjects(t *testing.T) {
 		if Keystrokes(text, 1, 2) == nil || Names(text, 1, 2) == nil {
 			t.Errorf("%s: target has no edit lines or names", p.Name)
 		}
+		if p.Name == "large" && (KeystrokesIn(text, KindBody, 1, 2) ==
+			nil || KeystrokesIn(text, KindSignature, 1, 2) == nil) {
+			t.Errorf("%s: target lacks body or signature lines", p.Name)
+		}
 	}
 }
 
@@ -234,7 +280,7 @@ func TestLargeProjectChecks(t *testing.T) {
 // The report derives tiers by the 50 ms rule and marks a missed gate.
 func TestReport(t *testing.T) {
 	mk := func(names, pub float64) Sample {
-		return Sample{Publish: pub,
+		return Sample{Kind: KindBody, Publish: pub,
 			Ready: map[string]float64{"parse": 1, "names": names,
 				"overloads": names, "static": names, "cross-file": names},
 			Self: map[string]float64{}}
@@ -244,9 +290,15 @@ func TestReport(t *testing.T) {
 			Hover: []float64{1}, Definition: []float64{1},
 			Completion: []float64{1}, Save: []float64{1}},
 		Sim: childOut{SimKernel: []float64{3}}}
+	sig := mk(500, 600)
+	sig.Kind = KindSignature
+	large.Warm.Samples = append(large.Warm.Samples, sig)
+	large.WarmPeakRSSMB = 700
 	out := report("", []result{large})
-	for _, want := range []string{"| parse | 1.0 ms | as you type |",
-		"| names | 60.0 ms | on save |",
+	for _, want := range []string{
+		"| parse | 1.0 ms | as you type | 1.0 ms | as you type |",
+		"| names | 60.0 ms | on save | 500.0 ms | on save |",
+		"Peak RSS of the warm session: 700 MB.",
 		"| First diagnostics from cold start, p95 < 2 s | 2.50 s | MISS |",
 		"1 gate(s) missed"} {
 		if !bytes.Contains([]byte(out), []byte(want)) {

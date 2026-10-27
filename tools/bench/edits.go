@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"regexp"
 
+	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/internal/parser"
 )
 
 // Edit is one keystroke: the text that replaces the range from
@@ -51,12 +53,64 @@ func ascii(b []byte) bool {
 	return true
 }
 
+// Edit kinds: a body edit lands in an architecture or a package body,
+// whose declarations no other unit sees, so it changes no declaration
+// another unit depends on; a signature edit lands in a primary unit
+// (an entity, a package, ...), whose declarations its dependents see.
+const (
+	KindBody      = "body"
+	KindSignature = "signature"
+)
+
+// linesOf returns the code lines of text that lie in a design unit of
+// the given kind ("" for every code line): the unit's context clause
+// counts as part of it. The units come from GoHard's own parser
+// (VHDL-2008), so the split is exact for the files the benchmark
+// edits.
+func linesOf(text []byte, kind string) []int {
+	lines := codeLines(text)
+	if kind == "" || len(lines) == 0 {
+		return lines
+	}
+	root := parser.Parse(text, parser.Options{}).Tree()
+	var spans []cst.Range
+	for du := range (cst.DesignFile{Node: root}).Units() {
+		k := du.Unit().Node.Kind()
+		body := k == cst.KindArchitectureBody || k == cst.KindPackageBody
+		if body == (kind == KindBody) {
+			spans = append(spans, du.Node.Span())
+		}
+	}
+	var out []int
+	off, line := 0, 0
+	for _, l := range lines {
+		for ; line < l; line++ {
+			off += bytes.IndexByte(text[off:], '\n') + 1
+		}
+		at := off + len(text[off:]) - len(bytes.TrimLeft(text[off:],
+			" \t"))
+		for _, sp := range spans {
+			if sp.Start <= at && at < sp.End {
+				out = append(out, l)
+				break
+			}
+		}
+	}
+	return out
+}
+
 // Keystrokes returns n edits of text as a pure function of (text,
 // seed): pairs that insert typed at the start of a code line and then
 // delete it again, so after every even number of edits the text is the
 // original. It returns nil when text has no code line.
 func Keystrokes(text []byte, seed uint64, n int) []Edit {
-	lines := codeLines(text)
+	return KeystrokesIn(text, "", seed, n)
+}
+
+// KeystrokesIn is Keystrokes on the code lines of the units of one
+// kind (KindBody, KindSignature) only.
+func KeystrokesIn(text []byte, kind string, seed uint64, n int) []Edit {
+	lines := linesOf(text, kind)
 	if len(lines) == 0 {
 		return nil
 	}
