@@ -45,7 +45,7 @@ that loads an invalid configuration exits 2.
 | [`lenient`](#lenient) | bool | `false` |
 | [`psl.comments`](#pslcomments) | bool | `false` |
 | [`psl.strict_keywords`](#pslstrict_keywords) | bool | `false` |
-| [`libraries`](#libraries) | map: library name to list of folders | `{}` |
+| [`libraries`](#libraries) | map: library name to list of folders or files | `{}` |
 | [`allow_opaque`](#allow_opaque) | list of `lib.unit` | `[]` |
 | [`defines`](#defines) | map: identifier to string | `{}` |
 | [`format.indent`](#formatindent) | int >= 1 | `2` |
@@ -98,9 +98,9 @@ Report PSL-only words used as identifiers as errors (GHDL-style).
 
 ### `libraries`
 
-Maps each library name to the folders holding its sources, relative to the project root. Files in no listed folder go to `work`. A missing or unreadable folder is a setup error (exit 2).
+Maps each library name to the folders holding its sources, relative to the project root. An entry may also name one `.vhd` or `.vhdl` file, as `gohard import` writes them; a file entry wins over a folder holding the file. Files in no listed folder go to `work`. A missing or unreadable folder or file is a setup error (exit 2).
 
-* Type: map: library name to list of folders
+* Type: map: library name to list of folders or files
 * Default: `{}`
 
 ### `allow_opaque`

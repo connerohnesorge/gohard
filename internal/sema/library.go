@@ -16,9 +16,10 @@ import (
 const Work Key = "work"
 
 // LibraryOf returns the library a project file is analyzed into: the
-// gohard.yaml library whose folder contains the file (the longest
-// folder wins; equal folders go to the first library by name), else
-// work. p is a project-relative slash path, folders are relative to
+// gohard.yaml library whose folder contains the file or whose file
+// entry is the file (the longest entry wins, so a file entry beats a
+// folder holding it; equal entries go to the first library by name),
+// else work. p is a project-relative slash path, folders are relative to
 // the project root (#28).
 func LibraryOf(c config.Config, p string) Key {
 	p = path.Clean(p)

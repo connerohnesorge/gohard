@@ -35,7 +35,7 @@
       }
     },
     "libraries": {
-      "description": "Maps each library name to the folders holding its sources, relative to the project root. Files in no listed folder go to `work`. A missing or unreadable folder is a setup error (exit 2).",
+      "description": "Maps each library name to the folders holding its sources, relative to the project root. An entry may also name one `.vhd` or `.vhdl` file, as `gohard import` writes them; a file entry wins over a folder holding the file. Files in no listed folder go to `work`. A missing or unreadable folder or file is a setup error (exit 2).",
       "type": "object",
       "propertyNames": {
         "type": "string",

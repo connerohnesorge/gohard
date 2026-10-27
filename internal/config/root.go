@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/env"
@@ -190,13 +191,19 @@ func reason(err error) string {
 }
 
 // CheckFolders reports every library folder that is missing or cannot
-// be listed (library/folder-missing, exit 2). Relative folders are
+// be listed, and every library entry that is a file but not a VHDL
+// file (library/folder-missing, exit 2). An entry may name one .vhd or
+// .vhdl file, as gohard import writes them (#2). Relative entries are
 // resolved against root.
 func CheckFolders(fsys env.FS, root string, c *Config) []diag.Diagnostic {
 	var out []diag.Diagnostic
 	for _, lib := range c.Libraries {
 		for _, f := range lib.Folders {
 			p := env.Abs(root, filepath.FromSlash(f.Path))
+			if fi, err := fsys.Stat(p); err == nil &&
+				fi.Mode().IsRegular() && isVHDLFile(p) {
+				continue
+			}
 			if _, err := fsys.ReadDir(p); err != nil {
 				out = append(out, diag.New(diag.LibraryFolderMissing,
 					lib.Name, f.Path).At(FileName, f.Line, f.Col))
@@ -204,4 +211,11 @@ func CheckFolders(fsys env.FS, root string, c *Config) []diag.Diagnostic {
 		}
 	}
 	return out
+}
+
+// isVHDLFile reports a .vhd or .vhdl extension in any letter case
+// (workspace.IsVHDL, which this layer cannot import).
+func isVHDLFile(name string) bool {
+	ext := strings.ToLower(filepath.Ext(name))
+	return ext == ".vhd" || ext == ".vhdl"
 }

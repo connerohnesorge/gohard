@@ -108,8 +108,8 @@ type Library struct {
 	Pos     // of the library name
 }
 
-// Folder is one source folder of a library, as written (relative paths
-// are relative to the project root).
+// Folder is one source folder of a library, or one VHDL file (#2), as
+// written (relative paths are relative to the project root).
 type Folder struct {
 	Path string
 	Pos

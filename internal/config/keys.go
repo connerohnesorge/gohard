@@ -36,7 +36,7 @@ const (
 	ItemNonEmpty                   // a non-empty string
 	ItemIdentifier                 // a VHDL basic identifier
 	ItemUnit                       // lib.unit
-	ItemFolders                    // a list of non-empty folder paths
+	ItemFolders                    // a list of non-empty folder or file paths
 	ItemVarName                    // non-empty, without '=' or NUL
 	ItemDefine                     // an identifier that is not built in
 )
@@ -297,11 +297,14 @@ var keys = []Key{
 	{
 		Name: "libraries", Type: TypeMap, MapKeys: ItemIdentifier,
 		Items: ItemFolders, Default: "{}",
-		TypeDoc: "map: library name to list of folders",
+		TypeDoc: "map: library name to list of folders or files",
 		Doc: "Maps each library name to the folders holding its " +
-			"sources, relative to the project root. Files in no " +
-			"listed folder go to `work`. A missing or unreadable " +
-			"folder is a setup error (exit 2).",
+			"sources, relative to the project root. An entry may " +
+			"also name one `.vhd` or `.vhdl` file, as `gohard " +
+			"import` writes them; a file entry wins over a folder " +
+			"holding the file. Files in no listed folder go to " +
+			"`work`. A missing or unreadable folder or file is a " +
+			"setup error (exit 2).",
 		acc: bind(func(c *Config) *[]Library { return &c.Libraries },
 			empty[Library], (*parser).libraries),
 	},

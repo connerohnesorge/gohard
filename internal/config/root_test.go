@@ -306,13 +306,15 @@ func TestLoad(t *testing.T) {
 			"gohard.yaml:1:1: error[config/unreadable]: cannot read " +
 				"gohard.yaml: it is a directory\n"},
 		{"library/folder-missing", map[string]string{
-			"/p/gohard.yaml": "libraries:\n  lib: [rtl, gone, f.vhd]\n" +
+			// A VHDL file is an entry (#2); another file is not.
+			"/p/gohard.yaml": "libraries:\n" +
+				"  lib: [rtl, gone, f.txt, f.vhd]\n" +
 				"  other: [/abs/missing]\n",
-			"/p/f.vhd": ""}, []string{"/p/rtl"},
+			"/p/f.txt": "", "/p/f.vhd": ""}, []string{"/p/rtl"},
 			"gohard.yaml:2:14: error[library/folder-missing]: library " +
 				"lib: folder gone is missing or unreadable\n" +
 				"gohard.yaml:2:20: error[library/folder-missing]: " +
-				"library lib: folder f.vhd is missing or unreadable\n" +
+				"library lib: folder f.txt is missing or unreadable\n" +
 				"gohard.yaml:3:11: error[library/folder-missing]: " +
 				"library other: folder /abs/missing is missing or " +
 				"unreadable\n"},

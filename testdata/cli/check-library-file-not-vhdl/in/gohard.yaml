@@ -1,0 +1,4 @@
+libraries:
+  mylib:
+    - src/pkg.vhd
+    - src/notes.txt

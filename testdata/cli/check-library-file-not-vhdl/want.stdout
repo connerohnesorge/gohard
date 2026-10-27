@@ -1,0 +1,2 @@
+gohard.yaml:4:7: error[library/folder-missing]: library mylib: folder src/notes.txt is missing or unreadable
+summary: 1 errors, 0 warnings, 0 hints, 0 files
