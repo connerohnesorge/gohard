@@ -12,7 +12,7 @@ Commands:
   libs     find vendor libraries and print gohard.yaml lines
   lsp      run the language server, or one language-server action
   parse    print the concrete syntax tree of a file
-  trace    export a simulation trace to VCD or FST
+  trace    export a simulation trace to VCD, FST or GHW
   version  print the version, commit, IEEE library and Go toolchain
 
 Global flags:

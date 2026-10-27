@@ -1,2 +1,2 @@
-gohard: error[trace/unknown-format]: unknown trace format svg; supported: vcd, fst
+gohard: error[trace/unknown-format]: unknown trace format svg; supported: vcd, fst, ghw
 summary: 1 errors, 0 warnings, 0 hints, 0 files

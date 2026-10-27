@@ -13,7 +13,7 @@ package follows [philosophy.md](philosophy.md) (P1-P8).
 bytes ─ lexer ─ tokens+trivia ─ (conditional analysis) ─ parser ─ CST
   CST ─ ast (typed views) ─ sema/resolve ─ elab ─ sim kernel ─ trace
                    │                                        │
-                 ide (LSP features)                exports: VCD, FST
+                 ide (LSP features)           exports: VCD, FST, GHW
 ```
 
 * Bytes come only through `env.FS`. Every stage below is a pure function
@@ -72,7 +72,7 @@ Env, maps SIGINT/SIGTERM to 130/143, and calls `cli.Run`.
 | 5 | `internal/cache` | the on-disk analysis cache `.gohard/cache` (#37): whole-cache key, file format and versioning, recovery; sema stores and restores the entries (`sema.Cache`) | #37 |
 | 6 | `internal/elab` | lowers a resolved design to a compact model; instance paths like `tb.dut.u0` | #35 |
 | 6 | `internal/sim` | single-threaded discrete-event kernel ordered by (time, delta, process sequence) | #35 |
-| 6 | `internal/trace` | lossless native trace, `Writer`/`Recorder` fed by the kernel, canonical text form (grammar in `doc.go`), value lookup; exports in `trace/vcd` and `trace/fst` (pure Go, fixed bytes); `trace/waveform` is "Open waveform" | #36 |
+| 6 | `internal/trace` | lossless native trace, `Writer`/`Recorder` fed by the kernel, canonical text form (grammar in `doc.go`), value lookup; exports in `trace/vcd`, `trace/fst` and `trace/ghw` (pure Go, fixed bytes); `trace/waveform` is "Open waveform" | #36, #60 |
 | 6 | `internal/repro` | repro files and session headers (`"schema":1`) | #29 |
 | 7 | `internal/ide` | LSP features as pure functions of a snapshot | #25 |
 | 7 | `internal/jsonrpc2` | hand-rolled JSON-RPC 2.0 framing; the only goroutines (stdio reader and writer) | #25 |
@@ -180,7 +180,7 @@ wipes existing GitHub alerts.
 | `gohard config check\|schema` | config diagnostics; JSON schema | #28 |
 | `gohard lsp` | stdio LSP 3.17 server; `--record DIR` | #25 |
 | `gohard lsp <action> --at PATH:LINE:COL` | one LSP action on the server's code path; `lsp sim` (with `--env`, `--real-env`), `lsp replay FILE` | #26, #18 |
-| `gohard trace export --format vcd\|fst` | export a native trace | #36 |
+| `gohard trace export --format vcd\|fst\|ghw` | export a native trace; see [Trace exports](#trace-exports) | #36, #60 |
 | `gohard import FILE` | write `gohard.yaml` from a ModelSim `.do`, Vivado `.xpr` or Quartus `.qsf` file (`--dir`, `--format`) | #2 |
 | `gohard libs detect [--write]` | find vendor library sources | #1 |
 | `gohard version` | prints `version`, `commit`, `ieee` (bundled IEEE tag and commit) and `go` lines; `unknown` when not known | #20, #39 |
@@ -194,6 +194,30 @@ real clock and environment (#18); both imply `--sim`, and under
 `--repro` both are ignored with a log line (the recorded environment
 wins). The `simulation.env.*` keys (#28) take effect since v1.1. A command that is not built yet exits 2 with
 `cli/not-implemented`.
+
+### Trace exports
+
+`gohard trace export --format FORMAT TRACE [-o OUT]` converts a native
+trace (`.gohard/traces/<tb>-<seed>.trace`) to a viewer format. Every
+format writes only the value each signal settles on at each time
+(deltas and zero-width glitches do not appear), and the same trace
+always gives the same bytes. An unknown format is
+`trace/unknown-format`; a trace the format cannot hold is
+`trace/invalid`.
+
+| Format | Package | Keeps | Opens in |
+| --- | --- | --- | --- |
+| `vcd` | `trace/vcd` | four values: 0, 1, x, z (L and H read as 0 and 1; U, X, W and - as x); enumerations as strings | every waveform viewer |
+| `fst` | `trace/fst` | all nine std_logic values; VHDL type names and scope kinds as attributes | GTKWave, Surfer; "Open waveform" uses it (#36) |
+| `ghw` | `trace/ghw` | VHDL types: enumerations with their literals, all nine std_logic values, integer and physical ranges, arrays with their range, records as record signals | GTKWave, Surfer, GHDL's `ghwdump` (#60) |
+
+GHW is GHDL's format. It has no place for an instance's design unit,
+the modeled mark, events or delta cycles; a mode-view record port is an
+inout port, a case-generate is an if-generate, and a for-generate whose
+index is not an integer is a block. Names with a byte in 0-31 or
+128-159, enumerations of more than 256 literals and array bounds beyond
+32 bits cannot be written. The package documentation of `trace/ghw`
+has the full mapping. "Open waveform" stays FST; GHW is CLI-only.
 
 ## Files GoHard writes
 

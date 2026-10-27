@@ -9,27 +9,32 @@ import (
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/trace"
 	"github.com/connerohnesorge/gohard/internal/trace/fst"
+	"github.com/connerohnesorge/gohard/internal/trace/ghw"
 	"github.com/connerohnesorge/gohard/internal/trace/vcd"
 )
 
 func init() { lookup("trace").Run = runTrace }
 
-// exporters are the formats of `gohard trace export --format` (#36).
-// GHW is v2.
-var exporters = []trace.Exporter{vcd.Exporter{}, fst.Exporter{}}
+// exporters are the formats of `gohard trace export --format` (#36,
+// GHW #60).
+var exporters = []trace.Exporter{
+	vcd.Exporter{}, fst.Exporter{}, ghw.Exporter{},
+}
 
-// runTrace is `gohard trace export --format vcd|fst TRACE [-o OUT]`
-// (#36): it converts a native trace and writes the export to standard
-// output, or with -o/--out to OUT through a temp file and a rename. A
-// missing --format is cli/usage and an unknown one (ghw included)
+// runTrace is `gohard trace export --format vcd|fst|ghw TRACE [-o OUT]`
+// (#36, #60): it converts a native trace and writes the export to
+// standard output, or with -o/--out to OUT through a temp file and a
+// rename. A missing --format is cli/usage and an unknown one
 // trace/unknown-format, both exit 2; a missing trace is
-// cli/missing-path and an unreadable or invalid one trace/invalid.
+// cli/missing-path and an unreadable or invalid one, or one the format
+// cannot hold, trace/invalid.
 func runTrace(inv *Invocation) Result {
 	if len(inv.Args) != 2 {
 		return inv.usage("gohard trace export takes one TRACE file")
 	}
 	if !inv.IsSet("format") {
-		return inv.usage("gohard trace export needs --format vcd or fst")
+		return inv.usage(
+			"gohard trace export needs --format vcd, fst or ghw")
 	}
 	format := inv.String("format")
 	var x trace.Exporter

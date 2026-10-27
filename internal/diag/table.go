@@ -669,7 +669,8 @@ var table = []Info{
 		Code: TraceUnknownFormat, Severity: Error, Class: Tool,
 		Owner:   36,
 		Summary: "an unknown trace export format",
-		Message: "unknown trace format {format}; supported: vcd, fst",
+		Message: "unknown trace format {format}; supported: vcd, fst, " +
+			"ghw",
 	},
 	{
 		Code: UnsupportedConstruct, Severity: Error, Class: Tool,

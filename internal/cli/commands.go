@@ -192,11 +192,11 @@ var commands = []Command{
 	},
 	{
 		Name: "trace", Args: "export TRACE",
-		Summary: "export a simulation trace to VCD or FST",
+		Summary: "export a simulation trace to VCD, FST or GHW",
 		Subs:    []string{"export"},
 		Flags: []Flag{
 			{
-				Name: "format", Kind: String, Value: "vcd|fst",
+				Name: "format", Kind: String, Value: "vcd|fst|ghw",
 				Usage: "export format (required)",
 			},
 			{
