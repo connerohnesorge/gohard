@@ -1,8 +1,8 @@
 // Package diag is the single source of truth for GoHard diagnostics
 // (#20): the table of every diagnostic code with its default severity,
 // exit class and message template, the Diagnostic value, deterministic
-// sorting, the exit-code rules, and the text, JSON (schema 1) and SARIF
-// 2.1.0 renderers.
+// sorting, the exit-code rules, and the text, JSON (schema 1), SARIF
+// 2.1.0 and JUnit XML renderers.
 //
 // Codes and message wording are locked when v1.0 ships. Until then this
 // table is the only place they are defined; fixtures are refreshed with

@@ -98,6 +98,30 @@ type Report struct {
 	// the run read it. SARIF needs it to turn GoHard's UTF-8 byte
 	// columns into UTF-16 code units; nil means no file is known.
 	Source func(path string) ([]byte, bool)
+	// Checked lists the paths of the files the run checked, in any
+	// order: JUnit shows each as a test case, passing when it has no
+	// failing diagnostic (#61).
+	Checked []string
+	// Testbenches are the testbench runs of a check --sim, in any
+	// order: JUnit shows each as a test case (#61).
+	Testbenches []Testbench
+}
+
+// Testbench is one testbench run of a check --sim (#61).
+type Testbench struct {
+	Name   string
+	Seed   uint64
+	Status string // the kernel status, such as "quiet" or "halted"
+	// End is the simulated end time, such as "100 ns"; empty when the
+	// run never started.
+	End string
+	// Repro is the slash path of the repro file the run wrote; empty
+	// when none was written.
+	Repro string
+	// Diagnostics are the run's own diagnostics (elaboration,
+	// simulation, races, writing its files). They are in the report's
+	// Diagnostics too; the other formats do not tell them apart.
+	Diagnostics []Diagnostic
 }
 
 // Exit returns the exit code of the report.

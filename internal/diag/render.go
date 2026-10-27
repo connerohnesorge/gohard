@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// Format is an output format (#20). JUnit is not in v1.
+// Format is an output format (#20, #61).
 type Format string
 
 // Output formats.
@@ -17,10 +17,11 @@ const (
 	FormatText  Format = "text"
 	FormatJSON  Format = "json"
 	FormatSARIF Format = "sarif"
+	FormatJUnit Format = "junit"
 )
 
 // Formats lists every output format in documentation order.
-var Formats = []Format{FormatText, FormatJSON, FormatSARIF}
+var Formats = []Format{FormatText, FormatJSON, FormatSARIF, FormatJUnit}
 
 // ParseFormat checks a --format value.
 func ParseFormat(s string) (Format, bool) {
@@ -37,6 +38,8 @@ func Render(f Format, r *Report) []byte {
 		return RenderJSON(r)
 	case FormatSARIF:
 		return RenderSARIF(r)
+	case FormatJUnit:
+		return RenderJUnit(r)
 	}
 	return RenderText(r)
 }
@@ -47,18 +50,24 @@ func Render(f Format, r *Report) []byte {
 func RenderText(r *Report) []byte {
 	var b bytes.Buffer
 	for _, d := range Normalize(r.Diagnostics) {
-		fmt.Fprintf(&b, "%s: %s[%s]: %s\n",
-			location(d.Path, d.Line, d.Col), d.Severity, d.Code,
-			escapeText(d.Message))
-		for _, rel := range d.Related {
-			fmt.Fprintf(&b, "  %s: note: %s\n",
-				location(rel.Path, rel.Line, rel.Col),
-				escapeText(rel.Message))
-		}
+		writeText(&b, d)
 	}
 	b.WriteString(SummaryLine(r.Counts()))
 	b.WriteByte('\n')
 	return b.Bytes()
+}
+
+// writeText writes the text form of d: its line and one indented note
+// line per related location.
+func writeText(b *bytes.Buffer, d Diagnostic) {
+	fmt.Fprintf(b, "%s: %s[%s]: %s\n",
+		location(d.Path, d.Line, d.Col), d.Severity, d.Code,
+		escapeText(d.Message))
+	for _, rel := range d.Related {
+		fmt.Fprintf(b, "  %s: note: %s\n",
+			location(rel.Path, rel.Line, rel.Col),
+			escapeText(rel.Message))
+	}
 }
 
 // SummaryLine is the text summary. The plural forms are fixed so the line
