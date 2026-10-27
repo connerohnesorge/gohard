@@ -70,12 +70,17 @@ On Neovim 0.11 or later you can skip `setup()`. Put `editors/nvim` on
 the runtime path, then call `vim.lsp.enable('gohard')`. The plugin's
 `lsp/gohard.lua` holds the same configuration that `setup()` uses.
 
-The two differ only in a folder with no `gohard.yaml` and no `.git`
-above the file. There `setup()` sends the file's folder as the
-workspace folder. `vim.lsp.enable` sends no workspace folder, and the
-server then takes the folder of the first file opened as the project
-folder (#48). Either way the project is the same, like the CLI run
-from that folder, and the testbench lens shows up.
+The two differ for files with no `gohard.yaml` and no `.git` above
+them. There `setup()` sends the file's folder as the workspace folder
+and starts one client per such folder. `vim.lsp.enable` sends no
+workspace folder, and the server takes the folder of the first file
+opened as the project folder (#48), like the CLI run from that folder,
+so the testbench lens shows up. Neovim then attaches every other file
+without a root marker to that same client, and the server keeps its
+first folder: a testbench in a second unmarked folder is checked
+against the first folder's project, so an entity defined in a file of
+its own folder that is not open does not resolve. To work in several
+unmarked folders, use `setup()` or put a `gohard.yaml` in each.
 
 Editor settings go under a `gohard` key in `settings`. They use the
 `gohard.yaml` keys of [config.md](config.md). Any key that
