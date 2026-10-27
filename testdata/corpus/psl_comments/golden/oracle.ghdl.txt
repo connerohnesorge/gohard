@@ -1,0 +1,94 @@
+gohard-oracle 1
+tool ghdl 6.0.0
+sources 2d8ccfa5a44ff37d
+testbench psl_comments_tb
+signal psl_comments_tb.a logic 1
+signal psl_comments_tb.b logic 1
+signal psl_comments_tb.clk logic 1
+signal psl_comments_tb.dut.a logic 1
+signal psl_comments_tb.dut.ai logic 1
+signal psl_comments_tb.dut.b logic 1
+signal psl_comments_tb.dut.bi logic 1
+signal psl_comments_tb.dut.clk logic 1
+signal psl_comments_tb.dut.n integer 32
+0 psl_comments_tb.a 0
+0 psl_comments_tb.b 0
+0 psl_comments_tb.clk 0
+0 psl_comments_tb.dut.a 0
+0 psl_comments_tb.dut.ai 0
+0 psl_comments_tb.dut.b 0
+0 psl_comments_tb.dut.bi 0
+0 psl_comments_tb.dut.clk 0
+0 psl_comments_tb.dut.n 0
+5000000 psl_comments_tb.clk 1
+5000000 psl_comments_tb.dut.clk 1
+10000000 psl_comments_tb.clk 0
+10000000 psl_comments_tb.dut.clk 0
+10000000 psl_comments_tb.dut.n 1
+15000000 psl_comments_tb.clk 1
+15000000 psl_comments_tb.dut.clk 1
+20000000 psl_comments_tb.a 1
+20000000 psl_comments_tb.clk 0
+20000000 psl_comments_tb.dut.a 1
+20000000 psl_comments_tb.dut.ai 1
+20000000 psl_comments_tb.dut.clk 0
+20000000 psl_comments_tb.dut.n 2
+25000000 psl_comments_tb.clk 1
+25000000 psl_comments_tb.dut.clk 1
+30000000 psl_comments_tb.a 0
+30000000 psl_comments_tb.b 1
+30000000 psl_comments_tb.clk 0
+30000000 psl_comments_tb.dut.a 0
+30000000 psl_comments_tb.dut.ai 0
+30000000 psl_comments_tb.dut.b 1
+30000000 psl_comments_tb.dut.bi 1
+30000000 psl_comments_tb.dut.clk 0
+30000000 psl_comments_tb.dut.n 3
+35000000 psl_comments_tb.clk 1
+35000000 psl_comments_tb.dut.clk 1
+40000000 psl_comments_tb.b 0
+40000000 psl_comments_tb.clk 0
+40000000 psl_comments_tb.dut.b 0
+40000000 psl_comments_tb.dut.bi 0
+40000000 psl_comments_tb.dut.clk 0
+40000000 psl_comments_tb.dut.n 4
+45000000 psl_comments_tb.clk 1
+45000000 psl_comments_tb.dut.clk 1
+50000000 psl_comments_tb.a 1
+50000000 psl_comments_tb.clk 0
+50000000 psl_comments_tb.dut.a 1
+50000000 psl_comments_tb.dut.ai 1
+50000000 psl_comments_tb.dut.clk 0
+50000000 psl_comments_tb.dut.n 5
+55000000 psl_comments_tb.clk 1
+55000000 psl_comments_tb.dut.clk 1
+60000000 psl_comments_tb.a 0
+60000000 psl_comments_tb.b 1
+60000000 psl_comments_tb.clk 0
+60000000 psl_comments_tb.dut.a 0
+60000000 psl_comments_tb.dut.ai 0
+60000000 psl_comments_tb.dut.b 1
+60000000 psl_comments_tb.dut.bi 1
+60000000 psl_comments_tb.dut.clk 0
+60000000 psl_comments_tb.dut.n 6
+65000000 psl_comments_tb.clk 1
+65000000 psl_comments_tb.dut.clk 1
+70000000 psl_comments_tb.b 0
+70000000 psl_comments_tb.clk 0
+70000000 psl_comments_tb.dut.b 0
+70000000 psl_comments_tb.dut.bi 0
+70000000 psl_comments_tb.dut.clk 0
+70000000 psl_comments_tb.dut.n 7
+75000000 psl_comments_tb.clk 1
+75000000 psl_comments_tb.dut.clk 1
+80000000 psl_comments_tb.clk 0
+80000000 psl_comments_tb.dut.clk 0
+80000000 psl_comments_tb.dut.n 8
+85000000 psl_comments_tb.clk 1
+85000000 psl_comments_tb.dut.clk 1
+90000000 psl_comments_tb.clk 0
+90000000 psl_comments_tb.dut.clk 0
+90000000 psl_comments_tb.dut.n 9
+95000000 psl_comments_tb.clk 1
+95000000 psl_comments_tb.dut.clk 1
+digest 80 18388c4bdca4c37257b1700f382ea508be2be2f78fa784ddb5b5dbb84bd18be5

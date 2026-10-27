@@ -1,0 +1,5 @@
+# Project config for the psl_comments corpus design (#109): parse
+# `-- psl` comment lines as PSL. GHDL needs -fpsl and NVC -a --psl for
+# the same.
+psl:
+  comments: true

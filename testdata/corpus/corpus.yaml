@@ -16,9 +16,10 @@
 schema: 1
 
 # Fixed vocabularies. A design's `features` and `invariants` may only use
-# the ids listed here. The feature list is exactly the semantics list in
-# the "Done when" section of #8; every id must appear in the `features` of
-# at least one design.
+# the ids listed here. The feature list is the semantics list in the
+# "Done when" section of #8 plus the ids added later (access_gc by #27,
+# psl_comments by #109); every id must appear in the `features` of at
+# least one design.
 vocabulary:
   features:
     - id: delta_ordering
@@ -66,6 +67,10 @@ vocabulary:
       semantic: >-
         garbage collection of access-type objects (#27, not in the #8
         list)
+    - id: psl_comments
+      semantic: >-
+        PSL in `-- psl` comments (psl.comments) with a comment default
+        clock (#109, not in the #8 list)
   invariants:
     - id: seed_independent
       meaning: byte-identical trace at seeds 0-3 (PR) and 64 seeds (nightly)
@@ -933,6 +938,76 @@ designs:
     oracle_sha256: 11b484709e5c9656f3ce83f87777efbdc5040b5417f8eda14a14cb2b3b48d6cf
     format_oracle_sha256: 08d5c45934017c8f93b2193e1d9b14ee8e9c627bb684580fd12d5848c0f28d3b
     semerr_sha256: 6c3d1fbac9cf9232749e5afacb9710f2841965daae69d091c6b2eb21aaf3906b
+  - name: psl_comments
+    standard: "2008"
+    milestone: v1.1
+    files:
+      - path: psl_comments.vhd
+        standard: "2008"
+      - path: psl_comments_tb.vhd
+        standard: "2008"
+    top: psl_comments
+    testbench: psl_comments_tb
+    defines: {}
+    models: {}
+    # psl.comments: true. The default clock and both directives are
+    # `-- psl` comments in the statement part (#109).
+    config: gohard.yaml
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 100 ns
+      messages:
+        - severity: hint
+          text: a then b
+          time: 35 ns
+    features: [psl_comments]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 -fpsl psl_comments.vhd psl_comments_tb.vhd; ghdl
+        --elab-run --std=08 -fpsl psl_comments_tb --psl-report=<tmp>/psl.json
+      result: pass
+      exit: 0
+      stop_time: 100 ns
+      messages:
+        - 'psl_comments.vhd:42:10:@35ns:(psl cover note): a then b'
+        - 'psl_comments.vhd:42:10:@65ns:(psl cover note): a then b'
+        - simulation finished @100ns
+      notes: >-
+        Without -fpsl GHDL reads the `-- psl` lines as comments and checks
+        nothing. --psl-report lists b_follows_a "passed" (started-count 10,
+        finished-count 0) and a_then_b "covered" (finished-count 2). With
+        b high at k = 7 instead of 6 GHDL reports "(psl assertion error):
+        Assertion violation" at 40:10, 65 ns, so the comment directives
+        are live.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a --psl psl_comments.vhd psl_comments_tb.vhd -e
+        psl_comments_tb -r
+      result: pass
+      exit: 0
+      stop_time: 100 ns
+      messages:
+        - '** Note: 35ns+0: a then b'
+        - '** Note: 65ns+0: a then b'
+        - '** Note: 100ns+0: FINISH called'
+      notes: >-
+        --psl is an analysis option. NVC also accepts the `-- psl` default
+        clock in the statement part, but rejects a `-- psl` property or
+        sequence declaration there at elaboration ("cannot lower PSL
+        declaration kind"), so the design declares none. With b high at
+        k = 7 instead of 6 NVC reports "** Error: 65ns+0: PSL assertion
+        failed".
+    disagreements: []
+    trace_sha256: e5ad233e36b71638237047820673a79eb30d849b34318ea36edda87746e61496
+    oracle_sha256: fe98e3731b9233d8eb9a178365b65554083e8aa8c4cb363d95cc132a34597a0a
+    format_oracle_sha256: 71d06d675a599b3b69c20a5a315348410ea6401355b907821a2f81af226be57f
+    semerr_sha256: 6a277de424df962600ce1b8b2ae89c9dd3c22dfc9bae3424c47ef43fbc1fdbf8
   - name: psl_simple
     standard: "2008"
     milestone: v1.0

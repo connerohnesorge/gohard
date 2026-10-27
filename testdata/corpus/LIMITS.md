@@ -59,12 +59,21 @@ opaque.
 * **Protected-type ports.** One design (`prot_cond`, v1.1), one port, one
   protected type, NVC only. Under v1.0 the design checks only that the
   unsupported-construct diagnostics appear.
-* **PSL.** One clocked simple-subset `assert` and two `cover`s. Neither
-  tool prints the cover miss during a run (GHDL's `--psl-report` lists it
-  as "not covered"), so the miss warning's text and severity rest on #35
-  alone. `psl_simple` sets `simulation.stop_level: failure` so that all
-  three tools run to 100 ns; GoHard halting on a PSL assert at the
-  default `stop_level` is not covered by any design.
+* **PSL.** `psl_simple`: one clocked simple-subset `assert` and two
+  `cover`s. Neither tool prints the cover miss during a run (GHDL's
+  `--psl-report` lists it as "not covered"), so the miss warning's text
+  and severity rest on #35 alone. `psl_simple` sets
+  `simulation.stop_level: failure` so that all three tools run to
+  100 ns; GoHard halting on a PSL assert at the default `stop_level` is
+  not covered by any design. `psl_comments` (#109) covers
+  `psl.comments: true`: a `-- psl` default clock in the statement part,
+  one `-- psl` assert that holds and one `-- psl` cover, each on one
+  line. A directive continued on further `--` lines is covered only by
+  the lexer and parser tests, and no design has a `-- psl` property or
+  sequence declaration (NVC 1.23.0 rejects one in the statement part).
+  GHDL and NVC continue a `-- psl` directive across a blank or non-comment
+  line up to its `;`; GoHard ends it at the first line that does not
+  start with `--`, so a design that relies on that fails in GoHard.
 * **Stand-in models.** One design (`standin_model`), one opaque unit, one
   stand-in. Neither GHDL nor NVC marks modeled drivers, so the
   `modeled_drivers_marked` invariant has no tool oracle; the marking in

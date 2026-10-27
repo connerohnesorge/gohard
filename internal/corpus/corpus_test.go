@@ -61,16 +61,17 @@ func loadManifest(t testing.TB) (*Manifest, ReadFunc) {
 	return m, read
 }
 
-// TestManifest checks the design list: the 14 designs of #8 and the
-// #27 gc_heap design, sorted, each with a directory, and every file of
-// every run present (a missing file names git submodule update --init,
-// never a skip).
+// TestManifest checks the design list: the 14 designs of #8, the #27
+// gc_heap design and the #109 psl_comments design, sorted, each with a
+// directory, and every file of every run present (a missing file names
+// git submodule update --init, never a skip).
 func TestManifest(t *testing.T) {
 	m, read := loadManifest(t)
 	want := []string{"assert_fail", "budget_hang", "force_ext",
 		"gc_heap", "hier_generate", "md_resolve", "mode_views",
-		"overload_ops", "postponed_attrs", "prot_cond", "psl_simple",
-		"standin_model", "textio_env", "vhdl93_only", "wait_forms"}
+		"overload_ops", "postponed_attrs", "prot_cond", "psl_comments",
+		"psl_simple", "standin_model", "textio_env", "vhdl93_only",
+		"wait_forms"}
 	var got []string
 	for _, d := range m.Designs {
 		got = append(got, d.Name)

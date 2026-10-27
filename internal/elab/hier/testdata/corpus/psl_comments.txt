@@ -1,0 +1,2 @@
+psl_comments_tb entity work.psl_comments_tb(sim)
+  psl_comments_tb.dut entity work.psl_comments(rtl)

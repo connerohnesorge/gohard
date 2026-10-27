@@ -37,9 +37,10 @@ testdata/corpus/
   `force_ext`, `textio_env`, `assert_fail`, `budget_hang`, `vhdl93_only`,
   `mode_views`, `prot_cond`, `psl_simple`, `hier_generate`, `overload_ops`,
   `standin_model`. No other design is required for v1.0. The 15th,
-  `gc_heap` (milestone v1.1), is the #27 garbage-collection design. Since
-  the v1.1 release both v1.1 designs (`prot_cond`, `gc_heap`) are
-  required to pass with `expected`. The
+  `gc_heap` (milestone v1.1), is the #27 garbage-collection design; the
+  16th, `psl_comments` (milestone v1.1), is the #109 `psl.comments`
+  design. Since the v1.1 release the v1.1 designs (`prot_cond`,
+  `gc_heap`, `psl_comments`) are required to pass with `expected`. The
   8 vhdl-examples are demos and are not part of the corpus.
 * Simulator work files (GHDL `*.cf`/`*.o`, NVC `work/` libraries, waveform
   dumps) never enter the repo. Run the tools in a `/tmp` work dir.
@@ -130,13 +131,13 @@ by `path`) so tools rewrite the file deterministically.
 | --- | --- | --- |
 | `name` | string | Design name; equals the directory name. |
 | `standard` | `"1993"`\|`"2002"`\|`"2008"`\|`"2019"` | Minimum standard of the design (quoted, as in `gohard.yaml`, #28). It is the standard GoHard runs the design under. |
-| `milestone` | `v1.0`\|`v1.1` | Release that must pass it. `prot_cond` and `gc_heap` are `v1.1`; the other 13 are `v1.0`. The release under test is `corpus.Release` (`v1.1`); a design of a later milestone is a manifest error. |
+| `milestone` | `v1.0`\|`v1.1` | Release that must pass it. `prot_cond`, `gc_heap` and `psl_comments` are `v1.1`; the other 13 are `v1.0`. The release under test is `corpus.Release` (`v1.1`); a design of a later milestone is a manifest error. |
 | `files` | list | Every source file, in analysis order, each `{path, standard}`. `path` is relative to the design directory; `standard` is the minimum standard of that file. |
 | `top` | string | Design-under-test entity (the unit whose hierarchy and LSP sessions matter). Equals `testbench` when the testbench is the whole design. |
 | `testbench` | string | Portless testbench entity that is the elaboration root, run with `gohard check --sim --tb <testbench>` and by the oracles. |
 | `defines` | map identifier to string | `defines:` passed to GoHard and the oracles (#28). `{}` except in `mode_views`, which needs one user identifier. Built-in identifiers (`VHDL_VERSION`, `TOOL_*`) are never allowed here. |
 | `models` | map `lib.unit` to path | `simulation.models` stand-ins (#35). `{}` except in `standin_model`. Paths are relative to the design directory. A stand-in file is not listed in `files`. |
-| `config` | path | Optional. Design-local `gohard.yaml` (#28), relative to the design directory, loaded by GoHard and `tools/oracle` as the project config. Its `defines` and `simulation.models` must equal the entry's `defines` and `models`. Absent means all #28 defaults. Required whenever `defines` or `models` is non-empty, since #31 takes user identifiers only from `gohard.yaml` `defines:` or `--define`. Used by `mode_views` (`defines: {MV_PROFILE: "wide"}`), `psl_simple` (`simulation.stop_level: failure`) and `standin_model` (`allow_opaque`, `simulation.models`). |
+| `config` | path | Optional. Design-local `gohard.yaml` (#28), relative to the design directory, loaded by GoHard and `tools/oracle` as the project config. Its `defines` and `simulation.models` must equal the entry's `defines` and `models`. Absent means all #28 defaults. Required whenever `defines` or `models` is non-empty, since #31 takes user identifiers only from `gohard.yaml` `defines:` or `--define`. Used by `mode_views` (`defines: {MV_PROFILE: "wide"}`), `psl_comments` (`psl.comments: true`, which `tools/oracle` passes to GHDL as `-fpsl` and to NVC as `-a --psl`), `psl_simple` (`simulation.stop_level: failure`) and `standin_model` (`allow_opaque`, `simulation.models`). |
 | `expected` | mapping | GoHard's outcome (see below). Every design, `prot_cond` and `gc_heap` included, runs against it. |
 | `expected_v1_0` | retired | The v1.0 outcome of a v1.1 design (exit 2, `unsupported/construct`) while one of its constructs was not delivered. Retired with the v1.1 release: no design has it, and `corpus.ParseManifest` rejects a manifest that does, since nothing would check it. Its last use is in the git history. |
 | `features` | list of ids | Semantics this design exercises, from `vocabulary.features`. May be empty for designs whose purpose is an outcome (`assert_fail`, `budget_hang`, `vhdl93_only`). |
@@ -247,7 +248,7 @@ before pinning.
 | `subfolder` | Folder inside the submodule that is parsed (checked out alone for `pr` entries); `.` for the whole tree. |
 | `expected_failures` | List of paths or globs, relative to the submodule, of every upstream file that carries the project's own expected-failure data (for GHDL the `testsuite.sh` scripts of `gna/` and `sanity/` plus both VESTS `non_compliant.exp` lists; for NVC `test/regress/testlist.txt` and every `test/test_*.c`). How each kind is read is written as a comment above the entries in `corpus.yaml`. A `.vhd`/`.vhdl` path or glob names source files that are not VHDL (preprocessor templates, documentation snippets) or are invalid upstream: they may fail, and a one-line comment above each such entry gives the reason. `[]` if every file must parse. |
 
-The bundled IEEE packages in `internal/stdlib/` and the 15 corpus designs
+The bundled IEEE packages in `internal/stdlib/` and the 16 corpus designs
 are always part of the PR set and need no entry. gohard-old is not used.
 
 ## Tooling
@@ -279,7 +280,9 @@ after `-r` for NVC) for any design that must not terminate on its own.
 `go run ./tools/oracle --update trace tree` (inside `nix develop`) runs
 GHDL (`ghdl -a`, then `ghdl --elab-run <tb> --vcd=dump.vcd
 --assert-level=<stop_level>`) and NVC (`nvc -a [-D N=V] ... -e <tb> -r
---wave=dump.vcd --format=vcd --dump-arrays --exit-severity=<stop_level>`)
+--wave=dump.vcd --format=vcd --dump-arrays --exit-severity=<stop_level>`),
+with `-fpsl` on every GHDL command (`tree` too) and `--psl` after NVC's
+`-a` when the design's `gohard.yaml` sets `psl.comments`,
 on the main run of every design whose `oracle` names them, in a fresh
 `/tmp` work dir, with `--stop-time=<stop_time>` when the tool's recorded
 result is `bounded`. Files carrying an IEEE 1735 envelope are left out
@@ -332,9 +335,10 @@ and each `variants` item at seeds 0..3 (`-corpus.seeds=64` nightly via
 design (#8 `variant_stable`) must give the same outcome with lines
 ignored: `layout` (doubled white space and line breaks), `case` (reserved
 words and identifiers in upper case), `rename` (every declared signal,
-variable and constant gets `_rn`, consistently in all files) and
+variable and constant gets `_rn`, consistently in all files, `-- psl`
+lines included) and
 `reorder` (the concurrent statements of each architecture without tool
-directives, reversed). A design that cannot simulate yet for want of
+directives, reversed; a `-- psl` statement moves with its marker). A design that cannot simulate yet for want of
 an interpreter is logged under plain `go test` and fails under
 `-corpus.require-sim`.
 
@@ -345,8 +349,10 @@ every file of every design with the design's `format.*` options
 (`config`, or the #28 defaults), under the standard the file is first
 listed with. It then analyzes each run (the design's `files`, with the
 `models` stand-ins first, and every variant's `files`, under the run's
-standard) twice in fresh `/tmp` work dirs, one `ghdl -a --std=XX` or
-`nvc --std=XXXX -a [-D NAME=VALUE]` per file: once as written, once as
+standard) twice in fresh `/tmp` work dirs, one `ghdl -a --std=XX
+[-fpsl]` or `nvc --std=XXXX -a [--psl] [-D NAME=VALUE]` per file (the
+PSL options when the design sets `psl.comments`, which the run line
+records as ` psl`): once as written, once as
 formatted. Error lines of the formatted text are mapped back to the
 original lines, and `golden/format.{ghdl,nvc}.txt` record, per file,
 the original and formatted sha256, both exit codes, the original
