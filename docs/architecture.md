@@ -462,6 +462,7 @@ with an NVC 1.23 recording where NVC supports it).
 | `testdata/libs/` | pinned real libraries (OSVVM, UVVM, VUnit, regression sources) as submodules | #1, #8 |
 | `testdata/stubs/` | CI-only vendor stub packages | #1 |
 | `testdata/libsguide/` | the `docs/libraries.md` examples as projects CI checks | #1 |
+| `testdata/synth/<rule>/` | the examples of the synthesizable-subset rule list ([synth-subset.md](synth-subset.md)): `top.vhd` and its `ghdl --synth` recording `ghdl.txt`; `neorv32/` holds the NEORV32 recordings; `record.sh` writes them all | #67 |
 
 `-update` refreshes goldens. CI (#30) runs build, vet, test, `gofmt`,
 `golines -m 80`, generated-file sync, `detlint`, fuzz-corpus replay and
