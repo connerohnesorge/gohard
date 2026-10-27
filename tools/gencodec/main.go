@@ -10,7 +10,8 @@
 // in codec.go: *cst.Green, cst.Node, cst.Token (unexported fields of
 // another package), *span.Index (rebuilt from the file's text) and
 // *parser.Result (its source bytes). Any other struct of another
-// package must have exported fields only.
+// package must have exported fields only. A field tagged `codec:"-"`
+// is neither written nor read.
 //
 //	go run ./tools/gencodec -root .
 //
@@ -30,6 +31,7 @@ import (
 	"go/types"
 	"os"
 	"path/filepath"
+	"reflect"
 	"slices"
 	"strings"
 
@@ -131,7 +133,10 @@ func (g *gen) walk(t types.Type) error {
 		}
 		g.order = append(g.order, u)
 		foreign := u.Obj().Pkg() != g.sema
-		for f := range st.Fields() {
+		for i, f := range fields(st) {
+			if skipped(st, i) {
+				continue
+			}
 			if foreign && !f.Exported() {
 				if partial[key] {
 					continue
@@ -174,6 +179,24 @@ func (g *gen) walk(t types.Type) error {
 		return nil
 	}
 	return fmt.Errorf("unsupported type %s", t)
+}
+
+// fields returns the fields of st with their indices.
+func fields(st *types.Struct) func(func(int, *types.Var) bool) {
+	return func(yield func(int, *types.Var) bool) {
+		for i := range st.NumFields() {
+			if !yield(i, st.Field(i)) {
+				return
+			}
+		}
+	}
+}
+
+// skipped reports whether field i of st is tagged `codec:"-"`: state
+// that is never stored (a result's memory of the analysis it reused,
+// #53), so the codec neither writes nor reads it.
+func skipped(st *types.Struct, i int) bool {
+	return reflect.StructTag(st.Tag(i)).Get("codec") == "-"
 }
 
 // id is the Go identifier part of a named type: Decl, eval_Type.
@@ -371,8 +394,8 @@ func (g *gen) file() ([]byte, error) {
 		id := g.id(n)
 		st := n.Underlying().(*types.Struct)
 		var enc, dec strings.Builder
-		for f := range st.Fields() {
-			if n.Obj().Pkg() != g.sema && !f.Exported() {
+		for i, f := range fields(st) {
+			if skipped(st, i) || n.Obj().Pkg() != g.sema && !f.Exported() {
 				continue
 			}
 			x := "v." + f.Name()
