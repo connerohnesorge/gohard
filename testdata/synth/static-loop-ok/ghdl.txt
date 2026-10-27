@@ -1,0 +1,176 @@
+command: ghdl --synth --std=08 top.vhd -e top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 0
+--- stderr
+--- stdout
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+entity top is
+  port (
+    x: in unsigned (7 downto 0);
+    n: out natural range 0 to 8
+  );
+end entity;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+architecture rtl of top is
+  subtype typ_wrap_x is std_logic_vector (7 downto 0);
+  signal wrap_x: typ_wrap_x;
+  subtype typ_wrap_n is std_logic_vector (3 downto 0);
+  signal wrap_n: typ_wrap_n;
+  signal n4 : std_logic;
+  signal n11 : std_logic_vector (3 downto 0);
+  signal n15 : std_logic;
+  signal n17 : std_logic;
+  signal n19 : std_logic_vector (3 downto 0);
+  signal n23 : std_logic;
+  signal n25 : std_logic;
+  signal n26 : std_logic;
+  signal n28 : std_logic;
+  signal n29 : std_logic;
+  signal n30 : std_logic;
+  signal n32 : std_logic_vector (3 downto 0);
+  signal n36 : std_logic;
+  signal n38 : std_logic;
+  signal n39 : std_logic;
+  signal n41 : std_logic;
+  signal n42 : std_logic;
+  signal n43 : std_logic;
+  signal n45 : std_logic_vector (3 downto 0);
+  signal n49 : std_logic;
+  signal n51 : std_logic;
+  signal n52 : std_logic;
+  signal n54 : std_logic;
+  signal n55 : std_logic;
+  signal n56 : std_logic;
+  signal n58 : std_logic_vector (3 downto 0);
+  signal n62 : std_logic;
+  signal n64 : std_logic;
+  signal n65 : std_logic;
+  signal n67 : std_logic;
+  signal n68 : std_logic;
+  signal n69 : std_logic;
+  signal n71 : std_logic_vector (3 downto 0);
+  signal n75 : std_logic;
+  signal n77 : std_logic;
+  signal n78 : std_logic;
+  signal n80 : std_logic;
+  signal n81 : std_logic;
+  signal n82 : std_logic;
+  signal n84 : std_logic_vector (3 downto 0);
+  signal n88 : std_logic;
+  signal n90 : std_logic;
+  signal n91 : std_logic;
+  signal n93 : std_logic;
+  signal n94 : std_logic;
+  signal n95 : std_logic;
+  signal n97 : std_logic_vector (3 downto 0);
+  signal n103 : std_logic;
+  signal n106 : std_logic;
+begin
+  wrap_x <= typ_wrap_x(x);
+  n <= to_integer (unsigned (wrap_n));
+  wrap_n <= n97;
+  -- top.vhd:20:11
+  n4 <= wrap_x (0);
+  -- top.vhd:20:7
+  n11 <= "1000" when n4 = '0' else "0000";
+  -- top.vhd:20:7
+  n15 <= '1' when n4 = '0' else '0';
+  -- top.vhd:20:11
+  n17 <= wrap_x (1);
+  -- top.vhd:20:7
+  n19 <= n11 when n28 = '0' else "0001";
+  -- top.vhd:20:7
+  n23 <= n15 when n29 = '0' else '0';
+  -- top.vhd:20:7
+  n25 <= n15 and n17;
+  -- top.vhd:20:7
+  n26 <= n15 and n17;
+  -- top.vhd:20:7
+  n28 <= n25 and n15;
+  -- top.vhd:20:7
+  n29 <= n26 and n15;
+  -- top.vhd:20:11
+  n30 <= wrap_x (2);
+  -- top.vhd:20:7
+  n32 <= n19 when n41 = '0' else "0010";
+  -- top.vhd:20:7
+  n36 <= n23 when n42 = '0' else '0';
+  -- top.vhd:20:7
+  n38 <= n23 and n30;
+  -- top.vhd:20:7
+  n39 <= n23 and n30;
+  -- top.vhd:20:7
+  n41 <= n38 and n23;
+  -- top.vhd:20:7
+  n42 <= n39 and n23;
+  -- top.vhd:20:11
+  n43 <= wrap_x (3);
+  -- top.vhd:20:7
+  n45 <= n32 when n54 = '0' else "0011";
+  -- top.vhd:20:7
+  n49 <= n36 when n55 = '0' else '0';
+  -- top.vhd:20:7
+  n51 <= n36 and n43;
+  -- top.vhd:20:7
+  n52 <= n36 and n43;
+  -- top.vhd:20:7
+  n54 <= n51 and n36;
+  -- top.vhd:20:7
+  n55 <= n52 and n36;
+  -- top.vhd:20:11
+  n56 <= wrap_x (4);
+  -- top.vhd:20:7
+  n58 <= n45 when n67 = '0' else "0100";
+  -- top.vhd:20:7
+  n62 <= n49 when n68 = '0' else '0';
+  -- top.vhd:20:7
+  n64 <= n49 and n56;
+  -- top.vhd:20:7
+  n65 <= n49 and n56;
+  -- top.vhd:20:7
+  n67 <= n64 and n49;
+  -- top.vhd:20:7
+  n68 <= n65 and n49;
+  -- top.vhd:20:11
+  n69 <= wrap_x (5);
+  -- top.vhd:20:7
+  n71 <= n58 when n80 = '0' else "0101";
+  -- top.vhd:20:7
+  n75 <= n62 when n81 = '0' else '0';
+  -- top.vhd:20:7
+  n77 <= n62 and n69;
+  -- top.vhd:20:7
+  n78 <= n62 and n69;
+  -- top.vhd:20:7
+  n80 <= n77 and n62;
+  -- top.vhd:20:7
+  n81 <= n78 and n62;
+  -- top.vhd:20:11
+  n82 <= wrap_x (6);
+  -- top.vhd:20:7
+  n84 <= n71 when n93 = '0' else "0110";
+  -- top.vhd:20:7
+  n88 <= n75 when n94 = '0' else '0';
+  -- top.vhd:20:7
+  n90 <= n75 and n82;
+  -- top.vhd:20:7
+  n91 <= n75 and n82;
+  -- top.vhd:20:7
+  n93 <= n90 and n75;
+  -- top.vhd:20:7
+  n94 <= n91 and n75;
+  -- top.vhd:20:11
+  n95 <= wrap_x (7);
+  -- top.vhd:20:7
+  n97 <= n84 when n106 = '0' else "0111";
+  -- top.vhd:20:7
+  n103 <= n88 and n95;
+  -- top.vhd:20:7
+  n106 <= n103 and n88;
+end rtl;

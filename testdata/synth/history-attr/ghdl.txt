@@ -1,0 +1,8 @@
+command: ghdl --synth --std=08 top.vhd -e top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 1
+--- stderr
+top.vhd:13:19:error: last_value attribute not allowed
+  q <= '1' when a'last_value = '0' and a'stable(5 ns) else '0';
+                  ^
+--- stdout

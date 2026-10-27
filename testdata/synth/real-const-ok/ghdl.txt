@@ -1,0 +1,52 @@
+command: ghdl --synth --std=08 top.vhd -e top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 0
+--- stderr
+--- stdout
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.math_real.all;
+entity top is
+  generic (
+    DEPTH: positive := 100
+  );
+  port (
+    clk: in std_ulogic;
+    rst: in std_ulogic;
+    q: out unsigned (integer (ceil (log2 (real (DEPTH)))) - 1 downto 0)
+  );
+end entity;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+architecture rtl of top is
+  signal wrap_clk: std_logic;
+  signal wrap_rst: std_logic;
+  subtype typ_wrap_q is std_logic_vector (6 downto 0);
+  signal wrap_q: typ_wrap_q;
+  signal count : std_logic_vector (6 downto 0);
+  signal n4 : std_logic_vector (6 downto 0);
+  signal n6 : std_logic_vector (6 downto 0);
+  signal n9 : std_logic_vector (6 downto 0);
+begin
+  wrap_clk <= clk;
+  wrap_rst <= rst;
+  q <= unsigned(wrap_q);
+  wrap_q <= count;
+  -- top.vhd:20:10
+  count <= n9; -- (signal)
+  -- top.vhd:28:24
+  n4 <= std_logic_vector (unsigned (count) + unsigned'("0000001"));
+  -- top.vhd:25:7
+  n6 <= n4 when wrap_rst = '0' else "0000000";
+  -- top.vhd:24:5
+  process (wrap_clk)
+  begin
+    if rising_edge (wrap_clk) then
+      n9 <= n6;
+    end if;
+  end process;
+end rtl;

@@ -1,0 +1,46 @@
+command: ghdl --synth --std=08 top.vhd -e top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 0
+--- stderr
+top.vhd:28:12:note: found ROM "n4", width: 8 bits, depth: 4
+  constant rom : rom_t := load("rom.txt");
+           ^
+--- stdout
+library ieee;
+use ieee.std_logic_1164.all;
+use std.textio.all;
+entity top is
+  port (
+    addr: in natural range 0 to 3;
+    q: out std_ulogic_vector (7 downto 0)
+  );
+end entity;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+architecture rtl of top is
+  subtype typ_wrap_addr is std_logic_vector (1 downto 0);
+  signal wrap_addr: typ_wrap_addr;
+  subtype typ_wrap_q is std_logic_vector (7 downto 0);
+  signal wrap_q: typ_wrap_q;
+  signal n8 : std_logic_vector (7 downto 0);
+begin
+  wrap_addr <= std_logic_vector(to_unsigned(addr, 2));
+  q <= std_ulogic_vector(wrap_q);
+  wrap_q <= n8;
+  -- top.vhd:30:12
+  process (wrap_addr) is
+    type n6_type is array (0 to 3)
+      of std_logic_vector (7 downto 0);
+    variable n6 : n6_type :=
+      (3 => "00001000",
+       2 => "00000100",
+       1 => "00000010",
+       0 => "00000001");
+  begin
+    n8 <= n6(to_integer (unsigned (wrap_addr)));
+  end process;
+  -- top.vhd:30:12
+end rtl;

@@ -1,0 +1,20 @@
+command: ghdl --synth --std=08 --work=neorv32 --out=none rtl/core/neorv32_package.vhd rtl/core/neorv32_sys.vhd rtl/core/neorv32_prim.vhd rtl/core/neorv32_cpu_decompressor.vhd rtl/core/neorv32_cpu_frontend.vhd rtl/core/neorv32_cpu_control.vhd rtl/core/neorv32_cpu_hwtrig.vhd rtl/core/neorv32_cpu_counters.vhd rtl/core/neorv32_cpu_alu_shifter.vhd rtl/core/neorv32_cpu_alu_muldiv.vhd rtl/core/neorv32_cpu_alu_bitmanip.vhd rtl/core/neorv32_cpu_alu_fpu.vhd rtl/core/neorv32_cpu_alu_cond.vhd rtl/core/neorv32_cpu_alu_crypto.vhd rtl/core/neorv32_cpu_alu.vhd rtl/core/neorv32_cpu_lsu.vhd rtl/core/neorv32_cpu_pmp.vhd rtl/core/neorv32_cpu_trace.vhd rtl/core/neorv32_cpu.vhd rtl/core/neorv32_cache.vhd rtl/core/neorv32_bus.vhd rtl/core/neorv32_core_complex.vhd rtl/core/neorv32_dma.vhd rtl/core/neorv32_smc.vhd rtl/core/neorv32_xbus.vhd rtl/core/neorv32_sdi.vhd rtl/core/neorv32_gpio.vhd rtl/core/neorv32_wdt.vhd rtl/core/neorv32_clint.vhd rtl/core/neorv32_uart.vhd rtl/core/neorv32_spi.vhd rtl/core/neorv32_twi.vhd rtl/core/neorv32_twd.vhd rtl/core/neorv32_pwm.vhd rtl/core/neorv32_trng.vhd rtl/core/neorv32_neoled.vhd rtl/core/neorv32_gptmr.vhd rtl/core/neorv32_onewire.vhd rtl/core/neorv32_slink.vhd rtl/core/neorv32_tracer.vhd rtl/core/neorv32_sysinfo.vhd rtl/core/neorv32_debug_dtm.vhd rtl/core/neorv32_debug_auth.vhd rtl/core/neorv32_debug_dm.vhd rtl/core/neorv32_top.vhd rtl/core/neorv32_cpu_alu_cfu.vhd rtl/core/neorv32_cpu_regfile.vhd rtl/core/neorv32_cache_ram.vhd rtl/core/neorv32_imem_image.vhd rtl/core/neorv32_imem.vhd rtl/core/neorv32_dmem.vhd rtl/core/neorv32_bootrom_image.vhd rtl/core/neorv32_bootrom.vhd rtl/core/neorv32_cfs.vhd -e neorv32_top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 0
+--- stderr
+rtl/core/neorv32_top.vhd:397:5:(assert note): [NEORV32] The NEORV32 RISC-V Processor (v01.13.06.00), github.com/stnolting/neorv32
+rtl/core/neorv32_top.vhd:406:5:(assert note): [NEORV32] Processor Configuration: CPU (single-core) BOOTROM SYSINFO 
+rtl/core/neorv32_top.vhd:447:5:(assert warning): [NEORV32] CLOCK_FREQUENCY must be configured according to the frequency of clk_i port!
+rtl/core/neorv32_top.vhd:451:5:(assert note): [NEORV32] BOOT_MODE_SELECT 0 - booting via bootloader
+rtl/core/neorv32_bootrom_image.vhd:8:10:note: found ROM "n1471", width: 32 bits, depth: 1024
+constant image_data_c : rom_t := (
+         ^
+rtl/core/neorv32_cpu.vhd:156:5:(assert note): [NEORV32] CPU ISA: rv32ix_zicsr_zifencei
+rtl/core/neorv32_cpu.vhd:201:5:(assert note): [NEORV32] CPU tuning options: fast_mul_regs=1 rf_arch=sram_sync 
+rtl/core/neorv32_cpu_regfile.vhd:60:10:note: found RAM "regfile", width: 32 bits, depth: 32
+  signal regfile : regfile_t;
+         ^
+rtl/core/neorv32_prim.vhd:143:14:note: found RAM "memory_large.memory_large_async_read.fifo", width: 17 bits, depth: 2
+      signal fifo : ram_t;
+             ^
+--- stdout

@@ -1,0 +1,51 @@
+command: ghdl --synth --std=08 --work=neorv32 --out=none -gTRACE_PORT_EN=true -gDUAL_CORE_EN=true -gOCD_EN=true -gOCD_AUTHENTICATION=true -gRISCV_ISA_C=true -gRISCV_ISA_M=true -gRISCV_ISA_U=true -gRISCV_ISA_Zaamo=true -gRISCV_ISA_Zalrsc=true -gRISCV_ISA_Zba=true -gRISCV_ISA_Zbb=true -gRISCV_ISA_Zbc=true -gRISCV_ISA_Zbkb=true -gRISCV_ISA_Zbkc=true -gRISCV_ISA_Zbkx=true -gRISCV_ISA_Zbs=true -gRISCV_ISA_Zcb=true -gRISCV_ISA_Zcmop=true -gRISCV_ISA_Zfinx=true -gRISCV_ISA_Zibi=true -gRISCV_ISA_Zicntr=true -gRISCV_ISA_Zicond=true -gRISCV_ISA_Zihpm=true -gRISCV_ISA_Zimop=true -gRISCV_ISA_Zknd=true -gRISCV_ISA_Zkne=true -gRISCV_ISA_Zknh=true -gRISCV_ISA_Zksed=true -gRISCV_ISA_Zksh=true -gRISCV_ISA_Smcntrpmf=true -gRISCV_ISA_Xcfu=true -gCPU_CONSTT_BR_EN=true -gCPU_FAST_MUL_EN=true -gCPU_FAST_SHIFT_EN=true -gPMP_TOR_MODE_EN=true -gPMP_NAP_MODE_EN=true -gIMEM_EN=true -gIMEM_OUTREG_EN=true -gDMEM_EN=true -gDMEM_OUTREG_EN=true -gICACHE_EN=true -gDCACHE_EN=true -gCACHE_BURSTS_EN=true -gSMC_EN=true -gXBUS_EN=true -gXBUS_REGSTAGE_EN=true -gIO_GPIO_DIR_EN=true -gIO_CLINT_EN=true -gIO_UART0_EN=true -gIO_UART1_EN=true -gIO_SPI_EN=true -gIO_SDI_EN=true -gIO_TWI_EN=true -gIO_TWD_EN=true -gIO_WDT_EN=true -gIO_TRNG_EN=true -gIO_CFS_EN=true -gIO_NEOLED_EN=true -gIO_ONEWIRE_EN=true -gIO_DMA_EN=true -gIO_SLINK_EN=true -gIO_TRACER_EN=true -gIO_TRACER_SIMLOG_EN=true -gCLOCK_FREQUENCY=100000000 -gOCD_NUM_HW_TRIGGERS=4 -gPMP_NUM_REGIONS=4 -gHPM_NUM_CNTS=4 -gIO_GPIO_NUM=8 -gIO_PWM_NUM=4 -gIO_GPTMR_NUM=2 rtl/core/neorv32_package.vhd rtl/core/neorv32_sys.vhd rtl/core/neorv32_prim.vhd rtl/core/neorv32_cpu_decompressor.vhd rtl/core/neorv32_cpu_frontend.vhd rtl/core/neorv32_cpu_control.vhd rtl/core/neorv32_cpu_hwtrig.vhd rtl/core/neorv32_cpu_counters.vhd rtl/core/neorv32_cpu_alu_shifter.vhd rtl/core/neorv32_cpu_alu_muldiv.vhd rtl/core/neorv32_cpu_alu_bitmanip.vhd rtl/core/neorv32_cpu_alu_fpu.vhd rtl/core/neorv32_cpu_alu_cond.vhd rtl/core/neorv32_cpu_alu_crypto.vhd rtl/core/neorv32_cpu_alu.vhd rtl/core/neorv32_cpu_lsu.vhd rtl/core/neorv32_cpu_pmp.vhd rtl/core/neorv32_cpu_trace.vhd rtl/core/neorv32_cpu.vhd rtl/core/neorv32_cache.vhd rtl/core/neorv32_bus.vhd rtl/core/neorv32_core_complex.vhd rtl/core/neorv32_dma.vhd rtl/core/neorv32_smc.vhd rtl/core/neorv32_xbus.vhd rtl/core/neorv32_sdi.vhd rtl/core/neorv32_gpio.vhd rtl/core/neorv32_wdt.vhd rtl/core/neorv32_clint.vhd rtl/core/neorv32_uart.vhd rtl/core/neorv32_spi.vhd rtl/core/neorv32_twi.vhd rtl/core/neorv32_twd.vhd rtl/core/neorv32_pwm.vhd rtl/core/neorv32_trng.vhd rtl/core/neorv32_neoled.vhd rtl/core/neorv32_gptmr.vhd rtl/core/neorv32_onewire.vhd rtl/core/neorv32_slink.vhd rtl/core/neorv32_tracer.vhd rtl/core/neorv32_sysinfo.vhd rtl/core/neorv32_debug_dtm.vhd rtl/core/neorv32_debug_auth.vhd rtl/core/neorv32_debug_dm.vhd rtl/core/neorv32_top.vhd rtl/core/neorv32_cpu_alu_cfu.vhd rtl/core/neorv32_cpu_regfile.vhd rtl/core/neorv32_cache_ram.vhd rtl/core/neorv32_imem_image.vhd rtl/core/neorv32_imem.vhd rtl/core/neorv32_dmem.vhd rtl/core/neorv32_bootrom_image.vhd rtl/core/neorv32_bootrom.vhd rtl/core/neorv32_cfs.vhd -e neorv32_top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 0
+--- stderr
+rtl/core/neorv32_top.vhd:397:5:(assert note): [NEORV32] The NEORV32 RISC-V Processor (v01.13.06.00), github.com/stnolting/neorv32
+rtl/core/neorv32_top.vhd:406:5:(assert note): [NEORV32] Processor Configuration: CPU (smp-dual-core) IMEM DMEM BOOTROM I-CACHE D-CACHE SMC XBUS CLINT GPIO UART0 UART1 SPI SDI TWI TWD PWM WDT TRNG CFS NEOLED GPTMR ONEWIRE DMA SLINK SYSINFO TRACER OCD OCD-AUTH OCD-HWBP 
+rtl/core/neorv32_top.vhd:451:5:(assert note): [NEORV32] BOOT_MODE_SELECT 0 - booting via bootloader
+rtl/core/neorv32_bootrom_image.vhd:8:10:note: found ROM "n4641", width: 32 bits, depth: 1024
+constant image_data_c : rom_t := (
+         ^
+rtl/core/neorv32_debug_dm.vhd:133:12:note: found ROM "n10999", width: 32 bits, depth: 16
+  constant code_rom_c : code_rom_t := (
+           ^
+rtl/core/neorv32_cpu.vhd:156:5:(assert note): [NEORV32] CPU ISA: rv32iabcmux_zaamo_zalrsc_zba_zbb_zbc_zbkb_zbkc_zbkx_zbs_zca_zcb_zcmop_zfinx_zibi_zicntr_zicond_zicsr_zifencei_zihpm_zimop_zkn_zknd_zkne_zknh_zks_zksed_zksh_zkt_sdext_sdtrig_smcntrpmf_smpmp_xcfu
+rtl/core/neorv32_cpu.vhd:201:5:(assert note): [NEORV32] CPU tuning options: trace constt_br fast_mul fast_mul_regs=1 fast_shift rf_arch=sram_sync 
+rtl/core/neorv32_prim.vhd:127:14:note: found RAM "memory_large.memory_large_sync_read.fifo", width: 32 bits, depth: 4
+      signal fifo : ram_t;
+             ^
+rtl/core/neorv32_prim.vhd:228:12:note: found RAM "memory_large.spram", width: 8 bits, depth: 4096
+    signal spram : ram_t;
+           ^
+rtl/core/neorv32_prim.vhd:228:12:note: found RAM "memory_large.spram", width: 8 bits, depth: 2048
+    signal spram : ram_t;
+           ^
+rtl/core/neorv32_prim.vhd:127:14:note: found RAM "memory_large.memory_large_sync_read.fifo", width: 32 bits, depth: 16
+      signal fifo : ram_t;
+             ^
+rtl/core/neorv32_trng.vhd:320:3:(assert note): [neoTRNG] The neoTRNG (v3.4) - A Tiny and Platform-Independent True Random Number Generator, github.com/stnolting/neoTRNG
+rtl/core/neorv32_debug_auth.vhd:67:3:(assert warning): [NEORV32] Using DEFAULT on-chip debugger authenticator. Replace by custom module.
+rtl/core/neorv32_cpu_regfile.vhd:60:10:note: found RAM "regfile", width: 32 bits, depth: 32
+  signal regfile : regfile_t;
+         ^
+rtl/core/neorv32_prim.vhd:228:12:note: found RAM "memory_large.spram", width: 1 bits, depth: 4
+    signal spram : ram_t;
+           ^
+rtl/core/neorv32_prim.vhd:143:14:note: found RAM "memory_large.memory_large_async_read.fifo", width: 17 bits, depth: 2
+      signal fifo : ram_t;
+             ^
+rtl/core/neorv32_cpu_alu_crypto.vhd:57:12:note: found ROM "n36302", width: 8 bits, depth: 512
+  constant aes_sbox_c : rom512x8_t := (
+           ^
+rtl/core/neorv32_cpu_alu_crypto.vhd:95:12:note: found ROM "n36871", width: 8 bits, depth: 256
+  constant sm4_sbox_c : rom256x8_t := (
+           ^
+rtl/core/neorv32_prim.vhd:228:12:note: found RAM "memory_large.spram", width: 24 bits, depth: 4
+    signal spram : ram_t;
+           ^
+rtl/core/neorv32_prim.vhd:228:12:note: found RAM "memory_large.spram", width: 8 bits, depth: 64
+    signal spram : ram_t;
+           ^
+--- stdout

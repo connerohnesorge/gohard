@@ -1,0 +1,21 @@
+command: ghdl --synth --std=08 top.vhd -e top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 2
+--- stderr
+top.vhd:16:14:error: variable with access type is not synthesizable
+    variable l : line;
+             ^
+
+******************** GHDL Bug occurred ***************************
+Please report this bug on https://github.com/ghdl/ghdl/issues
+GHDL release: 6.0.0 (tarball) [Dunoon edition]
+Compiled with GNAT Version: 16.2.0
+Target: x86_64-unknown-linux-gnu
+<example directory>
+Command line:
+ghdl --synth --std=08 top.vhd -e top
+Exception TYPES.INTERNAL_ERROR raised
+Exception information:
+raised TYPES.INTERNAL_ERROR : synth-vhdl_expr.adb:359
+******************************************************************
+--- stdout

@@ -1,0 +1,17 @@
+netlist shapes of NEORV32 (ghdl --synth --out=vhdl, see record.sh)
+default:
+  edge-as-data 0
+  gate_mdff    0
+  init-signal  0
+full:
+  edge-as-data 0
+  gate_mdff    0
+  init-signal  0
+rf-latch:
+  edge-as-data 0
+  gate_mdff    0
+  init-signal  0
+serial-shift:
+  edge-as-data 0
+  gate_mdff    0
+  init-signal  0

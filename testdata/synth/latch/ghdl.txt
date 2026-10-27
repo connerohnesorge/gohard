@@ -1,0 +1,8 @@
+command: ghdl --synth --std=08 top.vhd -e top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 1
+--- stderr
+top.vhd:8:5:error: latch infered for net "q" (use --latches)
+    q  : out std_ulogic
+    ^
+--- stdout

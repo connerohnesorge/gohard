@@ -1,0 +1,8 @@
+command: ghdl --synth --std=08 top.vhd -e top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 1
+--- stderr
+top.vhd:21:23:error: unhandled dyn operation: IIR_PREDEFINED_PHYSICAL_GREATER
+  q <= '1' when stamp > 100 ns else '0';
+                      ^
+--- stdout

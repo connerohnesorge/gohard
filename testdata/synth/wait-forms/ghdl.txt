@@ -1,0 +1,8 @@
+command: ghdl --synth --std=08 top.vhd -e top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 1
+--- stderr
+top.vhd:19:5:error: wait statement not allowed for synthesis
+    wait until rising_edge(clk);
+    ^
+--- stdout

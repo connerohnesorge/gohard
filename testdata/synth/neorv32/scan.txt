@@ -1,0 +1,40 @@
+text scan of NEORV32 (lines with a hit; see record.sh)
+rtl/file_list_core.f, synthesis-off regions removed:
+  wait          0
+  after-delay   0
+  time-now      0
+  sim-control   4
+  access-type   0
+  file-io       0
+  real-signal   0
+  shared-var    0
+  init-signal   0
+  guarded       1
+  history-attr  0
+  while-loop    0
+rtl/file_list_core.f, synthesis-off regions kept:
+  wait          0
+  after-delay   0
+  time-now      1
+  sim-control   4
+  access-type   0
+  file-io       3
+  real-signal   0
+  shared-var    0
+  init-signal   0
+  guarded       1
+  history-attr  0
+  while-loop    0
+sim/*.vhd, synthesis-off regions kept:
+  wait          15
+  after-delay   3
+  time-now      2
+  sim-control   0
+  access-type   1
+  file-io       5
+  real-signal   8
+  shared-var    0
+  init-signal   21
+  guarded       0
+  history-attr  0
+  while-loop    1
