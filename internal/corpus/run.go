@@ -35,6 +35,10 @@ type Options struct {
 	// Profile, when set, records the steps of the run's interpreted
 	// calls by package (the #35 native-body rule).
 	Profile *sema.Profile
+	// Simulating, when set, is called once analysis and elaboration
+	// are done, right before the kernel is built and run: the
+	// benchmarks time the simulation alone from there (#59).
+	Simulating func()
 }
 
 // Produced is one produced diagnostic with the simulated time of the
@@ -149,6 +153,9 @@ func Execute(r Run, src map[string][]byte, o Options) (*Result, error) {
 			out.Pending = []string{"(no interpreter)"}
 		}
 		return out, nil
+	}
+	if o.Simulating != nil {
+		o.Simulating()
 	}
 	rec := trace.NewRecorder(sc.DumpScope)
 	opts := sim.Options{Seed: o.Seed, TimeBudget: sim.Time(sc.TimeBudget),

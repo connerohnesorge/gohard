@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # shellcheck source-path=SCRIPTDIR
-# Nightly benchmarks (#19, #22, #30, #35). Runs every Benchmark* that
-# exists (BenchmarkSim is the simulation throughput benchmark) and the
-# ieee step and CPU shares of the #35 native-body rule, and records the
+# Nightly benchmarks (#19, #22, #30, #35, #59). Runs every Benchmark*
+# that exists (BenchmarkSim is the simulation throughput benchmark of
+# the corpus designs, BenchmarkSimNEORV32 that of the NEORV32
+# testbench, both with simfs/s, simulated femtoseconds per wall second
+# of simulation; NEORV32 also with cycles/s) and the ieee step and CPU
+# shares of the #35 native-body rule (NEORV32 included), and records the
 # numbers in $BENCH_OUT (default bench.txt in the repo root) and the
 # job summary. Never fails the job: benchmark numbers are recorded, not
 # gated. Later stages only add Benchmark* functions; this script picks
