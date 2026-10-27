@@ -2,6 +2,7 @@ package span
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 	"unicode/utf8"
 )
@@ -303,6 +304,52 @@ func TestUTF8PositionSnapsLikeForwardWalk(t *testing.T) {
 				t.Fatalf("case %d %q off %d: %v, want %v", n, src, off,
 					got, want)
 			}
+		}
+	}
+}
+
+// TestCursorMatchesPosition: a Cursor gives Index.Position at every
+// offset of a random walk that mostly moves forward and sometimes
+// jumps back or to another line, under every encoding (#55).
+func TestCursorMatchesPosition(t *testing.T) {
+	r := &rng{s: 5}
+	for n, src := range inputs(4, 2000) {
+		x := NewIndex([]byte(src))
+		for _, enc := range []Encoding{UTF8, UTF16, UTF32} {
+			c := x.Cursor(enc)
+			off := 0
+			for range 3 * (len(src) + 1) {
+				if r.intn(8) == 0 {
+					off = r.intn(len(src)+3) - 1
+				} else {
+					off += r.intn(3)
+				}
+				want := x.Position(off, enc)
+				if got := c.Position(off); got != want {
+					t.Fatalf("case %d %q %s off %d: %v, want %v", n, src,
+						enc, off, got, want)
+				}
+			}
+		}
+	}
+}
+
+// TestCursorLinear: converting every offset of a long line in order,
+// each twice, decodes each rune once, where Index.Position decodes
+// from the line start every time (#55: quadratic on a long line).
+func TestCursorLinear(t *testing.T) {
+	src := []byte("x := (" + strings.Repeat("é😀, ", 5000) + ");\n")
+	x := NewIndex(src)
+	runes := utf8.RuneCount(src[:x.LineEnd(0)])
+	for _, enc := range []Encoding{UTF16, UTF32} {
+		c := x.Cursor(enc)
+		for off := 0; off <= x.LineEnd(0); off++ {
+			c.Position(off)
+			c.Position(off)
+		}
+		if c.Steps() > runes {
+			t.Errorf("%s: %d runes decoded, want at most %d", enc,
+				c.Steps(), runes)
 		}
 	}
 }

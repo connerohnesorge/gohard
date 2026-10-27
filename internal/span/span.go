@@ -230,6 +230,54 @@ func (x *Index) Position(off int, enc Encoding) Position {
 	return Position{Line: line, Col: col}
 }
 
+// A Cursor converts byte offsets of one Index to positions in one
+// encoding, giving the same result as Index.Position. It keeps the
+// rune boundary it last decoded to, so a run of increasing offsets on
+// a line costs one decoding pass over the line, not one per offset
+// (#55: semantic tokens on a long line).
+type Cursor struct {
+	x   *Index
+	enc Encoding
+	// off is a rune boundary of line reached by decoding forward from
+	// the line start, and col its column in enc.
+	line, off, col int
+	steps          int
+}
+
+// Cursor returns a cursor over x in enc, before the text start.
+func (x *Index) Cursor(enc Encoding) *Cursor {
+	return &Cursor{x: x, enc: enc, line: -1}
+}
+
+// Position returns x.Position(off, enc). An offset on the line of the
+// previous call and not before it continues decoding from there; any
+// other starts again from its line start.
+func (c *Cursor) Position(off int) Position {
+	if c.enc == UTF8 {
+		return c.x.Position(off, UTF8) // already O(1)
+	}
+	line := c.x.Line(off)
+	start, end := c.x.lines[line], c.x.LineEnd(line)
+	off = max(start, min(off, end))
+	if line != c.line || off < c.off {
+		c.line, c.off, c.col = line, start, 0
+	}
+	for c.off < off {
+		r, size := utf8.DecodeRune(c.x.src[c.off:end])
+		if c.off+size > off {
+			break // off is inside this rune: snap back
+		}
+		c.steps++
+		c.col += units(r, size, c.enc)
+		c.off += size
+	}
+	return Position{Line: line, Col: c.col}
+}
+
+// Steps returns the number of runes the cursor has decoded, the
+// measure of its work (0 under UTF8, whose columns need no decoding).
+func (c *Cursor) Steps() int { return c.steps }
+
 // Offset converts a position in enc back to a byte offset. A column past
 // the end of the line is clamped to the line end, and a column inside a
 // rune (such as between the two halves of a UTF-16 surrogate pair) is
