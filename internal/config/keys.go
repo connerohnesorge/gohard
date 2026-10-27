@@ -355,6 +355,19 @@ var keys = []Key{
 		"A signal never read or never assigned, an in port never read, "+
 			"an out port never assigned (`lint/unused-signal`).",
 		func(c *Config) *string { return &c.Lint.UnusedSignal }),
+	boolKey("inlay_hints.parameter_names", "false",
+		"Show the formal name before each positional actual of a "+
+			"subprogram call, generic map or port map.",
+		func(c *Config) *bool { return &c.InlayHints.ParameterNames }),
+	boolKey("inlay_hints.types", "false",
+		"Show the type of an object alias declared without a subtype "+
+			"indication and of a loop parameter.",
+		func(c *Config) *bool { return &c.InlayHints.Types }),
+	boolKey("inlay_hints.values", "false",
+		"Show the static value of a constant or a generic default when "+
+			"static evaluation succeeds within the editor's limit of "+
+			"1,000,000 steps.",
+		func(c *Config) *bool { return &c.InlayHints.Values }),
 	boolKey("simulation.auto_run_on_save", "false",
 		"When on, testbench candidates whose dependencies changed "+
 			"run after a short debounce on save. The code lens and "+
@@ -524,11 +537,16 @@ func (p *parser) vars(key string, n *yaml.Node) ([]Var, bool) {
 	return out, ok
 }
 
+const inlayHintsDoc = "Inlay hints in the language server (#56), each " +
+	"kind off by default. Editors can set them through " +
+	"`initializationOptions` or `workspace/didChangeConfiguration`."
+
 // groupDocs describes each key group, in Groups order.
 var groupDocs = map[string]string{
 	"psl":            "PSL parsing.",
 	"format":         "The formatter (`gohard fmt`, #32).",
 	"lint":           "Lint rules (#54): `off`, `hint` or `warning` each.",
+	"inlay_hints":    inlayHintsDoc,
 	"simulation":     "Elaboration and simulation (#35).",
 	"simulation.env": "The deterministic `std.env` environment (v1.1).",
 }

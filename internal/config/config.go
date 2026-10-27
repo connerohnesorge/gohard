@@ -49,6 +49,7 @@ type Config struct {
 	Defines    []Define
 	Format     Format
 	Lint       Lint
+	InlayHints InlayHints
 	Simulation Simulation
 
 	// set records the position of every key the file set validly.
@@ -75,6 +76,14 @@ type Lint struct {
 	Latch           string
 	SensitivityList string
 	UnusedSignal    string
+}
+
+// InlayHints holds the inlay_hints.* keys (#56): each kind of inlay
+// hint the language server shows, all off by default.
+type InlayHints struct {
+	ParameterNames bool
+	Types          bool
+	Values         bool
 }
 
 // Simulation holds the simulation.* keys (#35).

@@ -113,6 +113,30 @@ gohard.yaml:2:18: warning[config/redundant-default]: lint.unused_signal is set t
 summary: 0 errors, 1 warnings, 0 hints, 1 files
 set lint.unused_signal = "warning"
 
+== inlay_hints.parameter_names
+| inlay_hints:
+|   parameter_names: false
+exit 0
+gohard.yaml:2:20: warning[config/redundant-default]: inlay_hints.parameter_names is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set inlay_hints.parameter_names = false
+
+== inlay_hints.types
+| inlay_hints:
+|   types: false
+exit 0
+gohard.yaml:2:10: warning[config/redundant-default]: inlay_hints.types is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set inlay_hints.types = false
+
+== inlay_hints.values
+| inlay_hints:
+|   values: false
+exit 0
+gohard.yaml:2:11: warning[config/redundant-default]: inlay_hints.values is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set inlay_hints.values = false
+
 == simulation.auto_run_on_save
 | simulation:
 |   auto_run_on_save: false

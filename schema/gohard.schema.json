@@ -137,6 +137,28 @@
         }
       }
     },
+    "inlay_hints": {
+      "description": "Inlay hints in the language server (#56), each kind off by default. Editors can set them through `initializationOptions` or `workspace/didChangeConfiguration`.",
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "parameter_names": {
+          "description": "Show the formal name before each positional actual of a subprogram call, generic map or port map.",
+          "type": "boolean",
+          "default": false
+        },
+        "types": {
+          "description": "Show the type of an object alias declared without a subtype indication and of a loop parameter.",
+          "type": "boolean",
+          "default": false
+        },
+        "values": {
+          "description": "Show the static value of a constant or a generic default when static evaluation succeeds within the editor's limit of 1,000,000 steps.",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
     "simulation": {
       "description": "Elaboration and simulation (#35).",
       "type": ["object", "null"],

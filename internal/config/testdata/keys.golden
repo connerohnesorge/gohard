@@ -25,6 +25,13 @@ exit 2
 gohard.yaml:2:3: error[config/unknown-key]: unknown key lint.bogus
 summary: 1 errors, 0 warnings, 0 hints, 1 files
 
+== unknown key at inlay_hints
+| inlay_hints:
+|   bogus: 1
+exit 2
+gohard.yaml:2:3: error[config/unknown-key]: unknown key inlay_hints.bogus
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
 == unknown key at simulation
 | simulation:
 |   bogus: 1
@@ -183,6 +190,33 @@ gohard.yaml:2:18: warning[config/redundant-default]: lint.unused_signal is set t
 gohard.yaml:3:3: error[config/duplicate-key]: duplicate key lint.unused_signal (first set on line 2)
 summary: 1 errors, 1 warnings, 0 hints, 1 files
 set lint.unused_signal = "warning"
+
+== duplicate inlay_hints.parameter_names
+| inlay_hints:
+|   parameter_names: true
+|   parameter_names: true
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key inlay_hints.parameter_names (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set inlay_hints.parameter_names = true
+
+== duplicate inlay_hints.types
+| inlay_hints:
+|   types: true
+|   types: true
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key inlay_hints.types (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set inlay_hints.types = true
+
+== duplicate inlay_hints.values
+| inlay_hints:
+|   values: true
+|   values: true
+exit 2
+gohard.yaml:3:3: error[config/duplicate-key]: duplicate key inlay_hints.values (first set on line 2)
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+set inlay_hints.values = true
 
 == duplicate simulation.auto_run_on_save
 | simulation:

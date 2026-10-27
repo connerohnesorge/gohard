@@ -56,6 +56,9 @@ that loads an invalid configuration exits 2.
 | [`lint.latch`](#lintlatch) | off\|hint\|warning | `warning` |
 | [`lint.sensitivity_list`](#lintsensitivity_list) | off\|hint\|warning | `warning` |
 | [`lint.unused_signal`](#lintunused_signal) | off\|hint\|warning | `warning` |
+| [`inlay_hints.parameter_names`](#inlay_hintsparameter_names) | bool | `false` |
+| [`inlay_hints.types`](#inlay_hintstypes) | bool | `false` |
+| [`inlay_hints.values`](#inlay_hintsvalues) | bool | `false` |
 | [`simulation.auto_run_on_save`](#simulationauto_run_on_save) | bool | `false` |
 | [`simulation.testbenches`](#simulationtestbenches) | list of entity names | `[]` |
 | [`simulation.seed`](#simulationseed) | uint64 | `0` |
@@ -172,6 +175,27 @@ A signal never read or never assigned, an in port never read, an out port never 
 
 * Type: off|hint|warning
 * Default: `warning`
+
+### `inlay_hints.parameter_names`
+
+Show the formal name before each positional actual of a subprogram call, generic map or port map.
+
+* Type: bool
+* Default: `false`
+
+### `inlay_hints.types`
+
+Show the type of an object alias declared without a subtype indication and of a loop parameter.
+
+* Type: bool
+* Default: `false`
+
+### `inlay_hints.values`
+
+Show the static value of a constant or a generic default when static evaluation succeeds within the editor's limit of 1,000,000 steps.
+
+* Type: bool
+* Default: `false`
 
 ### `simulation.auto_run_on_save`
 

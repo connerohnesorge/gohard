@@ -910,6 +910,138 @@ exit 2
 gohard.yaml:2:18: error[config/enum]: lint.unused_signal must be one of "off", "hint" or "warning", not yes
 summary: 1 errors, 0 warnings, 0 hints, 1 files
 
+== inlay_hints.parameter_names: {a: 1}
+| inlay_hints:
+|   parameter_names: {a: 1}
+exit 2
+gohard.yaml:2:20: error[config/type]: inlay_hints.parameter_names must be true or false, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: [1, 2]
+| inlay_hints:
+|   parameter_names: [1, 2]
+exit 2
+gohard.yaml:2:20: error[config/type]: inlay_hints.parameter_names must be true or false, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: ~
+| inlay_hints:
+|   parameter_names: ~
+exit 2
+gohard.yaml:2:20: error[config/type]: inlay_hints.parameter_names must be true or false, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: *x
+| x: &x 1
+| inlay_hints:
+|   parameter_names: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:20: error[config/type]: inlay_hints.parameter_names must be true or false, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: !!int 5
+| inlay_hints:
+|   parameter_names: !!int 5
+exit 2
+gohard.yaml:2:20: error[config/type]: inlay_hints.parameter_names must be true or false, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: maybe
+| inlay_hints:
+|   parameter_names: maybe
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not maybe
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: {a: 1}
+| inlay_hints:
+|   types: {a: 1}
+exit 2
+gohard.yaml:2:10: error[config/type]: inlay_hints.types must be true or false, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: [1, 2]
+| inlay_hints:
+|   types: [1, 2]
+exit 2
+gohard.yaml:2:10: error[config/type]: inlay_hints.types must be true or false, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: ~
+| inlay_hints:
+|   types: ~
+exit 2
+gohard.yaml:2:10: error[config/type]: inlay_hints.types must be true or false, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: *x
+| x: &x 1
+| inlay_hints:
+|   types: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:10: error[config/type]: inlay_hints.types must be true or false, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: !!int 5
+| inlay_hints:
+|   types: !!int 5
+exit 2
+gohard.yaml:2:10: error[config/type]: inlay_hints.types must be true or false, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: maybe
+| inlay_hints:
+|   types: maybe
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not maybe
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: {a: 1}
+| inlay_hints:
+|   values: {a: 1}
+exit 2
+gohard.yaml:2:11: error[config/type]: inlay_hints.values must be true or false, not a mapping
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: [1, 2]
+| inlay_hints:
+|   values: [1, 2]
+exit 2
+gohard.yaml:2:11: error[config/type]: inlay_hints.values must be true or false, not a list
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: ~
+| inlay_hints:
+|   values: ~
+exit 2
+gohard.yaml:2:11: error[config/type]: inlay_hints.values must be true or false, not null
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: *x
+| x: &x 1
+| inlay_hints:
+|   values: *x
+exit 2
+gohard.yaml:1:1: error[config/unknown-key]: unknown key x
+gohard.yaml:3:11: error[config/type]: inlay_hints.values must be true or false, not an alias (*x)
+summary: 2 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: !!int 5
+| inlay_hints:
+|   values: !!int 5
+exit 2
+gohard.yaml:2:11: error[config/type]: inlay_hints.values must be true or false, not a value tagged !!int
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: maybe
+| inlay_hints:
+|   values: maybe
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not maybe
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
 == simulation.auto_run_on_save: {a: 1}
 | simulation:
 |   auto_run_on_save: {a: 1}

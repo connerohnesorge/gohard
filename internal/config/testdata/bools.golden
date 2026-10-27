@@ -650,6 +650,513 @@ exit 2
 gohard.yaml:2:16: error[config/bad-bool]: format.align_ports must be true or false, not 1
 summary: 1 errors, 0 warnings, 0 hints, 1 files
 
+== inlay_hints.parameter_names: y
+| inlay_hints:
+|   parameter_names: y
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: Y
+| inlay_hints:
+|   parameter_names: Y
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not Y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: yes
+| inlay_hints:
+|   parameter_names: yes
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: Yes
+| inlay_hints:
+|   parameter_names: Yes
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not Yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: YES
+| inlay_hints:
+|   parameter_names: YES
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not YES
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: n
+| inlay_hints:
+|   parameter_names: n
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not n
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: N
+| inlay_hints:
+|   parameter_names: N
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not N
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: no
+| inlay_hints:
+|   parameter_names: no
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not no
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: No
+| inlay_hints:
+|   parameter_names: No
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not No
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: NO
+| inlay_hints:
+|   parameter_names: NO
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not NO
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: true
+| inlay_hints:
+|   parameter_names: true
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set inlay_hints.parameter_names = true
+
+== inlay_hints.parameter_names: True
+| inlay_hints:
+|   parameter_names: True
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not True
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: TRUE
+| inlay_hints:
+|   parameter_names: TRUE
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not TRUE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: false
+| inlay_hints:
+|   parameter_names: false
+exit 0
+gohard.yaml:2:20: warning[config/redundant-default]: inlay_hints.parameter_names is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set inlay_hints.parameter_names = false
+
+== inlay_hints.parameter_names: False
+| inlay_hints:
+|   parameter_names: False
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not False
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: FALSE
+| inlay_hints:
+|   parameter_names: FALSE
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not FALSE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: on
+| inlay_hints:
+|   parameter_names: on
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not on
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: On
+| inlay_hints:
+|   parameter_names: On
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not On
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: ON
+| inlay_hints:
+|   parameter_names: ON
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not ON
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: off
+| inlay_hints:
+|   parameter_names: off
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: Off
+| inlay_hints:
+|   parameter_names: Off
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not Off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: OFF
+| inlay_hints:
+|   parameter_names: OFF
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not OFF
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: quoted
+| inlay_hints:
+|   parameter_names: "true"
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not "true"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.parameter_names: number
+| inlay_hints:
+|   parameter_names: 1
+exit 2
+gohard.yaml:2:20: error[config/bad-bool]: inlay_hints.parameter_names must be true or false, not 1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: y
+| inlay_hints:
+|   types: y
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: Y
+| inlay_hints:
+|   types: Y
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not Y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: yes
+| inlay_hints:
+|   types: yes
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: Yes
+| inlay_hints:
+|   types: Yes
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not Yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: YES
+| inlay_hints:
+|   types: YES
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not YES
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: n
+| inlay_hints:
+|   types: n
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not n
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: N
+| inlay_hints:
+|   types: N
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not N
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: no
+| inlay_hints:
+|   types: no
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not no
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: No
+| inlay_hints:
+|   types: No
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not No
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: NO
+| inlay_hints:
+|   types: NO
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not NO
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: true
+| inlay_hints:
+|   types: true
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set inlay_hints.types = true
+
+== inlay_hints.types: True
+| inlay_hints:
+|   types: True
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not True
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: TRUE
+| inlay_hints:
+|   types: TRUE
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not TRUE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: false
+| inlay_hints:
+|   types: false
+exit 0
+gohard.yaml:2:10: warning[config/redundant-default]: inlay_hints.types is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set inlay_hints.types = false
+
+== inlay_hints.types: False
+| inlay_hints:
+|   types: False
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not False
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: FALSE
+| inlay_hints:
+|   types: FALSE
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not FALSE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: on
+| inlay_hints:
+|   types: on
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not on
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: On
+| inlay_hints:
+|   types: On
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not On
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: ON
+| inlay_hints:
+|   types: ON
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not ON
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: off
+| inlay_hints:
+|   types: off
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: Off
+| inlay_hints:
+|   types: Off
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not Off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: OFF
+| inlay_hints:
+|   types: OFF
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not OFF
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: quoted
+| inlay_hints:
+|   types: "true"
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not "true"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.types: number
+| inlay_hints:
+|   types: 1
+exit 2
+gohard.yaml:2:10: error[config/bad-bool]: inlay_hints.types must be true or false, not 1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: y
+| inlay_hints:
+|   values: y
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: Y
+| inlay_hints:
+|   values: Y
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not Y
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: yes
+| inlay_hints:
+|   values: yes
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: Yes
+| inlay_hints:
+|   values: Yes
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not Yes
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: YES
+| inlay_hints:
+|   values: YES
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not YES
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: n
+| inlay_hints:
+|   values: n
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not n
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: N
+| inlay_hints:
+|   values: N
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not N
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: no
+| inlay_hints:
+|   values: no
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not no
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: No
+| inlay_hints:
+|   values: No
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not No
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: NO
+| inlay_hints:
+|   values: NO
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not NO
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: true
+| inlay_hints:
+|   values: true
+exit 0
+summary: 0 errors, 0 warnings, 0 hints, 1 files
+set inlay_hints.values = true
+
+== inlay_hints.values: True
+| inlay_hints:
+|   values: True
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not True
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: TRUE
+| inlay_hints:
+|   values: TRUE
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not TRUE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: false
+| inlay_hints:
+|   values: false
+exit 0
+gohard.yaml:2:11: warning[config/redundant-default]: inlay_hints.values is set to its default value false
+summary: 0 errors, 1 warnings, 0 hints, 1 files
+set inlay_hints.values = false
+
+== inlay_hints.values: False
+| inlay_hints:
+|   values: False
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not False
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: FALSE
+| inlay_hints:
+|   values: FALSE
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not FALSE
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: on
+| inlay_hints:
+|   values: on
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not on
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: On
+| inlay_hints:
+|   values: On
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not On
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: ON
+| inlay_hints:
+|   values: ON
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not ON
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: off
+| inlay_hints:
+|   values: off
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: Off
+| inlay_hints:
+|   values: Off
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not Off
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: OFF
+| inlay_hints:
+|   values: OFF
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not OFF
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: quoted
+| inlay_hints:
+|   values: "true"
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not "true"
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
+== inlay_hints.values: number
+| inlay_hints:
+|   values: 1
+exit 2
+gohard.yaml:2:11: error[config/bad-bool]: inlay_hints.values must be true or false, not 1
+summary: 1 errors, 0 warnings, 0 hints, 1 files
+
 == simulation.auto_run_on_save: y
 | simulation:
 |   auto_run_on_save: y
