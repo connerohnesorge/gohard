@@ -10,12 +10,14 @@ import (
 
 // edgeStyle reports lint/clock-edge-style: a clk'event edge test in a
 // process of a design that also tests edges with rising_edge or
-// falling_edge, so one style is used throughout. 'event in a
-// subprogram (a change detector, an edge function) is not a clock edge
-// test of the design.
-func edgeStyle(res *sema.Result, sev diag.Severity) []diag.Diagnostic {
+// falling_edge, so one style is used throughout. Only 'event in the
+// condition of an if, elsif or wait is an edge test: 'event in a
+// subprogram (a change detector, an edge function) or in an assertion
+// is not a clock edge test of the design.
+func edgeStyle(res *sema.Result, m *meter, sev diag.Severity,
+) []finding {
 	type tick struct {
-		f  *sema.File
+		u  *sema.Unit
 		at cst.Range
 	}
 	var ticks []tick
@@ -26,12 +28,15 @@ func edgeStyle(res *sema.Result, sev diag.Severity) []diag.Diagnostic {
 		}
 		after := false
 		for t := range u.Node.DescendantTokens() {
+			if !m.spend(u, 1) {
+				break
+			}
 			s := strings.ToLower(t.Text())
 			switch {
 			case s == "rising_edge" || s == "falling_edge":
 				call = true
-			case after && s == "event" && inProcess(t):
-				ticks = append(ticks, tick{u.File, t.Span()})
+			case after && s == "event" && edgeTest(t):
+				ticks = append(ticks, tick{u, t.Span()})
 			}
 			after = s == "'"
 		}
@@ -39,24 +44,39 @@ func edgeStyle(res *sema.Result, sev diag.Severity) []diag.Diagnostic {
 	if !call {
 		return nil
 	}
-	var ds []diag.Diagnostic
+	var out []finding
 	for _, t := range ticks {
 		f := diag.New(diag.LintClockEdgeStyle)
 		f.Severity = sev
-		ds = append(ds, at(t.f, t.at, f))
+		out = append(out, finding{t.u, at(t.u.File, t.at, f)})
 	}
-	return ds
+	return out
 }
 
-// inProcess reports whether t is in a process statement and not in a
-// subprogram.
-func inProcess(t cst.Token) bool {
+// edgeTest reports whether t is in the condition of an if, elsif or
+// wait statement of a process, not in a subprogram.
+func edgeTest(t cst.Token) bool {
+	cond := false
 	for n := range t.Parent().Ancestors() {
 		switch n.Kind() {
 		case cst.KindProcessStmt:
-			return true
+			return cond
 		case cst.KindSubprogramBody:
 			return false
+		case cst.KindIfStmt, cst.KindElsifBranch, cst.KindWaitStmt:
+			cond = true
+		case cst.KindAssertStmt, cst.KindReportStmt, cst.KindCaseStmt,
+			cst.KindLoopStmt, cst.KindExitStmt, cst.KindNextStmt,
+			cst.KindReturnStmt, cst.KindConditionalReturnStmt,
+			cst.KindSignalAssignStmt, cst.KindVariableAssignStmt,
+			cst.KindConditionalSignalAssignStmt,
+			cst.KindConditionalVariableAssignStmt,
+			cst.KindSelectedSignalAssignStmt,
+			cst.KindSelectedVariableAssignStmt,
+			cst.KindForceAssignStmt, cst.KindProcedureCallStmt:
+			if !cond {
+				return false // in a statement other than the test
+			}
 		}
 	}
 	return false

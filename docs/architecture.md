@@ -66,6 +66,7 @@ Env, maps SIGINT/SIGTERM to 130/143, and calls `cli.Run`.
 | 5 | `internal/sema` | scopes, names, types, overloads, static evaluation (shared evaluator) | #34 |
 | 4 | `internal/libs` | `gohard libs detect`: the read-only search of vendor installs (Vivado, Quartus, Diamond), vendor variables, `PATH` and GHDL library indexes through `env.FS`/`Getenv`; the `gohard.yaml` edits shared with the "library not found" quick fix | #1 |
 | 5 | `internal/resolve` | queries over sema results: definition, references, hover data | #34 |
+| 5 | `internal/lint` | lint rules over a sema result, run by `gohard check` and the language server after `hier`; each unit's lint runs under a budget of 1,000,000 steps, past which the unit gets `sema/eval-limit` in place of its findings | #54 |
 | 5 | `internal/cache` | the on-disk analysis cache `.gohard/cache` (#37): whole-cache key, file format and versioning, recovery; sema stores and restores the entries (`sema.Cache`) | #37 |
 | 6 | `internal/elab` | lowers a resolved design to a compact model; instance paths like `tb.dut.u0` | #35 |
 | 6 | `internal/sim` | single-threaded discrete-event kernel ordered by (time, delta, process sequence) | #35 |
@@ -123,7 +124,7 @@ wording is locked when v1.0 ships. Codes are `area/kebab-name`:
 | `library/` | #34 | `library/unmapped`, `library/duplicate-unit`, `library/import-cycle` |
 | `stdlib/` | #33 | `stdlib/integrity` |
 | `sema/` | #34 | `sema/ambiguous-overload`, `sema/eval-limit`, `sema/unchecked-unit` |
-| `lint/` | #54 | `lint/unused-signal` |
+| `lint/` | #54 | `lint/unused-signal`, `lint/sensitivity-list`, `lint/latch`, `lint/clock-edge-style` |
 | `unsupported/` | #20 | `unsupported/construct` ("please report") |
 | `format/` | #32 | `format/would-change` |
 | `sim/` | #35, #29 | `sim/budget-exceeded`, `sim/assert-error`, `sim/race` |
