@@ -490,7 +490,7 @@ with an NVC 1.23 recording where NVC supports it).
 | `testdata/cli/<case>/` | `cmd`, `want.exit`, `want.stdout`, `want.stderr`, optional `in/`, `stdin`, `want/`; run in-process at `-p 1` and `-p 16`, each with a cold, warm and corrupted analysis cache (see its README) | #20, #37 |
 | `testdata/lsp/<action>/<case>/` | `gohard lsp <action>` fixtures | #26 |
 | `testdata/parse/<rule>/` | one valid file with a tree dump, one invalid file with an error position | #31 |
-| `testdata/corpus/<name>/` + `corpus.yaml` | the 15 oracle designs (#8, #27); goldens under `golden/` | #8 |
+| `testdata/corpus/<name>/` + `corpus.yaml` | the 16 oracle designs (#8, #27, #109); goldens under `golden/` | #8 |
 | `testdata/conformance/<feature>/` | the #18 VHDL-2019 cases: `<case>.vhd`, `.want`, optional `.nvc.txt` (see its README) | #18 |
 | `testdata/fuzz/<Target>/` | saved inputs for `FuzzParse`, `FuzzFormat`, `FuzzLSPReplay`, `FuzzConfig`; `FuzzElab` and `FuzzSim` keep theirs under `internal/elab` and `internal/simrun` (#58) | #30 |
 | `testdata/seeds/<pkg>/` | committed generator failures and LSP sessions, replayed by `go test` | #29 |

@@ -28,7 +28,7 @@ Triggers: `pull_request`, pushes to `main` and `v1`, manual dispatch.
 | `detlint` | `detlint.sh` (`go run ./tools/detlint ./...`) | wired; needs `tools/detlint` (#30) |
 | `go test -race` on Linux | `race.sh` | wired for `internal/env/realenv`, `internal/jsonrpc2` and `internal/server` (real pipe transport) |
 | Parser-regression set (`pr` submodules, stdlib, corpus) | `regression.sh pr` | placeholder; later #31 with #8's `corpus.yaml` |
-| Corpus designs at seeds 0..3, including the v1.1 designs `prot_cond` and `gc_heap` | `go test` (`internal/corpus` `TestCorpus`, `-corpus.seeds` defaults to 4); `SEEDS=4 corpus-seeds.sh` adds `-corpus.require-sim` and the oracle check | wired; designs that cannot simulate yet are logged by plain `go test` and fail under `corpus-seeds.sh` until the sequential interpreter registers `simrun.DefaultCode` |
+| Corpus designs at seeds 0..3, including the v1.1 designs `prot_cond`, `gc_heap` and `psl_comments` | `go test` (`internal/corpus` `TestCorpus`, `-corpus.seeds` defaults to 4); `SEEDS=4 corpus-seeds.sh` adds `-corpus.require-sim` and the oracle check | wired; designs that cannot simulate yet are logged by plain `go test` and fail under `corpus-seeds.sh` until the sequential interpreter registers `simrun.DefaultCode` |
 | `testdata/cli` fixtures at `-p 1` and `-p 16` | `go test` (`internal/cli`) | wired |
 | `testdata/lsp` and `testdata/parse` fixtures | `go test` | `testdata/lsp` wired (#25, see its README); `testdata/parse` later (#31) |
 | Liveness workload (60 s virtual, 5 s no-progress rule) | `go test` | wired: `TestLiveness` and `TestNoProgressRule` in `internal/server` |
