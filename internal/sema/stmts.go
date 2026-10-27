@@ -1553,7 +1553,7 @@ func (a *analyzer) vunit(lu cst.Node) {
 			for n := range (cst.PSLHierarchicalName{Node: c}).Names() {
 				a.lenientName(n.Node)
 			}
-			a.vunitArch(c) // psl.go
+			a.vunitArch() // psl.go
 		case c.Kind() == cst.KindPSLInheritSpec:
 			for n := range (cst.PSLInheritSpec{Node: c}).Names() {
 				a.lenientName(n.Node)

@@ -1,6 +1,10 @@
 package sema
 
-import "testing"
+import (
+	"slices"
+	"strings"
+	"testing"
+)
 
 // TestPSLNamesAndBuiltins: a named sequence or property is a PSL
 // operand by its name (IEEE 1850 6.1.1.1, 6.2.4), not a value error;
@@ -116,4 +120,110 @@ vunit v2(mwe(behavioral))
 {
 }
 `}})
+}
+
+// vunitDesign binds PSL verification units to a design entity in
+// another file (#110). a_props.vhd sorts before dut.vhd, so the vunits
+// see the bound units only because they depend on them. Lines marked
+// --E have an error.
+var vunitDesign = map[string]string{
+	"a_props.vhd": `vunit v_arch(dut(rtl)) {
+  default clock is rising_edge(clk);
+  assert always (a -> b);
+  assert always (q -> width = 4);
+}
+vunit v_entity(work.dut) {
+  default clock is rising_edge(clk);
+  assert always (a -> b);
+  assert always (q -> a); --E
+}
+vunit v_nope(dut(nope)) { --E
+  default clock is rising_edge(clk);
+  assert always (a -> b);
+}
+vunit v_typo(dut(rtl)) {
+  default clock is rising_edge(clk);
+  assert always (a -> bb); --E
+}
+`,
+	"dut.vhd": `library ieee;
+use ieee.std_logic_1164.all;
+entity dut is
+  generic (width : natural := 4);
+  port (clk : in std_logic; a, b : in std_logic);
+end entity;
+architecture rtl of dut is
+  signal q : std_logic;
+begin
+  q <= a and b;
+end architecture;
+`,
+}
+
+// TestVunitBoundNames: inside a verification unit bound to e(arch),
+// the declarations of e and arch and e's context clause are visible;
+// bound to e alone, only e's (IEEE 1850 7.2, #110).
+func TestVunitBoundNames(t *testing.T) {
+	r := analyze(t, vunitDesign, nil)
+	type line struct {
+		path string
+		n    int
+	}
+	var want, got []line
+	for _, p := range slices.Sorted(mapsKeys(vunitDesign)) {
+		for i, l := range strings.Split(vunitDesign[p], "\n") {
+			if strings.Contains(l, "--E") {
+				want = append(want, line{p, i + 1})
+			}
+		}
+	}
+	for _, d := range r.Diagnostics {
+		if d.Severity.String() == "error" {
+			got = append(got, line{d.Path, d.Line})
+		}
+	}
+	if !slices.Equal(got, want) {
+		t.Errorf("error lines %v, want %v\n%s", got, want, diagText(r))
+	}
+	src := vunitDesign["a_props.vhd"]
+	for _, c := range []struct {
+		at   int // occurrence index of name in a_props.vhd
+		name string
+		kind DeclKind
+		line int // of the declaration in dut.vhd
+	}{
+		{0, "clk", DeclPort, 5}, {0, "a -> b", DeclPort, 5},
+		{0, "q ->", DeclSignal, 8}, {0, "width", DeclGeneric, 4},
+		{1, "clk", DeclPort, 5}, {3, "clk", DeclPort, 5},
+	} {
+		off := nthOffset(src, c.name, c.at)
+		ref, ok := r.RefAt("a_props.vhd", off)
+		if !ok || ref.Decl == nil {
+			t.Errorf("%s #%d: no reference", c.name, c.at)
+			continue
+		}
+		d := ref.Decl
+		if l, _ := d.File.Lines.LineCol(d.Span.Start); d.Kind != c.kind ||
+			d.File.Path != "dut.vhd" || l != c.line {
+			t.Errorf("%s #%d: %s at %s:%d, want %s at dut.vhd:%d",
+				c.name, c.at, d.Kind, d.File.Path, l, c.kind, c.line)
+		}
+	}
+}
+
+// nthOffset returns the offset of the n-th (from 0) occurrence of sub
+// in s, -1 when there is none.
+func nthOffset(s, sub string, n int) int {
+	off := 0
+	for {
+		i := strings.Index(s[off:], sub)
+		if i < 0 {
+			return -1
+		}
+		if n == 0 {
+			return off + i
+		}
+		n--
+		off += i + len(sub)
+	}
 }

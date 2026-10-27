@@ -334,16 +334,49 @@ func (a *analyzer) pslClock(c cst.Node) {
 // vunit v(e(arch)): e's architecture arch exists (IEEE 1850 7.2, LRM
 // 2008 Annex: the binding names a design unit), checked once every
 // unit is analyzed.
-func (a *analyzer) vunitArch(h cst.Node) {
+func (a *analyzer) vunitArch() {
+	k, arch, ok := vunitBinding(a.u.Lib, a.u.Library)
+	if !ok || arch.IsZero() {
+		return
+	}
+	// The unit is named in the working library (the vunit's own).
+	l := a.s.libs[a.u.Library]
+	if l == nil {
+		return
+	}
+	if u, ok := l.UnitFrom(k, a.u); ok && u.Decl != nil &&
+		u.Decl.Kind == DeclEntity {
+		a.lateArch(arch, u.Decl)
+	}
+}
+
+// vunitBinding returns the binding of the PSL verification unit lu,
+// `vunit v(e[(arch)])` (IEEE 1850 7.2, LRM 2008 Annex): the key of
+// the entity e and the architecture identifier, zero when not given.
+// The entity is named by a simple name or as work.e or own.e, where
+// own is the vunit's library; ok is false for a unit without a binding
+// and for one bound by an instance path (`tb.u`).
+func vunitBinding(lu cst.Node, own Key) (entity Key, arch cst.Token,
+	ok bool,
+) {
+	h, found := cst.Node{}, false
+	for c := range lu.Nodes() {
+		if c.Kind() == cst.KindPSLHierarchicalName {
+			h, found = c, true
+			break
+		}
+	}
+	if !found {
+		return "", cst.Token{}, false
+	}
 	var first cst.Node
 	for n := range (cst.PSLHierarchicalName{Node: h}).Names() {
 		first = n.Node
 		break
 	}
 	if first.IsZero() {
-		return
+		return "", cst.Token{}, false
 	}
-	var arch cst.Token
 	after := false
 	for e := range h.Elements() {
 		switch {
@@ -353,20 +386,78 @@ func (a *analyzer) vunitArch(h cst.Node) {
 			arch = e.Token
 		}
 	}
-	if arch.IsZero() {
-		return
+	switch first.Kind() {
+	case cst.KindSimpleName:
+		entity = TokenKey(cst.SimpleName{Node: first}.Ident())
+	case cst.KindSelectedName:
+		sel := cst.SelectedName{Node: first}
+		if lib := simpleKey(sel.Prefix().Node); lib == Work || lib == own {
+			entity = TokenKey(sel.Suffix())
+		}
 	}
-	if first.Kind() != cst.KindSimpleName {
-		return
+	return entity, arch, entity != ""
+}
+
+// boundUnits returns the units the PSL verification unit u is bound
+// to, as u sees them (#110): the entity and, when the binding names
+// one, its architecture; nil when not found. The architecture is
+// looked up among the entity's secondary units like a late reference
+// (resolveLate), except that one after u in u's own design file is
+// not analyzed yet when u is (LRM 13.5).
+func (s *session) boundUnits(u *Unit) (entity, arch *Unit) {
+	if u.Kind != UnitVunit {
+		return nil, nil
 	}
-	// The unit is named in the working library (the vunit's own).
-	l := a.s.libs[a.u.Library]
-	if l == nil {
-		return
+	ek, at, ok := vunitBinding(u.Lib, u.Library)
+	if !ok {
+		return nil, nil
 	}
-	k := TokenKey(cst.SimpleName{Node: first}.Ident())
-	if u, ok := l.UnitFrom(k, a.u); ok && u.Decl != nil &&
-		u.Decl.Kind == DeclEntity {
-		a.lateArch(arch, u.Decl)
+	l, ok := s.library(u, Work)
+	if !ok {
+		return nil, nil
 	}
+	e, ok := l.UnitFrom(ek, u)
+	if !ok || e.Kind != UnitEntity {
+		return nil, nil
+	}
+	if k := TokenKey(at); k != "" {
+		for _, sec := range l.Secondary(e.Name) {
+			if sec.Kind == UnitArchitecture && sec.Name == k &&
+				!analyzedLater(sec, u) {
+				arch = sec
+				break
+			}
+		}
+	}
+	return e, arch
+}
+
+// boundRegion returns the region a PSL verification unit's names are
+// looked up in after its own (#110): the bound architecture's, which
+// extends its entity's, or the entity's when the binding names no
+// architecture or one that does not exist; nil when u is not bound.
+// A vunit's items belong to the bound design entity, so its ports,
+// signals and context clauses are visible (IEEE 1850 7.2).
+func (a *analyzer) boundRegion() *Region {
+	e, arch := a.s.boundUnits(a.u)
+	for _, b := range []*Unit{arch, e} {
+		if b != nil && a.s.readable(a.u, b) && b.Region != nil {
+			return b.Region
+		}
+	}
+	return nil
+}
+
+// Binds reports whether u is a PSL verification unit bound to the
+// design entity of the entity unit entity and the architecture unit
+// arch (#110): its names are looked up in arch's region, or in
+// entity's when its binding names no existing architecture.
+func (u *Unit) Binds(entity, arch *Unit) bool {
+	if u == nil || u.Kind != UnitVunit || u.Context == nil ||
+		u.Context.Parent == nil {
+		return false
+	}
+	p := u.Context.Parent
+	return entity != nil && p == entity.Region ||
+		arch != nil && p == arch.Region
 }

@@ -202,6 +202,10 @@ func (s *session) linkDeps() {
 				}
 			}
 		}
+		// A verification unit sees its bound unit's names (psl.go).
+		e, arch := s.boundUnits(u)
+		add(e)
+		add(arch)
 		slices.SortFunc(deps, func(a, b *Unit) int {
 			return cmp.Compare(a.Index, b.Index)
 		})
@@ -225,6 +229,12 @@ func (s *session) linkAllDeps() {
 					!p.File.Bundled {
 					libs = append(libs, p.allLibs...)
 				}
+			}
+		}
+		e, arch := s.boundUnits(u)
+		for _, p := range []*Unit{e, arch} {
+			if p != nil && p.File != nil && !p.File.Bundled {
+				libs = append(libs, p.allLibs...)
 			}
 		}
 		if len(libs) == 0 {

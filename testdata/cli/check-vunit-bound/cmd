@@ -1,0 +1,5 @@
+# An inline PSL vunit bound to dut(rtl) in another file (#110): the
+# ports of dut, its context clause (rising_edge) and the declarations
+# of rtl are visible inside it, so no sema/undefined. The ports that
+# only the vunit reads are not lint/unused-signal.
+gohard check

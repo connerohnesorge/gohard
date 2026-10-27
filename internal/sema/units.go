@@ -217,24 +217,32 @@ func walkRegions(r *Region, f func(*Region)) {
 // inheritedRefs returns the selected names L.U of a secondary unit u
 // whose prefix L is a library that only u's primary unit declares: the
 // context clause of a primary unit applies to its secondary units (LRM
-// 13.1), so u depends on those units as on its own references.
+// 13.1), so u depends on those units as on its own references. A
+// PSL verification unit inherits likewise from the entity and the
+// architecture it is bound to (#110).
 func (s *session) inheritedRefs(u *Unit) []unitRef {
-	if u.Kind.Primary() && u.Kind != UnitConfiguration {
-		return nil
-	}
-	l, ok := s.library(u, Work)
-	if !ok {
-		return nil
-	}
-	p, ok := l.UnitFrom(u.Of, u)
-	if !ok || p.Lib.IsZero() || p.File == nil || p.File.Bundled {
-		return nil
+	var outer []*Unit
+	switch {
+	case u.Kind == UnitVunit:
+		e, arch := s.boundUnits(u) // psl.go
+		outer = []*Unit{e, arch}
+	case !u.Kind.Primary() || u.Kind == UnitConfiguration:
+		if l, ok := s.library(u, Work); ok {
+			if p, ok := l.UnitFrom(u.Of, u); ok {
+				outer = []*Unit{p}
+			}
+		}
 	}
 	own := libraryNames(u.Node)
 	extra := map[Key]bool{}
-	for k := range libraryNames(p.Node) {
-		if !own[k] {
-			extra[k] = true
+	for _, p := range outer {
+		if p == nil || p.Lib.IsZero() || p.File == nil || p.File.Bundled {
+			continue
+		}
+		for k := range libraryNames(p.Node) {
+			if !own[k] {
+				extra[k] = true
+			}
 		}
 	}
 	if len(extra) == 0 {

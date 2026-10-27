@@ -265,6 +265,9 @@ func (a *analyzer) unit() {
 			ctx.Parent = primary.Region
 		}
 	}
+	if u.Kind == UnitVunit {
+		ctx.Parent = a.boundRegion() // psl.go
+	}
 	a.cur = ctx
 	a.implicitContext()
 	a.contextClause(cst.DesignUnit{Node: u.Node}.Context())

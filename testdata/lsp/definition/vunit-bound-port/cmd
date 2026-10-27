@@ -1,0 +1,3 @@
+# a port of the entity a PSL vunit is bound to, used inside the vunit
+# (#110): the port in dut.vhd.
+gohard lsp definition --at props.vhd:2:32
