@@ -369,7 +369,7 @@ func TestAliases(t *testing.T) {
 	runCases(t, []lintCase{{
 		name: "unused-signal",
 		src: header + `entity e is
-  port (i : in std_logic; o : out std_logic; o2 : out std_logic);
+  port (i, v : in std_logic; o, o2, o3 : out std_logic);
 end;
 architecture a of e is
   type pair is record x, w : std_logic; end record;
@@ -380,11 +380,14 @@ architecture a of e is
   alias as_o is o;
   alias as_rx is r.x;
   alias as_never is only_aliased;
+  alias as_v is v;
+  alias as_as_v is as_v; -- a read through it is a read of v
 begin
   as_s <= as_i;
   as_o <= s;
   as_rx <= s;
   o2 <= r.x;
+  o3 <= as_as_v;
 end;
 `,
 		want: []string{

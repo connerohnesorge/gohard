@@ -158,7 +158,13 @@ func object(d *sema.Decl) *sema.Decl {
 			return d
 		}
 		if d.Value == nil {
-			return d.Denotes()
+			// An alias of an alias, or of a non-object: sema sets
+			// Target, not Value. The target may be an object alias.
+			if d.Target == nil || d.Target == d {
+				return d
+			}
+			d = d.Target
+			continue
 		}
 		x := named(d.Value)
 		if x == nil {
