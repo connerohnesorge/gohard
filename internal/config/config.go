@@ -146,7 +146,12 @@ func Defaults() Config {
 			AlignPorts:    true,
 			MaxLineLength: 80,
 		},
-		Lint: Lint{ClockEdgeStyle: "off", Latch: "warning", SensitivityList: "warning", UnusedSignal: "warning"},
+		Lint: Lint{
+			ClockEdgeStyle:  "off",
+			Latch:           "warning",
+			SensitivityList: "warning",
+			UnusedSignal:    "warning",
+		},
 		Simulation: Simulation{
 			TimeBudget:  Millisecond,
 			DeltaBudget: 10000,
