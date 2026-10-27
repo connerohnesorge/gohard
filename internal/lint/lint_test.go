@@ -156,6 +156,70 @@ end;
 	}})
 }
 
+// TestPortModesLatchSensitivity: lint/latch reports ports of mode out,
+// inout and buffer written on some paths, and lint/sensitivity-list
+// reports ports of mode in, inout and buffer read but not listed.
+func TestPortModesLatchSensitivity(t *testing.T) {
+	runCases(t, []lintCase{{
+		name: "latch",
+		src: header + `entity e is
+  port (en, d : in std_logic; o : out std_logic; io : inout std_logic;
+        b : buffer std_logic);
+end;
+architecture a of e is
+begin
+  p : process (en, d) begin
+    if en = '1' then
+      o <= d;
+      io <= d;
+      b <= d;
+    end if;
+  end process;
+end;
+`,
+		want: []string{
+			"a.vhd:10:7: lint/latch: o is not assigned on every path " +
+				"through the process, so it infers a latch",
+			"a.vhd:11:7: lint/latch: io is not assigned on every path " +
+				"through the process, so it infers a latch",
+			"a.vhd:12:7: lint/latch: b is not assigned on every path " +
+				"through the process, so it infers a latch",
+		},
+	}, {
+		name: "sensitivity",
+		src: header + `entity e is
+  port (i : in std_logic; io : inout std_logic; b : buffer std_logic;
+        y : out std_logic);
+end;
+architecture a of e is
+begin
+  p : process (i) begin
+    y <= i and io and b;
+  end process;
+end;
+`,
+		want: []string{
+			"a.vhd:9:16: lint/sensitivity-list: io is read in the " +
+				"process but is not in its sensitivity list",
+			"a.vhd:9:23: lint/sensitivity-list: b is read in the " +
+				"process but is not in its sensitivity list",
+		},
+	}, {
+		name: "all listed",
+		src: header + `entity e is
+  port (i : in std_logic; io : inout std_logic; b : buffer std_logic;
+        y : out std_logic);
+end;
+architecture a of e is
+begin
+  p : process (i, io, b) begin
+    y <= i and io and b;
+  end process;
+end;
+`,
+	}})
+}
+
 // TestGenerates: signals declared in generates, and processes inside
 // them, are checked like any other.
 func TestGenerates(t *testing.T) {
@@ -261,6 +325,25 @@ end;
 				"process but is not in its sensitivity list",
 			"a.vhd:7:16: lint/unused-signal: signal unread is never read",
 		},
+	}, {
+		// The sensitivity list, like the other rules, works on whole
+		// signals: listing one field of r covers reads of every field.
+		// A process that lists r.x and reads r.w misses events on
+		// r.w, but the rule stays silent rather than track fields.
+		name: "one field listed",
+		src: header + `entity e is
+  port (a, b : in std_logic; y : out std_logic);
+end;
+architecture a of e is
+  type pair is record x, w : std_logic; end record;
+  signal r : pair;
+begin
+  r <= (x => a, w => b);
+  p : process (r.x) begin
+    y <= r.w;
+  end process;
+end;
+`,
 	}, {
 		// A name read in the index of a target is a read, not a write.
 		name: "index of a target",
@@ -421,6 +504,42 @@ end;
 			"a.vhd:8:12: lint/clock-edge-style: this edge test uses " +
 				"'event; the design also uses rising_edge or falling_edge",
 			"a.vhd:18:20: lint/clock-edge-style: this edge test uses " +
+				"'event; the design also uses rising_edge or falling_edge",
+		},
+	}, {
+		// 'event in a process inside a generate, and 'event on an
+		// alias of the clock, are edge tests like any other.
+		name: "generate and alias",
+		src: header + `entity e is
+  port (clk : in std_logic; d : in std_logic_vector(1 downto 0);
+        q, r : out std_logic_vector(1 downto 0); s : out std_logic);
+end;
+architecture a of e is
+  alias c is clk;
+begin
+  g : for k in 0 to 1 generate
+    p : process (clk) begin
+      if clk'event and clk = '1' then
+        q(k) <= d(k);
+      end if;
+    end process;
+  end generate;
+  p2 : process (c) begin
+    if c'event and c = '1' then
+      s <= d(0);
+    end if;
+  end process;
+  p3 : process (clk) begin
+    if rising_edge(clk) then
+      r <= d;
+    end if;
+  end process;
+end;
+`,
+		want: []string{
+			"a.vhd:11:14: lint/clock-edge-style: this edge test uses " +
+				"'event; the design also uses rising_edge or falling_edge",
+			"a.vhd:17:10: lint/clock-edge-style: this edge test uses " +
 				"'event; the design also uses rising_edge or falling_edge",
 		},
 	}})

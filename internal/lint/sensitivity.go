@@ -14,7 +14,10 @@ import (
 // clock, so only combinational processes are checked. Reads in a
 // procedure call's arguments and attribute prefixes (s'length) are not
 // counted. A read through an alias is a read of its signal; the
-// finding names the alias as written, which the quick fix adds.
+// finding names the alias as written, which the quick fix adds. The
+// rule works on whole signals: an element or field in the list covers
+// reads of every element or field of that signal, so listing r.x and
+// reading r.w gives no finding.
 func sensitivity(res *sema.Result, m *meter, sev diag.Severity,
 ) []finding {
 	bad := errorFiles(res)
