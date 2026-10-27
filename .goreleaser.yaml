@@ -32,18 +32,37 @@ archives:
       - goos: windows
         formats: [zip]
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    # Reproducible (#50): every archive entry takes its time from the
+    # commit and a fixed owner and mode, not the checkout's file times,
+    # the runner's user or its umask. scripts/ci/release-repro.sh builds
+    # two snapshots from two clones and compares the bytes.
+    builds_info:
+      owner: root
+      group: root
+      mode: 0755
+      mtime: "{{ .CommitDate }}"
     # scripts/ci/archive-check.sh fails the release when an archive lacks
-    # the IEEE license files (#40).
+    # the IEEE license files (#40) or an entry has other file info.
     files:
-      - README.md
-      - docs/editors.md
+      - src: README.md
+        info: &doc
+          owner: root
+          group: root
+          mode: 0644
+          mtime: "{{ .CommitDate }}"
+      - src: docs/editors.md
+        info: *doc
       # The binary embeds the Apache-2.0 IEEE-P1076 packages, so their
       # license and copyright holders ship with it.
-      - internal/stdlib/LICENSE
-      - internal/stdlib/AUTHORS.md
+      - src: internal/stdlib/LICENSE
+        info: *doc
+      - src: internal/stdlib/AUTHORS.md
+        info: *doc
       # The project license (MPL-2.0) and authors (#38, #40).
-      - LICENSE
-      - AUTHORS.md
+      - src: LICENSE
+        info: *doc
+      - src: AUTHORS.md
+        info: *doc
 
 checksum:
   name_template: checksums.txt
