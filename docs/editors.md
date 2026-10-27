@@ -70,6 +70,13 @@ On Neovim 0.11 or later you can skip `setup()`. Put `editors/nvim` on
 the runtime path, then call `vim.lsp.enable('gohard')`. The plugin's
 `lsp/gohard.lua` holds the same configuration that `setup()` uses.
 
+The two differ only in a folder with no `gohard.yaml` and no `.git`
+above the file. There `setup()` sends the file's folder as the
+workspace folder. `vim.lsp.enable` sends no workspace folder, and the
+server then takes the folder of the first file opened as the project
+folder (#48). Either way the project is the same, like the CLI run
+from that folder, and the testbench lens shows up.
+
 Editor settings go under a `gohard` key in `settings`. They use the
 `gohard.yaml` keys of [config.md](config.md). Any key that
 `gohard.yaml` also sets keeps the `gohard.yaml` value, and the server
@@ -124,6 +131,11 @@ Neovim (`nvim --headless --clean`) through `editors/nvim/test/e2e.lua`:
 4. For both testbenches, the `gohard-sim` diagnostics must equal what
    `gohard lsp sim --tb NAME` reports on the same project, and "Copy
    repro" must fill a register.
+5. On Neovim 0.11 or later, a second run skips `setup()` and calls
+   `vim.lsp.enable('gohard')` with the shipped `lsp/gohard.lua`, in a
+   copy of `wait_forms` with no `gohard.yaml` or `.git` above it. The
+   client has no root and no workspace folder; the "▶ Run" lens must
+   still appear and the run must pass the checks of step 2 and 4.
 
 CI runs it on Linux (`scripts/ci/nvim.sh`). Run it locally with
 `nix develop -c bash editors/nvim/test/run.sh`.

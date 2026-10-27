@@ -1,6 +1,11 @@
 -- Headless Neovim end-to-end test of the GoHard plugin (#38, #25).
 -- Run by test/run.sh:
---   nvim --headless --clean -l e2e.lua PLUGIN_DIR GOHARD_BIN WORK
+--   nvim --headless --clean -l e2e.lua PLUGIN_DIR GOHARD_BIN WORK [MODE]
+-- MODE setup (the default) starts the server with
+-- require('gohard').setup(); MODE enable uses vim.lsp.enable('gohard')
+-- and the shipped lsp/gohard.lua instead (Neovim 0.11+, #48), in a
+-- WORK with no gohard.yaml or .git, and only runs the wait_forms
+-- testbench there.
 -- WORK holds copies of a passing and a failing corpus testbench
 -- (wait_forms, assert_fail) and the cross-file fixture. The test opens
 -- each testbench, runs its "▶ Run" code lens, waits for the run to end
@@ -9,8 +14,9 @@
 -- checks hover, definition, references and rename across files, and
 -- go-to-definition into the bundled ieee sources (md_resolve).
 
-local plugin, bin, work = arg[1], arg[2], arg[3]
-assert(plugin and bin and work, 'usage: e2e.lua PLUGIN_DIR GOHARD_BIN WORK')
+local plugin, bin, work, mode = arg[1], arg[2], arg[3], arg[4] or 'setup'
+assert(plugin and bin and work and (mode == 'setup' or mode == 'enable'),
+  'usage: e2e.lua PLUGIN_DIR GOHARD_BIN WORK [setup|enable]')
 vim.opt.runtimepath:prepend(plugin)
 vim.opt.swapfile = false
 vim.opt.shortmess:append('A')
@@ -28,14 +34,36 @@ local function check(ok, fmt, ...)
   end
   return ok
 end
+--- wait polls cond for up to ms. The deadline is checked by hand:
+--- a cond that itself waits (a synchronous request) keeps vim.wait's
+--- own timeout from firing, so a lens that never comes hung the test.
 local function wait(ms, cond)
-  return vim.wait(ms, cond, 20)
+  local hrtime = (vim.uv or vim.loop).hrtime
+  local stop, ok = hrtime() + ms * 1e6, false
+  vim.wait(ms, function()
+    ok = cond() and true or false
+    return ok or hrtime() > stop
+  end, 20)
+  return ok
 end
 
 local gohard = require('gohard')
 local commands = require('gohard.commands')
 local compat = require('gohard.compat')
-gohard.setup({ cmd = { bin, 'lsp' } })
+if mode == 'enable' then
+  -- The native config exactly as shipped (#48): no setup(), no
+  -- overrides, gohard found on PATH, the plugin file sourced as at
+  -- startup.
+  if vim.fn.has('nvim-0.11') == 0 then
+    log('SKIP vim.lsp.enable needs Neovim 0.11 or later')
+    os.exit(0)
+  end
+  vim.env.PATH = vim.fs.dirname(bin) .. ':' .. vim.env.PATH
+  vim.cmd.runtime('plugin/gohard.lua')
+  vim.lsp.enable('gohard')
+else
+  gohard.setup({ cmd = { bin, 'lsp' } })
+end
 
 --- open edits path and waits for an initialized gohard client.
 local function open(path)
@@ -362,8 +390,9 @@ local function bundle()
     err and vim.inspect(err) or htext)
 end
 
--- GOHARD_E2E_ONLY=name runs one part: cross-file, bundle, wait_forms or
--- assert_fail. GOHARD_E2E_LOG=1 writes the LSP log at debug level.
+-- GOHARD_E2E_ONLY=name runs one part: cross-file, bundle, wait_forms,
+-- assert_fail or (in enable mode) enable. GOHARD_E2E_LOG=1 writes the
+-- LSP log at debug level.
 local only = vim.env.GOHARD_E2E_ONLY
 if vim.env.GOHARD_E2E_LOG == '1' then
   vim.lsp.log.set_level('debug')
@@ -374,7 +403,32 @@ local function part(name, fn, ...)
     fn(...)
   end
 end
+--- enable: vim.lsp.enable('gohard') in a folder with no gohard.yaml
+--- and no .git (#48). Neovim attaches with no root and no workspace
+--- folder; the server takes the folder of the first opened file as the
+--- project root, so the testbench lens is there and runs.
+local function enable()
+  log('-- vim.lsp.enable in a folder with no root markers')
+  local dir = work .. '/wait_forms'
+  local markers = vim.fs.find({ 'gohard.yaml', '.git' },
+    { path = dir, upward = true })
+  check(#markers == 0, 'no gohard.yaml or .git above %s (%s)', dir,
+    table.concat(markers, ', '))
+  local _, client = open(dir .. '/wait_forms_tb.vhd')
+  if not client then
+    return
+  end
+  check(client.root_dir == nil and client.workspace_folders == nil,
+    'the client has no root and no workspace folder (%s, %s)',
+    tostring(client.root_dir), vim.inspect(client.workspace_folders))
+  testbench('wait_forms', 0)
+end
+
 local ok, e = pcall(function()
+  if mode == 'enable' then
+    part('enable', enable)
+    return
+  end
   part('cross-file', cross_file)
   part('bundle', bundle)
   part('wait_forms', testbench, 'wait_forms', 0)
