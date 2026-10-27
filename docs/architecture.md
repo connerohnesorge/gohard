@@ -55,6 +55,7 @@ Env, maps SIGINT/SIGTERM to 130/143, and calls `cli.Run`.
 | 0 | `internal/diag` | the diagnostic table, `Diagnostic`, sorting, exit codes, text/JSON/SARIF renderers | #20 |
 | 1 | `internal/config` | `gohard.yaml` via `yaml.Node`; project root; the key table that generates the schema and `docs/config.md` | #28 |
 | 1 | `internal/text` | immutable document text and incremental edits | #25 |
+| 1 | `internal/gen/vhdlgen` | seeded generator of small, legal, bounded VHDL designs (entities, generics, processes, waits, resolved signals) for `FuzzElab`, `FuzzSim` and property tests; a pure function of (seed, bytes) | #58 |
 | 1 | `internal/token` | token kinds; per-standard keyword table (data); PSL flags | #31 |
 | 2 | `internal/lexer` | bytes + standard -> tokens with trivia; PSL modes; conditional analysis as a token pass | #31 |
 | 2 | `internal/cst` | lossless red/green tree, content-derived IDs, kinds generated from `kinds.yaml` | #31 |
@@ -402,7 +403,7 @@ with an NVC 1.23 recording where NVC supports it).
 | `testdata/parse/<rule>/` | one valid file with a tree dump, one invalid file with an error position | #31 |
 | `testdata/corpus/<name>/` + `corpus.yaml` | the 15 oracle designs (#8, #27); goldens under `golden/` | #8 |
 | `testdata/conformance/<feature>/` | the #18 VHDL-2019 cases: `<case>.vhd`, `.want`, optional `.nvc.txt` (see its README) | #18 |
-| `testdata/fuzz/<Target>/` | saved inputs for `FuzzParse`, `FuzzFormat`, `FuzzLSPReplay`, `FuzzConfig` | #30 |
+| `testdata/fuzz/<Target>/` | saved inputs for `FuzzParse`, `FuzzFormat`, `FuzzLSPReplay`, `FuzzConfig`; `FuzzElab` and `FuzzSim` keep theirs under `internal/elab` and `internal/simrun` (#58) | #30 |
 | `testdata/seeds/<pkg>/` | committed generator failures and LSP sessions, replayed by `go test` | #29 |
 | `testdata/libs/` | pinned real libraries (OSVVM, UVVM, VUnit, regression sources) as submodules | #1, #8 |
 | `testdata/stubs/` | CI-only vendor stub packages | #1 |
