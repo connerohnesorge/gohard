@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"cmp"
 	"slices"
+	"sync"
 
 	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/cst"
@@ -248,6 +249,11 @@ type session struct {
 	cache Cache
 	uc    *unitCache
 	popts parser.Options
+	// pslMu guards File.PSL, which the jobs of one level write
+	// together when a file has several units with PSL code (vunits).
+	// Each job writes its own spans, so the result is the same in any
+	// order.
+	pslMu sync.Mutex
 }
 
 func (s *session) run() *Result {

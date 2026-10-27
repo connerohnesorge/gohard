@@ -19,6 +19,8 @@ func (a *analyzer) pslExpr(n cst.Node) *Expr {
 	a.inPSL++
 	e := a.expr(n, nil)
 	a.inPSL--
+	a.s.pslMu.Lock()
+	defer a.s.pslMu.Unlock()
 	if a.f.PSL == nil {
 		a.f.PSL = map[cst.Range]*Expr{}
 	}
