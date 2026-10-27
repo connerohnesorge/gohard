@@ -10,14 +10,26 @@ give the same bytes on every OS.
 
 Pick one:
 
+* Homebrew (macOS, Linux):
+  `brew install --cask connerohnesorge/tap/gohard`
+* Scoop (Windows):
+  `scoop bucket add connerohnesorge https://github.com/connerohnesorge/scoop-bucket`,
+  then `scoop install connerohnesorge/gohard`
+* nixpkgs: `nix profile install nixpkgs#gohard` (nixpkgs can lag a
+  release behind)
+* The Nix flake: `nix profile install github:connerohnesorge/gohard`,
+  or `nix run github:connerohnesorge/gohard -- version`.
 * Go 1.27 or newer:
   `go install github.com/connerohnesorge/gohard/cmd/gohard@latest`
 * A release binary from
   [GitHub Releases](https://github.com/connerohnesorge/gohard/releases)
   for linux, darwin or windows on amd64 or arm64. Verify the archive
-  with `sha256sum -c checksums.txt --ignore-missing`.
-* Nix: `nix profile install github:connerohnesorge/gohard`, or
-  `nix run github:connerohnesorge/gohard -- version`.
+  with `sha256sum -c checksums.txt --ignore-missing`, and where it
+  came from with `gh attestation verify <archive> --repo
+  connerohnesorge/gohard`.
+
+[docs/install.md](docs/install.md) has the details of each path and
+of verifying a release.
 
 Then run `gohard version`. It prints the version, the commit, the
 bundled IEEE library tag and commit, and the Go toolchain:
@@ -71,7 +83,9 @@ Releases are built by goreleaser on `v*` tags
 with `nix run nixpkgs#goreleaser -- release --snapshot --clean`.
 The archives are reproducible: two clones of the same commit give
 byte-identical archives and `checksums.txt`, which the release job
-checks with `scripts/ci/release-repro.sh` before it publishes.
+checks with `scripts/ci/release-repro.sh` before it publishes. The
+same run pushes the Homebrew cask and the Scoop manifest and attests
+the archives (`actions/attest`).
 
 ## License
 

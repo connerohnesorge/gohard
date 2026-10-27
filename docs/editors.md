@@ -23,6 +23,10 @@ Install `gohard` on your `PATH` first. Use any of these:
 * Nix: `nix profile install github:connerohnesorge/gohard`, or
   `nix run github:connerohnesorge/gohard -- version`, or `nix build`
   in a checkout (the flake's `packages.default`, at `./result/bin`)
+* a package manager: `brew install --cask connerohnesorge/tap/gohard`,
+  `scoop install connerohnesorge/gohard` after
+  `scoop bucket add connerohnesorge https://github.com/connerohnesorge/scoop-bucket`,
+  or `nix profile install nixpkgs#gohard` ([install.md](install.md))
 
 Check it with `gohard version`.
 

@@ -66,3 +66,64 @@ func TestCIExampleJUnit(t *testing.T) {
 		}
 	}
 }
+
+// TestInstallPathsListed pins the install docs (#69): the README
+// names every path of the docs/install.md table with the same command
+// or link, and the tap and bucket the commands name are the
+// repositories .goreleaser.yaml pushes the cask and Scoop manifest to.
+func TestInstallPathsListed(t *testing.T) {
+	read := func(path string) string {
+		raw, err := os.ReadFile("../../" + path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return strings.ReplaceAll(string(raw), "\r\n", "\n")
+	}
+	// flat collapses whitespace: the README wraps commands.
+	flat := func(s string) string {
+		return strings.Join(strings.Fields(s), " ")
+	}
+	install := read("docs/install.md")
+	readme := flat(read("README.md"))
+	release := flat(read(".goreleaser.yaml"))
+	var paths []string
+	for _, l := range strings.Split(install, "\n") {
+		cells := strings.Split(l, " | ")
+		if !strings.HasPrefix(l, "| ") || len(cells) != 3 ||
+			cells[0] == "| Path" || cells[1] == "---" {
+			continue
+		}
+		paths = append(paths, strings.TrimPrefix(cells[0], "| "))
+		// The command column: its code spans, or else its link.
+		want := strings.Split(cells[1], "`")
+		if len(want) == 1 {
+			_, link, _ := strings.Cut(cells[1], "](")
+			link, _, _ = strings.Cut(link, ")")
+			want = []string{"", link}
+		}
+		for i := 1; i < len(want); i += 2 {
+			if !strings.Contains(readme, flat(want[i])) {
+				t.Errorf("README.md lacks %s install %q", paths[len(paths)-1],
+					want[i])
+			}
+		}
+	}
+	if got := strings.Join(paths, ", "); got != "Homebrew, Scoop, "+
+		"nixpkgs, Nix flake, Go, Release archive" {
+		t.Errorf("docs/install.md table lists %s", got)
+	}
+	for _, link := range []struct{ cmd, repo string }{
+		{"brew install --cask connerohnesorge/tap/gohard",
+			"owner: connerohnesorge name: homebrew-tap"},
+		{"scoop bucket add connerohnesorge " +
+			"https://github.com/connerohnesorge/scoop-bucket",
+			"owner: connerohnesorge name: scoop-bucket"},
+	} {
+		if !strings.Contains(flat(install), link.cmd) {
+			t.Errorf("docs/install.md lacks %q", link.cmd)
+		}
+		if !strings.Contains(release, link.repo) {
+			t.Errorf(".goreleaser.yaml does not push to %q", link.repo)
+		}
+	}
+}
