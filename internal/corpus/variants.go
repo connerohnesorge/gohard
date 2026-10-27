@@ -133,7 +133,9 @@ func rename(src map[string][]byte, o parser.Options) map[string][]byte {
 		b := src[k]
 		if isVHDL(k) {
 			b = edit(b, o, func(t lexer.Token, text []byte) []byte {
-				if plainWord(t) && t.Kind == token.Identifier &&
+				// Identifiers in `-- psl` lines are renamed too: they
+				// name the same objects (#109).
+				if t.Kind == token.Identifier && t.Word == 0 &&
 					names[strings.ToLower(string(text))] {
 					return append(bytes.Clone(text), renameSuffix...)
 				}
@@ -183,12 +185,15 @@ func declaredObjects(src []byte, o parser.Options, names map[string]bool) {
 
 // reorder reverses the concurrent statements of every architecture
 // body whose statement part has no tool directive: concurrent
-// statements are independent, so their order must not matter.
+// statements are independent, so their order must not matter. A
+// statement written in a `-- psl` comment moves with its `-- psl`
+// marker (#109).
 func reorder(src []byte, o parser.Options) []byte {
 	res := parser.Parse(src, o)
 	if len(res.Problems) > 0 {
 		return src
 	}
+	marker := pslMarkers(src, o)
 	type span struct{ start, end int }
 	var parts [][]span
 	for n := range res.Tree().Descendants() {
@@ -199,6 +204,9 @@ func reorder(src []byte, o parser.Options) []byte {
 		var items []span
 		for it := range a.Stmts().Items() {
 			r := it.Span()
+			if m, ok := marker[r.Start]; ok {
+				r.Start = m
+			}
 			items = append(items, span{r.Start, r.End})
 		}
 		if len(items) < 2 {
@@ -222,4 +230,23 @@ func reorder(src []byte, o parser.Options) []byte {
 	}
 	b.Write(src[at:])
 	return b.Bytes()
+}
+
+// pslMarkers maps the start of each token that opens a `-- psl`
+// comment line to the start of that line's `-- psl` marker.
+func pslMarkers(src []byte, o parser.Options) map[int]int {
+	out := map[int]int{}
+	toks, lx := lexer.All(src, lexOpts(o), lexer.VHDL)
+	for _, t := range toks {
+		if t.Flags&lexer.PSLComment == 0 {
+			continue
+		}
+		for _, tv := range lx.Leading(t) {
+			if tv.Kind == token.PSLCommentMarker {
+				out[t.Start] = tv.Start
+				break
+			}
+		}
+	}
+	return out
 }

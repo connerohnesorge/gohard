@@ -12,6 +12,7 @@ import (
 
 	"github.com/connerohnesorge/gohard/internal/parser"
 	"github.com/connerohnesorge/gohard/internal/simrun"
+	"github.com/connerohnesorge/gohard/internal/token"
 	"github.com/connerohnesorge/gohard/internal/trace"
 )
 
@@ -374,6 +375,36 @@ func TestTransformsKeepTokens(t *testing.T) {
 			if i < 0 || j < 0 || i > j {
 				t.Errorf("reorder: %q", out)
 			}
+		}
+		if p := parser.Parse(out, po).Problems; len(p) > 0 {
+			t.Errorf("%s: %v", tr.Name, p)
+		}
+	}
+}
+
+// TestTransformsPSLComments (#109): under psl.comments, rename renames
+// the objects a `-- psl` line names, and reorder moves each `-- psl`
+// statement with its marker.
+func TestTransformsPSLComments(t *testing.T) {
+	src := []byte("entity e is end;\narchitecture a of e is\n" +
+		"  signal s, t : bit;\nbegin\n  s <= '1';\n" +
+		"  -- psl default clock is rising_edge(s);\n" +
+		"  -- psl x : assert always t;\nend;\n")
+	po := parser.Options{Standard: token.Std2008, PSLComments: true}
+	in := map[string][]byte{"a.vhd": src}
+	want := map[string]string{
+		"rename": "  s_rn <= '1';\n" +
+			"  -- psl default clock is rising_edge(s_rn);\n" +
+			"  -- psl x : assert always t_rn;\n",
+		"reorder": "  -- psl x : assert always t;\n" +
+			"  -- psl default clock is rising_edge(s);\n" +
+			"  s <= '1';\n",
+	}
+	for _, tr := range Transforms {
+		out := tr.Apply(in, po)["a.vhd"]
+		if w, ok := want[tr.Name]; ok &&
+			!strings.Contains(string(out), "begin\n"+w+"end;") {
+			t.Errorf("%s: %q", tr.Name, out)
 		}
 		if p := parser.Parse(out, po).Problems; len(p) > 0 {
 			t.Errorf("%s: %v", tr.Name, p)
