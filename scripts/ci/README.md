@@ -60,7 +60,7 @@ default `10m`, and `seed_crash`, default false).
 
 | #30 item | Where | Status |
 | --- | --- | --- |
-| Fuzz each target for 10 minutes | `fuzz-targets.sh` (the one list) and `fuzz.sh` (one matrix job per target) | wired for `FuzzConfig` (#28), `FuzzIndex` and `FuzzLSPReplay` (#25); later: #31 `FuzzParse`, #32 `FuzzFormat` append to the list |
+| Fuzz each target for 10 minutes | `fuzz-targets.sh` (the one list) and `fuzz.sh` (one matrix job per target) | wired for `FuzzConfig` (#28), `FuzzIndex` and `FuzzLSPReplay` (#25), `FuzzParse` (#31), `FuzzFormat` (#32), `FuzzAnalyze` (#34), `FuzzElab` and `FuzzSim` (#58) |
 | Crash opens a PR adding the minimized input under `testdata/fuzz/<Target>/` | `fuzz.sh` | wired, provable on demand with dispatch input `seed_crash` (see below); pushes `fuzz/<Target>-<id>`, prints the compare URL, then `gh pr create`. GitHub refuses the PR unless Settings > Actions > General > Workflow permissions > "Allow GitHub Actions to create and approve pull requests" is on, or the `FUZZ_PR_TOKEN` secret holds a token with contents and pull-requests write; otherwise the job fails naming that setting and the compare URL. `selftest.sh` covers both paths |
 | Every corpus design at 64 seeds | `corpus-seeds.sh` (`SEEDS=64`, the default): `TestCorpus -corpus.seeds=64 -corpus.require-sim`, then `go run ./tools/oracle trace tree golden` | wired; fails while the sequential interpreter is missing |
 | Full parser-regression list (`pr` and `nightly` submodules) | `regression.sh nightly` | placeholder; later #31 |

@@ -6,8 +6,6 @@
 # testdata/fuzz/<Target>/ that the #30 targets replay themselves;
 # "local" is <package>/testdata/fuzz/<Target>/, which Go replays
 # automatically, for helper targets that do not read the root corpus.
-# Elaboration and simulation are not fuzz targets until the corpus
-# passes.
 #
 # With GOHARD_FUZZ_SEEDED_CRASH=1 (nightly dispatch input seed_crash)
 # the list also holds FuzzSeededCrash (tools/fuzzselftest), which fails
@@ -20,10 +18,12 @@
 TARGETS=(
 	"FuzzAnalyze ./internal/sema local"
 	"FuzzConfig ./internal/config root"
+	"FuzzElab ./internal/elab local"
 	"FuzzFormat ./internal/format root"
 	"FuzzIndex ./internal/span local"
 	"FuzzLSPReplay ./internal/server root"
 	"FuzzParse ./internal/parser root"
+	"FuzzSim ./internal/simrun local"
 )
 if [ "${GOHARD_FUZZ_SEEDED_CRASH:-}" = "1" ]; then
 	TARGETS+=("FuzzSeededCrash ./tools/fuzzselftest root")
