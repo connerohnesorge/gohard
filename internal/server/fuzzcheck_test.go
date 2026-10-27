@@ -32,12 +32,17 @@ import (
 // (op, place, snippet) is one edit typed into the open document, with
 // a few core steps between edits so later edits land while analysis
 // slices run. After a save, once the server settles with the analyzer
-// of `gohard lsp`, the published diagnostics of the file equal
-// `gohard check` on the final text.
+// of `gohard lsp`, the published diagnostics of every VHDL file of the
+// design equal `gohard check` on the final text: an edit that changes
+// a declaration's signature changes the diagnostics of the units that
+// depend on it, in other files, which the analyzer re-checks from the
+// result it reuses (#53).
 
 var (
-	// fuzzCompared counts the diagnostics fuzzQuiescence found equal.
+	// fuzzCompared counts the diagnostics fuzzQuiescence found equal,
+	// fuzzOther those of files other than the edited one.
 	fuzzCompared   int
+	fuzzOther      int
 	fuzzCorpusOnce sync.Once
 	fuzzCorpus     []map[string][]byte // corpus designs under /work
 )
@@ -85,6 +90,11 @@ var fuzzSnippets = []string{
 	"std_logic", "work.", "use work.nothing.all;\n", "  report \"r\";\n",
 	"0", "'1'", " + 1", "end;", "entity e9 is end;\n", "all", "\t",
 	"é", "\\ext id\\", "process begin wait; end process;\n",
+	// Declaration signatures (#53): ports, generics, modes, types and
+	// subprogram profiles that other units see.
+	"p9 : in bit;\n", " out ", " in ", "integer", "bit_vector(3 downto 0)",
+	"function f9 return bit;\n", "procedure q9 (x : in integer);\n",
+	"type t9 is (a9, b9);\n", "generic (g9 : natural := 1);\n",
 }
 
 // fuzzQuiescence runs the edit-script reading of data. On a failure
@@ -115,7 +125,7 @@ func fuzzQuiescence(t tb, failed func() bool, data []byte, seed string) {
 		t.Fatalf("header: %v", err)
 	}
 	var client [][]byte
-	var pub []string
+	pub := map[string][]string{} // the last diagnostics per URI
 	var d *server.Driver
 	d = server.NewDriver(server.Options{Version: cli.Version,
 		Analyzer: server.WithFormatting(ide.New(ide.Options{
@@ -134,16 +144,14 @@ func fuzzQuiescence(t tb, failed func() bool, data []byte, seed string) {
 			}
 		}
 		_ = json.Unmarshal(n.Params, &p)
-		if p.URI != uri {
-			return nil
-		}
-		pub = pub[:0]
+		var ds []string
 		for _, x := range p.Diagnostics {
 			r := x.Range
-			pub = append(pub, fmt.Sprintf("%d:%d-%d:%d %d %s %s",
+			ds = append(ds, fmt.Sprintf("%d:%d-%d:%d %d %s %s",
 				r.Start.Line, r.Start.Character, r.End.Line,
 				r.End.Character, x.Severity, x.Code, x.Message))
 		}
+		pub[p.URI] = ds
 		return nil
 	})
 	push := func(v any) {
@@ -181,32 +189,8 @@ func fuzzQuiescence(t tb, failed func() bool, data []byte, seed string) {
 				"text": string(text)}}})
 	version := 1
 	for i := 2; i+2 < len(data); i += 3 {
-		op, place, snip := data[i], data[i+1], data[i+2]
-		at := func(b byte) int { // a rune start in text
-			off := 0
-			if len(text) > 0 {
-				off = int(b) * (len(text) + 1) / 256
-			}
-			for off > 0 && off < len(text) &&
-				!utf8.RuneStart(text[off]) {
-				off--
-			}
-			return off
-		}
-		a := at(place)
-		b := a
-		repl := fuzzSnippets[int(snip)%len(fuzzSnippets)]
-		switch op % 3 {
-		case 0: // delete
-			repl = ""
-			b = a + 1 + int(snip%12)
-		case 2: // replace
-			b = a + 1 + int(op/3%6)
-		}
-		b = min(b, len(text))
-		for b > a && b < len(text) && !utf8.RuneStart(text[b]) {
-			b++
-		}
+		op := data[i]
+		a, b, repl := fuzzEdit(text, op, data[i+1], data[i+2])
 		x := span.NewIndex(text)
 		pa, pb := x.Position(a, span.UTF8), x.Position(b, span.UTF8)
 		text = slices.Concat(text[:a], []byte(repl), text[b:])
@@ -237,18 +221,77 @@ func fuzzQuiescence(t tb, failed func() bool, data []byte, seed string) {
 	if err := sim.FS.WriteFile(workDir+"/"+rel, text, 0o644); err != nil {
 		t.Fatalf("write: %v", err)
 	}
-	want := fuzzCheck(t, sim, rel)
-	fuzzCompared += len(want)
-	if !slices.Equal(pub, want) {
-		t.Errorf("%s after %d edits: server\n%s\ncheck\n%s\ntext:\n%s",
-			rel, version-1, strings.Join(pub, "\n"),
-			strings.Join(want, "\n"), text)
+	want := fuzzCheck(t, sim)
+	for _, p := range vhd {
+		got := pub["file://"+workDir+"/"+p]
+		fuzzCompared += len(want[p])
+		if p != rel {
+			fuzzOther += len(want[p])
+		}
+		if !slices.Equal(got, want[p]) {
+			t.Errorf("%s after %d edits of %s: server\n%s\ncheck\n%s\n"+
+				"text of %s:\n%s", p, version-1, rel,
+				strings.Join(got, "\n"), strings.Join(want[p], "\n"),
+				rel, text)
+		}
 	}
 }
 
-// fuzzCheck returns `gohard check --format json` on the project for
-// rel, in the server's form (zero-based UTF-8 range, LSP severity).
-func fuzzCheck(t tb, sim *simenv.Sim, rel string) []string {
+// fuzzEdit is the edit of one script triple (op, place, snip) on text:
+// the bytes [a, b) are replaced by repl.
+func fuzzEdit(text []byte, op, place, snip byte) (a, b int, repl string) {
+	a = 0
+	if len(text) > 0 {
+		a = int(place) * (len(text) + 1) / 256
+	}
+	for a > 0 && a < len(text) && !utf8.RuneStart(text[a]) {
+		a-- // a rune start
+	}
+	b = a
+	repl = fuzzSnippets[int(snip)%len(fuzzSnippets)]
+	switch op % 3 {
+	case 0: // delete
+		repl = ""
+		b = a + 1 + int(snip%12)
+	case 2: // replace
+		b = a + 1 + int(op/3%6)
+	}
+	b = min(b, len(text))
+	for b > a && b < len(text) && !utf8.RuneStart(text[b]) {
+		b++
+	}
+	return a, b, repl
+}
+
+// fuzzScript returns the design an edit script edits, the edited file
+// and its text after the edits (nil when data is no script).
+func fuzzScript(t tb, data []byte) (map[string][]byte, string, []byte) {
+	if len(data) < 2 {
+		return nil, "", nil
+	}
+	projects := fuzzProjects(t)
+	files := projects[int(data[0])%len(projects)]
+	var vhd []string
+	for _, p := range slices.Sorted(maps.Keys(files)) {
+		if strings.HasSuffix(p, ".vhd") {
+			vhd = append(vhd, strings.TrimPrefix(p, workDir+"/"))
+		}
+	}
+	if len(vhd) == 0 {
+		return nil, "", nil
+	}
+	rel := vhd[int(data[1])%len(vhd)]
+	text := files[workDir+"/"+rel]
+	for i := 2; i+2 < len(data); i += 3 {
+		a, b, repl := fuzzEdit(text, data[i], data[i+1], data[i+2])
+		text = slices.Concat(text[:a], []byte(repl), text[b:])
+	}
+	return files, rel, text
+}
+
+// fuzzCheck returns `gohard check --format json` on the project by
+// file, in the server's form (zero-based UTF-8 range, LSP severity).
+func fuzzCheck(t tb, sim *simenv.Sim) map[string][]string {
 	e := sim.Env()
 	var out, errb bytes.Buffer
 	e.Transport.Stdin = simenv.NewScript(nil)
@@ -268,17 +311,15 @@ func fuzzCheck(t tb, sim *simenv.Sim, rel string) []string {
 		t.Fatalf("check: %v\n%s%s", err, out.Bytes(), errb.Bytes())
 	}
 	sev := map[string]int{"error": 1, "warning": 2, "hint": 4}
-	var got []string
+	got := map[string][]string{}
 	for _, d := range r.Diagnostics {
-		if d.Path != rel {
-			continue
-		}
 		el, ec := d.EndLine, d.EndCol
 		if el == 0 {
 			el, ec = d.Line, d.Col
 		}
-		got = append(got, fmt.Sprintf("%d:%d-%d:%d %d %s %s", d.Line-1,
-			d.Col-1, el-1, ec-1, sev[d.Severity], d.Code, d.Message))
+		got[d.Path] = append(got[d.Path], fmt.Sprintf("%d:%d-%d:%d %d %s %s",
+			d.Line-1, d.Col-1, el-1, ec-1, sev[d.Severity], d.Code,
+			d.Message))
 	}
 	return got
 }
@@ -306,4 +347,52 @@ func TestFuzzQuiescenceScripts(t *testing.T) {
 		t.Fatalf("only %d diagnostics compared", fuzzCompared)
 	}
 	t.Logf("%d diagnostics compared", fuzzCompared)
+}
+
+// TestFuzzSignatureSeeds: the saved FuzzLSPReplay inputs named sig-*
+// are edit streams that change a declaration's signature (#53): the
+// final text changes the `gohard check` diagnostics of another file of
+// the design, which only re-checking the units that depend on the
+// edited one can get right. The quiescence property holds for each
+// (every file's diagnostics equal gohard check), so plain go test
+// covers them, and so does the fuzzer, whose corpus they seed.
+func TestFuzzSignatureSeeds(t *testing.T) {
+	names, _ := filepath.Glob("../../testdata/fuzz/FuzzLSPReplay/sig-*")
+	if len(names) < 3 {
+		t.Fatalf("%d signature seeds", len(names))
+	}
+	fuzzOther = 0
+	for _, name := range names {
+		data, err := readCorpusFile(name)
+		if err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
+		files, rel, text := fuzzScript(t, data)
+		if files == nil {
+			t.Fatalf("%s: not an edit script", name)
+		}
+		edited := maps.Clone(files)
+		edited[workDir+"/"+rel] = text
+		before := fuzzCheck(t, simenv.New(simenv.Options{Files: files,
+			Dir: workDir}))
+		after := fuzzCheck(t, simenv.New(simenv.Options{Files: edited,
+			Dir: workDir}))
+		changed := false
+		for _, p := range slices.Sorted(maps.Keys(files)) {
+			p = strings.TrimPrefix(p, workDir+"/")
+			if p != rel && !slices.Equal(before[p], after[p]) {
+				changed = true
+			}
+		}
+		if !changed {
+			t.Errorf("%s: editing %s changes no other file's "+
+				"diagnostics", name, rel)
+		}
+		fuzzQuiescence(t, t.Failed, data, filepath.Join(t.TempDir(),
+			"failure.jsonl"))
+	}
+	if fuzzOther == 0 {
+		t.Fatal("no diagnostics of a file other than the edited one " +
+			"were compared")
+	}
 }
