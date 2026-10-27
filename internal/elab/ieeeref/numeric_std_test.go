@@ -82,7 +82,10 @@ type env0 struct {
 	fns []fn
 }
 
-func load(t *testing.T) *env0 {
+// load analyzes numeric_std; native makes its evaluator call the
+// native Go bodies (internal/ieeenative, #59) instead of interpreting
+// the functions that have one.
+func load(t *testing.T, native bool) *env0 {
 	t.Helper()
 	cfg := config.Defaults()
 	cfg.Standard = "2008"
@@ -99,6 +102,7 @@ func load(t *testing.T) *env0 {
 		t.Fatal("no ieee.numeric_std")
 	}
 	ev := sema.NewEvaluator(r, 50_000_000)
+	ev.SetNativeBodies(native)
 	e := &env0{ev: ev}
 	for _, d := range u.Region.Decls {
 		if d.Kind != sema.DeclFunction || d.Implicit {
@@ -670,8 +674,14 @@ var groups = map[string][]string{
 
 // TestNumericStdAgainstBig runs every covered overload on generated
 // operands and compares with math/big.
-func TestNumericStdAgainstBig(t *testing.T) {
-	e := load(t)
+func TestNumericStdAgainstBig(t *testing.T) { againstBig(t, false) }
+
+// TestNumericStdNativeAgainstBig is the same check of the native
+// bodies (#59): the calls they take run in Go, the others from source.
+func TestNumericStdNativeAgainstBig(t *testing.T) { againstBig(t, true) }
+
+func againstBig(t *testing.T, native bool) {
+	e := load(t, native)
 	iters := 60
 	if testing.Short() {
 		iters = 20

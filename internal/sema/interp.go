@@ -65,6 +65,11 @@ type shared struct {
 	// deferred constants the evaluator looks into (static checks
 	// record what a unit's evaluation read, incr.go).
 	saw func(*Unit)
+	// nativeBodies runs the ieee functions with a native Go body
+	// natively (nativebody.go); nbodies caches each function's body
+	// (lookup only).
+	nativeBodies bool
+	nbodies      map[*Decl]nbody
 	// attrSubs are the predefined attribute functions (T'IMAGE, ...)
 	// that are actuals of generic subprograms: the function stand-in
 	// instanceSubs makes for one, and the attribute it calls (an
@@ -143,6 +148,11 @@ func (ev *Evaluator) Call(fn eval.Func, args []eval.Value, b *eval.Budget,
 	x := d.Denotes()
 	if x.Kind != DeclFunction || !Pure(x) {
 		return eval.Value{}, eval.NotStatic("call of " + x.Text)
+	}
+	if ev.sh.nativeBodies {
+		if v, ok, err := ev.nativeBody(x, args, b); ok {
+			return v, err
+		}
 	}
 	var in *Instance
 	if InstanceOf(x) != nil {
