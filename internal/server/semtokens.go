@@ -24,9 +24,20 @@ const (
 // the pieces that overlap r are kept, whole, so a range result is the
 // slice of the full result that overlaps the range. ts must be sorted
 // and not overlap; a piece that starts before the end of the previous
-// one is dropped, so the data is always valid.
+// one is dropped, so the data is always valid. The kept pieces are in
+// text order, so one span.Cursor converts them in a single pass over
+// each line: the work is linear in the text, also on a long line under
+// utf-16 or utf-32.
 func EncodeTokens(x *span.Index, ts []SemToken, r *Span,
 	enc span.Encoding,
+) []uint32 {
+	return encodeTokens(x, x.Cursor(enc), ts, r)
+}
+
+// encodeTokens is EncodeTokens with the cursor c over x, so the tests
+// can count its work.
+func encodeTokens(x *span.Index, c *span.Cursor, ts []SemToken,
+	r *Span,
 ) []uint32 {
 	data := make([]uint32, 0, 5*len(ts))
 	line, col, end := 0, 0, 0
@@ -44,7 +55,7 @@ func EncodeTokens(x *span.Index, ts []SemToken, r *Span,
 				continue
 			}
 			end = pb
-			s, e := x.Position(pa, enc), x.Position(pb, enc)
+			s, e := c.Position(pa), c.Position(pb)
 			dl, dc := s.Line-line, s.Col
 			if dl == 0 {
 				dc = s.Col - col

@@ -1,8 +1,12 @@
 package server
 
 import (
+	"fmt"
 	"slices"
+	"strings"
 	"testing"
+	"unicode/utf16"
+	"unicode/utf8"
 
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/span"
@@ -88,6 +92,60 @@ func TestEncodeTokens(t *testing.T) {
 	}
 	if n := len(EncodeTokens(x, nil, nil, span.UTF8)); n != 0 {
 		t.Errorf("no tokens: %d values", n)
+	}
+}
+
+// TestEncodeTokensLongLine: on one long line of generated ROM
+// constants with non-ASCII text between them, the data has the columns
+// counted while generating the line, under every encoding, and the
+// encoding decodes each rune of the line at most once. Converting each
+// piece from the line start instead took seconds under utf-16 for
+// 20000 tokens on a 140 KB line (#55).
+func TestEncodeTokensLongLine(t *testing.T) {
+	encs := []span.Encoding{span.UTF8, span.UTF16, span.UTF32}
+	var b strings.Builder
+	var col [4]int // indexed by encoding
+	write := func(s string) {
+		b.WriteString(s)
+		col[span.UTF8] += len(s)
+		col[span.UTF16] += len(utf16.Encode([]rune(s)))
+		col[span.UTF32] += utf8.RuneCountInString(s)
+	}
+	var ts []SemToken
+	want := map[span.Encoding][]uint32{}
+	var prev [4]int
+	write("constant ROM : rom_t := (")
+	for i := range 20000 {
+		if i > 0 {
+			write(", ")
+		}
+		if i%1000 == 0 {
+			write("\"é😀\", ") // a string, left untyped
+		}
+		s := b.Len()
+		for _, enc := range encs {
+			want[enc] = append(want[enc], 0, uint32(col[enc]-prev[enc]),
+				5, 10, 0)
+			prev[enc] = col[enc]
+		}
+		write(fmt.Sprintf("x\"%02x\"", i%256))
+		ts = append(ts, SemToken{Span{s, b.Len()}, 10, 0})
+	}
+	write(");\n")
+	text := []byte(b.String())
+	x := span.NewIndex(text)
+	runes := utf8.RuneCount(text)
+	for _, enc := range encs {
+		c := x.Cursor(enc)
+		if got := encodeTokens(x, c, ts, nil); !slices.Equal(got,
+			want[enc]) {
+			t.Errorf("%s: the data differs from the generated columns",
+				enc)
+		}
+		if c.Steps() > runes || enc != span.UTF8 && c.Steps() == 0 {
+			t.Errorf("%s: %d runes decoded for a %d-rune text", enc,
+				c.Steps(), runes)
+		}
 	}
 }
 
