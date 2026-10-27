@@ -8,6 +8,7 @@ import (
 	"errors"
 
 	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/internal/ieeenative"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/sim"
 )
@@ -259,6 +260,11 @@ func (m *machine) callFunction(fn *callFn, vals []eval.Value,
 	if fn.body == nil {
 		return m.builtinFunc(fn, obj, args)
 	}
+	if fn.edge != 0 {
+		if v, ok, err := m.edge(fn, args, b); ok {
+			return v, err
+		}
+	}
 	outs, err := m.funcOuts(fn)
 	if err != nil {
 		return eval.Value{}, err
@@ -373,4 +379,71 @@ func (m *machine) methodObject(outer int64, mo *sema.Expr, b *eval.Budget,
 			mo.Node.Text() + " is not elaborated")
 	}
 	return v.I, nil
+}
+
+// edgeOf returns the native body of x: +1 for ieee.std_logic_1164's
+// rising_edge, -1 for its falling_edge (as bundled), else 0.
+func edgeOf(x *sema.Decl) int8 {
+	u := x.Unit
+	if u == nil || u.File == nil || !u.File.Bundled ||
+		u.Library != "ieee" || u.Name != "std_logic_1164" ||
+		len(x.Params) != 1 || x.Params[0].Class != sema.ClassSignal {
+		return 0
+	}
+	switch x.Name {
+	case "rising_edge":
+		return 1
+	case "falling_edge":
+		return -1
+	}
+	return 0
+}
+
+// edge is the native body of rising_edge (fn.edge +1) and falling_edge
+// (-1) on the signal part of args[0] (#59): s'event and To_X01(s) =
+// '1' and To_X01(s'last_value) = '0' (for falling_edge '0' and '1'),
+// evaluated left to right with short-circuit and. ok false declines
+// (no running process, a value outside STD_ULOGIC, an error), and the
+// body is then interpreted.
+func (m *machine) edge(fn *callFn, args []arg, b *eval.Budget,
+) (eval.Value, bool, error) {
+	if m.ctx == nil || len(args) != 1 || args[0].sig == nil ||
+		fn.ret == nil {
+		return eval.Value{}, false, nil
+	}
+	p := *args[0].sig
+	ev, err := m.ctx.PartEvent(p.t)
+	if err != nil {
+		return eval.Value{}, false, nil
+	}
+	if err := b.Step(1); err != nil {
+		return eval.Value{}, true, err
+	}
+	if !ev {
+		return eval.Enum(fn.ret, 0), true, nil
+	}
+	now, want := int64(3), int64(2) // '1', then '0' (rising_edge)
+	if fn.edge < 0 {
+		now, want = 2, 3
+	}
+	v, err := m.sigValue(p)
+	x, ok := ieeenative.ToX01(v)
+	if err != nil || !ok {
+		return eval.Value{}, false, nil
+	}
+	if x != now {
+		return eval.Enum(fn.ret, 0), true, nil
+	}
+	flat, err := m.ctx.PartLastValues(p.t)
+	if err != nil || len(flat) != 1 {
+		return eval.Value{}, false, nil
+	}
+	x, ok = ieeenative.ToX01(flat[0])
+	if !ok {
+		return eval.Value{}, false, nil
+	}
+	if x == want {
+		return eval.Enum(fn.ret, 1), true, nil
+	}
+	return eval.Enum(fn.ret, 0), true, nil
 }

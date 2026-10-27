@@ -56,6 +56,9 @@ type (
 		// object.
 		method bool
 		ret    *eval.Type
+		// edge is the native body of ieee.std_logic_1164's
+		// rising_edge (+1) or falling_edge (-1), 0 for none (#59).
+		edge int8
 	}
 	derefFn struct{}
 	// methodObjFn is the object of a method alias: its prefix
@@ -562,6 +565,9 @@ func (m *machine) lowerCall(ev *sema.Evaluator, e *sema.Expr,
 		return nil, false, nil
 	}
 	fn := &callFn{x: x, body: body, e: e}
+	if body != nil && ev.NativeBodies() {
+		fn.edge = edgeOf(x)
+	}
 	if !e.Type.Unknown() {
 		t, err := ev.LayoutIn(e.Type, b)
 		if err != nil && !objectResult(e, x) { // interp_call.go

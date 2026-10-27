@@ -141,6 +141,10 @@ type Options struct {
 	// report statements the elaboration's evaluations run
 	// (sema.Evaluator.SetReporter).
 	Reporter sema.Reporter
+	// NativeBodies runs the ieee functions that have a native Go body
+	// natively (sema.Evaluator.SetNativeBodies): elaboration for a
+	// simulation (#59).
+	NativeBodies bool
 }
 
 // Result is the hierarchy and its diagnostics.
@@ -165,6 +169,7 @@ func Build(r *sema.Result, o Options) *Result {
 			base.SetReporter(o.Reporter)
 		}
 	}
+	base.SetNativeBodies(o.NativeBodies)
 	b := &builder{r: r, o: o, out: &Result{},
 		base:    base,
 		exprs:   map[*sema.Unit]map[[2]int]*sema.Expr{},

@@ -35,6 +35,10 @@ type Options struct {
 	// Profile, when set, records the steps of the run's interpreted
 	// calls by package (the #35 native-body rule).
 	Profile *sema.Profile
+	// InterpretedBodies runs every ieee function from its source,
+	// without the native Go bodies (elab.Options.InterpretedBodies):
+	// the reference TestNativeBodiesCorpus compares them with (#59).
+	InterpretedBodies bool
 	// Simulating, when set, is called once analysis and elaboration
 	// are done, right before the kernel is built and run: the
 	// benchmarks time the simulation alone from there (#59).
@@ -141,7 +145,8 @@ func Execute(r Run, src map[string][]byte, o Options) (*Result, error) {
 	}
 	// PSL directives run in the PSL runner, the rest in o.Code.
 	d, eds := elab.Elaborate(res, elab.Options{Top: r.Design.Testbench,
-		Budget: b, Code: psl.Wrap(o.Code)})
+		Budget: b, Code: psl.Wrap(o.Code),
+		InterpretedBodies: o.InterpretedBodies})
 	add(eds)
 	out.Design = d
 	if d == nil || blocking(ds) {

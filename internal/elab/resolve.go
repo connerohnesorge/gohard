@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/internal/ieeenative"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/sim"
 )
@@ -19,6 +20,11 @@ type FuncResolver struct {
 	// subs[n] is the argument subtype of n drivers, built on first
 	// use: a net resolves the same few driver counts over and over.
 	subs []*eval.Type
+	// native resolves natively (ieeenative.Resolve): Fn is
+	// ieee.std_logic_1164.resolved and the design runs native bodies
+	// (#59). rt is then the result subtype, STD_ULOGIC.
+	native bool
+	rt     *eval.Type
 }
 
 // Memoizable implements sim.Memoizable: a resolution function is pure
@@ -29,6 +35,15 @@ func (f *FuncResolver) Memoizable() {}
 func (f *FuncResolver) Resolve(b *eval.Budget, drivers []eval.Value) (
 	eval.Value, error,
 ) {
+	if f.native && len(drivers) > 0 {
+		if p, ok := ieeenative.Resolve(drivers); ok {
+			// The steps of the native call on its array argument.
+			_, err := metered(b, func(sb *eval.Budget) (struct{}, error) {
+				return struct{}{}, sb.Step(1 + int64(len(drivers)))
+			})
+			return eval.Enum(f.rt, p), err
+		}
+	}
 	n := int64(len(drivers))
 	r := eval.Range{Left: 0, Right: n - 1, Dir: eval.To}
 	if len(f.arr.Index) > 0 && f.arr.Index[0] != nil {
@@ -60,6 +75,15 @@ func (f *FuncResolver) subtype(n int, r eval.Range) *eval.Type {
 	return f.subs[n]
 }
 
+// nativeResolved reports whether fn is the resolution function of
+// STD_LOGIC, ieee.std_logic_1164.resolved, as bundled.
+func nativeResolved(fn *sema.Decl) bool {
+	u := fn.Unit
+	return u != nil && u.File != nil && u.File.Bundled &&
+		u.Library == "ieee" && u.Name == "std_logic_1164" &&
+		fn.Name == "resolved" && len(fn.Params) == 1
+}
+
 type resolverEntry struct {
 	fn *sema.Decl
 	r  sim.Resolver
@@ -85,7 +109,14 @@ func (d *Design) resolver(fn *sema.Decl) (sim.Resolver, error) {
 		return nil, errors.New("resolution function " + fn.Text +
 			" does not take an array")
 	}
+	ev.SetNativeBodies(d.native)
 	fr := &FuncResolver{Fn: fn, ev: ev.WithMemo(), arr: arr}
+	if d.native && nativeResolved(fn) {
+		if fr.rt, err = ev.Layout(fn.Type); err != nil {
+			return nil, err
+		}
+		fr.native = true
+	}
 	// Warm the evaluator's constant cache (the resolution table) at
 	// elaboration, so every simulation call costs the same steps and a
 	// forked kernel counts like a fresh one.

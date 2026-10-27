@@ -32,6 +32,8 @@ type runOpts struct {
 	// std is the VHDL standard of the analysis and the run ("":
 	// 2008).
 	std string
+	// interpreted runs every ieee body from source (#59).
+	interpreted bool
 }
 
 func simulate(t *testing.T, src, top string, o runOpts) run {
@@ -58,7 +60,8 @@ func simulate(t *testing.T, src, top string, o runOpts) run {
 		Output: func(l string) { out = append(out, l) },
 		Env:    EnvOptions{Standard: std}})
 	b := eval.NewBudget(o.steps)
-	d, ds := Elaborate(r, Options{Top: top, Budget: b, Code: code})
+	d, ds := Elaborate(r, Options{Top: top, Budget: b, Code: code,
+		InterpretedBodies: o.interpreted})
 	if d == nil {
 		t.Fatalf("elaboration: %v", ds)
 	}

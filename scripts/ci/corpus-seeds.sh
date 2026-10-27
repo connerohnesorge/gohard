@@ -6,7 +6,9 @@
 # layout/case/rename/reorder variants, checking exit, status, messages
 # and stop time, byte-identical traces across seeds 0..SEEDS-1 (the
 # first differing line is printed), and the golden trace and its
-# trace_sha256. Pull requests: SEEDS=4 (the
+# trace_sha256; and TestNativeBodiesCorpus, the same trace and
+# diagnostics with the native ieee bodies as with every body
+# interpreted, at every seed (#59). Pull requests: SEEDS=4 (the
 # plain `go test` default); nightly: SEEDS=64. A design that cannot
 # simulate yet (no sequential interpreter) fails here
 # (-corpus.require-sim) instead of being skipped. Then the recorded
@@ -20,7 +22,8 @@ case "$SEEDS" in
 esac
 
 group "corpus harness at $SEEDS seeds"
-go test -count=1 -timeout 60m -run '^TestCorpus$' ./internal/corpus \
+go test -count=1 -timeout 60m \
+	-run '^(TestCorpus|TestNativeBodiesCorpus)$' ./internal/corpus \
 	-args -corpus.seeds="$SEEDS" -corpus.require-sim
 endgroup
 

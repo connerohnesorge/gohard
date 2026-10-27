@@ -63,6 +63,11 @@ type Options struct {
 	// constants that call TOOL_NAME, GETENV, FILE_LINE, ...): the
 	// interpreter's InterpOptions.Env of the same run.
 	Env EnvOptions
+	// InterpretedBodies runs every ieee function from its source,
+	// without the native Go bodies of internal/ieeenative (#59): the
+	// reference the natives are checked against. Values and traces
+	// are the same either way; step counts differ.
+	InterpretedBodies bool
 }
 
 // Proc is one elaborated process: a process statement or a concurrent
@@ -111,6 +116,9 @@ type Design struct {
 	ownPorts []sharedKey
 	// vunits are the design's PSL verification units (boundVunit).
 	vunits []*sema.Unit
+	// native runs the ieee functions with a native body natively
+	// (not Options.InterpretedBodies).
+	native bool
 }
 
 type sigKey struct {
@@ -131,14 +139,14 @@ func Elaborate(r *sema.Result, o Options) (*Design, []diag.Diagnostic) {
 		sigs: map[sigKey]sim.SigID{}, byPath: map[string]sim.SigID{},
 		parent:   map[*hier.Instance]*hier.Instance{},
 		modeled:  map[*hier.Instance]bool{},
-		varPorts: map[sigKey]sharedKey{}}
+		varPorts: map[sigKey]sharedKey{}, native: !o.InterpretedBodies}
 	steps := b.Limit()
 	if steps <= 0 {
 		steps = eval.EditorSteps
 	}
 	h := hier.Build(r, hier.Options{Tops: []string{o.Top}, Steps: steps,
 		TotalSteps: steps, Natives: d.natives(o.Env),
-		Reporter: elabReporter{d: d}})
+		Reporter: elabReporter{d: d}, NativeBodies: d.native})
 	if d.charge(h.Steps, sim.SrcRef{}) {
 		return d, d.diags
 	}
