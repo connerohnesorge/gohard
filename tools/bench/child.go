@@ -22,6 +22,9 @@ type childOut struct {
 	Samples       []Sample
 	Hover, Definition, Completion,
 	Save []float64
+	// Tokens are warm textDocument/semanticTokens/full requests on
+	// the project's TokensFile (#55).
+	Tokens []float64
 	// SimBegin is the time from the run command to the run's
 	// $/progress begin, SimElab to its "elaborated" report (-1: none)
 	// and SimKernel to its first simulated-time report (or the
@@ -152,6 +155,9 @@ func runChild(a childArgs) (childOut, error) {
 			*q.into = append(*q.into, ms(m.at.Sub(t0)))
 		}
 	}
+	if err := c.tokens(a, &out); err != nil {
+		return out, err
+	}
 	// Saves: one stray name stays in the file throughout, so every
 	// save publishes the target's diagnostics (a document without any,
 	// before and after, gets no publish to wait for).
@@ -190,6 +196,42 @@ func runChild(a childArgs) (childOut, error) {
 		out.Save = append(out.Save, ms(m.at.Sub(t0)))
 	}
 	return out, nil
+}
+
+// tokens opens the project's TokensFile, sends one full semantic
+// tokens request to warm up (the open makes a new snapshot), then
+// measures n more on the unchanged document.
+func (c *client) tokens(a childArgs, out *childOut) error {
+	if a.p.TokensFile == "" {
+		return nil
+	}
+	path := filepath.Join(a.dir, filepath.FromSlash(a.p.TokensFile))
+	text, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	uri := server.PathToURI(path)
+	c.didOpen(uri, text)
+	params := map[string]any{"textDocument": map[string]string{
+		"uri": uri}}
+	for i := range a.n + 1 {
+		t0 := time.Now()
+		m, err := c.request("textDocument/semanticTokens/full", params)
+		if err != nil {
+			return err
+		}
+		var r struct {
+			Data []uint32 `json:"data"`
+		}
+		if json.Unmarshal(m.m["result"], &r) != nil || len(r.Data) == 0 {
+			return fmt.Errorf("semantic tokens of %s: no data",
+				a.p.TokensFile)
+		}
+		if i > 0 {
+			out.Tokens = append(out.Tokens, ms(m.at.Sub(t0)))
+		}
+	}
+	return nil
 }
 
 // keystroke sends e as version v of uri and measures the time to the

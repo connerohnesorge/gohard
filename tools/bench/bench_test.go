@@ -288,7 +288,8 @@ func TestReport(t *testing.T) {
 	large := result{Project: "large", First: []float64{2500},
 		Warm: childOut{Samples: []Sample{mk(10, 20), mk(60, 70)},
 			Hover: []float64{1}, Definition: []float64{1},
-			Completion: []float64{1}, Save: []float64{1}},
+			Completion: []float64{1}, Save: []float64{1},
+			Tokens: []float64{1}},
 		Sim: childOut{SimKernel: []float64{3}}}
 	sig := mk(500, 600)
 	sig.Kind = KindSignature
@@ -300,6 +301,8 @@ func TestReport(t *testing.T) {
 		"| names | 60.0 ms | on save | 500.0 ms | on save |",
 		"Peak RSS of the warm session: 700 MB.",
 		"| First diagnostics from cold start, p95 < 2 s | 2.50 s | MISS |",
+		"| Semantic tokens, full file neorv32_cpu_alu_fpu.vhd, warm " +
+			"p95 < 100 ms | 1.0 ms | pass |",
 		"1 gate(s) missed"} {
 		if !bytes.Contains([]byte(out), []byte(want)) {
 			t.Errorf("report lacks %q:\n%s", want, out)

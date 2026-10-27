@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"path"
 	"strings"
 )
 
@@ -38,8 +39,14 @@ func fmtMS(x float64) string {
 	return fmt.Sprintf("%.1f ms", x)
 }
 
-// Gates returns the #25 latency gates measured on the large project
-// result r; sim, when its testbench ran, adds first simulation
+// tokensFile names the document of the semantic tokens gate (#55).
+var tokensFile = func() string {
+	p, _ := projectByName("large")
+	return path.Base(p.TokensFile)
+}()
+
+// Gates returns the #25 latency gates and the #55 semantic tokens
+// gate measured on the large project result r; sim, when its testbench ran, adds first simulation
 // progress on a testbench that simulates.
 func Gates(r result, sim *result) []Gate {
 	g := func(name string, limit float64, xs []float64) Gate {
@@ -50,6 +57,8 @@ func Gates(r result, sim *result) []Gate {
 		g("Hover, warm p95 < 100 ms", 100, r.Warm.Hover),
 		g("Definition, warm p95 < 100 ms", 100, r.Warm.Definition),
 		g("Completion, warm p95 < 100 ms", 100, r.Warm.Completion),
+		g("Semantic tokens, full file "+tokensFile+
+			", warm p95 < 100 ms", 100, r.Warm.Tokens),
 		g("Diagnostics after save, warm p95 < 2 s", 2000, r.Warm.Save),
 		g("First diagnostics from cold start, p95 < 2 s", 2000, r.First),
 		g("First simulation progress (first simulated-time report "+
@@ -188,6 +197,7 @@ func simTable(b *strings.Builder, r result) {
 		{"Hover (warm)", r.Warm.Hover},
 		{"Definition (warm)", r.Warm.Definition},
 		{"Completion (warm)", r.Warm.Completion},
+		{"Semantic tokens, full file (warm)", r.Warm.Tokens},
 		{"Diagnostics after save (warm)", r.Warm.Save},
 		{"Run command to progress begin", r.Sim.SimBegin},
 		{"Run command to \"elaborated\"", r.Sim.SimElab},

@@ -20,6 +20,9 @@ type Project struct {
 	Config string
 	// Target is the edited document (slash path from the root).
 	Target string
+	// TokensFile, when set, is the document of the semantic tokens
+	// measure (#55): warm full-file requests on it.
+	TokensFile string
 	// Testbench is run for the first-simulation-progress measure
 	// ("" for none) and TestbenchFile is its file.
 	Testbench, TestbenchFile string
@@ -58,8 +61,10 @@ var Projects = []Project{
 		// simulates about a microsecond in a few seconds.
 		Config: "libraries:\n  neorv32: [rtl, sim]\n  osvvm: [osvvm]\n" +
 			"simulation:\n  time_budget: \"1 us\"\n",
-		Target:    "rtl/core/neorv32_cpu_control.vhd",
-		Testbench: "neorv32_tb", TestbenchFile: "sim/neorv32_tb.vhd",
+		Target: "rtl/core/neorv32_cpu_control.vhd",
+		// NEORV32's largest file (118,813 bytes at the pinned commit).
+		TokensFile: "rtl/core/neorv32_cpu_alu_fpu.vhd",
+		Testbench:  "neorv32_tb", TestbenchFile: "sim/neorv32_tb.vhd",
 	},
 	{
 		// A testbench that runs until the step budget stops it, so
@@ -160,6 +165,12 @@ func (p Project) Build(repo, dst string) (int, error) {
 	if _, err := os.Stat(filepath.Join(dst,
 		filepath.FromSlash(p.Target))); err != nil {
 		return 0, fmt.Errorf("%s: target: %w", p.Name, err)
+	}
+	if p.TokensFile != "" {
+		if _, err := os.Stat(filepath.Join(dst,
+			filepath.FromSlash(p.TokensFile))); err != nil {
+			return 0, fmt.Errorf("%s: tokens file: %w", p.Name, err)
+		}
 	}
 	return n, nil
 }
