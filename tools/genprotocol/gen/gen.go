@@ -151,17 +151,17 @@ var Names = map[string]string{
 
 // Skip are properties left out ("Parent.property", Parent being the
 // Go name of the structure or literal): the client and server
-// capabilities of features v1 does not have (#11: no notebooks,
-// semantic tokens, inlay hints, signature help, pull diagnostics,
-// hierarchies and the like). Decoding ignores unknown keys, so a
-// client that sends them is still read correctly.
+// capabilities of features GoHard does not have (#11: no notebooks,
+// inlay hints, signature help, pull diagnostics, hierarchies and the
+// like; semantic tokens came in v2, #55). Decoding ignores unknown
+// keys, so a client that sends them is still read correctly.
 var Skip = map[string]bool{}
 
 func init() {
 	notV1 := []string{"declaration", "typeDefinition", "implementation",
 		"signatureHelp", "documentLink", "colorProvider",
 		"onTypeFormatting", "selectionRange", "linkedEditingRange",
-		"callHierarchy", "semanticTokens", "moniker", "typeHierarchy",
+		"callHierarchy", "moniker", "typeHierarchy",
 		"inlineValue", "inlayHint", "diagnostic"}
 	for _, f := range notV1 {
 		Skip["TextDocumentClientCapabilities."+f] = true
@@ -176,7 +176,6 @@ func init() {
 	}
 	for _, f := range []string{"ClientCapabilities.notebookDocument",
 		"ServerCapabilities.notebookDocumentSync",
-		"WorkspaceClientCapabilities.semanticTokens",
 		"WorkspaceClientCapabilities.inlineValue",
 		"WorkspaceClientCapabilities.inlayHint",
 		"WorkspaceClientCapabilities.diagnostics",

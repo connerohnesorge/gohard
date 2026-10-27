@@ -601,6 +601,14 @@ const (
 	TextDocumentSyncKindIncremental TextDocumentSyncKind = 2
 )
 
+// TokenFormat.
+type TokenFormat string
+
+// The TokenFormat values.
+const (
+	TokenFormatRelative TokenFormat = "relative"
+)
+
 // TraceValues.
 type TraceValues string
 
@@ -2753,6 +2761,173 @@ type SaveOptions struct {
 	IncludeText *bool `json:"includeText,omitempty"`
 }
 
+// SemanticTokensClientCapabilities: @since 3.16.0
+type SemanticTokensClientCapabilities struct {
+	// Whether implementation supports dynamic registration. If this is set
+	// to `true` the client supports the new
+	// `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
+	// return value for the corresponding server capability as well.
+	DynamicRegistration *bool `json:"dynamicRegistration,omitempty"`
+
+	// Which requests the client supports and might send to the server
+	// depending on the server's capability. Please note that clients might
+	// not show semantic tokens or degrade some of the user experience if a
+	// range or full request is advertised by the client but not provided by
+	// the server. If for example the client capability `requests.full` and
+	// `request.range` are both set to true but the server only provides a
+	// range provider the client might not render a minimap correctly or
+	// might even decide to not show any semantic tokens at all.
+	Requests SemanticTokensClientCapabilitiesRequests `json:"requests"`
+
+	// The token types that the client supports.
+	TokenTypes []string `json:"tokenTypes"`
+
+	// The token modifiers that the client supports.
+	TokenModifiers []string `json:"tokenModifiers"`
+
+	// The token formats the clients supports.
+	Formats []TokenFormat `json:"formats"`
+
+	// Whether the client supports tokens that can overlap each other.
+	OverlappingTokenSupport *bool `json:"overlappingTokenSupport,omitempty"`
+
+	// Whether the client supports tokens that can span multiple lines.
+	MultilineTokenSupport *bool `json:"multilineTokenSupport,omitempty"`
+
+	// Whether the client allows the server to actively cancel a semantic
+	// token request, e.g. supports returning LSPErrorCodes.ServerCancelled.
+	// If a server does the client needs to retrigger the request.
+	ServerCancelSupport *bool `json:"serverCancelSupport,omitempty"`
+
+	// Whether the client uses semantic tokens to augment existing syntax
+	// tokens. If set to `true` client side created syntax tokens and
+	// semantic tokens are both used for colorization. If set to `false` the
+	// client only uses the returned semantic tokens for colorization.
+	AugmentsSyntaxTokens *bool `json:"augmentsSyntaxTokens,omitempty"`
+}
+
+// MarshalJSON writes a nil required list as an empty one.
+func (x SemanticTokensClientCapabilities) MarshalJSON() ([]byte, error) {
+	type plain SemanticTokensClientCapabilities
+	p := plain(x)
+	if p.TokenTypes == nil {
+		p.TokenTypes = []string{}
+	}
+	if p.TokenModifiers == nil {
+		p.TokenModifiers = []string{}
+	}
+	if p.Formats == nil {
+		p.Formats = []TokenFormat{}
+	}
+	return json.Marshal(p)
+}
+
+// SemanticTokensClientCapabilitiesRequests.
+type SemanticTokensClientCapabilitiesRequests struct {
+	// The client will send the `textDocument/semanticTokens/range` request
+	// if the server provides a corresponding handler.
+	Range BoolOrSemanticTokensClientCapabilitiesRequestsRange `json:"range,omitzero"`
+
+	// The client will send the `textDocument/semanticTokens/full` request
+	// if the server provides a corresponding handler.
+	Full BoolOrSemanticTokensClientCapabilitiesRequestsFull `json:"full,omitzero"`
+}
+
+// SemanticTokensClientCapabilitiesRequestsFull.
+type SemanticTokensClientCapabilitiesRequestsFull struct {
+	// The client will send the `textDocument/semanticTokens/full/delta`
+	// request if the server provides a corresponding handler.
+	Delta *bool `json:"delta,omitempty"`
+}
+
+// SemanticTokensClientCapabilitiesRequestsRange.
+type SemanticTokensClientCapabilitiesRequestsRange struct{}
+
+// SemanticTokensLegend: @since 3.16.0
+type SemanticTokensLegend struct {
+	// The token types a server uses.
+	TokenTypes []string `json:"tokenTypes"`
+
+	// The token modifiers a server uses.
+	TokenModifiers []string `json:"tokenModifiers"`
+}
+
+// MarshalJSON writes a nil required list as an empty one.
+func (x SemanticTokensLegend) MarshalJSON() ([]byte, error) {
+	type plain SemanticTokensLegend
+	p := plain(x)
+	if p.TokenTypes == nil {
+		p.TokenTypes = []string{}
+	}
+	if p.TokenModifiers == nil {
+		p.TokenModifiers = []string{}
+	}
+	return json.Marshal(p)
+}
+
+// SemanticTokensOptions: @since 3.16.0
+type SemanticTokensOptions struct {
+	WorkDoneProgress *bool `json:"workDoneProgress,omitempty"`
+
+	// The legend used by the server
+	Legend SemanticTokensLegend `json:"legend"`
+
+	// Server supports providing semantic tokens for a specific range of a
+	// document.
+	Range BoolOrSemanticTokensOptionsRange `json:"range,omitzero"`
+
+	// Server supports providing semantic tokens for a full document.
+	Full BoolOrSemanticTokensOptionsFull `json:"full,omitzero"`
+}
+
+// SemanticTokensOptionsFull.
+type SemanticTokensOptionsFull struct {
+	// The server supports deltas for full documents.
+	Delta *bool `json:"delta,omitempty"`
+}
+
+// SemanticTokensOptionsRange.
+type SemanticTokensOptionsRange struct{}
+
+// SemanticTokensRegistrationOptions: @since 3.16.0
+type SemanticTokensRegistrationOptions struct {
+	// A document selector to identify the scope of the registration. If set
+	// to null the document selector provided on the client side will be
+	// used.
+	DocumentSelector DocumentSelector `json:"documentSelector"`
+	WorkDoneProgress *bool            `json:"workDoneProgress,omitempty"`
+
+	// The legend used by the server
+	Legend SemanticTokensLegend `json:"legend"`
+
+	// Server supports providing semantic tokens for a specific range of a
+	// document.
+	Range BoolOrSemanticTokensRegistrationOptionsRange `json:"range,omitzero"`
+
+	// Server supports providing semantic tokens for a full document.
+	Full BoolOrSemanticTokensRegistrationOptionsFull `json:"full,omitzero"`
+
+	// The id used to register the request. The id can be used to deregister
+	// the request again. See also Registration#id.
+	ID string `json:"id,omitempty"`
+}
+
+// SemanticTokensRegistrationOptionsFull.
+type SemanticTokensRegistrationOptionsFull struct {
+	// The server supports deltas for full documents.
+	Delta *bool `json:"delta,omitempty"`
+}
+
+// SemanticTokensRegistrationOptionsRange.
+type SemanticTokensRegistrationOptionsRange struct{}
+
+// SemanticTokensWorkspaceClientCapabilities: @since 3.16.0
+type SemanticTokensWorkspaceClientCapabilities struct {
+	// Whether the client implementation supports a refresh request sent
+	// from the server to the client.
+	RefreshSupport *bool `json:"refreshSupport,omitempty"`
+}
+
 // ServerCapabilities: Defines the capabilities provided by a language server.
 type ServerCapabilities struct {
 	// The position encoding the server picked from the encodings offered by
@@ -2809,6 +2984,9 @@ type ServerCapabilities struct {
 
 	// The server provides execute command support.
 	ExecuteCommandProvider *ExecuteCommandOptions `json:"executeCommandProvider,omitempty"`
+
+	// The server provides semantic tokens support.
+	SemanticTokensProvider SemanticTokensOptionsOrSemanticTokensRegistrationOptions `json:"semanticTokensProvider,omitzero"`
 
 	// Workspace specific server capabilities.
 	Workspace *ServerCapabilitiesWorkspace `json:"workspace,omitempty"`
@@ -2979,6 +3157,9 @@ type TextDocumentClientCapabilities struct {
 	// Capabilities specific to the `textDocument/publishDiagnostics`
 	// notification.
 	PublishDiagnostics *PublishDiagnosticsClientCapabilities `json:"publishDiagnostics,omitempty"`
+
+	// Capabilities specific to the various semantic token request.
+	SemanticTokens *SemanticTokensClientCapabilities `json:"semanticTokens,omitempty"`
 }
 
 // TextDocumentContentChangePartial.
@@ -3294,6 +3475,10 @@ type WorkspaceClientCapabilities struct {
 
 	// The client supports `workspace/configuration` requests.
 	Configuration *bool `json:"configuration,omitempty"`
+
+	// Capabilities specific to the semantic token requests scoped to the
+	// workspace.
+	SemanticTokens *SemanticTokensWorkspaceClientCapabilities `json:"semanticTokens,omitempty"`
 
 	// Capabilities specific to the code lens requests scoped to the
 	// workspace.
@@ -3861,6 +4046,230 @@ func (o *BoolOrSaveOptions) UnmarshalJSON(b []byte) error {
 var altsBoolOrSaveOptions = []alt{
 	{kinds: kBool, decode: as[bool]},
 	{kinds: kObject, shape: shapeSaveOptions, decode: as[SaveOptions]},
+}
+
+// BoolOrSemanticTokensClientCapabilitiesRequestsFull is one of bool,
+// SemanticTokensClientCapabilitiesRequestsFull.
+type BoolOrSemanticTokensClientCapabilitiesRequestsFull struct {
+	// Value is nil (null) or a value of one of the types above, not a
+	// pointer to one.
+	Value any
+}
+
+// MarshalJSON writes Value; nil is null.
+func (o BoolOrSemanticTokensClientCapabilitiesRequestsFull) MarshalJSON() (
+	[]byte, error,
+) {
+	return marshalOr(o.Value)
+}
+
+// UnmarshalJSON reads the alternative that matches the JSON.
+func (o *BoolOrSemanticTokensClientCapabilitiesRequestsFull) UnmarshalJSON(
+	b []byte,
+) error {
+	v, err := unmarshalOr(
+		b, altsBoolOrSemanticTokensClientCapabilitiesRequestsFull,
+		"BoolOrSemanticTokensClientCapabilitiesRequestsFull",
+	)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+var altsBoolOrSemanticTokensClientCapabilitiesRequestsFull = []alt{
+	{kinds: kBool, decode: as[bool]},
+	{
+		kinds:  kObject,
+		shape:  shapeSemanticTokensClientCapabilitiesRequestsFull,
+		decode: as[SemanticTokensClientCapabilitiesRequestsFull],
+	},
+}
+
+// BoolOrSemanticTokensClientCapabilitiesRequestsRange is one of bool,
+// SemanticTokensClientCapabilitiesRequestsRange.
+type BoolOrSemanticTokensClientCapabilitiesRequestsRange struct {
+	// Value is nil (null) or a value of one of the types above, not a
+	// pointer to one.
+	Value any
+}
+
+// MarshalJSON writes Value; nil is null.
+func (o BoolOrSemanticTokensClientCapabilitiesRequestsRange) MarshalJSON() (
+	[]byte, error,
+) {
+	return marshalOr(o.Value)
+}
+
+// UnmarshalJSON reads the alternative that matches the JSON.
+func (o *BoolOrSemanticTokensClientCapabilitiesRequestsRange) UnmarshalJSON(
+	b []byte,
+) error {
+	v, err := unmarshalOr(
+		b, altsBoolOrSemanticTokensClientCapabilitiesRequestsRange,
+		"BoolOrSemanticTokensClientCapabilitiesRequestsRange",
+	)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+var altsBoolOrSemanticTokensClientCapabilitiesRequestsRange = []alt{
+	{kinds: kBool, decode: as[bool]},
+	{
+		kinds:  kObject,
+		shape:  shapeSemanticTokensClientCapabilitiesRequestsRange,
+		decode: as[SemanticTokensClientCapabilitiesRequestsRange],
+	},
+}
+
+// BoolOrSemanticTokensOptionsFull is one of bool, SemanticTokensOptionsFull.
+type BoolOrSemanticTokensOptionsFull struct {
+	// Value is nil (null) or a value of one of the types above, not a
+	// pointer to one.
+	Value any
+}
+
+// MarshalJSON writes Value; nil is null.
+func (o BoolOrSemanticTokensOptionsFull) MarshalJSON() ([]byte, error) {
+	return marshalOr(o.Value)
+}
+
+// UnmarshalJSON reads the alternative that matches the JSON.
+func (o *BoolOrSemanticTokensOptionsFull) UnmarshalJSON(b []byte) error {
+	v, err := unmarshalOr(
+		b, altsBoolOrSemanticTokensOptionsFull,
+		"BoolOrSemanticTokensOptionsFull",
+	)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+var altsBoolOrSemanticTokensOptionsFull = []alt{
+	{kinds: kBool, decode: as[bool]},
+	{
+		kinds:  kObject,
+		shape:  shapeSemanticTokensOptionsFull,
+		decode: as[SemanticTokensOptionsFull],
+	},
+}
+
+// BoolOrSemanticTokensOptionsRange is one of bool, SemanticTokensOptionsRange.
+type BoolOrSemanticTokensOptionsRange struct {
+	// Value is nil (null) or a value of one of the types above, not a
+	// pointer to one.
+	Value any
+}
+
+// MarshalJSON writes Value; nil is null.
+func (o BoolOrSemanticTokensOptionsRange) MarshalJSON() ([]byte, error) {
+	return marshalOr(o.Value)
+}
+
+// UnmarshalJSON reads the alternative that matches the JSON.
+func (o *BoolOrSemanticTokensOptionsRange) UnmarshalJSON(b []byte) error {
+	v, err := unmarshalOr(
+		b, altsBoolOrSemanticTokensOptionsRange,
+		"BoolOrSemanticTokensOptionsRange",
+	)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+var altsBoolOrSemanticTokensOptionsRange = []alt{
+	{kinds: kBool, decode: as[bool]},
+	{
+		kinds:  kObject,
+		shape:  shapeSemanticTokensOptionsRange,
+		decode: as[SemanticTokensOptionsRange],
+	},
+}
+
+// BoolOrSemanticTokensRegistrationOptionsFull is one of bool,
+// SemanticTokensRegistrationOptionsFull.
+type BoolOrSemanticTokensRegistrationOptionsFull struct {
+	// Value is nil (null) or a value of one of the types above, not a
+	// pointer to one.
+	Value any
+}
+
+// MarshalJSON writes Value; nil is null.
+func (o BoolOrSemanticTokensRegistrationOptionsFull) MarshalJSON() (
+	[]byte, error,
+) {
+	return marshalOr(o.Value)
+}
+
+// UnmarshalJSON reads the alternative that matches the JSON.
+func (o *BoolOrSemanticTokensRegistrationOptionsFull) UnmarshalJSON(
+	b []byte,
+) error {
+	v, err := unmarshalOr(
+		b, altsBoolOrSemanticTokensRegistrationOptionsFull,
+		"BoolOrSemanticTokensRegistrationOptionsFull",
+	)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+var altsBoolOrSemanticTokensRegistrationOptionsFull = []alt{
+	{kinds: kBool, decode: as[bool]},
+	{
+		kinds:  kObject,
+		shape:  shapeSemanticTokensRegistrationOptionsFull,
+		decode: as[SemanticTokensRegistrationOptionsFull],
+	},
+}
+
+// BoolOrSemanticTokensRegistrationOptionsRange is one of bool,
+// SemanticTokensRegistrationOptionsRange.
+type BoolOrSemanticTokensRegistrationOptionsRange struct {
+	// Value is nil (null) or a value of one of the types above, not a
+	// pointer to one.
+	Value any
+}
+
+// MarshalJSON writes Value; nil is null.
+func (o BoolOrSemanticTokensRegistrationOptionsRange) MarshalJSON() (
+	[]byte, error,
+) {
+	return marshalOr(o.Value)
+}
+
+// UnmarshalJSON reads the alternative that matches the JSON.
+func (o *BoolOrSemanticTokensRegistrationOptionsRange) UnmarshalJSON(
+	b []byte,
+) error {
+	v, err := unmarshalOr(
+		b, altsBoolOrSemanticTokensRegistrationOptionsRange,
+		"BoolOrSemanticTokensRegistrationOptionsRange",
+	)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+var altsBoolOrSemanticTokensRegistrationOptionsRange = []alt{
+	{kinds: kBool, decode: as[bool]},
+	{
+		kinds:  kObject,
+		shape:  shapeSemanticTokensRegistrationOptionsRange,
+		decode: as[SemanticTokensRegistrationOptionsRange],
+	},
 }
 
 // BoolOrWorkspaceSymbolOptions is one of bool, WorkspaceSymbolOptions.
@@ -4439,6 +4848,49 @@ var altsRangeOrEditRangeWithInsertReplace = []alt{
 		kinds:  kObject,
 		shape:  shapeEditRangeWithInsertReplace,
 		decode: as[EditRangeWithInsertReplace],
+	},
+}
+
+// SemanticTokensOptionsOrSemanticTokensRegistrationOptions is one of
+// SemanticTokensOptions, SemanticTokensRegistrationOptions.
+type SemanticTokensOptionsOrSemanticTokensRegistrationOptions struct {
+	// Value is nil (null) or a value of one of the types above, not a
+	// pointer to one.
+	Value any
+}
+
+// MarshalJSON writes Value; nil is null.
+func (o SemanticTokensOptionsOrSemanticTokensRegistrationOptions) MarshalJSON() (
+	[]byte, error,
+) {
+	return marshalOr(o.Value)
+}
+
+// UnmarshalJSON reads the alternative that matches the JSON.
+func (o *SemanticTokensOptionsOrSemanticTokensRegistrationOptions) UnmarshalJSON(
+	b []byte,
+) error {
+	v, err := unmarshalOr(
+		b, altsSemanticTokensOptionsOrSemanticTokensRegistrationOptions,
+		"SemanticTokensOptionsOrSemanticTokensRegistrationOptions",
+	)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+var altsSemanticTokensOptionsOrSemanticTokensRegistrationOptions = []alt{
+	{
+		kinds:  kObject,
+		shape:  shapeSemanticTokensOptions,
+		decode: as[SemanticTokensOptions],
+	},
+	{
+		kinds:  kObject,
+		shape:  shapeSemanticTokensRegistrationOptions,
+		decode: as[SemanticTokensRegistrationOptions],
 	},
 }
 
@@ -5097,6 +5549,37 @@ var shapeRenameOptions = &shape{
 var shapeSaveOptions = &shape{
 	known: []string{"includeText"},
 }
+
+var shapeSemanticTokensClientCapabilitiesRequestsFull = &shape{
+	known: []string{"delta"},
+}
+
+var shapeSemanticTokensClientCapabilitiesRequestsRange = &shape{}
+
+var shapeSemanticTokensOptions = &shape{
+	req:   []string{"legend"},
+	known: []string{"workDoneProgress", "legend", "range", "full"},
+}
+
+var shapeSemanticTokensOptionsFull = &shape{
+	known: []string{"delta"},
+}
+
+var shapeSemanticTokensOptionsRange = &shape{}
+
+var shapeSemanticTokensRegistrationOptions = &shape{
+	req: []string{"documentSelector", "legend"},
+	known: []string{
+		"documentSelector", "workDoneProgress", "legend", "range", "full",
+		"id",
+	},
+}
+
+var shapeSemanticTokensRegistrationOptionsFull = &shape{
+	known: []string{"delta"},
+}
+
+var shapeSemanticTokensRegistrationOptionsRange = &shape{}
 
 var shapeSymbolInformation = &shape{
 	req: []string{"name", "kind", "location"},
