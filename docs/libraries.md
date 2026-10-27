@@ -8,10 +8,12 @@ example shows the `gohard.yaml` lines for Linux, macOS and Windows.
 The rule is always the same. `libraries:` in `gohard.yaml` maps a
 library name to a list of folders ([config.md](config.md#libraries)).
 Every VHDL file under a listed folder, at any depth, belongs to that
-library. Every other project file belongs to `work`. A folder may be
-relative to the project root or absolute, and may lie outside the
-project: then its units resolve names, but GoHard does not report the
-library's own problems.
+library. An entry may also name one `.vhd` or `.vhdl` file, which
+then belongs to that library even inside a folder mapped to another
+one; `gohard import` writes such entries. Every other project file
+belongs to `work`. A folder may be relative to the project root or
+absolute, and may lie outside the project: then its units resolve
+names, but GoHard does not report the library's own problems.
 
 `std` and `ieee` are bundled with GoHard. Never map them.
 
@@ -609,6 +611,90 @@ end architecture rtl;
 
 A library whose index lists no sources, or whose sources are gone, is
 reported as `libs/unreadable`.
+
+## Importing a ModelSim, Vivado or Quartus project: `gohard import`
+
+A design that already has a ModelSim/Questa `.do` script, a Vivado
+`.xpr` project or a Quartus `.qsf` file lists its source files, their
+libraries and their VHDL standard there. `gohard import` reads that
+file and writes `gohard.yaml` at the project root:
+
+```sh
+gohard import sim/compile.do
+gohard import proj/counter.xpr
+gohard import counter.qsf
+```
+
+For this `.do` script
+
+```tcl
+vlib mylib
+vmap mylib mylib
+vcom -2008 -work mylib ../src/pkg.vhd
+vcom -2008 ../src/top.vhd ../tb/tb_top.vhd
+vsim -c work.tb_top
+```
+
+in `sim/`, it writes
+
+```yaml
+# Written by gohard import from sim/compile.do.
+libraries:
+  mylib:
+    - src/pkg.vhd
+  work:
+    - src/top.vhd
+    - tb/tb_top.vhd
+```
+
+and prints a hint for the `vsim` line, which it does not read.
+
+It reads only these parts of each format and never runs anything:
+
+| Format | Files | Library | Standard |
+| --- | --- | --- | --- |
+| ModelSim/Questa `.do` | the file arguments of `vcom` | `vcom -work NAME` (a `vmap` name, or the last element of a library folder); `work` when absent | `-87` or `-93` (both read as 1993), `-2002`, `-2008`, `-2019`; none when absent |
+| Vivado `.xpr` | the `File` entries of the `DesignSrcs` and `SimulationSrcs` filesets (`sources_1`, `sim_1`) | the `Library` attribute; `xil_defaultlib` when absent | the file type: `VHDL` is 1993, `VHDL 2008`, `VHDL 2019` |
+| Quartus `.qsf` | `set_global_assignment -name VHDL_FILE` | `-library NAME`; `work` when absent | `-hdl_version` (`VHDL_1987` reads as 1993, `VHDL_1993`, `VHDL_2008`, `VHDL_2019`), else the global `VHDL_INPUT_VERSION`; none when neither is set |
+
+* Paths are relative to the folder of the project file, as the tools
+  read them (in a `.xpr`, `$PPRDIR` is that folder and `$PSRCDIR`,
+  `$PGENDIR` and `$PIPUSERFILESDIR` are its `NAME.srcs`, `NAME.gen`
+  and `NAME.ip_user_files` folders). `gohard.yaml` gets them relative
+  to the project root.
+* `gohard.yaml` has one `standard` for every file. Import writes the
+  newest standard any file names, and leaves the key out when that is
+  2008 (the default) or no file names one. Files of an older standard
+  get one `import/standard` hint per standard.
+* Everything else is skipped with an `import/ignored` hint at its
+  line: other `.do` commands (`vsim`, `run`, `vlog`, `do`, Tcl such as
+  `if` or `set`), a `vlib`, `vmap` or `vcom` that uses Tcl
+  substitution (`$var`, `[...]`), `vcom -f` argument files, `.qsf`
+  assignments of other files (`VERILOG_FILE`, `QIP_FILE`, `SDC_FILE`)
+  and commands that are not assignments, `.xpr` files that are not
+  VHDL, are disabled or use another path variable, and any file
+  without a `.vhd` or `.vhdl` extension. Other `vcom` options and
+  `.qsf` assignments are skipped silently.
+* A file listed in two libraries keeps the first
+  (`import/library-conflict`, a warning).
+* GoHard never reads compiled libraries (ModelSim `_info`, `.dat`,
+  `.dbs`, Vivado or Quartus databases), only sources.
+
+Import writes nothing and exits 2 when a listed source file does not
+exist (`import/missing-file`, at the line that lists it), the project
+file cannot be read (`import/syntax`), lists no VHDL file
+(`import/no-files`) or the project root already has a `gohard.yaml`
+(`import/config-exists`). Diagnostics print in the `--format` chosen
+(text, JSON or SARIF), located in the project file.
+
+The project root is found as for every command
+([config.md](config.md)): the nearest folder with `gohard.yaml`, else
+with `.git`, else the current folder. Run `gohard import` from a folder
+whose root holds the sources: a listed file outside the root (a `.xpr`
+in a folder of its own run from there, `../src/a.vhd`) resolves names
+but its own problems are not reported, like a library folder outside
+the root. Files under the root that the project file does not list are
+still checked, as `work` files.
 
 ## How CI checks this guide
 

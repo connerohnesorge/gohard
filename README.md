@@ -37,6 +37,9 @@ go go1.27.2
 * `gohard check --sim` also runs testbenches; failures print a repro
   command.
 * `gohard lsp` is the language server over stdio.
+* `gohard import FILE` writes `gohard.yaml` from a ModelSim `.do`,
+  Vivado `.xpr` or Quartus `.qsf` file
+  ([docs/libraries.md](docs/libraries.md)).
 
 ## VHDL support
 

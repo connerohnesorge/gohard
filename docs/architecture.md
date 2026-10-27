@@ -64,6 +64,7 @@ Env, maps SIGINT/SIGTERM to 130/143, and calls `cli.Run`.
 | 4 | `internal/format` | the formatter (#32 rules), whole file and range | #32 |
 | 4 | `internal/stdlib` | vendored IEEE-P1076 `1076-2019` `std`/`ieee`, per-standard views, integrity hashes, prebuilt | #33 |
 | 4 | `internal/workspace` | file discovery, library mapping, snapshots | #34 |
+| 4 | `internal/importer` | `gohard import`: pure readers of ModelSim `.do`, Vivado `.xpr` and Quartus `.qsf` files (a Tcl word splitter that evaluates nothing, `encoding/xml`) giving each listed VHDL file with its library and standard, and the planner and writer of the resulting `gohard.yaml`; new formats add a row to `importer.Formats` | #2 |
 | 5 | `internal/sema` | scopes, names, types, overloads, static evaluation (shared evaluator) | #34 |
 | 4 | `internal/libs` | `gohard libs detect`: the read-only search of vendor installs (Vivado, Quartus, Diamond), vendor variables, `PATH` and GHDL library indexes through `env.FS`/`Getenv`; the `gohard.yaml` edits shared with the "library not found" quick fix | #1 |
 | 5 | `internal/resolve` | queries over sema results: definition, references, hover data | #34 |
@@ -129,6 +130,7 @@ wording is locked when v1.0 ships. Codes are `area/kebab-name`:
 | `unsupported/` | #20 | `unsupported/construct` ("please report") |
 | `format/` | #32 | `format/would-change` |
 | `sim/` | #35, #29 | `sim/budget-exceeded`, `sim/assert-error`, `sim/race` |
+| `import/` | #2 | `import/ignored`, `import/missing-file`, `import/standard` |
 | `repro/`, `trace/`, `lsp/`, `libs/`, `internal/` | #29, #36, #26, #1, #20 | `repro/source-changed`, `internal/crash` |
 
 A `Diagnostic` has a project-relative `/` path, one-based line and
@@ -179,6 +181,7 @@ wipes existing GitHub alerts.
 | `gohard lsp` | stdio LSP 3.17 server; `--record DIR` | #25 |
 | `gohard lsp <action> --at PATH:LINE:COL` | one LSP action on the server's code path; `lsp sim` (with `--env`, `--real-env`), `lsp replay FILE` | #26, #18 |
 | `gohard trace export --format vcd\|fst` | export a native trace | #36 |
+| `gohard import FILE` | write `gohard.yaml` from a ModelSim `.do`, Vivado `.xpr` or Quartus `.qsf` file (`--format`) | #2 |
 | `gohard libs detect [--write]` | find vendor library sources | #1 |
 | `gohard version` | prints `version`, `commit`, `ieee` (bundled IEEE tag and commit) and `go` lines; `unknown` when not known | #20, #39 |
 | `gohard help [COMMAND]` | | #20 |
