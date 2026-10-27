@@ -12,8 +12,9 @@ package sema
 // is still a complete, immutable value of its own snapshot (the server
 // never publishes a result for an older snapshot), and it is exactly
 // the result of a full analysis of that snapshot: TestIncrementalEdits
-// replays random edit sequences on the corpus and NEORV32 and compares
-// the two after every edit.
+// replays random edit sequences on the corpus, NEORV32 and the design
+// of TestIncrementalRules, in which each rule of step 3 decides the
+// result, and compares the two after every edit.
 //
 // A run that reuses prev:
 //
@@ -29,13 +30,17 @@ package sema
 //  3. Marks dirty the units of the edited files, then, up to a fixed
 //     point, every unit that depends on a dirty one: one of its Deps
 //     (the closure the #37 cache key rests on), a unit its job read
-//     (readable), an architecture its late references looked up, a
+//     (readable: in every known input such a unit is among Deps
+//     already, so this is defence in depth, as the cache's recorded
+//     reads are), an architecture its late references looked up, a
 //     unit of the same file (a file's units share its File object), or
 //     a library rebuilt for holding a dirty unit when the unit's use
 //     clauses name the library (use L.all keeps the Library).
 //  4. Reuses prev's objects for the clean units and libraries, and
 //     makes fresh ones for the rest; a file with a dirty unit gets a
-//     fresh File (the same text and tree). The dirty units are
+//     fresh File (the same text and tree), so the PSL expressions its
+//     units' jobs write (File.PSL, #110) never reach a shared File:
+//     every unit of that file is dirty. The dirty units are
 //     restored from the on-disk cache or analyzed, level by level, and
 //     never stored: entries are written by full analyses only.
 //  5. Runs the checks across units on every unit, as a full analysis

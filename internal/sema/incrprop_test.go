@@ -22,13 +22,27 @@ type incrProject struct {
 	name  string
 	cfg   config.Config
 	texts map[string][]byte
+	// rounds is the number of edit sequences, each from texts (0 is
+	// 1).
+	rounds int
 }
 
 func incrProjects(t *testing.T) []incrProject {
 	var out []incrProject
 	for _, s := range corpusSnapshots(t) {
-		out = append(out, incrProject{s.name, s.cfg, s.texts})
+		out = append(out, incrProject{name: s.name, cfg: s.cfg,
+			texts: s.texts})
 	}
+	// The rules design is small and reaches every rule of dirtyUnits
+	// (incrrules_test.go): it gets many short edit sequences, as a
+	// long one ends up broken beyond reuse (an envelope, a unit
+	// removed).
+	rules := incrProject{name: "rules", cfg: config.Defaults(),
+		texts: map[string][]byte{}, rounds: 20}
+	for k, v := range incrRulesDesign { // incrrules_test.go
+		rules.texts[k] = []byte(v)
+	}
+	out = append(out, rules)
 	if testing.Short() {
 		return out
 	}
@@ -48,13 +62,15 @@ func incrProjects(t *testing.T) []incrProject {
 }
 
 // incrSnippets are inserted by the edits: declarations (some needing
-// a body elsewhere, some with a static error), statements, a stray
-// name, a comment, an unbalanced parenthesis.
+// a body elsewhere, some with a static error), statements (a return
+// changes what a function body gives another unit's static
+// evaluation), a stray name, a comment, an unbalanced parenthesis.
 var incrSnippets = []string{
 	"x ", "signal zz9 : bit;\n", "constant k9 : integer := 3;\n",
 	"constant k8 : natural := -1;\n", "function f9 return integer;\n",
 	"procedure p9;\n", "  assert false;\n", "-- edited\n", "(",
 	"type t9 is range 0 to 3;\n", "zz9 <= '1';\n", "end;\n",
+	"return -1;\n",
 }
 
 // envelope is an encrypted envelope: it makes its unit opaque, which
@@ -132,7 +148,7 @@ func incrEdit(r *env.SplitMix64, prev *Result, texts map[string][]byte,
 }
 
 // TestIncrementalEdits (#53 Done when, P4): random edit sequences on
-// every corpus design and on NEORV32, analyzed the editor's way (the
+// every corpus design, on NEORV32 and on incrRulesDesign, analyzed the editor's way (the
 // trees of unchanged files reused, the previous result passed as
 // Input.Prev), with and without the on-disk cache. After every edit
 // the result equals a full analysis of the same snapshot: the
@@ -144,80 +160,60 @@ func TestIncrementalEdits(t *testing.T) {
 	steps, reusing, shared, total := 0, 0, 0, 0
 	for _, p := range incrProjects(t) {
 		pSteps, pReusing := steps, reusing
-		for _, withCache := range []bool{false, true} {
-			var c Cache
-			if withCache {
-				c = newCacheEnv(p.cfg).open()
-			}
-			popts := parser.FromConfig(p.cfg, "")
-			texts := map[string][]byte{}
-			trees := map[string]*parser.Result{}
-			for k, v := range p.texts {
-				texts[k] = v
-				trees[k] = parser.Parse(v, popts)
-			}
-			treeText := maps.Clone(texts)
-			// Jobs in a shuffled order without the cache, in parallel
-			// with it (run with -race).
-			var jobs env.Jobs = shuffled{uint64(len(p.name))}
-			if withCache {
-				jobs = realenv.New(realenv.Options{}).Jobs
-			}
-			input := func(prev *Result) Input {
-				s := snapshot{}
-				return Input{Files: s.sources(texts, trees, treeText),
-					Config: p.cfg, Cache: c, Prev: prev, Jobs: jobs,
-					Limit: 16}
-			}
-			prev := Analyze(input(nil))
-			history := map[string][][]byte{}
-			r := env.SplitMix64{State: 0x9e37}
-			for _, c := range p.name {
-				r.State = r.State*31 + uint64(c)
-			}
-			for range *incrSteps {
-				path, what := incrEdit(&r, prev, texts, history)
-				trees[path] = parser.Parse(texts[path], popts)
-				treeText[path] = texts[path]
-				before := graphBytes(t, prev)
-				incr := Analyze(input(prev))
-				full := Analyze(Input{Files: snapshot{}.sources(texts,
-					nil, nil), Config: p.cfg})
-				steps++
-				where := p.name + " " + path + " " + what
+		for round := range max(p.rounds, 1) {
+			for _, withCache := range []bool{false, true} {
+				var c Cache
 				if withCache {
-					where += " (cache)"
+					c = newCacheEnv(p.cfg).open()
 				}
-				gd, _ := json.Marshal(incr.Diagnostics)
-				wd, _ := json.Marshal(full.Diagnostics)
-				if !bytes.Equal(gd, wd) {
-					t.Fatalf("%s: diagnostics differ:\n%s", where,
-						firstDiffLine(diagText(incr), diagText(full)))
+				popts := parser.FromConfig(p.cfg, "")
+				texts := map[string][]byte{}
+				trees := map[string]*parser.Result{}
+				for k, v := range p.texts {
+					texts[k] = v
+					trees[k] = parser.Parse(v, popts)
 				}
-				if !slices.Equal(incr.Incomplete, full.Incomplete) {
-					t.Fatalf("%s: incomplete %v, want %v", where,
-						incr.Incomplete, full.Incomplete)
+				treeText := maps.Clone(texts)
+				// Jobs in a shuffled order without the cache, in parallel
+				// with it (run with -race).
+				var jobs env.Jobs = shuffled{uint64(len(p.name))}
+				if withCache {
+					jobs = realenv.New(realenv.Options{}).Jobs
 				}
-				if g, w := graphBytes(t, incr), graphBytes(t,
-					full); !bytes.Equal(g, w) {
-					t.Fatalf("%s: object graphs differ at %s", where,
-						firstDiff(g, w))
+				input := func(prev *Result) Input {
+					s := snapshot{}
+					return Input{Files: s.sources(texts, trees, treeText),
+						Config: p.cfg, Cache: c, Prev: prev, Jobs: jobs,
+						Limit: 16}
 				}
-				if !bytes.Equal(graphBytes(t, prev), before) {
-					t.Fatalf("%s: the previous result changed", where)
+				prev := Analyze(input(nil))
+				history := map[string][][]byte{}
+				r := env.SplitMix64{State: 0x9e37}
+				for _, c := range p.name {
+					r.State = r.State*31 + uint64(c)
 				}
-				n := 0
-				for i, u := range incr.Units {
-					if i < len(prev.Units) && prev.Units[i] == u {
-						n++
+				r.State += uint64(round)
+				for range *incrSteps {
+					path, what := incrEdit(&r, prev, texts, history)
+					trees[path] = parser.Parse(texts[path], popts)
+					treeText[path] = texts[path]
+					before := graphBytes(t, prev)
+					incr := Analyze(input(prev))
+					full := Analyze(Input{Files: snapshot{}.sources(texts,
+						nil, nil), Config: p.cfg})
+					steps++
+					where := p.name + " " + path + " " + what
+					if withCache {
+						where += " (cache)"
 					}
+					n := checkIncremental(t, where, prev, before, incr, full)
+					if n > 0 {
+						reusing++
+					}
+					shared += n
+					total += len(incr.Units)
+					prev = incr
 				}
-				if n > 0 {
-					reusing++
-				}
-				shared += n
-				total += len(incr.Units)
-				prev = incr
 			}
 		}
 		pSteps, pReusing = steps-pSteps, reusing-pReusing
@@ -235,4 +231,39 @@ func TestIncrementalEdits(t *testing.T) {
 		t.Fatalf("only %d of %d edits reused the previous result",
 			reusing, steps)
 	}
+}
+
+// checkIncremental fails t unless incr, the analysis of a snapshot
+// that reused prev, equals full, the full analysis of the same
+// snapshot (the diagnostics byte for byte, the incomplete list and the
+// object graph), and prev still encodes to before (P3). It returns how
+// many of incr's units are prev's.
+func checkIncremental(t *testing.T, where string, prev *Result,
+	before []byte, incr, full *Result,
+) int {
+	t.Helper()
+	gd, _ := json.Marshal(incr.Diagnostics)
+	wd, _ := json.Marshal(full.Diagnostics)
+	if !bytes.Equal(gd, wd) {
+		t.Fatalf("%s: diagnostics differ:\n%s", where,
+			firstDiffLine(diagText(incr), diagText(full)))
+	}
+	if !slices.Equal(incr.Incomplete, full.Incomplete) {
+		t.Fatalf("%s: incomplete %v, want %v", where, incr.Incomplete,
+			full.Incomplete)
+	}
+	if g, w := graphBytes(t, incr), graphBytes(t, full); !bytes.Equal(g,
+		w) {
+		t.Fatalf("%s: object graphs differ at %s", where, firstDiff(g, w))
+	}
+	if !bytes.Equal(graphBytes(t, prev), before) {
+		t.Fatalf("%s: the previous result changed", where)
+	}
+	n := 0
+	for i, u := range incr.Units {
+		if i < len(prev.Units) && prev.Units[i] == u {
+			n++
+		}
+	}
+	return n
 }

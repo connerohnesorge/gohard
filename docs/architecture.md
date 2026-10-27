@@ -342,6 +342,15 @@ reuses what the edit cannot change.
   previous result unchanged). `FuzzLSPReplay` compares every file's
   diagnostics after an edit stream; its `sig-*` inputs change
   declarations that other files see.
+* `TestIncrementalRules` (sema) has a small design in which each of
+  these rules decides the result: a static read of a function body
+  and of a deferred constant, a late architecture reference, `use
+  work.all`, a unit of the same file, and a vunit, whose job writes
+  its file's PSL expressions (#110). `TestIncrementalEdits` also
+  replays short random sequences on it; both fail when any one of
+  these rules is removed. The rule for a unit's job reads outside its
+  `Deps` is defence in depth, as the on-disk cache's recorded reads
+  are: no known input needs it.
 
 ## Language server (#25, #26)
 
