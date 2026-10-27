@@ -69,22 +69,40 @@ func isSpace(c byte) bool { return c == ' ' || c == '\t' || c == '\f' }
 // isEnd reports a command terminator.
 func isEnd(c byte) bool { return c == '\n' || c == '\r' || c == ';' }
 
+// continuation returns the length of the backslash-newline at s.pos
+// with the spaces and tabs that start the next line, which Tcl replaces
+// by one space; 0 when s.pos holds none. ModelSim reads scripts with
+// -translation auto, so the newline is LF, CRLF or a lone CR.
+func (s *tclScanner) continuation() int {
+	i := s.pos + 1
+	if s.peek() != '\\' || i >= len(s.src) {
+		return 0
+	}
+	switch {
+	case s.src[i] == '\r' && i+1 < len(s.src) && s.src[i+1] == '\n':
+		i += 2
+	case s.src[i] == '\n' || s.src[i] == '\r':
+		i++
+	default:
+		return 0
+	}
+	for i < len(s.src) && (s.src[i] == ' ' || s.src[i] == '\t') {
+		i++
+	}
+	return i - s.pos
+}
+
 // skipSpace skips separators and backslash-newlines inside a command.
 func (s *tclScanner) skipSpace() {
 	for !s.atEOF() {
-		c := s.peek()
-		switch {
-		case isSpace(c):
-			s.pos++
-		case c == '\\' && s.pos+1 < len(s.src) &&
-			(s.src[s.pos+1] == '\n' || s.src[s.pos+1] == '\r'):
-			s.pos += 2
-			if s.src[s.pos-1] == '\r' && s.peek() == '\n' {
-				s.pos++
-			}
-		default:
+		if n := s.continuation(); n > 0 {
+			s.pos += n
+			continue
+		}
+		if !isSpace(s.peek()) {
 			return
 		}
+		s.pos++
 	}
 }
 
@@ -125,7 +143,7 @@ func (s *tclScanner) comment() {
 	for !s.atEOF() {
 		c := s.peek()
 		if c == '\\' {
-			s.pos += 2
+			s.pos += max(s.continuation(), 2)
 			continue
 		}
 		if c == '\n' || c == '\r' {
@@ -158,15 +176,13 @@ func (s *tclScanner) braced() (word, bool) {
 		c := s.peek()
 		switch c {
 		case '\\':
+			if n := s.continuation(); n > 0 {
+				s.pos += n
+				b = append(b, ' ')
+				continue
+			}
 			if s.pos+1 < len(s.src) {
-				n := s.src[s.pos+1]
-				if n == '\n' || n == '\r' {
-					s.pos += 2
-					s.skipSpace()
-					b = append(b, ' ')
-					continue
-				}
-				b = append(b, c, n)
+				b = append(b, c, s.src[s.pos+1])
 				s.pos += 2
 				continue
 			}
@@ -176,15 +192,14 @@ func (s *tclScanner) braced() (word, bool) {
 			depth--
 			if depth == 0 {
 				s.pos++
-				w := word{Text: string(b), Off: start}
 				// Tcl refuses characters right after the closing
 				// brace; GoHard reads them as part of the word.
 				for !s.atEOF() && !isSpace(s.peek()) &&
 					!isEnd(s.peek()) {
-					w.Text += string(s.peek())
+					b = append(b, s.peek())
 					s.pos++
 				}
-				return w, true
+				return word{Text: string(b), Off: start}, true
 			}
 		}
 		b = append(b, c)
@@ -237,8 +252,7 @@ func (s *tclScanner) bare() (word, bool) {
 		}
 		switch c {
 		case '\\':
-			if s.pos+1 < len(s.src) && (s.src[s.pos+1] == '\n' ||
-				s.src[s.pos+1] == '\r') {
+			if s.continuation() > 0 {
 				w.Text = string(b)
 				return w, true // a backslash-newline ends the word
 			}
@@ -290,6 +304,10 @@ func (s *tclScanner) bracket(b *[]byte) bool {
 
 // escape appends the value of the backslash sequence at s.pos.
 func (s *tclScanner) escape(b []byte) []byte {
+	if n := s.continuation(); n > 0 {
+		s.pos += n
+		return append(b, ' ')
+	}
 	s.pos++
 	if s.atEOF() {
 		return append(b, '\\')
@@ -301,8 +319,6 @@ func (s *tclScanner) escape(b []byte) []byte {
 		return append(b, '\n')
 	case 't':
 		return append(b, '\t')
-	case '\n', '\r':
-		return append(b, ' ')
 	}
 	return append(b, c)
 }

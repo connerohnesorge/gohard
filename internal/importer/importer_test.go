@@ -265,3 +265,35 @@ func TestCodesInTable(t *testing.T) {
 		}
 	}
 }
+
+// TestParseDoCRLF: ModelSim reads a .do script with -translation auto,
+// so a CRLF script means what the same script with LF line ends means.
+// A backslash-CRLF continues a comment, and inside braces or quotes it
+// is one space with the indentation of the next line, as in Tcl.
+func TestParseDoCRLF(t *testing.T) {
+	for _, tc := range []struct{ src, want string }{
+		{"# vcom -work legacy src/old.vhd \\\nvcom -work mylib src/a.vhd\n",
+			""},
+		{"vcom {a.vhd\\\n  b.vhd}\n", "1:6 work a.vhd b.vhd \"\"\n"},
+		{"vcom \"a\\\n\tb.vhd\"\n", "1:6 work a b.vhd \"\"\n"},
+		{"vcom a.vhd \\\n  b.vhd\nvcom c.vhd\n", "1:6 work a.vhd \"\"\n" +
+			"2:3 work b.vhd \"\"\n3:6 work c.vhd \"\"\n"},
+	} {
+		check(t, ParseDo("a.do", []byte(tc.src)), tc.want)
+		crlf := strings.ReplaceAll(tc.src, "\n", "\r\n")
+		check(t, ParseDo("a.do", []byte(crlf)), tc.want)
+	}
+}
+
+// TestSplitTclLinear: the characters after a closing brace are read in
+// linear time, so a long or hostile line cannot stall gohard import
+// (P7). Appending them one at a time to a string allocated once per
+// character.
+func TestSplitTclLinear(t *testing.T) {
+	src := []byte("vcom {a}" + strings.Repeat("x", 20000) + ".vhd")
+	allocs := testing.AllocsPerRun(5, func() { splitTcl(src) })
+	if allocs > 100 {
+		t.Errorf("splitTcl made %.0f allocations, want at most 100",
+			allocs)
+	}
+}
