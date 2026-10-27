@@ -7,7 +7,10 @@
 # entry's file info is not the one .goreleaser.yaml pins for
 # reproducible archives (#50): owner root:root (uid and gid 0, tar
 # only), mode 0755 for the binary and 0644 for the rest, and the HEAD
-# commit time as mtime (to the 2 seconds a zip stores).
+# commit time as mtime (to the 2 seconds a zip stores). Last, it checks
+# the Homebrew cask and the Scoop manifest (#69): each must exist, name
+# only hashes listed in checksums.txt (four for the cask, two for the
+# manifest), and the cask must drop the macOS quarantine attribute.
 #
 #   nix run nixpkgs#goreleaser -- release --snapshot --clean
 #   bash scripts/ci/archive-check.sh [DIST]   # default dist
@@ -85,6 +88,36 @@ for a in "$dist"/*.tar.gz "$dist"/*.zip; do
 	fi
 done
 [ "$n" -gt 0 ] || die "no archives in $dist (run goreleaser first)"
+
+# manifest FILE COUNT fails unless FILE names exactly COUNT sha256
+# hashes, all of them in checksums.txt.
+manifest() {
+	local h hashes
+	if [ ! -f "$1" ]; then
+		err "missing $1"
+		failed=1
+		return
+	fi
+	hashes=$(grep -oE '[0-9a-f]{64}' "$1" | sort -u)
+	if [ "$(printf '%s\n' "$hashes" | grep -c .)" -ne "$2" ]; then
+		err "$1: want $2 sha256 hashes, have:"
+		printf '%s\n' "$hashes" >&2
+		failed=1
+	fi
+	for h in $hashes; do
+		if ! grep -q "^$h " "$dist/checksums.txt"; then
+			err "$1: hash $h is not in checksums.txt"
+			failed=1
+		fi
+	done
+}
+cask="$dist/homebrew/Casks/gohard.rb"
+manifest "$cask" 4
+manifest "$dist/scoop/gohard.json" 2
+if [ -f "$cask" ] && ! grep -qF com.apple.quarantine "$cask"; then
+	err "$cask does not remove the macOS quarantine attribute"
+	failed=1
+fi
 [ "$failed" -eq 0 ] ||
-	die "release archives lack required files or pinned file info"
-notice "$n archives contain: $required"
+	die "release archives or package manifests fail the checks above"
+notice "$n archives contain: $required; cask and scoop manifest match"

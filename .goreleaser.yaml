@@ -68,6 +68,50 @@ checksum:
   name_template: checksums.txt
   algorithm: sha256
 
+# Package-manager manifests (#69): a Homebrew cask in
+# connerohnesorge/homebrew-tap and a Scoop manifest in
+# connerohnesorge/scoop-bucket. The release job pushes both with the
+# PACKAGES_GITHUB_TOKEN secret (contents write on both repos); without
+# it the manifests are still written to dist/ but not uploaded.
+homebrew_casks:
+  - name: gohard
+    ids: [gohard]
+    binaries: [gohard]
+    directory: Casks
+    homepage: https://github.com/connerohnesorge/gohard
+    description: VHDL language server, checker, formatter and simulator
+    repository:
+      owner: connerohnesorge
+      name: homebrew-tap
+      token: '{{ envOrDefault "PACKAGES_GITHUB_TOKEN" "" }}'
+    skip_upload: >-
+      {{ if isEnvSet "PACKAGES_GITHUB_TOKEN" }}false{{ else }}true{{ end }}
+    commit_msg_template: "gohard: {{ .Tag }}"
+    # The binaries are neither signed nor notarized, so macOS would
+    # refuse to run one downloaded through Homebrew. This is the hook
+    # goreleaser documents for that case: it drops the quarantine
+    # attribute from the installed binary.
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/gohard"]
+          end
+
+scoops:
+  - name: gohard
+    ids: [gohard]
+    homepage: https://github.com/connerohnesorge/gohard
+    description: VHDL language server, checker, formatter and simulator
+    license: MPL-2.0
+    repository:
+      owner: connerohnesorge
+      name: scoop-bucket
+      token: '{{ envOrDefault "PACKAGES_GITHUB_TOKEN" "" }}'
+    skip_upload: >-
+      {{ if isEnvSet "PACKAGES_GITHUB_TOKEN" }}false{{ else }}true{{ end }}
+    commit_msg_template: "gohard: {{ .Tag }}"
+
 snapshot:
   version_template: "{{ incpatch .Version }}-snapshot"
 

@@ -2,11 +2,11 @@
 # shellcheck source-path=SCRIPTDIR
 # Checks that the release archives are reproducible (#50): builds a
 # goreleaser snapshot of HEAD in each of two fresh clones and fails
-# unless both give the same archive names and byte-identical archives
-# and checksums.txt. The second clone is made after the first build,
-# under umask 077, with every checked-out file's mtime set to
-# 2000-01-01, so an archive entry that keeps its checkout time or mode
-# shows up as a difference. Both dists must also pass archive-check.sh,
+# unless both give the same archive names and byte-identical archives,
+# checksums.txt, Homebrew cask and Scoop manifest (#69). The second
+# clone is made after the first build, under umask 077, with every
+# checked-out file's mtime set to 2000-01-01, so an archive entry that
+# keeps its checkout time or mode shows up as a difference. Both dists must also pass archive-check.sh,
 # which checks the owner, mode and time of every entry. Nothing in this
 # checkout is touched.
 #
@@ -48,9 +48,11 @@ skew() {
 snapshot "$tmp/a"
 (umask 077 && snapshot "$tmp/b" skew)
 
-# names DIST prints the archive and checksum file names in DIST.
+# names DIST prints the archive, checksum and package manifest file
+# names in DIST.
 names() {
-	(cd "$1" && ls -1 -- *.tar.gz *.zip checksums.txt 2>/dev/null) || true
+	(cd "$1" && ls -1 -- *.tar.gz *.zip checksums.txt \
+		homebrew/Casks/gohard.rb scoop/gohard.json 2>/dev/null) || true
 }
 
 failed=0
