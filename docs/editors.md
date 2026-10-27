@@ -6,7 +6,8 @@ over stdio (#26). It works out the project root from `gohard.yaml`
 v1.0 features are standard LSP: diagnostics, hover, go-to-definition,
 references, rename, completion, document and workspace symbols,
 formatting, folding, highlights, the simulation code lens and the
-"Open waveform" code action. Neovim is the editor CI checks end to end
+"Open waveform" code action. v2 adds semantic tokens (#55, see
+[Semantic tokens](#semantic-tokens)). Neovim is the editor CI checks end to end
 (#38). Helix works with no extension. VS Code support is planned for
 v2 (#3).
 
@@ -82,6 +83,13 @@ against the first folder's project, so an entity defined in a file of
 its own folder that is not open does not resolve. To work in several
 unmarked folders, use `setup()` or put a `gohard.yaml` in each.
 
+Neovim colours names with the server's semantic tokens on its own.
+`setup()` links the two token types LSP has no name for:
+`@lsp.type.signal.vhdl` to `@lsp.type.variable` and
+`@lsp.type.port.vhdl` to `@lsp.type.parameter` (as defaults, so a
+colour scheme or your config can set them). With `vim.lsp.enable`
+instead of `setup()`, link them yourself.
+
 Editor settings go under a `gohard` key in `settings`. They use the
 `gohard.yaml` keys of [config.md](config.md). Any key that
 `gohard.yaml` also sets keeps the `gohard.yaml` value, and the server
@@ -136,7 +144,12 @@ Neovim (`nvim --headless --clean`) through `editors/nvim/test/e2e.lua`:
 4. For both testbenches, the `gohard-sim` diagnostics must equal what
    `gohard lsp sim --tb NAME` reports on the same project, and "Copy
    repro" must fill a register.
-5. On Neovim 0.11 or later, a second run skips `setup()` and calls
+5. In the semantic tokens fixture (`testdata/lsp/semantic-tokens/full`)
+   it checks the token type and modifiers Neovim holds at a signal, a
+   port, a function, an enumeration literal, a record element, a
+   generic, a comment and a keyword, and that the signal is drawn
+   with `@lsp.type.signal.vhdl`, which has a colour.
+6. On Neovim 0.11 or later, a second run skips `setup()` and calls
    `vim.lsp.enable('gohard')` with the shipped `lsp/gohard.lua`, in a
    copy of `wait_forms` with no `gohard.yaml` or `.git` above it. The
    client has no root and no workspace folder; the "▶ Run" lens must
@@ -182,6 +195,38 @@ It sends the initialize handshake with Helix's own client capabilities
 and opens a file of a two-file project. The diagnostics it gets back
 must equal `gohard check` on the same project. Then it shuts the
 server down and checks that it exits 0.
+
+## Semantic tokens
+
+The server answers `textDocument/semanticTokens/full`, `/full/delta`
+and `/range` (#55) from the same analysis as hover and definition, in
+the negotiated position encoding. A token never spans lines. The
+legend:
+
+| Type | Names |
+| --- | --- |
+| `namespace` | libraries |
+| `type` | types and subtypes |
+| `class` | entities, architectures, packages, components, configurations, contexts |
+| `function` | functions and procedures |
+| `parameter` | subprogram parameters |
+| `variable` | variables, constants, generics, loop parameters, aliases of objects |
+| `property` | record elements |
+| `enumMember` | enumeration literals and physical units |
+| `signal`, `port` | signals and ports (not LSP standard types) |
+| `keyword`, `string`, `number`, `comment` | reserved words, string, bit-string and character literals, numbers, comments |
+
+Modifiers: `declaration` at the name a declaration defines; `readonly`
+on constants, generics, loop and generate parameters, `in` ports and
+constant parameters; `static` on generics and shared variables;
+`defaultLibrary` on `std` and `ieee` names; `inactive` on an inactive
+conditional-analysis branch (`` `if ``), whose lines are sent as
+`comment` tokens with that modifier so an editor can dim them. Labels,
+attributes, groups, mode views, PSL declarations and operators get no
+token.
+
+`gohard lsp semantic-tokens --at PATH:1:1 [full|range L:C-L:C]` prints
+the full or range result for a file (`--at` names the file).
 
 ## Platform notes
 

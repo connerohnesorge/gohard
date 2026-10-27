@@ -436,6 +436,16 @@ predefined and library names, declarations of opaque units, stand-ins
 named like an opaque unit, and extended identifiers; each use site
 keeps its letter case.
 
+Semantic tokens (#55) come from `ide.Analysis.SemanticTokens`, a
+pure function of the snapshot's analysis: the tokens of a whole
+document as byte spans, sorted and not overlapping. The server
+splits them per line and encodes them in the negotiated encoding
+(`server.EncodeTokens`); a range result is the slice of the full
+result that overlaps the range, and a delta is computed against the
+last full or delta result of the document, which the State keeps
+(result IDs are a counter, dropped on close), so a replay gives the
+same IDs and edits.
+
 ## VHDL-2019 in v1.1 (#18, #27)
 
 v1.1 is the release under test (`corpus.Release`); the corpus designs
