@@ -1,0 +1,140 @@
+command: ghdl --synth --std=08 top.vhd -e top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 0
+--- stderr
+--- stdout
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+entity top is
+  port (
+    x: in unsigned (7 downto 0);
+    n: out natural range 0 to 8
+  );
+end entity;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+architecture rtl of top is
+  subtype typ_wrap_x is std_logic_vector (7 downto 0);
+  signal wrap_x: typ_wrap_x;
+  subtype typ_wrap_n is std_logic_vector (3 downto 0);
+  signal wrap_n: typ_wrap_n;
+  signal n4 : std_logic;
+  signal n7 : std_logic_vector (3 downto 0);
+  signal n9 : std_logic;
+  signal n10 : std_logic_vector (31 downto 0);
+  signal n12 : std_logic_vector (31 downto 0);
+  signal n13 : std_logic_vector (3 downto 0);
+  signal n14 : std_logic_vector (3 downto 0);
+  signal n15 : std_logic;
+  signal n16 : std_logic_vector (31 downto 0);
+  signal n18 : std_logic_vector (31 downto 0);
+  signal n19 : std_logic_vector (3 downto 0);
+  signal n20 : std_logic_vector (3 downto 0);
+  signal n21 : std_logic;
+  signal n22 : std_logic_vector (31 downto 0);
+  signal n24 : std_logic_vector (31 downto 0);
+  signal n25 : std_logic_vector (3 downto 0);
+  signal n26 : std_logic_vector (3 downto 0);
+  signal n27 : std_logic;
+  signal n28 : std_logic_vector (31 downto 0);
+  signal n30 : std_logic_vector (31 downto 0);
+  signal n31 : std_logic_vector (3 downto 0);
+  signal n32 : std_logic_vector (3 downto 0);
+  signal n33 : std_logic;
+  signal n34 : std_logic_vector (31 downto 0);
+  signal n36 : std_logic_vector (31 downto 0);
+  signal n37 : std_logic_vector (3 downto 0);
+  signal n38 : std_logic_vector (3 downto 0);
+  signal n39 : std_logic;
+  signal n40 : std_logic_vector (31 downto 0);
+  signal n42 : std_logic_vector (31 downto 0);
+  signal n43 : std_logic_vector (3 downto 0);
+  signal n44 : std_logic_vector (3 downto 0);
+  signal n45 : std_logic;
+  signal n46 : std_logic_vector (31 downto 0);
+  signal n48 : std_logic_vector (31 downto 0);
+  signal n49 : std_logic_vector (3 downto 0);
+  signal n50 : std_logic_vector (3 downto 0);
+begin
+  wrap_x <= typ_wrap_x(x);
+  n <= to_integer (unsigned (wrap_n));
+  wrap_n <= n50;
+  -- top.vhd:34:11
+  n4 <= wrap_x (0);
+  -- top.vhd:34:7
+  n7 <= "0000" when n4 = '0' else "0001";
+  -- top.vhd:34:11
+  n9 <= wrap_x (1);
+  -- top.vhd:35:16
+  n10 <= "0000000000000000000000000000" & n7;  --  uext
+  -- top.vhd:35:16
+  n12 <= std_logic_vector (unsigned (n10) + unsigned'("00000000000000000000000000000001"));
+  -- top.vhd:35:9
+  n13 <= n12 (3 downto 0);  --  trunc
+  -- top.vhd:34:7
+  n14 <= n7 when n9 = '0' else n13;
+  -- top.vhd:34:11
+  n15 <= wrap_x (2);
+  -- top.vhd:35:16
+  n16 <= "0000000000000000000000000000" & n14;  --  uext
+  -- top.vhd:35:16
+  n18 <= std_logic_vector (unsigned (n16) + unsigned'("00000000000000000000000000000001"));
+  -- top.vhd:35:9
+  n19 <= n18 (3 downto 0);  --  trunc
+  -- top.vhd:34:7
+  n20 <= n14 when n15 = '0' else n19;
+  -- top.vhd:34:11
+  n21 <= wrap_x (3);
+  -- top.vhd:35:16
+  n22 <= "0000000000000000000000000000" & n20;  --  uext
+  -- top.vhd:35:16
+  n24 <= std_logic_vector (unsigned (n22) + unsigned'("00000000000000000000000000000001"));
+  -- top.vhd:35:9
+  n25 <= n24 (3 downto 0);  --  trunc
+  -- top.vhd:34:7
+  n26 <= n20 when n21 = '0' else n25;
+  -- top.vhd:34:11
+  n27 <= wrap_x (4);
+  -- top.vhd:35:16
+  n28 <= "0000000000000000000000000000" & n26;  --  uext
+  -- top.vhd:35:16
+  n30 <= std_logic_vector (unsigned (n28) + unsigned'("00000000000000000000000000000001"));
+  -- top.vhd:35:9
+  n31 <= n30 (3 downto 0);  --  trunc
+  -- top.vhd:34:7
+  n32 <= n26 when n27 = '0' else n31;
+  -- top.vhd:34:11
+  n33 <= wrap_x (5);
+  -- top.vhd:35:16
+  n34 <= "0000000000000000000000000000" & n32;  --  uext
+  -- top.vhd:35:16
+  n36 <= std_logic_vector (unsigned (n34) + unsigned'("00000000000000000000000000000001"));
+  -- top.vhd:35:9
+  n37 <= n36 (3 downto 0);  --  trunc
+  -- top.vhd:34:7
+  n38 <= n32 when n33 = '0' else n37;
+  -- top.vhd:34:11
+  n39 <= wrap_x (6);
+  -- top.vhd:35:16
+  n40 <= "0000000000000000000000000000" & n38;  --  uext
+  -- top.vhd:35:16
+  n42 <= std_logic_vector (unsigned (n40) + unsigned'("00000000000000000000000000000001"));
+  -- top.vhd:35:9
+  n43 <= n42 (3 downto 0);  --  trunc
+  -- top.vhd:34:7
+  n44 <= n38 when n39 = '0' else n43;
+  -- top.vhd:34:11
+  n45 <= wrap_x (7);
+  -- top.vhd:35:16
+  n46 <= "0000000000000000000000000000" & n44;  --  uext
+  -- top.vhd:35:16
+  n48 <= std_logic_vector (unsigned (n46) + unsigned'("00000000000000000000000000000001"));
+  -- top.vhd:35:9
+  n49 <= n48 (3 downto 0);  --  trunc
+  -- top.vhd:34:7
+  n50 <= n44 when n45 = '0' else n49;
+end rtl;

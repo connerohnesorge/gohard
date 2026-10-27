@@ -1,0 +1,37 @@
+command: ghdl --synth --std=08 top.vhd -e top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 0
+--- stderr
+--- stdout
+library ieee;
+use ieee.std_logic_1164.all;
+entity top is
+  port (
+    clk: in std_ulogic;
+    d: in std_ulogic;
+    q: out std_ulogic
+  );
+end entity;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+architecture rtl of top is
+  signal wrap_clk: std_logic;
+  signal wrap_d: std_logic;
+  signal wrap_q: std_logic;
+  signal n3 : std_logic;
+begin
+  wrap_clk <= clk;
+  wrap_d <= d;
+  q <= wrap_q;
+  wrap_q <= n3;
+  -- top.vhd:16:3
+  process (wrap_clk)
+  begin
+    if rising_edge (wrap_clk) then
+      n3 <= wrap_d;
+    end if;
+  end process;
+end rtl;

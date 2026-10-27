@@ -1,0 +1,63 @@
+command: ghdl --synth --std=08 top.vhd -e top
+version: GHDL 6.0.0 (tarball) [Dunoon edition]
+exit: 0
+--- stderr
+--- stdout
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+entity top is
+  generic (
+    CLK_PERIOD: time := 10 ns;
+    DEPTH: positive := 100
+  );
+  port (
+    clk: in std_ulogic;
+    rst: in std_ulogic;
+    q: out std_ulogic
+  );
+end entity;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+architecture rtl of top is
+  signal wrap_clk: std_logic;
+  signal wrap_rst: std_logic;
+  signal wrap_q: std_logic;
+  signal count : std_logic_vector (6 downto 0);
+  signal n4 : std_logic;
+  signal n5 : std_logic;
+  signal n7 : std_logic_vector (6 downto 0);
+  signal n9 : std_logic_vector (6 downto 0);
+  signal n14 : std_logic;
+  signal n15 : std_logic;
+  signal n17 : std_logic_vector (6 downto 0);
+begin
+  wrap_clk <= clk;
+  wrap_rst <= rst;
+  q <= wrap_q;
+  wrap_q <= n15;
+  -- top.vhd:44:10
+  count <= n17; -- (signal)
+  -- top.vhd:49:29
+  n4 <= '1' when count = "1100011" else '0';
+  -- top.vhd:49:20
+  n5 <= wrap_rst or n4;
+  -- top.vhd:52:24
+  n7 <= std_logic_vector (unsigned (count) + unsigned'("0000001"));
+  -- top.vhd:49:7
+  n9 <= n7 when n5 = '0' else "0000000";
+  -- top.vhd:57:23
+  n14 <= '1' when count = "0000000" else '0';
+  -- top.vhd:57:12
+  n15 <= '0' when n14 = '0' else '1';
+  -- top.vhd:48:5
+  process (wrap_clk)
+  begin
+    if rising_edge (wrap_clk) then
+      n17 <= n9;
+    end if;
+  end process;
+end rtl;
