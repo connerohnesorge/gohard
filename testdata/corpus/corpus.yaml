@@ -356,6 +356,7 @@ designs:
         signals:
           - case_generate_tb.u4.op_xor.t
     trace_sha256: 4fe5a59c3de81b41c5c720d68259c8dc7971d20c261a94bc164c3ef0d5cfc86f
+    coverage_sha256: 7a8274f264cb0867383b86a9a012bddedc180ab8e2e47128c3779cbfae6a528c
     oracle_sha256: 9ac19414687d438d3151f0a8a52eccefb758f2fc1fba7edd368983661d191137
     format_oracle_sha256: 9e8eac29ece7f5cec639083899493f366de2324ec33304416eba30ef4a1c69cd
     semerr_sha256: 80bb1678b17655891dc8263f30d5d50a2f1e228b2bc47ebbe4c2afe00336faf6
@@ -431,6 +432,7 @@ designs:
           - delayed_attrs_tb.r_dly
           - delayed_attrs_tb.v_dly
     trace_sha256: 75c6b6c1b59110729dc5ca68da788f26f427d088c322096bba16bd0162658660
+    coverage_sha256: 1341e01d227daa9c1cc44555531da8276d9c515fa5860d9cb83fe7183ba011cd
     oracle_sha256: d9717d9c53d50ae9a0c8cfd740d5cfc87f688f593ef6ba6038b4fcf176555d8b
     format_oracle_sha256: d0c6e24bc83d51d1d6b17629cb96bd159c160f85190df665651dc3ff2db4d817
     semerr_sha256: e8345b3eefc3b87b5d339d5b65401e448079e672b1d465bfa0502ebe5304ca41
@@ -511,6 +513,7 @@ designs:
           so its protected type's methods apply (LRM 8.7, 5.6.2). The
           trace oracle is GHDL alone.
     trace_sha256: bc2d88a8aa2f0566d055d65a8ac576759987f60a607d718a3ec9d0af4b8b68e0
+    coverage_sha256: 2c257a0bdf06f7fb6fe3869c9bdde2b379654dcce09e06763c2dff00d304c0e8
     oracle_sha256: 21b4a055e78e9108633c53b7630cb73e2b0e410bd672deabe994b0209f3a8c41
     format_oracle_sha256: 16191d2ee18ceef4de99ca81157403e186d9b66e111c6b439ad92429ee4ba911
     semerr_sha256: dafe341a1767a4042b51196e48e604b10427ab42c0bf2d3274a83d85a9fa3824
@@ -648,6 +651,7 @@ designs:
           GHDL 6.0.0 lacks the force mode syntax, so it is not a semantic
           disagreement about the design. The trace oracle is NVC alone.
     trace_sha256: 0a23d77a46ea4b3d7762bed6bb02b13d56e404a62f793b8fd641ea5a1eee6b51
+    coverage_sha256: adebd1ea3c841837f3f43060dc913253746a39024cd36c34f24ac0f653c8b228
     oracle_sha256: a6c964f98156e113d916c47aa3db482d17e1e514bb4903b4d87c21c7e96e2e5b
     format_oracle_sha256: 74f80060055ea8528a7079f6eb2576679da05fad936fddbb61705ed33cec0280
     semerr_sha256: 8f55e9aa9e72804496f8871b8860bdc2d8c70f982c956297ab9689be03916f74
@@ -1490,6 +1494,7 @@ designs:
           - psl_halt_tb.clk
           - psl_halt_tb.dut.clk
     trace_sha256: bfe40908a8ef3715db47bf4e7bb71f0ecc486aec5fb3954ffbf4cbf80f87579d
+    coverage_sha256: 0b018156167a39ae10dadd3853e0172c305cf7f28f49269bc6ea40ec290452d9
     oracle_sha256: e068ccc61cf1a65d4211336f3ba0d69f884b8d966ad9747b8e7cca18b5b44a6e
     format_oracle_sha256: 77c1e4f3d9f6221e065dcc9f07991b2fd0090966015558d89edca2ac4ade64fb
     semerr_sha256: fece2bcb801acd5939c2a6cded3ff0843eb72617859792dfb32cc41851f9d02b
@@ -1657,6 +1662,7 @@ designs:
           - race_order_tb.dut.order
           - race_order_tb.order
     trace_sha256: 8305e18fdb970753b882a5ce9bda21a2ae9d78bb1a112d1e9ed72fe8f78d81fa
+    coverage_sha256: 647fc2a44e086f0aab5824f96f95a7d8f106149af4045efe1d7840e85a09cadc
     oracle_sha256: 9772ee9771ff2905cecb0d5ca6842743e44f17c5685fe9b62ac118d10d785a7c
     format_oracle_sha256: 0f2859b6bc9a6f2b4bdac0cfa8ffeed734cb0dd57d77708d3e7706c53cd56292
     semerr_sha256: 2eddb632671535e1aff04108a11827047730c426fbb83b31d42b39ce49e37490
@@ -1809,7 +1815,7 @@ designs:
         finished". Neither is a design message.
     disagreements: []
     trace_sha256: 550f7e09d1eef9c5e02b1d9375a111c972d3182b4014ab2868af305406496785
-    coverage_sha256: 019d217b14af8df513fed47e7342d0e658deb86086a3f63420232f345c4251cc
+    coverage_sha256: 21421a69ad53e3c3d38b42f7df98e4ed890850370ea1f31f05a71be13e682ace
     oracle_sha256: 7970f17042f556933048546858ed59f59dfa0c0edcd64c64f07b48ed70660832
     format_oracle_sha256: bbbf0ef9e3dcc8def7724384d8a0cc39335debf702a18d880aa9ac3783f0264c
     semerr_sha256: 5232628ce92bc4b0baf53b187d61f6ae0ec32d608c4658c192d5eada63157e7f
@@ -1992,7 +1998,7 @@ designs:
           LRM 6.4.2.4 (a shared variable is of a protected type from
           VHDL-2002 on) is what rejects it.
     trace_sha256: 35b143c43679d047925347c65864fde3fd5cc30f7f7ac81cfa2c8af6448f3185
-    coverage_sha256: 2238d2eb2ac995c7dec8b2beddda1825bd047d6fd09182aa593e9ab42c3ff7d7
+    coverage_sha256: f914914b52c99f4bea4fa4ab6a9cde01295ba2f6f7bf6487509715d80ee1dad3
     oracle_sha256: c354519cb77487bc26ee682080b4647438728aede2a43ac10546f5745d0e366e
     format_oracle_sha256: e67b9449028c71d0eea4c44f9164a5e5cb113e2ce3d800b50cfd62d65488fa86
     semerr_sha256: 298721e71fa929ee5d78dac1b8d5837d2d32e336e05a4eadc9ad02016ba554cb
