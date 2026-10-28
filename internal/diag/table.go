@@ -147,6 +147,7 @@ const (
 
 	// import: `gohard import` of other tools' project files (#2, #64).
 	ImportConfigExists         Code = "import/config-exists"
+	ImportDependencyConflict   Code = "import/dependency-conflict"
 	ImportIgnored              Code = "import/ignored"
 	ImportLibraryConflict      Code = "import/library-conflict"
 	ImportMissingFile          Code = "import/missing-file"
@@ -311,6 +312,14 @@ var table = []Info{
 		Summary: "gohard import found a gohard.yaml at the project root",
 		Message: "{path} already exists; gohard import does not " +
 			"change an existing configuration",
+	},
+	{
+		Code: ImportDependencyConflict, Severity: Warning,
+		Class: Design, Owner: 64,
+		Summary: "no choice of core versions satisfies every dependency",
+		Message: "dependency {vlnv} does not match {core}, the version " +
+			"another dependency chose; no choice of versions satisfies " +
+			"every depend: entry, so only {core} is imported",
 	},
 	{
 		Code: ImportIgnored, Severity: Hint, Class: Design, Owner: 2,
