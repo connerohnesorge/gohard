@@ -22,14 +22,21 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      # A Nix build takes its version from flake.nix, not the tag, so the
-      # two must agree before anything publishes.
-      - name: Check the flake version matches the tag
+      # A Nix build takes its version from flake.nix, not the tag, and
+      # the VS Code extension from its package.json (#3), so all three
+      # must agree before anything publishes. TestVSCodeManifest keeps
+      # package.json and package-lock.json at the flake's version.
+      - name: Check the flake and extension versions match the tag
         run: |
           want="${GITHUB_REF_NAME#v}"
           got=$(sed -n 's/^ *version = "\(.*\)";$/\1/p' flake.nix)
           if [ "$got" != "$want" ]; then
             echo "flake.nix version is '$got', tag $GITHUB_REF_NAME needs '$want'"
+            exit 1
+          fi
+          got=$(sed -n 's/^  "version": "\(.*\)",$/\1/p' editors/vscode/package.json)
+          if [ "$got" != "$want" ]; then
+            echo "editors/vscode/package.json version is '$got', tag $GITHUB_REF_NAME needs '$want'"
             exit 1
           fi
 
@@ -76,3 +83,63 @@ jobs:
             dist/*.tar.gz
             dist/*.zip
             dist/checksums.txt
+
+  # The VS Code extension (#3). Its VSIX, built by vsce from the tagged
+  # editors/vscode, goes onto the release goreleaser published, then to
+  # the VS Code Marketplace with the VSCE_PAT secret and to Open VSX with
+  # the OVSX_PAT secret; a store whose secret is not set is skipped.
+  # The job also runs when goreleaser failed after publishing the
+  # release (a failed cask push); without a release the upload fails
+  # and nothing is published.
+  vscode:
+    needs: goreleaser
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    env:
+      VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      OVSX_PAT: ${{ secrets.OVSX_PAT }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build the VSIX
+        run: |
+          want="${GITHUB_REF_NAME#v}"
+          got=$(sed -n 's/^  "version": "\(.*\)",$/\1/p' editors/vscode/package.json)
+          if [ "$got" != "$want" ]; then
+            echo "editors/vscode/package.json version is '$got', tag $GITHUB_REF_NAME needs '$want'"
+            exit 1
+          fi
+          echo "VSIX=gohard-$want.vsix" >>"$GITHUB_ENV"
+          nix develop -c bash -c 'cd editors/vscode &&
+            npm ci --no-audit --no-fund && npx vsce package'
+
+      - name: Attach the VSIX to the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "$GITHUB_REF_NAME" "editors/vscode/$VSIX" \
+            --repo "$GITHUB_REPOSITORY"
+
+      - name: Publish to the VS Code Marketplace
+        if: ${{ env.VSCE_PAT != '' }}
+        run: |
+          nix develop -c bash -c 'cd editors/vscode &&
+            npx vsce publish --packagePath "$VSIX"'
+
+      - name: Publish to Open VSX
+        if: ${{ env.OVSX_PAT != '' }}
+        run: |
+          nix develop -c bash -c 'cd editors/vscode &&
+            npx ovsx publish "$VSIX"'
