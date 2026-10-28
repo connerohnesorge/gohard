@@ -270,7 +270,8 @@ func checkRacy(t *testing.T, r Run, src map[string][]byte, base *Result) {
 }
 
 // racyProblems checks races_by_design at seeds 0..n-1 (base is the
-// run at seed 0) and returns one line per failure.
+// run at seed 0) and returns one line per failure. It logs how many
+// different traces the seeds gave (shown by go test -v).
 func racyProblems(t *testing.T, r Run, src map[string][]byte,
 	base *Result, n int,
 ) []string {
@@ -293,6 +294,8 @@ func racyProblems(t *testing.T, r Run, src map[string][]byte,
 				"sim/race warning against seed 0, got %v", s, ds))
 		}
 	}
+	t.Logf("%s: %d different traces at seeds 0..%d", r.Name(),
+		len(traces), n-1)
 	if n > 1 && len(traces) < 2 {
 		probs = append(probs, fmt.Sprintf("the same trace at all %d "+
 			"seeds", n))
