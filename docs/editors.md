@@ -519,12 +519,15 @@ waveform", the server offers four actions that write VHDL (#57). The
 | Action | Kind | Where | Does |
 | --- | --- | --- | --- |
 | Instantiate entity LIB.NAME | `refactor.rewrite` | on a concurrent statement that is only a name, `counter` or `work.counter` (with or without `;`, with or without a label) | replaces the label, the name and its `;` with `u_counter : entity work.counter generic map (...) port map (...);` listing every formal; the statements after a name without `;` stay, and the action is not offered when more than the name is on its line; a name the unit's library does not declare is looked up in the other project libraries, and the unit gets `library LIB;` when it does not name LIB yet |
-| Declare component NAME | `refactor.rewrite` | on a component instantiation whose component is not declared | adds the component declaration of the entity of that name, its generics and ports as the entity writes them, at the end of the architecture's declarative part (after the comment on the line of the last declaration), and the `use` and `library` clauses the unit needs for the names they use |
+| Declare component NAME | `refactor.rewrite` | on a component instantiation whose component is not declared and whose entity is in the unit's library | adds the component declaration of the entity of that name, its generics and ports as the entity writes them, at the end of the architecture's declarative part (after the comment on the line of the last declaration), and the `use` and `library` clauses the unit needs for the names they use |
 | Complete port map | `refactor.rewrite` | on an instance whose port map leaves formals out | adds the missing formals after the last association, each on a line of its own when the map spans lines |
 | Create testbench NAME_tb.vhd | `source` | in an entity's design unit, when the entity has ports | creates `NAME_tb.vhd` next to the entity's file |
 
-Declare component is not offered when a name the generic and port
-declarations use denotes something else at the end of the
+Declare component is not offered for an entity of another library:
+the default binding of a component instance looks for the entity in
+the unit's own library only, so the instance would stay unbound; use
+Instantiate entity there. Nor is it offered when a name the generic
+and port declarations use denotes something else at the end of the
 architecture's declarative part.
 
 Instantiate entity and Complete port map write `formal => formal` when

@@ -229,6 +229,11 @@ func (x *gen) declareComponent(stmt cst.Node, u *sema.Unit,
 	}
 	var out []server.CodeAction
 	for _, e := range x.entitiesNamed(name, u) {
+		if e.Library != u.Library {
+			// The default binding looks for the component's entity in
+			// the unit's library only: the component would be unbound.
+			continue
+		}
 		ctx, ok := x.componentContext(e, u, at.off)
 		if !ok {
 			continue

@@ -589,7 +589,8 @@ func TestGeneratedKeepsLineComments(t *testing.T) {
 // TestDeclareComponentContext: the generic and port declarations a
 // component declaration copies keep naming what they name in the
 // entity: the clauses that only the entity's context has are added,
-// and the action is not offered where no clause can do it (#57).
+// and the action is not offered where no clause can do it, or where
+// the component would not bind to the entity (#57).
 func TestDeclareComponentContext(t *testing.T) {
 	types := "package types is\n" +
 		"  subtype word_t is bit_vector(7 downto 0);\n" +
@@ -660,5 +661,17 @@ func TestDeclareComponentContext(t *testing.T) {
 		}
 		p["top.vhd"] = got
 		cleanResult(t, p, "top.vhd")
+	}
+	// An entity of another library: the default binding would not find
+	// it, so only Instantiate entity is offered.
+	p := project{"gohard.yaml": []byte("libraries:\n  ip: [ip]\n"),
+		"ip/counter.vhd": ent("", "    clk : in bit"),
+		"top.vhd":        top("", "")}
+	if got, ok := genAction(t, p, "top.vhd", "u0 :", comp); ok {
+		t.Fatalf("offered for an entity of library ip:\n%s", got)
+	}
+	if _, ok := genAction(t, p, "top.vhd", "u0 :",
+		"Instantiate entity ip.counter"); !ok {
+		t.Fatal("Instantiate entity ip.counter not offered")
 	}
 }
