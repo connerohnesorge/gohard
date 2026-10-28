@@ -5,7 +5,9 @@
 # testdata/corpus/corpus.yaml, its listed variants and the generated
 # layout/case/rename/reorder variants, checking exit, status, messages
 # and stop time, byte-identical traces across seeds 0..SEEDS-1 (the
-# first differing line is printed), and the golden trace and its
+# first differing line is printed; the racy design race_order must
+# instead report sim/race at every seed after 0 and give at least two
+# traces, #63), and the golden trace and its
 # trace_sha256; and TestNativeBodiesCorpus, the same trace and
 # diagnostics with the native ieee bodies as with every body
 # interpreted, at every seed (#59). Pull requests: SEEDS=4 (the

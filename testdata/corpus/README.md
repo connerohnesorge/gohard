@@ -19,6 +19,8 @@ testdata/corpus/
   <name>/
     *.vhd            design and testbench sources, each tagged in `files`
                      (or in `variants[].files`, or a `models` stand-in)
+    *.txt            input files the design reads while it runs, listed
+                     in `inputs`
     gohard.yaml      optional design-local project config (`config`)
     golden/          written only by `go run ./tools/oracle --update`
       trace.txt      GoHard's canonical text trace (#36) at seed 0, the
@@ -39,9 +41,15 @@ testdata/corpus/
   `standin_model`. No other design is required for v1.0. The 15th,
   `gc_heap` (milestone v1.1), is the #27 garbage-collection design; the
   16th, `psl_comments` (milestone v1.1), is the #109 `psl.comments`
-  design. Since the v1.1 release the v1.1 designs (`prot_cond`,
-  `gc_heap`, `psl_comments`) are required to pass with `expected`. The
-  8 vhdl-examples are demos and are not part of the corpus.
+  design. #63 adds six designs for the gaps `LIMITS.md` listed
+  (milestone v1.1): `case_generate`, `delayed_attrs`, `ext_vars`,
+  `force_out`, `psl_halt` and `race_order`; it also extends
+  `textio_env` (a checked-in input file), `vhdl93_only` (a
+  non-protected shared variable and the `shared_2002` variant) and
+  `mode_views` (the `--define` variant `define_narrow`). Since the v1.1
+  release the v1.1 designs (`prot_cond`, `gc_heap`, `psl_comments` and
+  the six #63 designs) are required to pass with `expected`. The 8
+  vhdl-examples are demos and are not part of the corpus.
 * Simulator work files (GHDL `*.cf`/`*.o`, NVC `work/` libraries, waveform
   dumps) never enter the repo. Run the tools in a `/tmp` work dir.
 * If `testdata/corpus/*/golden/` exceeds 50 MB in total, the goldens move
@@ -74,9 +82,9 @@ it directly.
 | Key | Meaning |
 | --- | --- |
 | `schema` | Manifest schema version, `1`. |
-| `vocabulary.features` | Fixed feature ids. Exactly the semantics listed in #8 "Done when"; every id must appear in at least one design. |
+| `vocabulary.features` | Fixed feature ids: the semantics listed in #8 "Done when" plus the ids added by #27, #109 and #63. Every id must appear in at least one design, and a design may name only these ids (`corpus.ParseManifest` checks both). |
 | `vocabulary.invariants` | Fixed invariant ids a design may claim. |
-| `designs` | The 14 design entries, sorted by `name`. |
+| `designs` | The 22 design entries, sorted by `name`. |
 | `regression` | Parser-regression submodules, sorted by `name`. |
 
 Unknown keys are an error. Lists keep a fixed order (sorted by `name` or
@@ -131,19 +139,20 @@ by `path`) so tools rewrite the file deterministically.
 | --- | --- | --- |
 | `name` | string | Design name; equals the directory name. |
 | `standard` | `"1993"`\|`"2002"`\|`"2008"`\|`"2019"` | Minimum standard of the design (quoted, as in `gohard.yaml`, #28). It is the standard GoHard runs the design under. |
-| `milestone` | `v1.0`\|`v1.1` | Release that must pass it. `prot_cond`, `gc_heap` and `psl_comments` are `v1.1`; the other 13 are `v1.0`. The release under test is `corpus.Release` (`v1.1`); a design of a later milestone is a manifest error. |
+| `milestone` | `v1.0`\|`v1.1` | Release that must pass it. `prot_cond`, `gc_heap`, `psl_comments` and the six #63 designs are `v1.1`; the other 13 are `v1.0`. The release under test is `corpus.Release` (`v1.1`); a design of a later milestone is a manifest error. |
 | `files` | list | Every source file, in analysis order, each `{path, standard}`. `path` is relative to the design directory; `standard` is the minimum standard of that file. |
 | `top` | string | Design-under-test entity (the unit whose hierarchy and LSP sessions matter). Equals `testbench` when the testbench is the whole design. |
 | `testbench` | string | Portless testbench entity that is the elaboration root, run with `gohard check --sim --tb <testbench>` and by the oracles. |
 | `defines` | map identifier to string | `defines:` passed to GoHard and the oracles (#28). `{}` except in `mode_views`, which needs one user identifier. Built-in identifiers (`VHDL_VERSION`, `TOOL_*`) are never allowed here. |
 | `models` | map `lib.unit` to path | `simulation.models` stand-ins (#35). `{}` except in `standin_model`. Paths are relative to the design directory. A stand-in file is not listed in `files`. |
 | `config` | path | Optional. Design-local `gohard.yaml` (#28), relative to the design directory, loaded by GoHard and `tools/oracle` as the project config. Its `defines` and `simulation.models` must equal the entry's `defines` and `models`. Absent means all #28 defaults. Required whenever `defines` or `models` is non-empty, since #31 takes user identifiers only from `gohard.yaml` `defines:` or `--define`. Used by `mode_views` (`defines: {MV_PROFILE: "wide"}`), `psl_comments` (`psl.comments: true`, which `tools/oracle` passes to GHDL as `-fpsl` and to NVC as `-a --psl`), `psl_simple` (`simulation.stop_level: failure`) and `standin_model` (`allow_opaque`, `simulation.models`). |
+| `inputs` | list of paths | Optional. Checked-in data files the design reads while it runs (textio), relative to the design directory; variants read them too. The corpus harness serves them to the interpreter as the project files of the run, as `gohard check --sim` run in the design directory reads them, and `tools/oracle` copies them into every GHDL and NVC work directory and hashes them into each recording's `sources` line. Used by `textio_env` (`textio_env_in.txt`, #63). |
 | `expected` | mapping | GoHard's outcome (see below). Every design, `prot_cond` and `gc_heap` included, runs against it. |
 | `expected_v1_0` | retired | The v1.0 outcome of a v1.1 design (exit 2, `unsupported/construct`) while one of its constructs was not delivered. Retired with the v1.1 release: no design has it, and `corpus.ParseManifest` rejects a manifest that does, since nothing would check it. Its last use is in the git history. |
-| `features` | list of ids | Semantics this design exercises, from `vocabulary.features`. May be empty for designs whose purpose is an outcome (`assert_fail`, `budget_hang`, `vhdl93_only`). |
-| `invariants` | list of ids | From `vocabulary.invariants`. Every design claims `variant_stable`; every design except a deliberately racy one claims `seed_independent`. |
+| `features` | list of ids | Semantics this design exercises, from `vocabulary.features`. May be empty for designs whose purpose is an outcome (`assert_fail`, `budget_hang`). |
+| `invariants` | list of ids | From `vocabulary.invariants`. Every design claims `variant_stable`, and exactly one of `seed_independent` and `races_by_design`: the deliberately racy `race_order` claims `races_by_design`, every other design `seed_independent` (`TestManifest` checks it). |
 | `oracle` | `ghdl`\|`nvc`\|`both`\|`none, hand-checked` | Which tool results the golden trace is compared with. `none, hand-checked` means the golden trace is hand-written and reviewed once. Quote it in YAML: `oracle: "none, hand-checked"`. |
-| `hierarchy_oracle` | `ghdl`\|`none, hand-checked` | Source of the elaboration oracle (hierarchy and generic values, #8). `ghdl`: the `--disp-tree` output recorded by `tools/oracle`. `none, hand-checked`: a hand-written `golden/hierarchy.txt`, reviewed once; required whenever `ghdl.result` is `unsupported`, `analysis-error` or `elab-error` (the 2019 designs `mode_views` and `prot_cond`). |
+| `hierarchy_oracle` | `ghdl`\|`none, hand-checked` | Source of the elaboration oracle (hierarchy and generic values, #8). `ghdl`: the `--disp-tree` output recorded by `tools/oracle`. `none, hand-checked`: a hand-written `golden/hierarchy.txt`, reviewed once; required whenever `ghdl.result` is `unsupported`, `analysis-error` or `elab-error` (the 2019 designs `mode_views` and `prot_cond`, and `force_out`, whose force modes GHDL 6.0.0 cannot parse). |
 | `ghdl`, `nvc` | mapping | What each tool did (below). Present even when the tool is not the oracle, so the reason is on record. |
 | `disagreements` | list | Every point where GHDL and NVC differ (below). Empty when they agree. |
 | `variants` | list | Optional. Extra runs of the same design with other files or another standard, each with its own expected outcome (below). |
@@ -179,13 +188,15 @@ nothing on success, so `messages: []` is the normal pass.
 A variant is a second, independent check of the design: the same
 testbench with some files swapped (`hier_generate` `width_err`: one
 generate instance wired one bit too narrow) or the same files analysed
-under another standard (`vhdl93_only` `std_2002`, `std_2008`: the
-`standard_gated` rejection). Each item has exactly these keys:
+under another standard (`vhdl93_only` `std_2002`, `std_2008`,
+`shared_2002`: the `standard_gated` rejection), or the same files with
+a `--define` (`mode_views` `define_narrow`). Each item has these keys:
 
 | Field | Meaning |
 | --- | --- |
 | `name` | Variant id, unique within the design. |
 | `standard` | Standard the variant runs under. |
+| `defines` | Optional map: the `--define NAME=VALUE` arguments of the run. They override the design config's `defines:` the way the command line does (`config.ApplyDefines`); `tools/oracle` passes the result to NVC as `-D` in the format and semerr sections. |
 | `files` | Full analysis list for the variant, as in `files`. A file that appears only here (for example `hier_generate_width_err.vhd`) is allowed in the design directory. |
 | `expected` | As `expected`. `messages` may list only the first error where parser recovery can add more; the listed ones must appear, in order. |
 | `ghdl`, `nvc` | As for the design. |
@@ -248,7 +259,7 @@ before pinning.
 | `subfolder` | Folder inside the submodule that is parsed (checked out alone for `pr` entries); `.` for the whole tree. |
 | `expected_failures` | List of paths or globs, relative to the submodule, of every upstream file that carries the project's own expected-failure data (for GHDL the `testsuite.sh` scripts of `gna/` and `sanity/` plus both VESTS `non_compliant.exp` lists; for NVC `test/regress/testlist.txt` and every `test/test_*.c`). How each kind is read is written as a comment above the entries in `corpus.yaml`. A `.vhd`/`.vhdl` path or glob names source files that are not VHDL (preprocessor templates, documentation snippets) or are invalid upstream: they may fail, and a one-line comment above each such entry gives the reason. `[]` if every file must parse. |
 
-The bundled IEEE packages in `internal/stdlib/` and the 16 corpus designs
+The bundled IEEE packages in `internal/stdlib/` and the 22 corpus designs
 are always part of the PR set and need no entry. gohard-old is not used.
 
 ## Tooling
@@ -269,7 +280,8 @@ cd - && rm -rf "$w"
 ```
 
 The `command` recorded in each `ghdl`/`nvc` block is run exactly this
-way, from inside the copied design directory.
+way, from inside the copied design directory, which also holds the
+design's `inputs`.
 
 Use `--std=93`/`--std=1993` or `--std=19`/`--std=2019` as the entry's
 `standard` requires. Append `--stop-time=<t>` (after the unit for GHDL,
@@ -284,7 +296,8 @@ GHDL (`ghdl -a`, then `ghdl --elab-run <tb> --vcd=dump.vcd
 with `-fpsl` on every GHDL command (`tree` too) and `--psl` after NVC's
 `-a` when the design's `gohard.yaml` sets `psl.comments`,
 on the main run of every design whose `oracle` names them, in a fresh
-`/tmp` work dir, with `--stop-time=<stop_time>` when the tool's recorded
+`/tmp` work dir that also holds the design's `inputs`, with
+`--stop-time=<stop_time>` when the tool's recorded
 result is `bounded`. Files carrying an IEEE 1735 envelope are left out
 (the `models` stand-in replaces them). Each dump is converted to
 `golden/oracle.<tool>.txt`:
@@ -344,6 +357,14 @@ of it are reversed, since GHDL and NVC clock only the directives after a
 `-- psl default clock`). A design that cannot simulate yet for want of
 an interpreter is logged under plain `go test` and fails under
 `-corpus.require-sim`.
+
+The racy design (`race_order`, invariant `races_by_design`, #63) is
+checked the other way round: at every seed N >= 1 the run must have
+`expected` and, compared with seed 0 as `gohard check --sim --seed N`
+compares it (`corpus.Races`), give exactly one `sim/race` warning; and
+the checked seeds must give at least two different traces.
+`TestRacyDetects` shows the check failing a race_order whose writers no
+longer race.
 
 ## Formatter oracle
 
