@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"slices"
 	"strings"
 	"testing"
 
@@ -247,6 +248,7 @@ func reverseWalk(t *testing.T, d corpus.Design, o simrun.Options,
 	seen := map[int64]string{}
 	record := func(st *simdbg.Stop) {
 		t.Helper()
+		checkpoints(t, s, st)
 		txt := stopText(st)
 		if old, ok := seen[st.Event]; ok && old != txt {
 			fail("event %d reached twice with two states:\n%s\n%s",
@@ -329,6 +331,7 @@ func reverseWalk(t *testing.T, d corpus.Design, o simrun.Options,
 		if b.Stop == nil || b.Stop.Event >= at.Event {
 			fail("move %d back from %d: %+v", m, at.Event, b)
 		}
+		checkpoints(t, s, b.Stop)
 		got := stopText(b.Stop)
 		want, ok := seen[b.Stop.Event]
 		if !ok && fresh < 4 {
@@ -354,6 +357,21 @@ func reverseWalk(t *testing.T, d corpus.Design, o simrun.Options,
 type srcLine struct {
 	path string
 	line int
+}
+
+// checkpoints checks the checkpoints of s, stopped at st: at most
+// simdbg.MaxCheckpoints, in run order, and none after the stop. A move
+// back drops the later ones, so every checkpoint is made from the one
+// before it and they share the trace they recorded (#68); a later one
+// left in place held its own copy of the trace up to it.
+func checkpoints(t *testing.T, s *simdbg.Session, st *simdbg.Stop) {
+	t.Helper()
+	cs := s.CheckpointEvents()
+	if len(cs) == 0 || len(cs) > simdbg.MaxCheckpoints ||
+		!slices.IsSorted(cs) || cs[len(cs)-1] >= st.Event {
+		t.Fatalf("at statement %d: checkpoints after %v statements",
+			st.Event, cs)
+	}
 }
 
 // TestCancel: a cancelled move leaves the session at its stop, and the

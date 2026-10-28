@@ -326,9 +326,13 @@ folder.
   a count names one state, and `simdbg.Session` reaches it by
   replaying: a run is never kept suspended inside a process. The
   session keeps checkpoints (`simrun.Checkpoint`: a
-  `sim.Kernel.Clone`, a copy of the trace recorded so far and of the
-  files written so far) at the start of every kernel cycle it stopped
-  in, at most 16 (past that it drops every other one but the first).
+  `sim.Kernel.Clone`, a copy of the files written so far, and the
+  trace recorded so far, which a `trace.Recorder.Clone` shares instead
+  of copying) at the start of every kernel cycle it stopped in, at
+  most 16 (past that it drops every other one but the first). A move
+  that stops before a checkpoint drops the later ones, which no move
+  from there uses, so each checkpoint is made from the one before it
+  and together they hold the trace up to the last one once.
   A move forward replays from the latest checkpoint before the
   current stop until a statement the move accepts, halts there, keeps
   the state and throws the halted kernel away, then replays once more
@@ -376,9 +380,12 @@ folder.
   file door, which each resume resets to the checkpoint's files, so
   they are stepped one at a time. Every stop copies the values of
   all the run's processes and signals, and every checkpoint the
-  kernel and the trace so far, so a large design stops slower and
-  holds up to 16 such copies. "Run to time T" and VS Code (#3) are
-  not done.
+  kernel, so a large design stops slower and holds up to 16 kernel
+  copies. A move replays to its stop twice (once to find it, once to
+  the start of its cycle) and holds what each replay records until it
+  ends, so a session takes more memory than `gohard check --sim` of
+  the run: 890 MB against 766 MB peak for 40 `next`s after 2 ms of a
+  1 ns clock. "Run to time T" and VS Code (#3) are not done.
 
 ## Files GoHard writes
 

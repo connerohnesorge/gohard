@@ -72,9 +72,9 @@ const (
 
 // MaxCheckpoints is the most checkpoints a session keeps: past it,
 // every other one but the first is dropped. Each holds a copy of the
-// kernel and of the trace so far, so this bounds the session's memory
-// to that many copies of the run's state; fewer checkpoints only make
-// replays longer.
+// kernel and of the files written so far, so this bounds the session's
+// memory to that many copies of the run's state; the trace recorded so
+// far they share (keep). Fewer checkpoints only make replays longer.
 const MaxCheckpoints = 16
 
 // Stop is the state of the run at one statement, before it executes.
@@ -403,23 +403,22 @@ func (s *Session) before(n int64) int {
 	return 0
 }
 
-// keep adds the checkpoint n cycles after checkpoint i (the start of
-// the cycle a replay from i halted in), so the next move starts
-// there.
+// keep makes the checkpoint n cycles after checkpoint i (the start of
+// the cycle a replay from i halted in) the last one, so the next move
+// starts there. Checkpoint i is the latest at or before that cycle;
+// the later ones, which only a move back leaves, are dropped: no move
+// from the new stop uses them (a move forward replays every statement
+// after the stop, a move back looks before it). So every checkpoint is
+// made from the one before it, and as a recorder shares what it
+// recorded with its clones (trace.Recorder.Clone), the checkpoints
+// together hold the trace up to the last one once, not once each.
 func (s *Session) keep(i int, n int64) {
+	clear(s.cps[i+1:])
+	s.cps = s.cps[:i+1]
 	if n <= 0 {
 		return
 	}
 	base := s.cps[i]
-	cycle := base.cycle + n
-	j, found := slices.BinarySearchFunc(s.cps, cycle, func(c checkpoint,
-		cy int64,
-	) int {
-		return int(c.cycle - cy)
-	})
-	if found {
-		return
-	}
 	r := base.cp.Resume()
 	s.h.set(base.events, modeCount, 0, 0, nil)
 	for k := int64(0); k < n; k++ {
@@ -430,13 +429,14 @@ func (s *Session) keep(i int, n int64) {
 			return // cannot happen: the replay went further
 		}
 	}
-	cp := checkpoint{cp: r.Checkpoint(), events: s.h.count, cycle: cycle}
-	s.cps = slices.Insert(s.cps, j, cp)
+	s.cps = append(s.cps, checkpoint{cp: r.Checkpoint(),
+		events: s.h.count, cycle: base.cycle + n})
 	if len(s.cps) > MaxCheckpoints {
 		kept := s.cps[:1]
 		for k := 2; k < len(s.cps); k += 2 {
 			kept = append(kept, s.cps[k])
 		}
+		clear(s.cps[len(kept):])
 		s.cps = kept
 	}
 }
