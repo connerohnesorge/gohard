@@ -1,6 +1,7 @@
 package simrun
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/coverage"
@@ -19,6 +20,7 @@ import (
 // the editor's sliced runs share one code path (#35).
 type Running struct {
 	out  Outcome
+	d    *elab.Design
 	k    *sim.Kernel
 	rec  *trace.Recorder
 	ov   *env.Overlay
@@ -80,6 +82,7 @@ func Start(o Options) *Running {
 		return r
 	}
 	r.rec = trace.NewRecorder(o.Sim.DumpScope)
+	r.d = d
 	out.Model = d.Model
 	so := sim.Options{Seed: o.Seed,
 		Order: Order(o.Seed), TimeBudget: sim.Time(o.Sim.TimeBudget),
@@ -91,6 +94,9 @@ func Start(o Options) *Running {
 		// executes from the kernel's initialization on.
 		r.cov = coverage.New(o.Result, d)
 		d.SetStmtHook(r.cov)
+	} else if o.Hook != nil {
+		so.Uncached = true
+		d.SetStmtHook(o.Hook)
 	}
 	if o.Orders != nil {
 		so.Observe = o.Orders.Observe
@@ -167,3 +173,38 @@ func (r *Running) Asserts() sim.Asserts {
 
 // Outcome is the finished run; call it once Done.
 func (r *Running) Outcome() Outcome { return r.out }
+
+// Design is the elaborated design; nil when elaboration failed.
+func (r *Running) Design() *elab.Design { return r.d }
+
+// Checkpoint is a frozen run in progress (#68): Resume continues it
+// from where it was frozen, as often as needed, and every resumed run
+// goes on exactly as the frozen one would have. The resumed runs
+// share the elaborated design (its statement hook included) and the
+// interpreter's file door, an env.Overlay that Resume resets to the
+// files of the checkpoint: step only the run resumed last.
+type Checkpoint struct {
+	r     *Running
+	files *env.Overlay
+}
+
+// Checkpoint freezes r, which must not be stepped again; a run that
+// is done or records coverage cannot be frozen (nil).
+func (r *Running) Checkpoint() *Checkpoint {
+	if r.done || r.cov != nil {
+		return nil
+	}
+	return &Checkpoint{r: r, files: r.ov.Clone()}
+}
+
+// Resume returns a run that continues from c: a sim.Kernel.Clone of
+// its kernel writing to a copy of its trace so far.
+func (c *Checkpoint) Resume() *Running {
+	r := *c.r
+	r.k = c.r.k.Clone()
+	r.rec = c.r.rec.Clone()
+	r.k.SetWriter(r.rec)
+	r.out.Diagnostics = slices.Clone(c.r.out.Diagnostics)
+	*r.ov = *c.files.Clone()
+	return &r
+}

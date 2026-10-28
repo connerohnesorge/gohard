@@ -82,6 +82,11 @@ type Options struct {
 	// coverage (#62) in Outcome.Coverage. It changes no value, trace,
 	// diagnostic or step count.
 	Coverage bool
+	// Hook, when set and Coverage is not, is installed on the design
+	// like the coverage collector (elab.Design.SetStmtHook): the
+	// debugger's (#68). Only a DebugHook that halts the run changes
+	// it.
+	Hook sema.StmtHook
 }
 
 // Env is what a run sees of the world besides its options (#18). The
