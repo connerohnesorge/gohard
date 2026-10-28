@@ -644,6 +644,26 @@ analyzer answers without waiting for the analysis. A change of the
 `inlay_hints.*` keys sends `workspace/inlayHint/refresh` to a client
 that supports it.
 
+The generated code actions (#57, `internal/ide/generate.go` and
+`testbench.go`) are pure functions of the snapshot's analysis, like
+the quick fixes: Instantiate entity, Declare component and Complete
+port map (`refactor.rewrite`) and Create testbench (`source`). They
+find their statement in the syntax tree and their entity in sema's
+libraries. Every text they write is laid out by the formatter: an
+edit is the replaced range of the edited document after
+`format.Range` over it, a new file `format.Format` of its text, both
+with the snapshot's `format.*` keys. Create testbench is a
+`CreateFile` resource operation (`server.FileEdit.Create`, sent as
+`documentChanges`), offered only when the client's initialize names
+`create` in `workspace.workspaceEdit.resourceOperations`; the server
+passes that to `Analyzer.CodeActions`. `TestGeneratedTestbench` (ide)
+checks on every entity of the corpus and of generated designs that
+the testbench is formatted, adds no diagnostic, simulates to its end
+without a budget overrun, and that the three rewrites restore its
+instance; `TestGeneratedTestbenchCorpus` (cli) runs the testbenches of
+the clocked corpus entities through `gohard lsp codeaction` and
+`gohard check --sim`.
+
 ## VHDL-2019 in v1.1 (#18, #27)
 
 v1.1 is the release under test (`corpus.Release`); the corpus designs

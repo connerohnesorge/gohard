@@ -7,8 +7,10 @@ v1.0 features are standard LSP: diagnostics, hover, go-to-definition,
 references, rename, completion, document and workspace symbols,
 formatting, folding, highlights, the simulation code lens and the
 "Open waveform" code action. v2 adds semantic tokens (#55, see
-[Semantic tokens](#semantic-tokens)) and signature help and inlay hints
-(#56, see [Signature help and inlay hints](#signature-help-and-inlay-hints)).
+[Semantic tokens](#semantic-tokens)), signature help and inlay hints
+(#56, see [Signature help and inlay hints](#signature-help-and-inlay-hints))
+and code actions that write instances, component declarations, port
+maps and testbenches (#57, see [Code actions](#code-actions)).
 CI checks Neovim (#38) and VS Code (#3) end to end. Helix works with
 no extension. Zed and VS Code have extensions, in `editors/zed` (#65)
 and `editors/vscode` (#3). The configs proposed to nvim-lspconfig,
@@ -505,6 +507,64 @@ set `gohard.inlay_hints.parameter_names` and the other kinds
 help at a position, and `gohard lsp inlay-hints --at PATH:LINE:COL
 [END_LINE:END_COL]` the hints from the position to the end (the end
 of the file without one).
+
+## Code actions
+
+Besides its quick fixes (`quickfix`: add a missing `use`, map an
+unmapped library, add a signal to a sensitivity list) and "Open
+waveform", the server offers four actions that write VHDL (#57). The
+`codeActionKinds` it advertises are `quickfix`, `refactor.rewrite` and
+`source`.
+
+| Action | Kind | Where | Does |
+| --- | --- | --- | --- |
+| Instantiate entity LIB.NAME | `refactor.rewrite` | on a concurrent statement that is only a name, `counter` or `work.counter` (with or without `;`, with or without a label) | replaces it with `u_counter : entity work.counter generic map (...) port map (...);` listing every formal; a name the unit's library does not declare is looked up in the other project libraries, and the unit gets `library LIB;` when it does not name LIB yet |
+| Declare component NAME | `refactor.rewrite` | on a component instantiation whose component is not declared | adds the component declaration of the entity of that name, its generics and ports as the entity writes them, at the end of the architecture's declarative part |
+| Complete port map | `refactor.rewrite` | on an instance whose port map leaves formals out | adds the missing formals after the last association, each on a line of its own when the map spans lines |
+| Create testbench NAME_tb.vhd | `source` | in an entity's design unit, when the entity has ports | creates `NAME_tb.vhd` next to the entity's file |
+
+Instantiate entity and Complete port map write `formal => formal` when
+an object of the formal's name is visible at the instance, else
+`formal => open` when the formal has a default or is a port of a mode
+other than `in`, else `formal => formal` for you to declare. Every
+generated text is laid out by the formatter with the `format.*` keys
+of `gohard.yaml`, so `gohard fmt --check` accepts a formatted file
+after the edit.
+
+The testbench repeats the entity's context clause and declares a
+constant for every generic (its default; without one, the value in the
+type's range nearest to 0, or `T'left`, or `""` for a string-like
+type), a signal for every port with the port's subtype and default,
+and the instance `u_NAME`. A port looks like a clock when it is an
+`in` port of type `std_logic` or `std_ulogic` whose name, in any
+letter case, is `clk` or `clock` or starts with `clk_` or ends with
+`_clk`. Each clock gets a process toggling it with the period
+`CLK_PERIOD` (10 ns). The stimulus process waits 100 clock periods,
+or 100 ns without a clock, then calls `std.env.finish`. Under
+`standard: "1993"` or `"2002"`, which have no `std.env`, the stimulus
+sets the signal `done` instead, which stops the clocks, and every
+process ends with `wait;`, so the run ends when nothing is left to
+do. The testbench has no ports, so it is a testbench without any
+`simulation.testbenches` entry. Names the testbench adds get a `_2`
+suffix when a port or generic already uses them.
+
+Create testbench is offered only when the client announces
+`workspace.workspaceEdit.resourceOperations` with `create`: the edit
+is a `CreateFile` operation followed by the file's text. It is not
+offered when `NAME_tb.vhd` or a unit `NAME_tb` already exists, when
+the new file would not be analyzed into the entity's library (a folder
+starting with `.`, a folder outside the project root that `libraries`
+does not list, or an entity whose file `libraries` lists as a file
+entry), or when the entity has a generic type, subprogram or package,
+a generic without a default whose type has no placeholder, or a port
+of a mode view, of a shared variable, or of a subtype that is not
+fully constrained.
+
+`gohard lsp codeaction --at PATH:LINE:COL` prints the code actions at a
+position; with a TITLE argument it applies that action instead,
+writing its edits and creating its file, and prints it.
+`--no-resource-operations` plays a client without the `create`
+resource operation.
 
 ## Platform notes
 
