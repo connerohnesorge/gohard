@@ -56,6 +56,29 @@ func NewRecorder(dumpScope []string) *Recorder {
 	return &Recorder{dumpScope: slices.Clone(dumpScope)}
 }
 
+// Clone returns an independent copy of r: the copy holds what r
+// recorded so far, and each goes on recording without the other
+// seeing it, as a forked kernel needs (sim.Kernel.Clone, #68).
+func (r *Recorder) Clone() *Recorder {
+	c := *r
+	c.dumpScope = slices.Clone(r.dumpScope)
+	c.sigMap = slices.Clone(r.sigMap)
+	c.procMap = slices.Clone(r.procMap)
+	if r.t != nil {
+		// The declarations never change after Begin; the changes and
+		// events are appended to, and Trace sorts them in place. A
+		// recorded value is never changed once recorded.
+		t := *r.t
+		t.Types, t.Scopes = slices.Clip(t.Types), slices.Clip(t.Scopes)
+		t.Signals = slices.Clip(t.Signals)
+		t.Processes = slices.Clip(t.Processes)
+		t.Changes = slices.Clone(r.t.Changes)
+		t.Events = slices.Clone(r.t.Events)
+		c.t = &t
+	}
+	return &c
+}
+
 func (r *Recorder) fail(err error) error {
 	if r.err == nil {
 		r.err = err

@@ -534,7 +534,9 @@ func (k *Kernel) Clone() *Kernel {
 	return &c
 }
 
-// SetWriter sets the trace writer of a kernel that has not started.
+// SetWriter sets the trace writer of a kernel that has not started,
+// or of a Clone, whose writer must then hold what the original's
+// recorded so far (trace.Recorder.Clone).
 func (k *Kernel) SetWriter(w trace.Writer) { k.opts.Writer = w }
 
 // Now returns the current simulated time; Delta the current delta.

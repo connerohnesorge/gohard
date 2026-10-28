@@ -50,6 +50,18 @@ func NewOverlay(base FS, root string) *Overlay {
 		reads: map[string]string{}, lists: map[string]string{}}
 }
 
+// Clone returns a copy of o that shares only Base: what the run wrote,
+// created, removed, read and listed so far, which each goes on
+// changing on its own (the debugger's checkpoints, #68). A stored
+// file's content is never changed in place, only replaced.
+func (o *Overlay) Clone() *Overlay {
+	c := *o
+	c.files, c.dirs = maps.Clone(o.files), maps.Clone(o.dirs)
+	c.gone, c.reads = maps.Clone(o.gone), maps.Clone(o.reads)
+	c.lists = maps.Clone(o.lists)
+	return &c
+}
+
 // Input is one project file a run read through Base: its
 // root-relative slash path and the lowercase hex sha256 of what it
 // read, or "" when the file did not exist. The run's inputs are part
