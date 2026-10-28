@@ -16,8 +16,9 @@ import (
 
 func init() { provide(server.FeatureCodeActions) }
 
-// CodeActions implements server.Analyzer (Analysis.QuickFixes).
-func (a *Analyzer) CodeActions(q server.Query, r server.Span,
+// CodeActions implements server.Analyzer (Analysis.QuickFixes). No
+// quick fix creates a file.
+func (a *Analyzer) CodeActions(q server.Query, r server.Span, _ bool,
 ) server.Task[[]server.CodeAction] {
 	return Query(a, q.Snap, func(an *Analysis) []server.CodeAction {
 		return an.QuickFixes(q.URI, r)
@@ -96,7 +97,7 @@ func (an *Analysis) mapLibrary(path string, off int) []server.CodeAction {
 		if !ok {
 			return nil
 		}
-		return []server.CodeAction{{Title: title, Kind: "quickfix",
+		return []server.CodeAction{{Title: title, Kind: server.ActionQuickFix,
 			Preferred: preferred, Edits: []server.FileEdit{{
 				URI: cfg.URI, Edits: []server.Edit{ed}}}}}
 	}
@@ -194,7 +195,7 @@ func (an *Analysis) addUse(path, uri string, text []byte, s, e int,
 		ed := insertContext(u, text, clause, needLib, lib)
 		out = append(out, server.CodeAction{
 			Title: "Add " + strings.TrimSuffix(clause, ";"),
-			Kind:  "quickfix", Preferred: len(cands) == 1,
+			Kind:  server.ActionQuickFix, Preferred: len(cands) == 1,
 			Edits: []server.FileEdit{{URI: uri,
 				Edits: []server.Edit{ed}}},
 		})
@@ -230,7 +231,7 @@ func (an *Analysis) addSensitivity(path, uri string, text []byte, s, e int,
 		at := last.Span().Start
 		return []server.CodeAction{{
 			Title: "Add " + name + " to the sensitivity list",
-			Kind:  "quickfix", Preferred: true,
+			Kind:  server.ActionQuickFix, Preferred: true,
 			Edits: []server.FileEdit{{URI: uri, Edits: []server.Edit{{
 				Span: server.Span{Start: at, End: at}, NewText: ", " + name,
 			}}}},

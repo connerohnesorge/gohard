@@ -67,8 +67,12 @@ type State struct {
 	progressOK bool // window.workDoneProgress
 	// watchReg: the client registers file watchers dynamically.
 	watchReg bool
-	folder   string
-	root     string
+	// createFiles: the client applies CreateFile resource operations
+	// (workspace.workspaceEdit.resourceOperations has "create"), so
+	// code actions may create files (#57).
+	createFiles bool
+	folder      string
+	root        string
 
 	file     *config.Loaded // gohard.yaml, once loaded
 	editor   *config.Config // editor settings, if the client sent any

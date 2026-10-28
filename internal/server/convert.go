@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"slices"
 
 	"github.com/connerohnesorge/gohard/internal/span"
 )
@@ -81,13 +82,41 @@ func (c conv) renamed(r Renamed) any {
 	return c.workspaceEdit(r.Edits)
 }
 
+// workspaceEdit is the WorkspaceEdit of fs: changes by URI, or, when
+// one of them creates its document, documentChanges in order, each
+// created document's CreateFile before its edits (#57).
 func (c conv) workspaceEdit(fs []FileEdit) any {
-	changes := map[string]any{}
+	if !slices.ContainsFunc(fs, func(f FileEdit) bool { return f.Create }) {
+		changes := map[string]any{}
+		for _, f := range fs {
+			changes[f.URI] = c.edits(f.URI, f.Edits)
+		}
+		return struct {
+			Changes map[string]any `json:"changes"`
+		}{changes}
+	}
+	type create struct {
+		Kind string `json:"kind"`
+		URI  string `json:"uri"`
+	}
+	type doc struct {
+		URI     string `json:"uri"`
+		Version *int   `json:"version"`
+	}
+	type docEdit struct {
+		TextDocument doc `json:"textDocument"`
+		Edits        any `json:"edits"`
+	}
+	var changes []any
 	for _, f := range fs {
-		changes[f.URI] = c.edits(f.URI, f.Edits)
+		if f.Create {
+			changes = append(changes, create{"create", f.URI})
+		}
+		changes = append(changes, docEdit{doc{URI: f.URI},
+			c.edits(f.URI, f.Edits)})
 	}
 	return struct {
-		Changes map[string]any `json:"changes"`
+		DocumentChanges []any `json:"documentChanges"`
 	}{changes}
 }
 

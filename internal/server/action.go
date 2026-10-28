@@ -141,7 +141,9 @@ func init() {
 		},
 		{
 			Name: "codeaction", Method: "textDocument/codeAction",
-			Summary: "quick fixes for the diagnostics at the position",
+			Summary: "the code actions at the position; with TITLE " +
+				"apply that action",
+			Args: "[TITLE]",
 			Params: func(uri string, pos Position, args []string) (any,
 				error,
 			) {
@@ -157,7 +159,12 @@ func init() {
 				p.TextDocument.URI = uri
 				p.Range = Range{Start: pos, End: pos}
 				p.Context.Diagnostics = []any{}
-				return p, noArgs("codeaction", args)
+				if len(args) > 1 {
+					return nil, errors.New("gohard lsp codeaction takes " +
+						"at most one argument, the title of the action " +
+						"to apply")
+				}
+				return p, nil
 			},
 		},
 		{
@@ -214,6 +221,15 @@ var ErrNotProvided = errors.New("the analyzer does not provide it")
 // publishMethod is the notification the diagnostics action reports.
 const publishMethod = "textDocument/publishDiagnostics"
 
+// ActionClient is what the client of RunAction announces besides the
+// utf-8 position encoding.
+type ActionClient struct {
+	// NoResourceOperations leaves out
+	// workspace.workspaceEdit.resourceOperations ["create"], so no
+	// code action that creates a file is offered (#57).
+	NoResourceOperations bool
+}
+
 // RunAction runs a at the zero-based UTF-8 position pos of the file
 // path (an OS path) on the server's own code path: an in-memory
 // session in folder that negotiates utf-8, opens the file with text,
@@ -223,6 +239,7 @@ const publishMethod = "textDocument/publishDiagnostics"
 // after the open (the quiescent diagnostics, equal to `gohard check`).
 func RunAction(e env.Env, o Options, jobs int, folder string, a Action,
 	path string, text []byte, pos Position, args []string,
+	client ActionClient,
 ) (*jsonrpc2.Response, error) {
 	uri := PathToURI(path)
 	params, err := a.Params(uri, pos, args)
@@ -252,11 +269,18 @@ func RunAction(e env.Env, o Options, jobs int, folder string, a Action,
 		}
 		return nil
 	})
+	edit := map[string]any{"documentChanges": true}
+	if !client.NoResourceOperations {
+		edit["resourceOperations"] = []string{"create"}
+	}
 	init := map[string]any{
 		"processId": nil,
 		"rootUri":   PathToURI(folder),
-		"capabilities": map[string]any{"general": map[string]any{
-			"positionEncodings": []string{"utf-8"}}},
+		"capabilities": map[string]any{
+			"general": map[string]any{
+				"positionEncodings": []string{"utf-8"}},
+			"workspace": map[string]any{"workspaceEdit": edit},
+		},
 	}
 	open := map[string]any{"textDocument": map[string]any{
 		"uri": uri, "languageId": "vhdl", "version": 1,

@@ -223,7 +223,8 @@ func (s *State) runner(method string, q Query, p docParams,
 			r = toSpan(d.index, *p.Range, s.enc)
 		}
 		q.Offset = r.Start
-		return runTask(an.CodeActions(q, r), c.codeActions)
+		return runTask(an.CodeActions(q, r, s.createFiles),
+			c.codeActions)
 	case "textDocument/codeLens":
 		return runTask(an.CodeLens(snap, uri), func(ls []Lens) any {
 			return c.lenses(uri, ls)

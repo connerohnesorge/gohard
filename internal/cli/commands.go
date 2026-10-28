@@ -192,6 +192,12 @@ var commands = []Command{
 				Usage: "rename: print the edit plan, write nothing",
 			},
 			envFlag,
+			{
+				Name: "no-resource-operations", Kind: Bool,
+				Usage: "codeaction: a client without the create " +
+					"resource operation, which gets no action that " +
+					"creates a file",
+			},
 			realEnvFlag,
 			{
 				Name: "record", Kind: String, Value: "DIR",

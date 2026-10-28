@@ -113,7 +113,8 @@ func TestRunAction(t *testing.T) {
 	}
 	resp, err := server.RunAction(sim.Env(), server.Options{
 		Analyzer: echo{}}, 1, workDir, a, "/work/top.vhd", text,
-		server.Position{Line: 0, Character: 10}, nil)
+		server.Position{Line: 0, Character: 10}, nil,
+		server.ActionClient{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -124,14 +125,15 @@ func TestRunAction(t *testing.T) {
 		t.Fatalf("got %s", resp.Result)
 	}
 	_, err = server.RunAction(sim.Env(), server.Options{}, 1, workDir, a,
-		"/work/top.vhd", text, server.Position{}, nil)
+		"/work/top.vhd", text, server.Position{}, nil,
+		server.ActionClient{})
 	if !errors.Is(err, server.ErrNotProvided) {
 		t.Fatalf("Nop: %v", err)
 	}
 	r, _ := server.LookupAction("rename")
 	if _, err := server.RunAction(sim.Env(), server.Options{}, 1,
 		workDir, r, "/work/top.vhd", text, server.Position{},
-		nil); err == nil {
+		nil, server.ActionClient{}); err == nil {
 		t.Fatal("rename without a new name was accepted")
 	}
 	defer func() {

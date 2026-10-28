@@ -52,10 +52,15 @@ type Analyzer interface {
 	// Features.Commands (for example running a testbench, #35).
 	Command(snap *Snapshot, name string,
 		args []json.RawMessage) Task[json.RawMessage]
-	// CodeActions returns the quick fixes for the diagnostics of the
-	// range r of the document q.URI (q.Offset is r.Start): add a
-	// missing use, map an unmapped library (#25, #34).
-	CodeActions(q Query, r Span) Task[[]CodeAction]
+	// CodeActions returns the code actions of the range r of the
+	// document q.URI (q.Offset is r.Start): the quick fixes of its
+	// diagnostics (add a missing use, map an unmapped library, #25,
+	// #34), then the rewrites and source actions there (instantiate
+	// an entity, declare a component, complete a port map, create a
+	// testbench, #57). create reports whether the client applies
+	// CreateFile resource operations; without it no action creates a
+	// file.
+	CodeActions(q Query, r Span, create bool) Task[[]CodeAction]
 	// SemanticTokens returns the semantic tokens of the whole
 	// document uri, sorted by position and not overlapping (#55); a
 	// token may span lines. The server splits them per line, encodes
@@ -151,10 +156,13 @@ type Hover struct {
 	Span     *Span
 }
 
-// FileEdit are the edits of one document.
+// FileEdit are the edits of one document. With Create the document
+// does not exist yet: the edit creates it (a CreateFile resource
+// operation, #57) and Edits insert its text at offset 0.
 type FileEdit struct {
-	URI   string
-	Edits []Edit
+	URI    string
+	Edits  []Edit
+	Create bool
 }
 
 // Renamed is the result of a rename: the edits of every affected
@@ -214,15 +222,25 @@ type Lens struct {
 	Args    []json.RawMessage
 }
 
-// CodeAction is a quick fix: the edits of every affected document,
-// which may include gohard.yaml (Snapshot.ConfigDocument).
+// CodeAction is a quick fix, rewrite or source action: the edits of
+// every affected document, which may include gohard.yaml
+// (Snapshot.ConfigDocument) and a document it creates.
 type CodeAction struct {
 	Title string
-	// Kind is the LSP CodeActionKind ("quickfix").
+	// Kind is the LSP CodeActionKind ("quickfix", "refactor.rewrite"
+	// or "source").
 	Kind      string
 	Preferred bool
 	Edits     []FileEdit
 }
+
+// The code action kinds of CodeAction.Kind; the server advertises
+// them in codeActionKinds (#57).
+const (
+	ActionQuickFix = "quickfix"
+	ActionRewrite  = "refactor.rewrite"
+	ActionSource   = "source"
+)
 
 // SemToken is one semantic token: Span in one document, Type an index
 // into Features.TokenTypes, Mods a set of Features.TokenModifiers
@@ -348,7 +366,7 @@ func (Nop) Command(*Snapshot, string,
 }
 
 // CodeActions implements Analyzer.
-func (Nop) CodeActions(Query, Span) Task[[]CodeAction] {
+func (Nop) CodeActions(Query, Span, bool) Task[[]CodeAction] {
 	return Done[[]CodeAction](nil)
 }
 

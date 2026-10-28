@@ -38,6 +38,9 @@ type initializeParams struct {
 			DidChangeWatchedFiles struct {
 				DynamicRegistration bool `json:"dynamicRegistration"`
 			} `json:"didChangeWatchedFiles"`
+			WorkspaceEdit struct {
+				ResourceOperations []string `json:"resourceOperations"`
+			} `json:"workspaceEdit"`
 		} `json:"workspace"`
 	} `json:"capabilities"`
 }
@@ -114,6 +117,8 @@ func (s *State) initialize(o *out, m call) {
 	s.hintRefresh = p.Capabilities.Workspace.InlayHint.RefreshSupport
 	s.watchReg = p.Capabilities.Workspace.DidChangeWatchedFiles.
 		DynamicRegistration
+	s.createFiles = slices.Contains(
+		p.Capabilities.Workspace.WorkspaceEdit.ResourceOperations, "create")
 	s.folder, _ = p.Folder()
 	s.root = s.folder
 	s.phase = phaseInitialized
@@ -349,7 +354,8 @@ func (s *State) capabilities() map[string]any {
 	set(FeatureCodeLens, "codeLensProvider",
 		map[string]any{"resolveProvider": false})
 	set(FeatureCodeActions, "codeActionProvider",
-		map[string]any{"codeActionKinds": []string{"quickfix"}})
+		map[string]any{"codeActionKinds": []string{ActionQuickFix,
+			ActionRewrite, ActionSource}})
 	set(FeatureSemanticTokens, "semanticTokensProvider",
 		tokensCapability(f))
 	sigTriggers := slices.Clone(f.SignatureTriggers)

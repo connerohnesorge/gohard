@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"io/fs"
 	"maps"
 	"path/filepath"
 	"slices"
@@ -229,7 +230,10 @@ func replayLSP(inv *Invocation) Result {
 // lspAction is `gohard lsp ACTION --at PATH:LINE:COL [ARG...]` (#26).
 // It runs the action through server.RunAction, the server's own code
 // path, and prints the LSP result as JSON on stdout. Positions in the
-// output are LSP positions (zero-based) in UTF-8 code units.
+// output are LSP positions (zero-based) in UTF-8 code units. A rename
+// writes its edits unless --dry-run; `codeaction ... TITLE` writes the
+// edits of the action titled TITLE, creating the files it creates, and
+// prints that action (#57).
 func lspAction(inv *Invocation) Result {
 	name := inv.Args[0]
 	if name == "sim" {
@@ -279,7 +283,9 @@ func lspAction(inv *Invocation) Result {
 	p := x.Position(off, span.UTF8)
 	resp, err := server.RunAction(inv.Env, serverOptions(inv, true),
 		inv.Jobs, wd, a, path, text,
-		server.Position{Line: p.Line, Character: p.Col}, inv.Args[1:])
+		server.Position{Line: p.Line, Character: p.Col}, inv.Args[1:],
+		server.ActionClient{
+			NoResourceOperations: inv.Bool("no-resource-operations")})
 	switch {
 	case errors.Is(err, server.ErrNotProvided):
 		return inv.Fail(diag.New(diag.CLINotImplemented, "lsp "+name))
@@ -293,13 +299,45 @@ func lspAction(inv *Invocation) Result {
 	case resp.Error != nil:
 		panic("gohard lsp " + name + ": " + resp.Error.Message)
 	}
-	if name == "rename" && !inv.Bool("dry-run") {
-		if err := applyEdits(fsys, resp.Result); err != nil {
+	// A rename is applied unless --dry-run; a code action when its
+	// title is given (#57).
+	result, edit := resp.Result, resp.Result
+	apply := name == "rename" && !inv.Bool("dry-run")
+	if name == "codeaction" && len(inv.Args) == 2 {
+		var ok bool
+		result, edit, ok = pickAction(resp.Result, inv.Args[1])
+		if !ok {
+			return inv.usage("gohard lsp codeaction: no action with " +
+				"edits is titled " + strconv.Quote(inv.Args[1]))
+		}
+		apply = true
+	}
+	if apply {
+		if err := applyEdits(fsys, edit); err != nil {
 			return inv.Fail(diag.New(diag.CLIOutputFailed, file,
 				errReason(err)))
 		}
 	}
-	return Result{Stdout: append(compactJSON(resp.Result), '\n')}
+	return Result{Stdout: append(compactJSON(result), '\n')}
+}
+
+// pickAction returns the code action titled title that has edits, and
+// its WorkspaceEdit, from the actions of a codeAction response.
+func pickAction(result json.RawMessage, title string,
+) (action, edit json.RawMessage, ok bool) {
+	var as []json.RawMessage
+	_ = json.Unmarshal(result, &as)
+	for _, a := range as {
+		var v struct {
+			Title string          `json:"title"`
+			Edit  json.RawMessage `json:"edit"`
+		}
+		if json.Unmarshal(a, &v) == nil && v.Title == title &&
+			v.Edit != nil {
+			return a, v.Edit, true
+		}
+	}
+	return nil, nil, false
 }
 
 // parseAt splits PATH:LINE:COL from the right, so a path may hold ':'.
@@ -331,48 +369,93 @@ func compactJSON(b []byte) []byte {
 	return out.Bytes()
 }
 
-// applyEdits writes a rename's WorkspaceEdit ({"changes":{uri:[...]}},
-// UTF-8 positions) to the files, each through a temp file and a rename.
+// textEdit is an LSP TextEdit in UTF-8 positions.
+type textEdit struct {
+	Range   server.Range `json:"range"`
+	NewText string       `json:"newText"`
+}
+
+// applyEdits writes a WorkspaceEdit (UTF-8 positions) to the files,
+// each through a temp file and a rename: the changes of a rename
+// ({"changes":{uri:[...]}}), or the documentChanges of a code action,
+// whose CreateFile operations create files that must not exist yet
+// (#57).
 func applyEdits(fsys env.FS, result json.RawMessage) error {
 	var we struct {
-		Changes map[string][]struct {
-			Range   server.Range `json:"range"`
-			NewText string       `json:"newText"`
-		} `json:"changes"`
+		Changes         map[string][]textEdit `json:"changes"`
+		DocumentChanges []struct {
+			Kind         string `json:"kind"`
+			URI          string `json:"uri"`
+			TextDocument struct {
+				URI string `json:"uri"`
+			} `json:"textDocument"`
+			Edits []textEdit `json:"edits"`
+		} `json:"documentChanges"`
 	}
 	if err := json.Unmarshal(result, &we); err != nil {
 		return err
 	}
 	for _, uri := range slices.Sorted(maps.Keys(we.Changes)) {
-		path, ok := server.URIToPath(uri)
-		if !ok {
-			continue
-		}
-		text, err := fsys.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		x := span.NewIndex(text)
-		edits := we.Changes[uri]
-		type sp struct {
-			a, b int
-			s    string
-		}
-		var ss []sp
-		for _, e := range edits {
-			a, _ := x.Offset(span.Position{Line: e.Range.Start.Line,
-				Col: e.Range.Start.Character}, span.UTF8)
-			b, _ := x.Offset(span.Position{Line: e.Range.End.Line,
-				Col: e.Range.End.Character}, span.UTF8)
-			ss = append(ss, sp{a, max(a, b), e.NewText})
-		}
-		slices.SortStableFunc(ss, func(p, q sp) int { return q.a - p.a })
-		for _, e := range ss {
-			text = slices.Concat(text[:e.a], []byte(e.s), text[e.b:])
-		}
-		if err := writeOutput(fsys, path, text); err != nil {
+		if err := applyFileEdits(fsys, uri, we.Changes[uri],
+			false); err != nil {
 			return err
 		}
 	}
+	created := map[string]bool{}
+	for _, c := range we.DocumentChanges {
+		switch {
+		case c.Kind == "create":
+			created[c.URI] = true
+		case c.Kind == "":
+			uri := c.TextDocument.URI
+			if err := applyFileEdits(fsys, uri, c.Edits,
+				created[uri]); err != nil {
+				return err
+			}
+			created[uri] = false
+		default:
+			return errors.New("unexpected resource operation " + c.Kind)
+		}
+	}
 	return nil
+}
+
+// applyFileEdits applies edits to the file uri; with create the file
+// starts empty and must not exist.
+func applyFileEdits(fsys env.FS, uri string, edits []textEdit,
+	create bool,
+) error {
+	path, ok := server.URIToPath(uri)
+	if !ok {
+		return nil
+	}
+	var text []byte
+	if create {
+		if _, err := fsys.Lstat(path); err == nil {
+			return fs.ErrExist
+		}
+	} else {
+		var err error
+		if text, err = fsys.ReadFile(path); err != nil {
+			return err
+		}
+	}
+	x := span.NewIndex(text)
+	type sp struct {
+		a, b int
+		s    string
+	}
+	var ss []sp
+	for _, e := range edits {
+		a, _ := x.Offset(span.Position{Line: e.Range.Start.Line,
+			Col: e.Range.Start.Character}, span.UTF8)
+		b, _ := x.Offset(span.Position{Line: e.Range.End.Line,
+			Col: e.Range.End.Character}, span.UTF8)
+		ss = append(ss, sp{a, max(a, b), e.NewText})
+	}
+	slices.SortStableFunc(ss, func(p, q sp) int { return q.a - p.a })
+	for _, e := range ss {
+		text = slices.Concat(text[:e.a], []byte(e.s), text[e.b:])
+	}
+	return writeOutput(fsys, path, text)
 }
