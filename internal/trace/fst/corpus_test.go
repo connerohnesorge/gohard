@@ -27,26 +27,30 @@ func TestCorpusGoldensStable(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", f, err)
 		}
-		back, err := trace.Decode(trace.Encode(tr))
-		if err != nil {
-			t.Fatal(err)
-		}
 		a, err := Exporter{}.Export(tr)
 		if err != nil {
 			t.Fatalf("%s: %v", f, err)
 		}
-		b, _ := Exporter{}.Export(back)
-		c, _ := Exporter{}.Export(tr)
-		if !bytes.Equal(a, b) || !bytes.Equal(a, c) {
+		if c, _ := (Exporter{}).Export(tr); !bytes.Equal(a, c) {
+			t.Fatalf("%s: FST export not stable", f)
+		}
+		check(t, tr, 0)
+		if len(tr.Changes) < 5000 {
+			check(t, tr, 3)
+		}
+		// The round trip is decoded once tr is no longer used, so one
+		// decoded copy of budget_hang's 200,000 clock edges is live at
+		// a time, not two.
+		back, err := trace.Decode(trace.Encode(tr))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if b, _ := (Exporter{}).Export(back); !bytes.Equal(a, b) {
 			t.Fatalf("%s: FST export not stable", f)
 		}
 		back.Header.Seed ^= 0x5eed
 		if d, _ := (Exporter{}).Export(back); !bytes.Equal(a, d) {
 			t.Fatalf("%s: FST export depends on the seed", f)
-		}
-		check(t, tr, 0)
-		if len(tr.Changes) < 5000 {
-			check(t, tr, 3)
 		}
 	}
 }

@@ -26,12 +26,18 @@ func TestCorpusGoldensStable(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", f, err)
 		}
+		a := Export(tr)
+		if !bytes.Equal(a, Export(tr)) {
+			t.Fatalf("%s: VCD export not stable", f)
+		}
+		// The round trip is decoded once tr is no longer used, so one
+		// decoded copy of budget_hang's 200,000 clock edges is live at
+		// a time, not two.
 		back, err := trace.Decode(trace.Encode(tr))
 		if err != nil {
 			t.Fatal(err)
 		}
-		a := Export(tr)
-		if !bytes.Equal(a, Export(back)) || !bytes.Equal(a, Export(tr)) {
+		if !bytes.Equal(a, Export(back)) {
 			t.Fatalf("%s: VCD export not stable", f)
 		}
 		if !bytes.HasPrefix(a, []byte("$")) ||
