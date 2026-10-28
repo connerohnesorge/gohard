@@ -240,13 +240,15 @@ func TestDerivativeStatesBounded(t *testing.T) {
 	}
 }
 
-// gp is a generated simple-subset property.
+// gp is a generated simple-subset property. op nextevent is
+// next_event(b)[n+1](l), nexteventa and nexteventE are next_event_a and
+// next_event_e (b)[n+1 to hi+1](l) (#66).
 type gp struct {
 	op           string
 	b, b2        int
 	strong, incl bool
 	overlap      bool
-	n            int
+	n, hi        int
 	l, r         *gp
 	s            *gs
 }
@@ -259,14 +261,17 @@ func genP(r *rng, depth int) *gp {
 		return &gp{op: "bool", b: r.n(nBools)}
 	}
 	ops := []string{"and", "or", "always", "never", "eventually", "next",
-		"until", "before", "suffix", "abort", "implies"}
+		"until", "before", "suffix", "abort", "implies", "nextevent",
+		"nexteventa", "nexteventE"}
 	g := &gp{op: ops[r.n(len(ops))], b: r.n(nBools), b2: r.n(nBools),
 		strong: r.n(2) == 0, incl: r.n(2) == 0, overlap: r.n(2) == 0,
 		n: r.n(3)}
+	g.hi = g.n + r.n(3)
 	switch g.op {
 	case "and", "or":
 		g.l, g.r = genP(r, depth-1), genP(r, depth-1)
-	case "always", "next", "abort", "implies":
+	case "always", "next", "abort", "implies", "nextevent", "nexteventa",
+		"nexteventE":
 		g.l = genP(r, depth-1)
 	case "suffix":
 		g.s, g.l = genS(r, 2), genP(r, depth-1)
@@ -304,6 +309,17 @@ func (g *gp) build() *prop {
 		return abortP(g.l.build(), g.b)
 	case "implies":
 		return orP(notP(boolP(g.b)), g.l.build())
+	case "nextevent":
+		return nextEventP(g.b, g.n+1, g.strong, g.l.build())
+	case "nexteventa", "nexteventE":
+		var xs []*prop
+		for k := g.n + 1; k <= g.hi+1; k++ {
+			xs = append(xs, nextEventP(g.b, k, g.strong, g.l.build()))
+		}
+		if g.op == "nexteventE" {
+			return orP(xs...)
+		}
+		return andP(xs...)
 	}
 	panic(g.op)
 }
@@ -323,7 +339,7 @@ func (g *gp) holds(w [][]bool, i, n int, top bool) bool {
 			return g.l.holds(w, i, n, top) || g.r.holds(w, i, n, top)
 		case "eventually":
 			return false
-		case "until", "before":
+		case "until", "before", "nextevent", "nexteventa", "nexteventE":
 			return !g.strong
 		case "next":
 			if g.n == 0 {
@@ -412,6 +428,8 @@ func (g *gp) holds(w [][]bool, i, n int, top bool) bool {
 			}
 		}
 		return true
+	case "nextevent", "nexteventa", "nexteventE":
+		return g.nextEvent(w, i, n, top)
 	case "abort":
 		for j := i; j < n; j++ {
 			if w[j][g.b] {
@@ -421,6 +439,48 @@ func (g *gp) holds(w [][]bool, i, n int, top bool) bool {
 		return g.l.holds(w, i, n, top)
 	}
 	panic(g.op)
+}
+
+// nextEvent is the reference semantics of the next_event family (IEEE
+// 1850 6.2.1.6) at position i of w[:n]: the ticks at and after i on
+// which b holds are counted from 1; l must hold at the k-th of them
+// (next_event), at each of the lo-th to hi-th that the trace reaches
+// (next_event_a) or at one of them (next_event_e). A strong form also
+// needs the trace to reach the last tick it names (next_event_e: one
+// where l holds); a weak one holds when the trace ends first.
+func (g *gp) nextEvent(w [][]bool, i, n int, top bool) bool {
+	lo, hi := g.n+1, g.hi+1
+	if g.op == "nextevent" {
+		hi = lo
+	}
+	var at []int // the lo-th to hi-th ticks of b
+	k := 0
+	for j := i; j < n && k < hi; j++ {
+		if w[j][g.b] {
+			k++
+			if k >= lo {
+				at = append(at, j)
+			}
+		}
+	}
+	// ended: the trace ends before the hi-th tick of b; on a truncated
+	// (aborted) trace that holds, as everything does.
+	ended := k < hi && (top || !g.strong)
+	switch g.op {
+	case "nextevent", "nexteventa":
+		for _, j := range at {
+			if !g.l.holds(w, j, n, top) {
+				return false
+			}
+		}
+		return k >= hi || ended
+	}
+	for _, j := range at {
+		if g.l.holds(w, j, n, top) {
+			return true
+		}
+	}
+	return ended
 }
 
 // check runs p over w the way the runner does: it reports whether no

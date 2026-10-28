@@ -112,13 +112,46 @@ type clockSpec struct {
 }
 
 type builder struct {
-	d     *elab.Design
-	p     *elab.Proc
+	d *elab.Design
+	p *elab.Proc
+	// f is the file whose PSL code is compiled and sc the instance
+	// whose body it is (nil outside one).
 	f     *sema.File
+	sc    *scope
 	dir   *directive
-	bools map[cst.Range]int
+	bools map[boolKey]int
 	calls map[*sema.Expr]bool // the built-in calls compiled
 }
+
+// boolKey names a boolean of the directive: a node of a file's PSL
+// code in an instance of a property or sequence (sc, nil outside one).
+type boolKey struct {
+	f  *sema.File
+	sp cst.Range
+	sc *scope
+}
+
+// scope is one property or sequence instance being compiled (#66):
+// the declaration's formal parameters bound to the instance's actuals,
+// which are read where the instance is written, and the nesting depth
+// of instances.
+type scope struct {
+	args  map[*sema.Decl]actual
+	depth int
+}
+
+// actual is the actual of a formal parameter: the node n of file f,
+// read in the instance sc.
+type actual struct {
+	n  cst.Node
+	f  *sema.File
+	sc *scope
+}
+
+// maxInstances bounds the nesting of property and sequence instances:
+// a declaration that instantiates itself (IEEE 1850 forbids it)
+// reports unsupported/construct there instead of recursing.
+const maxInstances = 64
 
 func compile(d *elab.Design, p *elab.Proc) *directive {
 	n := p.Stmt.Node
@@ -129,7 +162,7 @@ func compile(d *elab.Design, p *elab.Proc) *directive {
 		dir.label = string(p.Stmt.Label.Name)
 	}
 	b := &builder{d: d, p: p, f: p.File, dir: dir,
-		bools: map[cst.Range]int{}, calls: map[*sema.Expr]bool{}}
+		bools: map[boolKey]int{}, calls: map[*sema.Expr]bool{}}
 	switch n.Kind() {
 	case cst.KindPSLAssert:
 		dir.kind = dAssert
@@ -348,25 +381,77 @@ func stringOf(v eval.Value) (string, bool) {
 }
 
 // expr returns the typed expression of n (a PSL boolean or a VHDL
-// expression in PSL code).
+// expression in PSL code). Inside an instance, an expression that is a
+// formal parameter is its actual's (#66); a formal deeper inside an
+// HDL expression is not simulated.
 func (b *builder) expr(n cst.Node) *sema.Expr {
-	if e := b.f.PSLExpr(n); e != nil {
-		return e
-	}
-	for c := range n.Nodes() {
-		if e := b.f.PSLExpr(c); e != nil {
-			return e
+	e := b.f.PSLExpr(n)
+	if e == nil {
+		for c := range n.Nodes() {
+			if e = b.f.PSLExpr(c); e != nil {
+				break
+			}
 		}
 	}
-	return nil
+	if e == nil || b.sc == nil {
+		return e
+	}
+	if a, ok := b.sc.args[formalOf(e)]; ok {
+		var out *sema.Expr
+		b.in(a.f, a.sc, func() { out = b.expr(a.n) })
+		return out
+	}
+	walkExpr(e, func(x *sema.Expr) {
+		if _, ok := b.sc.args[formalOf(x)]; ok {
+			b.unsupported("a formal parameter of a property or " +
+				"sequence inside an HDL expression")
+		}
+	})
+	return e
+}
+
+// formalOf returns the declaration e names when e is a name, else nil.
+func formalOf(e *sema.Expr) *sema.Decl {
+	if e == nil || e.Kind != sema.ExprName {
+		return nil
+	}
+	return e.Decl
+}
+
+// in runs f with the builder reading the file fl in the instance sc.
+func (b *builder) in(fl *sema.File, sc *scope, f func()) {
+	savedF, savedSc := b.f, b.sc
+	b.f, b.sc = fl, sc
+	defer func() { b.f, b.sc = savedF, savedSc }()
+	f()
+}
+
+// formal returns the actual of the PSL operand n when n is a formal
+// parameter of the instance being compiled.
+func (b *builder) formal(n cst.Node) (actual, bool) {
+	if b.sc == nil || n.Kind() != cst.KindPSLBoolean {
+		return actual{}, false
+	}
+	for c := range n.Nodes() {
+		a, ok := b.sc.args[formalOf(b.f.PSLExpr(c))]
+		return a, ok
+	}
+	return actual{}, false
 }
 
 // isBoolean reports whether the PSL operand n is a Boolean: a
-// PSLBoolean, or a call of a built-in function sema typed.
+// PSLBoolean that names no property or sequence, or a call of a
+// built-in function sema typed.
 func (b *builder) isBoolean(n cst.Node) bool {
+	if a, ok := b.formal(n); ok {
+		var out bool
+		b.in(a.f, a.sc, func() { out = b.isBoolean(a.n) })
+		return out
+	}
 	switch n.Kind() {
 	case cst.KindPSLBoolean:
-		return true
+		_, _, ok := b.instanceOf(n)
+		return !ok
 	case cst.KindPSLBuiltinCall:
 		return sema.PSLBuiltin(b.f.PSLExpr(n)) != ""
 	}
@@ -376,7 +461,8 @@ func (b *builder) isBoolean(n cst.Node) bool {
 // boolean returns the index of the boolean n in the directive's
 // letter, adding it on first use.
 func (b *builder) boolean(n cst.Node) int {
-	if i, ok := b.bools[n.Span()]; ok {
+	k := boolKey{b.f, n.Span(), b.sc}
+	if i, ok := b.bools[k]; ok {
 		return i
 	}
 	e := b.expr(n)
@@ -387,8 +473,144 @@ func (b *builder) boolean(n cst.Node) int {
 	b.signals(e)
 	i := len(b.dir.bools)
 	b.dir.bools = append(b.dir.bools, e)
-	b.bools[n.Span()] = i
+	b.bools[k] = i
 	return i
+}
+
+// instanceOf returns the PSL property or sequence declaration that the
+// operand n instantiates (IEEE 1850 6.1.1.1, 6.2.4, #66) and the nodes
+// of its actuals: a property or sequence instance, or a PSLBoolean
+// that is the declaration's name (with actuals in parentheses when
+// the parser read it as an HDL call). ok is false when n is none.
+func (b *builder) instanceOf(n cst.Node) (*sema.Decl, []cst.Node, bool) {
+	var name cst.Node
+	var args []cst.Node
+	switch n.Kind() {
+	case cst.KindPSLPropertyInstance, cst.KindPSLSequenceInstance:
+		for c := range n.Nodes() {
+			if c.Kind() == cst.KindAssociationList {
+				args = slices.Collect(c.Nodes())
+			} else if name.IsZero() {
+				name = c
+			}
+		}
+	case cst.KindPSLBoolean:
+		name = firstKid(n)
+		if c, ok := cst.As[cst.CallOrIndexName](name); ok {
+			name = c.Prefix().Node
+			for item := range c.Args().Items() {
+				args = append(args, item.Actual().Node)
+			}
+		}
+	default:
+		return nil, nil, false
+	}
+	d := b.f.PSLDecl(name)
+	return d, args, d != nil
+}
+
+// instance compiles the body of the declaration d instantiated with
+// the actuals args, with f compiling the body node: the formals are
+// bound to the actuals, read here.
+func (b *builder) instance(d *sema.Decl, args []cst.Node,
+	f func(body cst.Node),
+) {
+	depth := 1
+	if b.sc != nil {
+		depth = b.sc.depth + 1
+	}
+	formals := d.PSLFormals()
+	switch {
+	case depth > maxInstances:
+		b.unsupported("a recursive property or sequence instance")
+		return
+	case len(formals) != len(args):
+		b.unsupported("the instance of " + d.Text)
+		return
+	}
+	sc := &scope{args: map[*sema.Decl]actual{}, depth: depth}
+	for i, x := range formals {
+		sc.args[x] = actual{n: args[i], f: b.f, sc: b.sc}
+	}
+	var body cst.Node
+	switch d.Node.Kind() {
+	case cst.KindPSLPropertyDecl:
+		body = cst.PSLPropertyDecl{Node: d.Node}.Property().Node
+	case cst.KindPSLSequenceDecl:
+		body = cst.PSLSequenceDecl{Node: d.Node}.Sequence().Node
+	}
+	if body.IsZero() || d.File == nil {
+		b.unsupported("an instance of " + d.Text)
+		return
+	}
+	b.in(d.File, sc, func() { f(body) })
+}
+
+// instanceProp compiles an instance of the property or sequence d with
+// the actuals args as a property: a sequence is a weak sequential
+// property, as a braced SERE is.
+func (b *builder) instanceProp(d *sema.Decl, args []cst.Node) *prop {
+	p := pT
+	b.instance(d, args, func(body cst.Node) {
+		if d.Node.Kind() == cst.KindPSLSequenceDecl {
+			p = sereP(states([]*sere{b.sere(body)}), false)
+			return
+		}
+		p = b.prop(body)
+	})
+	return p
+}
+
+// instanceSere compiles an instance of the sequence d with the actuals
+// args as a sequence.
+func (b *builder) instanceSere(d *sema.Decl, args []cst.Node) *sere {
+	if d.Node.Kind() != cst.KindPSLSequenceDecl {
+		b.unsupported("the property instance " + d.Text + " in a sequence")
+		return none
+	}
+	s := none
+	b.instance(d, args, func(body cst.Node) { s = b.sere(body) })
+	return s
+}
+
+// nextEvent compiles next_event[!](e)[k](p), next_event_a[!](e)[i to
+// j](p) and next_event_e[!](e)[i to j](p) (IEEE 1850 6.2.1.6, #66):
+// p holds at the k-th tick on which e holds (at every, or some, i-th
+// to j-th such tick), counting the current tick as the first; the
+// strong forms need those ticks to come.
+func (b *builder) nextEvent(n cst.Node) *prop {
+	var ev, cnt, op cst.Node
+	for c := range n.Nodes() {
+		switch {
+		case c.Kind() == cst.KindPSLCount:
+			cnt = c
+		case ev.IsZero():
+			ev = c
+		case op.IsZero():
+			op = c
+		}
+	}
+	strong := slices.ContainsFunc(words(n), func(w string) bool {
+		return strings.HasSuffix(w, "!")
+	})
+	lo, hi := 1, 1
+	if !cnt.IsZero() {
+		lo, hi = b.count(cnt)
+	}
+	if hi < 0 {
+		b.unsupported("an infinite next_event_a or next_event_e range")
+		return pT
+	}
+	x := b.boolean(ev)
+	p := b.prop(op)
+	var xs []*prop
+	for k := max(lo, 1); k <= hi; k++ {
+		xs = append(xs, nextEventP(x, k, strong, p))
+	}
+	if n.Kind() == cst.KindPSLNextEventE {
+		return orP(xs...)
+	}
+	return andP(xs...)
 }
 
 // signals records the signals e reads.
@@ -558,9 +780,20 @@ func (b *builder) prop(n cst.Node) *prop {
 		}
 		return cst.Node{}
 	}
+	if a, ok := b.formal(n); ok {
+		p := pT
+		b.in(a.f, a.sc, func() { p = b.prop(a.n) })
+		return p
+	}
+	if d, args, ok := b.instanceOf(n); ok {
+		return b.instanceProp(d, args)
+	}
 	switch n.Kind() {
 	case cst.KindPSLParenProp:
 		return b.prop(kid(0))
+	case cst.KindPSLNextEvent, cst.KindPSLNextEventA,
+		cst.KindPSLNextEventE:
+		return b.nextEvent(n)
 	case cst.KindPSLBoolean:
 		return boolP(b.boolean(n))
 	case cst.KindPSLBuiltinCall:
@@ -671,6 +904,14 @@ func (b *builder) sere(n cst.Node) *sere {
 			return kids[i]
 		}
 		return cst.Node{}
+	}
+	if a, ok := b.formal(n); ok {
+		s := none
+		b.in(a.f, a.sc, func() { s = b.sere(a.n) })
+		return s
+	}
+	if d, args, ok := b.instanceOf(n); ok {
+		return b.instanceSere(d, args)
 	}
 	switch n.Kind() {
 	case cst.KindPSLBracedSere, cst.KindPSLParenProp:

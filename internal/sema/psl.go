@@ -1,6 +1,7 @@
 package sema
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/cst"
@@ -76,13 +77,71 @@ func (a *analyzer) pslDeclName(n cst.Node) bool {
 		return false
 	}
 	a.ref(tok, r.Decls[0], RefRead)
-	a.lenientArgs(args)
+	// The actuals are typed and recorded for the PSL runner, which
+	// binds them to the formals (#66).
+	nargs := 0
+	for item := range args.Items() {
+		if v := item.Actual(); !v.IsZero() {
+			a.pslExpr(v.Node)
+		}
+		nargs++
+	}
+	if p := n.Parent(); p.Kind() != cst.KindPSLPropertyInstance &&
+		p.Kind() != cst.KindPSLSequenceInstance {
+		// An instance node counts its actuals itself (pslForm).
+		a.pslArity(n, r.Decls[0], nargs)
+	}
 	if d := r.Decls[0]; d.Node.Kind() == cst.KindPSLPropertyDecl &&
 		sequenceContext(n) {
 		a.semaError(n.Span(), tok.Text()+" is a property, and a "+
 			"sequence is needed here")
 	}
 	return true
+}
+
+// pslArity reports an instance (named by n) of the PSL declaration d
+// with nargs actuals when d has another number of formal parameters
+// (IEEE 1850 6.2.4: the actuals match the formals one to one).
+func (a *analyzer) pslArity(n cst.Node, d *Decl, nargs int) {
+	if a.quiet {
+		return
+	}
+	if want := len(d.PSLFormals()); want != nargs {
+		a.semaError(n.Span(), "an instance of "+d.Text+" needs "+
+			strconv.Itoa(want)+" actuals, not "+strconv.Itoa(nargs))
+	}
+}
+
+// PSLFormals returns the formal parameters of the PSL property or
+// sequence declaration d, in order (#66).
+func (d *Decl) PSLFormals() []*Decl {
+	if d == nil || d.Kind != DeclPSL || d.Region == nil {
+		return nil
+	}
+	var out []*Decl
+	for _, x := range d.Region.Decls {
+		if x.Kind == DeclParameter {
+			out = append(out, x)
+		}
+	}
+	return out
+}
+
+// PSLDecl returns the PSL property, sequence or endpoint declaration
+// that the name n of the file's PSL code (the name of a property or
+// sequence instance) denotes, nil when it denotes none (#66).
+func (f *File) PSLDecl(n cst.Node) *Decl {
+	if f == nil || n.IsZero() {
+		return nil
+	}
+	off := n.LastToken().Span().Start
+	for _, u := range f.Units {
+		if r, ok := refAt(u.Refs, off); ok && r.Decl != nil &&
+			r.Decl.Kind == DeclPSL {
+			return r.Decl
+		}
+	}
+	return nil
 }
 
 // sequenceContext reports whether the PSL operand n stands where a
@@ -289,6 +348,21 @@ func (a *analyzer) pslForm(n cst.Node) {
 		if c := kid(1); !c.IsZero() {
 			a.pslOperand(c, c)
 		}
+	case cst.KindPSLPropertyInstance, cst.KindPSLSequenceInstance:
+		name, nargs := cst.Node{}, 0
+		for _, c := range kids {
+			if c.Kind() == cst.KindAssociationList {
+				nargs = len(pslKids(c))
+			} else if name.IsZero() {
+				name = c
+			}
+		}
+		if d := a.pslTypedDecl(name); d != nil {
+			a.pslArity(name, d, nargs)
+		}
+	case cst.KindPSLNextEvent, cst.KindPSLNextEventA,
+		cst.KindPSLNextEventE:
+		a.pslEventCount(n)
 	case cst.KindPSLUnion:
 		u := cst.PSLUnion{Node: n}
 		l, r := a.pslTyped(u.Lhs().Node), a.pslTyped(u.Rhs().Node)
@@ -327,6 +401,37 @@ func pslSequence(n cst.Node) bool {
 		return true
 	}
 	return false
+}
+
+// pslTypedDecl returns the PSL declaration the simple name n denotes
+// (its reference), nil when it denotes none.
+func (a *analyzer) pslTypedDecl(n cst.Node) *Decl {
+	if n.Kind() != cst.KindSimpleName {
+		return nil
+	}
+	r := a.lookup(TokenKey(cst.SimpleName{Node: n}.Ident()))
+	if len(r.Decls) == 0 || r.Decls[0].Kind != DeclPSL {
+		return nil
+	}
+	return r.Decls[0]
+}
+
+// pslEventCount reports a literal count of next_event, next_event_a or
+// next_event_e below 1: the occurrences of the event are counted from
+// 1, the current tick (IEEE 1850 6.2.1.6).
+func (a *analyzer) pslEventCount(n cst.Node) {
+	for c := range n.Nodes() {
+		if c.Kind() != cst.KindPSLCount {
+			continue
+		}
+		for x := range c.Nodes() {
+			e := a.pslTyped(x)
+			if v, ok := literalInt(e); ok && e != nil && v < 1 {
+				a.semaError(x.Span(), "a next_event count must be at "+
+					"least 1")
+			}
+		}
+	}
 }
 
 // pslCount reports a PSL range low to high with literal bounds where

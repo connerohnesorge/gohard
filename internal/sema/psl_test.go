@@ -377,3 +377,30 @@ func nthOffset(s, sub string, n int) int {
 		off += i + len(sub)
 	}
 }
+
+// TestPSLInstanceForms (#66): an instance of a property or sequence
+// has one actual per formal parameter (IEEE 1850 6.2.4), and the count
+// of next_event is at least 1 (IEEE 1850 6.2.1.6).
+func TestPSLInstanceForms(t *testing.T) {
+	checkMarked(t, []markedCase{{name: "psl", std: "2008", src: `
+entity e is end;
+architecture a of e is
+  signal clk, x, y : bit;
+  default clock is clk'event;
+  property p (boolean l, r) is always (l -> next r);
+  sequence s (boolean l) is {l; l};
+  property p0 is always x;
+begin
+  a1: assert p(x, y);
+  a2: assert p(x); --E
+  a3: assert p0;
+  a4: assert p0(x); --E
+  a5: cover {s(x)};
+  a6: cover {s(x, y)}; --E
+  a7: assert p; --E
+  a8: assert always (x -> next_event(y)[0](x)); --E
+  a9: assert always (x -> next_event_a(y)[1 to 2](x));
+  b1: assert always (x -> next_event(y)(x));
+end;
+`}})
+}

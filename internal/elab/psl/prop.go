@@ -14,8 +14,8 @@ import (
 // obligations of `always` stay a bounded set.
 type prop struct {
 	k       pKind
-	b       int // pBool, pAbort: the boolean
-	n       int // pNext: ticks to wait
+	b       int // pBool, pAbort, pNextEvent: the boolean
+	n       int // pNext: ticks to wait; pNextEvent: ticks of b to wait
 	strong  bool
 	incl    bool // until_, before_
 	overlap bool // |-> (true) or |=> (false)
@@ -44,6 +44,9 @@ const (
 	pSuffix // ss |-> r or ss |=> r
 	pSere   // a sequence used as a property
 	pAbort  // l abort b
+	// pNextEvent is next_event(b)[n](l): l at the n-th tick on which
+	// b holds, counting the current one (#66).
+	pNextEvent
 )
 
 var (
@@ -182,6 +185,18 @@ func abortP(p *prop, b int) *prop {
 		key: "A" + strconv.Itoa(b) + "(" + p.key + ")"}
 }
 
+func nextEventP(b, n int, strong bool, p *prop) *prop {
+	if p.k == pTrue && !strong {
+		return pT
+	}
+	k := "V" + strconv.Itoa(b) + "," + strconv.Itoa(n)
+	if strong {
+		k += "!"
+	}
+	return &prop{k: pNextEvent, b: b, n: n, strong: strong, l: p,
+		key: k + "(" + p.key + ")"}
+}
+
 func flags(strong, incl bool) string {
 	s := ""
 	if strong {
@@ -272,6 +287,14 @@ func (st *stepper) prog(p *prop, a []bool) *prop {
 			return pT
 		}
 		return abortP(st.prog(p.l, a), p.b)
+	case pNextEvent:
+		switch {
+		case !a[p.b]:
+			return p
+		case p.n <= 1:
+			return st.prog(p.l, a)
+		}
+		return nextEventP(p.b, p.n-1, p.strong, p.l)
 	}
 	return p
 }
@@ -282,7 +305,7 @@ func pending(p *prop) bool {
 	switch p.k {
 	case pEventually:
 		return true
-	case pNext, pUntil, pBefore, pSere:
+	case pNext, pUntil, pBefore, pSere, pNextEvent:
 		return p.strong
 	case pAnd:
 		return slices.ContainsFunc(p.args, pending)
