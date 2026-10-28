@@ -19,9 +19,11 @@ const proFormat = "OSVVM .pro script"
 // proBudget is the most commands one import of a .pro script reads,
 // with the scripts it includes and the branches it takes, and
 // proByteBudget the most script text it splits, counting a script
-// included twice twice (P7). The 83 .pro scripts of PoC together hold
-// 2,624 lines in 97 kilobytes; the budgets stop scripts that include
-// each other without end.
+// included twice twice and the text of a [command] substitution again
+// at each level of nesting, which splits it again (P7). The 83 .pro
+// scripts of PoC together hold 2,624 lines in 97 kilobytes; the budgets
+// stop scripts that include each other without end, and nested
+// substitutions that copy a long text at each level.
 const (
 	proBudget     = 20000
 	proByteBudget = 4 << 20
@@ -114,6 +116,11 @@ type proRun struct {
 	stop  bool     // a budget ran out
 	stack []string // the scripts being read, outermost first
 	srcs  map[string][]byte
+	// cur is the script, and the offset in it, of the command being
+	// read: where a substitution that runs a budget out stops the
+	// import.
+	cur    proScript
+	curOff int
 }
 
 // proScript is one script being read.
@@ -125,13 +132,7 @@ type proScript struct {
 
 // script reads the commands of s.src[from:to].
 func (r *proRun) script(s proScript, from, to, depth int) {
-	if r.stop {
-		return
-	}
-	if r.bytes += to - from; r.bytes > proByteBudget {
-		r.over(s, from, "the scripts hold more than "+
-			strconv.Itoa(proByteBudget>>20)+" MiB, counting each "+
-			"include")
+	if r.stop || !r.spend(s, from, to-from) {
 		return
 	}
 	cmds, serr := splitTclRange(s.src, from, to)
@@ -144,12 +145,25 @@ func (r *proRun) script(s proScript, from, to, depth int) {
 				strconv.Itoa(proBudget)+" commands")
 			return
 		}
+		r.cur, r.curOff = s, c.Off
 		r.command(s, c, depth)
 	}
 	if serr != nil && !r.stop {
 		r.p.Diagnostics = append(r.p.Diagnostics, s.l.syntax(proFormat,
 			serr.Off, serr.Reason))
 	}
+}
+
+// spend counts n more bytes of script text; past proByteBudget it
+// stops the import at off of s and reports false.
+func (r *proRun) spend(s proScript, off, n int) bool {
+	if r.bytes += n; r.bytes > proByteBudget {
+		r.over(s, off, "the scripts hold more than "+
+			strconv.Itoa(proByteBudget>>20)+" MiB, counting each "+
+			"include and each nested [command]")
+		return false
+	}
+	return true
 }
 
 // over stops the import at off of s: a budget ran out.
@@ -159,8 +173,12 @@ func (r *proRun) over(s proScript, off int, reason string) {
 	r.stop = true
 }
 
-// ignored adds the import/ignored hint for item at off of s.
+// ignored adds the import/ignored hint for item at off of s, unless
+// a budget ran out while the import evaluated the item.
 func (r *proRun) ignored(s proScript, off int, item, reason string) {
+	if r.stop {
+		return
+	}
 	r.p.Diagnostics = append(r.p.Diagnostics, s.l.ignored(off, item,
 		reason))
 }
@@ -532,6 +550,11 @@ func closeBracket(s string, open int) int {
 // FindSettingsPkgBody NAME, or Tcl's string compare. Any other command
 // cannot be evaluated.
 func (r *proRun) call(script string, depth int) (string, string) {
+	// Each level of nesting splits its text again, so that text counts
+	// at each level.
+	if r.stop || !r.spend(r.cur, r.curOff, len(script)) {
+		return "", "the import stopped"
+	}
 	src := []byte(script)
 	cmds, serr := splitTcl(src)
 	if serr != nil || len(cmds) != 1 {

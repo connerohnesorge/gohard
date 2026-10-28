@@ -207,6 +207,27 @@ func TestParseProBudget(t *testing.T) {
 	}
 }
 
+// TestParseProSubstBudget checks that the text of a [command]
+// substitution counts against proByteBudget again at each level of
+// nesting, which splits and copies it again (P7). Before, a 4 MB
+// script of 99 nested [string compare] around one long string peaked
+// at 1.6 GB in gohard import; one level of the same text stays within
+// the budget.
+func TestParseProSubstBudget(t *testing.T) {
+	long := `[string compare "` + strings.Repeat("A", 1<<20) + `" b]`
+	checkAll(t, ParsePro("a.pro", []byte("analyze "+long+".vhd\n"),
+		memFiles{}), `a.pro:1:9 default -1.vhd ""
+`)
+	nested := long
+	for range 99 {
+		nested = "[string compare " + nested + " a]"
+	}
+	checkAll(t, ParsePro("a.pro", []byte("analyze "+nested+"\n"),
+		memFiles{}), "a.pro:1:1 error[import/syntax]: not a valid "+
+		"OSVVM .pro script: the scripts hold more than 4 MiB, counting "+
+		"each include and each nested [command]\n")
+}
+
 // TestProConditions checks the if condition evaluator against Tcl's
 // expr results for the operators .pro scripts use.
 func TestProConditions(t *testing.T) {

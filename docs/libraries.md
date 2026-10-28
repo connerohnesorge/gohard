@@ -794,7 +794,8 @@ command other than the ones above (`puts`, `set`, `simulate`,
 `TestSuite`, PoC's `disabled`), or an `include` of a `.tcl`, `.do`,
 `.files` or `.dirs` file. A script that includes itself is skipped
 the same way. Import reads at most 20,000 commands and 4 MiB of
-script, counting a script included twice twice; past that it stops
+script, counting a script included twice twice and the text of a
+`[command]` again at each level of nesting; past that it stops
 with `import/syntax`.
 
 PoC's `src/build.pro` imports 214 files into library `PoC`. Two of
