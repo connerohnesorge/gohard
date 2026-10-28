@@ -165,12 +165,15 @@ func (s *hintsSession) run() {
 
 // TestInlayHintsNeverStaleCorpus: in sessions over the real analyzer
 // on every corpus design, inlay hint requests interleaved at random
-// with edits and slices each get one response, and every hint result
-// is the hints of the latest snapshot at the time it is sent: no hint
-// is published for a superseded snapshot (#56, P3).
+// with edits, slices and runs to idle each get one response, and every
+// hint result is the hints of the latest snapshot at the time it is
+// sent: no hint is published for a superseded snapshot (#56, P3). The
+// runs to idle answer requests partway through a session, so one
+// session answers at several snapshots, the case where hints kept from
+// an older snapshot would be sent.
 func TestInlayHintsNeverStaleCorpus(t *testing.T) {
-	answered, modified := 0, 0
-	for _, name := range slices.Sorted(maps.Keys(corpus(t))) {
+	answered, modified, multi := 0, 0, 0
+	for i, name := range slices.Sorted(maps.Keys(corpus(t))) {
 		p := withHints(corpus(t)[name])
 		var vhd []string
 		for k := range p {
@@ -183,7 +186,8 @@ func TestInlayHintsNeverStaleCorpus(t *testing.T) {
 			continue
 		}
 		for seed := range uint64(2) {
-			r := env.SplitMix64{State: seed + 1}
+			// Each design and seed has its own operations.
+			r := env.SplitMix64{State: uint64(i)<<1 | seed}
 			s := newHintsSession(t, p)
 			rel := vhd[env.Intn(&r, len(vhd))]
 			text := string(p[rel])
@@ -195,7 +199,7 @@ func TestInlayHintsNeverStaleCorpus(t *testing.T) {
 			s.run()
 			ids, version := 0, 1
 			for range 24 {
-				switch env.Intn(&r, 4) {
+				switch env.Intn(&r, 5) {
 				case 0:
 					ids++
 					s.push(map[string]any{"jsonrpc": "2.0", "id": ids,
@@ -222,6 +226,8 @@ func TestInlayHintsNeverStaleCorpus(t *testing.T) {
 								"version": version},
 							"contentChanges": []any{
 								map[string]any{"text": text}}}})
+				case 2:
+					s.run()
 				default:
 					for range 1 + env.Intn(&r, 3) {
 						if err := s.d.Step(); err != nil {
@@ -232,6 +238,7 @@ func TestInlayHintsNeverStaleCorpus(t *testing.T) {
 			}
 			s.run()
 			got := map[string]int{}
+			snaps := map[uint64]bool{}
 			for _, m := range s.sent {
 				res, ok := m.msg.(*jsonrpc2.Response)
 				if !ok || res.ID.String() == `"init"` {
@@ -246,7 +253,11 @@ func TestInlayHintsNeverStaleCorpus(t *testing.T) {
 					continue
 				}
 				answered++
+				snaps[m.snap.ID] = true
 				checkHints(t, name+" "+rel, m.snap, u, res.Result)
+			}
+			if len(snaps) > 1 {
+				multi++
 			}
 			for id := 1; id <= ids; id++ {
 				if n := got[fmt.Sprint(id)]; n != 1 {
@@ -255,8 +266,9 @@ func TestInlayHintsNeverStaleCorpus(t *testing.T) {
 			}
 		}
 	}
-	t.Logf("%d answered, %d ContentModified", answered, modified)
-	if answered == 0 || modified == 0 {
+	t.Logf("%d answered, %d ContentModified, %d sessions answer at "+
+		"more than one snapshot", answered, modified, multi)
+	if answered == 0 || modified == 0 || multi == 0 {
 		t.Fatal("the sessions miss a case")
 	}
 }
