@@ -37,6 +37,7 @@ Triggers: `pull_request`, pushes to `main` and `v1`, manual dispatch.
 | Helix stdio connection test | `go test` (`TestHelixStdio` in `cmd/gohard`, real pipes) | wired (#38); command line from the upstream entry `editors/upstream/helix/gohard.diff` (#65) |
 | Zed stdio connection test | `go test` (`TestZedStdio` in `cmd/gohard`, real pipes; Zed itself is not run) | wired (#65): command line from `editors/zed/src/lib.rs` |
 | GHW exports read back by GHDL's `ghwdump` (Linux) | `ghwdump.sh` (job `ghwdump`, `nix develop` provides GHDL); plain `go test` skips the ghwdump part of `TestGhwdump` when `ghwdump` is not on PATH | wired (#60): every corpus golden, the sample, the shapes trace and random traces |
+| Coverage files read by lcov's `genhtml` (Linux) | `genhtml.sh` (job `genhtml`, `nix develop` provides lcov); plain `go test` skips `TestGenhtml` when `genhtml` is not on PATH | wired (#62): every corpus coverage golden, the `check-sim-coverage` fixture and a test design, with branches, no warning allowed |
 | `docs/libraries.md` examples | new step | later: #1 |
 
 Formatting scope: every tracked or untracked, non-ignored `*.go` file,
@@ -144,9 +145,10 @@ GORELEASER=$(nix build nixpkgs#goreleaser --no-link --print-out-paths)/bin/gorel
 * CI downloads nothing beyond checking out submodules and the Go module
   cache (the pinned golines comes from the module proxy).
   The exceptions are the `editors` job, which installs Nix and
-  takes Neovim from the flake's dev shell (#38), and the `ghwdump`
+  takes Neovim from the flake's dev shell (#38), the `ghwdump`
   job, which takes GHDL's `ghwdump` from the same dev shell to read
-  the GHW exports (#60). GHDL and NVC never simulate or analyze in
+  the GHW exports (#60), and the `genhtml` job, which takes lcov's
+  `genhtml` from it to read the coverage files (#62). GHDL and NVC never simulate or analyze in
   CI; hashes recorded by `tools/oracle` are compared.
 * A missing submodule must fail with a message naming
   `git submodule update --init`; nothing is skipped.

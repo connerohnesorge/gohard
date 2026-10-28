@@ -58,6 +58,7 @@
           golines
           ghdl
           nvc
+          lcov
           neovim
           helix
         ];

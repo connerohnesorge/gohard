@@ -160,6 +160,31 @@ jobs:
           GOHARD_MEMCAP: '0'
         run: nix develop -c bash scripts/ci/ghwdump.sh
 
+  # lcov's genhtml reads the coverage files (#62). genhtml comes with
+  # lcov from the flake's dev shell; `check` runs the same test without
+  # it and skips.
+  genhtml:
+    name: genhtml (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: genhtml on the coverage files
+        env:
+          GOHARD_MEMCAP: '0'
+        run: nix develop -c bash scripts/ci/genhtml.sh
+
   install:
     name: go install (ubuntu-latest)
     runs-on: ubuntu-latest
