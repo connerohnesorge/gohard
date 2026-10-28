@@ -1,0 +1,5 @@
+# A launch with stopOnEntry whose run ends during elaboration (#68):
+# the design analyzes clean but elaboration reports unsupported/construct,
+# so configurationDone reports the end of the run (output, exited with
+# the exit code of gohard check --sim, terminated), not a stop.
+gohard dap

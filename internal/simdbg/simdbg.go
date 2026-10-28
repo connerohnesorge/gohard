@@ -249,8 +249,12 @@ func (s *Session) pos() int64 {
 	return s.stop.Event
 }
 
-// Entry moves to the run's first statement.
+// Entry moves to the run's first statement. After the run ended, it
+// does nothing.
 func (s *Session) Entry() Result {
+	if s.out != nil {
+		return Result{Ended: true}
+	}
 	return s.forward(0, func(event) (string, bool) {
 		return ReasonEntry, true
 	})

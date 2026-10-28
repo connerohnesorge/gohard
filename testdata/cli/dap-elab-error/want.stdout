@@ -1,0 +1,27 @@
+Content-Length: 154
+
+{"seq":1,"type":"response","request_seq":1,"success":true,"command":"initialize","body":{"supportsConfigurationDoneRequest":true,"supportsStepBack":true}}Content-Length: 77
+
+{"seq":2,"type":"response","request_seq":2,"success":true,"command":"launch"}Content-Length: 114
+
+{"seq":3,"type":"event","event":"output","body":{"category":"console","output":"gohard: debugging tb (seed 0)\n"}}Content-Length: 46
+
+{"seq":4,"type":"event","event":"initialized"}Content-Length: 120
+
+{"seq":5,"type":"response","request_seq":3,"success":true,"command":"setExceptionBreakpoints","body":{"breakpoints":[]}}Content-Length: 88
+
+{"seq":6,"type":"response","request_seq":4,"success":true,"command":"configurationDone"}Content-Length: 122
+
+{"seq":7,"type":"event","event":"output","body":{"category":"console","output":"gohard: simulated tb (seed 0): failed\n"}}Content-Length: 325
+
+{"seq":8,"type":"event","event":"output","body":{"category":"console","output":"tb.vhd:18:10: error[unsupported/construct]: impure function calls during elaboration is not supported yet, please report\ntb.vhd:18:10: warning[lint/unused-signal]: signal s is never assigned\nsummary: 1 errors, 1 warnings, 0 hints, 1 files\n"}}Content-Length: 63
+
+{"seq":9,"type":"event","event":"exited","body":{"exitCode":2}}Content-Length: 46
+
+{"seq":10,"type":"event","event":"terminated"}Content-Length: 107
+
+{"seq":11,"type":"response","request_seq":5,"success":false,"command":"next","message":"the run has ended"}Content-Length: 101
+
+{"seq":12,"type":"response","request_seq":6,"success":true,"command":"threads","body":{"threads":[]}}Content-Length: 82
+
+{"seq":13,"type":"response","request_seq":7,"success":true,"command":"disconnect"}

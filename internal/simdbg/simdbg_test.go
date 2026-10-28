@@ -10,9 +10,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/corpus"
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/simdbg"
 	"github.com/connerohnesorge/gohard/internal/simrun"
 	"github.com/connerohnesorge/gohard/internal/trace"
@@ -374,5 +376,76 @@ func TestCancel(t *testing.T) {
 	if r := s.Move(simdbg.StepIn); r.Stop == nil ||
 		r.Stop.Event <= at.Event {
 		t.Fatalf("move after the cancel: %+v", r)
+	}
+}
+
+// inline returns the run options of testbench tb of the design src,
+// analyzed alone as tb.vhd with the default configuration.
+func inline(t *testing.T, src, tb string) simrun.Options {
+	t.Helper()
+	cfg := config.Defaults()
+	res := sema.Analyze(sema.Input{Files: []sema.Source{{Path: "tb.vhd",
+		Text: []byte(src)}}, Config: cfg})
+	for _, dg := range res.Diagnostics {
+		if dg.Severity.String() == "error" {
+			t.Fatalf("%s:%d:%d: %s", dg.Path, dg.Line, dg.Col,
+				dg.Message)
+		}
+	}
+	root := filepath.FromSlash(simenv.DefaultDir)
+	fs := simenv.New(simenv.Options{Dir: root}).FS
+	return simrun.Options{Result: res, Sim: cfg.Simulation, Testbench: tb,
+		Env: simrun.Env{Root: root, FS: fs}}
+}
+
+// TestEndedAtStart: a run that ends before its first statement, here
+// because elaboration fails, gives a session that has already ended.
+// Entry, every move and Goto report the end and leave the outcome
+// (gohard dap's launch with stopOnEntry calls Entry first).
+func TestEndedAtStart(t *testing.T) {
+	o := inline(t, `entity tb is
+end entity tb;
+
+architecture sim of tb is
+  type int_ptr is access integer;
+
+  impure function seven return integer is
+    variable p : int_ptr := new integer'(7);
+  begin
+    return p.all;
+  end function seven;
+
+  signal s : integer := seven;
+begin
+  process
+  begin
+    report "s = " & integer'image(s);
+    wait;
+  end process;
+end architecture sim;
+`, "tb")
+	want := simrun.Run(o)
+	if want.Trace != nil || len(want.Diagnostics) == 0 {
+		t.Fatalf("the design elaborates: %+v", want)
+	}
+	s := simdbg.Start(o)
+	if r := s.Entry(); !r.Ended || r.Stop != nil {
+		t.Fatalf("entry: %+v", r)
+	}
+	for _, m := range []simdbg.Move{simdbg.Continue, simdbg.Next,
+		simdbg.StepIn, simdbg.StepOut, simdbg.StepBack,
+		simdbg.ReverseContinue} {
+		if r := s.Move(m); !r.Ended || r.Stop != nil {
+			t.Fatalf("move %d: %+v", m, r)
+		}
+	}
+	if r := s.Goto(1); !r.Ended || r.Stop != nil {
+		t.Fatalf("goto: %+v", r)
+	}
+	got, ok := s.Outcome()
+	if !ok || got.Status != want.Status ||
+		!reflect.DeepEqual(got.Diagnostics, want.Diagnostics) {
+		t.Fatalf("outcome %v %s %v, want %s %v", ok, got.Status,
+			got.Diagnostics, want.Status, want.Diagnostics)
 	}
 }
