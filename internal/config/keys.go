@@ -366,7 +366,8 @@ var keys = []Key{
 	boolKey("inlay_hints.values", "false",
 		"Show the static value of a constant or a generic default when "+
 			"static evaluation succeeds within the editor's limit of "+
-			"1,000,000 steps.",
+			"1,000,000 steps, which the values of one request share in "+
+			"source order.",
 		func(c *Config) *bool { return &c.InlayHints.Values }),
 	boolKey("simulation.auto_run_on_save", "false",
 		"When on, testbench candidates whose dependencies changed "+

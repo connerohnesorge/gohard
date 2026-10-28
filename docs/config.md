@@ -192,7 +192,7 @@ Show the type of an object alias declared without a subtype indication and of a 
 
 ### `inlay_hints.values`
 
-Show the static value of a constant or a generic default when static evaluation succeeds within the editor's limit of 1,000,000 steps.
+Show the static value of a constant or a generic default when static evaluation succeeds within the editor's limit of 1,000,000 steps, which the values of one request share in source order.
 
 * Type: bool
 * Default: `false`

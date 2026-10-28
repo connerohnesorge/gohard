@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/connerohnesorge/gohard/internal/eval"
 )
 
 const hintSrc = `entity e is
@@ -142,5 +144,59 @@ end architecture;
 		HintKinds{Values: true}))
 	if want := "2:34 = 1073741824\n"; got != want {
 		t.Errorf("value hints:\n%s\nwant\n%s", got, want)
+	}
+}
+
+// TestValueHintsShareABudget: the value hints of one request share
+// one budget of eval.EditorSteps steps, spent in source order, so
+// constants that each run out of the step limit cost one limit, not
+// one each; a value before them still gets its hint, one after them
+// gets none, and the hints still do not depend on the range asked for
+// (#56, P7).
+func TestValueHintsShareABudget(t *testing.T) {
+	var b strings.Builder
+	b.WriteString(`package p is
+  function loopy(n : natural) return natural;
+end package;
+package body p is
+  function loopy(n : natural) return natural is
+    variable s : natural := 0;
+  begin
+    for i in 0 to n loop
+      s := (s + i) mod 7;
+    end loop;
+    return s;
+  end function;
+end package body;
+use work.p.all;
+package q is
+  constant FIRST : natural := 2 ** 4;
+`)
+	for k := range 8 {
+		fmt.Fprintf(&b, "  constant C%d : natural := loopy(2 ** 30 + %d);\n",
+			k, k)
+	}
+	b.WriteString("  constant LAST : natural := 2 ** 5;\nend package;\n")
+	src := b.String()
+	r := analyzeOne(t, src)
+	var hs []Hint
+	spent := valueHints(r, mustFile(t, r, "a.vhd"), len(src),
+		func(off int, label string, k HintKind) {
+			hs = append(hs, Hint{Off: off, Label: label, Kind: k})
+		})
+	if spent > eval.EditorSteps {
+		t.Errorf("value hints spent %d steps, more than %d", spent,
+			eval.EditorSteps)
+	}
+	if got, want := hintText(src, hs), "16:37 = 16\n"; got != want {
+		t.Errorf("value hints:\n%s\nwant\n%s", got, want)
+	}
+	k := HintKinds{Values: true}
+	whole := Hints(r, "a.vhd", 0, len(src), k)
+	mid := strings.Index(src, "  constant C4")
+	half := append(Hints(r, "a.vhd", 0, mid-1, k),
+		Hints(r, "a.vhd", mid, len(src), k)...)
+	if a, b := hintText(src, whole), hintText(src, half); a != b {
+		t.Errorf("whole:\n%s\nhalves:\n%s", a, b)
 	}
 }

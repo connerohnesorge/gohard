@@ -55,12 +55,17 @@ const (
 	maxValueElems = 1024
 )
 
+// valueSteps is the step budget the value hints of one request share
+// (P7): however many constants a file has, a request evaluates at most
+// as much as one static evaluation of the editor (eval.EditorSteps).
+const valueSteps = eval.EditorSteps
+
 // Hints returns the inlay hints of the kinds k in the file at path
 // whose offset lies in [start, end], sorted by offset, kind and label.
-// They are a pure function of the result: values come from static
-// evaluation with a fresh evaluator per declaration and the editor's
-// fixed step limit (eval.EditorSteps, P7), so a hint never depends on
-// the range asked for or on other hints.
+// They are a pure function of the result and never depend on the range
+// asked for. Values come from static evaluation with a fresh evaluator
+// per declaration, in source order, each within the editor's step
+// limit and what is left of the request's budget (valueHints).
 func Hints(r *sema.Result, path string, start, end int,
 	k HintKinds,
 ) []Hint {
@@ -78,26 +83,24 @@ func Hints(r *sema.Result, path string, start, end int,
 	if k.ParameterNames {
 		parameterHints(f, add)
 	}
-	for _, u := range f.Units {
-		if u.Opaque {
-			continue
-		}
-		for _, d := range u.Decls {
-			if d.File != f || d.Implicit || d.Node.IsZero() {
+	if k.Types {
+		for _, u := range f.Units {
+			if u.Opaque {
 				continue
 			}
-			if k.Types && in(d.Span.End) {
+			for _, d := range u.Decls {
+				if d.File != f || d.Implicit || d.Node.IsZero() ||
+					!in(d.Span.End) {
+					continue
+				}
 				if t, ok := typeHint(d); ok {
 					add(d.Span.End, ": "+t, HintType)
 				}
 			}
-			if k.Values && d.Value != nil && !d.Value.Node.IsZero() &&
-				in(d.Value.Node.Span().End) {
-				if v, ok := valueHint(r, d); ok {
-					add(d.Value.Node.Span().End, "= "+v, HintValue)
-				}
-			}
 		}
+	}
+	if k.Values {
+		valueHints(r, f, end, add)
 	}
 	slices.SortFunc(out, func(a, b Hint) int {
 		return cmp.Or(cmp.Compare(a.Off, b.Off),
@@ -179,26 +182,59 @@ func typeHint(d *sema.Decl) (string, bool) {
 	return "", false
 }
 
-// valueHint returns the static value of a constant or of a generic's
-// default, when static evaluation succeeds. A value written as a
-// literal gets none: it is already there.
-func valueHint(r *sema.Result, d *sema.Decl) (string, bool) {
-	if d.Kind != sema.DeclConstant && d.Kind != sema.DeclGeneric ||
-		literal(d.Value) {
-		return "", false
+// valueHints adds the static value of each constant and generic
+// default of the file f whose value ends at or before the offset end,
+// when static evaluation succeeds. A value written as a literal gets
+// none: it is already there. The values are evaluated in source order
+// from the start of the file, each with the editor's step limit or
+// what is left of valueSteps if that is less, so whether a value gets
+// a hint depends on the values before it and never on the range asked
+// for; once the budget is spent, the rest get none. It returns the
+// steps spent.
+func valueHints(r *sema.Result, f *sema.File, end int,
+	add func(int, string, HintKind),
+) int64 {
+	var ds []*sema.Decl
+	for _, u := range f.Units {
+		if u.Opaque {
+			continue
+		}
+		for _, d := range u.Decls {
+			if d.File == f && !d.Implicit && !d.Node.IsZero() &&
+				(d.Kind == sema.DeclConstant || d.Kind == sema.DeclGeneric) &&
+				d.Value != nil && !d.Value.Node.IsZero() &&
+				!literal(d.Value) {
+				ds = append(ds, d)
+			}
+		}
 	}
-	ev := sema.NewEvaluator(r, eval.EditorSteps)
-	var v eval.Value
-	var err error
-	if d.Kind == sema.DeclConstant {
-		v, err = ev.Constant(d)
-	} else {
-		v, err = ev.Value(d.Value)
+	slices.SortStableFunc(ds, func(a, b *sema.Decl) int {
+		return cmp.Compare(a.Value.Node.Span().End, b.Value.Node.Span().End)
+	})
+	var spent int64
+	for _, d := range ds {
+		at := d.Value.Node.Span().End
+		if at > end || spent >= valueSteps {
+			break
+		}
+		limit := min(eval.EditorSteps, valueSteps-spent)
+		ev := sema.NewEvaluator(r, limit)
+		var v eval.Value
+		var err error
+		if d.Kind == sema.DeclConstant {
+			v, err = ev.Constant(d)
+		} else {
+			v, err = ev.Value(d.Value)
+		}
+		spent += min(ev.Used(), limit)
+		if err != nil {
+			continue
+		}
+		if s, ok := image(v); ok {
+			add(at, "= "+s, HintValue)
+		}
 	}
-	if err != nil {
-		return "", false
-	}
-	return image(v)
+	return spent
 }
 
 // literal reports whether e is written as a literal value: a numeric,

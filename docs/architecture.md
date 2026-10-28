@@ -533,9 +533,11 @@ gives the formal list of its unit. `resolve.Hints` is a pure function
 of the sema result and the kinds turned on (`inlay_hints.*` in the
 snapshot's configuration): parameter names come from the formals sema
 matched to each positional actual, types from the declarations, and
-values from static evaluation with a fresh evaluator per declaration
-under the editor's 1,000,000-step limit (P7), so a hint does not
-depend on the range asked for or on other hints. Each hint sits on a
+values from static evaluation with a fresh evaluator per declaration.
+The values of one request share one budget of 1,000,000 steps (P7),
+spent in source order from the start of the file, so a request costs
+at most one editor evaluation however many constants the file has, and
+a hint does not depend on the range asked for. Each hint sits on a
 token boundary. With every kind off the analyzer answers without
 waiting for the analysis. A change of the `inlay_hints.*` keys sends
 `workspace/inlayHint/refresh` to a client that supports it.

@@ -341,7 +341,7 @@ the editor settings, all off by default:
 | --- | --- |
 | `inlay_hints.parameter_names` | `formal =>` before each positional actual of a call, generic map or port map |
 | `inlay_hints.types` | `: TYPE` after the name of an object alias without a subtype indication and of a loop parameter |
-| `inlay_hints.values` | `= VALUE` after the value of a constant or a generic default, when static evaluation succeeds within the editor's limit of 1,000,000 steps; a value written as a literal and a composite value of more than 1,024 scalars get none, and an image longer than 40 bytes is cut |
+| `inlay_hints.values` | `= VALUE` after the value of a constant or a generic default, when static evaluation succeeds within the editor's limit of 1,000,000 steps; the values of one request share that limit in source order, so once it is spent the later values of the file get none; a value written as a literal and a composite value of more than 1,024 scalars get none, and an image longer than 40 bytes is cut |
 
 A changed key takes effect at the next request; a client that
 announces `workspace.inlayHint.refreshSupport` is asked to request its
