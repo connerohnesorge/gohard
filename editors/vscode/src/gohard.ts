@@ -1,6 +1,7 @@
 // The parts of the client that do not need VS Code (#3): the server
-// command line, the settings sent to the server and the command results
-// the client copies. The unit tests run them under plain Node.
+// command line, the settings sent to the server, the command results
+// the client copies and the order of the client's starts and stops.
+// The unit tests run them under plain Node.
 
 /** The commands the extension contributes. */
 export const restartServerCommand = 'gohard.restartServer';
@@ -85,4 +86,74 @@ export function copyText(command: string, result: unknown): string | undefined {
     return result;
   }
   return undefined;
+}
+
+/** The part of LanguageClient that Lifecycle uses. */
+export interface Client {
+  start(): Promise<void>;
+  dispose(): Promise<void>;
+}
+
+/**
+ * Lifecycle starts and stops the language client, one request at a
+ * time. LanguageClient cannot stop a client that is still starting:
+ * dispose throws, and the client goes on to start and register the
+ * server's commands, so the next client's start fails on a command that
+ * already exists while the first server runs on unreferenced. A restart
+ * or stop therefore waits until the one before it has ended, a restart
+ * ends when its client's start has ended, and so no client is disposed
+ * while it starts. A server that never answers initialize keeps later
+ * restarts waiting until the window reloads.
+ */
+export class Lifecycle<C extends Client> {
+  private current: C | undefined;
+  private last: Promise<void> = Promise.resolve();
+
+  /** make returns a new client with the current settings. */
+  constructor(private readonly make: () => C) {}
+
+  /** client returns the client of the last restart, or undefined after
+   * stop. */
+  client(): C | undefined {
+    return this.current;
+  }
+
+  /** restart stops the client, if any, and starts a new one. A start
+   * that fails is reported by the client, so restart resolves anyway. */
+  restart(): Promise<void> {
+    return this.queue(async () => {
+      await this.stopNow();
+      this.current = this.make();
+      try {
+        await this.current.start();
+      } catch {
+        // Reported by the client.
+      }
+    });
+  }
+
+  /** stop stops the client, if any. */
+  stop(): Promise<void> {
+    return this.queue(() => this.stopNow());
+  }
+
+  private queue(op: () => Promise<void>): Promise<void> {
+    const done = this.last.then(op);
+    this.last = done.catch(() => undefined);
+    return done;
+  }
+
+  private async stopNow(): Promise<void> {
+    const c = this.current;
+    this.current = undefined;
+    if (c === undefined) {
+      return;
+    }
+    try {
+      await c.dispose();
+    } catch {
+      // A client whose start failed cannot be stopped; dropping it is
+      // enough.
+    }
+  }
 }

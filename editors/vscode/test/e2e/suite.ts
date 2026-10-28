@@ -10,11 +10,13 @@
 //                parameter_names turned on gives the hints of the
 //                inlay-hints/parameter-names fixture, through
 //                didChangeConfiguration and, after "GoHard: Restart
-//                Server", through initializationOptions; "Copy repro"
-//                copies its command
+//                Server", through initializationOptions; after three
+//                restarts at once the last client takes a setting
+//                change, "Copy repro" copies its command and one
+//                server runs
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as vscode from 'vscode';
 
@@ -75,6 +77,27 @@ function cli(folder: string, action: string, file: string): any {
     encoding: 'utf8',
   });
   return JSON.parse(out);
+}
+
+/** servers returns the number of `gohard lsp` processes of the gohard
+ * under test, from /proc. */
+function servers(): number {
+  let n = 0;
+  for (const pid of readdirSync('/proc')) {
+    if (!/^[0-9]+$/.test(pid)) {
+      continue;
+    }
+    let argv: string[];
+    try {
+      argv = readFileSync(`/proc/${pid}/cmdline`, 'utf8').split('\0');
+    } catch {
+      continue; // exited
+    }
+    if (same(argv, [gohard, 'lsp', ''])) {
+      n++;
+    }
+  }
+  return n;
 }
 
 async function open(file: string): Promise<vscode.TextDocument> {
@@ -222,6 +245,31 @@ async function inlayHints(): Promise<void> {
     return { ok: same(got, want), value: got };
   });
   console.log(`inlay-hints: ${want.length} hints after a restart`);
+
+  // Restarts run one at a time, so none disposes a client that is
+  // still starting and no two clients register the server's commands.
+  // The last client must be the one running: it takes the setting
+  // change, its "Copy repro" works below, and no other server is left.
+  const restart = () => vscode.commands.executeCommand('gohard.restartServer');
+  await Promise.all([restart(), restart(), restart()]);
+  await vscode.workspace
+    .getConfiguration('gohard')
+    .update(
+      'inlay_hints.parameter_names',
+      false,
+      vscode.ConfigurationTarget.Global,
+    );
+  await until('no hint after three restarts and a change', async () => {
+    const got = await hints();
+    return { ok: got.length === 0, value: got };
+  });
+  if (process.platform === 'linux') {
+    await until('one gohard lsp', async () => {
+      const n = servers();
+      return { ok: n === 1, value: n };
+    });
+  }
+  console.log('inlay-hints: three restarts at once leave one server');
 
   await vscode.commands.executeCommand('gohard.showOutput');
 

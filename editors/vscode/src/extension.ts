@@ -10,14 +10,14 @@ import {
 import {
   copyText,
   forwardedKeys,
+  Lifecycle,
   restartServerCommand,
   serverCommand,
   serverSettings,
   showOutputCommand,
 } from './gohard';
 
-let client: LanguageClient | undefined;
-let output: vscode.LogOutputChannel | undefined;
+let clients: Lifecycle<LanguageClient> | undefined;
 
 function settings() {
   const c = vscode.workspace.getConfiguration('gohard');
@@ -44,52 +44,21 @@ function newClient(out: vscode.LogOutputChannel): LanguageClient {
   });
 }
 
-async function stop(): Promise<void> {
-  const c = client;
-  client = undefined;
-  if (c === undefined) {
-    return;
-  }
-  try {
-    await c.dispose();
-  } catch {
-    // A client that never started cannot be stopped; dropping it is
-    // enough.
-  }
-}
-
-/** start starts a new client with the current settings. A server that
- * fails to start is reported by the client in a notification and the
- * GoHard output; the extension stays active so the user can fix
- * gohard.path and restart. */
-async function start(): Promise<void> {
-  if (output === undefined) {
-    return;
-  }
-  client = newClient(output);
-  try {
-    await client.start();
-  } catch {
-    // Reported by the client.
-  }
-}
-
-async function restart(): Promise<void> {
-  await stop();
-  await start();
-}
-
 export async function activate(ctx: vscode.ExtensionContext): Promise<void> {
-  output = vscode.window.createOutputChannel('GoHard', { log: true });
+  const output = vscode.window.createOutputChannel('GoHard', { log: true });
+  // A server that fails to start is reported by the client in a
+  // notification and the GoHard output; the extension stays active so
+  // the user can fix gohard.path and restart.
+  const lc = new Lifecycle(() => newClient(output));
+  clients = lc;
   ctx.subscriptions.push(
     output,
-    vscode.commands.registerCommand(restartServerCommand, restart),
-    vscode.commands.registerCommand(showOutputCommand, () =>
-      output?.show(true),
-    ),
+    vscode.commands.registerCommand(restartServerCommand, () => lc.restart()),
+    vscode.commands.registerCommand(showOutputCommand, () => output.show(true)),
     vscode.workspace.onDidChangeConfiguration(async (e) => {
+      const client = lc.client();
       if (e.affectsConfiguration('gohard.path')) {
-        await restart();
+        await lc.restart();
       } else if (
         forwardedKeys.some((k) => e.affectsConfiguration('gohard.' + k)) &&
         client?.isRunning()
@@ -100,9 +69,9 @@ export async function activate(ctx: vscode.ExtensionContext): Promise<void> {
       }
     }),
   );
-  await start();
+  await lc.restart();
 }
 
-export function deactivate(): Promise<void> {
-  return stop();
+export function deactivate(): Promise<void> | undefined {
+  return clients?.stop();
 }

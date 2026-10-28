@@ -360,6 +360,10 @@ folder of the first file opened (#48).
 
 Two commands: "GoHard: Restart Server" and "GoHard: Show Output" (the
 server's log, and the LSP messages when `gohard.trace.server` is on).
+Restarts, by the command or by a change of `gohard.path`, run one at a
+time, and each waits until the server before it has answered
+`initialize`; a server that never answers holds them until the window
+reloads.
 The lenses run through the server's commands. The one thing the
 extension does with a command's result is "Copy repro": it copies the
 command the server returns to the clipboard.
@@ -387,13 +391,15 @@ that build:
    user settings, its hints must equal those of the
    `inlay-hints/parameter-names` fixture (sent with
    `didChangeConfiguration`), and again after "GoHard: Restart
-   Server" (sent with `initializationOptions`). "GoHard: Show Output"
-   runs, and the `gohard.copyRepro` command leaves its result on the
-   clipboard.
+   Server" (sent with `initializationOptions`). After three restarts
+   at once, turning the setting off must remove the hints and one
+   `gohard lsp` process must be left. "GoHard: Show Output" runs, and
+   the `gohard.copyRepro` command leaves its result on the clipboard.
 
 A run that exits without reaching the end of its checks fails.
 `npm test` runs the unit tests under Node: the settings the extension
-sends, the manifest, and the grammar with VS Code's TextMate engine
+sends, the order of the client's starts and stops, the manifest, and
+the grammar with VS Code's TextMate engine
 (`vscode-textmate`). Every reserved word of `internal/token/keywords.yaml`
 must be a keyword in any letter case and the PSL-only words must not.
 `TestVSCodeManifest` in `cmd/gohard` (plain `go test`) checks the
