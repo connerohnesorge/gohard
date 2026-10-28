@@ -85,6 +85,9 @@ type directive struct {
 	// assert without an antecedent is covered at its first tick.
 	ante    *sere
 	anteAll bool
+	// builtins are the built-in function calls of bools, inner calls
+	// first (builtin.go).
+	builtins []*builtin
 }
 
 type sigRef struct {
@@ -114,6 +117,7 @@ type builder struct {
 	f     *sema.File
 	dir   *directive
 	bools map[cst.Range]int
+	calls map[*sema.Expr]bool // the built-in calls compiled
 }
 
 func compile(d *elab.Design, p *elab.Proc) *directive {
@@ -125,7 +129,7 @@ func compile(d *elab.Design, p *elab.Proc) *directive {
 		dir.label = string(p.Stmt.Label.Name)
 	}
 	b := &builder{d: d, p: p, f: p.File, dir: dir,
-		bools: map[cst.Range]int{}}
+		bools: map[cst.Range]int{}, calls: map[*sema.Expr]bool{}}
 	switch n.Kind() {
 	case cst.KindPSLAssert:
 		dir.kind = dAssert
@@ -198,7 +202,7 @@ func (b *builder) antecedent(n cst.Node) (*sere, bool) {
 			return b.sere(firstKid(n)), always
 		case cst.KindPSLImplication:
 			l := firstKid(n)
-			if has(n, "<->") || l.Kind() != cst.KindPSLBoolean {
+			if has(n, "<->") || !b.isBoolean(l) {
 				return nil, false
 			}
 			return boolS(b.boolean(l), false), always
@@ -353,6 +357,18 @@ func (b *builder) expr(n cst.Node) *sema.Expr {
 	return nil
 }
 
+// isBoolean reports whether the PSL operand n is a Boolean: a
+// PSLBoolean, or a call of a built-in function sema typed.
+func (b *builder) isBoolean(n cst.Node) bool {
+	switch n.Kind() {
+	case cst.KindPSLBoolean:
+		return true
+	case cst.KindPSLBuiltinCall:
+		return sema.PSLBuiltin(b.f.PSLExpr(n)) != ""
+	}
+	return false
+}
+
 // boolean returns the index of the boolean n in the directive's
 // letter, adding it on first use.
 func (b *builder) boolean(n cst.Node) int {
@@ -363,6 +379,7 @@ func (b *builder) boolean(n cst.Node) int {
 	if e == nil {
 		b.unsupported("the expression " + strings.TrimSpace(n.Text()))
 	}
+	b.builtins(e)
 	b.signals(e)
 	i := len(b.dir.bools)
 	b.dir.bools = append(b.dir.bools, e)
@@ -411,6 +428,11 @@ func (b *builder) clock(n cst.Node) {
 	e := b.expr(n)
 	if e == nil {
 		b.unsupported("the clock expression " + strings.TrimSpace(n.Text()))
+		return
+	}
+	if name := firstBuiltin(e); name != "" {
+		b.unsupported("the built-in function " + name +
+			" in a clock expression")
 		return
 	}
 	c := &b.dir.clock
@@ -506,7 +528,7 @@ func (b *builder) count(n cst.Node) (lo, hi int) {
 }
 
 // maxCount bounds the repetition and next counts the simulator
-// expands.
+// expands, and the samples a prev call keeps.
 const maxCount = 1 << 12
 
 // operand returns the child of n that is not a count.
@@ -537,6 +559,11 @@ func (b *builder) prop(n cst.Node) *prop {
 		return b.prop(kid(0))
 	case cst.KindPSLBoolean:
 		return boolP(b.boolean(n))
+	case cst.KindPSLBuiltinCall:
+		if b.isBoolean(n) {
+			return boolP(b.boolean(n))
+		}
+		b.unsupported(kindWord(n))
 	case cst.KindPSLAlways:
 		return alwaysP(b.prop(kid(0)))
 	case cst.KindPSLNever:
@@ -646,6 +673,10 @@ func (b *builder) sere(n cst.Node) *sere {
 		return b.sere(kid(0))
 	case cst.KindPSLBoolean:
 		return boolS(b.boolean(n), false)
+	case cst.KindPSLBuiltinCall:
+		if b.isBoolean(n) {
+			return boolS(b.boolean(n), false)
+		}
 	case cst.KindPSLSereConcat:
 		return cat(b.sere(kid(0)), b.sere(kid(1)))
 	case cst.KindPSLSereFusion:

@@ -17,6 +17,15 @@
 //     (sere.go): every hit is a cover-hit trace event; at the end of
 //     the run the cover reports sim/cover-hit (a hint, with the count)
 //     or sim/cover-miss (a warning, and a cover-miss trace event).
+//   - The built-in functions prev, stable, rose and fell read their
+//     argument at earlier ticks of the directive's clock, and onehot,
+//     onehot0 and isunknown read it at the tick (builtin.go, #111).
+//     The runner samples each argument at time 0 (its initial value,
+//     as NVC 1.23 does) and at every tick before the booleans; before
+//     the n-th sample prev(e, n) is the default value of e's subtype
+//     (T'LEFT). The samples are values the design had: ClearPslState
+//     keeps them. A clock argument, ended and a built-in in a clock
+//     expression are unsupported/construct, reported at time 0.
 //   - assume, restrict and fairness do nothing in simulation.
 //   - The std.env PSL API (#18) reads the kernel's PSL state
 //     (sim.Ctx.PSL*): an enabled violation sets PslAssertFailed; a
@@ -45,5 +54,8 @@
 // psl_simple gives exactly one failing assert, one cover hit and one
 // cover miss with identical traces at every seed; on random words with
 // ClearPslState at random ticks the PSL state agrees with a reference
-// semantics after every tick, also across Kernel.Clone.
+// semantics after every tick, also across Kernel.Clone; on random
+// sample sequences every built-in's value agrees with a reference that
+// indexes the whole sequence, also from a cloned state; the #111
+// directives fail at the ticks NVC 1.23.0 gives.
 package psl

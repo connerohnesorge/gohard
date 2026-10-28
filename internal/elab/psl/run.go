@@ -22,7 +22,8 @@ const maxStates = 1 << 14
 // of an assert's antecedent (as) and whether the directive is covered
 // (#18, PslIsCovered and PslIsAssertCovered): immutable values, so
 // Clone copies the slices only. epoch is the kernel's ClearPslState
-// epoch the state belongs to (sync).
+// epoch the state belongs to (sync). hist holds the earlier samples
+// of each built-in call's argument (dir.builtins, builtin.go).
 type runner struct {
 	dir     *directive
 	started bool
@@ -33,6 +34,7 @@ type runner struct {
 	hits    int
 	covered bool
 	epoch   uint64
+	hist    []samples
 }
 
 // Clone implements sim.Code.
@@ -41,15 +43,24 @@ func (r *runner) Clone() sim.Code {
 	c.obls = slices.Clone(r.obls)
 	c.ss = slices.Clone(r.ss)
 	c.as = slices.Clone(r.as)
+	if r.hist != nil {
+		c.hist = make([]samples, len(r.hist))
+		for i, h := range r.hist {
+			c.hist[i] = h.clone()
+		}
+	}
 	return &c
 }
 
 // sync drops the directive's state when the design called
 // ClearPslState since the runner last ran: the directive starts over
 // at its next tick, with no hits, no open obligation and not covered.
+// The samples of its built-in calls stay: they are values the design
+// had, not verification state.
 func (r *runner) sync(c *sim.Ctx) {
 	if e := c.PSLEpoch(); e != r.epoch {
-		*r = runner{dir: r.dir, started: r.started, epoch: e}
+		*r = runner{dir: r.dir, started: r.started, epoch: e,
+			hist: r.hist}
 	}
 }
 
@@ -79,6 +90,13 @@ func (r *runner) Resume(c *sim.Ctx) (sim.Wait, error) {
 				d.unsup))
 			return sim.Wait{}, nil
 		}
+		if len(d.builtins) > 0 {
+			// The first sample of the built-in calls' arguments: their
+			// initial values.
+			if _, err := r.sample(c, r.bound(c)); err != nil {
+				return sim.Wait{}, err
+			}
+		}
 		return sim.Wait{On: d.clock.on}, nil
 	}
 	r.sync(c)
@@ -105,15 +123,23 @@ func (r *runner) bound(c *sim.Ctx) *sema.Evaluator {
 	return ev
 }
 
-func (r *runner) value(c *sim.Ctx, ev *sema.Evaluator, e *sema.Expr) (
-	bool, error,
+// eval evaluates e, charging the steps to the run's budget.
+func (r *runner) eval(c *sim.Ctx, ev *sema.Evaluator, e *sema.Expr) (
+	eval.Value, error,
 ) {
 	v, err := ev.Value(e)
 	if b := c.Budget(); b != nil {
 		if berr := b.Step(ev.Used()); berr != nil {
-			return false, berr
+			return eval.Value{}, berr
 		}
 	}
+	return v, err
+}
+
+func (r *runner) value(c *sim.Ctx, ev *sema.Evaluator, e *sema.Expr) (
+	bool, error,
+) {
+	v, err := r.eval(c, ev, e)
 	if err != nil {
 		return false, err
 	}
@@ -191,8 +217,43 @@ func (r *runner) letter(c *sim.Ctx, ev *sema.Evaluator) ([]bool, error) {
 	return a, nil
 }
 
+// sample evaluates the directive's built-in calls (inner calls first)
+// and records their arguments' values as the newest samples. It
+// returns ev answering each call with its value, for the booleans of
+// this tick.
+func (r *runner) sample(c *sim.Ctx, ev *sema.Evaluator) (*sema.Evaluator,
+	error,
+) {
+	bs := r.dir.builtins
+	if len(bs) == 0 {
+		return ev, nil
+	}
+	if len(r.hist) != len(bs) {
+		r.hist = make([]samples, len(bs))
+	}
+	vals := builtinVals{}
+	ev = ev.WithDynamic(vals)
+	for i, bi := range bs {
+		cur, err := r.eval(c, ev, bi.arg)
+		if err != nil {
+			return nil, err
+		}
+		v, err := bi.value(cur, &r.hist[i])
+		if err != nil {
+			return nil, err
+		}
+		vals[bi.call] = v
+		r.hist[i].push(cur, bi.depth)
+	}
+	return ev, nil
+}
+
 func (r *runner) step(c *sim.Ctx, ev *sema.Evaluator) (err error) {
 	d := r.dir
+	ev, err = r.sample(c, ev)
+	if err != nil {
+		return err
+	}
 	a, err := r.letter(c, ev)
 	if err != nil {
 		return err
