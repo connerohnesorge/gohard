@@ -15,7 +15,9 @@ import (
 // (static reads); it names architecture rtl of sub, which is no
 // dependency and sits in a file of its own (a late reference); w uses work.all (a library rebuilt
 // for a dirty unit); and vunit v is bound to sub(rtl), so its job
-// writes the PSL expressions of its file (#110).
+// writes the PSL expressions of its file (#110). The unbound vunit vf
+// is bound to top(a) by the use vunit of configuration cfg (#66): its
+// Deps come from cfg's text, so an edit of cfg changes the unit graph.
 var incrRulesDesign = map[string]string{
 	"a_pkg.vhd": `package p is
   function f return integer;
@@ -63,6 +65,16 @@ end architecture;
   default clock is rising_edge(clk);
   assert always (a -> b);
 }
+`,
+	"f_free.vhd": `vunit vf {
+  assert always (x -> y) @ (clk'event);
+}
+`,
+	"g_cfg.vhd": `configuration cfg of top is
+  use vunit vf;
+  for a
+  end for;
+end configuration;
 `,
 }
 
@@ -114,6 +126,14 @@ func TestIncrementalRules(t *testing.T) {
 			want:   "f_props.vhd:3:23: sema/undefined: bb is not declared",
 			remade: []string{"work.v"},
 			kept:   []string{"work.sub(rtl)", "work.top(a)"}},
+		{name: "a use vunit binding removed", path: "g_cfg.vhd",
+			old: "  use vunit vf;\n", new: "",
+			want:   "f_free.vhd:2:18: sema/undefined: x is not declared",
+			remade: []string{"work.vf", "work.cfg"}},
+		{name: "a use vunit binding restored", path: "g_cfg.vhd",
+			old: "  for a\n", new: "  use vunit vf;\n  for a\n",
+			gone:   "x is not declared",
+			remade: []string{"work.vf", "work.cfg"}},
 		{name: "a signature edit", path: "a_pkg.vhd",
 			old: "  constant dc", new: "  function f2 return integer;\n" +
 				"  constant dc",
