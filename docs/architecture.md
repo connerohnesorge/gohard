@@ -146,16 +146,14 @@ severity, code and message.
 Every legal construct GoHard does not implement is
 `unsupported/construct` with the message "<construct> is not supported
 yet, please report" (exit 2, the unit opaque): found during analysis
-(`sema/unsupported.go`; today only verification unit bindings in
-configurations), or met during elaboration or by a running process
-(`sema.UnsupportedError`, for example `'PATH_NAME` of a declaration in
-a generic package, named associations in aggregate targets, guarded
-signal assignments, an implicit signal of a part of a signal, a PSL
-`vunit` bound to an elaborated design entity); the run stops there.
-Inside a `vunit`, `vmode` or `vprop` bound to `e(a)` (or `e`) the
-names of `e` and `a` are visible, context clauses included (#110), so
-`gohard check` analyzes it; only its simulation waits for #66. No
-construct fails silently or with a generic "not
+(`sema/unsupported.go`; today only verification units bound to an
+instance path, `vunit v(tb.u)`), or met during elaboration or by a
+running process (`sema.UnsupportedError`, for example `'PATH_NAME` of
+a declaration in a generic package, named associations in aggregate
+targets, guarded signal assignments, an implicit signal of a part of a
+signal, a PSL construct the runner does not simulate, see
+[PSL verification units](#psl-verification-units-66)); the run stops
+there. No construct fails silently or with a generic "not
 static" run-time error. The v1.0 variant naming the v1.1 milestone is
 retired: v1.1 delivers every construct it named (#18, #27). Under a
 standard before 2019 the VHDL-2019 constructs are not unsupported but
@@ -174,6 +172,36 @@ to stderr; all output is buffered and written once; `--output FILE`
 writes a temp file and renames it. `docs/ci.md` is the documented CI
 example: it uploads SARIF only on exit 0 or 1, so an exit-2 run never
 wipes existing GitHub alerts.
+
+### PSL verification units (#66)
+
+A `vunit`, `vmode` or `vprop` is bound to a design entity in its
+declaration (`vunit v(e(a))` or `vunit v(e)`, IEEE 1850 7.2), or, when
+it has no binding of its own, by a verification unit binding
+indication (`use vunit v, w;`, LRM 2008 7.3.4) in a configuration
+declaration (the configured design entity), a component
+configuration or a configuration specification (the design entity the
+instances are bound to). Inside it the names of the bound entity and
+architecture are visible, context clauses included (#110). Sema
+analyzes each unit once: an unbound unit against the first indication
+that names it, in canonical order (`sema/vunitbind.go`); naming a unit
+bound in its declaration, or another kind of unit, in `use vunit` is
+`sema/error`. Elaboration runs a unit's signals and statements in every
+instance it is bound to (`hier.Instance.Vunits`), named under the
+instance path and the unit's name (`tb.dut.v.a1`, a block scope in the
+trace); a directive's default clock is the vunit's own. A unit bound
+to two different design entities, an `inherit`, and an instance, block
+or generate statement inside a unit are `unsupported/construct` at
+elaboration. GHDL 6.0.0 runs no vunit item and neither GHDL 6.0.0 nor
+NVC 1.23.0 parses `use vunit`, so these outcomes are hand-checked
+(`psl_vunit`, `check-vunit-*` fixtures).
+
+Named property and sequence instances (with boolean, sequence,
+property and const formals) and `next_event`, `next_event_a` and
+`next_event_e` simulate (`internal/elab/psl`); a formal inside a larger
+HDL expression, nested clocks, `forall`, `ended`, and infinite
+`next_a`, `next_e`, `next_event_a` and `next_event_e` ranges are
+`unsupported/construct` when a directive using them is simulated.
 
 ## Commands
 
@@ -712,7 +740,7 @@ with an NVC 1.23 recording where NVC supports it).
 | `testdata/cli/<case>/` | `cmd`, `want.exit`, `want.stdout`, `want.stderr`, optional `in/`, `stdin`, `want/`; run in-process at `-p 1` and `-p 16`, each with a cold, warm and corrupted analysis cache (see its README) | #20, #37 |
 | `testdata/lsp/<action>/<case>/` | `gohard lsp <action>` fixtures | #26 |
 | `testdata/parse/<rule>/` | one valid file with a tree dump, one invalid file with an error position | #31 |
-| `testdata/corpus/<name>/` + `corpus.yaml` | the 22 oracle designs (#8, #27, #109, #63); goldens under `golden/` | #8 |
+| `testdata/corpus/<name>/` + `corpus.yaml` | the 24 oracle designs (#8, #27, #109, #63, #66); goldens under `golden/` | #8 |
 | `testdata/conformance/<feature>/` | the #18 VHDL-2019 cases: `<case>.vhd`, `.want`, optional `.nvc.txt` (see its README) | #18 |
 | `testdata/fuzz/<Target>/` | saved inputs for `FuzzParse`, `FuzzFormat`, `FuzzLSPReplay`, `FuzzConfig`; `FuzzElab` and `FuzzSim` keep theirs under `internal/elab` and `internal/simrun` (#58) | #30 |
 | `testdata/seeds/<pkg>/` | committed generator failures and LSP sessions, replayed by `go test` | #29 |

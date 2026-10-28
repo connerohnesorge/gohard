@@ -29,6 +29,21 @@
 //     that the call is a run-time error at its first sample (P7). A
 //     clock argument, ended and a built-in in a clock expression are
 //     unsupported/construct, reported at time 0.
+//   - A property or sequence instance is its declaration's body with
+//     the formal parameters bound to the actuals, which are read where
+//     the instance is written (#66): a boolean, sequence or property
+//     formal used as an operand, and a const formal used as a count.
+//     A formal inside a larger HDL expression and a recursive instance
+//     are unsupported/construct. next_event(b)[k](p) holds when p holds
+//     at the k-th tick on which b holds, counting the current one;
+//     next_event_a and next_event_e over [i to j] are the conjunction
+//     and the disjunction of those (an infinite range is
+//     unsupported/construct). forall, nested clocks and infinite
+//     next_a and next_e ranges are unsupported/construct.
+//   - The directives of a PSL verification unit run as processes of
+//     every instance the unit is bound to (elab, #66), named under the
+//     instance path and the unit's name; their default clock is the
+//     unit's own.
 //   - assume, restrict and fairness do nothing in simulation.
 //   - The std.env PSL API (#18) reads the kernel's PSL state
 //     (sim.Ctx.PSL*): an enabled violation sets PslAssertFailed; a
@@ -58,6 +73,10 @@
 // cover miss with identical traces at every seed; on random words with
 // ClearPslState at random ticks the PSL state agrees with a reference
 // semantics after every tick, also across Kernel.Clone; on random
+// properties written as VHDL text a directive fails exactly when the
+// reference semantics says its property does not hold, and gives the
+// same events in a vunit bound inline or by use vunit, as a property
+// instance (with formals) and with its sequences declared (#66); on random
 // sample sequences every built-in's value agrees with a reference that
 // indexes the whole sequence, also from a cloned state; the #111
 // directives fail at the ticks NVC 1.23.0 gives; a call over the
