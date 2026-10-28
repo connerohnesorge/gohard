@@ -181,20 +181,25 @@ it has no binding of its own, by a verification unit binding
 indication (`use vunit v, w;`, LRM 2008 7.3.4) in a configuration
 declaration (the configured design entity), a component
 configuration or a configuration specification (the design entity the
-instances are bound to). Inside it the names of the bound entity and
-architecture are visible, context clauses included (#110). Sema
-analyzes each unit once: an unbound unit against the first indication
-that names it, in canonical order (`sema/vunitbind.go`); naming a unit
-bound in its declaration, or another kind of unit, in `use vunit` is
-`sema/error`. Elaboration runs a unit's signals and statements in every
-instance it is bound to (`hier.Instance.Vunits`), named under the
-instance path and the unit's name (`tb.dut.v.a1`, a block scope in the
-trace); a directive's default clock is the vunit's own. A unit bound
-to two different design entities, an `inherit`, and an instance, block
-or generate statement inside a unit are `unsupported/construct` at
-elaboration. GHDL 6.0.0 runs no vunit item and neither GHDL 6.0.0 nor
-NVC 1.23.0 parses `use vunit`, so these outcomes are hand-checked
-(`psl_vunit`, `check-vunit-*` fixtures).
+instances are bound to; for a component configuration without an
+entity aspect, the one the configuration specification of the
+configured block binds them to, else the default binding). Inside it
+the names of the bound entity and architecture are visible, context
+clauses included (#110). Sema analyzes each unit once: an unbound unit
+against the first indication that names it, in canonical order
+(`sema/vunitbind.go`); naming a unit bound in its declaration, or
+another kind of unit, in `use vunit` is `sema/error`. The unit holding
+an indication depends on the units it names, except a unit bound to
+that unit itself (a recursive design's configuration specification),
+which would be an import cycle. Elaboration runs a unit's signals and
+statements in every instance it is bound to (`hier.Instance.Vunits`),
+named under the instance path and the unit's name (`tb.dut.v.a1`, a
+block scope in the trace); a directive's default clock is the vunit's
+own. A unit bound to two different design entities, an `inherit`, and
+an instance, block or generate statement inside a unit are
+`unsupported/construct` at elaboration. GHDL 6.0.0 runs no vunit item
+and neither GHDL 6.0.0 nor NVC 1.23.0 parses `use vunit`, so these
+outcomes are hand-checked (`psl_vunit`, `check-vunit-*` fixtures).
 
 Named property and sequence instances (with boolean, sequence,
 property and const formals) and `next_event`, `next_event_a` and

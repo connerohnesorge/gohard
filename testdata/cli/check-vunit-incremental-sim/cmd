@@ -1,0 +1,7 @@
+# use vunit in a component configuration without an entity aspect
+# (#66): the configuration specification of tb binds u1 to dut(rtl),
+# so v_comp's names are dut's ports, its ports count as read, and
+# comp_ab runs in tb.u1 and fails at 25 ns (a = '1', b = '0'). GHDL
+# 6.0.0 and NVC 1.23.0 cannot parse `use vunit`, so the time is
+# hand-checked.
+gohard check --sim --tb cfg

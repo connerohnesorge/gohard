@@ -181,6 +181,9 @@ func (s *session) linkDeps() {
 		}
 		for _, r := range append(slices.Clone(u.uses),
 			s.inheritedRefs(u)...) { // units.go
+			if r.node.Parent().Kind() == cst.KindVerificationUnitBinding {
+				continue // use vunit lib.v: linkVunitDeps
+			}
 			l, ok := s.library(u, r.lib)
 			if !ok {
 				continue
@@ -205,21 +208,41 @@ func (s *session) linkDeps() {
 				}
 			}
 		}
-		// A verification unit sees its bound unit's names (psl.go);
-		// a verification unit binding indication names a unit
-		// (vunitbind.go).
+		// A verification unit sees its bound unit's names (psl.go).
 		e, arch := s.boundUnits(u)
 		add(e)
 		add(arch)
-		for _, v := range s.namedVunits(u) {
-			add(v)
-		}
 		slices.SortFunc(deps, func(a, b *Unit) int {
 			return cmp.Compare(a.Index, b.Index)
 		})
 		u.Deps = deps
 	}
+	s.linkVunitDeps()
 	s.linkAllDeps()
+}
+
+// linkVunitDeps makes a unit holding verification unit binding
+// indications depend on the units they name (vunitbind.go), unless the
+// named unit depends on it: an architecture whose configuration
+// specification binds a unit to the architecture itself (a recursive
+// design) would close an import cycle. Such a unit is analyzed after
+// the indication, which then reads only its tree (vunitName). Units
+// are linked in canonical order.
+func (s *session) linkVunitDeps() {
+	for _, u := range s.units {
+		added := false
+		for _, v := range s.namedVunits(u) {
+			if v != u && !slices.Contains(u.Deps, v) && !reaches(v, u) {
+				u.Deps = append(u.Deps, v)
+				added = true
+			}
+		}
+		if added {
+			slices.SortFunc(u.Deps, func(a, b *Unit) int {
+				return cmp.Compare(a.Index, b.Index)
+			})
+		}
+	}
 }
 
 // linkAllDeps adds the dependencies a use clause L.all implies: each

@@ -104,14 +104,8 @@ func (b *builder) vunitsOf(u *sema.Unit, n cst.Node) []*sema.Unit {
 	var out []*sema.Unit
 	for vb := range n.Children[cst.VerificationUnitBinding]() {
 		for name := range vb.Names() {
-			ref, ok := b.r.RefAt(u.File.Path,
-				name.Node.LastToken().Span().Start)
-			if !ok || ref.Decl == nil {
-				continue
-			}
-			v := ref.Decl.Denotes().Unit
-			if ref.Decl.Denotes().Kind == sema.DeclVunit && v != nil &&
-				!slices.Contains(out, v) {
+			v := b.r.NamedVunit(u, name.Node)
+			if v != nil && !slices.Contains(out, v) {
 				out = append(out, v)
 			}
 		}

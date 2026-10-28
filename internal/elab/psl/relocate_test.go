@@ -203,6 +203,15 @@ func relocations(g *gp, w [][]bool) []relocated {
 			"s.vhd": design("", ""), "v.vhd": vunit(""),
 			"c.vhd": "configuration c of s is\n  use vunit v;\n" +
 				"  for rtl\n  end for;\nend configuration;\n"}},
+		{"use vunit, incremental binding", "c", map[string]string{
+			"s.vhd": design("", ""), "v.vhd": vunit(""),
+			"t.vhd": "entity t is end;\narchitecture a of t is\n" +
+				"  component sc is end component;\n" +
+				"  for u : sc use entity work.s(rtl);\n" +
+				"begin\n  u : sc;\nend;\n",
+			"c.vhd": "configuration c of t is\n  for a\n" +
+				"    for u : sc\n      use vunit v;\n    end for;\n" +
+				"  end for;\nend configuration;\n"}},
 		{"property instance", "s", map[string]string{
 			"s.vhd": design("property q is "+text+";", "x: assert q;")}},
 		{"property with formals", "s", map[string]string{
@@ -321,9 +330,11 @@ func verdicts(evs []trace.Event) []string {
 // (next_event family included) and random words, `assert P` written
 // in the architecture fails exactly when the reference semantics says
 // P does not hold on the word, and it gives the same events in a vunit
-// bound inline or by use vunit, as an instance of a property
-// declaration with or without formals, and with its sequences
-// declared.
+// bound inline or by use vunit (in a configuration of s, and in a
+// component configuration without an entity aspect, whose instance a
+// configuration specification binds to s(rtl)), as an instance of a
+// property declaration with or without formals, and with its
+// sequences declared.
 func TestRelocatedDirective(t *testing.T) {
 	r := &rng{env.SplitMix64{State: 66}}
 	n := 300
@@ -365,5 +376,67 @@ func TestRelocatedDirective(t *testing.T) {
 					want)
 			}
 		}
+	}
+}
+
+// TestVunitRecursiveDesign (#66): a recursive design whose generate
+// binds its nested instances to its own architecture by a
+// configuration specification with use vunit (no import cycle): the
+// vunit runs in each of the two nested instances, which fail at the
+// 25 ns tick (a = '1', b = '0'), and not in the top one, which no
+// indication binds.
+func TestVunitRecursiveDesign(t *testing.T) {
+	files := map[string]string{
+		"props.vhd": `vunit v {
+  default clock is rising_edge(clk);
+  assert always (a -> b) report "a without b";
+}
+`,
+		"tree.vhd": `library ieee;
+use ieee.std_logic_1164.all;
+entity tree is
+  generic (n : natural := 2);
+  port (clk : in std_logic; a, b : in std_logic);
+end entity;
+architecture rtl of tree is
+  component tree is
+    generic (n : natural := 2);
+    port (clk : in std_logic; a, b : in std_logic);
+  end component;
+begin
+  g : if n > 0 generate
+    for all : tree use entity work.tree(rtl);
+      use vunit v;
+    end for;
+  begin
+    u : tree generic map (n - 1) port map (clk, a, b);
+  end generate;
+end architecture;
+`,
+		"tb.vhd": `library ieee;
+use ieee.std_logic_1164.all;
+entity tb is end entity;
+architecture sim of tb is
+  signal clk, a, b : std_logic := '0';
+begin
+  t : entity work.tree port map (clk, a, b);
+  clk <= not clk after 5 ns when now < 40 ns;
+  process begin
+    wait for 22 ns; a <= '1';
+    wait for 10 ns; a <= '0';
+    wait;
+  end process;
+end architecture;
+`,
+	}
+	evs, _, errs := simFiles(t, "tb", files)
+	if len(errs) > 0 {
+		t.Fatal(errs)
+	}
+	got := verdicts(evs)
+	fail := fmt.Sprintf("%d@%d: a without b", trace.Assert, 25*ns)
+	want := []string{fail, fail}
+	if !slices.Equal(got, want) {
+		t.Errorf("events %v, want %v", got, want)
 	}
 }

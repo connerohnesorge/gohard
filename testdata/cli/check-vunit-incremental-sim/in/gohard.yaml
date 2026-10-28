@@ -1,0 +1,3 @@
+simulation:
+  testbenches: [cfg]
+  stop_level: failure

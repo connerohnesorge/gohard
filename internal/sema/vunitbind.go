@@ -9,7 +9,11 @@ package sema
 // indication binds the instances to (its entity aspect, a
 // configuration's entity, or the default binding: the entity named
 // like the component, with the architecture of the component
-// configuration's block configuration).
+// configuration's block configuration). A component configuration
+// without an entity aspect (an incremental binding, LRM 7.3.2.1) binds
+// to the design entity of the configuration specification that binds
+// the first of its instances in the configured block, and to the
+// default binding when none does.
 //
 // A unit named there has no binding of its own (LRM 7.3.4: one bound
 // in its declaration is an error). Its names are looked up in the
@@ -28,6 +32,8 @@ package sema
 // changes the graph, and the incremental analysis starts over.
 
 import (
+	"slices"
+
 	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/token"
 )
@@ -44,11 +50,15 @@ type vunitBinder struct {
 // for a simple name), and its design entity, as the entity aspect
 // names it (lib Work when the name has no library prefix) or, when
 // config is set, as the configuration lib.config does. open is a
-// binding to open, which binds nothing.
+// binding to open, which binds nothing. cc is the component
+// configuration of an incremental binding (no entity aspect): a
+// configuration specification of the configured block may bind its
+// instances to another design entity (incrementalSite).
 type vunitSite struct {
 	names                     []unitRef
 	lib, entity, arch, config Key
 	open                      bool
+	cc                        cst.ComponentConfiguration
 }
 
 // vunitSites lists the verification unit binding indications of the
@@ -80,6 +90,9 @@ func vunitSites(u *Unit) []vunitSite {
 		case cst.KindComponentConfiguration:
 			cc := cst.ComponentConfiguration{Node: p}
 			site.aspect(cc.Binding(), cc.Spec())
+			if cc.Binding().Entity().IsZero() {
+				site.cc = cc
+			}
 			if site.arch == "" && site.config == "" {
 				site.arch = blockArch(cc.Block())
 			}
@@ -198,6 +211,14 @@ func (s *session) findVunitBinders() map[*Unit]vunitBinder {
 func (s *session) siteBinder(u *Unit, site vunitSite) (vunitBinder,
 	bool,
 ) {
+	if !site.cc.IsZero() {
+		if a, spec, ok := s.incrementalSite(u, site.cc); ok {
+			if spec.arch == "" && spec.config == "" {
+				spec.arch = site.arch
+			}
+			return s.siteBinder(a, spec)
+		}
+	}
 	if site.open {
 		return vunitBinder{}, false
 	}
@@ -223,6 +244,195 @@ func (s *session) siteBinder(u *Unit, site vunitSite) (vunitBinder,
 	}
 	return vunitBinder{lib: c.Library, entity: c.Of,
 		arch: blockArch(cd.Block())}, c.Of != ""
+}
+
+// incrementalSite returns the configuration specification that binds
+// the instances of the component configuration cc of unit u, which
+// has no entity aspect (LRM 7.3.2.1: the binding it adds to is that of
+// the configuration specification, else the default binding), as an
+// indication site, and the architecture a holding it. The
+// specification of the first instance cc applies to, in source order,
+// counts. ok is false when the configured block or the specification
+// is not found.
+func (s *session) incrementalSite(u *Unit, cc cst.ComponentConfiguration,
+) (a *Unit, spec vunitSite, ok bool) {
+	a, owner := s.ccOwner(u, cc)
+	if owner.IsZero() {
+		return nil, vunitSite{}, false
+	}
+	comp := lastIdent(cc.Spec().Component().Node)
+	insts := directInstances(owner)
+	var target cst.Node
+	for _, k := range sortedKeys(insts) {
+		st := insts[k]
+		if instComponent(st) == comp && ccNames(cc, k) &&
+			(target.IsZero() || st.Span().Start < target.Span().Start) {
+			target = st
+		}
+	}
+	if target.IsZero() {
+		return nil, vunitSite{}, false
+	}
+	label := TokenKey(cst.ComponentInstantiationStmt{Node: target}.Label().
+		Name())
+	var others cst.ConfigurationSpec
+	for x := range owner.Descendants() {
+		cs, ok := cst.As[cst.ConfigurationSpec](x)
+		if !ok || x.Inactive() || !specOwner(x).Equal(owner) ||
+			lastIdent(cs.Spec().Component().Node) != comp {
+			continue
+		}
+		list := cs.Spec().Instances()
+		named := !list.Node.Token(token.KwAll, 0).IsZero()
+		for tok := range list.Labels() {
+			named = named || TokenKey(tok) == label
+		}
+		if !named {
+			if others.IsZero() &&
+				!list.Node.Token(token.KwOthers, 0).IsZero() {
+				others = cs
+			}
+			continue
+		}
+		spec = vunitSite{lib: Work}
+		spec.aspect(cs.Binding(), cs.Spec())
+		return a, spec, true
+	}
+	if others.IsZero() {
+		return nil, vunitSite{}, false
+	}
+	spec = vunitSite{lib: Work}
+	spec.aspect(others.Binding(), others.Spec())
+	return a, spec, true
+}
+
+// ccNames reports whether the instantiation list of the component
+// configuration cc names the instance labelled k: by its label, all,
+// or others when no other component configuration of the same block
+// configuration names it.
+func ccNames(cc cst.ComponentConfiguration, k Key) bool {
+	list := cc.Spec().Instances()
+	if !list.Node.Token(token.KwAll, 0).IsZero() {
+		return true
+	}
+	for tok := range list.Labels() {
+		if TokenKey(tok) == k {
+			return true
+		}
+	}
+	if list.Node.Token(token.KwOthers, 0).IsZero() {
+		return false
+	}
+	comp := lastIdent(cc.Spec().Component().Node)
+	for x := range cc.Node.Parent().Nodes() {
+		o, ok := cst.As[cst.ComponentConfiguration](x)
+		if !ok || x.Equal(cc.Node) ||
+			lastIdent(o.Spec().Component().Node) != comp {
+			continue
+		}
+		for tok := range o.Spec().Instances().Labels() {
+			if TokenKey(tok) == k {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// ccOwner returns the architecture body, block statement or generate
+// body whose statements the component configuration cc of unit u
+// configures, and the architecture a holding it: the block
+// configurations around cc name the architecture of the configured
+// design entity (that of the configuration declaration, or the design
+// entity an enclosing component configuration binds to) and the
+// blocks and generate statements inside it. owner is zero when one
+// is not found.
+func (s *session) ccOwner(u *Unit, cc cst.ComponentConfiguration,
+) (a *Unit, owner cst.Node) {
+	var chain []cst.BlockConfiguration // innermost first
+	p := cc.Node.Parent()
+	for ; p.Kind() == cst.KindBlockConfiguration; p = p.Parent() {
+		chain = append(chain, cst.BlockConfiguration{Node: p})
+	}
+	if len(chain) == 0 {
+		return nil, cst.Node{}
+	}
+	top := chain[len(chain)-1]
+	var lib, entity, arch Key
+	switch p.Kind() {
+	case cst.KindConfigurationDecl:
+		lib, entity, arch = u.Library, u.Of, blockArch(top)
+	case cst.KindComponentConfiguration:
+		outer := cst.ComponentConfiguration{Node: p}
+		site := vunitSite{lib: Work}
+		site.aspect(outer.Binding(), outer.Spec())
+		if outer.Binding().Entity().IsZero() {
+			site.cc = outer
+		}
+		if site.arch == "" && site.config == "" {
+			site.arch = blockArch(top)
+		}
+		b, ok := s.siteBinder(u, site)
+		if !ok {
+			return nil, cst.Node{}
+		}
+		lib, entity, arch = b.lib, b.entity, b.arch
+	default:
+		return nil, cst.Node{}
+	}
+	l, ok := s.libs[lib]
+	if !ok || arch == "" {
+		return nil, cst.Node{}
+	}
+	for _, x := range l.Secondary(entity) {
+		if x.Kind == UnitArchitecture && x.Name == arch && !x.Duplicate &&
+			!x.Lib.IsZero() {
+			a, owner = x, x.Lib
+			break
+		}
+	}
+	for i := len(chain) - 2; i >= 0 && !owner.IsZero(); i-- {
+		owner = nestedOwner(owner, chain[i])
+	}
+	return a, owner
+}
+
+// nestedOwner returns the block statement or generate body of owner
+// that the block configuration bc names (an if or case generate's
+// alternative by its label, gen(alt), else its first one); zero when
+// there is none.
+func nestedOwner(owner cst.Node, bc cst.BlockConfiguration) cst.Node {
+	st, ok := directStatements(owner)[TokenKey(bc.Spec().Node.
+		FirstToken())]
+	if !ok {
+		return cst.Node{}
+	}
+	var alt Key
+	if l := bc.Node.Child[cst.AssociationList](0); !l.IsZero() {
+		for item := range l.Items() {
+			alt = simpleKey(item.Actual().Node)
+			break
+		}
+	}
+	switch st.Kind() {
+	case cst.KindBlockStmt:
+		return st
+	case cst.KindForGenerateStmt:
+		return cst.ForGenerateStmt{Node: st}.Body().Node
+	case cst.KindIfGenerateStmt:
+		for br := range (cst.IfGenerateStmt{Node: st}).Branches() {
+			if alt == "" || TokenKey(br.AltLabel().Name()) == alt {
+				return br.Body().Node
+			}
+		}
+	case cst.KindCaseGenerateStmt:
+		for c := range (cst.CaseGenerateStmt{Node: st}).Alternatives() {
+			if alt == "" || TokenKey(c.AltLabel().Name()) == alt {
+				return c.Body().Node
+			}
+		}
+	}
+	return cst.Node{}
 }
 
 // namedVunit returns the verification unit the name r of an
@@ -279,8 +489,26 @@ func (a *analyzer) vunitBindings(n cst.Node) {
 // vunitName resolves one name of a verification unit list: it denotes
 // a PSL verification unit without a binding of its own (LRM 7.3.4). A
 // simple name that names nothing visible denotes the unit of the
-// working library.
+// working library. A unit that a.u does not depend on (linkVunitDeps:
+// it is bound to a.u's own architecture) is analyzed after a.u, so the
+// name is checked against its tree and records no reference
+// (Result.NamedVunit finds the unit).
 func (a *analyzer) vunitName(n cst.Node) {
+	boundInline := func() {
+		a.semaError(n.Span(), a.text(n)+" is bound in its "+
+			"declaration, and a verification unit binding indication "+
+			"names only unbound verification units (LRM 7.3.4)")
+	}
+	if r, ok := vunitListName(n); ok && (r.lib != "" ||
+		len(a.lookup(r.unit).Decls) == 0) {
+		if v := a.s.namedVunit(a.u, r); v != nil &&
+			!slices.Contains(a.u.Deps, v) {
+			if v.BoundInline() {
+				boundInline()
+			}
+			return
+		}
+	}
 	var d *Decl
 	if n.Kind() == cst.KindSimpleName {
 		tok := cst.SimpleName{Node: n}.Ident()
@@ -315,8 +543,42 @@ func (a *analyzer) vunitName(n cst.Node) {
 		a.semaError(n.Span(), a.text(n)+" is "+article(d.Kind)+" "+
 			d.Kind.String()+", not a verification unit (LRM 7.3.4)")
 	case d.Unit != nil && d.Unit.BoundInline():
-		a.semaError(n.Span(), a.text(n)+" is bound in its "+
-			"declaration, and a verification unit binding indication "+
-			"names only unbound verification units (LRM 7.3.4)")
+		boundInline()
 	}
+}
+
+// NamedVunit returns the PSL verification unit that the name n of a
+// verification unit binding indication written in unit u denotes, nil
+// when it denotes none: the unit its reference names or, for a unit u
+// does not depend on (vunitName), the unit of the library the name
+// names.
+func (r *Result) NamedVunit(u *Unit, n cst.Node) *Unit {
+	if r == nil || u == nil || u.File == nil || n.IsZero() {
+		return nil
+	}
+	if ref, ok := r.RefAt(u.File.Path, n.LastToken().Span().Start); ok &&
+		ref.Decl != nil {
+		if d := ref.Decl.Denotes(); d.Kind == DeclVunit {
+			return d.Unit
+		}
+		return nil
+	}
+	name, ok := vunitListName(n)
+	if !ok {
+		return nil
+	}
+	lib := name.lib
+	if lib == "" || lib == Work {
+		lib = u.Library
+	}
+	l, ok := r.libs[lib]
+	if !ok {
+		return nil
+	}
+	v, ok := l.UnitFrom(name.unit, u)
+	if !ok || v.Kind != UnitVunit || v == u || v.BoundInline() ||
+		slices.Contains(u.Deps, v) {
+		return nil
+	}
+	return v
 }
