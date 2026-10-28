@@ -145,14 +145,15 @@ const (
 	// libs: `gohard libs detect` (#1).
 	LibsUnreadable Code = "libs/unreadable"
 
-	// import: `gohard import` of other tools' project files (#2).
-	ImportConfigExists    Code = "import/config-exists"
-	ImportIgnored         Code = "import/ignored"
-	ImportLibraryConflict Code = "import/library-conflict"
-	ImportMissingFile     Code = "import/missing-file"
-	ImportNoFiles         Code = "import/no-files"
-	ImportStandard        Code = "import/standard"
-	ImportSyntax          Code = "import/syntax"
+	// import: `gohard import` of other tools' project files (#2, #64).
+	ImportConfigExists         Code = "import/config-exists"
+	ImportIgnored              Code = "import/ignored"
+	ImportLibraryConflict      Code = "import/library-conflict"
+	ImportMissingFile          Code = "import/missing-file"
+	ImportNoFiles              Code = "import/no-files"
+	ImportStandard             Code = "import/standard"
+	ImportSyntax               Code = "import/syntax"
+	ImportUnresolvedDependency Code = "import/unresolved-dependency"
 
 	// lint: likely RTL mistakes in legal VHDL (#54).
 	LintClockEdgeStyle  Code = "lint/clock-edge-style"
@@ -345,6 +346,14 @@ var table = []Info{
 		Code: ImportSyntax, Severity: Error, Class: Tool, Owner: 2,
 		Summary: "the project file cannot be read",
 		Message: "not a valid {format}: {reason}",
+	},
+	{
+		Code: ImportUnresolvedDependency, Severity: Warning,
+		Class: Design, Owner: 64,
+		Summary: "no .core file provides a dependency of the core",
+		Message: "dependency {vlnv} matches no .core file under the " +
+			"project root or on the command line; gohard import " +
+			"fetches nothing, so its files are not imported",
 	},
 	{
 		Code: InternalCrash, Severity: Error, Class: Tool, Owner: 20,
