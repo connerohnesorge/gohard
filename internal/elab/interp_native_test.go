@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/sema"
-	"github.com/connerohnesorge/gohard/internal/sim"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/sim"
 )
 
 // TestUnsupportedStopsTheRun: a legal statement the interpreter does

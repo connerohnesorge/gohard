@@ -20,8 +20,8 @@ import (
 	"sort"
 	"unicode/utf8"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // Mode is a lexer mode chosen by the parser (#6). PSL_COMMENT is not a

@@ -12,8 +12,8 @@ package sema
 // value or a trace of a run within its budget.
 
 import (
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/ieeenative"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/ieeenative"
 )
 
 // nbody is the native body of one function declaration and its result

@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/tools/genprotocol/gen"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/tools/genprotocol/gen"
 )
 
 // TestGeneratedUpToDate: protocol_gen.go is exactly what the generator

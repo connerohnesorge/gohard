@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
-	"github.com/connerohnesorge/gohard/internal/span"
-	"github.com/connerohnesorge/gohard/internal/stdlib"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/stdlib"
 )
 
 // Text synchronization is incremental only (#25): didChange carries

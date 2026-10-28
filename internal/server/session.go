@@ -9,14 +9,14 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
-	"github.com/connerohnesorge/gohard/internal/repro"
-	"github.com/connerohnesorge/gohard/internal/stdlib"
-	"github.com/connerohnesorge/gohard/internal/workspace"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/repro"
+	"github.com/connerohnesorge/gohard/v2/internal/stdlib"
+	"github.com/connerohnesorge/gohard/v2/internal/workspace"
 )
 
 // SessionFolder is the folder a session works in: the workspace

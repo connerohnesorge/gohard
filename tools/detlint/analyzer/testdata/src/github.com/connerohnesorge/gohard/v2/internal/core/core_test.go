@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/env/realenv"
+	"github.com/connerohnesorge/gohard/v2/internal/env/realenv"
 )
 
 // Tests may use files, the environment, stdio and realenv; they may

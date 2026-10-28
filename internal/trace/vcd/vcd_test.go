@@ -9,10 +9,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/trace"
-	"github.com/connerohnesorge/gohard/internal/trace/fst"
-	"github.com/connerohnesorge/gohard/internal/trace/tracetest"
-	"github.com/connerohnesorge/gohard/internal/trace/vcd"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/trace/fst"
+	"github.com/connerohnesorge/gohard/v2/internal/trace/tracetest"
+	"github.com/connerohnesorge/gohard/v2/internal/trace/vcd"
 )
 
 var update = flag.Bool("update", false, "rewrite golden files")

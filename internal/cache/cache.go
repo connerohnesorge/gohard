@@ -45,9 +45,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // Dir is the cache folder under a project root.

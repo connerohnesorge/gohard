@@ -1,8 +1,8 @@
 package sema
 
 import (
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // This file declares the implicitly defined operations of every type

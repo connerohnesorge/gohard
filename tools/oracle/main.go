@@ -166,7 +166,7 @@ func findRoot() (string, error) {
 	for {
 		b, err := os.ReadFile(filepath.Join(dir, "go.mod"))
 		if err == nil && bytes.Contains(b,
-			[]byte("module github.com/connerohnesorge/gohard\n")) {
+			[]byte("module github.com/connerohnesorge/gohard/v2\n")) {
 			return dir, nil
 		}
 		up := filepath.Dir(dir)

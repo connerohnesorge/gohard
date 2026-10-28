@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // pslExpr analyzes n, a VHDL expression inside PSL code (a boolean, a

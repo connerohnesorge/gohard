@@ -4,11 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/elab"
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/sema"
-	"github.com/connerohnesorge/gohard/internal/sim"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/elab"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/sim"
 )
 
 const raceTB = `entity tb is

@@ -58,7 +58,7 @@ import (
 	"bytes"
 	"slices"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
 )
 
 // incState is what a result keeps for a later analysis to reuse it.

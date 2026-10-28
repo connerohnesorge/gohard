@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // BenchmarkParse measures full reparse for #22: wall time per 1k lines

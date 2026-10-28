@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
 )
 
 // staticPkg is a package whose constants exercise the interpreter:

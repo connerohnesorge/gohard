@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/cli"
+	"github.com/connerohnesorge/gohard/v2/internal/cli"
 )
 
 const lspRoot = "../../testdata/lsp"

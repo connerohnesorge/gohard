@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
-	"github.com/connerohnesorge/gohard/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
 )
 
 // session runs a whole server session with this package's analyzer

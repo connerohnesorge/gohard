@@ -1,7 +1,7 @@
 package cst
 
 import (
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // maxInternKids is the largest child count of a node the Builder

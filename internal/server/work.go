@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
 )
 
 // work is one running task: a request or the diagnostics of a

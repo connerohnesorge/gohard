@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
 )
 
 // A recorded session (#29) is a header line and then one line per

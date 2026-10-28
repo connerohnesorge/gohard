@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/repro"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/repro"
 )
 
 // Ext is the native trace file extension.

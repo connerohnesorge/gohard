@@ -7,12 +7,12 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
-	"github.com/connerohnesorge/gohard/internal/trace"
-	"github.com/connerohnesorge/gohard/internal/trace/fst"
-	"github.com/connerohnesorge/gohard/internal/trace/tracetest"
-	"github.com/connerohnesorge/gohard/internal/trace/waveform"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/trace/fst"
+	"github.com/connerohnesorge/gohard/v2/internal/trace/tracetest"
+	"github.com/connerohnesorge/gohard/v2/internal/trace/waveform"
 )
 
 func prog(context.Context, env.Command) (env.Result, error) {

@@ -4,14 +4,14 @@ package sema
 
 import (
 	"cmp"
-	"github.com/connerohnesorge/gohard/internal/condanal"
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/lexer"
-	"github.com/connerohnesorge/gohard/internal/parser"
-	"github.com/connerohnesorge/gohard/internal/span"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/condanal"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/lexer"
+	"github.com/connerohnesorge/gohard/v2/internal/parser"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 	"maps"
 	"slices"
 )

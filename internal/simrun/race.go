@@ -3,8 +3,8 @@ package simrun
 import (
 	"errors"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/sim"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/sim"
 )
 
 // errNoTrace stops race detection when a seed's run gave no trace.

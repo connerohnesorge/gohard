@@ -7,8 +7,8 @@ package sim
 import (
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // TestFxInitReports: over generated Init lists, the trace has the

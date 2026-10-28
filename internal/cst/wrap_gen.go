@@ -6,7 +6,7 @@ package cst
 import (
 	"iter"
 
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // Child returns the nth (from 0) child node that T accepts, as a T, or

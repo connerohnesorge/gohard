@@ -4,7 +4,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
 )
 
 // pslExprKinds are the Expr group kinds pslShape collapses to "E"

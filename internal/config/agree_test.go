@@ -8,7 +8,7 @@ import (
 
 	"go.yaml.in/yaml/v3"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
 )
 
 // scalarSlots are the free-string value positions of the key table: a

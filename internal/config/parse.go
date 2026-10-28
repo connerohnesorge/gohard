@@ -12,8 +12,8 @@ import (
 
 	"go.yaml.in/yaml/v3"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
 )
 
 // Parse builds a Config from the bytes of a gohard.yaml. name is the

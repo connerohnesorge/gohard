@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
-	"github.com/connerohnesorge/gohard/internal/simrun"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/simrun"
 )
 
 // TestLSPRunSharesSimFixtures: the editor's run command (the code

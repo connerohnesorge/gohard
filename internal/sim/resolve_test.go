@@ -3,7 +3,7 @@ package sim
 import (
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
 )
 
 // stdLogicTable is the IEEE 1164 resolution table (LRM-companion

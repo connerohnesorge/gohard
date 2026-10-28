@@ -9,11 +9,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/format"
-	"github.com/connerohnesorge/gohard/internal/parser"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/format"
+	"github.com/connerohnesorge/gohard/v2/internal/parser"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // The format section (#32): GHDL and NVC analyze every corpus file as

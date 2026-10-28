@@ -1,9 +1,9 @@
 package lint
 
 import (
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
 )
 
 // latches reports lint/latch: a combinational process (a sensitivity

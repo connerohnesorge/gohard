@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // Host is the machine the search looks at: its operating system and

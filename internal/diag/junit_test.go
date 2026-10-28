@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/diag/junittest"
+	"github.com/connerohnesorge/gohard/v2/internal/diag/junittest"
 )
 
 // junitDoc is the part of the JUnit form the tests read back.

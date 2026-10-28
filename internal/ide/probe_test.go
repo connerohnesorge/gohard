@@ -6,7 +6,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
 )
 
 // TestProbe: on every corpus design the probe sees one analysis's

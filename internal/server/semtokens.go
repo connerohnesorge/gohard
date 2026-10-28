@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
-	"github.com/connerohnesorge/gohard/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
 )
 
 // The semantic tokens requests (#55).

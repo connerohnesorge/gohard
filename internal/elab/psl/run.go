@@ -5,11 +5,11 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/sema"
-	"github.com/connerohnesorge/gohard/internal/sim"
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/sim"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // maxStates bounds the pending obligations (assert) or running

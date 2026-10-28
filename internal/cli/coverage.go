@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/connerohnesorge/gohard/internal/coverage"
-	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/coverage"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
 )
 
 func init() { lookup("coverage").Run = runCoverage }

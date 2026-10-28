@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // TestNVC2008Set: the 2008 view of ieee and std has exactly NVC's

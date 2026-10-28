@@ -1,6 +1,6 @@
 package sim
 
-import "github.com/connerohnesorge/gohard/internal/eval"
+import "github.com/connerohnesorge/gohard/v2/internal/eval"
 
 // txn is one transaction of a projected output waveform: a scalar
 // value (or a disconnection) at an absolute time.

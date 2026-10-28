@@ -8,8 +8,8 @@ import (
 	"unicode/utf16"
 	"unicode/utf8"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
 )
 
 // decoded is one decoded token: a byte span and its type and

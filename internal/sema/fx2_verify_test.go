@@ -15,8 +15,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
 )
 
 // TestFx2ProtGenericDuplicate: LRM 6.5.7.1, a generic of a protected

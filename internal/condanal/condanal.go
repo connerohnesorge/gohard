@@ -16,9 +16,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/lexer"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/lexer"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // Define is one user identifier (from defines: or --define, already

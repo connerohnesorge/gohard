@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
 
 	"slices"
 	"strconv"

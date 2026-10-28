@@ -3,7 +3,7 @@ package cst
 import (
 	"iter"
 
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // Range is a half-open byte range [Start, End) in the parsed text.

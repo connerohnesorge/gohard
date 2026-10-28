@@ -252,12 +252,12 @@ jobs:
           export GOMODCACHE="$GOPATH/pkg/mod"
           cd "$RUNNER_TEMP"
           go install \
-            "github.com/connerohnesorge/gohard/cmd/gohard@$SHA"
+            "github.com/connerohnesorge/gohard/v2/cmd/gohard@$SHA"
           "$GOPATH/bin/gohard" version | tee version.txt
           # The pseudo-version names the commit (#39). A tagged commit
           # resolves to its release version, which carries no commit.
           MV=$(go list -m -f '{{.Version}}' \
-            "github.com/connerohnesorge/gohard@$SHA")
+            "github.com/connerohnesorge/gohard/v2@$SHA")
           if grep -qE '[0-9]{14}-[0-9a-f]{12}$' <<<"$MV"; then
             grep -qx "commit ${SHA:0:12}" version.txt
           else

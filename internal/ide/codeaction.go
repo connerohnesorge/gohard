@@ -5,13 +5,13 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/libs"
-	"github.com/connerohnesorge/gohard/internal/lint"
-	"github.com/connerohnesorge/gohard/internal/sema"
-	"github.com/connerohnesorge/gohard/internal/server"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/libs"
+	"github.com/connerohnesorge/gohard/v2/internal/lint"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 func init() { provide(server.FeatureCodeActions) }

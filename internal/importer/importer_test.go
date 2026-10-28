@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
 )
 
 // show renders a project as one line per entry and diagnostic.

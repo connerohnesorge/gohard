@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/elab/hier"
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/elab/hier"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
 )
 
 const fCounterPkg = `

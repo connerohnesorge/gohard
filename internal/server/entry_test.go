@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
-	"github.com/connerohnesorge/gohard/internal/repro"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/repro"
 )
 
 // TestArrivalLineRoundTrip: every client input, whatever its bytes,

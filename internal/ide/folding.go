@@ -4,10 +4,10 @@ import (
 	"cmp"
 	"slices"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/server"
-	"github.com/connerohnesorge/gohard/internal/span"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 func init() { provide(server.FeatureFolding) }

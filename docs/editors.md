@@ -19,7 +19,7 @@ Helix and Zed's extension registry are listed under
 
 Install `gohard` on your `PATH` first. Use any of these:
 
-* `go install github.com/connerohnesorge/gohard/cmd/gohard@latest`
+* `go install github.com/connerohnesorge/gohard/v2/cmd/gohard@latest`
   (Go 1.27 or newer; the binary lands in `$(go env GOPATH)/bin`)
 * a release binary from the GitHub Releases page: one archive per
   OS (linux, darwin, windows) and arch (amd64, arm64), checked with

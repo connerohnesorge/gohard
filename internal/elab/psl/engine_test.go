@@ -3,7 +3,7 @@ package psl
 import (
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // The engine tests check the derivative matcher and the formula

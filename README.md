@@ -20,7 +20,7 @@ Pick one:
 * The Nix flake: `nix profile install github:connerohnesorge/gohard`,
   or `nix run github:connerohnesorge/gohard -- version`.
 * Go 1.27 or newer:
-  `go install github.com/connerohnesorge/gohard/cmd/gohard@latest`
+  `go install github.com/connerohnesorge/gohard/v2/cmd/gohard@latest`
 * A release binary from
   [GitHub Releases](https://github.com/connerohnesorge/gohard/releases)
   for linux, darwin or windows on amd64 or arm64. Verify the archive

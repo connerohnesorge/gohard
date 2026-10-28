@@ -6,7 +6,7 @@ import (
 	"io/fs"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
 )
 
 // TestReadOnce: an editor run reads each project file once; a rebuilt

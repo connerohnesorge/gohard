@@ -1,6 +1,6 @@
 package ide
 
-import "github.com/connerohnesorge/gohard/internal/server"
+import "github.com/connerohnesorge/gohard/v2/internal/server"
 
 func init() {
 	provide(server.FeatureDocumentSymbols | server.FeatureWorkspaceSymbols)

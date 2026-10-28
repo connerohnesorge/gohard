@@ -14,9 +14,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/sema"
-	"github.com/connerohnesorge/gohard/internal/sim"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/sim"
 )
 
 // ErrHalted is the error of a process whose DebugHook halted it: the

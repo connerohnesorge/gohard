@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
 )
 
 // This file is the naive reference scheduler (#35 oracle): a direct,

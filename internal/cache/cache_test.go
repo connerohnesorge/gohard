@@ -7,10 +7,10 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/env/realenv"
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env/realenv"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
 )
 
 const dir = "/p/.gohard/cache"

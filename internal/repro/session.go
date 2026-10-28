@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // Session is a recorded language-server session (#29): the header,

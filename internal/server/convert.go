@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"slices"
 
-	"github.com/connerohnesorge/gohard/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
 )
 
 // conv turns analyzer results (byte offsets) into LSP values in the

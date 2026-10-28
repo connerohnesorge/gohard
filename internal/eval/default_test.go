@@ -3,7 +3,7 @@ package eval
 import (
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // TestDefault: the default value of every scalar subtype is its 'LEFT

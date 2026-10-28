@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 var update = flag.Bool("update", false,

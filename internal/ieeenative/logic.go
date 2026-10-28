@@ -4,7 +4,7 @@ package ieeenative
 // constants, row and column in STD_ULOGIC position order (U X 0 1 Z W
 // L H -).
 
-import "github.com/connerohnesorge/gohard/internal/eval"
+import "github.com/connerohnesorge/gohard/v2/internal/eval"
 
 type table [9][9]int64
 

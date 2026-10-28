@@ -23,7 +23,7 @@ package ieeenative
 import (
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
 )
 
 // Func is a native body: the value of a call on args (in parameter

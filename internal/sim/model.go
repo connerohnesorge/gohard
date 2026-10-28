@@ -1,8 +1,8 @@
 package sim
 
 import (
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // Time is simulated time in femtoseconds. It is a value: the kernel has

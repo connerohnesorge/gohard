@@ -1,6 +1,6 @@
 package sim
 
-import "github.com/connerohnesorge/gohard/internal/diag"
+import "github.com/connerohnesorge/gohard/v2/internal/diag"
 
 // Finisher is implemented by Code that reports when a run ends: PSL
 // cover misses and strong obligations still pending (#35). The kernel

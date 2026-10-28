@@ -30,8 +30,8 @@
         ldflags = [
           "-s"
           "-w"
-          "-X github.com/connerohnesorge/gohard/internal/cli.Version=${version}"
-          "-X github.com/connerohnesorge/gohard/internal/cli.Commit=${commit}"
+          "-X github.com/connerohnesorge/gohard/v2/internal/cli.Version=${version}"
+          "-X github.com/connerohnesorge/gohard/v2/internal/cli.Commit=${commit}"
         ];
         doCheck = false;
         meta = {

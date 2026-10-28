@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/condanal"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/condanal"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // refSummary renders refs as "file fail|must std [psl]" lines.

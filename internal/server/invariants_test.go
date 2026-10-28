@@ -7,8 +7,8 @@ import (
 	"maps"
 	"slices"
 
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
-	"github.com/connerohnesorge/gohard/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
 )
 
 // checkSession checks the server invariants of #25 on one session,

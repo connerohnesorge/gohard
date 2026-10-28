@@ -9,8 +9,8 @@ package sema
 // declaration, analyzed before the call; other callees are not judged.
 
 import (
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // procSummary is what a procedure body does, its callees included.

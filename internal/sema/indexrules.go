@@ -1,6 +1,6 @@
 package sema
 
-import "github.com/connerohnesorge/gohard/internal/cst"
+import "github.com/connerohnesorge/gohard/v2/internal/cst"
 
 // notIndexable reports prefix(...) where the prefix p denotes no value
 // and no subprogram: a label, a design unit, a package or a component

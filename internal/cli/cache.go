@@ -4,10 +4,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/connerohnesorge/gohard/internal/cache"
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/cache"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
 )
 
 // binaryID identifies the gohard executable itself (a hash of its

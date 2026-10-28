@@ -1,6 +1,6 @@
 package cst
 
-import "github.com/connerohnesorge/gohard/internal/token"
+import "github.com/connerohnesorge/gohard/v2/internal/token"
 
 // Raw access for the codec of the prebuilt std/ieee bundle (#33): the
 // bundle is analyzed when GoHard is built and its trees are stored and

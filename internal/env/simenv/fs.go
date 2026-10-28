@@ -15,7 +15,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // Errors of the simulated file system besides the io/fs sentinels.

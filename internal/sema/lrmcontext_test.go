@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
 )
 
 // TestLRMContexts: the IEEE 1076-2008 context declarations

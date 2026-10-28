@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // i_geninst_test.go tests the implicit instance Decl of a VHDL-2019

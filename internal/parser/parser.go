@@ -26,13 +26,13 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/connerohnesorge/gohard/internal/condanal"
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/lexer"
-	"github.com/connerohnesorge/gohard/internal/span"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/condanal"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/lexer"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // Size limits (#10, #31).

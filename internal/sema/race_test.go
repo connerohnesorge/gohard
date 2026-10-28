@@ -3,8 +3,8 @@ package sema
 import (
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/env/realenv"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/env/realenv"
 )
 
 // TestParallelJobs runs the unit jobs on the real goroutine pool (run

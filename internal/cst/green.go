@@ -23,7 +23,7 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // Kind is a CST node kind from kinds.yaml. The zero Kind is not valid.

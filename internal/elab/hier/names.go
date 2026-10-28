@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
 )
 
 // names.go: the LRM 16.2.5 name strings, 'SIMPLE_NAME, 'PATH_NAME and

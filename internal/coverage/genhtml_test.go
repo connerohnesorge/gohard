@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/corpus"
-	"github.com/connerohnesorge/gohard/internal/coverage"
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/env/realenv"
-	"github.com/connerohnesorge/gohard/internal/simrun"
+	"github.com/connerohnesorge/gohard/v2/internal/corpus"
+	"github.com/connerohnesorge/gohard/v2/internal/coverage"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env/realenv"
+	"github.com/connerohnesorge/gohard/v2/internal/simrun"
 )
 
 // TestGenhtml: genhtml (lcov 2) reads the coverage GoHard writes (#62)

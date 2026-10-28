@@ -6,9 +6,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/elab/hier"
-	"github.com/connerohnesorge/gohard/internal/repro"
-	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/elab/hier"
+	"github.com/connerohnesorge/gohard/v2/internal/repro"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
 )
 
 // Units returns the coverable units of the design elaborated from top

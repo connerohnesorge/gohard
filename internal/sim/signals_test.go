@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // TestForceModes checks LRM 10.5.2.1: a force of mode out replaces the

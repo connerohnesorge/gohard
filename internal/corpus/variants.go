@@ -6,10 +6,10 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/lexer"
-	"github.com/connerohnesorge/gohard/internal/parser"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/lexer"
+	"github.com/connerohnesorge/gohard/v2/internal/parser"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // The #8 variants behind the variant_stable invariant: each one is a

@@ -9,7 +9,7 @@ import (
 
 	"go.yaml.in/yaml/v3"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
 )
 
 // Type is the kind of value a key holds.

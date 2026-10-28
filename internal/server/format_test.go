@@ -11,14 +11,14 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
-	"github.com/connerohnesorge/gohard/internal/format"
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
-	"github.com/connerohnesorge/gohard/internal/parser"
-	"github.com/connerohnesorge/gohard/internal/server"
-	"github.com/connerohnesorge/gohard/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/format"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/parser"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
 )
 
 func TestWithFormattingFeatures(t *testing.T) {

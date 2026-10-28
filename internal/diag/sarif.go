@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
 )
 
 // SARIF 2.1.0 output. Struct field order is the key order, so the bytes

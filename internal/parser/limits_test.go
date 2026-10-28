@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/token"
-	"github.com/connerohnesorge/gohard/internal/workspace"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/workspace"
 )
 
 // countNodes is the number of CST nodes (root included, tokens not) of

@@ -8,8 +8,8 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // corpusGoldens decodes every testdata/corpus/*/golden/trace.txt. The

@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/cli"
-	"github.com/connerohnesorge/gohard/internal/env/realenv"
-	"github.com/connerohnesorge/gohard/internal/workspace"
+	"github.com/connerohnesorge/gohard/v2/internal/cli"
+	"github.com/connerohnesorge/gohard/v2/internal/env/realenv"
+	"github.com/connerohnesorge/gohard/v2/internal/workspace"
 )
 
 // TestImportThenCheck is the #2 and #64 acceptance check: for a

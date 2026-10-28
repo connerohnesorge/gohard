@@ -5,8 +5,8 @@ import (
 	"testing"
 	"testing/quick"
 
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
 )
 
 // TestKeepCase: a use site spelled like the declaration gets the new

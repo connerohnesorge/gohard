@@ -58,9 +58,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/parser"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/parser"
 )
 
 // Cache is the on-disk analysis cache as Analyze uses it: entries of a

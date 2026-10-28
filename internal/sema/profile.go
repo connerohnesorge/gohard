@@ -4,7 +4,7 @@ import (
 	"maps"
 	"slices"
 
-	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
 )
 
 // Profile attributes evaluation steps to the design unit that declares

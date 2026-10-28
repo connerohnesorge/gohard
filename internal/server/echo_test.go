@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
 )
 
 // echo is the analyzer of the fixtures: it makes the server's view of

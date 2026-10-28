@@ -24,7 +24,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // Epoch is the default start of the virtual clock, the same instant as

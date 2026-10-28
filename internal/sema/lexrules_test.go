@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // TestBitStringRules: the underscore, digit, signed-empty, length and

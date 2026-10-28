@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // ErrNonReproducible is the error of a trace recorded with --real-env

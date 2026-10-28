@@ -1,8 +1,8 @@
 package format
 
 import (
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // Case is the format.keyword_case setting.

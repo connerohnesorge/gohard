@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
 )
 
 // childOut is what one benchmark process reports to the driver (one

@@ -3,11 +3,11 @@ package elab
 import (
 	"slices"
 
-	"github.com/connerohnesorge/gohard/internal/elab/hier"
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/sema"
-	"github.com/connerohnesorge/gohard/internal/sim"
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/elab/hier"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/sim"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // charging is an Indexer that charges the design's step budget.

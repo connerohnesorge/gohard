@@ -7,11 +7,11 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/sim"
-	"github.com/connerohnesorge/gohard/internal/token"
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/sim"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // gcHeapRun runs the gc_heap corpus design (testdata/corpus/gc_heap,

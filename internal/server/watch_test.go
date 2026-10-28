@@ -6,12 +6,12 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/cli"
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
-	"github.com/connerohnesorge/gohard/internal/ide"
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
-	"github.com/connerohnesorge/gohard/internal/repro"
-	"github.com/connerohnesorge/gohard/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/cli"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/ide"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/repro"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
 )
 
 // TestServeRecordsDiskChanges: a session in which a file changes on

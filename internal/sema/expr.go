@@ -1,7 +1,7 @@
 package sema
 
 import (
-	"github.com/connerohnesorge/gohard/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
 )
 
 // ExprKind is the kind of a typed expression.

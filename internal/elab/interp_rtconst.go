@@ -1,6 +1,6 @@
 package elab
 
-import "github.com/connerohnesorge/gohard/internal/sema"
+import "github.com/connerohnesorge/gohard/v2/internal/sema"
 
 // interp_rtconst.go: constants of design regions (packages,
 // architectures, entities, blocks) whose initial value only the

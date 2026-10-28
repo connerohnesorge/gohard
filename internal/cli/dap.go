@@ -7,13 +7,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/dap"
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
-	"github.com/connerohnesorge/gohard/internal/repro"
-	"github.com/connerohnesorge/gohard/internal/simdbg"
-	"github.com/connerohnesorge/gohard/internal/simrun"
+	"github.com/connerohnesorge/gohard/v2/internal/dap"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/repro"
+	"github.com/connerohnesorge/gohard/v2/internal/simdbg"
+	"github.com/connerohnesorge/gohard/v2/internal/simrun"
 )
 
 func init() { lookup("dap").Run = runDAP }

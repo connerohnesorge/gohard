@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
 )
 
 // TestMethodAliasTarget: under VHDL-2019 an alias in a protected type

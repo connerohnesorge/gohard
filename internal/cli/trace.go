@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/trace"
-	"github.com/connerohnesorge/gohard/internal/trace/fst"
-	"github.com/connerohnesorge/gohard/internal/trace/ghw"
-	"github.com/connerohnesorge/gohard/internal/trace/vcd"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/trace/fst"
+	"github.com/connerohnesorge/gohard/v2/internal/trace/ghw"
+	"github.com/connerohnesorge/gohard/v2/internal/trace/vcd"
 )
 
 func init() { lookup("trace").Run = runTrace }

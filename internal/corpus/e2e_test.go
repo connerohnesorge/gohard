@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/elab"
+	"github.com/connerohnesorge/gohard/v2/internal/elab"
 )
 
 // TestEndToEnd runs psl_simple and overload_ops through the sequential

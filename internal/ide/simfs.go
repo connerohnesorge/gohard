@@ -7,7 +7,7 @@ import (
 	"slices"
 	"sync"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // readOnce is the project as one editor run reads it (#18): the reads

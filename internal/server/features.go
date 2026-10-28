@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
 )
 
 type docParams struct {

@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // VHDL-2019 constructs (builder: v2019) and the node-kind gate engine.

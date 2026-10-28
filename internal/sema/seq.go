@@ -1,6 +1,6 @@
 package sema
 
-import "github.com/connerohnesorge/gohard/internal/cst"
+import "github.com/connerohnesorge/gohard/v2/internal/cst"
 
 // SeqKind is the kind of a sequential statement.
 type SeqKind uint8

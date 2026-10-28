@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/env/realenv"
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env/realenv"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
 )
 
 // specialFS reports chosen names as a FIFO, a character device (what a

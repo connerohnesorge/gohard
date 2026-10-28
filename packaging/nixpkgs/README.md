@@ -18,6 +18,10 @@ To move it to a new release, set `version`, empty `hash` and
 `vendorHash` (`""`), build, and paste the hashes the two failures
 print (or run `nix-update gohard` in a nixpkgs checkout). `vendorHash`
 is the flake's `vendorHash` whenever `go.mod` and `go.sum` match.
+From 2.0.0 the module path is `github.com/connerohnesorge/gohard/v2`,
+so the `-X` flag in `ldflags` must name
+`github.com/connerohnesorge/gohard/v2/internal/cli.Version`; with the
+1.x path the version stays unset and the install check fails.
 
 Submitting it to nixpkgs:
 

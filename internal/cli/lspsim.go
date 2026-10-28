@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"maps"
 
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/server"
-	"github.com/connerohnesorge/gohard/internal/sim"
-	"github.com/connerohnesorge/gohard/internal/simrun"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/sim"
+	"github.com/connerohnesorge/gohard/v2/internal/simrun"
 )
 
 func init() {

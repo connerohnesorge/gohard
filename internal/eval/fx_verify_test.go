@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // TestFxRealValue: 'VALUE of a floating type reads back every 'IMAGE

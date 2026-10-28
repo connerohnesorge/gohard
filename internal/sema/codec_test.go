@@ -9,8 +9,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/stdlib"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/stdlib"
 )
 
 // TestStartupNoAnalysis: the bundle a run starts with is the one

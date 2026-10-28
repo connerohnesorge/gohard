@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
 )
 
 // TestTypeAttributePrefix: 'IMAGE, 'VALUE, 'POS and the other function

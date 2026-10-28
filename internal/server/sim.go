@@ -9,14 +9,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
-	"github.com/connerohnesorge/gohard/internal/repro"
-	"github.com/connerohnesorge/gohard/internal/span"
-	"github.com/connerohnesorge/gohard/internal/stdlib"
-	"github.com/connerohnesorge/gohard/internal/trace"
-	"github.com/connerohnesorge/gohard/internal/trace/waveform"
-	"github.com/connerohnesorge/gohard/internal/workspace"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/repro"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/stdlib"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/trace/waveform"
+	"github.com/connerohnesorge/gohard/v2/internal/workspace"
 )
 
 // Simulation in the editor (#25, #35, #36). The server owns the run

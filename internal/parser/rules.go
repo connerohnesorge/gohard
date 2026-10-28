@@ -5,7 +5,7 @@ import (
 	"encoding/csv"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // rulesCSV is the #7 standard-gating table, the single source of the

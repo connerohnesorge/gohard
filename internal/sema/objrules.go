@@ -7,8 +7,8 @@ package sema
 // subtype (LRM 4.2.1).
 
 import (
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // checksOff reports whether the rules of this file are off: while

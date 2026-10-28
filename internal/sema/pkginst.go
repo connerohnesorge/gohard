@@ -8,8 +8,8 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // uninstantiatedPackage reports whether x is a package declaration

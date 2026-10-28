@@ -17,8 +17,8 @@ import (
 	"testing/fstest"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/env/realenv"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env/realenv"
 )
 
 // workload drives every door of e with a pseudo-random series of calls

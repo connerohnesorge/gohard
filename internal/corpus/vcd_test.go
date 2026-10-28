@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // ghdlVCD is a GHDL-style dump of tb: package scopes, a port sharing

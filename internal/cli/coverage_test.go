@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env/realenv"
+	"github.com/connerohnesorge/gohard/v2/internal/env/realenv"
 )
 
 // TestCoverageMergeOrder: `gohard coverage merge` gives the same bytes

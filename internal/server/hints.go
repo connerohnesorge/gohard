@@ -5,7 +5,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/connerohnesorge/gohard/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
 )
 
 // Signature help and inlay hints (#56): the LSP form of the analyzer's

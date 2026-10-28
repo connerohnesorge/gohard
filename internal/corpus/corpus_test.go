@@ -10,12 +10,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/coverage"
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/parser"
-	"github.com/connerohnesorge/gohard/internal/simrun"
-	"github.com/connerohnesorge/gohard/internal/token"
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/coverage"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/parser"
+	"github.com/connerohnesorge/gohard/v2/internal/simrun"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // The corpus harness (#8, #24, #35, #36): every design of corpus.yaml,

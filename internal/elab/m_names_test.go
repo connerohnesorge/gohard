@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
 )
 
 // The name attributes 'SIMPLE_NAME, 'PATH_NAME and 'INSTANCE_NAME

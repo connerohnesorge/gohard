@@ -2,7 +2,7 @@
 
 GoHard is a pure-Go 1.27 VHDL language server with a built-in pure-Go
 simulator: one binary, `gohard`, module
-`github.com/connerohnesorge/gohard`. This file is the package contract.
+`github.com/connerohnesorge/gohard/v2`. This file is the package contract.
 The GitHub issues are the source of truth and win where they differ
 (#4 holds the principles and settled decisions, #23 tracks v1.0). Every
 package follows [philosophy.md](philosophy.md) (P1-P8).

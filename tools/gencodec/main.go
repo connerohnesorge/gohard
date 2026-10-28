@@ -39,7 +39,7 @@ import (
 )
 
 const (
-	modPath  = "github.com/connerohnesorge/gohard/"
+	modPath  = "github.com/connerohnesorge/gohard/v2/"
 	semaPath = modPath + "internal/sema"
 	outPath  = "internal/sema/codec_gen.go"
 )

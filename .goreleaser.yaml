@@ -17,11 +17,11 @@ builds:
       - -trimpath
     ldflags:
       - -s -w
-      - -X github.com/connerohnesorge/gohard/internal/cli.Version={{.Version}}
+      - -X github.com/connerohnesorge/gohard/v2/internal/cli.Version={{.Version}}
       # `gohard version` and the repro headers show the commit (#39). A
       # release refuses a dirty tree, so there is no -dirty suffix here
       # (and goreleaser reports a snapshot's tree as clean anyway).
-      - -X github.com/connerohnesorge/gohard/internal/cli.Commit={{.FullCommit}}
+      - -X github.com/connerohnesorge/gohard/v2/internal/cli.Commit={{.FullCommit}}
     # Reproducible: file times come from the commit, not the clock.
     mod_timestamp: "{{ .CommitTimestamp }}"
 

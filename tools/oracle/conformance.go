@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/corpus"
+	"github.com/connerohnesorge/gohard/v2/internal/corpus"
 )
 
 // The conformance section (#18): the NVC cross-check of the

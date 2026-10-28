@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // tagsFile maps every bundled declaration to the first standard that

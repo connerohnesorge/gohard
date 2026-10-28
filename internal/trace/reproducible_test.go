@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/trace"
-	"github.com/connerohnesorge/gohard/internal/trace/tracetest"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/trace/tracetest"
 )
 
 // TestNonReproducibleLine: a --real-env trace carries the additive

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
 )
 
 // SnapshotMethod is the notification that follows every response and

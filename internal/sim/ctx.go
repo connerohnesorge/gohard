@@ -7,9 +7,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // Ctx is a process's view of the kernel while it runs (Code.Resume,

@@ -5,8 +5,8 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // Race detection (#29, #35): a race-free design gives a byte-identical

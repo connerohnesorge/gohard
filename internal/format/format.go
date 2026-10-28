@@ -3,8 +3,8 @@ package format
 import (
 	"errors"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/parser"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/parser"
 )
 
 // Edit replaces the input bytes [Start, End) with NewText. Offsets are

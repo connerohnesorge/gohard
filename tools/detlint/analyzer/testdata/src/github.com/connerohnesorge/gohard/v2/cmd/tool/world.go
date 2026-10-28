@@ -1,5 +1,5 @@
-// Package sub is exempt: nothing is reported.
-package sub
+// Package tool is exempt: nothing is reported.
+package tool
 
 import (
 	crand "crypto/rand"
@@ -20,7 +20,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/env/realenv"
+	"github.com/connerohnesorge/gohard/v2/internal/env/realenv"
 )
 
 var (

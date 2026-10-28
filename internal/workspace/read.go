@@ -1,8 +1,8 @@
 package workspace
 
 import (
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // Source is a file and its bytes.

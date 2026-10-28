@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
 )
 
 // hinter is an analyzer with signature help and inlay hints: one

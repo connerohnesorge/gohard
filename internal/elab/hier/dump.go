@@ -3,7 +3,7 @@ package hier
 import (
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
 )
 
 // Dump returns the hierarchy in its stable text form, the form the

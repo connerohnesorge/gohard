@@ -5,7 +5,7 @@ import (
 	"io"
 	"io/fs"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // cancelFS is the file system a command sees: once the run's context is

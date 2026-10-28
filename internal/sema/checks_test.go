@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
 )
 
 // TestStructuralChecks: one error each, at the offending part, for

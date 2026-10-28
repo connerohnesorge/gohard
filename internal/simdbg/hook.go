@@ -1,8 +1,8 @@
 package simdbg
 
 import (
-	"github.com/connerohnesorge/gohard/internal/elab"
-	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/elab"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
 )
 
 // event is one statement a replay starts.

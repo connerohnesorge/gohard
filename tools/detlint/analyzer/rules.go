@@ -6,7 +6,7 @@ import (
 
 // Module is the import path of the GoHard module. Scopes are decided
 // relative to it.
-const Module = "github.com/connerohnesorge/gohard"
+const Module = "github.com/connerohnesorge/gohard/v2"
 
 // Rule is a set of detlint rules, one bit per rule.
 type Rule uint16

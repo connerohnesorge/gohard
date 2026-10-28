@@ -15,7 +15,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
 )
 
 // memoLimit bounds the recorded calls of one analysis; past it calls

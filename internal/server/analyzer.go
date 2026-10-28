@@ -3,8 +3,8 @@ package server
 import (
 	"encoding/json"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
 )
 
 // Analyzer computes the language features from a Snapshot. Later

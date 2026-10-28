@@ -12,11 +12,11 @@ import (
 	"testing"
 	"unicode"
 
-	"github.com/connerohnesorge/gohard/internal/condanal"
-	"github.com/connerohnesorge/gohard/internal/config"
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/condanal"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // Per-grammar-rule goldens (#31): testdata/parse/<rule>/ holds

@@ -8,9 +8,9 @@ package sema
 import (
 	"strconv"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 var modeNames = [...]string{ModeNone: "in", ModeIn: "in", ModeOut: "out",

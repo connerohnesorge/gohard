@@ -19,7 +19,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
 )
 
 // Outputs maps each generated file (slash path from the repository root)

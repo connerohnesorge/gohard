@@ -4,7 +4,7 @@ import (
 	"cmp"
 	"slices"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
 )
 
 // RefKind says how a name occurrence uses its declaration.

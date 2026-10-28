@@ -1,6 +1,6 @@
 package sema
 
-import "github.com/connerohnesorge/gohard/internal/diag"
+import "github.com/connerohnesorge/gohard/v2/internal/diag"
 
 // Explain returns the diagnostic an undecided overload result reports
 // (#34): sema/no-overload with every candidate and why it does not fit

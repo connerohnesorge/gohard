@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // edges are tried before random values (P5: generators try edge values

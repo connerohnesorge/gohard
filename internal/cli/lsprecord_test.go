@@ -3,7 +3,7 @@ package cli
 import (
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
 )
 
 // TestRecordScansEachBodyOnce: while the session folder is not known

@@ -10,10 +10,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/cli"
-	"github.com/connerohnesorge/gohard/internal/corpus"
-	"github.com/connerohnesorge/gohard/internal/parser"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/cli"
+	"github.com/connerohnesorge/gohard/v2/internal/corpus"
+	"github.com/connerohnesorge/gohard/v2/internal/parser"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // conformanceRoot is corpus.ConformanceDir from this package.

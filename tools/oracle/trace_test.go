@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/simrun"
+	"github.com/connerohnesorge/gohard/v2/internal/simrun"
 )
 
 const traceManifest = `schema: 1

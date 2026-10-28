@@ -28,7 +28,7 @@ import (
 	"unsafe" // want `import of unsafe: memory addresses differ`
 	"weak"   // want `import of weak: run parallel work`
 
-	"github.com/connerohnesorge/gohard/internal/env/realenv" // want `import of`
+	"github.com/connerohnesorge/gohard/v2/internal/env/realenv" // want `import of`
 )
 
 var (

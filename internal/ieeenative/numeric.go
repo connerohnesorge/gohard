@@ -7,7 +7,7 @@ package ieeenative
 // vector's leftmost element is its most significant bit whatever its
 // direction (the body aliases it as L'length-1 downto 0).
 
-import "github.com/connerohnesorge/gohard/internal/eval"
+import "github.com/connerohnesorge/gohard/v2/internal/eval"
 
 const libNumeric = "numeric_std"
 

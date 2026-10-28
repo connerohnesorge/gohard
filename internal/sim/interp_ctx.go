@@ -8,7 +8,7 @@ package sim
 import (
 	"errors"
 
-	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
 )
 
 // partNets returns the net elements of t.

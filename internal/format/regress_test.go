@@ -14,8 +14,8 @@ import (
 
 	"go.yaml.in/yaml/v3"
 
-	"github.com/connerohnesorge/gohard/internal/parser"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/parser"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 var prRegression = flag.Bool("format.regression", false,

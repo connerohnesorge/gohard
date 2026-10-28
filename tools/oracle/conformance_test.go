@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/corpus"
+	"github.com/connerohnesorge/gohard/v2/internal/corpus"
 )
 
 const confCase = "-- std: 2008\nentity c_tb is\nend entity;\n"

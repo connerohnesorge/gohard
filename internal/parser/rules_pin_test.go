@@ -3,9 +3,9 @@ package parser
 import (
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
 
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // pinnedFirst is the `first` column of #7's rule table, copied by hand

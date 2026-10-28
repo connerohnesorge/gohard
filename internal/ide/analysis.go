@@ -1,11 +1,11 @@
 package ide
 
 import (
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/libs"
-	"github.com/connerohnesorge/gohard/internal/resolve"
-	"github.com/connerohnesorge/gohard/internal/sema"
-	"github.com/connerohnesorge/gohard/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/libs"
+	"github.com/connerohnesorge/gohard/v2/internal/resolve"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
 )
 
 // Analysis is the analyzed workspace of one snapshot and the query

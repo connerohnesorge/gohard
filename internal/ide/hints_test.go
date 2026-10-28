@@ -9,12 +9,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
-	"github.com/connerohnesorge/gohard/internal/jsonrpc2"
-	"github.com/connerohnesorge/gohard/internal/resolve"
-	"github.com/connerohnesorge/gohard/internal/server"
-	"github.com/connerohnesorge/gohard/internal/span"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/jsonrpc2"
+	"github.com/connerohnesorge/gohard/v2/internal/resolve"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/span"
 )
 
 // allHints turns every inlay hint kind on in gohard.yaml.

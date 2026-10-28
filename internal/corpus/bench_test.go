@@ -12,10 +12,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/elab"
-	"github.com/connerohnesorge/gohard/internal/sema"
-	"github.com/connerohnesorge/gohard/internal/simrun"
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/elab"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/simrun"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // interpretedBodies runs the benchmarks with every ieee body

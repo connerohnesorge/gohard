@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
 )
 
 // A Probe sees the phases in order and balanced overload resolutions,

@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/cli"
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/cli"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
 )
 
 // TestCacheBinaryIdentity (#37): the executable's identity is part of

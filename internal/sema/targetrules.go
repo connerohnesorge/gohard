@@ -1,6 +1,6 @@
 package sema
 
-import "github.com/connerohnesorge/gohard/internal/cst"
+import "github.com/connerohnesorge/gohard/v2/internal/cst"
 
 // targetForm reports a target name that denotes no object an
 // assignment can write (LRM 10.5.2.1, 10.6.2.1): an attribute (an

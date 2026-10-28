@@ -9,7 +9,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/stdlib"
+	"github.com/connerohnesorge/gohard/v2/internal/stdlib"
 )
 
 // The stdlib section (#33): the declaration sets of GHDL's and NVC's

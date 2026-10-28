@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
 )
 
 // mapCache is a Cache with no checks of its own: whatever bytes a test

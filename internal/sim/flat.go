@@ -1,6 +1,6 @@
 package sim
 
-import "github.com/connerohnesorge/gohard/internal/eval"
+import "github.com/connerohnesorge/gohard/v2/internal/eval"
 
 // isLeaf reports whether v is a scalar subelement (not an array or a
 // record).

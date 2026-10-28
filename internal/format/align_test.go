@@ -5,8 +5,8 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/connerohnesorge/gohard/internal/parser"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/parser"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 func noAlign(o *Options) { o.AlignPorts = false }

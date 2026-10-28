@@ -3,7 +3,7 @@ package sema
 import (
 	"slices"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
 )
 
 // unitRef is a syntactic reference lib.unit found in a design unit: a

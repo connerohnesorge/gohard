@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // TestNativeBodiesCorpus is the corpus check of the native ieee bodies

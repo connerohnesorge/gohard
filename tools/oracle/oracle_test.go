@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/format"
+	"github.com/connerohnesorge/gohard/v2/internal/format"
 	"go.yaml.in/yaml/v3"
 )
 

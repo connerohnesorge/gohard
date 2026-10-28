@@ -7,7 +7,7 @@ import (
 	"runtime/debug"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/v2/internal/config"
 )
 
 // analyzeOptions are the configurations FuzzAnalyze runs an input

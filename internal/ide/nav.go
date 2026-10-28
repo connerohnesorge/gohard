@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/resolve"
-	"github.com/connerohnesorge/gohard/internal/sema"
-	"github.com/connerohnesorge/gohard/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/resolve"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
 )
 
 // Navigation (#25): hover, go-to-definition, references and rename,

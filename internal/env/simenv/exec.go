@@ -11,7 +11,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // ErrNotFound is returned by LookPath, like exec.ErrNotFound.

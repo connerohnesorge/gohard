@@ -3,7 +3,7 @@ package sim
 import (
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
 )
 
 // leaves and leafAt step over an array's elements by the element

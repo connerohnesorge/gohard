@@ -1,8 +1,8 @@
 package ide
 
 import (
-	"github.com/connerohnesorge/gohard/internal/resolve"
-	"github.com/connerohnesorge/gohard/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/resolve"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
 )
 
 // Signature help and inlay hints (#56), from resolve over the

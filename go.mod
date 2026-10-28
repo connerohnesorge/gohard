@@ -1,4 +1,4 @@
-module github.com/connerohnesorge/gohard
+module github.com/connerohnesorge/gohard/v2
 
 go 1.27
 

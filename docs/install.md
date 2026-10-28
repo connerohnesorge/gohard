@@ -10,7 +10,7 @@ IEEE library and the Go toolchain.
 | Scoop | `scoop bucket add connerohnesorge https://github.com/connerohnesorge/scoop-bucket` then `scoop install connerohnesorge/gohard` | Windows |
 | nixpkgs | `nix profile install nixpkgs#gohard` | Linux, macOS |
 | Nix flake | `nix profile install github:connerohnesorge/gohard` | Linux, macOS |
-| Go | `go install github.com/connerohnesorge/gohard/cmd/gohard@latest` | any Go 1.27 target |
+| Go | `go install github.com/connerohnesorge/gohard/v2/cmd/gohard@latest` | any Go 1.27 target |
 | Release archive | download from [GitHub Releases](https://github.com/connerohnesorge/gohard/releases) | linux, darwin, windows on amd64 and arm64 |
 
 ## Homebrew and Scoop

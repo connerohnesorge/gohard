@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // Clock is a virtual clock. Time moves only through Advance, AdvanceTo,

@@ -3,8 +3,8 @@ package sema
 import (
 	"slices"
 
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
 )
 
 // TypeClass is the class of a type (LRM 5).

@@ -524,7 +524,7 @@ func expectReserved(w wordDef, std string, psl, strict bool) bool {
 func genKeywordEdges(m *model) string {
 	var b strings.Builder
 	b.WriteString(header + "package lexer\n\n")
-	b.WriteString("import \"github.com/connerohnesorge/gohard/" +
+	b.WriteString("import \"github.com/connerohnesorge/gohard/v2/" +
 		"internal/token\"\n\n")
 	b.WriteString("// keywordEdges lists every keyword under every " +
 		"standard, lexer mode\n// and psl.strict_keywords setting with " +
@@ -551,7 +551,7 @@ func genKeywordEdges(m *model) string {
 func genNodeKinds(m *model) string {
 	var b strings.Builder
 	b.WriteString(header + "package cst\n\n")
-	b.WriteString("import \"github.com/connerohnesorge/gohard/" +
+	b.WriteString("import \"github.com/connerohnesorge/gohard/v2/" +
 		"internal/token\"\n\n")
 	b.WriteString("// KindsHash is the SHA-256 of kinds.yaml and " +
 		"keywords.yaml (line\n// endings normalized to LF): a " +
@@ -609,7 +609,7 @@ func genWrappers(m *model) string {
 	var b strings.Builder
 	b.WriteString(header + "package cst\n\n")
 	b.WriteString("import (\n\t\"iter\"\n\n\t\"github.com/connerohnesorge/" +
-		"gohard/internal/token\"\n)\n\n")
+		"gohard/v2/internal/token\"\n)\n\n")
 	b.WriteString(genericMethods)
 	// Token sets for multi-kind token fields, in a fixed order.
 	type setVar struct{ name, kinds string }

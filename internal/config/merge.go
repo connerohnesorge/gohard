@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
 )
 
 // ApplyDefines applies --define NAME=VALUE arguments in command-line

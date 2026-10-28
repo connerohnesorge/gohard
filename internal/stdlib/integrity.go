@@ -7,7 +7,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
 )
 
 // sumsFile is the integrity manifest: one "<sha256 hex>  <path>" line

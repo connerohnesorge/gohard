@@ -3,7 +3,7 @@
 
 package cst
 
-import "github.com/connerohnesorge/gohard/internal/token"
+import "github.com/connerohnesorge/gohard/v2/internal/token"
 
 // KindsHash is the SHA-256 of kinds.yaml and keywords.yaml (line
 // endings normalized to LF): a component of the on-disk analysis

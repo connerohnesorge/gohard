@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
 )
 
 // o_sweep_test.go holds the static-evaluator side of the v1.1 "please

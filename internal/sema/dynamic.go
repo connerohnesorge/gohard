@@ -10,7 +10,7 @@ package sema
 // as the ieee packages) is evaluated exactly as static evaluation does,
 // so elaboration, simulation and the editor share one evaluator.
 
-import "github.com/connerohnesorge/gohard/internal/eval"
+import "github.com/connerohnesorge/gohard/v2/internal/eval"
 
 // Dynamic is the run-time context of an evaluation.
 type Dynamic interface {

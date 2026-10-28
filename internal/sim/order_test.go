@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // reverseOrder is a non-identity Order: every in-delta batch runs in

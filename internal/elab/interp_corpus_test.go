@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/corpus"
-	"github.com/connerohnesorge/gohard/internal/elab"
+	"github.com/connerohnesorge/gohard/v2/internal/corpus"
+	"github.com/connerohnesorge/gohard/v2/internal/elab"
 )
 
 // interpDesigns are the corpus designs the sequential interpreter must

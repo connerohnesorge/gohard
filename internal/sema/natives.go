@@ -8,7 +8,7 @@ package sema
 // elaboration installs Natives so generics, signal initial values and
 // design constants that call them are evaluated as a simulator does.
 
-import "github.com/connerohnesorge/gohard/internal/eval"
+import "github.com/connerohnesorge/gohard/v2/internal/eval"
 
 // Natives evaluates the call e of the function x, which has no body,
 // on the argument values args (in parameter order) with the result

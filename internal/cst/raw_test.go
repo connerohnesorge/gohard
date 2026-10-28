@@ -3,7 +3,7 @@ package cst
 import (
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // nodes returns every green node of g, depth first.

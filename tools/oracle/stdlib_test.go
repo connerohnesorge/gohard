@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/stdlib"
+	"github.com/connerohnesorge/gohard/v2/internal/stdlib"
 )
 
 // stdlibRepo is a repository with the stdlib package marker and fake

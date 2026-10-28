@@ -9,7 +9,7 @@ package main
 import (
 	"golang.org/x/tools/go/analysis/singlechecker"
 
-	"github.com/connerohnesorge/gohard/tools/detlint/analyzer"
+	"github.com/connerohnesorge/gohard/v2/tools/detlint/analyzer"
 )
 
 func main() { singlechecker.Main(analyzer.Analyzer) }

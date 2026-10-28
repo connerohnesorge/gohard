@@ -1,8 +1,8 @@
 package ide
 
 import (
-	"github.com/connerohnesorge/gohard/internal/sema"
-	"github.com/connerohnesorge/gohard/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
 )
 
 func init() { provide(server.FeatureHighlights) }

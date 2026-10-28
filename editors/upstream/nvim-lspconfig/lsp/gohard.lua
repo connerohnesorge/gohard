@@ -5,7 +5,7 @@
 --- GoHard, a VHDL language server, checker, formatter and simulator.
 --- Install `gohard` on your `PATH`:
 --- ```sh
---- go install github.com/connerohnesorge/gohard/cmd/gohard@latest
+--- go install github.com/connerohnesorge/gohard/v2/cmd/gohard@latest
 --- ```
 --- or take a release binary from the GitHub Releases page.
 ---

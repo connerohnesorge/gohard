@@ -3,8 +3,8 @@ package server_test
 import (
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
-	"github.com/connerohnesorge/gohard/internal/server"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/server"
 )
 
 // creating offers one code action, which creates a file, when the

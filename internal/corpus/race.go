@@ -1,8 +1,8 @@
 package corpus
 
 import (
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/simrun"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/simrun"
 )
 
 // Races reruns r at each seed through simrun.Races and returns the

@@ -4,7 +4,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // Kind is the class of a VHDL type.

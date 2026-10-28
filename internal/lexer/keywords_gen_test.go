@@ -3,7 +3,7 @@
 
 package lexer
 
-import "github.com/connerohnesorge/gohard/internal/token"
+import "github.com/connerohnesorge/gohard/v2/internal/token"
 
 // keywordEdges lists every keyword under every standard, lexer mode
 // and psl.strict_keywords setting with the kind the lexer must give.

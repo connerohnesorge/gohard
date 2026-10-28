@@ -6,7 +6,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/diag/junittest"
+	"github.com/connerohnesorge/gohard/v2/internal/diag/junittest"
 )
 
 // TestJUnitFixturesValid: the JUnit XML of every testdata/cli fixture

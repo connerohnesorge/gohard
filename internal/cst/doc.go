@@ -1,6 +1,6 @@
 package cst
 
-import "github.com/connerohnesorge/gohard/internal/token"
+import "github.com/connerohnesorge/gohard/v2/internal/token"
 
 // DocComment returns the doc comment of the construct that starts with
 // token t (#10): the block of comments in t's leading trivia that ends

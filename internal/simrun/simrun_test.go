@@ -3,7 +3,7 @@ package simrun
 import (
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 func TestStopLevel(t *testing.T) {

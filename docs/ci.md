@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: '1.27.x'
-      - run: go install github.com/connerohnesorge/gohard/cmd/gohard@latest
+      - run: go install github.com/connerohnesorge/gohard/v2/cmd/gohard@latest
       - id: gohard
         # Record the exit code instead of failing here.
         run: |
@@ -84,7 +84,7 @@ always` keeps the report and the repro files of a failing run:
 gohard:
   image: golang:1.27
   script:
-    - go install github.com/connerohnesorge/gohard/cmd/gohard@latest
+    - go install github.com/connerohnesorge/gohard/v2/cmd/gohard@latest
     - gohard check --sim --format junit --output gohard-junit.xml
   artifacts:
     when: always
@@ -112,7 +112,7 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: '1.27.x'
-      - run: go install github.com/connerohnesorge/gohard/cmd/gohard@latest
+      - run: go install github.com/connerohnesorge/gohard/v2/cmd/gohard@latest
       - run: gohard check --sim --format junit --output gohard-junit.xml
       - if: always()
         uses: mikepenz/action-junit-report@v6
@@ -144,7 +144,7 @@ counts: the order of its files does not change the result.
 gohard-coverage:
   image: golang:1.27
   script:
-    - go install github.com/connerohnesorge/gohard/cmd/gohard@latest
+    - go install github.com/connerohnesorge/gohard/v2/cmd/gohard@latest
     - gohard check --coverage --seed 1
     - gohard check --coverage --seed 2
     - gohard coverage merge -o lcov.info .gohard/coverage/*-1.info .gohard/coverage/*-2.info

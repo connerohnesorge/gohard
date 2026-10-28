@@ -17,7 +17,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
 )
 
 const outPath = "internal/stdlib/prebuilt.bin"

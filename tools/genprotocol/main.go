@@ -24,7 +24,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/connerohnesorge/gohard/tools/genprotocol/gen"
+	"github.com/connerohnesorge/gohard/v2/tools/genprotocol/gen"
 )
 
 func main() {

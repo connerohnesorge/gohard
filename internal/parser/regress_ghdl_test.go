@@ -12,7 +12,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // This file reads GHDL's own expectations (testdata/corpus/corpus.yaml,

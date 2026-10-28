@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/sema"
 )
 
 // TestUpToDate: the committed prebuilt.bin is what prebuild writes now.

@@ -16,8 +16,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/cli"
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/cli"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 func TestPoolCanonicalOrder(t *testing.T) {

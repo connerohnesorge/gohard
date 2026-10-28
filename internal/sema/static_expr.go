@@ -1,6 +1,6 @@
 package sema
 
-import "github.com/connerohnesorge/gohard/internal/token"
+import "github.com/connerohnesorge/gohard/v2/internal/token"
 
 // globallyStatic approximates LRM 9.4.3 globally static expressions:
 // literals, generics, generate parameters, constants whose values are

@@ -1,8 +1,8 @@
 package sim
 
 import (
-	"github.com/connerohnesorge/gohard/internal/eval"
-	"github.com/connerohnesorge/gohard/internal/trace"
+	"github.com/connerohnesorge/gohard/v2/internal/eval"
+	"github.com/connerohnesorge/gohard/v2/internal/trace"
 )
 
 // ForceMode is the mode of a force or release (LRM 10.5.2.1).

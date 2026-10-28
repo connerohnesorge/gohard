@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // TestReleaseBeforeVHDL2008 pins #7's keyword rule for release: before

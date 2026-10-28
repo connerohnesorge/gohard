@@ -23,15 +23,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/env"
-	"github.com/connerohnesorge/gohard/internal/simrun"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/simrun"
 )
 
 // Version is the gohard release version. It is also the value of the
 // TOOL_VERSION conditional-analysis identifier (#31) and is recorded in
 // repro files (#29). Release builds set it with
-// -ldflags "-X github.com/connerohnesorge/gohard/internal/cli.Version=…";
+// -ldflags "-X github.com/connerohnesorge/gohard/v2/internal/cli.Version=…";
 // otherwise SetBuildInfo takes the module version (version.go).
 var Version = devVersion
 

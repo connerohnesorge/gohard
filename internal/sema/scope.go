@@ -3,8 +3,8 @@ package sema
 import (
 	"strconv"
 
-	"github.com/connerohnesorge/gohard/internal/diag"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // This file is the visibility machinery of LRM 12: direct visibility

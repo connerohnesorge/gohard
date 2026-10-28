@@ -10,7 +10,7 @@ import (
 	"golang.org/x/tools/go/analysis/analysistest"
 	"golang.org/x/tools/go/packages"
 
-	"github.com/connerohnesorge/gohard/tools/detlint/analyzer"
+	"github.com/connerohnesorge/gohard/v2/tools/detlint/analyzer"
 )
 
 const mod = analyzer.Module

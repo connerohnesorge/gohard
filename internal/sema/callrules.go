@@ -10,8 +10,8 @@ package sema
 // An integer division by zero is left to run time, as GHDL and NVC do.
 
 import (
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // exprRules checks the calls in the typed expression e.

@@ -21,7 +21,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // Options configure New. The zero value uses the process's own streams

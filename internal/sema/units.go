@@ -1,8 +1,8 @@
 package sema
 
 import (
-	"github.com/connerohnesorge/gohard/internal/cst"
-	"github.com/connerohnesorge/gohard/internal/diag"
+	"github.com/connerohnesorge/gohard/v2/internal/cst"
+	"github.com/connerohnesorge/gohard/v2/internal/diag"
 )
 
 // Design-unit order rules (#34): what a unit of a design file may see

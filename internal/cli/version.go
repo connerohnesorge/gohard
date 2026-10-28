@@ -5,12 +5,12 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/repro"
-	"github.com/connerohnesorge/gohard/internal/stdlib"
+	"github.com/connerohnesorge/gohard/v2/internal/repro"
+	"github.com/connerohnesorge/gohard/v2/internal/stdlib"
 )
 
 // Commit is the commit gohard was built from. Release builds set it
-// with -ldflags "-X github.com/connerohnesorge/gohard/internal/cli.Commit=…"
+// with -ldflags "-X github.com/connerohnesorge/gohard/v2/internal/cli.Commit=…"
 // (goreleaser, Nix); otherwise SetBuildInfo takes vcs.revision from the
 // Go build info.
 var Commit = ""

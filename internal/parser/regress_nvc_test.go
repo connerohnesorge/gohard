@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/connerohnesorge/gohard/internal/condanal"
-	"github.com/connerohnesorge/gohard/internal/token"
+	"github.com/connerohnesorge/gohard/v2/internal/condanal"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // This file reads NVC's own expectations (corpus.yaml, "Expected-

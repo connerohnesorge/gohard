@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/v2/internal/env"
 )
 
 // lPkg declares, on lines 1 to 17, the generic protected type gp

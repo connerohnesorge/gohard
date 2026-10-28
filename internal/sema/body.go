@@ -1,6 +1,6 @@
 package sema
 
-import "github.com/connerohnesorge/gohard/internal/cst"
+import "github.com/connerohnesorge/gohard/v2/internal/cst"
 
 // StmtKind is the kind of a concurrent statement in a unit's body tree.
 type StmtKind uint8

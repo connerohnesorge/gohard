@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/connerohnesorge/gohard/internal/env/simenv"
+	"github.com/connerohnesorge/gohard/v2/internal/env/simenv"
 )
 
 // TestCacheConfigLayout (#37): the analysis cache never changes
