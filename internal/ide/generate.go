@@ -355,7 +355,7 @@ type insertion struct {
 }
 
 // declarationsEnd returns the end of the declarative part of the
-// architecture u.
+// architecture u, after the comments on the line of its last token.
 func declarationsEnd(u *sema.Unit) (insertion, bool) {
 	ab := cst.ArchitectureBody{Node: u.Lib}
 	if ab.IsZero() || u.Lib.Kind() != cst.KindArchitectureBody {
@@ -364,14 +364,27 @@ func declarationsEnd(u *sema.Unit) (insertion, bool) {
 	if dp := ab.Decls(); !dp.IsZero() {
 		if t := dp.Node.LastToken(); !t.IsZero() && !t.Missing() &&
 			t.Span().Len() > 0 {
-			return insertion{off: t.Span().End}, true
+			return insertion{off: afterComments(t)}, true
 		}
 	}
 	is := u.Lib.Token(token.KwIs, 0)
 	if is.IsZero() || is.Missing() {
 		return insertion{}, false
 	}
-	return insertion{off: is.Span().End, empty: true}, true
+	return insertion{off: afterComments(is), empty: true}, true
+}
+
+// afterComments returns the end of t, or of the last comment after t
+// on its line: text inserted there leaves the comment on t's line.
+func afterComments(t cst.Token) int {
+	off, end := t.Span().End, t.Span().End
+	for _, tr := range t.Trailing() {
+		off += len(tr.Text)
+		if tr.Kind != token.Whitespace {
+			end = off
+		}
+	}
+	return end
 }
 
 // entitiesNamed returns the entities the name n written in u denotes:

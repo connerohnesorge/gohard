@@ -285,7 +285,8 @@ func names(r *sema.Result, u *sema.Unit, k sema.Key) bool {
 
 // insertContext returns the edit adding clause (after `library lib;`
 // when needLib) to the context clause of u: on a new line after its
-// last clause, indented like it, or before the unit when it has none.
+// last clause (and the comments on its line), indented like it, or
+// before the unit when it has none.
 func insertContext(u *sema.Unit, text []byte, clause string,
 	needLib bool, lib string,
 ) server.Edit {
@@ -302,7 +303,7 @@ func insertContext(u *sema.Unit, text []byte, clause string,
 	if !ctx.IsZero() {
 		if last := ctx.LastToken(); !last.IsZero() && !last.Missing() &&
 			last.Span().End > last.Span().Start {
-			end := last.Span().End
+			end := afterComments(last)
 			first := ctx.FirstToken().Span().Start
 			indent := leading(text[lineStart(text, first):])
 			var b strings.Builder

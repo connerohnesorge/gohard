@@ -522,3 +522,66 @@ func TestInstantiateKeepsNextStatement(t *testing.T) {
 		}
 	}
 }
+
+// TestGeneratedKeepsLineComments: a declaration or context clause
+// added after the last one goes after the comment on its line, so the
+// comment stays with what it describes (#57).
+func TestGeneratedKeepsLineComments(t *testing.T) {
+	const comp = "Declare component counter"
+	for _, c := range []struct{ arch, keep string }{
+		{"architecture rtl of top is\n" +
+			"  signal s : std_logic; -- drives q\nbegin\n",
+			"  signal s : std_logic; -- drives q\n\n  component counter is\n"},
+		{"architecture rtl of top is -- the top level\nbegin\n",
+			"architecture rtl of top is -- the top level\n" +
+				"  component counter is\n"},
+		{"architecture rtl of top is /* top */\nbegin\n",
+			"architecture rtl of top is /* top */\n" +
+				"  component counter is\n"},
+	} {
+		p := project{"counter.vhd": []byte(genCounter),
+			"top.vhd": []byte("library ieee;\nuse ieee.std_logic_1164.all;" +
+				"\n\nentity top is\n  port (\n    clk : in std_logic\n" +
+				"  );\nend entity top;\n\n" + c.arch +
+				"  u0 : counter\n    port map (\n      clk => clk\n" +
+				"    );\nend architecture rtl;\n")}
+		got, ok := genAction(t, p, "top.vhd", "u0 :", comp)
+		if !ok {
+			t.Fatalf("%q: not offered", c.arch)
+		}
+		if !strings.Contains(string(got), c.keep) ||
+			!strings.Contains(string(got), "  end component counter;\n") {
+			t.Fatalf("%q gave\n%s", c.arch, got)
+		}
+		p["top.vhd"] = got
+		cleanResult(t, p, "top.vhd")
+	}
+	// The library clause Instantiate entity adds follows the comment
+	// of the last context clause.
+	p := project{
+		"gohard.yaml": []byte("libraries:\n  ip: [ip]\n"),
+		"ip/fifo.vhd": []byte(strings.ReplaceAll(genCounter, "counter",
+			"fifo")),
+		"top.vhd": []byte("entity top is\nend entity top;\n\n" +
+			"library ieee; -- the standard\n" +
+			"use ieee.std_logic_1164.all; -- std_logic\n\n" +
+			"architecture rtl of top is\n  signal clk : std_logic;\n" +
+			"begin\n  fifo\nend architecture rtl;\n"),
+	}
+	got, ok := genAction(
+		t,
+		p,
+		"top.vhd",
+		"  fifo",
+		"Instantiate entity ip.fifo",
+	)
+	if !ok {
+		t.Fatal("Instantiate entity ip.fifo not offered")
+	}
+	if !strings.Contains(string(got), "use ieee.std_logic_1164.all; "+
+		"-- std_logic\nlibrary ip;\n\narchitecture") {
+		t.Fatalf("library clause:\n%s", got)
+	}
+	p["top.vhd"] = got
+	cleanResult(t, p, "top.vhd")
+}

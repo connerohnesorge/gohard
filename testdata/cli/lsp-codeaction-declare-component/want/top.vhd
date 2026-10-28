@@ -13,7 +13,7 @@ entity top is
 end entity top;
 
 architecture rtl of top is
-  signal enable : std_logic;
+  signal enable : std_logic; -- drives en
 
   component counter is
     generic (

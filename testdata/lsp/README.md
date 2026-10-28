@@ -101,7 +101,7 @@ result; positions are zero-based UTF-8.
 | `codeaction/map-library-new-yaml` | without `gohard.yaml` the fix adds a `libraries` block |
 | `codeaction/instantiate-entity` | a bare entity name without its `;` before another statement: Instantiate entity (#57) writes the entity instantiation with every formal, the visible port of the formal's name or `open`, in place of the name only |
 | `codeaction/instantiate-entity-library` | an entity of another library: the instance names the library and the edit adds `library ip;`; a generic without a default maps to the visible constant of its name |
-| `codeaction/declare-component` | a component instantiation of an undeclared component: Declare component adds the entity's component declaration at the end of the declarative part |
+| `codeaction/declare-component` | a component instantiation of an undeclared component: Declare component adds the entity's component declaration at the end of the declarative part, after the comment on the last declaration's line |
 | `codeaction/complete-port-map` | a port map that names only the clock: Complete port map adds the other formals, each on its own line, the comment staying with its association |
 | `codeaction/create-testbench` | in an entity with a clock port: Create testbench, a `CreateFile` operation and the testbench's text (clock process, stimulus ending in `std.env.finish`) |
 | `codeaction/create-testbench-vhdl93` | under `standard: "1993"`: the stimulus stops the clock through `done` and every process ends with `wait;` |
