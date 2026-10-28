@@ -25,6 +25,8 @@ testdata/corpus/
     golden/          written only by `go run ./tools/oracle --update`
       trace.txt      GoHard's canonical text trace (#36) at seed 0, the
                      golden (section `golden`; needs the interpreter)
+      coverage.info  GoHard's lcov coverage (#62) at seed 0 (section
+                     `coverage`)
       oracle.ghdl.txt, oracle.nvc.txt
                      GHDL/NVC VCD dumps as settled values per time under
                      GoHard's paths (section `trace`, see below)
@@ -157,6 +159,7 @@ by `path`) so tools rewrite the file deterministically.
 | `disagreements` | list | Every point where GHDL and NVC differ (below). Empty when they agree. |
 | `variants` | list | Optional. Extra runs of the same design with other files or another standard, each with its own expected outcome (below). |
 | `trace_sha256` | hex \| `pending` | sha256 of `golden/trace.txt`. |
+| `coverage_sha256` | hex | sha256 of `golden/coverage.info` (#62), written by `tools/oracle` on the line after `trace_sha256`. |
 | `oracle_sha256` | hex \| `pending` | sha256 over the recorded oracle files in `golden/` (GHDL/NVC traces, `--disp-tree`), or over the hand-checked files for `none, hand-checked`. |
 | `format_oracle_sha256` | hex | Formatter oracle (#32): hash over `golden/format.ghdl.txt` and `golden/format.nvc.txt` (see "Formatter oracle" below). Never `pending`; written by `tools/oracle` on the line after `oracle_sha256`. |
 | `semerr_sha256` | hex | Semantic-error oracle (#34): hash over `testdata/corpus/golden/semerr/corpus-<name>.txt` (see "Semantic-error oracle" below). Written by `tools/oracle` on the line after `format_oracle_sha256`. |
@@ -339,12 +342,37 @@ Both files feed
 `golden/trace.txt` is GoHard's own trace at seed 0 (section `golden`,
 `trace_sha256`); it is written once the sequential interpreter exists.
 
+`golden/coverage.info` is the coverage of the same run (#62), what
+`gohard check --sim --coverage --tb <testbench>` writes for it (section
+`coverage`, `coverage_sha256`). Three were checked by hand against
+their sources, count by count:
+
+* `wait_forms`: each checker's wait statement runs once more than its
+  process resumes (the last wait never returns), the three delay lines
+  of the DUT run at initialization and on the 6 events of `x`, the
+  helper procedures run 30, 15 and 4 times (the sum of their callers'
+  resumptions), and the final `wait` after `std.env.stop` never runs.
+* `hier_generate`: `expect` runs 5 times with 4 loop iterations each,
+  its `if i mod 2 = 1` taken and not taken 10 times; each lane's
+  assignment runs at initialization and on the 4 events of its slice
+  of `din` (2 lanes per branch of the polarity generate, 10 runs per
+  line); the `single` alternative of `tap` is not elaborated (0); the
+  `wait` after `std.env.finish` never runs.
+* `psl_simple`: the clock assignment and `count` run 21 times
+  (initialization and 20 edges up to 100 ns), `falling_edge` holds 10
+  times; the assignments of `ai` and `bi` run at initialization and on
+  the 9 events of `n`, their `when` taken twice; `a_then_b` has its one `cover-hit` and
+  `b_twice` none; the PSL `assert` is not a line.
+
 ## Corpus harness
 
 `go test ./internal/corpus` runs every design (no skips): the main run
 and each `variants` item at seeds 0..3 (`-corpus.seeds=64` nightly via
 `scripts/ci/corpus-seeds.sh`), checks `expected`, byte-identical traces across seeds (first differing line shown), and
-`golden/trace.txt` with `trace_sha256`. Four generated variants of each
+`golden/trace.txt` with `trace_sha256`. Each run is repeated at seed 0
+with coverage: the trace, messages and step count must not change, and
+the main run's coverage must equal `golden/coverage.info` with
+`coverage_sha256`. Four generated variants of each
 design (#8 `variant_stable`) must give the same outcome with lines
 ignored: `layout` (doubled white space and line breaks), `case` (reserved
 words and identifiers in upper case), `rename` (every declared signal,

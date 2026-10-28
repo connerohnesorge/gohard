@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/connerohnesorge/gohard/internal/coverage"
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/parser"
 	"github.com/connerohnesorge/gohard/internal/simrun"
@@ -202,6 +203,7 @@ func runDesign(t *testing.T, r Run, read ReadFunc) {
 		if r.Variant == "" {
 			checkGolden(t, r, read, res)
 		}
+		checkCoverage(t, r, read, src, res)
 	}
 	if r.Variant == "" {
 		checkGenerated(t, r, src, res)
@@ -366,6 +368,67 @@ func checkGolden(t *testing.T, r Run, read ReadFunc, res *Result) {
 	if n, a, b, ok := trace.FirstDiff(want, res.Text); ok {
 		t.Errorf("%s: trace differs from %s at line %d:\n  golden: %s\n"+
 			"  gohard: %s", d.Name, rel, n, a, b)
+	}
+}
+
+// checkCoverage runs r again at seed 0 with coverage (#62). The
+// coverage must change nothing (the same trace bytes, messages and
+// step count as base, the run without it), every statement the run
+// executed must be a coverable one, and the main run's coverage must
+// equal golden/coverage.info, whose hash is coverage_sha256.
+func checkCoverage(t *testing.T, r Run, read ReadFunc,
+	src map[string][]byte, base *Result,
+) {
+	t.Helper()
+	res, err := Execute(r, src, Options{Code: simrun.DefaultCode,
+		Coverage: true})
+	if err != nil {
+		t.Fatalf("%s coverage: %v", r.Name(), err)
+	}
+	if n, a, b, ok := trace.FirstDiff(base.Text, res.Text); ok {
+		t.Errorf("%s: the trace with coverage differs at line %d:\n"+
+			"  without: %s\n  with:    %s", r.Name(), n, a, b)
+	}
+	if a, b := outline(base), outline(res); a != b {
+		t.Errorf("%s: coverage changed the outcome:\n  without: %s\n"+
+			"  with:    %s", r.Name(), a, b)
+	}
+	if base.Steps != res.Steps {
+		t.Errorf("%s: %d steps with coverage, %d without", r.Name(),
+			res.Steps, base.Steps)
+	}
+	if res.Coverage == nil {
+		t.Errorf("%s: no coverage", r.Name())
+		return
+	}
+	if res.Unmatched != 0 {
+		t.Errorf("%s: %d statements or branches ran outside the "+
+			"coverable ones", r.Name(), res.Unmatched)
+	}
+	if r.Variant != "" {
+		return
+	}
+	d := r.Design
+	rel := filepath.ToSlash(filepath.Join(d.GoldenDir(), "coverage.info"))
+	if d.CoverageSHA256 == "" {
+		t.Errorf("%s: no coverage_sha256: run go run ./tools/oracle "+
+			"--update coverage", d.Name)
+		return
+	}
+	want, err := read(rel)
+	if err != nil {
+		t.Errorf("%s: %v", d.Name, Missing(rel, err))
+		return
+	}
+	if h := FieldHash(map[string][]byte{"coverage.info": want}); h !=
+		d.CoverageSHA256 {
+		t.Errorf("%s: %s hashes to %s, corpus.yaml has %s", d.Name, rel,
+			h, d.CoverageSHA256)
+	}
+	got := coverage.Encode(*res.Coverage)
+	if n, a, b, ok := trace.FirstDiff(want, got); ok {
+		t.Errorf("%s: coverage differs from %s at line %d:\n"+
+			"  golden: %s\n  gohard: %s", d.Name, rel, n, a, b)
 	}
 }
 

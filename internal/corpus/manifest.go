@@ -58,6 +58,7 @@ type Design struct {
 	NVC             Tool              `yaml:"nvc"`
 	Variants        []Variant         `yaml:"variants"`
 	TraceSHA256     string            `yaml:"trace_sha256"`
+	CoverageSHA256  string            `yaml:"coverage_sha256"`
 	OracleSHA256    string            `yaml:"oracle_sha256"`
 
 	// RetiredV10 is the v1.0 outcome key expected_v1_0, retired with

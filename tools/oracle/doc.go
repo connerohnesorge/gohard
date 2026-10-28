@@ -80,6 +80,12 @@
 //     pending and internal/corpus reports the designs as pending.
 //     Hash: trace_sha256.
 //
+//   - coverage (#62): GoHard's lcov coverage of the same run,
+//     golden/coverage.info, for the designs the golden section
+//     records. It runs no external tool; the goldens of wait_forms,
+//     hier_generate and psl_simple were checked by hand
+//     (testdata/corpus/README.md). Hash: coverage_sha256.
+//
 //   - stdlib (#33): the declaration sets of GHDL's VHDL-93, 2008 and
 //     2019 std/ieee sources (lib/ghdl/src of the shell's ghdl) and of
 //     NVC's VHDL-2008 sources (NVC ships them compiled only, so they

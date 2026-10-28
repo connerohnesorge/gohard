@@ -41,8 +41,8 @@ func TestSectionsRegistered(t *testing.T) {
 	if code := run([]string{"-list"}, &out, &out); code != 0 {
 		t.Fatalf("exit %d: %s", code, out.String())
 	}
-	if out.String() != "format\nsemerr\ntrace\ntree\ngolden\nstdlib\n"+
-		"conformance\n" {
+	if out.String() != "format\nsemerr\ntrace\ntree\ngolden\n"+
+		"coverage\nstdlib\nconformance\n" {
 		t.Fatalf("sections %q", out.String())
 	}
 	if code := run([]string{"nope"}, &out, &out); code != 2 {

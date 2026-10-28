@@ -221,6 +221,7 @@ designs:
           severity error match NVC's default; the recorded GHDL command adds
           --assert-level=error so both tools give the same outcome.
     trace_sha256: bf68151e0b8890502a387f6adfa5e545025e88442c86050a220fe342566ba104
+    coverage_sha256: b0ef5135d3860a295bb1d1228aee35da9a0cbde6333ddea4c5f403b78f285657
     oracle_sha256: 15a127bdfd151f6c5732db18348ccdacb4fc69fdf0e35277beeee7787abd51d3
     format_oracle_sha256: 94f4f084426baf39982f1199a3a23095a90d765a82ba68fd130a51b51e9c4704
     semerr_sha256: 450128ae11d7afbf4ea5eca7f512cfd819682c4d2e75eb4b71b31cf7dc66afa3
@@ -281,6 +282,7 @@ designs:
         --stop-time=10ms (exit 0, about 0.4 s of run time).
     disagreements: []
     trace_sha256: 5fc63ea977c275242a412664f55f7b2242ed0e22da9ffc158f7c75027c839967
+    coverage_sha256: 16c1cadb4b80c66984a56fb83b30c949b26e9370a80350ea74a36367f0481443
     oracle_sha256: 26480e5448a1ab41c592b920393aa66c3ea604405f400416fe733f19c230fb67
     format_oracle_sha256: fc46b6ac8d47033e318591de4c4f503ada8e77b7a4e8e2e214ee25f25b5de7e3
     semerr_sha256: baed22dcaf5c6903f30507da87a21d7e5815a7d74116a9027717a4c86094ddc9
@@ -574,6 +576,7 @@ designs:
         design message.
     disagreements: []
     trace_sha256: bceac1c4817b55b561c3c1be261fb9c94efc5e1cb248af8aa6342b9cc6d9e7a1
+    coverage_sha256: 675e30e50c7c390edfecaa13a82f0ddb5410f166649ad6ac4418a0773945bd78
     oracle_sha256: d6d54594d33b03d28a0db0d05c0dc07e1a7fca28ef23f643ab814cc2844b391d
     format_oracle_sha256: 7c16ae3aba230fb4e90c6b22d3bb804c3e88d0cbed8b6081bce316e7b6bff792
     semerr_sha256: 6b8cf8314f1f818ee756eb77ae1e3569eb087fbb5a48ce28b995cba8238e26ed
@@ -742,6 +745,7 @@ designs:
           - gc_heap_tb.clk
           - gc_heap_tb.dut.clk
     trace_sha256: 112fc2f5cda5dd3ed418e4ea26842deaf54772d058b0832833dbf841a4c41b8b
+    coverage_sha256: a482020955d4b78626807dde037878bba8b9b65aa4577e8e4b78804ee1f126e0
     oracle_sha256: c349ca59272331ab82de13f374a052ccf53587b836fbed80248d44cdc54bff62
     format_oracle_sha256: a46cc677927dcaf5ae493f04191070779dcd2f1f44e91c1a89e08393a4db503f
     semerr_sha256: bcc2fb4edb05a128b0f3f3bdf962542831605c5862806533fbfc3684c011b7f9
@@ -893,6 +897,7 @@ designs:
           Both messages point at hier_generate_width_err.vhd:31 (columns 22
           and 47).
     trace_sha256: b9fccb27e80186b8b57efeac3f0465d106b7f07502a0d9f548cfea80ef5391a1
+    coverage_sha256: 0efac6f4545c8b50f01e01086a8c43ec6d11341e87f2a94ae91f00d7101c6913
     oracle_sha256: 1ff432450a84071ebb022389d1dad741a12f54c7881fabbac5ffb27404ab00f2
     format_oracle_sha256: 5f66f04782a786dc41c8bc14e422030fc76a501c7170f83dcedd5333ccf7cf07
     semerr_sha256: 8664b532660e9eab5e9d79f020caf1180444e32e9e909989fc6d2f19f1113c34
@@ -958,6 +963,7 @@ designs:
         assertion fired earlier in the run.
     disagreements: []
     trace_sha256: f0a8020759e95bc1d59245984585d48c5f3bd663002848baed4dbdac02bcea35
+    coverage_sha256: b486ecede1daefd9cee1ef4d131f6cde3dd6c2004218c3bb5162ad3a46bea648
     oracle_sha256: 844a9a6fe16894d3fd01497587f361e34c954cb9ba411aa071dd47ef64f324e1
     format_oracle_sha256: f440d6de675b9a0bbb49ee160573acdde6f381afa5a0c005ed3bd5472cb1e51a
     semerr_sha256: e8bf6422b3a4ffe267b063475bfa268e2b9bad976d88a0c4023f846d5d57a935
@@ -1092,6 +1098,7 @@ designs:
           The repro header of the gohard run records defines
           {"MV_PROFILE": "narrow"}, so --repro replays the override.
     trace_sha256: 6b21bbd3a1f3de5e1d5ff7ed787f445cdbb6fadb6ca7e599f37843d2e2b80dce
+    coverage_sha256: 8b741925505c4e968a9c17b849b422790e0d5abd9ffdd0a46ddee83cfcf94b5a
     oracle_sha256: 901f95aae64fe22e966e78ba21e7bc3a9ab8d4b5ad017afa24671f0bc16a1c62
     format_oracle_sha256: 8cb2d7569e8e05a17cee3ddefeed9b47df9b2a222e96fd21c4a3c2aca9d37f5e
     semerr_sha256: 89d9b4145705a5b204dec6f22c082dc1d5f69b25a50d4c3db7ad4c4749b2bc43
@@ -1148,6 +1155,7 @@ designs:
         integer, chosen by the assignment target).
     disagreements: []
     trace_sha256: f06e87618258599b4b99ca9d3deba7927e92d76f23011d3d92b40a9e6f6c412e
+    coverage_sha256: 9514332836371f0d3e969c0afecd89feeff26bb08b4a9a1520c3afcdf528c28c
     oracle_sha256: 41e86cacce0d1ed7270db36737ea615f0ad5a5eb717d743fb308ae80d32f667e
     format_oracle_sha256: ed3f37bc6b820d2b44c528384e12a9b10b96dc989ad740ce9b2430274ba6df04
     semerr_sha256: 21bb2e141169b7ecae0ceb83ad59058ef337c482e4f425d065cedf5d3c33d019
@@ -1242,6 +1250,7 @@ designs:
           - postponed_attrs_tb.dut.q_dly
           - postponed_attrs_tb.q_dly
     trace_sha256: c17eb3e01883750ea8aed51a91c5174d2d21fc10d82ff440b075c9f7d21c4fbe
+    coverage_sha256: db0e7525edc3767c53382ba5c8805666dad257380adb5725207b372f52841d2a
     oracle_sha256: 600b1a1b4acde3b2fcd3b4ed974e8cdc39a2c3ea1d355de4e5a245c7419007d4
     format_oracle_sha256: 6a5fe946b5cb751d12431c39f0c18e8ed944bf6108dd579468f9d55291b24f94
     semerr_sha256: a327b2b0a368d449dc553f8ab9d8e571ad0de088966ddda61edc19f7412f45f0
@@ -1327,6 +1336,7 @@ designs:
         "unknown" and fails the TOOL_NAME check.
     disagreements: []
     trace_sha256: 8a387344bf36236a746846fd72a410684e87ec3a1367fade1fe99c2dd4c52171
+    coverage_sha256: 14542c1a22348fcda89447cf5027d2a698eecb308fa26ee2d6398a73d0194ac7
     oracle_sha256: 11b484709e5c9656f3ce83f87777efbdc5040b5417f8eda14a14cb2b3b48d6cf
     format_oracle_sha256: 08d5c45934017c8f93b2193e1d9b14ee8e9c627bb684580fd12d5848c0f28d3b
     semerr_sha256: 6c3d1fbac9cf9232749e5afacb9710f2841965daae69d091c6b2eb21aaf3906b
@@ -1574,6 +1584,7 @@ designs:
           that an error-severity PSL assert under --sim exits 1. Reported
           events and times agree.
     trace_sha256: 7342ad0283712ae02428137b9b030adaf6b2c4111d8e90a8a774a433001b215d
+    coverage_sha256: 51616e7b112a9dad485d41fa46280a3cca55661de7e51cc5f85a9e0e979a456e
     oracle_sha256: ef9811e748022662bde89003654d0e5fe152ef95b68a8f983f38e98f68c5202d
     format_oracle_sha256: 3991573b856dd572670d95c0f9ef57bdf5fb94b5cfd3452818daf30a90860247
     semerr_sha256: c7a7bb9b018f0a0908a2929afe55ededada06ec2db9e214691643d0aae7b4b96
@@ -1729,6 +1740,7 @@ designs:
         modeled marking; GoHard adds it to u_core's dout/valid drivers.
     disagreements: []
     trace_sha256: 0822cc1204a3e43e5668a8d9d8f154f7d09dd00dbd590dc8ae7f19dbd5c4ded6
+    coverage_sha256: 35a588946744e9b509f42a2be6ac7280ead9458f22ecd149a53e9cc01c4fc8bd
     oracle_sha256: 8bef736395f22d8d1bdb452bfee165a023fae84566b5a38711e720f70ec26121
     format_oracle_sha256: c81d70aad425eac9f85f9738fe80f33b9ae95a06d6d16a6334429c9a3d810324
     semerr_sha256: c8efd659c6d0354bb321c84bd04241feb553b79154b4067105eb0b5c6a9c81d1
@@ -1796,6 +1808,7 @@ designs:
         finished". Neither is a design message.
     disagreements: []
     trace_sha256: 550f7e09d1eef9c5e02b1d9375a111c972d3182b4014ab2868af305406496785
+    coverage_sha256: 019d217b14af8df513fed47e7342d0e658deb86086a3f63420232f345c4251cc
     oracle_sha256: 7970f17042f556933048546858ed59f59dfa0c0edcd64c64f07b48ed70660832
     format_oracle_sha256: bbbf0ef9e3dcc8def7724384d8a0cc39335debf702a18d880aa9ac3783f0264c
     semerr_sha256: 5232628ce92bc4b0baf53b187d61f6ae0ec32d608c4658c192d5eada63157e7f
@@ -1978,6 +1991,7 @@ designs:
           LRM 6.4.2.4 (a shared variable is of a protected type from
           VHDL-2002 on) is what rejects it.
     trace_sha256: 35b143c43679d047925347c65864fde3fd5cc30f7f7ac81cfa2c8af6448f3185
+    coverage_sha256: 2238d2eb2ac995c7dec8b2beddda1825bd047d6fd09182aa593e9ab42c3ff7d7
     oracle_sha256: c354519cb77487bc26ee682080b4647438728aede2a43ac10546f5745d0e366e
     format_oracle_sha256: e67b9449028c71d0eea4c44f9164a5e5cb113e2ce3d800b50cfd62d65488fa86
     semerr_sha256: 298721e71fa929ee5d78dac1b8d5837d2d32e336e05a4eadc9ad02016ba554cb
@@ -2048,6 +2062,7 @@ designs:
         for std.env.stop.
     disagreements: []
     trace_sha256: d466a389d48a9f6d0321d336f27b4a5c93e5bbb4bce5b55079ddacf69e682d79
+    coverage_sha256: 30219ee0b810c84967c72a3ecb256b0c86fe7f59fa90ece04e48cdf6f3cb766e
     oracle_sha256: e65f232d4c5f950d169fd1aaf52e953c85420ab7a7252aba2d34ccc8326e55ff
     format_oracle_sha256: 725a3af5b035375a9039c2526f2ce30547bff9db603058a65b073e8070733d66
     semerr_sha256: 9e1ff0853f80b27ec28bdad462a5dfaaa54b17225524cf58952e6b900f5cfe1f
