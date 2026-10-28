@@ -1,6 +1,6 @@
 .direnv
 result
 /.go/
-/.gohard/
+.gohard/
 *.test
 dist
