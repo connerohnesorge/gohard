@@ -1,0 +1,4 @@
+props.vhd:3:3: error[sim/assert-error]: assertion error: f1: b did not follow a
+props.vhd:4:3: error[sim/assert-error]: assertion error: f2: b did not follow a
+props.vhd:5:3: hint[sim/cover-hit]: cover c1 (c1: a then b) hit 1 times
+summary: 2 errors, 0 warnings, 1 hints, 3 files

@@ -35,8 +35,11 @@
 //     formal used as an operand, and a const formal used as a count.
 //     A formal inside a larger HDL expression and a recursive instance
 //     (sema reports the recursion) are unsupported/construct. An
-//     instance in parentheses is the instance, and an assert of a
-//     property instance has its body's antecedent. next_event(b)[k](p)
+//     instance in parentheses is the instance. The parser reads one
+//     with actuals, (p(a, b)), and one of a declaration in another
+//     file as an HDL call, whose actuals have no PSLBoolean around
+//     them; they are operands all the same (hdlOperand). An assert of
+//     a property instance has its body's antecedent. next_event(b)[k](p)
 //     holds when p holds at the k-th tick on which b holds, counting
 //     the current one; next_event_a and next_event_e over [i to j] are
 //     the conjunction and the disjunction of those (an infinite range

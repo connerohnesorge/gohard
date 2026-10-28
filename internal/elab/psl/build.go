@@ -511,14 +511,24 @@ func (b *builder) in(fl *sema.File, sc *scope, f func()) {
 // formal returns the actual of the PSL operand n when n is a formal
 // parameter of the instance being compiled.
 func (b *builder) formal(n cst.Node) (actual, bool) {
-	if b.sc == nil || n.Kind() != cst.KindPSLBoolean {
+	if b.sc == nil || !hdlOperand(n) {
 		return actual{}, false
 	}
-	for c := range n.Nodes() {
-		a, ok := b.sc.args[formalOf(b.f.PSLExpr(c))]
-		return a, ok
+	if n.Kind() == cst.KindPSLBoolean {
+		n = firstKid(n)
 	}
-	return actual{}, false
+	a, ok := b.sc.args[formalOf(b.f.PSLExpr(n))]
+	return a, ok
+}
+
+// hdlOperand reports whether the PSL operand n is an HDL expression: a
+// PSLBoolean, or an actual of a property or sequence instance that the
+// parser read as an HDL call, which has no PSLBoolean around it (the
+// a and b of `(p(a, b))`, #66). It is a Boolean unless it names a
+// property or sequence (instanceOf).
+func hdlOperand(n cst.Node) bool {
+	return n.Kind() == cst.KindPSLBoolean ||
+		n.Parent().Kind() == cst.KindAssociationElement
 }
 
 // isBoolean reports whether the PSL operand n is a Boolean: a
@@ -530,11 +540,11 @@ func (b *builder) isBoolean(n cst.Node) bool {
 		b.in(a.f, a.sc, func() { out = b.isBoolean(a.n) })
 		return out
 	}
-	switch n.Kind() {
-	case cst.KindPSLBoolean:
+	if hdlOperand(n) {
 		_, _, ok := b.instanceOf(n)
 		return !ok
-	case cst.KindPSLBuiltinCall:
+	}
+	if n.Kind() == cst.KindPSLBuiltinCall {
 		return sema.PSLBuiltin(b.f.PSLExpr(n)) != ""
 	}
 	return false
@@ -561,14 +571,16 @@ func (b *builder) boolean(n cst.Node) int {
 
 // instanceOf returns the PSL property or sequence declaration that the
 // operand n instantiates (IEEE 1850 6.1.1.1, 6.2.4, #66) and the nodes
-// of its actuals: a property or sequence instance, or a PSLBoolean
-// that is the declaration's name (with actuals in parentheses when
-// the parser read it as an HDL call). ok is false when n is none.
+// of its actuals: a property or sequence instance, or an HDL operand
+// (hdlOperand) that is the declaration's name, in parentheses or not,
+// with actuals in parentheses when the parser read it as an HDL call.
+// Those actuals are HDL operands too. ok is false when n is none.
 func (b *builder) instanceOf(n cst.Node) (*sema.Decl, []cst.Node, bool) {
 	var name cst.Node
 	var args []cst.Node
-	switch n.Kind() {
-	case cst.KindPSLPropertyInstance, cst.KindPSLSequenceInstance:
+	switch {
+	case n.Kind() == cst.KindPSLPropertyInstance,
+		n.Kind() == cst.KindPSLSequenceInstance:
 		for c := range n.Nodes() {
 			if c.Kind() == cst.KindAssociationList {
 				args = slices.Collect(c.Nodes())
@@ -576,8 +588,12 @@ func (b *builder) instanceOf(n cst.Node) (*sema.Decl, []cst.Node, bool) {
 				name = c
 			}
 		}
-	case cst.KindPSLBoolean:
-		name = sema.UnparenPSL(firstKid(n))
+	case hdlOperand(n):
+		name = n
+		if n.Kind() == cst.KindPSLBoolean {
+			name = firstKid(n)
+		}
+		name = sema.UnparenPSL(name)
 		if c, ok := cst.As[cst.CallOrIndexName](name); ok {
 			name = c.Prefix().Node
 			for item := range c.Args().Items() {
@@ -916,14 +932,15 @@ func (b *builder) prop(n cst.Node) *prop {
 	if d, args, ok := b.instanceOf(n); ok {
 		return b.instanceProp(n, d, args)
 	}
+	if hdlOperand(n) {
+		return boolP(b.boolean(n))
+	}
 	switch n.Kind() {
 	case cst.KindPSLParenProp:
 		return b.prop(kid(0))
 	case cst.KindPSLNextEvent, cst.KindPSLNextEventA,
 		cst.KindPSLNextEventE:
 		return b.nextEvent(n)
-	case cst.KindPSLBoolean:
-		return boolP(b.boolean(n))
 	case cst.KindPSLBuiltinCall:
 		if b.isBoolean(n) {
 			return boolP(b.boolean(n))
@@ -1054,11 +1071,12 @@ func (b *builder) sere(n cst.Node) *sere {
 	if d, args, ok := b.instanceOf(n); ok {
 		return b.instanceSere(n, d, args)
 	}
+	if hdlOperand(n) {
+		return boolS(b.boolean(n), false)
+	}
 	switch n.Kind() {
 	case cst.KindPSLBracedSere, cst.KindPSLParenProp:
 		return b.sere(kid(0))
-	case cst.KindPSLBoolean:
-		return boolS(b.boolean(n), false)
 	case cst.KindPSLBuiltinCall:
 		if b.isBoolean(n) {
 			return boolS(b.boolean(n), false)

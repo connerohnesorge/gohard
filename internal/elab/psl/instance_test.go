@@ -90,6 +90,21 @@ func TestInstances(t *testing.T) {
 		{"sequence s_ab is {a; b};", "cover {(s_ab)};", []int64{35}},
 		{"property p (property q) is always (a -> (q));",
 			"assert p(next c);", []int64{35}},
+		// With actuals the parser reads (p(a, c)) as an HDL call, whose
+		// actuals are HDL expressions with no PSLBoolean around them:
+		// 35, 35, 35, 35 and 45 ns as the rows above.
+		{"property p (boolean l, r) is always (l -> next r);",
+			"assert (p(a, c));", []int64{35}},
+		{"property p (boolean l) is l -> next c;",
+			"assert always (p(a));", []int64{35}},
+		{"sequence s (boolean l, r) is {l; r};", "cover {(s(a, b))};",
+			[]int64{35}},
+		{"property q (boolean l) is l -> next c;\n" +
+			"  property p (boolean l) is always ((q(l)));",
+			"assert (p(a));", []int64{35}},
+		{"sequence s_ab is {a; b};\n" +
+			"  property p (sequence q; boolean r) is always (q |=> r);",
+			"assert (p(s_ab, c));", []int64{45}},
 	}
 	for _, r := range rows {
 		src := strings.NewReplacer("DECLS", r.decls, "DIR", r.dir).
@@ -297,6 +312,10 @@ func TestNamedAntecedent(t *testing.T) {
 		{"property p is (a -> next c);", "assert always p;"},
 		{"property p (boolean l, r) is always (l -> next r);",
 			"assert p(a, c);"},
+		{"property p (boolean l, r) is always (l -> next r);",
+			"assert (p(a, c));"},
+		{"property p (boolean l) is l -> next c;",
+			"assert always (p(a));"},
 		{"property q is always (a -> next c);\n  property p is q;",
 			"assert p;"},
 		{"property p (property q) is q;",

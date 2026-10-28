@@ -1,0 +1,3 @@
+simulation:
+  # Run on past the assert errors, so the cover shows too.
+  stop_level: failure

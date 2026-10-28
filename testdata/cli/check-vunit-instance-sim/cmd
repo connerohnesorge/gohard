@@ -1,0 +1,9 @@
+# A vunit bound to dut(rtl) instantiates the property follows and the
+# sequence pair that dut's architecture declares (#66). Declared in
+# another file, follows(a, b) is an HDL call to the parser, as
+# (follows(a, b)) and {(pair(a, b))} are in any file, so their actuals
+# are HDL expressions with no PSL Boolean around them. f1 and f2 fail
+# at 75 ns (a = '1' at 65 ns, b = '0' at 75 ns) and c1 is hit at 35 ns
+# (a = '1' at 25 ns, b = '1' at 35 ns). GHDL 6.0.0 runs no vunit item
+# and NVC 1.23.0 cannot parse vunits, so the times are hand-checked.
+gohard check --sim --tb tb
