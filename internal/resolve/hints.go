@@ -1,0 +1,255 @@
+package resolve
+
+import (
+	"cmp"
+	"slices"
+	"strings"
+	"unicode/utf8"
+
+	"github.com/connerohnesorge/gohard/internal/cst"
+	"github.com/connerohnesorge/gohard/internal/eval"
+	"github.com/connerohnesorge/gohard/internal/sema"
+)
+
+// Inlay hints (#56). Each kind has its own inlay_hints.* setting; later
+// kinds (inferred widths #97, waveform-cursor values #76) add a field
+// to HintKinds and a pass to Hints.
+
+// HintKinds selects the kinds of inlay hints (the inlay_hints.* keys).
+type HintKinds struct {
+	// ParameterNames: the formal before each positional actual of a
+	// call, generic map or port map.
+	ParameterNames bool
+	// Types: the type of an object alias without a subtype indication
+	// and of a loop parameter.
+	Types bool
+	// Values: the static value of a constant or a generic default.
+	Values bool
+}
+
+// HintKind is what a hint shows.
+type HintKind uint8
+
+// Hint kinds.
+const (
+	HintParameter HintKind = iota + 1
+	HintType
+	HintValue
+)
+
+// Hint is one inlay hint: Label shown at the byte offset Off, which is
+// always the start or the end of a token: a parameter name goes before
+// the actual's first token, a type after the name, a value after the
+// value's last token.
+type Hint struct {
+	Off   int
+	Label string
+	Kind  HintKind
+}
+
+// Hint label limits: a value image longer than maxValueLen bytes is
+// cut, and a composite value of more than maxValueElems scalars gets
+// no hint (its image would be too long to read).
+const (
+	maxValueLen   = 40
+	maxValueElems = 1024
+)
+
+// Hints returns the inlay hints of the kinds k in the file at path
+// whose offset lies in [start, end], sorted by offset, kind and label.
+// They are a pure function of the result: values come from static
+// evaluation with a fresh evaluator per declaration and the editor's
+// fixed step limit (eval.EditorSteps, P7), so a hint never depends on
+// the range asked for or on other hints.
+func Hints(r *sema.Result, path string, start, end int,
+	k HintKinds,
+) []Hint {
+	f, ok := r.File(path)
+	if !ok || !k.ParameterNames && !k.Types && !k.Values {
+		return nil
+	}
+	var out []Hint
+	in := func(off int) bool { return off >= start && off <= end }
+	add := func(off int, label string, kind HintKind) {
+		if in(off) && label != "" {
+			out = append(out, Hint{Off: off, Label: label, Kind: kind})
+		}
+	}
+	if k.ParameterNames {
+		parameterHints(f, add)
+	}
+	for _, u := range f.Units {
+		if u.Opaque {
+			continue
+		}
+		for _, d := range u.Decls {
+			if d.File != f || d.Implicit || d.Node.IsZero() {
+				continue
+			}
+			if k.Types && in(d.Span.End) {
+				if t, ok := typeHint(d); ok {
+					add(d.Span.End, ": "+t, HintType)
+				}
+			}
+			if k.Values && d.Value != nil && !d.Value.Node.IsZero() &&
+				in(d.Value.Node.Span().End) {
+				if v, ok := valueHint(r, d); ok {
+					add(d.Value.Node.Span().End, "= "+v, HintValue)
+				}
+			}
+		}
+	}
+	slices.SortFunc(out, func(a, b Hint) int {
+		return cmp.Or(cmp.Compare(a.Off, b.Off),
+			cmp.Compare(a.Kind, b.Kind), strings.Compare(a.Label, b.Label))
+	})
+	return slices.Compact(out)
+}
+
+// parameterHints adds the formal name before each positional actual
+// of the file's calls and maps. An actual that is the formal's own
+// name, and a formal without a name (a predefined unary operation),
+// get none.
+func parameterHints(f *sema.File, add func(int, string, HintKind)) {
+	hint := func(it cst.AssociationElement, formal *sema.Decl) {
+		if formal == nil || formal.Name == "anonymous" ||
+			!it.Formal().IsZero() {
+			return
+		}
+		act := it.Actual()
+		if act.IsZero() || act.Span().End <= act.Span().Start {
+			return
+		}
+		if act.Kind() == cst.KindSimpleName &&
+			sema.TokenKey(cst.SimpleName{Node: act.Node}.Ident()) ==
+				formal.Name {
+			return
+		}
+		add(act.Span().Start, formal.Text+" =>", HintParameter)
+	}
+	eachExpr(f, func(e *sema.Expr) {
+		if e.Decl == nil {
+			return
+		}
+		l, ok := callList(e)
+		if !ok {
+			return
+		}
+		i := 0
+		for it := range l.Items() {
+			if i < len(e.Args) && i < len(e.Formals) &&
+				within(e.Args[i].Node.Span(), it.Span()) {
+				hint(it, e.Formals[i])
+			}
+			i++
+		}
+	})
+	for _, u := range f.Units {
+		if u.Opaque {
+			continue
+		}
+		eachMap(u, func(m assocMap) {
+			for _, as := range m.assocs {
+				if it, ok := cst.As[cst.AssociationElement](as.Node); ok {
+					hint(it, as.Formal)
+				}
+			}
+		})
+	}
+}
+
+// typeHint returns the type shown after the name of an object alias
+// declared without a subtype indication, or of a loop parameter.
+func typeHint(d *sema.Decl) (string, bool) {
+	if d.Type == nil || d.Type.Unknown() {
+		return "", false
+	}
+	switch d.Kind {
+	case sema.DeclLoopParam:
+		return d.Type.Name(), true
+	case sema.DeclAlias:
+		// An object alias holds the object name as its Value.
+		a, ok := cst.As[cst.AliasDecl](d.Node)
+		if !ok || !a.Subtype().IsZero() || !a.Signature().IsZero() ||
+			d.Value == nil || d.View != nil {
+			return "", false
+		}
+		return d.Type.Name(), true
+	}
+	return "", false
+}
+
+// valueHint returns the static value of a constant or of a generic's
+// default, when static evaluation succeeds. A value written as a
+// literal gets none: it is already there.
+func valueHint(r *sema.Result, d *sema.Decl) (string, bool) {
+	if d.Kind != sema.DeclConstant && d.Kind != sema.DeclGeneric ||
+		literal(d.Value) {
+		return "", false
+	}
+	ev := sema.NewEvaluator(r, eval.EditorSteps)
+	var v eval.Value
+	var err error
+	if d.Kind == sema.DeclConstant {
+		v, err = ev.Constant(d)
+	} else {
+		v, err = ev.Value(d.Value)
+	}
+	if err != nil {
+		return "", false
+	}
+	return image(v)
+}
+
+// literal reports whether e is written as a literal value: a numeric,
+// string, bit-string or character literal, a physical literal or an
+// enumeration literal, possibly negated.
+func literal(e *sema.Expr) bool {
+	switch e.Kind {
+	case sema.ExprLiteral, sema.ExprPhysical:
+		return true
+	case sema.ExprName:
+		return e.Decl != nil && e.Decl.Kind == sema.DeclEnumLiteral
+	}
+	if u, ok := cst.As[cst.UnaryExpr](e.Node); ok &&
+		u.Op().Text() == "-" {
+		switch u.Operand().Kind() {
+		case cst.KindLiteralExpr, cst.KindPhysicalLiteral:
+			return true
+		}
+	}
+	return false
+}
+
+// image is the value as eval.Value.Image writes it (a string or a
+// bit string in quotes, other composites as aggregates), cut to
+// maxValueLen bytes; ok is false for a composite value of more than
+// maxValueElems scalars.
+func image(v eval.Value) (string, bool) {
+	n := 0
+	var count func(v eval.Value) bool
+	count = func(v eval.Value) bool {
+		n++
+		if n > maxValueElems {
+			return false
+		}
+		for _, e := range v.E {
+			if !count(e) {
+				return false
+			}
+		}
+		return true
+	}
+	if !count(v) {
+		return "", false
+	}
+	s := strings.ToValidUTF8(v.Image(), "?")
+	if len(s) > maxValueLen {
+		cut := maxValueLen
+		for cut > 0 && !utf8.RuneStart(s[cut]) {
+			cut--
+		}
+		s = s[:cut] + "..."
+	}
+	return s, true
+}
