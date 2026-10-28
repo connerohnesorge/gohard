@@ -16,4 +16,9 @@ begin
   x4: assert always {a; prev(i)};
   x5: assert always prev(a);
   x6: assert always (prev(i) = 1 -> a);
+  x7: assert always ((a -> a) abort prev(i));
+  x8: assert always ((a -> a) async_abort prev(i));
+  x9: assert always ((a -> a) sync_abort prev(v));
+  x10: assert always (a -> a) abort i;
+  x11: assert always (a -> a) abort prev(a);
 end;

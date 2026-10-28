@@ -239,8 +239,9 @@ func (a *analyzer) pslBuiltinCall(n cst.Node) {
 //     never is a Boolean or a sequence (IEEE 1850 4.4.4);
 //   - a range's low bound does not exceed its high bound (IEEE 1850
 //     5.3.1, 6.1.1.2);
-//   - a clock expression is a Boolean (IEEE 1850 6.1.1.1), and so is
-//     an HDL expression that is a PSL operand (pslOperand);
+//   - a clock expression is a Boolean (IEEE 1850 6.1.1.1), and so are
+//     an HDL expression that is a PSL operand and the condition of
+//     abort, async_abort and sync_abort (pslOperand);
 //   - the operands of union are of one type (IEEE 1850 5.1.3).
 func (a *analyzer) pslForm(n cst.Node) {
 	if a.quiet {
@@ -283,6 +284,10 @@ func (a *analyzer) pslForm(n cst.Node) {
 	case cst.KindPSLBoolean:
 		if op := kid(0); !op.IsZero() {
 			a.pslOperand(n, op)
+		}
+	case cst.KindPSLAbort:
+		if c := kid(1); !c.IsZero() {
+			a.pslOperand(c, c)
 		}
 	case cst.KindPSLUnion:
 		u := cst.PSLUnion{Node: n}
@@ -356,12 +361,13 @@ func (a *analyzer) pslClock(c cst.Node) {
 	}
 }
 
-// pslOperand reports the PSL operand n (a PSLBoolean or a built-in
-// function call; x holds its typed expression) when it is no PSL
-// Boolean, as prev(i) of an INTEGER i: a SERE item or the operand of
-// a property is a Boolean, and the simulator's PSL runner reads it as
-// one (#111). The actual of a property or sequence instance may be a
-// value (for a const formal) and is not checked.
+// pslOperand reports the PSL operand n (a PSLBoolean, a built-in
+// function call or an abort condition; x holds its typed expression)
+// when it is no PSL Boolean, as prev(i) of an INTEGER i: a SERE item,
+// the operand of a property and an abort condition are Booleans, and
+// the simulator's PSL runner reads them as such (#111). The actual of
+// a property or sequence instance may be a value (for a const formal)
+// and is not checked.
 func (a *analyzer) pslOperand(n, x cst.Node) {
 	if a.quiet {
 		return

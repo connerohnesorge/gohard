@@ -2,4 +2,8 @@ t.vhd:13:21: error[sema/error]: a PSL Boolean must be BOOLEAN, BIT or STD_ULOGIC
 t.vhd:14:21: error[sema/error]: a PSL Boolean must be BOOLEAN, BIT or STD_ULOGIC, not STD_LOGIC_VECTOR
 t.vhd:15:21: error[sema/error]: a PSL Boolean must be BOOLEAN, BIT or STD_ULOGIC, not INTEGER
 t.vhd:16:25: error[sema/error]: a PSL Boolean must be BOOLEAN, BIT or STD_ULOGIC, not INTEGER
-summary: 4 errors, 0 warnings, 0 hints, 1 files
+t.vhd:19:37: error[sema/error]: a PSL Boolean must be BOOLEAN, BIT or STD_ULOGIC, not INTEGER
+t.vhd:20:43: error[sema/error]: a PSL Boolean must be BOOLEAN, BIT or STD_ULOGIC, not INTEGER
+t.vhd:21:42: error[sema/error]: a PSL Boolean must be BOOLEAN, BIT or STD_ULOGIC, not STD_LOGIC_VECTOR
+t.vhd:22:37: error[sema/error]: a PSL Boolean must be BOOLEAN, BIT or STD_ULOGIC, not INTEGER
+summary: 8 errors, 0 warnings, 0 hints, 1 files
