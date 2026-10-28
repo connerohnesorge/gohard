@@ -1,0 +1,9 @@
+CAPI=2:
+name: acme:demo:dep:2.0
+filesets:
+  rtl:
+    files:
+      - dep_pkg.vhd
+      - gone.vhd
+    file_type: vhdlSource-2008
+    logical_name: mylib

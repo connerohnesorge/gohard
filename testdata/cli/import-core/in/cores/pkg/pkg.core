@@ -1,0 +1,8 @@
+CAPI=2:
+name: acme:demo:pkg:1.2.0
+
+filesets:
+  rtl:
+    files: [pkg.vhd]
+    file_type: vhdlSource-2008
+    logical_name: mylib

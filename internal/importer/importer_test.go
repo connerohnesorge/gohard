@@ -243,6 +243,7 @@ libraries:
 func TestFormatOf(t *testing.T) {
 	for _, tc := range [][2]string{
 		{"a.do", ".do"}, {"B.XPR", ".xpr"}, {`dir\x.Qsf`, ".qsf"},
+		{"x.core", ".core"}, {"OSVVM.PRO", ".pro"},
 		{"a.tcl", ""}, {"do", ""},
 	} {
 		name, want := tc[0], tc[1]
@@ -251,7 +252,7 @@ func TestFormatOf(t *testing.T) {
 			t.Errorf("FormatOf(%q) = %q, %v", name, f.Ext, ok)
 		}
 	}
-	if got := Extensions(); got != ".do, .qsf and .xpr" {
+	if got := Extensions(); got != ".core, .do, .pro, .qsf and .xpr" {
 		t.Errorf("Extensions() = %q", got)
 	}
 }
@@ -259,7 +260,8 @@ func TestFormatOf(t *testing.T) {
 // TestCodesInTable keeps the codes this package emits in the table.
 func TestCodesInTable(t *testing.T) {
 	for _, c := range []diag.Code{diag.ImportIgnored, diag.ImportSyntax,
-		diag.ImportStandard, diag.ImportLibraryConflict} {
+		diag.ImportStandard, diag.ImportLibraryConflict,
+		diag.ImportUnresolvedDependency, diag.ImportMissingFile} {
 		if _, ok := c.Info(); !ok {
 			t.Errorf("%s missing from the diag table", c)
 		}

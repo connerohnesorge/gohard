@@ -52,7 +52,7 @@ go go1.27.2
   (`genhtml` reads them); `gohard coverage merge` sums several runs.
 * `gohard lsp` is the language server over stdio.
 * `gohard import FILE` writes `gohard.yaml` from a ModelSim `.do`,
-  Vivado `.xpr` or Quartus `.qsf` file
+  Vivado `.xpr`, Quartus `.qsf`, FuseSoC `.core` or OSVVM `.pro` file
   ([docs/libraries.md](docs/libraries.md)).
 
 ## VHDL support

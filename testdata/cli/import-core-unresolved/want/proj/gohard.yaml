@@ -1,0 +1,6 @@
+# Written by gohard import from top.core.
+libraries:
+  mylib:
+    - ../vendor/dep/pkg.vhd
+  work:
+    - top.vhd

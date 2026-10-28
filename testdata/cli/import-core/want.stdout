@@ -1,0 +1,2 @@
+rtl/top.core:9:9: hint[import/ignored]: timing.sdc ignored: file type SDC is not VHDL
+summary: 0 errors, 0 warnings, 1 hints, 3 files

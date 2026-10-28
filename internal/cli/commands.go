@@ -142,9 +142,9 @@ var commands = []Command{
 		// Run is set in init: runHelp reads this table.
 	},
 	{
-		Name: "import", Args: "FILE",
-		Summary: "write gohard.yaml from a ModelSim .do, Vivado .xpr " +
-			"or Quartus .qsf file",
+		Name: "import", Args: "FILE [CORE...]",
+		Summary: "write gohard.yaml from a ModelSim, Vivado, Quartus, " +
+			"FuseSoC or OSVVM project file",
 		Flags: []Flag{
 			{
 				Name: "dir", Kind: String, Value: "DIR",

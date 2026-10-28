@@ -1,7 +1,9 @@
 package importer
 
 import (
+	"path"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/connerohnesorge/gohard/internal/config"
@@ -9,9 +11,29 @@ import (
 	"github.com/connerohnesorge/gohard/internal/span"
 )
 
-// FuzzImport checks the #2 invariants for every format on any bytes:
-// Parse never panics and is deterministic, reports only codes from the
-// diag table, at real positions of the input; every entry is a VHDL
+// fuzzFiles serves the fuzz input as every other file a project file
+// names, so a .pro includes itself and a .core depends on itself, and
+// records the paths read.
+type fuzzFiles struct {
+	src  []byte
+	read []string
+}
+
+func (f *fuzzFiles) Read(p string) ([]byte, error) {
+	f.read = append(f.read, p)
+	return f.src, nil
+}
+
+func (f *fuzzFiles) IsDir(p string) bool { return strings.Contains(p, "d") }
+
+func (f *fuzzFiles) Cores() []string {
+	return []string{"dep/a.core", "../b.core"}
+}
+
+// FuzzImport checks the #2 and #64 invariants for every format on any
+// bytes: Parse never panics, ends within its budgets and is
+// deterministic, reports only codes from the diag table, at real
+// positions of the input or of a file it read; every entry is a VHDL
 // file in a library named by a VHDL identifier, at a real position;
 // and the gohard.yaml that Plan and Render make from the entries loads
 // with no diagnostic at all, so gohard import never writes a
@@ -28,6 +50,17 @@ func FuzzImport(f *testing.F) {
 			"<File Path=\"$PPRDIR/a.vhd\"><FileInfo SFType=\"VHDL\">" +
 			"<Attr Name=\"Library\" Val=\"On\"/></FileInfo></File>",
 		"vcom [a", "vcom \"a", "\\", "#\\", "vcom a.vhd\\\r\nb.vhd",
+		"library l\nanalyze a.vhd\ninclude self.pro\ninclude d\n" +
+			"if {$::osvvm::ToolName eq \"GoHard\"} {analyze b.vhd} " +
+			"else {analyze c.vhd}",
+		"include x/p.pro\ninclude x/p.pro\nanalyze [FindSettingsPkgBody P]",
+		"if {[string compare a b] == -1 && (1 || $x)} {RunTest t.vhd}" +
+			" elseif {$::poc::vendorName in {A GENERIC}} {SetVHDLVersion 93}",
+		"CAPI=2:\nname: a:b:c:1\nfilesets:\n  r:\n" +
+			"    files: [a.vhd, b.vhd: {logical_name: x}]\n" +
+			"    file_type: vhdlSource-2008\n    depend: [a:b:c, ^a:b:d:1]\n",
+		"CAPI=2:\nfilesets: {r: {files: [&x a.vhd, *x], " +
+			"file_type: vhdlSource}}\nprovider: {}",
 	} {
 		for i := range Formats {
 			f.Add(uint8(i), []byte(s))
@@ -36,10 +69,16 @@ func FuzzImport(f *testing.F) {
 	f.Fuzz(func(t *testing.T, which uint8, src []byte) {
 		ft := Formats[int(which)%len(Formats)]
 		name := "dir/p" + ft.Ext
-		p1 := ft.Parse(name, src)
-		p2 := ft.Parse(name, src)
-		if show(p1) != show(p2) {
+		read := &fuzzFiles{src: src}
+		p1 := ft.Parse(name, src, read)
+		p2 := ft.Parse(name, src, &fuzzFiles{src: src})
+		if showAll(p1) != showAll(p2) {
 			t.Fatalf("%s: Parse is not deterministic", ft.Ext)
+		}
+		// Every file holds src, so every position must be real in it.
+		paths := []string{name}
+		for _, p := range read.read {
+			paths = append(paths, join(path.Dir(name), p))
 		}
 		idx := span.NewIndex(src)
 		isReal := func(line, col int) bool {
@@ -55,14 +94,14 @@ func FuzzImport(f *testing.F) {
 				d.Code == diag.InternalUnknownCode {
 				t.Fatalf("unknown code %s", d.Code)
 			}
-			if d.Path != name || !isReal(d.Line, d.Col) {
+			if !slices.Contains(paths, d.Path) || !isReal(d.Line, d.Col) {
 				t.Fatalf("%s:%d:%d is not a position of the input: %s",
 					d.Path, d.Line, d.Col, d.Message)
 			}
 		}
 		for _, e := range p1.Entries {
 			if !isVHDL(e.Path) || !config.IsIdentifier(e.Library) ||
-				!isReal(e.Line, e.Col) {
+				!slices.Contains(paths, e.File) || !isReal(e.Line, e.Col) {
 				t.Fatalf("bad entry %+v", e)
 			}
 			if !slices.Contains([]string{"", "1993", "2002", "2008",

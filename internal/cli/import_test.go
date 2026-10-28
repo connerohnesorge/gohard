@@ -11,10 +11,12 @@ import (
 	"github.com/connerohnesorge/gohard/internal/env/realenv"
 )
 
-// TestImportThenCheck is the #2 acceptance check: for a ModelSim .do
-// script (one run from its own folder, one run from the project folder
-// with vcom wildcards), a Vivado .xpr project and a Quartus .qsf file,
-// gohard import writes a gohard.yaml with which gohard check passes.
+// TestImportThenCheck is the #2 and #64 acceptance check: for a
+// ModelSim .do script (one run from its own folder, one run from the
+// project folder with vcom wildcards), a Vivado .xpr project, a Quartus
+// .qsf file, an OSVVM .pro script and a FuseSoC .core file (with a
+// depend: on another .core under the root), gohard import writes a
+// gohard.yaml with which gohard check passes.
 // The design needs the mapping: it uses library mylib, which only the
 // imported libraries: entry provides.
 func TestImportThenCheck(t *testing.T) {
@@ -26,6 +28,8 @@ func TestImportThenCheck(t *testing.T) {
 		{"import-do-glob", []string{"scripts/compile.do"}},
 		{"import-xpr", []string{"proj/counter.xpr"}},
 		{"import-qsf", []string{"counter.qsf"}},
+		{"import-pro", []string{"build.pro"}},
+		{"import-core", []string{"rtl/top.core"}},
 	} {
 		t.Run(tc.fixture, func(t *testing.T) {
 			dir := t.TempDir()

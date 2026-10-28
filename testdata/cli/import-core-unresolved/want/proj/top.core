@@ -1,0 +1,10 @@
+CAPI=2:
+name: acme:demo:top:1.0
+
+filesets:
+  rtl:
+    files: [top.vhd]
+    file_type: vhdlSource-2008
+    depend:
+      - acme:demo:pkg:1.0
+      - ">=acme:demo:fifo:2.0"

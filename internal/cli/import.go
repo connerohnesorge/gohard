@@ -16,22 +16,26 @@ import (
 
 func init() { lookup("import").Run = runImport }
 
-// runImport is `gohard import FILE` (#2). It reads a ModelSim .do
-// script, Vivado .xpr project or Quartus .qsf file (internal/importer)
-// and writes gohard.yaml at the project root of the current directory:
-// each library with the VHDL files the project compiles into it, and
-// the newest VHDL standard the project names. Paths in a .xpr or .qsf
-// are relative to its folder. A .do script is read as vsim runs it:
-// paths are relative to the folder it runs from (--dir, default the
-// current folder), and vcom wildcards are expanded. gohard.yaml gets
-// the paths relative to the root. Diagnostics go to stdout in the
-// --format chosen, located in the project file. Nothing is written
-// when a source file is missing (import/missing-file), the file cannot
-// be read (import/syntax), it lists no VHDL file (import/no-files) or
-// the root already has a gohard.yaml (import/config-exists); all of
-// them exit 2.
+// runImport is `gohard import FILE [CORE...]` (#2, #64). It reads a
+// ModelSim .do script, Vivado .xpr project, Quartus .qsf file, FuseSoC
+// .core file or OSVVM .pro script (internal/importer) and writes
+// gohard.yaml at the project root of the current directory: each
+// library with the VHDL files the project compiles into it, and the
+// newest VHDL standard the project names. Paths in a .xpr, .qsf, .core
+// or .pro are relative to the folder of the file that names them (a
+// .pro reads the scripts it includes, a .core the .core files its
+// depend: entries resolve to: the CORE arguments and every .core under
+// the project root). A .do script is read as vsim runs it: paths are
+// relative to the folder it runs from (--dir, default the current
+// folder), and vcom wildcards are expanded. gohard.yaml gets the paths
+// relative to the root. Diagnostics go to stdout in the --format
+// chosen, located in the project file or the file they concern.
+// Nothing is written when a source file is missing
+// (import/missing-file), a file cannot be read (import/syntax), it
+// lists no VHDL file (import/no-files) or the root already has a
+// gohard.yaml (import/config-exists); all of them exit 2.
 func runImport(inv *Invocation) Result {
-	if len(inv.Args) != 1 {
+	if len(inv.Args) == 0 {
 		return inv.usage("gohard import takes one project FILE")
 	}
 	arg := inv.Args[0]
@@ -39,6 +43,14 @@ func runImport(inv *Invocation) Result {
 	if !ok {
 		return inv.usage("gohard import reads " + importer.Extensions() +
 			" files, not " + filepath.ToSlash(arg))
+	}
+	for _, a := range inv.Args[1:] {
+		if g, _ := importer.FormatOf(a); f.Ext != ".core" ||
+			g.Ext != ".core" {
+			return inv.usage("gohard import takes one project FILE; " +
+				"only a .core FILE takes more .core files, to " +
+				"resolve its dependencies")
+		}
 	}
 	if inv.IsSet("dir") && !f.Script {
 		return inv.usage("--dir applies to .do scripts; paths in a " +
@@ -67,14 +79,30 @@ func runImport(inv *Invocation) Result {
 		return inv.Fail(diag.New(diag.ImportConfigExists,
 			config.FileName).At(config.FileName, 1, 1))
 	}
+	dir := filepath.Dir(abs)
+	files := &importFiles{fsys: fsys, root: root, dir: dir, self: abs,
+		read: map[string][]byte{}}
+	for _, a := range inv.Args[1:] {
+		a = env.Abs(cwd, filepath.FromSlash(a))
+		if _, err := fsys.Stat(a); err != nil {
+			return inv.Fail(diag.New(diag.CLIMissingPath,
+				relSlash(root, a)))
+		}
+		files.given = append(files.given, a)
+	}
 	r := inv.NewReport()
-	r.Source = func(p string) ([]byte, bool) { return src, p == name }
-	p := f.Parse(name, src)
+	r.Source = func(p string) ([]byte, bool) {
+		if p == name {
+			return src, true
+		}
+		b, ok := files.read[p]
+		return b, ok
+	}
+	p := f.Parse(name, src, files)
 	r.Diagnostics = p.Diagnostics
 	if hasTool(r.Diagnostics) {
 		return Result{Report: r}
 	}
-	dir := filepath.Dir(abs)
 	if f.Script {
 		dir = env.Abs(cwd, filepath.FromSlash(inv.String("dir")))
 	}
@@ -92,7 +120,7 @@ func runImport(inv *Invocation) Result {
 			if fi, err := fsys.Stat(a); err != nil ||
 				!fi.Mode().IsRegular() {
 				r.Diagnostics = append(r.Diagnostics, diag.New(
-					diag.ImportMissingFile, e.Path).At(name, e.Line,
+					diag.ImportMissingFile, e.Path).At(e.File, e.Line,
 					e.Col))
 				continue
 			}
@@ -166,4 +194,90 @@ func glob(fsys env.FS, dir, pat string) []string {
 		}
 	}
 	return out
+}
+
+// importFiles reads the files a project file names besides itself
+// through env.FS (importer.Files): paths relative to dir, the folder
+// of the project file self. It keeps what it read, by root-relative
+// path, for the report's Source.
+type importFiles struct {
+	fsys            env.FS
+	root, dir, self string
+	given           []string // the CORE arguments, absolute
+	read            map[string][]byte
+	cores           []string
+	walked          bool
+}
+
+func (f *importFiles) abs(p string) string {
+	return env.Abs(f.dir, filepath.FromSlash(p))
+}
+
+// Read reads the regular file at p.
+func (f *importFiles) Read(p string) ([]byte, error) {
+	a := f.abs(p)
+	fi, err := f.fsys.Stat(a)
+	if err != nil {
+		return nil, err
+	}
+	if !fi.Mode().IsRegular() {
+		return nil, fs.ErrNotExist
+	}
+	b, err := f.fsys.ReadFile(a)
+	if err == nil {
+		f.read[relSlash(f.root, a)] = b
+	}
+	return b, err
+}
+
+// IsDir reports a folder at p.
+func (f *importFiles) IsDir(p string) bool {
+	fi, err := f.fsys.Stat(f.abs(p))
+	return err == nil && fi.IsDir()
+}
+
+// Cores lists the CORE arguments, then every .core file under the
+// project root in name order (folders whose name starts with '.' and
+// symbolic links are not entered), without the project file; each
+// path relative to the project file's folder. The root is walked on
+// the first call only, so a core without depend: walks nothing.
+func (f *importFiles) Cores() []string {
+	if f.walked {
+		return f.cores
+	}
+	f.walked = true
+	seen := map[string]bool{f.self: true}
+	add := func(a string) {
+		if seen[a] {
+			return
+		}
+		seen[a] = true
+		p, err := filepath.Rel(f.dir, a)
+		if err != nil {
+			p = a
+		}
+		f.cores = append(f.cores, filepath.ToSlash(p))
+	}
+	for _, a := range f.given {
+		add(a)
+	}
+	var walk func(dir string)
+	walk = func(dir string) {
+		es, err := f.fsys.ReadDir(dir)
+		if err != nil {
+			return
+		}
+		for _, e := range es {
+			a := filepath.Join(dir, e.Name())
+			switch {
+			case e.IsDir() && !strings.HasPrefix(e.Name(), "."):
+				walk(a)
+			case e.Type().IsRegular() && strings.EqualFold(
+				filepath.Ext(e.Name()), ".core"):
+				add(a)
+			}
+		}
+	}
+	walk(f.root)
+	return f.cores
 }

@@ -1,17 +1,24 @@
 package importer
 
 // The command splitter for the Tcl files gohard import reads (ModelSim
-// .do scripts and Quartus .qsf files). It follows the Tcl word rules
-// (commands end at a newline or ';', '#' starts a comment where a
-// command could start, words are bare, "quoted" or {braced}, a
-// backslash-newline is a space) but evaluates nothing: a word that
-// would be substituted ($var or [command]) is only marked, and the
-// caller skips that command with a hint. Nothing is ever run.
+// .do scripts, Quartus .qsf files and OSVVM .pro scripts). It follows
+// the Tcl word rules (commands end at a newline or ';', '#' starts a
+// comment where a command could start, words are bare, "quoted" or
+// {braced}, a backslash-newline is a space) but evaluates nothing: a
+// word that would be substituted ($var or [command]) is only marked.
+// The .do and .qsf readers skip that command with a hint; the .pro
+// reader (pro.go) substitutes the variables of its fixed profile.
+// Nothing is ever run.
 
 // word is one Tcl word of a command.
 type word struct {
 	Text string
 	Off  int // byte offset of the word's first character
+	// End is the byte offset just past the word as written: past the
+	// closing quote of a "quoted" word, past the closing brace of a
+	// {braced} one (characters right after that brace, which Text
+	// includes, are not).
+	End int
 	// Subst reports a $ or [ substitution Tcl would perform, so Text
 	// is not the value Tcl would see.
 	Subst bool
@@ -32,7 +39,14 @@ type syntaxError struct {
 // splitTcl splits src into commands. It stops at the first syntax
 // error, returning the commands before it.
 func splitTcl(src []byte) ([]command, *syntaxError) {
-	s := &tclScanner{src: src}
+	return splitTclRange(src, 0, len(src))
+}
+
+// splitTclRange splits src[from:to] into commands, as splitTcl does;
+// offsets are offsets in src. The .pro reader splits the body of a
+// {braced} if branch with it.
+func splitTclRange(src []byte, from, to int) ([]command, *syntaxError) {
+	s := &tclScanner{src: src[:to], pos: from}
 	var out []command
 	for {
 		c, ok := s.command()
@@ -192,6 +206,7 @@ func (s *tclScanner) braced() (word, bool) {
 			depth--
 			if depth == 0 {
 				s.pos++
+				end := s.pos
 				// Tcl refuses characters right after the closing
 				// brace; GoHard reads them as part of the word.
 				for !s.atEOF() && !isSpace(s.peek()) &&
@@ -199,7 +214,8 @@ func (s *tclScanner) braced() (word, bool) {
 					b = append(b, s.peek())
 					s.pos++
 				}
-				return word{Text: string(b), Off: start}, true
+				return word{Text: string(b), Off: start, End: end},
+					true
 			}
 		}
 		b = append(b, c)
@@ -220,7 +236,7 @@ func (s *tclScanner) quoted() (word, bool) {
 		switch c {
 		case '"':
 			s.pos++
-			w.Text = string(b)
+			w.Text, w.End = string(b), s.pos
 			return w, true
 		case '\\':
 			b = s.escape(b)
@@ -253,7 +269,7 @@ func (s *tclScanner) bare() (word, bool) {
 		switch c {
 		case '\\':
 			if s.continuation() > 0 {
-				w.Text = string(b)
+				w.Text, w.End = string(b), s.pos
 				return w, true // a backslash-newline ends the word
 			}
 			b = s.escape(b)
@@ -270,7 +286,7 @@ func (s *tclScanner) bare() (word, bool) {
 		b = append(b, c)
 		s.pos++
 	}
-	w.Text = string(b)
+	w.Text, w.End = string(b), s.pos
 	return w, true
 }
 

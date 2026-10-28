@@ -1,0 +1,4 @@
+build.pro:11:1: hint[import/ignored]: analyze ignored: it uses $::my::extraFile, which the import profile does not set
+build.pro:12:4: hint[import/ignored]: if ignored: it uses [DirectoryExists ...], which gohard import does not evaluate
+build.pro:17:1: hint[import/ignored]: simulate ignored: gohard import reads only library, analyze, RunTest, include, build, SetVHDLVersion and if
+summary: 0 errors, 0 warnings, 3 hints, 3 files

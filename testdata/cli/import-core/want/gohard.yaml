@@ -1,0 +1,7 @@
+# Written by gohard import from rtl/top.core.
+libraries:
+  mylib:
+    - cores/pkg/pkg.vhd
+  work:
+    - rtl/top.vhd
+    - tb/tb_top.vhd

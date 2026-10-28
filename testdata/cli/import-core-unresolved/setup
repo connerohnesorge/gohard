@@ -1,0 +1,4 @@
+# The project root is proj; the .core it depends on is outside
+# it, so the command line names it.
+mkdir proj/.git
+cwd proj

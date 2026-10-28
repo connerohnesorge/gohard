@@ -357,7 +357,10 @@ end architecture rtl;
 Clone OSVVM (`git clone https://github.com/OSVVM/OSVVM`), or the
 `OsvvmLibraries` collection, and map its `osvvm` folder. A copy inside
 the project (a git submodule, say) can be mapped with a relative path
-such as `osvvm: [third_party/osvvm]`.
+such as `osvvm: [third_party/osvvm]`. To map only the files OSVVM's
+own build script analyzes, import it instead:
+`gohard import ../OsvvmLibraries/osvvm/osvvm.pro`
+([gohard import](#importing-a-project-file-gohard-import)).
 
 Linux:
 
@@ -612,17 +615,20 @@ end architecture rtl;
 A library whose index lists no sources, or whose sources are gone, is
 reported as `libs/unreadable`.
 
-## Importing a ModelSim, Vivado or Quartus project: `gohard import`
+## Importing a project file: `gohard import`
 
 A design that already has a ModelSim/Questa `.do` script, a Vivado
-`.xpr` project or a Quartus `.qsf` file lists its source files, their
-libraries and their VHDL standard there. `gohard import` reads that
-file and writes `gohard.yaml` at the project root:
+`.xpr` project, a Quartus `.qsf` file, a FuseSoC `.core` file or an
+OSVVM `.pro` script lists its source files, their libraries and their
+VHDL standard there. `gohard import` reads that file and writes
+`gohard.yaml` at the project root:
 
 ```sh
 gohard import --dir sim sim/compile.do
 gohard import proj/counter.xpr
 gohard import counter.qsf
+gohard import rtl/top.core
+gohard import ../OsvvmLibraries/osvvm/osvvm.pro
 ```
 
 For this `.do` script
@@ -656,12 +662,17 @@ It reads only these parts of each format and never runs anything:
 | ModelSim/Questa `.do` | the file arguments of `vcom`, with wildcards (`*`, `?`, `[...]`) expanded | `vcom -work NAME` (a `vmap` name, or the last element of a library folder); `work` when absent | `-87` or `-93` (both read as 1993), `-2002`, `-2008`, `-2019`; none when absent |
 | Vivado `.xpr` | the `File` entries of the `DesignSrcs` and `SimulationSrcs` filesets (`sources_1`, `sim_1`) | the `Library` attribute; `xil_defaultlib` when absent | the file type: `VHDL` is 1993, `VHDL 2008`, `VHDL 2019` |
 | Quartus `.qsf` | `set_global_assignment -name VHDL_FILE` | `-library NAME`; `work` when absent | `-hdl_version` (`VHDL_1987` reads as 1993, `VHDL_1993`, `VHDL_2008`, `VHDL_2019`), else the global `VHDL_INPUT_VERSION`; none when neither is set |
+| FuseSoC `.core` (CAPI2) | the `files` of every fileset whose `file_type` (the file's own, else the fileset's) is `vhdlSource`, `vhdlSource-87`, `-93`, `-2008` or `-2019`; then the same for every core a `depend:` entry resolves to, before the files of the core that depends on it | `logical_name` (the file's own, else the fileset's); `work` when absent | the file type: `-87` and `-93` read as 1993, `-2008`, `-2019`; none for `vhdlSource` |
+| OSVVM `.pro` | `analyze FILE` and `RunTest FILE`, in this script and the scripts it reads with `include` and `build` | the last `library NAME` before; `default` before any, as in OSVVM | the last `SetVHDLVersion` before (`1993`, `2002`, `2008`, `2019`, or `93`, `02`, `08`, `19`; `1987` reads as 1993); none before any |
 
-* Paths in a `.xpr` or `.qsf` are relative to the folder of the
-  project file, as Vivado and Quartus read them (in a `.xpr`,
-  `$PPRDIR` is that folder and `$PSRCDIR`, `$PGENDIR` and
-  `$PIPUSERFILESDIR` are its `NAME.srcs`, `NAME.gen` and
-  `NAME.ip_user_files` folders). Paths in a `.do` script are relative
+* Paths in a `.xpr`, `.qsf`, `.core` or `.pro` are relative to the
+  folder of the file that names them, as the tools read them: the
+  files of a core another core depends on are relative to that core's
+  folder, and the files an included `.pro` script analyzes to that
+  script's folder. In a `.xpr`, `$PPRDIR` is the project file's folder
+  and `$PSRCDIR`, `$PGENDIR` and `$PIPUSERFILESDIR` are its
+  `NAME.srcs`, `NAME.gen` and `NAME.ip_user_files` folders. Paths in
+  a `.do` script are relative
   to the folder vsim runs it from, not to the script's folder: give
   that folder with `--dir DIR`; without it, the current folder. A
   script kept in `scripts/` and run from the project folder
@@ -678,21 +689,96 @@ It reads only these parts of each format and never runs anything:
   substitution (`$var`, `[...]`), `vcom -f` argument files, `.qsf`
   assignments of other files (`VERILOG_FILE`, `QIP_FILE`, `SDC_FILE`)
   and commands that are not assignments, `.xpr` files that are not
-  VHDL, are disabled or use another path variable, and any file
-  without a `.vhd` or `.vhdl` extension. Other `vcom` options and
-  `.qsf` assignments are skipped silently.
+  VHDL, are disabled or use another path variable, `.core` files of
+  another type (`xdc`, `SDC`, `tclSource`, `user`: one hint per file)
+  or with a FuseSoC use-flag condition (`tool_vivado? (...)`), a
+  `.core`'s `provider:` (nothing is fetched, so its files are read
+  from the `.core` file's folder), `.pro` commands other than the ones
+  in the table and below, and any file without a `.vhd` or `.vhdl`
+  extension. Other `vcom` options, `.qsf` assignments, `.core` keys
+  (`targets`, `generators`, `parameters`) and the options after an
+  `analyze` file are skipped silently.
 * A file listed in two libraries keeps the first
   (`import/library-conflict`, a warning).
 * GoHard never reads compiled libraries (ModelSim `_info`, `.dat`,
   `.dbs`, Vivado or Quartus databases), only sources.
 
-Import writes nothing and exits 2 when a listed source file does not
-exist or a `vcom` wildcard matches no file (`import/missing-file`, at
-the line that lists it), the project file cannot be read
-(`import/syntax`), lists no VHDL file (`import/no-files`) or the
-project root already has a `gohard.yaml` (`import/config-exists`).
-Diagnostics print in the `--format` chosen (text, JSON or SARIF),
-located in the project file.
+### FuseSoC `.core` dependencies
+
+Each `depend:` entry, `[op]vendor:library:name[:version]`, resolves to
+a `.core` file named on the command line after FILE
+(`gohard import top.core ../ip/fifo/fifo.core`) or found under the
+project root (folders whose name starts with `.` are not searched).
+Without a version any version matches; with one and no operator only
+that version; `>=`, `>`, `<=`, `<` compare, `^1.2.0` takes `1.2.0` and
+later `1.x`, and `~1.2.0` takes `1.2.0` and later `1.2.x`. Versions
+compare part by part, numbers as numbers. Of the cores that match,
+the newest is imported, and a later dependency on the same
+`vendor:library:name` that it satisfies reuses it. A dependency that
+no core matches is `import/unresolved-dependency` (a warning): import
+fetches nothing, so the files of that core are not in `gohard.yaml`.
+
+### OSVVM `.pro` scripts
+
+A `.pro` script is Tcl. Import reads it the way OSVVM runs it, without
+a Tcl interpreter: `library`, `analyze`, `RunTest` (which analyzes its
+file), `include` and `build` (a `.pro` file; for a folder, its
+`NAME.pro` and its `build.pro`, those that exist; a name without
+extension, `NAME.pro`), `SetVHDLVersion`, and
+`if`/`elseif`/`else`, which reads the branch whose condition is true.
+Conditions and `$variable` substitutions are evaluated over this fixed
+profile: GoHard as an OSVVM tool that supports generic packages and
+the VHDL-2019 packages, and PoC's vendor-free build.
+
+| Variable | Value |
+| --- | --- |
+| `::osvvm::ClockResetVersion` | `2026.09` |
+| `::osvvm::FunctionalCoverageIntegratedInSimulator` | `default` |
+| `::osvvm::OsvvmDevDerivePackageHeaders` | `false` |
+| `::osvvm::Supports2019AssertApi` | `true` |
+| `::osvvm::Supports2019FilePath` | `true` |
+| `::osvvm::Supports2019Generics` | `true` |
+| `::osvvm::Supports2019ImpureFunctions` | `true` |
+| `::osvvm::ToolName` | `GoHard` |
+| `::osvvm::ToolNameVersion` | `GoHard` |
+| `::osvvm::ToolSupportsGenericPackages` | `true` |
+| `::osvvm::ToolVendor` | `GoHard` |
+| `::osvvm::UseMemoryPkg01` | `false` |
+| `::osvvm::VhdlVersion` | the version `SetVHDLVersion` set; `2008` before |
+| `::poc::localConfigurationFile` | `../tb/common/local_configuration.vhdl` |
+| `::poc::projectConfigurationFile` | `../tb/common/project_configuration_GENERIC.vhdl` |
+| `::poc::vendorName` | `GENERIC` |
+
+`[FindOsvvmScriptSettingsPkg]` gives
+`OsvvmScriptSettingsPkg_default.vhd` and
+`[FindSettingsPkgBody NAME]` gives `NAME_default.vhd`, the files OSVVM
+uses when no user settings exist; `[string compare A B]` is Tcl's.
+The PoC values are the defaults of PoC's `tools/poc.tcl`. PoC's
+scripts write `local_configuration.vhdl` (`WriteLocalConfiguration`)
+and import does not run them, so create it before importing PoC. Under this profile `osvvm.pro`
+imports 47 files, and after `SetVHDLVersion 2019` 47 files with the
+VHDL-2019 packages in place of their `deprecated/*_c.vhd` stand-ins;
+`gohard check` passes on both sets.
+
+A command that needs anything else is skipped with an
+`import/ignored` hint at its line: a variable outside the profile
+(`analyze $::poc::myFile`), another `[command]`
+(`if {[DirectoryExists X]}`: then no branch of that `if` is read), a
+command other than the ones above (`puts`, `set`, `simulate`,
+`TestSuite`, PoC's `disabled`), or an `include` of a `.tcl`, `.do`,
+`.files` or `.dirs` file. A script that includes itself is skipped
+the same way. Import reads at most 20,000 commands and 4 MiB of
+script, counting a script included twice twice; past that it stops
+with `import/syntax`.
+
+Import writes nothing and exits 2 when a listed source file or an
+included `.pro` script does not exist or a `vcom` wildcard matches no
+file (`import/missing-file`, at the line that lists it), a project
+file cannot be read (`import/syntax`), lists no VHDL file
+(`import/no-files`) or the project root already has a `gohard.yaml`
+(`import/config-exists`). Diagnostics print in the `--format` chosen
+(text, JSON or SARIF), located in the file they concern: the project
+file, an included script or a `.core` it depends on.
 
 The project root is found as for every command
 ([config.md](config.md)): the nearest folder with `gohard.yaml`, else

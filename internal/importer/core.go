@@ -1,0 +1,484 @@
+package importer
+
+import (
+	"bytes"
+	"errors"
+	"fmt"
+	"io"
+	"path"
+	"regexp"
+	"strconv"
+	"strings"
+	"unicode/utf8"
+
+	"go.yaml.in/yaml/v3"
+
+	"github.com/connerohnesorge/gohard/internal/diag"
+)
+
+// coreFormat names the format in import/syntax messages.
+const coreFormat = "FuseSoC .core file"
+
+// coreStandards maps the FuseSoC VHDL file types to gohard standards.
+// GoHard's oldest standard is VHDL-1993, so vhdlSource-87 reads as
+// 1993; plain vhdlSource names none.
+var coreStandards = map[string]string{
+	"vhdlSource": "", "vhdlSource-87": "1993", "vhdlSource-93": "1993",
+	"vhdlSource-2008": "2008", "vhdlSource-2019": "2019",
+}
+
+// coreFlagRE matches a FuseSoC use-flag condition: "flag? (item)" or
+// "!flag? (item)".
+var coreFlagRE = regexp.MustCompile(`^!?[A-Za-z0-9_-]+\?\s*\(`)
+
+// coreOps are the version operators of a depend: entry, longest first.
+var coreOps = []string{">=", "<=", ">", "<", "=", "^", "~"}
+
+// ParseCore reads a FuseSoC CAPI2 .core file (#64): every file of
+// every fileset whose file_type (the file's own, else the fileset's)
+// is vhdlSource, vhdlSource-87 or -93 (both read as 1993), -2008 or
+// -2019, in the library of its logical_name (work when absent). Paths
+// are relative to the folder of the .core file. Each depend: entry
+// ([op]vendor:library:name[:version], op one of = >= > <= < ^ ~, no
+// op with a version meaning =) resolves to the newest matching core
+// among this core and files.Cores(), or to the core an earlier
+// dependency on the same vendor:library:name chose when it matches.
+// The files of a core come after the files of the cores it depends on;
+// a dependency nothing matches is import/unresolved-dependency. Files of another type, provider:
+// (nothing is fetched) and entries with a use-flag condition are
+// skipped with an import/ignored hint; targets, generators and every
+// other key are skipped silently.
+func ParseCore(name string, src []byte, files Files) Project {
+	r := &coreRun{files: files, main: name, visited: map[string]bool{},
+		chosen: map[vlnv]*coreFile{}}
+	c := readCore(path.Base(name), name, src)
+	if c.fatal {
+		r.p.Diagnostics = c.diags
+		return r.p
+	}
+	if c.named {
+		// A dependency may lead back to the project file's own core.
+		r.cands = append(r.cands, c)
+		key := c.vlnv
+		key.version = ""
+		r.chosen[key] = c
+	}
+	r.visit(c)
+	return r.p
+}
+
+// coreRun is one import of a .core file and the cores it depends on.
+type coreRun struct {
+	files   Files
+	main    string // the project file, as diagnostics show it
+	p       Project
+	cands   []*coreFile // the cores a depend: may resolve to
+	loaded  bool        // cands is read
+	visited map[string]bool
+	// chosen is the core a dependency on vendor:library:name resolved
+	// to first; later dependencies it satisfies reuse it.
+	chosen map[vlnv]*coreFile
+}
+
+// coreFile is one .core file read: its own entries, hints and
+// dependencies.
+type coreFile struct {
+	rel     string // relative to the project file's folder
+	l       lines
+	src     []byte
+	vlnv    vlnv
+	named   bool // it has a valid name:
+	entries []Entry
+	diags   []diag.Diagnostic
+	deps    []coreDep
+	fatal   bool // not a CAPI2 file
+	cur     cursor
+}
+
+// coreDep is one depend: entry.
+type coreDep struct {
+	op   string
+	want vlnv
+	text string
+	off  int
+}
+
+// vlnv is a FuseSoC core name, vendor:library:name:version.
+type vlnv struct{ vendor, library, name, version string }
+
+// cursor resumes the conversion of YAML positions on one line.
+type cursor struct{ line, col, off int }
+
+var utf8BOM = []byte("\ufeff")
+
+// visit adds c's dependencies, then c's own entries.
+func (r *coreRun) visit(c *coreFile) {
+	r.visited[c.rel] = true
+	r.p.Diagnostics = append(r.p.Diagnostics, c.diags...)
+	for _, d := range c.deps {
+		dep := r.resolve(d)
+		if dep == nil {
+			r.p.Diagnostics = append(r.p.Diagnostics, c.l.at(diag.New(
+				diag.ImportUnresolvedDependency, d.text), d.off))
+			continue
+		}
+		if !r.visited[dep.rel] {
+			r.visit(dep)
+		}
+	}
+	r.p.Entries = append(r.p.Entries, c.entries...)
+}
+
+// resolve returns the core d resolves to: the core an earlier
+// dependency on the same vendor:library:name chose, when d matches it;
+// else the newest core d matches, the first among equal versions (the
+// project file's own core, then files.Cores() order); nil when none
+// does.
+func (r *coreRun) resolve(d coreDep) *coreFile {
+	key := d.want
+	key.version = ""
+	if c, ok := r.chosen[key]; ok && d.matches(c.vlnv) {
+		return c
+	}
+	if !r.loaded {
+		r.loaded = true
+		for _, p := range r.files.Cores() {
+			src, err := r.files.Read(p)
+			if err != nil {
+				continue // an unreadable core provides nothing
+			}
+			c := readCore(p, join(path.Dir(r.main), p), src)
+			if !c.fatal && c.named {
+				r.cands = append(r.cands, c)
+			}
+		}
+	}
+	var best *coreFile
+	for _, c := range r.cands {
+		if d.matches(c.vlnv) && (best == nil ||
+			compareVersions(c.vlnv.version, best.vlnv.version) > 0) {
+			best = c
+		}
+	}
+	if _, ok := r.chosen[key]; !ok && best != nil {
+		r.chosen[key] = best
+	}
+	return best
+}
+
+// matches reports whether the core have satisfies d.
+func (d coreDep) matches(have vlnv) bool {
+	w := d.want
+	if w.vendor != have.vendor || w.library != have.library ||
+		w.name != have.name {
+		return false
+	}
+	if w.version == "" {
+		return true
+	}
+	c := compareVersions(have.version, w.version)
+	hp, wp := versionParts(have.version), versionParts(w.version)
+	part := func(i int) bool {
+		return len(hp) > i && len(wp) > i && hp[i] == wp[i]
+	}
+	switch d.op {
+	case ">=":
+		return c >= 0
+	case ">":
+		return c > 0
+	case "<=":
+		return c <= 0
+	case "<":
+		return c < 0
+	case "^":
+		return c >= 0 && part(0)
+	case "~":
+		return c >= 0 && part(0) && part(1)
+	}
+	return c == 0
+}
+
+// versionParts splits a version at '.' and '-'.
+func versionParts(v string) []string {
+	return strings.FieldsFunc(v, func(r rune) bool {
+		return r == '.' || r == '-'
+	})
+}
+
+// compareVersions compares two versions part by part: parts made of
+// digits as numbers, others as strings; a version that runs out of
+// parts first is the older.
+func compareVersions(a, b string) int {
+	ap, bp := versionParts(a), versionParts(b)
+	for i := range min(len(ap), len(bp)) {
+		x, y := ap[i], bp[i]
+		if digits(x) && digits(y) {
+			x, y = strings.TrimLeft(x, "0"), strings.TrimLeft(y, "0")
+			if len(x) != len(y) {
+				if len(x) < len(y) {
+					return -1
+				}
+				return 1
+			}
+		}
+		if c := strings.Compare(x, y); c != 0 {
+			return c
+		}
+	}
+	return len(ap) - len(bp)
+}
+
+func digits(s string) bool {
+	for i := range len(s) {
+		if s[i] < '0' || s[i] > '9' {
+			return false
+		}
+	}
+	return s != ""
+}
+
+// parseVLNV reads [op]vendor:library:name[:version].
+func parseVLNV(s string) (op string, v vlnv, ok bool) {
+	for _, o := range coreOps {
+		if strings.HasPrefix(s, o) {
+			op, s = o, s[len(o):]
+			break
+		}
+	}
+	parts := strings.Split(s, ":")
+	if len(parts) < 3 || len(parts) > 4 || parts[2] == "" {
+		return "", vlnv{}, false
+	}
+	v = vlnv{vendor: parts[0], library: parts[1], name: parts[2]}
+	if len(parts) == 4 {
+		v.version = parts[3]
+	}
+	return op, v, true
+}
+
+// readCore reads the .core file src at rel (relative to the project
+// file's folder), shown as shown.
+func readCore(rel, shown string, src []byte) (c *coreFile) {
+	c = &coreFile{rel: rel, l: newLines(shown, src), src: src}
+	defer func() {
+		// The YAML library is third-party code; a panic inside it must
+		// not crash GoHard (P6).
+		if v := recover(); v != nil {
+			c.fail(0, fmt.Sprint(v))
+		}
+	}()
+	var doc yaml.Node
+	if err := yaml.NewDecoder(bytes.NewReader(src)).Decode(
+		&doc); err != nil {
+		if errors.Is(err, io.EOF) {
+			c.fail(0, "the file is empty")
+		} else {
+			c.syntax(err)
+		}
+		return c
+	}
+	if len(doc.Content) == 0 || doc.Content[0].Kind != yaml.MappingNode {
+		c.fail(0, "the file is not a YAML mapping")
+		return c
+	}
+	root := doc.Content[0]
+	capi := false
+	for i := 0; i+1 < len(root.Content); i += 2 {
+		k, v := root.Content[i], deref(root.Content[i+1])
+		switch k.Value {
+		case "CAPI=2":
+			capi = true
+		case "name":
+			if op, n, ok := parseVLNV(v.Value); ok && op == "" &&
+				v.Kind == yaml.ScalarNode {
+				c.vlnv, c.named = n, true
+			}
+		case "filesets":
+			c.filesets(v)
+		case "provider":
+			c.ignored(k, "provider", "gohard import fetches nothing, "+
+				"so it reads the files from the .core file's folder")
+		}
+	}
+	if !capi {
+		c.fail(0, "it is not a CAPI2 core: it has no CAPI=2: line")
+	}
+	return c
+}
+
+var yamlLineRE = regexp.MustCompile(`^yaml: line (\d+): `)
+
+// syntax reports a YAML error; the library gives only its line.
+func (c *coreFile) syntax(err error) {
+	msg, line := err.Error(), 1
+	if m := yamlLineRE.FindStringSubmatch(msg); m != nil {
+		line, _ = strconv.Atoi(m[1])
+		msg = msg[len(m[0]):]
+	}
+	msg = strings.TrimPrefix(msg, "yaml: ")
+	line = max(1, min(line, c.l.idx.LineCount()))
+	c.fail(c.l.idx.LineStart(line-1), msg)
+}
+
+// fail records the import/syntax error that makes c unusable.
+func (c *coreFile) fail(off int, reason string) {
+	c.fatal = true
+	c.diags = append(c.diags, c.l.syntax(coreFormat, off, reason))
+}
+
+// ignored records the import/ignored hint for item at n.
+func (c *coreFile) ignored(n *yaml.Node, item, reason string) {
+	c.diags = append(c.diags, c.l.ignored(c.off(n), item, reason))
+}
+
+// deref returns the node an alias stands for.
+func deref(n *yaml.Node) *yaml.Node {
+	for i := 0; i < 8 && n.Kind == yaml.AliasNode && n.Alias != nil; i++ {
+		n = n.Alias
+	}
+	return n
+}
+
+// pairs returns the keys and values of the mapping n, or nothing.
+func pairs(n *yaml.Node) [][2]*yaml.Node {
+	n = deref(n)
+	if n.Kind != yaml.MappingNode {
+		return nil
+	}
+	var out [][2]*yaml.Node
+	for i := 0; i+1 < len(n.Content); i += 2 {
+		out = append(out, [2]*yaml.Node{n.Content[i],
+			deref(n.Content[i+1])})
+	}
+	return out
+}
+
+// yamlScalar returns the value of n when it is a scalar.
+func yamlScalar(n *yaml.Node) (string, bool) {
+	n = deref(n)
+	return n.Value, n.Kind == yaml.ScalarNode
+}
+
+// filesets reads the filesets mapping.
+func (c *coreFile) filesets(n *yaml.Node) {
+	for _, set := range pairs(n) {
+		var files, deps *yaml.Node
+		typ, lib := "", "work"
+		for _, kv := range pairs(set[1]) {
+			switch kv[0].Value {
+			case "files":
+				files = kv[1]
+			case "depend":
+				deps = kv[1]
+			case "file_type":
+				typ, _ = yamlScalar(kv[1])
+			case "logical_name":
+				if v, ok := yamlScalar(kv[1]); ok && v != "" {
+					lib = v
+				}
+			}
+		}
+		if files != nil && files.Kind == yaml.SequenceNode {
+			for _, it := range files.Content {
+				c.file(it, typ, lib)
+			}
+		}
+		if deps != nil && deps.Kind == yaml.SequenceNode {
+			for _, it := range deps.Content {
+				c.depend(it)
+			}
+		}
+	}
+}
+
+// file reads one files: entry, "path" or "path: {attributes}", with
+// the fileset's file type and library.
+func (c *coreFile) file(it *yaml.Node, typ, lib string) {
+	at := deref(it)
+	p, ok := yamlScalar(at)
+	if !ok {
+		kv := pairs(at)
+		if len(kv) != 1 {
+			c.ignored(it, "files entry", "not a file name or a file "+
+				"name with attributes")
+			return
+		}
+		at = kv[0][0]
+		p = at.Value
+		for _, a := range pairs(kv[0][1]) {
+			v, _ := yamlScalar(a[1])
+			switch a[0].Value {
+			case "file_type":
+				typ = v
+			case "logical_name":
+				if v != "" {
+					lib = v
+				}
+			}
+		}
+	}
+	p = strings.ReplaceAll(p, `\`, "/")
+	std, vhdl := coreStandards[typ]
+	switch {
+	case coreFlagRE.MatchString(p):
+		c.ignored(at, p, "it has a FuseSoC use-flag condition")
+	case typ == "":
+		c.ignored(at, p, "it has no file_type")
+	case !vhdl:
+		c.ignored(at, p, "file type "+typ+" is not VHDL")
+	default:
+		e, d := c.l.file(join(path.Dir(c.rel), p), lib, std, c.off(at))
+		if d != nil {
+			c.diags = append(c.diags, *d)
+			return
+		}
+		c.entries = append(c.entries, e)
+	}
+}
+
+// depend reads one depend: entry.
+func (c *coreFile) depend(it *yaml.Node) {
+	s, ok := yamlScalar(it)
+	switch {
+	case !ok:
+		c.ignored(it, "depend entry", "not a core name")
+		return
+	case coreFlagRE.MatchString(s):
+		c.ignored(it, "depend "+s, "it has a FuseSoC use-flag condition")
+		return
+	}
+	op, want, ok := parseVLNV(s)
+	if !ok {
+		c.ignored(it, "depend "+s, "not of the form "+
+			"[op]vendor:library:name[:version]")
+		return
+	}
+	c.deps = append(c.deps, coreDep{op: op, want: want, text: s,
+		off: c.off(it)})
+}
+
+// off returns the byte offset of the node n. YAML counts columns in
+// characters and does not count a byte order mark; nodes come mostly
+// in document order, so off resumes from the previous node on the same
+// line and a long single-line file costs linear time.
+func (c *coreFile) off(n *yaml.Node) int {
+	idx := c.l.idx
+	line := min(max(1, n.Line), idx.LineCount())
+	col := max(1, n.Column)
+	k := &c.cur
+	if k.line != line || k.col > col {
+		off := idx.LineStart(line - 1)
+		if line == 1 && bytes.HasPrefix(c.src, utf8BOM) {
+			off += len(utf8BOM)
+		}
+		*k = cursor{line: line, col: 1, off: off}
+	}
+	end := idx.LineEnd(line - 1)
+	for k.col < col && k.off < end {
+		_, size := utf8.DecodeRune(c.src[k.off:end])
+		k.off += size
+		k.col++
+	}
+	k.col = col
+	return k.off
+}

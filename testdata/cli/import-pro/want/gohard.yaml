@@ -1,0 +1,7 @@
+# Written by gohard import from build.pro.
+libraries:
+  mylib:
+    - src/pkg.vhd
+  work:
+    - src/top.vhd
+    - tb/tb_top.vhd

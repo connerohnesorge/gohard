@@ -1,0 +1,2 @@
+top.core:10:9: warning[import/unresolved-dependency]: dependency >=acme:demo:fifo:2.0 matches no .core file under the project root or on the command line; gohard import fetches nothing, so its files are not imported
+summary: 0 errors, 1 warnings, 0 hints, 2 files

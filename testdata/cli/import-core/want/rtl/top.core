@@ -1,0 +1,21 @@
+CAPI=2:
+name: acme:demo:top:1.0.0
+description: a counter, its testbench and the package it depends on
+
+filesets:
+  rtl:
+    files:
+      - top.vhd
+      - timing.sdc: {file_type: SDC}
+    file_type: vhdlSource-2008
+    depend:
+      - ^acme:demo:pkg:1.0
+  tb:
+    files:
+      - ../tb/tb_top.vhd
+    file_type: vhdlSource-2008
+
+targets:
+  sim:
+    filesets: [rtl, tb]
+    toplevel: tb_top
