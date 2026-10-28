@@ -1,0 +1,9 @@
+case_generate_tb entity work.case_generate_tb(sim)
+  case_generate_tb.u0 entity work.case_generate(rtl) op=0
+    case_generate_tb.u0.pick.op_and case-generate
+  case_generate_tb.u2 entity work.case_generate(rtl) op=2
+    case_generate_tb.u2.pick.op_or case-generate
+  case_generate_tb.u4 entity work.case_generate(rtl) op=4
+    case_generate_tb.u4.pick.op_xor case-generate
+  case_generate_tb.u9 entity work.case_generate(rtl) op=9
+    case_generate_tb.u9.pick.op_not case-generate

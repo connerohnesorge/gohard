@@ -1,0 +1,15 @@
+# GoHard formatter oracle (#32): delayed_attrs, nvc.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool nvc 1.23.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file delayed_attrs_tb.vhd std=2008 sha256=5b521dff390c7b259f0d09fb2d8a940d94b1cad74835ba27005f05473402fb8d formatted=31507018108ddcad7ccf5524d28d1d393152a6ae81f3bd764ba866f0f0283e1b changed
+  exit original=0 formatted=0
+result new=0

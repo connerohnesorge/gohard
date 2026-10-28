@@ -1,0 +1,17 @@
+# GoHard formatter oracle (#32): case_generate, ghdl.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool ghdl 6.0.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file case_generate.vhd std=2008 sha256=93c383f827e22145f1c674ca85a0624acc95fd9304c00c3b4d88f1a8197b0d8f formatted=3f0b362818882f78d1c959853cccfa78f2bf6e0276ff284220d5f0d5e3913748 changed
+  exit original=0 formatted=0
+file case_generate_tb.vhd std=2008 sha256=6eb249eda3913c98680568e65e47def4ea68277ba10d40e7717fc1b74c667cb6 formatted=016251bcffb3662fe3b74c13a6c00881170e2ed6d9a8dbb2ec01a2502058be5c changed
+  exit original=0 formatted=0
+result new=0

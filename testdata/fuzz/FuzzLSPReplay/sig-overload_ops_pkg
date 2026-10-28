@@ -1,2 +1,2 @@
 go test fuzz v1
-[]byte("\x07p7\x0c#Yf\"")
+[]byte("\x0bp7\x0c#Yf\"")

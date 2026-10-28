@@ -1,0 +1,2 @@
+force_out_tb entity work.force_out_tb(tb)
+  force_out_tb.dut entity work.force_out(rtl)

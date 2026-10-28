@@ -1,0 +1,31 @@
+gohard-oracle 1
+tool ghdl 6.0.0
+sources ebca06402b95c4d5
+testbench delayed_attrs_tb
+signal delayed_attrs_tb.r logic 1
+signal delayed_attrs_tb.r_dly logic 1
+signal delayed_attrs_tb.v logic 4
+signal delayed_attrs_tb.v_dly logic 4
+0 delayed_attrs_tb.r Z
+0 delayed_attrs_tb.r_dly Z
+0 delayed_attrs_tb.v 0000
+0 delayed_attrs_tb.v_dly 0000
+10000000 delayed_attrs_tb.r 1
+10000000 delayed_attrs_tb.v 1010
+12000000 delayed_attrs_tb.v 1011
+14000000 delayed_attrs_tb.v 0000
+15000000 delayed_attrs_tb.r_dly 1
+15000000 delayed_attrs_tb.v_dly 1010
+17000000 delayed_attrs_tb.v_dly 1011
+19000000 delayed_attrs_tb.v_dly 0000
+20000000 delayed_attrs_tb.r X
+20000000 delayed_attrs_tb.v 1000
+21000000 delayed_attrs_tb.v 0000
+25000000 delayed_attrs_tb.r_dly X
+25000000 delayed_attrs_tb.v_dly 1000
+26000000 delayed_attrs_tb.v_dly 0000
+30000000 delayed_attrs_tb.r 0
+35000000 delayed_attrs_tb.r_dly 0
+40000000 delayed_attrs_tb.r Z
+45000000 delayed_attrs_tb.r_dly Z
+digest 22 5adec9fde26e2b779c34c217b29fadd28ed20a812225393ff3b813013c971096

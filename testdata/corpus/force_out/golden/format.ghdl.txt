@@ -1,0 +1,20 @@
+# GoHard formatter oracle (#32): force_out, ghdl.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool ghdl 6.0.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file force_out.vhd std=2008 sha256=e42caceb9fcba96d67eb8f969d1dccc72d3f9643e0851a03726def25a6aa4210 formatted=16dab4651556c7ce0a6f523a9112ed073b9aebde0e6ef994eeece31c01651613 changed
+  exit original=0 formatted=0
+file force_out_tb.vhd std=2008 sha256=98184ee0469f7cc25672c715a0f23d00e878dc2cd13804ddd131f73c528f014f formatted=cd0f5b0567440f31a21268d74d515a41f10c88641096bf9f9ae97e85fae89c3e changed
+  exit original=1 formatted=1
+  error 31: unexpected token 'out' in a primary
+  error 31: missing ";" at end of statement
+  error 44: missing ";" at end of statement
+result new=0

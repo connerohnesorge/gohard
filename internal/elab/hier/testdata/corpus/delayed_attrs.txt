@@ -1,0 +1,1 @@
+delayed_attrs_tb entity work.delayed_attrs_tb(tb)

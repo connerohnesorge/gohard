@@ -1,0 +1,19 @@
+# GoHard formatter oracle (#32): ext_vars, ghdl.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool ghdl 6.0.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file ext_vars_pkg.vhd std=2008 sha256=3618026ab5e135d50e5a5b57a9b8cf1f23d9334433fc377a6efa290d0d752f57 formatted=3618026ab5e135d50e5a5b57a9b8cf1f23d9334433fc377a6efa290d0d752f57 unchanged
+  exit original=0 formatted=0
+file ext_vars.vhd std=2008 sha256=4ca8222ea730ab2677a3ee573eff0931702b5d307918a3783d364f29a1c06b6e formatted=4ca8222ea730ab2677a3ee573eff0931702b5d307918a3783d364f29a1c06b6e unchanged
+  exit original=0 formatted=0
+file ext_vars_tb.vhd std=2008 sha256=16b25c25eace97b781aaffc169b69c2b8e2bfabd53006b4d676c1a37cd353eee formatted=16b25c25eace97b781aaffc169b69c2b8e2bfabd53006b4d676c1a37cd353eee unchanged
+  exit original=0 formatted=0
+result new=0

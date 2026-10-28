@@ -1,0 +1,39 @@
+gohard-oracle 1
+tool nvc 1.23.0
+sources 66794152231bf9a5
+testbench force_out_tb
+signal force_out_tb.a logic 1
+signal force_out_tb.dut.a logic 1
+signal force_out_tb.dut.y logic 1
+signal force_out_tb.dut.y_seen logic 1
+signal force_out_tb.y logic 1
+signal force_out_tb.y_seen logic 1
+0 force_out_tb.a 0
+0 force_out_tb.dut.a 0
+0 force_out_tb.dut.y 1
+0 force_out_tb.dut.y_seen 1
+0 force_out_tb.y 1
+0 force_out_tb.y_seen 1
+1000000 force_out_tb.dut.y 0
+1000000 force_out_tb.dut.y_seen 0
+1000000 force_out_tb.y 0
+1000000 force_out_tb.y_seen 0
+2000000 force_out_tb.a 1
+2000000 force_out_tb.dut.a 1
+3000000 force_out_tb.a 0
+3000000 force_out_tb.dut.a 0
+4000000 force_out_tb.dut.y 1
+4000000 force_out_tb.dut.y_seen 1
+4000000 force_out_tb.y 1
+4000000 force_out_tb.y_seen 1
+5000000 force_out_tb.dut.y Z
+5000000 force_out_tb.dut.y_seen Z
+5000000 force_out_tb.y Z
+5000000 force_out_tb.y_seen Z
+6000000 force_out_tb.a 1
+6000000 force_out_tb.dut.a 1
+7000000 force_out_tb.dut.y 0
+7000000 force_out_tb.dut.y_seen 0
+7000000 force_out_tb.y 0
+7000000 force_out_tb.y_seen 0
+digest 28 f148c4b1ee03edd92cad58b1004b605803fd5f66f55b579d995e3fd9d28c89ee

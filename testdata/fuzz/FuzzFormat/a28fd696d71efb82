@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- ext_vars: counts the rising edges of a in the shared variable hits\n-- of its architecture, and adds C_STEP to the package variable total\n-- on each (#63).\nuse work.ext_vars_pkg.all;\nuse work.ext_vars_obj.all;\n\nentity ext_vars is\n  port (\n    a : in bit\n  );\nend entity ext_vars;\n\narchitecture rtl of ext_vars is\n  shared variable hits : counter_t;\nbegin\n  count : process (a) is\n  begin\n    if a = '1' then\n      hits.add(1);\n      total.add(C_STEP);\n    end if;\n  end process count;\nend architecture rtl;\n")

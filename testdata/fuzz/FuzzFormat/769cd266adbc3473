@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("-- force_out: an inverter whose out port y the testbench forces with\n-- force mode out (#63). y_seen reads y back (VHDL-2008 lets a design\n-- read its out ports), so the port's own value is observable.\nlibrary ieee;\nuse ieee.std_logic_1164.all;\n\nentity force_out is\n  port (\n    a      : in  std_logic;\n    y      : out std_logic;\n    y_seen : out std_logic\n  );\nend entity force_out;\n\narchitecture rtl of force_out is\nbegin\n  y      <= not a;\n  y_seen <= y;\nend architecture rtl;\n")

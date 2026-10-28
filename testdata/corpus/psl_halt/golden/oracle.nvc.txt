@@ -1,0 +1,73 @@
+gohard-oracle 1
+tool nvc 1.23.0
+sources 9a97dc1032a8a097
+testbench psl_halt_tb
+signal psl_halt_tb.ack logic 1
+signal psl_halt_tb.clk logic 1
+signal psl_halt_tb.dut.ack logic 1
+signal psl_halt_tb.dut.acki logic 1
+signal psl_halt_tb.dut.clk logic 1
+signal psl_halt_tb.dut.n integer 32
+signal psl_halt_tb.dut.req logic 1
+signal psl_halt_tb.dut.reqi logic 1
+signal psl_halt_tb.req logic 1
+0 psl_halt_tb.ack 0
+0 psl_halt_tb.clk 0
+0 psl_halt_tb.dut.ack 0
+0 psl_halt_tb.dut.acki 0
+0 psl_halt_tb.dut.clk 0
+0 psl_halt_tb.dut.n 0
+0 psl_halt_tb.dut.req 0
+0 psl_halt_tb.dut.reqi 0
+0 psl_halt_tb.req 0
+5000000 psl_halt_tb.clk 1
+5000000 psl_halt_tb.dut.clk 1
+10000000 psl_halt_tb.clk 0
+10000000 psl_halt_tb.dut.clk 0
+10000000 psl_halt_tb.dut.n 1
+15000000 psl_halt_tb.clk 1
+15000000 psl_halt_tb.dut.clk 1
+20000000 psl_halt_tb.clk 0
+20000000 psl_halt_tb.dut.clk 0
+20000000 psl_halt_tb.dut.n 2
+20000000 psl_halt_tb.dut.req 1
+20000000 psl_halt_tb.dut.reqi 1
+20000000 psl_halt_tb.req 1
+25000000 psl_halt_tb.clk 1
+25000000 psl_halt_tb.dut.clk 1
+30000000 psl_halt_tb.ack 1
+30000000 psl_halt_tb.clk 0
+30000000 psl_halt_tb.dut.ack 1
+30000000 psl_halt_tb.dut.acki 1
+30000000 psl_halt_tb.dut.clk 0
+30000000 psl_halt_tb.dut.n 3
+30000000 psl_halt_tb.dut.req 0
+30000000 psl_halt_tb.dut.reqi 0
+30000000 psl_halt_tb.req 0
+35000000 psl_halt_tb.clk 1
+35000000 psl_halt_tb.dut.clk 1
+40000000 psl_halt_tb.ack 0
+40000000 psl_halt_tb.clk 0
+40000000 psl_halt_tb.dut.ack 0
+40000000 psl_halt_tb.dut.acki 0
+40000000 psl_halt_tb.dut.clk 0
+40000000 psl_halt_tb.dut.n 4
+45000000 psl_halt_tb.clk 1
+45000000 psl_halt_tb.dut.clk 1
+50000000 psl_halt_tb.clk 0
+50000000 psl_halt_tb.dut.clk 0
+50000000 psl_halt_tb.dut.n 5
+50000000 psl_halt_tb.dut.req 1
+50000000 psl_halt_tb.dut.reqi 1
+50000000 psl_halt_tb.req 1
+55000000 psl_halt_tb.clk 1
+55000000 psl_halt_tb.dut.clk 1
+60000000 psl_halt_tb.clk 0
+60000000 psl_halt_tb.dut.clk 0
+60000000 psl_halt_tb.dut.n 6
+60000000 psl_halt_tb.dut.req 0
+60000000 psl_halt_tb.dut.reqi 0
+60000000 psl_halt_tb.req 0
+65000000 psl_halt_tb.clk 1
+65000000 psl_halt_tb.dut.clk 1
+digest 59 c47dce8383bf9a216e55f9b33cd7e7a04f123ad032e026235d0ebade81bac650

@@ -1,0 +1,122 @@
+gohard-trace 1
+testbench case_generate_tb
+end 40000000
+type std_logic_vector array std_ulogic
+type std_ulogic logic
+scope case_generate_tb instance case_generate_tb(sim)
+scope case_generate_tb.u0 instance case_generate(rtl)
+scope case_generate_tb.u0.pick.op_and case-generate
+scope case_generate_tb.u2 instance case_generate(rtl)
+scope case_generate_tb.u2.pick.op_or case-generate
+scope case_generate_tb.u4 instance case_generate(rtl)
+scope case_generate_tb.u4.pick.op_xor case-generate
+scope case_generate_tb.u9 instance case_generate(rtl)
+scope case_generate_tb.u9.pick.op_not case-generate
+signal case_generate_tb.a std_logic_vector signal 3 downto 0
+signal case_generate_tb.b std_logic_vector signal 3 downto 0
+signal case_generate_tb.u0.a std_logic_vector in 3 downto 0
+signal case_generate_tb.u0.b std_logic_vector in 3 downto 0
+signal case_generate_tb.u0.y std_logic_vector out 3 downto 0
+signal case_generate_tb.u2.a std_logic_vector in 3 downto 0
+signal case_generate_tb.u2.b std_logic_vector in 3 downto 0
+signal case_generate_tb.u2.y std_logic_vector out 3 downto 0
+signal case_generate_tb.u4.a std_logic_vector in 3 downto 0
+signal case_generate_tb.u4.b std_logic_vector in 3 downto 0
+signal case_generate_tb.u4.pick.op_xor.t std_logic_vector signal 3 downto 0
+signal case_generate_tb.u4.y std_logic_vector out 3 downto 0
+signal case_generate_tb.u9.a std_logic_vector in 3 downto 0
+signal case_generate_tb.u9.b std_logic_vector in 3 downto 0
+signal case_generate_tb.u9.y std_logic_vector out 3 downto 0
+signal case_generate_tb.y0 std_logic_vector signal 3 downto 0
+signal case_generate_tb.y2 std_logic_vector signal 3 downto 0
+signal case_generate_tb.y4 std_logic_vector signal 3 downto 0
+signal case_generate_tb.y9 std_logic_vector signal 3 downto 0
+process 1 case_generate_tb.check
+process 2 case_generate_tb.u0.pick.op_and._p0
+process 3 case_generate_tb.u2.pick.op_or._p0
+process 4 case_generate_tb.u4.pick.op_xor._p0
+process 5 case_generate_tb.u4.pick.op_xor._p1
+process 6 case_generate_tb.u9.pick.op_not._p0
+0 0 case_generate_tb.a 0000 -
+0 0 case_generate_tb.b 0000 -
+0 0 case_generate_tb.u0.a 0000 -
+0 0 case_generate_tb.u0.b 0000 -
+0 0 case_generate_tb.u0.y UUUU -
+0 0 case_generate_tb.u2.a 0000 -
+0 0 case_generate_tb.u2.b 0000 -
+0 0 case_generate_tb.u2.y UUUU -
+0 0 case_generate_tb.u4.a 0000 -
+0 0 case_generate_tb.u4.b 0000 -
+0 0 case_generate_tb.u4.pick.op_xor.t UUUU -
+0 0 case_generate_tb.u4.y UUUU -
+0 0 case_generate_tb.u9.a 0000 -
+0 0 case_generate_tb.u9.b 0000 -
+0 0 case_generate_tb.u9.y UUUU -
+0 0 case_generate_tb.y0 UUUU -
+0 0 case_generate_tb.y2 UUUU -
+0 0 case_generate_tb.y4 UUUU -
+0 0 case_generate_tb.y9 UUUU -
+0 1 case_generate_tb.u0.y 0000 p2
+0 1 case_generate_tb.u2.y 0000 p3
+0 1 case_generate_tb.u4.pick.op_xor.t 0000 p4
+0 1 case_generate_tb.u9.y 1111 p6
+0 1 case_generate_tb.y0 0000 p2
+0 1 case_generate_tb.y2 0000 p3
+0 1 case_generate_tb.y9 1111 p6
+0 2 case_generate_tb.u4.y 0000 p5
+0 2 case_generate_tb.y4 0000 p5
+10000000 1 case_generate_tb.a 1100 p1
+10000000 1 case_generate_tb.b 1010 p1
+10000000 1 case_generate_tb.u0.a 1100 p1
+10000000 1 case_generate_tb.u0.b 1010 p1
+10000000 1 case_generate_tb.u2.a 1100 p1
+10000000 1 case_generate_tb.u2.b 1010 p1
+10000000 1 case_generate_tb.u4.a 1100 p1
+10000000 1 case_generate_tb.u4.b 1010 p1
+10000000 1 case_generate_tb.u9.a 1100 p1
+10000000 1 case_generate_tb.u9.b 1010 p1
+10000000 2 case_generate_tb.u0.y 1000 p2
+10000000 2 case_generate_tb.u2.y 1110 p3
+10000000 2 case_generate_tb.u4.pick.op_xor.t 0110 p4
+10000000 2 case_generate_tb.u9.y 0011 p6
+10000000 2 case_generate_tb.y0 1000 p2
+10000000 2 case_generate_tb.y2 1110 p3
+10000000 2 case_generate_tb.y9 0011 p6
+10000000 3 case_generate_tb.u4.y 0110 p5
+10000000 3 case_generate_tb.y4 0110 p5
+20000000 1 case_generate_tb.a 1010 p1
+20000000 1 case_generate_tb.b 0110 p1
+20000000 1 case_generate_tb.u0.a 1010 p1
+20000000 1 case_generate_tb.u0.b 0110 p1
+20000000 1 case_generate_tb.u2.a 1010 p1
+20000000 1 case_generate_tb.u2.b 0110 p1
+20000000 1 case_generate_tb.u4.a 1010 p1
+20000000 1 case_generate_tb.u4.b 0110 p1
+20000000 1 case_generate_tb.u9.a 1010 p1
+20000000 1 case_generate_tb.u9.b 0110 p1
+20000000 2 case_generate_tb.u0.y 0010 p2
+20000000 2 case_generate_tb.u4.pick.op_xor.t 1100 p4
+20000000 2 case_generate_tb.u9.y 0101 p6
+20000000 2 case_generate_tb.y0 0010 p2
+20000000 2 case_generate_tb.y9 0101 p6
+20000000 3 case_generate_tb.u4.y 1100 p5
+20000000 3 case_generate_tb.y4 1100 p5
+30000000 1 case_generate_tb.a 1111 p1
+30000000 1 case_generate_tb.b 0101 p1
+30000000 1 case_generate_tb.u0.a 1111 p1
+30000000 1 case_generate_tb.u0.b 0101 p1
+30000000 1 case_generate_tb.u2.a 1111 p1
+30000000 1 case_generate_tb.u2.b 0101 p1
+30000000 1 case_generate_tb.u4.a 1111 p1
+30000000 1 case_generate_tb.u4.b 0101 p1
+30000000 1 case_generate_tb.u9.a 1111 p1
+30000000 1 case_generate_tb.u9.b 0101 p1
+30000000 2 case_generate_tb.u0.y 0101 p2
+30000000 2 case_generate_tb.u2.y 1111 p3
+30000000 2 case_generate_tb.u4.pick.op_xor.t 1010 p4
+30000000 2 case_generate_tb.u9.y 0000 p6
+30000000 2 case_generate_tb.y0 0101 p2
+30000000 2 case_generate_tb.y2 1111 p3
+30000000 2 case_generate_tb.y9 0000 p6
+30000000 3 case_generate_tb.u4.y 1010 p5
+30000000 3 case_generate_tb.y4 1010 p5

@@ -1,0 +1,21 @@
+gohard-oracle 1
+tool ghdl 6.0.0
+sources 23a603a1ae5bf337
+testbench ext_vars_tb
+signal ext_vars_tb.a logic 1
+signal ext_vars_tb.dut.a logic 1
+0 ext_vars_tb.a 1
+0 ext_vars_tb.dut.a 1
+1000000 ext_vars_tb.a 0
+1000000 ext_vars_tb.dut.a 0
+2000000 ext_vars_tb.a 1
+2000000 ext_vars_tb.dut.a 1
+3000000 ext_vars_tb.a 0
+3000000 ext_vars_tb.dut.a 0
+4000000 ext_vars_tb.a 1
+4000000 ext_vars_tb.dut.a 1
+5000000 ext_vars_tb.a 0
+5000000 ext_vars_tb.dut.a 0
+6000000 ext_vars_tb.a 1
+6000000 ext_vars_tb.dut.a 1
+digest 14 4999b5eb06c852e3dffe6f43673c168ffe845083d00c38481b87f939453534ae

@@ -1,0 +1,26 @@
+gohard-trace 1
+testbench ext_vars_tb
+end 7000000
+type bit enum '0' '1'
+scope ext_vars_tb instance ext_vars_tb(tb)
+scope ext_vars_tb.dut instance ext_vars(rtl)
+signal ext_vars_tb.a bit signal
+signal ext_vars_tb.dut.a bit in
+process 1 ext_vars_tb.dut.count
+process 2 ext_vars_tb.stim
+0 0 ext_vars_tb.a '0' -
+0 0 ext_vars_tb.dut.a '0' -
+0 1 ext_vars_tb.a '1' p2
+0 1 ext_vars_tb.dut.a '1' p2
+1000000 1 ext_vars_tb.a '0' p2
+1000000 1 ext_vars_tb.dut.a '0' p2
+2000000 1 ext_vars_tb.a '1' p2
+2000000 1 ext_vars_tb.dut.a '1' p2
+3000000 1 ext_vars_tb.a '0' p2
+3000000 1 ext_vars_tb.dut.a '0' p2
+4000000 1 ext_vars_tb.a '1' p2
+4000000 1 ext_vars_tb.dut.a '1' p2
+5000000 1 ext_vars_tb.a '0' p2
+5000000 1 ext_vars_tb.dut.a '0' p2
+6000000 1 ext_vars_tb.a '1' p2
+6000000 1 ext_vars_tb.dut.a '1' p2

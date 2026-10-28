@@ -1,0 +1,33 @@
+gohard-oracle 1
+tool nvc 1.23.0
+sources ebca06402b95c4d5
+testbench delayed_attrs_tb
+signal delayed_attrs_tb.r logic 1
+signal delayed_attrs_tb.r_dly logic 1
+signal delayed_attrs_tb.v logic 4
+signal delayed_attrs_tb.v_dly logic 4
+0 delayed_attrs_tb.r Z
+0 delayed_attrs_tb.r_dly U
+0 delayed_attrs_tb.v 0000
+0 delayed_attrs_tb.v_dly UUUU
+5000000 delayed_attrs_tb.r_dly Z
+5000000 delayed_attrs_tb.v_dly 0000
+10000000 delayed_attrs_tb.r 1
+10000000 delayed_attrs_tb.v 1010
+12000000 delayed_attrs_tb.v 1011
+14000000 delayed_attrs_tb.v 0000
+15000000 delayed_attrs_tb.r_dly 1
+15000000 delayed_attrs_tb.v_dly 1010
+17000000 delayed_attrs_tb.v_dly 1011
+19000000 delayed_attrs_tb.v_dly 0000
+20000000 delayed_attrs_tb.r X
+20000000 delayed_attrs_tb.v 1000
+21000000 delayed_attrs_tb.v 0000
+25000000 delayed_attrs_tb.r_dly X
+25000000 delayed_attrs_tb.v_dly 1000
+26000000 delayed_attrs_tb.v_dly 0000
+30000000 delayed_attrs_tb.r 0
+35000000 delayed_attrs_tb.r_dly 0
+40000000 delayed_attrs_tb.r Z
+45000000 delayed_attrs_tb.r_dly Z
+digest 24 f1b573b671b8ca0f9e14fa5fe7b13877e8aef1ad8ea0f67a61e0cb5c4d3ab044

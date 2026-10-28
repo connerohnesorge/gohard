@@ -1,0 +1,47 @@
+gohard-trace 1
+testbench force_out_tb
+end 8000000
+type std_logic logic
+scope force_out_tb instance force_out_tb(tb)
+scope force_out_tb.dut instance force_out(rtl)
+signal force_out_tb.a std_logic signal
+signal force_out_tb.dut.a std_logic in
+signal force_out_tb.dut.y std_logic out
+signal force_out_tb.dut.y_seen std_logic out
+signal force_out_tb.y std_logic signal
+signal force_out_tb.y_seen std_logic signal
+process 1 force_out_tb.dut._p0
+process 2 force_out_tb.dut._p1
+process 3 force_out_tb.stim
+0 0 force_out_tb.a 0 -
+0 0 force_out_tb.dut.a 0 -
+0 0 force_out_tb.dut.y U -
+0 0 force_out_tb.dut.y_seen U -
+0 0 force_out_tb.y U -
+0 0 force_out_tb.y_seen U -
+0 1 force_out_tb.dut.y 1 p1
+0 1 force_out_tb.y 1 p1
+0 2 force_out_tb.dut.y_seen 1 p2
+0 2 force_out_tb.y_seen 1 p2
+1000000 1 force_out_tb.dut.y 0 -
+1000000 1 force_out_tb.y 0 -
+1000000 2 force_out_tb.dut.y_seen 0 p2
+1000000 2 force_out_tb.y_seen 0 p2
+2000000 1 force_out_tb.a 1 p3
+2000000 1 force_out_tb.dut.a 1 p3
+3000000 1 force_out_tb.a 0 p3
+3000000 1 force_out_tb.dut.a 0 p3
+4000000 1 force_out_tb.dut.y 1 -
+4000000 1 force_out_tb.y 1 -
+4000000 2 force_out_tb.dut.y_seen 1 p2
+4000000 2 force_out_tb.y_seen 1 p2
+5000000 1 force_out_tb.dut.y Z -
+5000000 1 force_out_tb.y Z -
+5000000 2 force_out_tb.dut.y_seen Z p2
+5000000 2 force_out_tb.y_seen Z p2
+6000000 1 force_out_tb.a 1 p3
+6000000 1 force_out_tb.dut.a 1 p3
+7000000 1 force_out_tb.dut.y 0 -
+7000000 1 force_out_tb.y 0 -
+7000000 2 force_out_tb.dut.y_seen 0 p2
+7000000 2 force_out_tb.y_seen 0 p2

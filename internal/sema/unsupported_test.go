@@ -23,9 +23,9 @@ type v11Design struct {
 }
 
 // TestV11CorpusClean: every milestone-v1.1 corpus design (prot_cond,
-// gc_heap, psl_comments) analyzes under v1.1 with no error, no opaque
-// or unchecked unit, and exit 0 (#18, #20, #109): every construct it
-// uses is delivered.
+// gc_heap, psl_comments and the six #63 designs) analyzes under v1.1
+// with no error, no opaque or unchecked unit, and exit 0 (#18, #20,
+// #109, #63): every construct it uses is delivered.
 func TestV11CorpusClean(t *testing.T) {
 	b, err := os.ReadFile("../../testdata/corpus/corpus.yaml")
 	if err != nil {

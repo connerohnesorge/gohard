@@ -1,0 +1,12 @@
+gohard-tree 1
+tool ghdl 6.0.0
+sources 23a603a1ae5bf337
+ext_vars_tb [entity]
+`-tb [arch]
+  `-dut [instance]
+    `-ext_vars [entity]
+      `-rtl [arch]
+std.standard [package]
+work.ext_vars_pkg [package]
+work.ext_vars_obj [package]
+std.env [package]

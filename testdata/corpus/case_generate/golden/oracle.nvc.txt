@@ -1,0 +1,98 @@
+gohard-oracle 1
+tool nvc 1.23.0
+sources 838239375678e838
+testbench case_generate_tb
+signal case_generate_tb.a logic 4
+signal case_generate_tb.b logic 4
+signal case_generate_tb.u0.a logic 4
+signal case_generate_tb.u0.b logic 4
+signal case_generate_tb.u0.y logic 4
+signal case_generate_tb.u2.a logic 4
+signal case_generate_tb.u2.b logic 4
+signal case_generate_tb.u2.y logic 4
+signal case_generate_tb.u4.a logic 4
+signal case_generate_tb.u4.b logic 4
+signal case_generate_tb.u4.op_xor.t logic 4
+signal case_generate_tb.u4.y logic 4
+signal case_generate_tb.u9.a logic 4
+signal case_generate_tb.u9.b logic 4
+signal case_generate_tb.u9.y logic 4
+signal case_generate_tb.y0 logic 4
+signal case_generate_tb.y2 logic 4
+signal case_generate_tb.y4 logic 4
+signal case_generate_tb.y9 logic 4
+0 case_generate_tb.a 0000
+0 case_generate_tb.b 0000
+0 case_generate_tb.u0.a 0000
+0 case_generate_tb.u0.b 0000
+0 case_generate_tb.u0.y 0000
+0 case_generate_tb.u2.a 0000
+0 case_generate_tb.u2.b 0000
+0 case_generate_tb.u2.y 0000
+0 case_generate_tb.u4.a 0000
+0 case_generate_tb.u4.b 0000
+0 case_generate_tb.u4.op_xor.t 0000
+0 case_generate_tb.u4.y 0000
+0 case_generate_tb.u9.a 0000
+0 case_generate_tb.u9.b 0000
+0 case_generate_tb.u9.y 1111
+0 case_generate_tb.y0 0000
+0 case_generate_tb.y2 0000
+0 case_generate_tb.y4 0000
+0 case_generate_tb.y9 1111
+10000000 case_generate_tb.a 1100
+10000000 case_generate_tb.b 1010
+10000000 case_generate_tb.u0.a 1100
+10000000 case_generate_tb.u0.b 1010
+10000000 case_generate_tb.u0.y 1000
+10000000 case_generate_tb.u2.a 1100
+10000000 case_generate_tb.u2.b 1010
+10000000 case_generate_tb.u2.y 1110
+10000000 case_generate_tb.u4.a 1100
+10000000 case_generate_tb.u4.b 1010
+10000000 case_generate_tb.u4.op_xor.t 0110
+10000000 case_generate_tb.u4.y 0110
+10000000 case_generate_tb.u9.a 1100
+10000000 case_generate_tb.u9.b 1010
+10000000 case_generate_tb.u9.y 0011
+10000000 case_generate_tb.y0 1000
+10000000 case_generate_tb.y2 1110
+10000000 case_generate_tb.y4 0110
+10000000 case_generate_tb.y9 0011
+20000000 case_generate_tb.a 1010
+20000000 case_generate_tb.b 0110
+20000000 case_generate_tb.u0.a 1010
+20000000 case_generate_tb.u0.b 0110
+20000000 case_generate_tb.u0.y 0010
+20000000 case_generate_tb.u2.a 1010
+20000000 case_generate_tb.u2.b 0110
+20000000 case_generate_tb.u4.a 1010
+20000000 case_generate_tb.u4.b 0110
+20000000 case_generate_tb.u4.op_xor.t 1100
+20000000 case_generate_tb.u4.y 1100
+20000000 case_generate_tb.u9.a 1010
+20000000 case_generate_tb.u9.b 0110
+20000000 case_generate_tb.u9.y 0101
+20000000 case_generate_tb.y0 0010
+20000000 case_generate_tb.y4 1100
+20000000 case_generate_tb.y9 0101
+30000000 case_generate_tb.a 1111
+30000000 case_generate_tb.b 0101
+30000000 case_generate_tb.u0.a 1111
+30000000 case_generate_tb.u0.b 0101
+30000000 case_generate_tb.u0.y 0101
+30000000 case_generate_tb.u2.a 1111
+30000000 case_generate_tb.u2.b 0101
+30000000 case_generate_tb.u2.y 1111
+30000000 case_generate_tb.u4.a 1111
+30000000 case_generate_tb.u4.b 0101
+30000000 case_generate_tb.u4.op_xor.t 1010
+30000000 case_generate_tb.u4.y 1010
+30000000 case_generate_tb.u9.a 1111
+30000000 case_generate_tb.u9.b 0101
+30000000 case_generate_tb.u9.y 0000
+30000000 case_generate_tb.y0 0101
+30000000 case_generate_tb.y2 1111
+30000000 case_generate_tb.y4 1010
+30000000 case_generate_tb.y9 0000
+digest 74 85b94e31142873c1b508d5cda121a43df84b87a54eb311f669d6bd44618bf847

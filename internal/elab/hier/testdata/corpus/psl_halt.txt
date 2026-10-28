@@ -1,0 +1,2 @@
+psl_halt_tb entity work.psl_halt_tb(sim)
+  psl_halt_tb.dut entity work.psl_halt(rtl)

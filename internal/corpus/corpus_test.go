@@ -63,15 +63,17 @@ func loadManifest(t testing.TB) (*Manifest, ReadFunc) {
 }
 
 // TestManifest checks the design list: the 14 designs of #8, the #27
-// gc_heap design, the #109 psl_comments design and the #63 race_order
-// design, sorted, each with a directory, and every file of every run
-// present (a missing file names git submodule update --init, never a
-// skip).
+// gc_heap design, the #109 psl_comments design and the six #63
+// designs (case_generate, delayed_attrs, ext_vars, force_out, psl_halt,
+// race_order), sorted, each with a directory, and every file of every
+// run present (a missing file names git submodule update --init, never
+// a skip).
 func TestManifest(t *testing.T) {
 	m, read := loadManifest(t)
-	want := []string{"assert_fail", "budget_hang", "force_ext",
-		"gc_heap", "hier_generate", "md_resolve", "mode_views",
-		"overload_ops", "postponed_attrs", "prot_cond", "psl_comments",
+	want := []string{"assert_fail", "budget_hang", "case_generate",
+		"delayed_attrs", "ext_vars", "force_ext", "force_out", "gc_heap",
+		"hier_generate", "md_resolve", "mode_views", "overload_ops",
+		"postponed_attrs", "prot_cond", "psl_comments", "psl_halt",
 		"psl_simple", "race_order", "standin_model", "textio_env",
 		"vhdl93_only", "wait_forms"}
 	var got []string

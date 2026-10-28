@@ -1,0 +1,2 @@
+ext_vars_tb entity work.ext_vars_tb(tb)
+  ext_vars_tb.dut entity work.ext_vars(rtl)

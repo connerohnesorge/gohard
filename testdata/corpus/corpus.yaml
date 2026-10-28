@@ -72,6 +72,28 @@ vocabulary:
       semantic: >-
         PSL in `-- psl` comments (psl.comments) with a comment default
         clock (#109, not in the #8 list)
+    - id: case_generate
+      semantic: case generate (#63, not in the #8 list)
+    - id: delayed_vector_resolved
+      semantic: >-
+        'delayed(t) of a vector and of a resolved signal with two drivers
+        (#63, not in the #8 list)
+    - id: external_variable
+      semantic: >-
+        external variable names, through an instance path and a package
+        path (#63, not in the #8 list)
+    - id: external_package_path
+      semantic: >-
+        external names with a package path, @lib.pkg.obj (#63, not in the
+        #8 list)
+    - id: force_out_mode
+      semantic: >-
+        force and release with force mode out on a port of mode out (#63,
+        not in the #8 list)
+    - id: psl_assert_halt
+      semantic: >-
+        a PSL assert halting the run at the default simulation.stop_level
+        (#63, not in the #8 list)
     - id: race_warning
       semantic: >-
         the #29 sim/race warning: a trace that depends on the in-delta
@@ -262,6 +284,234 @@ designs:
     oracle_sha256: 26480e5448a1ab41c592b920393aa66c3ea604405f400416fe733f19c230fb67
     format_oracle_sha256: fc46b6ac8d47033e318591de4c4f503ada8e77b7a4e8e2e214ee25f25b5de7e3
     semerr_sha256: baed22dcaf5c6903f30507da87a21d7e5815a7d74116a9027717a4c86094ddc9
+  - name: case_generate
+    standard: "2008"
+    milestone: v1.1
+    files:
+      - path: case_generate.vhd
+        standard: "2008"
+      - path: case_generate_tb.vhd
+        standard: "2008"
+    top: case_generate
+    testbench: case_generate_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 40 ns
+      messages: []
+    features: [case_generate]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 case_generate.vhd case_generate_tb.vhd;
+        ghdl --elab-run --std=08 case_generate_tb
+      result: pass
+      exit: 0
+      stop_time: 40 ns
+      messages:
+        - "simulation finished @40ns"
+      notes: >-
+        Four instances, OP = 0, 2, 4 and 9, take the alternatives op_and
+        (choice 0), op_or (choice list 1 | 2), op_xor (range 3 to 5, with
+        its own signal t) and op_not (others); four stimuli are checked
+        against each function. --disp-tree=inst shows u0 .. u9 [instance]
+        -> case_generate/rtl/pick [case-generate] without the alternative
+        label, which GoHard's hierarchy names. Finished via std.env.finish
+        at 40 ns. Instantiating OP => 6 instead of 4 (op_not instead of
+        op_xor) is reported at 10 ns as "OP 4: xor" by GHDL, NVC and
+        GoHard.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a case_generate.vhd case_generate_tb.vhd
+        -e case_generate_tb -r
+      result: pass
+      exit: 0
+      stop_time: 40 ns
+      messages:
+        - "** Note: 40ns+0: FINISH called"
+      notes: same outcome as GHDL
+    disagreements:
+      - topic: VCD scope of the signal declared in a case generate
+          alternative (trace oracle)
+        ghdl: does not dump t of u4's op_xor alternative
+        nvc: >-
+          dumps it as case_generate_tb.u4.op_xor.t, under the
+          alternative label without the generate label pick
+        follows: ghdl
+        lrm: n/a
+        notes: >-
+          Dump scopes are outside the LRM. GoHard's trace names the
+          signal case_generate_tb.u4.pick.op_xor.t (the generate label,
+          then the alternative label, as its hierarchy does), so t is
+          compared with no tool; y4, which t drives, is compared with
+          both.
+        signals:
+          - case_generate_tb.u4.op_xor.t
+    trace_sha256: 4fe5a59c3de81b41c5c720d68259c8dc7971d20c261a94bc164c3ef0d5cfc86f
+    oracle_sha256: 9ac19414687d438d3151f0a8a52eccefb758f2fc1fba7edd368983661d191137
+    format_oracle_sha256: 9e8eac29ece7f5cec639083899493f366de2324ec33304416eba30ef4a1c69cd
+    semerr_sha256: 80bb1678b17655891dc8263f30d5d50a2f1e228b2bc47ebbe4c2afe00336faf6
+  - name: delayed_attrs
+    standard: "2008"
+    milestone: v1.1
+    files:
+      - path: delayed_attrs_tb.vhd
+        standard: "2008"
+    top: delayed_attrs_tb
+    testbench: delayed_attrs_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 50 ns
+      messages: []
+    features: [delayed_vector_resolved, signal_attributes]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 delayed_attrs_tb.vhd;
+        ghdl --elab-run --std=08 delayed_attrs_tb
+      result: pass
+      exit: 0
+      stop_time: 50 ns
+      messages:
+        - "simulation finished @50ns"
+      notes: >-
+        v_dly <= v'delayed(5 ns) on a 4-bit std_logic_vector and r_dly <=
+        r'delayed(5 ns) on a std_logic driven by drv_a and drv_b. Checked
+        between events: v_dly is "1010" at 16 ns, "1011" at 18 ns (one
+        element moved at 17 ns, v_dly'last_event = 1 ns, element 0 of
+        v'delayed(5 ns) is '1'), "0000" at 20 ns, "1000" at 25.5 ns (the
+        1 ns pulse on element 3 at 20 ns comes through), "0000" at 27 ns;
+        r_dly is 'Z' at 12 ns, '1' at 16 ns, 'X' at 27 ns (both drivers
+        on since 20 ns), '0' at 37 ns, 'Z' at 47 ns. Finished via
+        std.env.finish at 50 ns. Mutations reported by GHDL, NVC and
+        GoHard alike: v'delayed(4 ns) ("v delayed event at 17 ns" at
+        18 ns), r'delayed(6 ns) ("r delayed at 16 ns") and the inertial
+        `v after 5 ns`, which drops "1010" ("v delayed at 16 ns").
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a delayed_attrs_tb.vhd -e delayed_attrs_tb -r
+      result: pass
+      exit: 0
+      stop_time: 50 ns
+      messages:
+        - "** Note: 50ns+0: FINISH called"
+      notes: same outcome as GHDL
+    disagreements:
+      - topic: initial values of v'delayed(5 ns) and r'delayed(5 ns)
+          (trace oracle)
+        ghdl: >-
+          v_dly and r_dly settle on "0000" and 'Z' at 0 fs, the initial
+          values of v and r
+        nvc: >-
+          v_dly and r_dly stay "UUUU" and 'U' until 5 ns, as if the
+          delayed signals started at the default value of std_logic, as
+          in postponed_attrs
+        follows: ghdl
+        lrm: 16.2.3
+        notes: >-
+          The implicit signal S'DELAYED(T) takes the initial value of S.
+          The trace section compares v_dly and r_dly with the GHDL
+          recording only.
+        signals:
+          - delayed_attrs_tb.r_dly
+          - delayed_attrs_tb.v_dly
+    trace_sha256: 75c6b6c1b59110729dc5ca68da788f26f427d088c322096bba16bd0162658660
+    oracle_sha256: d9717d9c53d50ae9a0c8cfd740d5cfc87f688f593ef6ba6038b4fcf176555d8b
+    format_oracle_sha256: d0c6e24bc83d51d1d6b17629cb96bd159c160f85190df665651dc3ff2db4d817
+    semerr_sha256: e8345b3eefc3b87b5d339d5b65401e448079e672b1d465bfa0502ebe5304ca41
+  - name: ext_vars
+    standard: "2008"
+    milestone: v1.1
+    files:
+      - path: ext_vars_pkg.vhd
+        standard: "2008"
+      - path: ext_vars.vhd
+        standard: "2008"
+      - path: ext_vars_tb.vhd
+        standard: "2008"
+    top: ext_vars
+    testbench: ext_vars_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 7 ns
+      messages: []
+    features: [external_variable, external_package_path]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: ghdl
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 ext_vars_pkg.vhd ext_vars.vhd ext_vars_tb.vhd;
+        ghdl --elab-run --std=08 ext_vars_tb
+      result: pass
+      exit: 0
+      stop_time: 7 ns
+      messages:
+        - "simulation finished @7ns"
+      notes: >-
+        Finished via std.env.finish at 7 ns with no assertion output.
+        External names: the variable <<variable .ext_vars_tb.dut.hits :
+        counter_t>> (a shared variable of the dut architecture), and
+        through package paths <<variable @work.ext_vars_obj.total :
+        counter_t>> and <<constant @work.ext_vars_obj.C_STEP : integer>>.
+        The testbench reads both counters with get and changes them with
+        add; total is then read under its own name (use clause) and
+        holds the change. GHDL needs the use clause of ext_vars_obj in
+        the testbench: without it the package is not elaborated and the
+        package path is "cannot find package". Changing hits.add(10) to
+        add(9) is reported at 7 ns ("external variable after add") by
+        GHDL and GoHard.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a ext_vars_pkg.vhd ext_vars.vhd ext_vars_tb.vhd
+        -e ext_vars_tb -r
+      result: analysis-error
+      exit: 1
+      stop_time: none
+      messages:
+        - "** Error: protected type COUNTER_T has no method named GET"
+        - "** Error: protected type COUNTER_T has no method named ADD"
+      notes: >-
+        NVC 1.23.0 rejects every method call through an external
+        variable name or its alias (ext_vars_tb.vhd lines 34, 35, 39,
+        40 and 43), although counter_t declares get and add; a call
+        through the package's own name (total.get) is accepted. So NVC
+        is not an oracle for this design. It runs the package-path
+        constant alone.
+    disagreements:
+      - topic: method calls through an external variable name
+        ghdl: accepts and runs them on the denoted shared variable
+        nvc: >-
+          rejects them at analysis ("protected type COUNTER_T has no
+          method named GET")
+        follows: ghdl
+        lrm: "8.7"
+        notes: >-
+          An external variable name denotes the shared variable itself,
+          so its protected type's methods apply (LRM 8.7, 5.6.2). The
+          trace oracle is GHDL alone.
+    trace_sha256: bc2d88a8aa2f0566d055d65a8ac576759987f60a607d718a3ec9d0af4b8b68e0
+    oracle_sha256: 21b4a055e78e9108633c53b7630cb73e2b0e410bd672deabe994b0209f3a8c41
+    format_oracle_sha256: 16191d2ee18ceef4de99ca81157403e186d9b66e111c6b439ad92429ee4ba911
+    semerr_sha256: dafe341a1767a4042b51196e48e604b10427ab42c0bf2d3274a83d85a9fa3824
   - name: force_ext
     standard: "2008"
     milestone: v1.0
@@ -327,6 +577,77 @@ designs:
     oracle_sha256: d6d54594d33b03d28a0db0d05c0dc07e1a7fca28ef23f643ab814cc2844b391d
     format_oracle_sha256: 7c16ae3aba230fb4e90c6b22d3bb804c3e88d0cbed8b6081bce316e7b6bff792
     semerr_sha256: 6b8cf8314f1f818ee756eb77ae1e3569eb087fbb5a48ce28b995cba8238e26ed
+  - name: force_out
+    standard: "2008"
+    milestone: v1.1
+    files:
+      - path: force_out.vhd
+        standard: "2008"
+      - path: force_out_tb.vhd
+        standard: "2008"
+    top: force_out
+    testbench: force_out_tb
+    defines: {}
+    models: {}
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 8 ns
+      messages: []
+    features: [force_out_mode]
+    invariants: [seed_independent, variant_stable, self_stopping]
+    oracle: nvc
+    # GHDL 6.0.0 cannot analyze `force out`, so there is no --disp-tree
+    # recording: the hierarchy is a hand-written golden/hierarchy.txt,
+    # reviewed once (#8).
+    hierarchy_oracle: "none, hand-checked"
+    ghdl:
+      version: 6.0.0
+      command: ghdl -a --std=08 force_out.vhd force_out_tb.vhd
+      result: unsupported
+      exit: 1
+      stop_time: none
+      messages:
+        - "force_out_tb.vhd:31:21:error: unexpected token 'out' in a primary"
+      notes: >-
+        GHDL 6.0.0 parses no force mode: `force out`, `release out`,
+        `force in` and `release in` are all syntax errors. It accepts a
+        force without a mode (force_ext).
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a force_out.vhd force_out_tb.vhd -e force_out_tb
+        -r
+      result: pass
+      exit: 0
+      stop_time: 8 ns
+      messages:
+        - "** Note: 8ns+0: FINISH called"
+      notes: >-
+        Finished via std.env.finish at 8 ns with no assertion output.
+        y_port is <<signal .force_out_tb.dut.y : std_logic>>, an out
+        port. `force out '0'` at 1 ns sets y and the value the dut reads
+        back (y_seen) to '0' and holds while a changes; `release out`
+        returns both to not a; `force 'Z'` without a mode (out, the
+        default for a port of mode out, LRM 10.5.2.1) and `release` do
+        the same. Dropping the force out, the release out or the default
+        force is reported by NVC and GoHard ("force out at the actual",
+        "released out", "default force mode"). Replacing the out mode by
+        in changes nothing in either tool, so the design does not tell
+        the two modes apart at a port of mode out.
+    disagreements:
+      - topic: force modes in and out
+        ghdl: rejects `force out` and `release out` as syntax errors
+        nvc: implements both
+        follows: nvc
+        lrm: 10.5.2.1
+        notes: >-
+          GHDL 6.0.0 lacks the force mode syntax, so it is not a semantic
+          disagreement about the design. The trace oracle is NVC alone.
+    trace_sha256: 0a23d77a46ea4b3d7762bed6bb02b13d56e404a62f793b8fd641ea5a1eee6b51
+    oracle_sha256: a6c964f98156e113d916c47aa3db482d17e1e514bb4903b4d87c21c7e96e2e5b
+    format_oracle_sha256: 74f80060055ea8528a7079f6eb2576679da05fad936fddbb61705ed33cec0280
+    semerr_sha256: 8f55e9aa9e72804496f8871b8860bdc2d8c70f982c956297ab9689be03916f74
   - name: gc_heap
     standard: "2019"
     milestone: v1.1
@@ -1079,6 +1400,88 @@ designs:
     oracle_sha256: fe98e3731b9233d8eb9a178365b65554083e8aa8c4cb363d95cc132a34597a0a
     format_oracle_sha256: 71d06d675a599b3b69c20a5a315348410ea6401355b907821a2f81af226be57f
     semerr_sha256: 6a277de424df962600ce1b8b2ae89c9dd3c22dfc9bae3424c47ef43fbc1fdbf8
+  - name: psl_halt
+    standard: "2008"
+    milestone: v1.1
+    files:
+      - path: psl_halt.vhd
+        standard: "2008"
+      - path: psl_halt_tb.vhd
+        standard: "2008"
+    top: psl_halt
+    testbench: psl_halt_tb
+    defines: {}
+    models: {}
+    # No config: the default simulation.stop_level (error) halts the run
+    # at the failing PSL assert (#35).
+    expected:
+      exit: 1
+      status: problems
+      stop_time: 65 ns
+      # Diagnostics in sorted (source) order, #20.
+      messages:
+        - severity: error
+          text: ack did not follow req
+          time: 65 ns
+        - severity: hint
+          text: req then ack
+          time: 35 ns
+    features: [psl_assert_halt, psl_assert_cover]
+    invariants: [seed_independent, variant_stable, fails_by_design]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 psl_halt.vhd psl_halt_tb.vhd; ghdl --elab-run
+        --std=08 psl_halt_tb --assert-level=error
+      result: fail
+      exit: 1
+      stop_time: 65 ns
+      messages:
+        - 'psl_halt.vhd:43:3:@35ns:(psl cover note): req then ack'
+        - 'psl_halt.vhd:40:3:@65ns:(psl assertion error): ack did not follow req'
+        - "ghdl:error: psl assertion failed"
+        - "ghdl:error: simulation failed"
+      notes: >-
+        --assert-level=error (what tools/oracle passes for the default
+        stop_level) makes GHDL halt at the PSL assertion error at 65 ns,
+        so the report at 80 ns and the finish at 100 ns never run.
+        Without it GHDL runs on to the finish, as in psl_simple.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a psl_halt.vhd psl_halt_tb.vhd -e psl_halt_tb -r
+        --exit-severity=error
+      result: fail
+      exit: 1
+      stop_time: 65 ns
+      messages:
+        - '** Note: 35ns+0: req then ack'
+        - '** Error: 65ns+0: ack did not follow req'
+      notes: >-
+        --exit-severity=error makes NVC treat the PSL assertion error as
+        fatal ("this will be treated as a fatal error") and stop at
+        65 ns; psl_simple, recorded without it, runs on. Same events and
+        times as GHDL and GoHard.
+    disagreements:
+      - topic: the time step of the halt in the VCD dump (trace oracle)
+        ghdl: dumps nothing of the 65 ns step in which the assert fails
+        nvc: dumps the rising clk edge of the 65 ns step
+        follows: ghdl
+        lrm: n/a
+        notes: >-
+          Dump content is outside the LRM. GoHard's trace has the 65 ns
+          clk edge, as NVC's dump does; the trace section compares a run
+          the design ended without its final time step, as GHDL dumps
+          one, so clk is compared with GHDL only.
+        signals:
+          - psl_halt_tb.clk
+          - psl_halt_tb.dut.clk
+    trace_sha256: bfe40908a8ef3715db47bf4e7bb71f0ecc486aec5fb3954ffbf4cbf80f87579d
+    oracle_sha256: e068ccc61cf1a65d4211336f3ba0d69f884b8d966ad9747b8e7cca18b5b44a6e
+    format_oracle_sha256: 77c1e4f3d9f6221e065dcc9f07991b2fd0090966015558d89edca2ac4ade64fb
+    semerr_sha256: fece2bcb801acd5939c2a6cded3ff0843eb72617859792dfb32cc41851f9d02b
   - name: psl_simple
     standard: "2008"
     milestone: v1.0

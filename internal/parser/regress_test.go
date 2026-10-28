@@ -70,7 +70,7 @@ func readManifest(t testing.TB) manifest {
 	if err := yaml.Unmarshal(src, &m); err != nil {
 		t.Fatalf("corpus.yaml: %v", err)
 	}
-	if len(m.Designs) != 17 || len(m.Regression) == 0 {
+	if len(m.Designs) != 22 || len(m.Regression) == 0 {
 		t.Fatalf("corpus.yaml: %d designs, %d regression entries",
 			len(m.Designs), len(m.Regression))
 	}
@@ -133,7 +133,7 @@ func missingSubmodule(dir, submodule string, err error) error {
 
 // regressionSources returns the sources of set ("pr" or "nightly"):
 // the bundled std/ieee packages under internal/stdlib,
-// the 17 corpus designs, and the regression entries of the set.
+// the 22 corpus designs, and the regression entries of the set.
 func regressionSources(t *testing.T, set string) []*regSource {
 	t.Helper()
 	m := readManifest(t)
@@ -643,7 +643,7 @@ func checkSource(t *testing.T, s *regSource) (regTally, []regFailure) {
 
 // TestParserRegression is the parser-regression runner (#31, #30): it
 // round-trips every .vhd/.vhdl file of the bundled std/ieee packages
-// (internal/stdlib, each under 2008 and 2019), the 17 corpus designs
+// (internal/stdlib, each under 2008 and 2019), the 22 corpus designs
 // and the regression entries tagged pr in corpus.yaml (with
 // -regression=nightly, also those tagged nightly), and requires zero
 // syntax errors for every file the upstream project expects to

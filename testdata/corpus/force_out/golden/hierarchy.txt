@@ -1,0 +1,8 @@
+# oracle: none, hand-checked (#8, #63). GHDL 6.0.0 cannot analyze the
+# force modes of this design, so there is no --disp-tree recording.
+# Written from the VHDL: force_out_tb(tb) instantiates dut : entity
+# work.force_out, whose rtl has no instances or blocks. No entity has
+# generics. Form: internal/elab/hier Dump; lines starting with # are
+# not compared.
+force_out_tb entity work.force_out_tb(tb)
+  force_out_tb.dut entity work.force_out(rtl)
