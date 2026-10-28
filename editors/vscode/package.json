@@ -2,7 +2,7 @@
   "name": "gohard",
   "displayName": "GoHard",
   "description": "VHDL language server: diagnostics, navigation, formatting, semantic tokens and testbench code lenses from gohard lsp.",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "publisher": "connerohnesorge",
   "license": "MPL-2.0",
   "homepage": "https://github.com/connerohnesorge/gohard/blob/main/docs/editors.md#vs-code",

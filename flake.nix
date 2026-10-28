@@ -14,7 +14,7 @@
   }:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
-      version = "1.1.1";
+      version = "2.0.0";
       # The source copy has no .git, so the Go build info has no
       # vcs.revision: pass the flake's commit (#39). A dirty tree has
       # only dirtyRev ("<sha>-dirty"); with neither, gohard says unknown.
