@@ -741,12 +741,23 @@ picks the newest core it matches, and a later entry that does not
 match that core is `import/dependency-conflict` (a warning): only the
 first pick is imported. A dependency that no core matches is
 `import/unresolved-dependency` (a warning): import fetches nothing,
-so the files of that core are not in `gohard.yaml`.
-A `.core` file over 10 MB is not read, so it matches nothing. Import
-takes at most 100,000 steps (a key or list item read, or a core
+so the files of that core are not in `gohard.yaml`. A `.core` file
+over 10 MB is not read, so it matches nothing.
+
+An open-logic core imports with the base core it depends on
+(`gohard import src/axi/olo_axi_dev.core`: 49 files in `olo`), but
+that `gohard.yaml` does not check as written. The base core's files
+use Synopsys `ieee.std_logic_misc`, which GoHard's bundled `ieee` does
+not have, and its RAMs declare shared variables of a type that is not
+protected, which open-logic's own simulation allows with GHDL
+`-frelaxed-rules`: `lenient: true`. With `lenient: true` and a copy of
+`std_logic_misc` (NVC's `lib/synopsys/std_logic_misc.vhd` without its
+pre-2008 branches) listed under `ieee:`, `gohard check` passes.
+
+Import takes at most 100,000 steps (a key or list item read, or a core
 compared with a `depend:` entry, again each time the search goes back;
-an item a YAML alias reaches counts each time) and reads at most 4 MiB of `.core` files; past that it
-stops with `import/syntax`.
+an item a YAML alias reaches counts each time) and reads at most 4 MiB
+of `.core` files; past that it stops with `import/syntax`.
 
 ### OSVVM `.pro` scripts
 
@@ -806,15 +817,19 @@ script, counting a script included twice twice and the text of a
 `[command]` again at each level of nesting; past that it stops
 with `import/syntax`.
 
-PoC's `src/build.pro` imports 214 files into library `PoC`. Two of
-them use `osvvm_axi4`, which PoC's `regression.tcl` builds from
-`lib/OsvvmLibraries.pro` before `PoC.pro`. That script tests each
-library with `[DirectoryExists X]`, which import does not evaluate. A
-`.pro` that includes `lib/osvvm/osvvm.pro`, `lib/OSVVM-Common` and
-`lib/OSVVM-AXI4` and then `PoC.pro` imports 323 files in 4 libraries,
-and
-`gohard check` passes on PoC's 214 with `lenient: true` (PoC analyzes
-with GHDL `-frelaxed` and NVC `--relaxed`).
+PoC's `src/build.pro` imports 214 files into library `PoC`, once
+`local_configuration.vhdl` exists. That `gohard.yaml` does not check
+as written. Two of the files use `osvvm_axi4`, which PoC's
+`regression.tcl` (plain Tcl, which import does not read) builds from
+`lib/OsvvmLibraries.pro` before `PoC.pro`; that script tests for each
+library with `[DirectoryExists X]`, which import does not evaluate.
+And four files use `others` where the context gives no index range,
+which PoC's `tools/poc.tcl` allows with GHDL `-frelaxed` and NVC
+`--relaxed`, GoHard's `lenient: true`. A `.pro` that includes
+`lib/osvvm/osvvm.pro`, `lib/OSVVM-Common` and `lib/OSVVM-AXI4` (the
+libraries of a recursive checkout) and then `PoC.pro` imports 323
+files in 4 libraries, and with `lenient: true` added `gohard check`
+passes on PoC's 214.
 
 ## How CI checks this guide
 

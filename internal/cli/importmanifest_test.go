@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"io/fs"
+	"maps"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -296,15 +297,48 @@ func TestImportOSVVM(t *testing.T) {
 	}
 }
 
+// checkErrors returns the errors gohard check printed in out, as
+// "file: message" without the position, each counted under the first
+// class that matches it, and fails for an error no class matches.
+func checkErrors(t *testing.T, out string,
+	classes map[string]*regexp.Regexp,
+) map[string]int {
+	t.Helper()
+	line := regexp.MustCompile(`^([^:]+):\d+:\d+: (error\[.*)$`)
+	got := map[string]int{}
+	for l := range strings.Lines(out) {
+		m := line.FindStringSubmatch(strings.TrimSuffix(l, "\n"))
+		if m == nil {
+			continue
+		}
+		e := m[1] + ": " + m[2]
+		known := false
+		for _, name := range slices.Sorted(maps.Keys(classes)) {
+			if classes[name].MatchString(e) {
+				got[name]++
+				known = true
+				break
+			}
+		}
+		if !known {
+			t.Errorf("unexpected error: %s", l)
+		}
+	}
+	return got
+}
+
 // TestImportOpenLogic: gohard import of open-logic's axi core resolves
 // its depend: on the base core among the .core files of the pinned
-// checkout. gohard check of the result, with lenient: true (the GHDL
-// -frelaxed-rules and NVC --relaxed that open-logic's own sim/run.py
-// analyzes with, which no .core file says), reports errors only for
-// Synopsys std_logic_misc, which the bundled ieee does not have (#33):
-// the missing unit and the *_reduce functions it declares. With that
-// package supplied as a user library (NVC's copy, as #54's lint survey
-// supplies it), gohard check passes.
+// checkout and imports 49 files. The gohard.yaml it writes does not
+// check, a known gap of #64's criterion 2, for two reasons no .core
+// file holds. Every open-logic core depends on the base core, whose
+// files use Synopsys ieee.std_logic_misc, which the bundled ieee does
+// not have (#33). And its RAMs declare shared variables of a
+// non-protected type, which open-logic's sim/run.py analyzes with GHDL
+// -frelaxed-rules and NVC --relaxed: lenient: true. The test pins those
+// errors and no other, then adds both, std_logic_misc as a user
+// library (NVC's copy, as #54's lint survey supplies it), and checks
+// that gohard check passes.
 func TestImportOpenLogic(t *testing.T) {
 	olo := pinned(t, "testdata/open-logic")
 	dir := t.TempDir()
@@ -332,28 +366,26 @@ func TestImportOpenLogic(t *testing.T) {
 		}
 		if bytes.Contains(bytes.ToLower(b),
 			[]byte("ieee.std_logic_misc")) {
-			misc = append(misc, f)
+			misc = append(misc, regexp.QuoteMeta(f))
 		}
 	}
-	appendConfig(t, dir, "lenient: true\n")
 	// The other cores' files under the root are context.
 	code, out = gohard(dir, append([]string{"check"}, files...)...)
-	if code > 1 || !strings.Contains(out, "49 files") {
+	if code != 1 || !strings.Contains(out, "49 files") {
 		t.Fatalf("gohard check: exit %d\n%s", code, out)
 	}
-	reduce := regexp.MustCompile(`: error\[sema/undefined\]: ` +
-		`(or|and|xor)_reduce is not declared$`)
-	for l := range strings.Lines(out) {
-		l = strings.TrimSuffix(l, "\n")
-		if !strings.Contains(l, ": error[") {
-			continue
-		}
-		f, _, _ := strings.Cut(l, ":")
-		if !slices.Contains(misc, f) || !strings.Contains(l,
-			"library ieee has no unit std_logic_misc") &&
-			!reduce.MatchString(l) {
-			t.Errorf("error not about std_logic_misc: %s", l)
-		}
+	miscFile := "^(" + strings.Join(misc, "|") + "): "
+	got := checkErrors(t, out, map[string]*regexp.Regexp{
+		"misc": regexp.MustCompile(miscFile + `error\[(library/` +
+			`missing-unit\]: library ieee has no unit std_logic_misc|` +
+			`sema/undefined\]: (or|and|xor)_reduce is not declared$)`),
+		"shared": regexp.MustCompile(`^src/base/vhdl/olo_base_ram_` +
+			`(sdp|sp|tdp)\.vhd: error\[sema/error\]: the type of a ` +
+			`shared variable must be a protected type, not Data_t$`),
+	})
+	if len(misc) != 6 || got["misc"] != 11 || got["shared"] != 3 {
+		t.Errorf("%d files use std_logic_misc; errors: %v\n%s",
+			len(misc), got, out)
 	}
 
 	nvcMisc, err := os.ReadFile(filepath.Join(pinned(t, "testdata/nvc"),
@@ -377,14 +409,15 @@ func TestImportOpenLogic(t *testing.T) {
 	}
 	b = bytes.Replace(b, []byte("libraries:\n"), []byte("libraries:\n"+
 		"  ieee:\n    - synopsys/std_logic_misc.vhd\n"), 1)
-	if err := os.WriteFile(cfg, b, 0o644); err != nil {
+	if err := os.WriteFile(cfg, append(b, "lenient: true\n"...),
+		0o644); err != nil {
 		t.Fatal(err)
 	}
 	code, out = gohard(dir, append([]string{"check"}, files...)...)
 	if code != 0 || !strings.Contains(out, "summary: 0 errors, ") ||
 		!strings.Contains(out, "49 files") {
-		t.Errorf("gohard check with std_logic_misc: exit %d\n%s", code,
-			out)
+		t.Errorf("gohard check with std_logic_misc and lenient: exit "+
+			"%d\n%s", code, out)
 	}
 }
 
@@ -413,11 +446,13 @@ func pinnedNested(t *testing.T, top, sub string) string {
 // a submodule nested in the PoC checkout.
 var pocLibs = []string{"osvvm", "OSVVM-Common", "OSVVM-AXI4"}
 
-// pocRegression is the build order of PoC's regression.tcl as one
-// script: lib/OsvvmLibraries.pro as it runs in a recursive checkout
-// (where [DirectoryExists OSVVM-AXI4] holds), limited to pocLibs, then
-// PoC.pro. The libraries sit outside the project root, as in a project
-// that uses them.
+// pocRegression is the build order of PoC's regression.tcl as one .pro
+// script, which gohard import needs: it reads one project file, and
+// regression.tcl is plain Tcl that builds lib/OsvvmLibraries.pro, then
+// PoC.pro. The first lines are lib/OsvvmLibraries.pro as it runs in a
+// recursive checkout, where [DirectoryExists OSVVM-AXI4] (which import
+// does not evaluate) holds, limited to pocLibs. The libraries sit
+// outside the project root, as in a project that uses them.
 const pocRegression = `include ../lib/osvvm/osvvm.pro
 include ../lib/OSVVM-Common
 include ../lib/OSVVM-AXI4
@@ -426,13 +461,19 @@ include PoC.pro
 
 // TestImportPoC: gohard import of PoC's src/build.pro (the build.pro
 // PoC.pro includes, which sets library PoC and includes the other 33)
-// under the default profile, after PoC's own setup step of writing
-// tb/common/local_configuration.vhdl, imports every file. Imported in
-// the build order of PoC's regression.tcl, after the OSVVM libraries
-// PoC's own checkout pins, gohard check passes on PoC's files, with
-// lenient: true for the GHDL -frelaxed and NVC --relaxed PoC's
-// tools/poc.tcl analyzes with. Every script of the pinned checkouts
-// is read unchanged.
+// under the default profile imports all 214 files, once PoC's own
+// setup step has written tb/common/local_configuration.vhdl, which
+// src/build.pro analyzes (regression.tcl runs WriteLocalConfiguration
+// first). The gohard.yaml it writes does not check, a known gap of
+// #64's criterion 3: two PoC packages use osvvm_axi4 (OSVVM-AXI4, a
+// submodule nested in the PoC checkout), which regression.tcl builds
+// before PoC.pro, and four files leave the range of others to an
+// unconstrained context, which GHDL -frelaxed (set by PoC's
+// tools/poc.tcl) and gohard's lenient: true accept. The test pins those
+// errors and no other. Then it imports PoC's files after the OSVVM
+// libraries in regression.tcl's order (pocRegression), with every
+// script of the pinned checkouts unchanged, adds lenient: true, and
+// checks that gohard check passes on PoC's files.
 func TestImportPoC(t *testing.T) {
 	poc := pinned(t, "testdata/poc")
 	dir := t.TempDir()
@@ -472,6 +513,23 @@ func TestImportPoC(t *testing.T) {
 		}
 	}
 	pocFiles := importedFiles(t, proj)
+	code, out = gohard(proj, append([]string{"check"}, pocFiles...)...)
+	if code != 1 || !strings.Contains(out, " 214 files") {
+		t.Fatalf("gohard check: exit %d\n%s", code, out)
+	}
+	got := checkErrors(t, out, map[string]*regexp.Regexp{
+		"axi4": regexp.MustCompile(`^src/bus/axi4(lite)?/` +
+			`axi4(lite)?_OSVVM\.pkg\.vhdl: error\[(library/unmapped\]: ` +
+			`library (osvvm_axi4|OSVVM_AXI4) is not mapped|` +
+			`sema/undefined\]: (Axi4|InitAxi4)(Lite)?Rec(Type)? is not ` +
+			`declared$)`),
+		"others": regexp.MustCompile(`: error\[sema/error\]: others ` +
+			`needs an index range from the context, and ` +
+			`STD_LOGIC_VECTOR is unconstrained$`),
+	})
+	if got["axi4"] != 14 || got["others"] != 8 {
+		t.Errorf("errors: %v\n%s", got, out)
+	}
 
 	b, err := os.ReadFile(filepath.Join(poc, "PoC.pro"))
 	if err != nil {
