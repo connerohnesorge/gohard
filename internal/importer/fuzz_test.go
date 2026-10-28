@@ -24,7 +24,9 @@ func (f *fuzzFiles) Read(p string) ([]byte, error) {
 	return f.src, nil
 }
 
-func (f *fuzzFiles) IsDir(p string) bool { return strings.Contains(p, "d") }
+func (f *fuzzFiles) Folder(p string) (string, bool) {
+	return "d", strings.Contains(p, "d")
+}
 
 func (f *fuzzFiles) Cores() []string {
 	return []string{"dep/a.core", "../b.core"}

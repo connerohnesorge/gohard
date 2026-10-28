@@ -67,8 +67,9 @@ type Files interface {
 	// Read returns the content of the regular file at p. The error
 	// wraps fs.ErrNotExist when there is none.
 	Read(p string) ([]byte, error)
-	// IsDir reports a folder at p.
-	IsDir(p string) bool
+	// Folder reports a folder at p, and its name: the last element of
+	// its absolute path, so the name of "." or ".." too.
+	Folder(p string) (name string, ok bool)
 	// Cores lists the .core files a depend: may resolve to, other
 	// than the project file itself, in a fixed order.
 	Cores() []string

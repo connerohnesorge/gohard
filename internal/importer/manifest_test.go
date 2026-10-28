@@ -27,11 +27,18 @@ func (m memFiles) Read(p string) ([]byte, error) {
 	return nil, fs.ErrNotExist
 }
 
-func (m memFiles) IsDir(p string) bool {
-	p = path.Clean(p) + "/"
-	return slices.ContainsFunc(slices.Sorted(maps.Keys(m.files)),
-		func(k string) bool { return strings.HasPrefix(k, p) })
+// Folder reports a folder that holds a file of m; the project file's
+// folder is memProject.
+func (m memFiles) Folder(p string) (string, bool) {
+	p = path.Clean(p)
+	name := path.Base(path.Join(memProject, p))
+	return name, p == "." || slices.ContainsFunc(
+		slices.Sorted(maps.Keys(m.files)),
+		func(k string) bool { return strings.HasPrefix(k, p+"/") })
 }
+
+// memProject is the absolute folder of the project file of a memFiles.
+const memProject = "/work/proj"
 
 func (m memFiles) Cores() []string { return m.cores }
 
@@ -131,19 +138,34 @@ lib/osvvm.pro:41:1 hint[import/ignored]: if ignored: not of the form if {expr} {
 }
 
 func TestParseProDefaults(t *testing.T) {
-	// Before any library command OSVVM analyzes into "default"; a
-	// folder include reads NAME.pro and build.pro, those that exist.
+	// Before any library command OSVVM analyzes into "default". A
+	// folder include reads one script, as OSVVM's FindIncludeFile
+	// picks it: NAME.pro (NAME the folder's name without extension,
+	// the real name for "." and ".."), else build.pro; ip/build.pro and
+	// its library tblib are not read.
 	files := memFiles{files: map[string]string{
 		"src/src.pro":    "analyze a.vhd\n",
 		"src/build.pro":  "analyze b.vhd\n",
 		"only/build.pro": "RunTest tb.vhd\n",
 		"named.pro":      "build only\n",
+		"ip/ip.pro":      "library iplib\nanalyze a.vhd\n",
+		"ip/build.pro": "include ip.pro\nlibrary tblib\n" +
+			"analyze tb.vhd\n",
+		"sub/sub.pro":     "include ..\n",
+		"proj.pro":        "analyze top.vhd\ninclude .\n",
+		"build.pro":       "analyze wrong.vhd\n",
+		"ip.v2/ip.pro":    "analyze v2.vhd\n",
+		"ip.v2/build.pro": "analyze wrong.vhd\n",
 	}}
 	checkAll(t, ParsePro("p.pro", []byte("include src\ninclude named\n"+
-		"include empty\n"), files), `src/src.pro:1:9 default src/a.vhd ""
-src/build.pro:1:9 default src/b.vhd ""
+		"include empty\ninclude ip\ninclude sub\ninclude ip.v2\n"),
+		files), `src/src.pro:1:9 default src/a.vhd ""
 only/build.pro:1:9 default only/tb.vhd ""
+ip/ip.pro:2:9 iplib ip/a.vhd ""
+proj.pro:1:9 iplib top.vhd ""
+ip.v2/ip.pro:1:9 iplib ip.v2/v2.vhd ""
 p.pro:3:9 error[import/missing-file]: source file empty.pro does not exist
+proj.pro:2:9 hint[import/ignored]: include proj.pro ignored: the script is already being read, so including it again would never end
 `)
 }
 

@@ -80,8 +80,8 @@ const proDefaultLibrary = "default"
 // ParsePro reads an OSVVM .pro script (#64) the way OSVVM runs it, but
 // without running Tcl: library sets the library of the files that
 // follow ("default" before any), analyze and RunTest give a file,
-// include and build read another script (a folder: its NAME.pro and
-// its build.pro, those that exist; a name without extension: NAME.pro),
+// include and build read another script (a folder: its NAME.pro, else
+// its build.pro; a name without extension: NAME.pro),
 // SetVHDLVersion sets the standard of the files that follow, and
 // if/elseif/else takes the branch its conditions select under
 // proProfile. Paths are relative to the folder of the script that
@@ -229,40 +229,31 @@ func (r *proRun) command(s proScript, c command, depth int) {
 	}
 }
 
-// include reads the script p (relative to the project file's folder)
-// that s names at off: a .pro file; for a folder, its NAME.pro and
-// build.pro, those that exist; for a name without extension, NAME.pro.
+// include reads the one script that the path p (relative to the
+// project file's folder), named by s at off, stands for, as OSVVM's
+// FindIncludeFile picks it: for a folder, NAME.pro when it exists
+// (NAME the folder's own name without extension, also for "." and
+// ".."), else build.pro; for a .pro file, the file; for a name without
+// extension, NAME.pro.
 func (r *proRun) include(s proScript, off int, p string, depth int) {
-	var targets []string
+	t := p
+	name, dir := r.files.Folder(p)
 	ext := strings.ToLower(path.Ext(p))
 	switch {
+	case dir:
+		t = path.Join(p, strings.TrimSuffix(name, path.Ext(name))+".pro")
+		if _, err := r.read(t); errors.Is(err, fs.ErrNotExist) {
+			t = path.Join(p, "build.pro")
+		}
 	case ext == ".pro":
-		targets = []string{p}
-	case r.files.IsDir(p):
-		var tried []string
-		if base := path.Base(p); base != "." && base != ".." &&
-			base != "/" {
-			tried = append(tried, path.Join(p, base+".pro"))
-		}
-		tried = append(tried, path.Join(p, "build.pro"))
-		for _, t := range tried {
-			if _, err := r.read(t); err == nil {
-				targets = append(targets, t)
-			}
-		}
-		if len(targets) == 0 {
-			targets = tried[len(tried)-1:] // reported missing
-		}
 	case ext == "":
-		targets = []string{p + ".pro"}
+		t = p + ".pro"
 	default:
 		r.ignored(s, off, "include "+p, "gohard import reads only "+
 			".pro scripts")
 		return
 	}
-	for _, t := range targets {
-		r.run(s, off, t, depth)
-	}
+	r.run(s, off, t, depth)
 }
 
 // run reads the included script t.

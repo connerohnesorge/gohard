@@ -256,10 +256,11 @@ func (f *importFiles) Read(p string) ([]byte, error) {
 	return b, err
 }
 
-// IsDir reports a folder at p.
-func (f *importFiles) IsDir(p string) bool {
-	fi, err := f.fsys.Stat(f.abs(p))
-	return err == nil && fi.IsDir()
+// Folder reports a folder at p, and its name.
+func (f *importFiles) Folder(p string) (string, bool) {
+	a := f.abs(p)
+	fi, err := f.fsys.Stat(a)
+	return filepath.Base(a), err == nil && fi.IsDir()
 }
 
 // Cores lists the CORE arguments, then every .core file under the

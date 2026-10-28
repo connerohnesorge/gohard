@@ -747,7 +747,8 @@ stops with `import/syntax`.
 A `.pro` script is Tcl. Import reads it the way OSVVM runs it, without
 a Tcl interpreter: `library`, `analyze`, `RunTest` (which analyzes its
 file), `include` and `build` (a `.pro` file; for a folder, its
-`NAME.pro` and its `build.pro`, those that exist; a name without
+`NAME.pro`, NAME being the folder's name, else its `build.pro`, the
+one script OSVVM's `FindIncludeFile` picks; a name without
 extension, `NAME.pro`), `SetVHDLVersion`, and
 `if`/`elseif`/`else`, which reads the branch whose condition is true.
 Conditions and `$variable` substitutions are evaluated over this fixed
