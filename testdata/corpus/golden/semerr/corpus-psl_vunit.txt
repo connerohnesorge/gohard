@@ -15,7 +15,7 @@
 # (semerr_check.go).
 tool ghdl 6.0.0
 tool nvc 1.23.0
-run corpus:psl_vunit:main dir=testdata/corpus/psl_vunit std=08 sha=0b496442e5fc9176
+run corpus:psl_vunit:main dir=testdata/corpus/psl_vunit std=08 sha=1b24a62653957812
  psl_vunit.vhd ghdl=0 nvc=0
  psl_vunit_props.vhd ghdl=0 nvc=1@10
  psl_vunit_tb.vhd ghdl=0 nvc=0

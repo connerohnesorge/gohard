@@ -401,8 +401,8 @@ func (d *Design) instance(in *hier.Instance) {
 // vunit elaborates the PSL verification unit v bound to the entity
 // instance in (#66): its items belong to in's design entity (IEEE 1850
 // 7.2, LRM 7.3.4), so its directives and processes run in in and read
-// in's signals. They are named under in.Path + "." + v's name (a block
-// scope in the trace): tb.dut.v.a1, unlabeled ones _p0, _p1 within v.
+// in's signals. They are named under vunitPath (a block scope in the
+// trace): tb.dut.v@work.a1, unlabeled ones _p0, _p1 within v.
 // A unit sema analyzed against another design entity (one unbound unit
 // bound to two), a structural statement in v and an inherit of other
 // units stop the run with unsupported/construct.
@@ -430,11 +430,20 @@ func (d *Design) vunit(in *hier.Instance, v *sema.Unit) {
 			return
 		}
 	}
-	path := in.Path + "." + string(v.Name)
+	path := vunitPath(in, v)
 	d.Model.Scopes = append(d.Model.Scopes, trace.Scope{Path: path,
 		Kind: trace.Block})
 	d.declarations(in, v.Region, path)
 	d.body(in, v.Body, v.File, path)
+}
+
+// vunitPath is the path of the scope of the PSL verification unit v
+// bound to the instance in: in's path, then v's name and library
+// joined by @ (tb.dut.v@work). No label of in's design entity and no
+// other unit bound to in has that name, as no VHDL identifier holds @
+// outside an extended identifier's backslashes.
+func vunitPath(in *hier.Instance, v *sema.Unit) string {
+	return in.Path + "." + string(v.Name) + "@" + string(v.Library)
 }
 
 // The PSL verification unit constructs the simulator does not run.

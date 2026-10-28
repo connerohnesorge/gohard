@@ -194,13 +194,16 @@ func relocations(g *gp, w [][]bool) []relocated {
 			"  default clock is rising_edge(clk);\n" +
 			"  x: assert " + text + ";\n}\n"
 	}
+	// v names a block of s too: the vunit's scope is v@work, so the
+	// trace has no second scope s.v.
+	block := "v: block begin end block;"
 	return []relocated{
 		{"architecture", "s", map[string]string{
 			"s.vhd": design("", "x: assert "+text+";")}},
 		{"inline vunit", "s", map[string]string{
-			"s.vhd": design("", ""), "v.vhd": vunit("(s(rtl))")}},
+			"s.vhd": design("", block), "v.vhd": vunit("(s(rtl))")}},
 		{"use vunit", "c", map[string]string{
-			"s.vhd": design("", ""), "v.vhd": vunit(""),
+			"s.vhd": design("", block), "v.vhd": vunit(""),
 			"c.vhd": "configuration c of s is\n  use vunit v;\n" +
 				"  for rtl\n  end for;\nend configuration;\n"}},
 		{"use vunit, incremental binding", "c", map[string]string{
@@ -330,11 +333,12 @@ func verdicts(evs []trace.Event) []string {
 // (next_event family included) and random words, `assert P` written
 // in the architecture fails exactly when the reference semantics says
 // P does not hold on the word, and it gives the same events in a vunit
-// bound inline or by use vunit (in a configuration of s, and in a
-// component configuration without an entity aspect, whose instance a
-// configuration specification binds to s(rtl)), as an instance of a
-// property declaration with or without formals, and with its
-// sequences declared.
+// bound inline or by use vunit (in a configuration of s, also when s
+// has a block named like the vunit, and in a component configuration
+// without an entity aspect, whose instance a configuration
+// specification binds to s(rtl)), as an instance of a property
+// declaration with or without formals, and with its sequences
+// declared. simFiles validates every trace.
 func TestRelocatedDirective(t *testing.T) {
 	r := &rng{env.SplitMix64{State: 66}}
 	n := 300

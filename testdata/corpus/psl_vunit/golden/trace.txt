@@ -5,7 +5,7 @@ type integer integer 0 2147483647
 type std_logic logic
 scope psl_vunit_tb instance psl_vunit_tb(sim)
 scope psl_vunit_tb.dut instance psl_vunit(rtl)
-scope psl_vunit_tb.dut.psl_vunit_checks block
+scope psl_vunit_tb.dut.psl_vunit_checks@work block
 signal psl_vunit_tb.ack std_logic signal
 signal psl_vunit_tb.clk std_logic signal
 signal psl_vunit_tb.dut.ack std_logic out
@@ -21,8 +21,8 @@ process 3 psl_vunit_tb.dut._p1
 process 4 psl_vunit_tb.dut._p2
 process 5 psl_vunit_tb.dut._p3
 process 6 psl_vunit_tb.dut.count
-process 7 psl_vunit_tb.dut.psl_vunit_checks.ack_next
-process 8 psl_vunit_tb.dut.psl_vunit_checks.req_ack
+process 7 psl_vunit_tb.dut.psl_vunit_checks@work.ack_next
+process 8 psl_vunit_tb.dut.psl_vunit_checks@work.req_ack
 process 9 psl_vunit_tb.stopper
 0 0 psl_vunit_tb.ack U -
 0 0 psl_vunit_tb.clk 0 -

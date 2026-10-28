@@ -193,8 +193,9 @@ an indication depends on the units it names, except a unit bound to
 that unit itself (a recursive design's configuration specification),
 which would be an import cycle. Elaboration runs a unit's signals and
 statements in every instance it is bound to (`hier.Instance.Vunits`),
-named under the instance path and the unit's name (`tb.dut.v.a1`, a
-block scope in the trace); a directive's default clock is the vunit's
+named under the instance path and the unit's name and library joined
+by `@` (`tb.dut.v@work.a1`, a block scope in the trace), which no label
+of the instance can be; a directive's default clock is the vunit's
 own. A unit bound to two different design entities, an `inherit`, and
 an instance, block or generate statement inside a unit are
 `unsupported/construct` at elaboration. GHDL 6.0.0 runs no vunit item

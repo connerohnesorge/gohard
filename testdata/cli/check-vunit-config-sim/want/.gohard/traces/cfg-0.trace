@@ -4,10 +4,10 @@ end 60000000
 type std_logic logic
 scope tb instance tb(sim)
 scope tb.u1 instance dut(rtl)
-scope tb.u1.v_comp block
+scope tb.u1.v_comp@work block
 scope tb.u2 instance dut(rtl)
-scope tb.u2.v_spec block
-scope tb.v_top block
+scope tb.u2.v_spec@work block
+scope tb.v_top@work block
 signal tb.a std_logic signal
 signal tb.b std_logic signal
 signal tb.clk std_logic signal
@@ -19,9 +19,9 @@ signal tb.u2.b std_logic in
 signal tb.u2.clk std_logic in
 process 1 tb._p0
 process 2 tb._p1
-process 3 tb.u1.v_comp.comp_ab
-process 4 tb.u2.v_spec.spec_pulse
-process 5 tb.v_top.top_ab
+process 3 tb.u1.v_comp@work.comp_ab
+process 4 tb.u2.v_spec@work.spec_pulse
+process 5 tb.v_top@work.top_ab
 0 0 tb.a 0 -
 0 0 tb.b 0 -
 0 0 tb.clk 0 -

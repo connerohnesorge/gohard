@@ -42,8 +42,8 @@
 //     next_a and next_e ranges are unsupported/construct.
 //   - The directives of a PSL verification unit run as processes of
 //     every instance the unit is bound to (elab, #66), named under the
-//     instance path and the unit's name; their default clock is the
-//     unit's own.
+//     instance path and the unit's name@library; their default clock
+//     is the unit's own.
 //   - assume, restrict and fairness do nothing in simulation.
 //   - The std.env PSL API (#18) reads the kernel's PSL state
 //     (sim.Ctx.PSL*): an enabled violation sets PslAssertFailed; a

@@ -2,8 +2,8 @@
 -- psl_vunit(rtl) (#66). Its names are those of the bound design entity:
 -- the port clk and the architecture's signals reqi and acki. Its
 -- directives run in every instance of psl_vunit(rtl) (here
--- psl_vunit_tb.dut, as psl_vunit_tb.dut.psl_vunit_checks.ack_next and
--- .req_ack).
+-- psl_vunit_tb.dut, as psl_vunit_tb.dut.psl_vunit_checks@work.ack_next
+-- and .req_ack).
 --   assert always (req -> next ack)  holds at k = 2, fails at k = 6
 --                                    (65 ns), by design
 --   cover {req; ack}                 hits at k = 3 (35 ns)
