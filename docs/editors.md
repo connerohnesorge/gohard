@@ -7,11 +7,13 @@ v1.0 features are standard LSP: diagnostics, hover, go-to-definition,
 references, rename, completion, document and workspace symbols,
 formatting, folding, highlights, the simulation code lens and the
 "Open waveform" code action. v2 adds semantic tokens (#55, see
-[Semantic tokens](#semantic-tokens)). Neovim is the editor CI checks end to end
-(#38). Helix works with no extension. Zed has an extension in
-`editors/zed` (#65). VS Code support is planned for v2 (#3). The
-configs proposed to nvim-lspconfig, Helix and Zed's extension registry
-are listed under [Upstream configs](#upstream-configs).
+[Semantic tokens](#semantic-tokens)) and signature help and inlay hints
+(#56, see [Signature help and inlay hints](#signature-help-and-inlay-hints)).
+Neovim is the editor CI checks end to end (#38). Helix works with no
+extension. Zed has an extension in `editors/zed` (#65). VS Code support
+is planned for v2 (#3). The configs proposed to nvim-lspconfig, Helix
+and Zed's extension registry are listed under
+[Upstream configs](#upstream-configs).
 
 Install `gohard` on your `PATH` first. Use any of these:
 
@@ -319,6 +321,45 @@ token.
 
 `gohard lsp semantic-tokens --at PATH:1:1 [full|range L:C-L:C]` prints
 the full or range result for a file (`--at` names the file).
+
+## Signature help and inlay hints
+
+Signature help (#56) opens on `(` and `,` inside a subprogram call, a
+procedure call, a generic map or a port map, and on an operand of an
+operator. A call shows every overload the resolver kept: the one the
+call resolves to first (the one hover and go to definition give),
+then the others, each with why it does not fit. A map shows the
+generic or port list of the instantiated entity, component or block.
+Each signature carries its parameters with their class, mode, type
+and default as written. The active parameter is the formal a named
+association names, else the position of a positional one.
+
+Inlay hints come in kinds, each with its own key in `gohard.yaml` or
+the editor settings, all off by default:
+
+| Key | Shows |
+| --- | --- |
+| `inlay_hints.parameter_names` | `formal =>` before each positional actual of a call, generic map or port map |
+| `inlay_hints.types` | `: TYPE` after the name of an object alias without a subtype indication and of a loop parameter |
+| `inlay_hints.values` | `= VALUE` after the value of a constant or a generic default, when static evaluation succeeds within the editor's limit of 1,000,000 steps; a value written as a literal and a composite value of more than 1,024 scalars get none, and an image longer than 40 bytes is cut |
+
+A changed key takes effect at the next request; a client that
+announces `workspace.inlayHint.refreshSupport` is asked to request its
+hints again. A result computed for a snapshot an edit has replaced is
+never sent. In Neovim, turn the display on with
+`vim.lsp.inlay_hint.enable(true)` and the kinds in `settings`:
+
+```lua
+settings = { gohard = { inlay_hints = { parameter_names = true } } },
+```
+
+In Helix, set `display-inlay-hints = true` under `[editor.lsp]` and
+the kinds in `config`.
+
+`gohard lsp signature-help --at PATH:LINE:COL` prints the signature
+help at a position, and `gohard lsp inlay-hints --at PATH:LINE:COL
+[END_LINE:END_COL]` the hints from the position to the end (the end
+of the file without one).
 
 ## Platform notes
 

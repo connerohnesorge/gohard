@@ -524,6 +524,22 @@ last full or delta result of the document, which the State keeps
 (result IDs are a counter, dropped on close), so a replay gives the
 same IDs and edits.
 
+Signature help and inlay hints (#56) are `resolve` queries, like
+navigation.
+`resolve.SignatureHelp` takes the overloads of a call from the
+reference sema recorded at the call's name, the one hover and
+definition answer from, so the three agree; a generic or port map
+gives the formal list of its unit. `resolve.Hints` is a pure function
+of the sema result and the kinds turned on (`inlay_hints.*` in the
+snapshot's configuration): parameter names come from the formals sema
+matched to each positional actual, types from the declarations, and
+values from static evaluation with a fresh evaluator per declaration
+under the editor's 1,000,000-step limit (P7), so a hint does not
+depend on the range asked for or on other hints. Each hint sits on a
+token boundary. With every kind off the analyzer answers without
+waiting for the analysis. A change of the `inlay_hints.*` keys sends
+`workspace/inlayHint/refresh` to a client that supports it.
+
 ## VHDL-2019 in v1.1 (#18, #27)
 
 v1.1 is the release under test (`corpus.Release`); the corpus designs
