@@ -420,3 +420,64 @@ begin
 end;
 `}})
 }
+
+// TestPSLInstanceInParens (#66): a property or sequence instance in
+// parentheses is the instance (FL_Property ::= ( FL_Property )), not a
+// value, in every directive form, also as a whole assert, and its name
+// refers to the declaration.
+func TestPSLInstanceInParens(t *testing.T) {
+	src := `
+library ieee;
+use ieee.std_logic_1164.all;
+entity e is end;
+architecture a of e is
+  signal clk, x, y : std_logic;
+  default clock is rising_edge(clk);
+  property p0 is (x = '1' -> next y = '1');
+  property p1 (boolean l) is always (l -> next y = '1');
+  property pf (property q) is always (x = '1' -> (q));
+  sequence s0 is {x = '1'; y = '0'};
+begin
+  a1: assert always (p0);
+  a2: assert always {s0} |=> (p0);
+  a3: cover {(s0)};
+  a4: assert (p1(x = '1'));
+  a5: assert ((p1(x = '1')));
+  a6: assert pf(next y = '1');
+end;
+`
+	checkMarked(t, []markedCase{{name: "psl", std: "2008", src: src}})
+	r := analyze(t, map[string]string{"e.vhd": src}, func(c *config.Config) {
+		c.Standard = "2008"
+	})
+	// Each prefix is followed by an instance's name.
+	for _, prefix := range []string{"a1: assert always (",
+		"a2: assert always {s0} |=> (", "a3: cover {(", "a4: assert (",
+		"a5: assert (("} {
+		off := nthOffset(src, prefix, 0) + len(prefix)
+		ref, ok := r.RefAt("e.vhd", off)
+		if !ok || ref.Decl == nil || ref.Decl.Kind != DeclPSL {
+			t.Errorf("%s: %+v", prefix, ref.Decl)
+		}
+	}
+}
+
+// TestPSLRecursiveDecl (#66): a property or sequence declaration that
+// instantiates itself is an error (IEEE 1850 does not allow recursion);
+// one that instantiates an earlier declaration twice is not.
+func TestPSLRecursiveDecl(t *testing.T) {
+	checkMarked(t, []markedCase{{name: "psl", std: "2008", src: `
+entity e is end;
+architecture a of e is
+  signal clk, x, y : bit;
+  default clock is clk'event;
+  property p is always (x -> next p); --E
+  property q is (always q) and (always x); --E
+  sequence s is {x; s}; --E
+  property r0 is always (x -> next y);
+  property r1 is (always r0) and (always r0);
+begin
+  a1: assert r1;
+end;
+`}})
+}

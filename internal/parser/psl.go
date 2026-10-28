@@ -328,6 +328,17 @@ func (p *Parser) pslNameAt(i int) cst.Kind {
 	return p.pslNames[pslKey(p.text[r.Start:r.End])]
 }
 
+// pslInstanceAt reports whether the tokens from buffer index i, past
+// opening parentheses, start with the name of a PSL property or
+// sequence declared earlier: `assert p(a, b);` and `assert (p);` are
+// PSL directives (#66).
+func (p *Parser) pslInstanceAt(i int) bool {
+	for n := 0; n < pslStmtScanLimit && p.kindAt(i) == token.LParen; n++ {
+		i = p.visibleAt(i + 1)
+	}
+	return p.pslNameAt(i) != 0
+}
+
 // pslKey is the lookup key of a name: basic identifiers are case
 // insensitive, extended identifiers are not.
 func pslKey(name string) string {
@@ -1258,8 +1269,8 @@ func (x pslParser) parenIsPSL(i int) bool {
 // report or severity clause or the closing `;`.
 func (x pslParser) plainAssert() bool {
 	i := x.visibleAt(x.nthIdx(0) + 1)
-	if x.pslNameAt(i) != 0 {
-		return false // assert p(a, b) of a declared property
+	if x.pslInstanceAt(i) {
+		return false // assert p(a, b) or (p) of a declared property
 	}
 	depth := 0
 	prev := token.KwAssert

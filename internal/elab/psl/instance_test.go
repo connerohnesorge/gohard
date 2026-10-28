@@ -79,15 +79,13 @@ func TestInstances(t *testing.T) {
 }
 
 // TestInstanceUnsupported (#66): a formal parameter inside an HDL
-// expression, a recursive property, an infinite next_event_a range and
-// forall make the directive report unsupported/construct at time 0.
+// expression, an infinite next_event_a range and forall make the
+// directive report unsupported/construct at time 0.
 func TestInstanceUnsupported(t *testing.T) {
 	cases := []struct{ decls, dir, want string }{
 		{"property p (boolean l) is always (l = '1');", "assert p(a);",
 			"a formal parameter of a property or sequence inside an " +
 				"HDL expression"},
-		{"property p is always (a -> next p);", "assert p;",
-			"a recursive property or sequence instance"},
 		{"", "assert always (a -> next_event_a(b)[1 to inf](c));",
 			"an infinite next_event_a or next_event_e range"},
 		{"", "assert forall i in {0 to 1} : always (a -> b);", "forall"},

@@ -92,8 +92,9 @@ const (
 // retired v1.1 unsupported/construct detectors; 4: PSL built-in calls
 // keep their actuals, isunknown is one and a PSL operand is a PSL
 // Boolean, #111; 5: a verification unit keeps its statements and
-// `use vunit` binds, #66).
-const cacheFormat = 5
+// `use vunit` binds, #66; 6: incremental `use vunit` bindings, PSL
+// instances in parentheses and recursive PSL declarations, #66).
+const cacheFormat = 6
 
 var schemaOnce = sync.OnceValue(func() string {
 	return codecSchema + "/" + sourcesHash() + "/" +

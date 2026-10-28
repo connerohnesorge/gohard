@@ -488,8 +488,8 @@ func (p *Parser) assertIsPSL(n int) bool {
 	if i < 0 {
 		return false
 	}
-	if p.pslNameAt(i) != 0 {
-		return true // assert p(a, b) of a declared property
+	if p.pslInstanceAt(i) {
+		return true // assert p(a, b) or (p) of a declared property
 	}
 	depth := 0
 	for steps := 0; steps < maxAssertScan; steps++ {

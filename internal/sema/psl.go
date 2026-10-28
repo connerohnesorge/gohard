@@ -55,9 +55,12 @@ func (a *analyzer) pslTyped(n cst.Node) *Expr {
 
 // pslDeclName reports whether n is a name, or a call with actuals, of
 // a visible PSL declaration (IEEE 1850 6.1.1.1, 6.2.4: a named
-// sequence or property is instantiated by its name), recording the
-// reference.
+// sequence or property is instantiated by its name), in parentheses or
+// not, recording the reference. A declaration that instantiates itself
+// is an error: IEEE 1850 does not allow recursion, and the simulator
+// would expand it without end.
 func (a *analyzer) pslDeclName(n cst.Node) bool {
+	n = UnparenPSL(n)
 	var args cst.AssociationList
 	if n.Kind() == cst.KindCallOrIndexName {
 		c := cst.CallOrIndexName{Node: n}
@@ -77,6 +80,14 @@ func (a *analyzer) pslDeclName(n cst.Node) bool {
 		return false
 	}
 	a.ref(tok, r.Decls[0], RefRead)
+	for x := a.cur; x != nil && !a.quiet; x = x.Parent {
+		if x.Owner == r.Decls[0] {
+			a.semaError(n.Span(), "the declaration of "+tok.Text()+
+				" instantiates "+tok.Text()+", and IEEE 1850 does not "+
+				"allow a recursive property or sequence")
+			break
+		}
+	}
 	// The actuals are typed and recorded for the PSL runner, which
 	// binds them to the formals (#66).
 	nargs := 0
@@ -110,6 +121,20 @@ func (a *analyzer) pslArity(n cst.Node, d *Decl, nargs int) {
 		a.semaError(n.Span(), "an instance of "+d.Text+" needs "+
 			strconv.Itoa(want)+" actuals, not "+strconv.Itoa(nargs))
 	}
+}
+
+// UnparenPSL returns the node inside the parentheses around n, (n) or
+// ((n)), and n when it has none: a property or sequence instance in
+// parentheses is a PSL Boolean to the parser (#66).
+func UnparenPSL(n cst.Node) cst.Node {
+	for range 64 {
+		p, ok := cst.As[cst.ParenExpr](n)
+		if !ok || p.Inner().IsZero() {
+			break
+		}
+		n = p.Inner().Node
+	}
+	return n
 }
 
 // PSLFormals returns the formal parameters of the PSL property or
