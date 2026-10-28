@@ -226,11 +226,17 @@ package q is
 		t.Errorf("value hints:\n%s\nwant\n%s", got, want)
 	}
 	k := HintKinds{Values: true}
-	whole := Hints(r, "a.vhd", 0, len(src), k)
-	mid := strings.Index(src, "  constant C4")
-	half := append(Hints(r, "a.vhd", 0, mid-1, k),
-		Hints(r, "a.vhd", mid, len(src), k)...)
-	if a, b := hintText(src, whole), hintText(src, half); a != b {
-		t.Errorf("whole:\n%s\nhalves:\n%s", a, b)
+	whole := hintText(src, Hints(r, "a.vhd", 0, len(src), k))
+	// Split inside the expensive constants, and after them: a budget
+	// counted from the start of the range would give LAST a hint
+	// in the second half of the second split.
+	for _, at := range []string{"  constant C4", "  constant LAST"} {
+		mid := strings.Index(src, at)
+		half := append(Hints(r, "a.vhd", 0, mid-1, k),
+			Hints(r, "a.vhd", mid, len(src), k)...)
+		if got := hintText(src, half); got != whole {
+			t.Errorf("split at %q: whole:\n%s\nhalves:\n%s", at, whole,
+				got)
+		}
 	}
 }
