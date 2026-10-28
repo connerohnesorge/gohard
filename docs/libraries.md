@@ -785,6 +785,17 @@ Under this profile `osvvm.pro` imports 47 files, and after
 their `deprecated/*_c.vhd` stand-ins; `gohard check` passes on both
 sets.
 
+A command that needs anything else is skipped with an
+`import/ignored` hint at its line: a variable outside the profile
+(`analyze $::poc::myFile`), another `[command]`
+(`if {[DirectoryExists X]}`: then no branch of that `if` is read), a
+command other than the ones above (`puts`, `set`, `simulate`,
+`TestSuite`, PoC's `disabled`), or an `include` of a `.tcl`, `.do`,
+`.files` or `.dirs` file. A script that includes itself is skipped
+the same way. Import reads at most 20,000 commands and 4 MiB of
+script, counting a script included twice twice; past that it stops
+with `import/syntax`.
+
 PoC's `src/build.pro` imports 214 files into library `PoC`. Two of
 them use `osvvm_axi4`, which PoC's `regression.tcl` builds from
 `lib/OsvvmLibraries.pro` before `PoC.pro`. That script tests each
@@ -796,17 +807,6 @@ evaluates neither. A `.pro` that includes `lib/osvvm/osvvm.pro`,
 `ChangeWorkingDirectory` line, imports 323 files in 4 libraries, and
 `gohard check` passes on PoC's 214 with `lenient: true` (PoC analyzes
 with GHDL `-frelaxed` and NVC `--relaxed`).
-
-A command that needs anything else is skipped with an
-`import/ignored` hint at its line: a variable outside the profile
-(`analyze $::poc::myFile`), another `[command]`
-(`if {[DirectoryExists X]}`: then no branch of that `if` is read), a
-command other than the ones above (`puts`, `set`, `simulate`,
-`TestSuite`, PoC's `disabled`), or an `include` of a `.tcl`, `.do`,
-`.files` or `.dirs` file. A script that includes itself is skipped
-the same way. Import reads at most 20,000 commands and 4 MiB of
-script, counting a script included twice twice; past that it stops
-with `import/syntax`.
 
 ## How CI checks this guide
 
