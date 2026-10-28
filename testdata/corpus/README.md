@@ -48,9 +48,14 @@ testdata/corpus/
   `force_out`, `psl_halt` and `race_order`; it also extends
   `textio_env` (a checked-in input file), `vhdl93_only` (a
   non-protected shared variable and the `shared_2002` variant) and
-  `mode_views` (the `--define` variant `define_narrow`). Since the v1.1
-  release the v1.1 designs (`prot_cond`, `gc_heap`, `psl_comments` and
-  the six #63 designs) are required to pass with `expected`. The 8
+  `mode_views` (the `--define` variant `define_narrow`). #66 adds two
+  PSL designs (milestone v1.1): `psl_vunit`, whose directives are in an
+  inline verification unit bound to the design entity, and
+  `psl_named`, with named property and sequence instances and the
+  `next_event` family (and the `formals` variant, a property with
+  formal parameters). Since the v1.1 release the v1.1 designs
+  (`prot_cond`, `gc_heap`, `psl_comments`, the six #63 designs and the
+  two #66 designs) are required to pass with `expected`. The 8
   vhdl-examples are demos and are not part of the corpus.
 * Simulator work files (GHDL `*.cf`/`*.o`, NVC `work/` libraries, waveform
   dumps) never enter the repo. Run the tools in a `/tmp` work dir.
@@ -86,7 +91,7 @@ it directly.
 | `schema` | Manifest schema version, `1`. |
 | `vocabulary.features` | Fixed feature ids: the semantics listed in #8 "Done when" plus the ids added by #27, #109 and #63. Every id must appear in at least one design, and a design may name only these ids (`corpus.ParseManifest` checks both). |
 | `vocabulary.invariants` | Fixed invariant ids a design may claim. |
-| `designs` | The 22 design entries, sorted by `name`. |
+| `designs` | The 24 design entries, sorted by `name`. |
 | `regression` | Parser-regression submodules, sorted by `name`. |
 
 Unknown keys are an error. Lists keep a fixed order (sorted by `name` or
@@ -141,13 +146,13 @@ by `path`) so tools rewrite the file deterministically.
 | --- | --- | --- |
 | `name` | string | Design name; equals the directory name. |
 | `standard` | `"1993"`\|`"2002"`\|`"2008"`\|`"2019"` | Minimum standard of the design (quoted, as in `gohard.yaml`, #28). It is the standard GoHard runs the design under. |
-| `milestone` | `v1.0`\|`v1.1` | Release that must pass it. `prot_cond`, `gc_heap`, `psl_comments` and the six #63 designs are `v1.1`; the other 13 are `v1.0`. The release under test is `corpus.Release` (`v1.1`); a design of a later milestone is a manifest error. |
+| `milestone` | `v1.0`\|`v1.1` | Release that must pass it. `prot_cond`, `gc_heap`, `psl_comments`, the six #63 designs and the two #66 designs are `v1.1`; the other 13 are `v1.0`. The release under test is `corpus.Release` (`v1.1`); a design of a later milestone is a manifest error. |
 | `files` | list | Every source file, in analysis order, each `{path, standard}`. `path` is relative to the design directory; `standard` is the minimum standard of that file. |
 | `top` | string | Design-under-test entity (the unit whose hierarchy and LSP sessions matter). Equals `testbench` when the testbench is the whole design. |
 | `testbench` | string | Portless testbench entity that is the elaboration root, run with `gohard check --sim --tb <testbench>` and by the oracles. |
 | `defines` | map identifier to string | `defines:` passed to GoHard and the oracles (#28). `{}` except in `mode_views`, which needs one user identifier. Built-in identifiers (`VHDL_VERSION`, `TOOL_*`) are never allowed here. |
 | `models` | map `lib.unit` to path | `simulation.models` stand-ins (#35). `{}` except in `standin_model`. Paths are relative to the design directory. A stand-in file is not listed in `files`. |
-| `config` | path | Optional. Design-local `gohard.yaml` (#28), relative to the design directory, loaded by GoHard and `tools/oracle` as the project config. Its `defines` and `simulation.models` must equal the entry's `defines` and `models`. Absent means all #28 defaults. Required whenever `defines` or `models` is non-empty, since #31 takes user identifiers only from `gohard.yaml` `defines:` or `--define`. Used by `mode_views` (`defines: {MV_PROFILE: "wide"}`), `psl_comments` (`psl.comments: true`, which `tools/oracle` passes to GHDL as `-fpsl` and to NVC as `-a --psl`), `psl_simple` (`simulation.stop_level: failure`) and `standin_model` (`allow_opaque`, `simulation.models`). |
+| `config` | path | Optional. Design-local `gohard.yaml` (#28), relative to the design directory, loaded by GoHard and `tools/oracle` as the project config. Its `defines` and `simulation.models` must equal the entry's `defines` and `models`. Absent means all #28 defaults. Required whenever `defines` or `models` is non-empty, since #31 takes user identifiers only from `gohard.yaml` `defines:` or `--define`. Used by `mode_views` (`defines: {MV_PROFILE: "wide"}`), `psl_comments` (`psl.comments: true`, which `tools/oracle` passes to GHDL as `-fpsl` and to NVC as `-a --psl`), `psl_simple`, `psl_named` and `psl_vunit` (`simulation.stop_level: failure`) and `standin_model` (`allow_opaque`, `simulation.models`). |
 | `inputs` | list of paths | Optional. Checked-in data files the design reads while it runs (textio), relative to the design directory; variants read them too. The corpus harness serves them to the interpreter as the project files of the run, as `gohard check --sim` run in the design directory reads them, and `tools/oracle` copies them into every GHDL and NVC work directory and hashes them into each recording's `sources` line. Used by `textio_env` (`textio_env_in.txt`, #63). |
 | `expected` | mapping | GoHard's outcome (see below). Every design, `prot_cond` and `gc_heap` included, runs against it. |
 | `expected_v1_0` | retired | The v1.0 outcome of a v1.1 design (exit 2, `unsupported/construct`) while one of its constructs was not delivered. Retired with the v1.1 release: no design has it, and `corpus.ParseManifest` rejects a manifest that does, since nothing would check it. Its last use is in the git history. |
@@ -262,7 +267,7 @@ before pinning.
 | `subfolder` | Folder inside the submodule that is parsed (checked out alone for `pr` entries); `.` for the whole tree. |
 | `expected_failures` | List of paths or globs, relative to the submodule, of every upstream file that carries the project's own expected-failure data (for GHDL the `testsuite.sh` scripts of `gna/` and `sanity/` plus both VESTS `non_compliant.exp` lists; for NVC `test/regress/testlist.txt` and every `test/test_*.c`). How each kind is read is written as a comment above the entries in `corpus.yaml`. A `.vhd`/`.vhdl` path or glob names source files that are not VHDL (preprocessor templates, documentation snippets) or are invalid upstream: they may fail, and a one-line comment above each such entry gives the reason. `[]` if every file must parse. |
 
-The bundled IEEE packages in `internal/stdlib/` and the 22 corpus designs
+The bundled IEEE packages in `internal/stdlib/` and the 24 corpus designs
 are always part of the PR set and need no entry. gohard-old is not used.
 
 ## Tooling

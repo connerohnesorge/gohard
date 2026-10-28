@@ -1,0 +1,20 @@
+# GoHard formatter oracle (#32): psl_vunit, nvc.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool nvc 1.23.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file psl_vunit.vhd std=2008 sha256=bd1b535c3d68ac6e9d419a04ee7805c276f1ab6e97f003b695019d8c3fba926a formatted=0631b2952d92d1e28c704a38af20d0eb08f211b0e524a674d6720214111aa49e changed
+  exit original=0 formatted=0
+file psl_vunit_props.vhd std=2008 sha256=ce60ac466d399c5669f89917d5a8c781c40edd34b5105015533eb4c319d5e5ef formatted=ce60ac466d399c5669f89917d5a8c781c40edd34b5105015533eb4c319d5e5ef unchanged
+  exit original=1 formatted=1
+  error 10: unexpected identifier while parsing library unit, expecting one of entity, configuration, architecture, package or context
+file psl_vunit_tb.vhd std=2008 sha256=a08acd8e4633631f0c272201c7de39519c0be5b6cea959552a42f333c3167456 formatted=a08acd8e4633631f0c272201c7de39519c0be5b6cea959552a42f333c3167456 unchanged
+  exit original=0 formatted=0
+result new=0

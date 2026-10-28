@@ -1,0 +1,2 @@
+psl_vunit_tb entity work.psl_vunit_tb(sim)
+  psl_vunit_tb.dut entity work.psl_vunit(rtl)

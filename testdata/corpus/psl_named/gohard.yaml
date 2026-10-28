@@ -1,0 +1,4 @@
+# Project config for the psl_named corpus design (#66): run on past the
+# failing asserts to the 100 ns finish, as psl_simple does.
+simulation:
+  stop_level: failure

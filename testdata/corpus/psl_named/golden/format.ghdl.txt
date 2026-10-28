@@ -1,0 +1,23 @@
+# GoHard formatter oracle (#32): psl_named, ghdl.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool ghdl 6.0.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file psl_named.vhd std=2008 sha256=f593fc2d30c7d9b7def6a0e7873402a7081c37d98f62f5ce150ad5ff455032c9 formatted=4dc55d6a121094d815e1fb2e9bd5e555f9a52e1366da98a570bd9b79366eded9 changed
+  exit original=0 formatted=0
+file psl_named_tb.vhd std=2008 sha256=e9b309326fad7c490fceea03bb142ec7be141b85435633ec571413c99137230e formatted=e9b309326fad7c490fceea03bb142ec7be141b85435633ec571413c99137230e unchanged
+  exit original=0 formatted=0
+run formals std=2008
+file psl_named_formals.vhd std=2008 sha256=e3489c8574cf7c324f3b4a0d502f4b00d8166b3f572f5d614b2f5a58a42a2e84 formatted=eb284eb9fc886a143f589d06c89fd7e0a2c82939ce461b928057b9cd7e2f1fd0 changed
+  exit original=2 formatted=2
+file psl_named_tb.vhd std=2008 sha256=e9b309326fad7c490fceea03bb142ec7be141b85435633ec571413c99137230e formatted=e9b309326fad7c490fceea03bb142ec7be141b85435633ec571413c99137230e unchanged
+  exit original=1 formatted=1
+  error 18: unit "psl_named" not found in library "work"
+result new=0

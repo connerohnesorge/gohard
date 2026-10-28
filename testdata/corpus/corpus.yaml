@@ -109,6 +109,18 @@ vocabulary:
       semantic: >-
         conditional analysis, user identifier from --define over defines:
         (in mode_views, #63, not in the #8 list)
+    - id: psl_vunit
+      semantic: >-
+        an inline PSL verification unit bound to a design entity, its
+        directives run in the entity's instances (#66, not in the #8 list)
+    - id: psl_named_instances
+      semantic: >-
+        named PSL property and sequence instances, with and without formal
+        parameters (#66, not in the #8 list)
+    - id: psl_next_event
+      semantic: >-
+        the PSL next_event, next_event_a and next_event_e operators (#66,
+        not in the #8 list)
   invariants:
     - id: seed_independent
       meaning: byte-identical trace at seeds 0-3 (PR) and 64 seeds (nightly)
@@ -1498,6 +1510,145 @@ designs:
     oracle_sha256: e068ccc61cf1a65d4211336f3ba0d69f884b8d966ad9747b8e7cca18b5b44a6e
     format_oracle_sha256: 77c1e4f3d9f6221e065dcc9f07991b2fd0090966015558d89edca2ac4ade64fb
     semerr_sha256: fece2bcb801acd5939c2a6cded3ff0843eb72617859792dfb32cc41851f9d02b
+  - name: psl_named
+    standard: "2008"
+    milestone: v1.1
+    files:
+      - path: psl_named.vhd
+        standard: "2008"
+      - path: psl_named_tb.vhd
+        standard: "2008"
+    top: psl_named
+    testbench: psl_named_tb
+    defines: {}
+    models: {}
+    # simulation.stop_level: failure, so the run goes on past the
+    # error-severity PSL asserts to the 100 ns finish, as psl_simple's.
+    config: gohard.yaml
+    expected:
+      exit: 1
+      status: problems
+      stop_time: 100 ns
+      # Diagnostics in sorted (source) order, #20.
+      messages:
+        - severity: hint
+          text: req then ack
+          time: 35 ns
+        - severity: error
+          text: ack did not follow req
+          time: 65 ns
+        - severity: error
+          text: ack came at 7
+          time: 75 ns
+        - severity: error
+          text: n reached 4 after a req
+          time: 45 ns
+    features: [psl_named_instances, psl_next_event]
+    invariants:
+      - seed_independent
+      - variant_stable
+      - self_stopping
+      - fails_by_design
+    oracle: ghdl
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 psl_named.vhd psl_named_tb.vhd; ghdl --elab-run
+        --std=08 psl_named_tb --psl-report=<tmp>/psl.json
+      result: fail
+      exit: 0
+      stop_time: 100 ns
+      messages:
+        - 'psl_named.vhd:52:3:@35ns:(psl cover note): req then ack'
+        - 'psl_named.vhd:62:3:@45ns:(psl assertion error): n reached 4 after a req'
+        - 'psl_named.vhd:55:3:@65ns:(psl assertion error): ack did not follow req'
+        - 'psl_named.vhd:58:3:@75ns:(psl assertion error): ack came at 7'
+        - simulation finished @100ns
+      notes: >-
+        The same events and times as GoHard. --psl-report lists req_ack
+        "covered" (finished-count 1), ack_next, ack_event and ack_all
+        "failed" (finished-count 1 each) and ack_some "passed". GHDL exits
+        0 after a PSL assertion error, as in psl_simple. GHDL rejects a
+        property or sequence declaration in the architecture's declarative
+        part ("'begin' is expected instead of 'property'"), so the design
+        declares them in the statement part, which GHDL and GoHard accept.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a psl_named.vhd psl_named_tb.vhd -e psl_named_tb -r
+      result: analysis-error
+      exit: 1
+      stop_time: none
+      messages:
+        - >-
+          ** Error: unexpected identifier while parsing concurrent procedure
+          call statement, expecting one of ( or ;
+      notes: >-
+        NVC 1.23.0 parses no property or sequence declaration in an
+        architecture (in the declarative part either), and not the
+        next_event_a and next_event_e forms ("unexpected | while parsing
+        FL property"); next_event alone parses but does not elaborate
+        ("cannot handle PSL kind P_NEXT_EVENT in build_node"). It is not an
+        oracle here.
+    disagreements: []
+    variants:
+      - name: formals
+        standard: "2008"
+        files:
+          - path: psl_named_formals.vhd
+            standard: "2008"
+          - path: psl_named_tb.vhd
+            standard: "2008"
+        expected:
+          exit: 1
+          status: problems
+          stop_time: 100 ns
+          messages:
+            - severity: hint
+              text: req then ack
+              time: 35 ns
+            - severity: error
+              text: ack did not follow req
+              time: 65 ns
+            - severity: error
+              text: ack came at 7
+              time: 75 ns
+            - severity: error
+              text: n reached 4 after a req
+              time: 45 ns
+        ghdl:
+          version: 6.0.0
+          command: >-
+            ghdl -a --std=08 psl_named_formals.vhd psl_named_tb.vhd
+          result: unsupported
+          exit: 2
+          stop_time: none
+          messages:
+            - "rewrite_property: cannot handle N_BOOLEAN_PARAMETER"
+          notes: >-
+            GHDL 6.0.0 crashes at analysis on a property with boolean
+            formals ("GHDL Bug occurred", TYPES.INTERNAL_ERROR at
+            psl-errors.adb:37). The outcome is hand-checked: follows(reqi =
+            '1', acki = '1') is ack_follows with the formals bound, so the
+            events are psl_named's.
+        nvc:
+          version: 1.23.0
+          command: >-
+            nvc --std=2008 -a psl_named_formals.vhd psl_named_tb.vhd -e
+            psl_named_tb -r
+          result: analysis-error
+          exit: 1
+          stop_time: none
+          notes: as psl_named
+        notes: >-
+          A property with boolean formal parameters instantiated with HDL
+          expressions as actuals (#66).
+    trace_sha256: 6b49240c4fa3a67051796828bcb1cb32befb4a51e8ec1c7b55d6f1e497c07a28
+    coverage_sha256: 865c42ce07ea607b478b2e70d81e99be624bd09e5eb5ac500a84fb45793f1f35
+    oracle_sha256: 5d8d6ba15873b32d6f13fe0fb76f6d26c53685ca2adba0f05665c5eede2e9756
+    format_oracle_sha256: 0c51029da727849969d5140ba4a2a9fc092b93a5facc5cb43fafc51542f42c76
+    semerr_sha256: d65f24c5de35b858c86f90575aac23c6eae7aefe678d0cdc0e4cfa32952bdabf
   - name: psl_simple
     standard: "2008"
     milestone: v1.0
@@ -1594,6 +1745,84 @@ designs:
     oracle_sha256: ef9811e748022662bde89003654d0e5fe152ef95b68a8f983f38e98f68c5202d
     format_oracle_sha256: 3991573b856dd572670d95c0f9ef57bdf5fb94b5cfd3452818daf30a90860247
     semerr_sha256: c7a7bb9b018f0a0908a2929afe55ededada06ec2db9e214691643d0aae7b4b96
+  - name: psl_vunit
+    standard: "2008"
+    milestone: v1.1
+    files:
+      - path: psl_vunit.vhd
+        standard: "2008"
+      - path: psl_vunit_props.vhd
+        standard: "2008"
+      - path: psl_vunit_tb.vhd
+        standard: "2008"
+    top: psl_vunit
+    testbench: psl_vunit_tb
+    defines: {}
+    models: {}
+    # simulation.stop_level: failure, so the run goes on past the
+    # vunit's error-severity PSL assert to the 100 ns finish.
+    config: gohard.yaml
+    expected:
+      exit: 1
+      status: problems
+      stop_time: 100 ns
+      # Diagnostics in sorted (source) order, #20.
+      messages:
+        - severity: error
+          text: ack did not follow req
+          time: 65 ns
+        - severity: hint
+          text: req then ack
+          time: 35 ns
+    features: [psl_vunit]
+    invariants:
+      - seed_independent
+      - variant_stable
+      - self_stopping
+      - fails_by_design
+    oracle: "none, hand-checked"
+    hierarchy_oracle: "none, hand-checked"
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 psl_vunit.vhd psl_vunit_props.vhd psl_vunit_tb.vhd;
+        ghdl --elab-run --std=08 psl_vunit_tb --psl-report=<tmp>/psl.json
+      result: unsupported
+      exit: 0
+      stop_time: 100 ns
+      messages:
+        - simulation finished @100ns
+      notes: >-
+        GHDL 6.0.0 analyzes the vunit (with or without -fpsl) but runs none
+        of its items: --psl-report lists no directive, and a report in a
+        process inside the vunit is never printed. The LLVM build of 6.0.0
+        crashes at analysis ("translate: cannot handle
+        IIR_KIND_VUNIT_DECLARATION"). So there is no trace oracle; the
+        golden trace was checked by hand against the comment in
+        psl_vunit_props.vhd: the cover hit at 35 ns and the assert failure
+        at 65 ns, as psl_halt's directives, written in the architecture,
+        give under both tools. The hierarchy has no generate, so it is
+        written by hand too.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a psl_vunit.vhd psl_vunit_props.vhd psl_vunit_tb.vhd
+        -e psl_vunit_tb -r
+      result: analysis-error
+      exit: 1
+      stop_time: none
+      messages:
+        - >-
+          ** Error: unexpected identifier while parsing library unit,
+          expecting one of entity, configuration, architecture, package or
+          context
+      notes: NVC 1.23.0 parses no vunit, with or without --psl.
+    disagreements: []
+    trace_sha256: 068757df1a69092cddab8195279550b29a55ae667b7ccafa0f9c8da1b709a363
+    coverage_sha256: d781a38edcf4ccab101c6c92cd543a4124af2f97bd58db2cb487abf40eeef3ca
+    oracle_sha256: e4cea3a0ec6dc65e11482fd75ce6b8df66f639372525bd98c19984d557f6338c
+    format_oracle_sha256: fa82618a39a7ddb9c30fd3d64249a4e93c4a703f07a70fdfea7e578d6e5f7044
+    semerr_sha256: 3a681e62daf02fc8141c4e2d2839dc75c34afec80a4b93152cda21da2eea42ab
   - name: race_order
     standard: "2008"
     milestone: v1.1

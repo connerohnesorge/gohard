@@ -95,6 +95,21 @@ v1.1, since under v1.0 its units are opaque.
   GHDL and NVC continue a `-- psl` directive across a blank or non-comment
   line up to its `;`; GoHard ends it at the first line that does not
   start with `--`, so a design that relies on that fails in GoHard.
+  `psl_vunit` (#66) has the directives of `psl_halt` in an inline
+  verification unit bound to `psl_vunit(rtl)`; GHDL 6.0.0 analyzes it
+  but runs none of its items and NVC 1.23.0 cannot parse it, so its
+  trace and hierarchy are hand-checked. No design binds a vunit with
+  `use vunit` (a configuration cannot be a corpus testbench, and
+  neither tool parses it): the `check-vunit-config*` fixtures and
+  `TestRelocatedDirective` cover it. `psl_named` (#66) has a sequence
+  instance with formals, a property instance and the `next_event`,
+  `next_event_a!` and `next_event_e` operators, with GHDL as the
+  oracle; its `formals` variant (a property with boolean formals) is
+  hand-checked, since GHDL crashes on it ("cannot handle
+  N_BOOLEAN_PARAMETER"). NVC 1.23.0 parses no PSL declaration in an
+  architecture and none of the three `next_event` forms runs. A formal
+  inside a larger HDL expression (`l = '1'`) is `unsupported/construct`
+  and in no design.
   No design uses the PSL built-in functions (`prev`, `stable`, `rose`,
   `fell`, `onehot`, `onehot0`, `isunknown`, #111). GHDL 6.0.0 crashes
   on the first six ("cannot handle IIR_KIND_PSL_PREV") and does not

@@ -1,0 +1,114 @@
+gohard-trace 1
+testbench psl_vunit_tb
+end 100000000
+type integer integer 0 2147483647
+type std_logic logic
+scope psl_vunit_tb instance psl_vunit_tb(sim)
+scope psl_vunit_tb.dut instance psl_vunit(rtl)
+scope psl_vunit_tb.dut.psl_vunit_checks block
+signal psl_vunit_tb.ack std_logic signal
+signal psl_vunit_tb.clk std_logic signal
+signal psl_vunit_tb.dut.ack std_logic out
+signal psl_vunit_tb.dut.acki std_logic signal
+signal psl_vunit_tb.dut.clk std_logic in
+signal psl_vunit_tb.dut.n integer signal
+signal psl_vunit_tb.dut.req std_logic out
+signal psl_vunit_tb.dut.reqi std_logic signal
+signal psl_vunit_tb.req std_logic signal
+process 1 psl_vunit_tb._p0
+process 2 psl_vunit_tb.dut._p0
+process 3 psl_vunit_tb.dut._p1
+process 4 psl_vunit_tb.dut._p2
+process 5 psl_vunit_tb.dut._p3
+process 6 psl_vunit_tb.dut.count
+process 7 psl_vunit_tb.dut.psl_vunit_checks.ack_next
+process 8 psl_vunit_tb.dut.psl_vunit_checks.req_ack
+process 9 psl_vunit_tb.stopper
+0 0 psl_vunit_tb.ack U -
+0 0 psl_vunit_tb.clk 0 -
+0 0 psl_vunit_tb.dut.ack U -
+0 0 psl_vunit_tb.dut.acki 0 -
+0 0 psl_vunit_tb.dut.clk 0 -
+0 0 psl_vunit_tb.dut.n 0 -
+0 0 psl_vunit_tb.dut.req U -
+0 0 psl_vunit_tb.dut.reqi 0 -
+0 0 psl_vunit_tb.req U -
+0 1 psl_vunit_tb.ack 0 p5
+0 1 psl_vunit_tb.dut.ack 0 p5
+0 1 psl_vunit_tb.dut.req 0 p4
+0 1 psl_vunit_tb.req 0 p4
+5000000 0 psl_vunit_tb.clk 1 p1
+5000000 0 psl_vunit_tb.dut.clk 1 p1
+10000000 0 psl_vunit_tb.clk 0 p1
+10000000 0 psl_vunit_tb.dut.clk 0 p1
+10000000 1 psl_vunit_tb.dut.n 1 p6
+15000000 0 psl_vunit_tb.clk 1 p1
+15000000 0 psl_vunit_tb.dut.clk 1 p1
+20000000 0 psl_vunit_tb.clk 0 p1
+20000000 0 psl_vunit_tb.dut.clk 0 p1
+20000000 1 psl_vunit_tb.dut.n 2 p6
+20000000 2 psl_vunit_tb.dut.reqi 1 p2
+20000000 3 psl_vunit_tb.dut.req 1 p4
+20000000 3 psl_vunit_tb.req 1 p4
+25000000 0 psl_vunit_tb.clk 1 p1
+25000000 0 psl_vunit_tb.dut.clk 1 p1
+30000000 0 psl_vunit_tb.clk 0 p1
+30000000 0 psl_vunit_tb.dut.clk 0 p1
+30000000 1 psl_vunit_tb.dut.n 3 p6
+30000000 2 psl_vunit_tb.dut.acki 1 p3
+30000000 2 psl_vunit_tb.dut.reqi 0 p2
+30000000 3 psl_vunit_tb.ack 1 p5
+30000000 3 psl_vunit_tb.dut.ack 1 p5
+30000000 3 psl_vunit_tb.dut.req 0 p4
+30000000 3 psl_vunit_tb.req 0 p4
+35000000 0 psl_vunit_tb.clk 1 p1
+35000000 0 psl_vunit_tb.dut.clk 1 p1
+35000000 0 ! cover-hit - psl_vunit_props.vhd:16 p8 "req then ack"
+40000000 0 psl_vunit_tb.clk 0 p1
+40000000 0 psl_vunit_tb.dut.clk 0 p1
+40000000 1 psl_vunit_tb.dut.n 4 p6
+40000000 2 psl_vunit_tb.dut.acki 0 p3
+40000000 3 psl_vunit_tb.ack 0 p5
+40000000 3 psl_vunit_tb.dut.ack 0 p5
+45000000 0 psl_vunit_tb.clk 1 p1
+45000000 0 psl_vunit_tb.dut.clk 1 p1
+50000000 0 psl_vunit_tb.clk 0 p1
+50000000 0 psl_vunit_tb.dut.clk 0 p1
+50000000 1 psl_vunit_tb.dut.n 5 p6
+50000000 2 psl_vunit_tb.dut.reqi 1 p2
+50000000 3 psl_vunit_tb.dut.req 1 p4
+50000000 3 psl_vunit_tb.req 1 p4
+55000000 0 psl_vunit_tb.clk 1 p1
+55000000 0 psl_vunit_tb.dut.clk 1 p1
+60000000 0 psl_vunit_tb.clk 0 p1
+60000000 0 psl_vunit_tb.dut.clk 0 p1
+60000000 1 psl_vunit_tb.dut.n 6 p6
+60000000 2 psl_vunit_tb.dut.reqi 0 p2
+60000000 3 psl_vunit_tb.dut.req 0 p4
+60000000 3 psl_vunit_tb.req 0 p4
+65000000 0 psl_vunit_tb.clk 1 p1
+65000000 0 psl_vunit_tb.dut.clk 1 p1
+65000000 0 ! assert error psl_vunit_props.vhd:13 p7 "ack did not follow req"
+70000000 0 psl_vunit_tb.clk 0 p1
+70000000 0 psl_vunit_tb.dut.clk 0 p1
+70000000 1 psl_vunit_tb.dut.n 7 p6
+70000000 2 psl_vunit_tb.dut.acki 1 p3
+70000000 3 psl_vunit_tb.ack 1 p5
+70000000 3 psl_vunit_tb.dut.ack 1 p5
+75000000 0 psl_vunit_tb.clk 1 p1
+75000000 0 psl_vunit_tb.dut.clk 1 p1
+80000000 0 psl_vunit_tb.clk 0 p1
+80000000 0 psl_vunit_tb.dut.clk 0 p1
+80000000 1 psl_vunit_tb.dut.n 8 p6
+80000000 2 psl_vunit_tb.dut.acki 0 p3
+80000000 3 psl_vunit_tb.ack 0 p5
+80000000 3 psl_vunit_tb.dut.ack 0 p5
+85000000 0 psl_vunit_tb.clk 1 p1
+85000000 0 psl_vunit_tb.dut.clk 1 p1
+90000000 0 psl_vunit_tb.clk 0 p1
+90000000 0 psl_vunit_tb.dut.clk 0 p1
+90000000 1 psl_vunit_tb.dut.n 9 p6
+95000000 0 psl_vunit_tb.clk 1 p1
+95000000 0 psl_vunit_tb.dut.clk 1 p1
+100000000 0 psl_vunit_tb.clk 0 p1
+100000000 0 psl_vunit_tb.dut.clk 0 p1

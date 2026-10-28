@@ -1,0 +1,8 @@
+# oracle: none, hand-checked (#8, #66). GHDL 6.0.0 runs no item of the
+# vunit, so the design is not recorded as a GHDL run. Written from the
+# VHDL: psl_vunit_tb(sim) instantiates dut : entity work.psl_vunit,
+# whose rtl has no instances or blocks; the vunit psl_vunit_checks bound
+# to psl_vunit(rtl) adds no instance. No entity has generics. Form:
+# internal/elab/hier Dump; lines starting with # are not compared.
+psl_vunit_tb entity work.psl_vunit_tb(sim)
+  psl_vunit_tb.dut entity work.psl_vunit(rtl)
