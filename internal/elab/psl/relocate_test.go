@@ -217,6 +217,9 @@ func relocations(g *gp, w [][]bool) []relocated {
 				"  end for;\nend configuration;\n"}},
 		{"property instance", "s", map[string]string{
 			"s.vhd": design("property q is "+text+";", "x: assert q;")}},
+		{"property instance in parentheses", "s", map[string]string{
+			"s.vhd": design("property q is "+text+";",
+				"x: assert (q);")}},
 		{"property with formals", "s", map[string]string{
 			"s.vhd": design(params, "x: assert "+call+";")}},
 		{"sequence instances", "s", map[string]string{
@@ -337,8 +340,8 @@ func verdicts(evs []trace.Event) []string {
 // has a block named like the vunit, and in a component configuration
 // without an entity aspect, whose instance a configuration
 // specification binds to s(rtl)), as an instance of a property
-// declaration with or without formals, and with its sequences
-// declared. simFiles validates every trace.
+// declaration with or without formals, in parentheses, and with its
+// sequences declared. simFiles validates every trace.
 func TestRelocatedDirective(t *testing.T) {
 	r := &rng{env.SplitMix64{State: 66}}
 	n := 300

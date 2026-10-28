@@ -34,12 +34,18 @@
 //     the instance is written (#66): a boolean, sequence or property
 //     formal used as an operand, and a const formal used as a count.
 //     A formal inside a larger HDL expression and a recursive instance
-//     are unsupported/construct. next_event(b)[k](p) holds when p holds
-//     at the k-th tick on which b holds, counting the current one;
-//     next_event_a and next_event_e over [i to j] are the conjunction
-//     and the disjunction of those (an infinite range is
-//     unsupported/construct). forall, nested clocks and infinite
-//     next_a and next_e ranges are unsupported/construct.
+//     (sema reports the recursion) are unsupported/construct. An
+//     instance in parentheses is the instance, and an assert of a
+//     property instance has its body's antecedent. next_event(b)[k](p)
+//     holds when p holds at the k-th tick on which b holds, counting
+//     the current one; next_event_a and next_event_e over [i to j] are
+//     the conjunction and the disjunction of those (an infinite range
+//     is unsupported/construct; a count below 1 or an empty range is a
+//     run-time error at elaboration). forall, nested clocks and
+//     infinite next_a and next_e ranges are unsupported/construct. A
+//     directive that expands to more than maxCompile operators
+//     (instances expanded, ranges counted per tick) is a run-time error
+//     at elaboration, before it is built (P7).
 //   - The directives of a PSL verification unit run as processes of
 //     every instance the unit is bound to (elab, #66), named under the
 //     instance path and the unit's name@library; their default clock
@@ -75,10 +81,14 @@
 // semantics after every tick, also across Kernel.Clone; on random
 // properties written as VHDL text a directive fails exactly when the
 // reference semantics says its property does not hold, and gives the
-// same events in a vunit bound inline or by use vunit, as a property
-// instance (with formals) and with its sequences declared (#66); on random
-// sample sequences every built-in's value agrees with a reference that
-// indexes the whole sequence, also from a cloned state; the #111
-// directives fail at the ticks NVC 1.23.0 gives; a call over the
-// sample bound fails at time 0 and one just under it runs.
+// same events in a vunit bound inline or by use vunit (also by an
+// incremental binding, and next to a block named like the vunit), as a
+// property instance (with formals, in parentheses) and with its
+// sequences declared (#66); on random sample sequences every
+// built-in's value agrees with a reference that indexes the whole
+// sequence, also from a cloned state; the #111 directives fail at the
+// ticks NVC 1.23.0 gives; a call over the sample bound fails at time 0
+// and one just under it runs; a directive past maxCompile fails at
+// elaboration and one with 2^8 copies of a property runs; a named
+// property's antecedent is its body's.
 package psl

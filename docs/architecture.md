@@ -203,11 +203,16 @@ and neither GHDL 6.0.0 nor NVC 1.23.0 parses `use vunit`, so these
 outcomes are hand-checked (`psl_vunit`, `check-vunit-*` fixtures).
 
 Named property and sequence instances (with boolean, sequence,
-property and const formals) and `next_event`, `next_event_a` and
-`next_event_e` simulate (`internal/elab/psl`); a formal inside a larger
-HDL expression, nested clocks, `forall`, `ended`, and infinite
-`next_a`, `next_e`, `next_event_a` and `next_event_e` ranges are
-`unsupported/construct` when a directive using them is simulated.
+property and const formals, also in parentheses) and `next_event`,
+`next_event_a` and `next_event_e` simulate (`internal/elab/psl`); a
+formal inside a larger HDL expression, nested clocks, `forall`,
+`ended`, and infinite `next_a`, `next_e`, `next_event_a` and
+`next_event_e` ranges are `unsupported/construct` when a directive
+using them is simulated. A declaration that instantiates itself is
+`sema/error` (IEEE 1850 has no recursion). A `next_event` count below
+1 and an empty range whose bounds are not literals (sema reports
+literal ones), and a directive whose instances expand to more than
+65536 operators (P7), are `sim/runtime-error` at elaboration.
 
 ## Commands
 
