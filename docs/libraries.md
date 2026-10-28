@@ -755,10 +755,12 @@ a Tcl interpreter: `library`, `analyze`, `RunTest` (which analyzes its
 file), `include` and `build` (a `.pro` file; for a folder, its
 `NAME.pro`, NAME being the folder's name, else its `build.pro`, the
 one script OSVVM's `FindIncludeFile` picks; a name without
-extension, `NAME.pro`), `SetVHDLVersion`, and
-`if`/`elseif`/`else`, which reads the branch whose condition is true.
-Conditions and `$variable` substitutions are evaluated over this fixed
-profile: GoHard as an OSVVM tool that supports generic packages and
+extension, `NAME.pro`), `SetVHDLVersion`,
+`ChangeWorkingDirectory DIR` (the script's later relative paths start
+from DIR, as OSVVM-AXI4's scripts use it), and `if`/`elseif`/`else`,
+which reads the branch whose condition is true. Conditions and
+`$variable` substitutions are evaluated over this fixed profile:
+GoHard as an OSVVM tool that supports generic packages and
 the VHDL-2019 packages, and PoC's vendor-free build.
 
 | Variable | Value |
@@ -807,12 +809,10 @@ with `import/syntax`.
 PoC's `src/build.pro` imports 214 files into library `PoC`. Two of
 them use `osvvm_axi4`, which PoC's `regression.tcl` builds from
 `lib/OsvvmLibraries.pro` before `PoC.pro`. That script tests each
-library with `[DirectoryExists X]`, and OSVVM-AXI4's
-`common/build.pro` starts with `ChangeWorkingDirectory ./src`; import
-evaluates neither. A `.pro` that includes `lib/osvvm/osvvm.pro`,
-`lib/OSVVM-Common` and `lib/OSVVM-AXI4` and then `PoC.pro`, with that
-`common/build.pro` moved to `common/src` without its
-`ChangeWorkingDirectory` line, imports 323 files in 4 libraries, and
+library with `[DirectoryExists X]`, which import does not evaluate. A
+`.pro` that includes `lib/osvvm/osvvm.pro`, `lib/OSVVM-Common` and
+`lib/OSVVM-AXI4` and then `PoC.pro` imports 323 files in 4 libraries,
+and
 `gohard check` passes on PoC's 214 with `lenient: true` (PoC analyzes
 with GHDL `-frelaxed` and NVC `--relaxed`).
 

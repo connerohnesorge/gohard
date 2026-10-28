@@ -36,7 +36,8 @@ const proMaxDepth = 100
 // proCommands lists the commands a .pro import reads, for the hint
 // that skips any other.
 const proCommands = "gohard import reads only library, analyze, " +
-	"RunTest, include, build, SetVHDLVersion and if"
+	"RunTest, include, build, SetVHDLVersion, ChangeWorkingDirectory " +
+	"and if"
 
 // proProfile is the fixed variable profile (#64) that .pro if
 // conditions and $variable substitutions are evaluated over: GoHard as
@@ -84,10 +85,11 @@ const proDefaultLibrary = "default"
 // follow ("default" before any), analyze and RunTest give a file,
 // include and build read another script (a folder: its NAME.pro, else
 // its build.pro; a name without extension: NAME.pro),
-// SetVHDLVersion sets the standard of the files that follow, and
+// SetVHDLVersion sets the standard of the files that follow,
+// ChangeWorkingDirectory moves the folder the script's later relative
+// paths start from (the script's own folder at first), and
 // if/elseif/else takes the branch its conditions select under
-// proProfile. Paths are relative to the folder of the script that
-// names them. A $variable outside the profile, a [command] other than
+// proProfile. A $variable outside the profile, a [command] other than
 // OSVVM's FindOsvvmScriptSettingsPkg and FindSettingsPkgBody (which
 // give their default files) and string compare, and any other
 // command skip their command (for if, every branch) with an
@@ -99,7 +101,8 @@ func ParsePro(name string, src []byte, files Files) Project {
 	self := path.Base(name)
 	r := &proRun{files: files, main: name, stack: []string{self},
 		srcs: map[string][]byte{}}
-	r.script(proScript{dir: ".", src: src, l: newLines(name, src)}, 0,
+	dir := "."
+	r.script(proScript{dir: &dir, src: src, l: newLines(name, src)}, 0,
 		len(src), 0)
 	return r.p
 }
@@ -125,7 +128,11 @@ type proRun struct {
 
 // proScript is one script being read.
 type proScript struct {
-	dir string // its folder, relative to the project file's folder
+	// dir is the folder its relative paths start from, relative to the
+	// project file's folder: the script's own folder until
+	// ChangeWorkingDirectory changes it. The if branches of the script
+	// share it, as they share OSVVM's CurrentWorkingDirectory.
+	dir *string
 	src []byte
 	l   lines
 }
@@ -218,7 +225,7 @@ func (r *proRun) command(s proScript, c command, depth int) {
 		if lib == "" {
 			lib = proDefaultLibrary
 		}
-		e, d := s.l.file(join(s.dir, v), lib, r.std, args[0].Off)
+		e, d := s.l.file(join(*s.dir, v), lib, r.std, args[0].Off)
 		if d != nil {
 			r.p.Diagnostics = append(r.p.Diagnostics, *d)
 			return
@@ -226,7 +233,11 @@ func (r *proRun) command(s proScript, c command, depth int) {
 		r.p.Entries = append(r.p.Entries, e)
 	case "include", "build":
 		if v, ok := arg("script"); ok {
-			r.include(s, args[0].Off, join(s.dir, v), depth)
+			r.include(s, args[0].Off, join(*s.dir, v), depth)
+		}
+	case "ChangeWorkingDirectory":
+		if v, ok := arg("folder"); ok {
+			*s.dir = join(*s.dir, v)
 		}
 	case "SetVHDLVersion":
 		v, ok := arg("version")
@@ -300,7 +311,8 @@ func (r *proRun) run(s proScript, off int, t string, depth int) {
 		return
 	}
 	r.stack = append(r.stack, t)
-	r.script(proScript{dir: path.Dir(t), src: src,
+	dir := path.Dir(t)
+	r.script(proScript{dir: &dir, src: src,
 		l: newLines(shown, src)}, 0, len(src), depth+1)
 	r.stack = r.stack[:len(r.stack)-1]
 }

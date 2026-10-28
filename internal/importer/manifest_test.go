@@ -126,7 +126,7 @@ lib/osvvm.pro:32:11 sublib Gen2019.vhd "2019"
 lib/osvvm.pro:35:11 sublib ClockResetPkg.vhd "2019"
 lib/osvvm.pro:21:1 hint[import/ignored]: analyze ignored: it uses $::poc::boardFile, which the import profile does not set
 lib/osvvm.pro:22:4 hint[import/ignored]: if ignored: it uses [DirectoryExists ...], which gohard import does not evaluate
-lib/osvvm.pro:25:1 hint[import/ignored]: puts ignored: gohard import reads only library, analyze, RunTest, include, build, SetVHDLVersion and if
+lib/osvvm.pro:25:1 hint[import/ignored]: puts ignored: gohard import reads only library, analyze, RunTest, include, build, SetVHDLVersion, ChangeWorkingDirectory and if
 lib/osvvm.pro:27:9 error[import/missing-file]: source file lib/missing.pro does not exist
 lib/osvvm.pro:28:9 hint[import/ignored]: include helper.tcl ignored: gohard import reads only .pro scripts
 lib/osvvm.pro:29:9 hint[import/ignored]: include osvvm.pro ignored: the script is already being read, so including it again would never end
@@ -166,6 +166,29 @@ proj.pro:1:9 iplib top.vhd ""
 ip.v2/ip.pro:1:9 iplib ip.v2/v2.vhd ""
 p.pro:3:9 error[import/missing-file]: source file empty.pro does not exist
 proj.pro:2:9 hint[import/ignored]: include proj.pro ignored: the script is already being read, so including it again would never end
+`)
+}
+
+// TestParseProWorkingDirectory checks OSVVM's ChangeWorkingDirectory
+// (OSVVM-AXI4's common/build.pro starts with ChangeWorkingDirectory
+// ./src): it moves the folder later relative paths of its script start
+// from, also when an if branch calls it, and not those of the script
+// that included it.
+func TestParseProWorkingDirectory(t *testing.T) {
+	files := memFiles{files: map[string]string{
+		"common/build.pro": "library axi\n" +
+			"ChangeWorkingDirectory ./src\nanalyze A.vhd\n" +
+			"if {1} {\n  ChangeWorkingDirectory ../alt\n}\n" +
+			"analyze B.vhd\ninclude more\nanalyze D.vhd\n",
+		"common/alt/more/build.pro": "analyze C.vhd\n" +
+			"ChangeWorkingDirectory ..\n",
+	}}
+	checkAll(t, ParsePro("p.pro", []byte("include common\n"+
+		"analyze top.vhd\n"), files), `common/build.pro:3:9 axi common/src/A.vhd ""
+common/build.pro:7:9 axi common/alt/B.vhd ""
+common/alt/more/build.pro:1:9 axi common/alt/more/C.vhd ""
+common/build.pro:9:9 axi common/alt/D.vhd ""
+p.pro:2:9 axi top.vhd ""
 `)
 }
 

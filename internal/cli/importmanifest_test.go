@@ -431,7 +431,8 @@ include PoC.pro
 // the build order of PoC's regression.tcl, after the OSVVM libraries
 // PoC's own checkout pins, gohard check passes on PoC's files, with
 // lenient: true for the GHDL -frelaxed and NVC --relaxed PoC's
-// tools/poc.tcl analyzes with.
+// tools/poc.tcl analyzes with. Every script of the pinned checkouts
+// is read unchanged.
 func TestImportPoC(t *testing.T) {
 	poc := pinned(t, "testdata/poc")
 	dir := t.TempDir()
@@ -472,28 +473,7 @@ func TestImportPoC(t *testing.T) {
 	}
 	pocFiles := importedFiles(t, proj)
 
-	// OSVVM-AXI4's common/build.pro starts with ChangeWorkingDirectory
-	// ./src, which gohard import does not evaluate: the rest of that
-	// script, moved to common/src, analyzes the same files.
-	common := filepath.Join(dir, "lib", "OSVVM-AXI4", "common")
-	b, err := os.ReadFile(filepath.Join(common, "build.pro"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	head, rest, ok := bytes.Cut(b, []byte("ChangeWorkingDirectory ./src\n"))
-	if !ok {
-		t.Fatalf("OSVVM-AXI4/common/build.pro has no "+
-			"ChangeWorkingDirectory ./src:\n%s", b)
-	}
-	if err := os.WriteFile(filepath.Join(common, "src", "build.pro"),
-		append(head, rest...), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(common, "build.pro"),
-		[]byte("include ./src\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	b, err = os.ReadFile(filepath.Join(poc, "PoC.pro"))
+	b, err := os.ReadFile(filepath.Join(poc, "PoC.pro"))
 	if err != nil {
 		t.Fatal(err)
 	}
