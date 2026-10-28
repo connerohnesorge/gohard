@@ -1,0 +1,7 @@
+t.vhd:11:3: error[sim/assert-error]: assertion error: assertion x2 failed
+t.vhd:12:3: error[sim/assert-error]: assertion error: assertion x3 failed
+t.vhd:13:3: error[sim/assert-error]: assertion error: assertion x4 failed
+t.vhd:14:3: error[sim/assert-error]: assertion error: assertion x5 failed
+t.vhd:15:3: error[sim/assert-error]: assertion error: assertion x6 failed
+t.vhd:16:3: error[sim/assert-error]: assertion error: assertion x7 failed
+summary: 6 errors, 0 warnings, 0 hints, 1 files

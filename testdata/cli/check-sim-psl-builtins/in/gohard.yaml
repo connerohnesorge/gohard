@@ -1,0 +1,6 @@
+# The rows of #111, one directive each, on the issue's reproducer. With
+# the default stop_level (error) the run would halt at the first
+# failure, at 5 ns; halting only on failure runs every directive to
+# 100 ns, as NVC 1.23.0 does. x1 and x8 hold; the others fail.
+simulation:
+  stop_level: failure
