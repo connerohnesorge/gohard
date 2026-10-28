@@ -51,6 +51,10 @@ go go1.27.2
   branch and PSL cover coverage as lcov files under `.gohard/coverage/`
   (`genhtml` reads them); `gohard coverage merge` sums several runs.
 * `gohard lsp` is the language server over stdio.
+* `gohard dap` debugs a testbench over the Debug Adapter Protocol
+  (prototype, Neovim through nvim-dap): breakpoints on statements,
+  stepping forward and back, variables and signals
+  ([docs/editors.md](docs/editors.md#debugging-prototype)).
 * `gohard import FILE` writes `gohard.yaml` from a ModelSim `.do`,
   Vivado `.xpr`, Quartus `.qsf`, FuseSoC `.core` or OSVVM `.pro` file
   ([docs/libraries.md](docs/libraries.md)).

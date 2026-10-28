@@ -76,6 +76,8 @@ Env, maps SIGINT/SIGTERM to 130/143, and calls `cli.Run`.
 | 6 | `internal/trace` | lossless native trace, `Writer`/`Recorder` fed by the kernel, canonical text form (grammar in `doc.go`), value lookup; exports in `trace/vcd`, `trace/fst` and `trace/ghw` (pure Go, fixed bytes); `trace/waveform` is "Open waveform" | #36, #60 |
 | 6 | `internal/coverage` | the coverage of a simulation run: the coverable statements of the design's units, the collector the run installs as its `sema.StmtHook`, lcov encode, parse and merge | #62 |
 | 6 | `internal/repro` | repro files and session headers (`"schema":1`) | #29 |
+| 7 | `internal/simdbg` | the simulation debugger: breakpoints, stepping forward and back by replay from `simrun.Checkpoint`s, the state at each stop; see [Debugger](#debugger-68) | #68 |
+| 7 | `internal/dap` | the Debug Adapter Protocol state machine of `gohard dap` over a `simdbg.Session` | #68 |
 | 7 | `internal/ide` | LSP features as pure functions of a snapshot | #25 |
 | 7 | `internal/jsonrpc2` | hand-rolled JSON-RPC 2.0 framing; the only goroutines (stdio reader and writer) | #25 |
 | 7 | `internal/protocol` | LSP 3.17 types generated from `metaModel.json` | #25 |
@@ -185,6 +187,7 @@ wipes existing GitHub alerts.
 | `gohard lsp <action> --at PATH:LINE:COL` | one LSP action on the server's code path; `lsp sim` (with `--env`, `--real-env`), `lsp replay FILE` | #26, #18 |
 | `gohard trace export --format vcd\|fst\|ghw` | export a native trace; see [Trace exports](#trace-exports) | #36, #60 |
 | `gohard coverage merge FILE... [-o OUT]` | sum lcov coverage files; see [Coverage](#coverage) | #62 |
+| `gohard dap` | the simulation debugger over the Debug Adapter Protocol on stdio (prototype); see [Debugger](#debugger-68) | #68 |
 | `gohard import FILE [CORE...]` | write `gohard.yaml` from a ModelSim `.do`, Vivado `.xpr`, Quartus `.qsf`, FuseSoC `.core` or OSVVM `.pro` file (`--dir`, `--format`; CORE: more `.core` files a `depend:` may resolve to) | #2, #64 |
 | `gohard libs detect [--write]` | find vendor library sources | #1 |
 | `gohard version` | prints `version`, `commit`, `ieee` (bundled IEEE tag and commit) and `go` lines; `unknown` when not known | #20, #39 |
@@ -294,6 +297,88 @@ project-relative, so `genhtml --branch-coverage -o html
   form against hand-worked counts, and `TestGenhtml` (CI job `genhtml`)
   has lcov 2's `genhtml --branch-coverage` read the goldens without a
   warning.
+
+## Debugger (#68)
+
+`gohard dap` debugs one testbench run over the Debug Adapter
+Protocol on stdio (prototype; Neovim through nvim-dap, see
+[editors.md](editors.md#debugging-prototype)). The launch request
+names the testbench and seed (`testbench`, `seed`, `stopOnEntry`);
+the adapter analyzes the project of its working directory as
+`gohard check --sim --tb TB --seed N` does, with the same
+configuration, std.env environment and run directory, and refuses a
+design with errors. Besides the analysis cache, which that analysis
+uses as `check` does, it writes no file: no trace, repro or run
+folder.
+
+* Position: a point of a run is its statement count, the number of
+  statements the interpreter has started since the kernel's
+  initialization. The interpreter tells an `elab.DebugHook`
+  (installed with `simrun.Options.Hook`, the `sema.StmtHook` of #62)
+  where each statement runs (`ProcStmt`: process, call depth, place,
+  and through `elab.At` the call stacks, variables and signals), and
+  the hook may halt the run before the statement executes
+  (`elab.ErrHalted`, the kernel then ends the run). Statements of
+  pure functions, which the evaluator runs, are not stops; procedures,
+  impure functions and the functions the interpreter runs itself are
+  (`elab.Interpreted`).
+* Replay: a run is a pure function of its options and seed (P1), so
+  a count names one state, and `simdbg.Session` reaches it by
+  replaying: a run is never kept suspended inside a process. The
+  session keeps checkpoints (`simrun.Checkpoint`: a
+  `sim.Kernel.Clone`, a copy of the trace recorded so far and of the
+  files written so far) at the start of every kernel cycle it stopped
+  in, at most 16 (past that it drops every other one but the first).
+  A move forward replays from the latest checkpoint before the
+  current stop until a statement the move accepts, halts there, keeps
+  the state and throws the halted kernel away, then replays once more
+  to the start of that cycle for the next checkpoint. A move back
+  scans the checkpoint intervals from the latest back for the last
+  statement it accepts and then moves forward to that count, so
+  reverse stepping lands on the state stepping forward gives.
+  `next`, `stepIn` and `stepOut` follow the stopped process (at the
+  same or an outer call depth, any depth, an outer depth); `stepBack`
+  is `next` backwards and `reverseContinue` goes back to a breakpoint;
+  every move also stops at a breakpoint it meets first. Replays run
+  under the run's budgets (P7), and the shell's cancellation is
+  polled every 256 cycles.
+* Protocol: `dap.Server.Handle` takes one message and returns the
+  messages to send; the shell reads a frame (the LSP base protocol,
+  `jsonrpc2.ReadFrame`) and writes the answers before it reads the
+  next, so no goroutine is involved and a move cannot be paused.
+  Threads are the processes the interpreter runs (`threadId` is the
+  model index plus one); each frame has the scopes Locals (its
+  constants, variables and parameters) and Signals (the signals of
+  its process's design entity instance and the blocks and generates
+  around it), values written as messages write them and cut at 4096
+  bytes. The stopped event's description gives the time, delta and
+  statement count. At the end of the run the adapter sends the
+  report `gohard check --sim` gives for the run as output, then
+  `exited` with its exit code and `terminated`.
+* Tests: `TestDAPStdio` (`cmd/gohard`) drives the built binary over
+  real pipes with nvim-dap's requests on `wait_forms` and
+  `assert_fail`. `TestReplayTrace` (`internal/simdbg`) continues
+  every simulating corpus design from breakpoint to breakpoint on
+  every statement line (up to 300 stops) at seeds 0 and 1 and
+  requires the trace bytes, status, diagnostics and assert counts of
+  the run without the debugger. `TestReverseStep` walks every
+  simulating corpus design with seeded forward moves and requires
+  each `stepBack` after a step at one call depth to land on the stop
+  the step came from with the same state, and every move back to
+  land on the state the walk, or a new session moving straight to
+  that count, recorded there; a failure prints its walk seed
+  (`-simdbg.walk=N`).
+* Limits: no pause, no watch expressions or `evaluate`, no setting of
+  values; composite values are one line of text; columns are UTF-8
+  byte columns. A move that reaches the end of the run ends the
+  session, so there is no stepping back from the end. The runs
+  replayed from one session's checkpoints share the interpreter's
+  file door, which each resume resets to the checkpoint's files, so
+  they are stepped one at a time. Every stop copies the values of
+  all the run's processes and signals, and every checkpoint the
+  kernel and the trace so far, so a large design stops slower and
+  holds up to 16 such copies. "Run to time T" and VS Code (#3) are
+  not done.
 
 ## Files GoHard writes
 

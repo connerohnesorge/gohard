@@ -179,6 +179,46 @@ Neovim (`nvim --headless --clean`) through `editors/nvim/test/e2e.lua`:
 CI runs it on Linux (`scripts/ci/nvim.sh`). Run it locally with
 `nix develop -c bash editors/nvim/test/run.sh`.
 
+### Debugging (prototype)
+
+`gohard dap` is a simulation debugger that speaks the Debug Adapter
+Protocol on stdio (#68). With
+[nvim-dap](https://github.com/mfussenegger/nvim-dap) installed,
+`editors/nvim/lua/gohard/dap.lua` registers the adapter and a launch
+configuration for VHDL buffers:
+
+```lua
+require('gohard.dap').setup({
+  -- Every key is optional; these are the defaults.
+  cmd = { 'gohard', 'dap' },
+  testbench = nil,     -- asked for when nil; empty: the only testbench
+  seed = 0,            -- the simulation seed, as --seed
+  stopOnEntry = false, -- stop at the run's first statement
+})
+```
+
+The adapter analyzes the project of the configuration's `cwd`
+(`${workspaceFolder}`, the folder Neovim was started in) as `gohard
+check --sim --tb TB --seed N` does and debugs that run. Set a
+breakpoint on a sequential statement (`:DapToggleBreakpoint`) and
+start with `:DapContinue`:
+
+* every process is a thread; each frame has the scopes Locals (its
+  constants, variables and parameters) and Signals (the signals its
+  process sees)
+* step over, into and out of procedures, continue, and step back and
+  reverse continue (`require('dap').step_back()`,
+  `require('dap').reverse_continue()`); the stop's description shows
+  the simulated time, the delta and the statement count
+* at the end of the run the console shows the report `gohard check
+  --sim` gives, and the session ends with its exit code
+
+Statements of pure functions are not stops, a running move cannot be
+paused, and values cannot be changed. The debugger replays the run
+from checkpoints instead of keeping it suspended, so a run with
+breakpoints gives the same trace as one without them; the design is
+in [architecture.md](architecture.md#debugger-68).
+
 ## Helix
 
 Helix connects over stdio with no extension. The change proposed to
