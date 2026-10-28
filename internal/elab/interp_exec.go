@@ -33,14 +33,15 @@ func (m *machine) exec(n *node) (sim.Wait, bool, error) {
 		}
 		return sim.Wait{}, false, m.assignVar(s.Target, v)
 	case sema.SeqCondVarAssign:
-		for _, br := range s.Branches {
+		for i, br := range s.Branches {
 			ok, err := ev.Cond(br.Cond, b)
 			if err != nil {
 				return sim.Wait{}, false, err
 			}
 			if ok {
+				m.branch(s, i)
 				if br.Value == nil {
-					break
+					return sim.Wait{}, false, nil
 				}
 				v, err := m.evalFor(br.Value, s.Target)
 				if err != nil {
@@ -49,11 +50,16 @@ func (m *machine) exec(n *node) (sim.Wait, bool, error) {
 				return sim.Wait{}, false, m.assignVar(s.Target, v)
 			}
 		}
+		m.branch(s, len(s.Branches))
 	case sema.SeqSelVarAssign:
 		i, err := m.choose(s.Selector, altChoices(s.Alts), altOthers(s.Alts),
 			s.Matching)
-		if err != nil || i < 0 || s.Alts[i].Value == nil {
+		if err != nil || i < 0 {
 			return sim.Wait{}, false, err
+		}
+		m.branch(s, i)
+		if s.Alts[i].Value == nil {
+			return sim.Wait{}, false, nil
 		}
 		v, err := m.evalFor(s.Alts[i].Value, s.Target)
 		if err != nil {
@@ -75,10 +81,12 @@ func (m *machine) exec(n *node) (sim.Wait, bool, error) {
 				return sim.Wait{}, false, err
 			}
 			if ok {
+				m.branch(s, i)
 				m.push(n.branches[i], nil)
 				return sim.Wait{}, false, nil
 			}
 		}
+		m.branch(s, len(s.Branches))
 		m.push(n.els, nil)
 	case sema.SeqCase:
 		i, err := m.choose(s.Selector, altChoices(s.Alts),
@@ -90,6 +98,7 @@ func (m *machine) exec(n *node) (sim.Wait, bool, error) {
 			return sim.Wait{}, false, errors.New("no case choice " +
 				"covers the selector value")
 		}
+		m.branch(s, i)
 		m.push(n.alts[i], nil)
 	case sema.SeqLoop:
 		return sim.Wait{}, false, m.loop(n)
@@ -147,6 +156,14 @@ func (m *machine) exec(n *node) (sim.Wait, bool, error) {
 			"in simulation")
 	}
 	return sim.Wait{}, false, nil
+}
+
+// branch reports to the design's statement hook (Design.SetStmtHook)
+// that the decision s took its alternative i.
+func (m *machine) branch(s *sema.SeqStmt, i int) {
+	if h := m.w.d.hook; h != nil {
+		h.Branch(s, i)
+	}
 }
 
 func altChoices(as []sema.SeqAlt) [][]*sema.Expr {
@@ -1249,6 +1266,11 @@ func (m *machine) signal(n *node) error {
 				break
 			}
 		}
+		if k < 0 {
+			m.branch(n.s, len(g.conds))
+		} else {
+			m.branch(n.s, k)
+		}
 	case sigSelected:
 		i, err := m.choose(g.selector, g.choices, g.others, g.matching)
 		if err != nil {
@@ -1258,6 +1280,7 @@ func (m *machine) signal(n *node) error {
 			return errors.New("no choice covers the selector value")
 		}
 		k = i
+		m.branch(n.s, k)
 	}
 	if k < 0 || g.unaff[k] {
 		return nil

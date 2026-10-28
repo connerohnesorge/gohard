@@ -119,6 +119,32 @@ type Design struct {
 	// native runs the ieee functions with a native body natively
 	// (not Options.InterpretedBodies).
 	native bool
+	// hook observes the statements the processes run (SetStmtHook).
+	hook sema.StmtHook
+}
+
+// SetStmtHook makes every statement the design's processes run from
+// now on, and every decision they take, known to h (nil: none): the
+// statements of process and concurrent statements, of the subprograms
+// they call (pure functions included) and of the resolution functions
+// the kernel calls (#62 coverage, #68). Install it after Elaborate and
+// before the kernel runs, so the evaluations of elaboration are not
+// reported, and run the kernel with sim.Options.Uncached so the
+// kernel calls every resolution it would make without its cache. The
+// hook observes only: values, the trace and step counts stay the
+// same.
+func (d *Design) SetStmtHook(h sema.StmtHook) {
+	d.hook = h
+	if d.Top != nil {
+		// Every instance's evaluator shares the design state of the
+		// hierarchy's (hier.Instance.Evaluator).
+		d.Top.Evaluator().SetStmtHook(h)
+	}
+	for _, e := range d.res {
+		if fr, ok := e.r.(*FuncResolver); ok {
+			fr.ev.SetStmtHook(h)
+		}
+	}
 }
 
 type sigKey struct {

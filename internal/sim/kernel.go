@@ -42,6 +42,12 @@ type Options struct {
 	// cycle, in run order (race detection, race.go). It must not
 	// change the kernel.
 	Observe func(now Time, delta uint32, order []int32)
+	// Uncached makes initialization call the resolution function of
+	// every resolved net instead of answering repeated (resolver,
+	// value) pairs from its cache (initCache), so a statement hook
+	// (coverage, #62) sees every call. Values, the trace and step
+	// counts are the same either way.
+	Uncached bool
 }
 
 // Status is how far a run got.
@@ -877,11 +883,12 @@ func (c *initCache) resolve(k *Kernel, n *net) (eval.Value, error) {
 
 // initKeyOf is the cache key of net n: ok when n has exactly one
 // driver, it is not null and its value is a scalar, and no observer
-// counts the budget's charges (a hit charges them at once), and the
-// resolver is Memoizable.
+// counts the budget's charges (a hit charges them at once), the run
+// is not Uncached, and the resolver is Memoizable.
 func initKeyOf(k *Kernel, n *net) (initKey, bool) {
 	r, ok := n.resolve.(Memoizable)
-	if !ok || len(n.drivers) != 1 || k.budget.Observer() != nil {
+	if !ok || len(n.drivers) != 1 || k.budget.Observer() != nil ||
+		k.opts.Uncached {
 		return initKey{}, false
 	}
 	d := &k.drivers[n.drivers[0]]

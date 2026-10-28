@@ -58,6 +58,9 @@ type shared struct {
 	// evaluator runs while the design is elaborated (SetReporter);
 	// nil drops them.
 	reporter Reporter
+	// hook observes the statements the evaluator interprets
+	// (SetStmtHook, hook.go); nil when none.
+	hook StmtHook
 	// instSubs are the actuals of the generic subprograms of each
 	// subprogram instance, by generic position (instanceSubs).
 	instSubs map[*Decl][]*Decl
@@ -163,7 +166,9 @@ func (ev *Evaluator) Call(fn eval.Func, args []eval.Value, b *eval.Budget,
 			return eval.Value{}, err
 		}
 	}
-	if ev.memo {
+	if ev.memo && ev.sh.hook == nil {
+		// A statement hook sees every statement: a recorded call
+		// would hide the statements of its repetitions.
 		return ev.memoCall(x, in, args, b) // memo.go
 	}
 	return ev.pureCall(x, in, args, b)
@@ -388,6 +393,9 @@ func (ev *Evaluator) exec(ss []*SeqStmt, b *eval.Budget) (outcome, error) {
 		if err := b.Step(1); err != nil {
 			return outcome{}, err
 		}
+		if h := ev.sh.hook; h != nil {
+			h.Stmt(s)
+		}
 		out, err := ev.stmt(s, b)
 		if err != nil || out.flow != flowNormal {
 			return out, err
@@ -411,40 +419,46 @@ func (ev *Evaluator) stmt(s *SeqStmt, b *eval.Budget) (outcome, error) {
 		}
 		return outcome{}, ev.assign(s.Target, v, b)
 	case SeqCondVarAssign:
-		for _, br := range s.Branches {
+		for i, br := range s.Branches {
 			ok, err := ev.cond(br.Cond, b)
 			if err != nil {
 				return outcome{}, err
 			}
 			if ok {
+				ev.branch(s, i)
 				return outcome{}, ev.assignValue(s.Target, br.Value, b)
 			}
 		}
+		ev.branch(s, len(s.Branches))
 		return outcome{}, nil
 	case SeqSelVarAssign:
 		i, err := ev.choose(s.Selector, s.Alts, s.Matching, b)
 		if err != nil || i < 0 {
 			return outcome{}, err
 		}
+		ev.branch(s, i)
 		return outcome{}, ev.assignValue(s.Target, s.Alts[i].Value, b)
 	case SeqCall:
 		return outcome{}, ev.procedure(s.Call, b)
 	case SeqIf:
-		for _, br := range s.Branches {
+		for i, br := range s.Branches {
 			ok, err := ev.cond(br.Cond, b)
 			if err != nil {
 				return outcome{}, err
 			}
 			if ok {
+				ev.branch(s, i)
 				return ev.exec(br.Body, b)
 			}
 		}
+		ev.branch(s, len(s.Branches))
 		return ev.exec(s.Else, b)
 	case SeqCase:
 		i, err := ev.choose(s.Selector, s.Alts, s.Matching, b)
 		if err != nil || i < 0 {
 			return outcome{}, err
 		}
+		ev.branch(s, i)
 		return ev.exec(s.Alts[i].Body, b)
 	case SeqLoop:
 		return ev.loop(s, b)

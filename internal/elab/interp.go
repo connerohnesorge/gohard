@@ -461,6 +461,9 @@ func (m *machine) run(base int) (w sim.Wait, susp bool, err error) {
 		if err := m.b.Step(1); err != nil {
 			return sim.Wait{}, false, err
 		}
+		if h := m.w.d.hook; h != nil {
+			h.Stmt(n.s)
+		}
 		w, susp, err := m.exec(n)
 		if err != nil {
 			return sim.Wait{}, false, located(n, err)
