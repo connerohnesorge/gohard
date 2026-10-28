@@ -404,3 +404,19 @@ begin
 end;
 `}})
 }
+
+// TestPSLForall (#66): the parameter of forall is declared for its
+// property only (IEEE 1850 6.2.1.7).
+func TestPSLForall(t *testing.T) {
+	checkMarked(t, []markedCase{{name: "psl", std: "2008", src: `
+entity e is end;
+architecture a of e is
+  signal clk, x : bit;
+  signal v : bit_vector(0 to 1);
+  default clock is clk'event;
+begin
+  a1: assert forall i in {0 to 1} : always (x -> v(i) = '1');
+  a2: assert always (x -> v(i) = '1'); --E
+end;
+`}})
+}

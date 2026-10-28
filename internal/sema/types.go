@@ -1174,6 +1174,10 @@ func fits(have, want *Type) bool {
 
 // psl walks a PSL property, sequence or directive operand for names.
 func (a *analyzer) psl(n cst.Node) {
+	if n.Kind() == cst.KindPSLForall {
+		a.pslForall(n) // psl.go
+		return
+	}
 	for c := range n.Nodes() {
 		if c.Kind() == cst.KindPSLBuiltinCall {
 			a.pslBuiltinCall(c) // psl.go

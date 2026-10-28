@@ -375,6 +375,32 @@ func (a *analyzer) pslForm(n cst.Node) {
 	}
 }
 
+// pslForall analyzes the replicator `forall i in values : p` (IEEE
+// 1850 6.2.1.7): the parameter i is declared for p only. Simulation
+// does not replicate (#66, unsupported/construct), so i is typed like a
+// PSL formal parameter.
+func (a *analyzer) pslForall(n cst.Node) {
+	var p cst.Node
+	for c := range n.Nodes() {
+		if c.Kind() == cst.KindPSLValueSet {
+			a.psl(c)
+		} else if p.IsZero() {
+			p = c
+		}
+	}
+	a.push(RegionStatement, nil, n)
+	if tok := n.TokenIn(nameTokens, 0); !tok.IsZero() {
+		d := a.newDecl(DeclParameter, tok, n)
+		d.Type = UnknownType
+		a.declare(d)
+	}
+	if !p.IsZero() {
+		a.psl(p)
+	}
+	a.pop()
+	a.pslForm(n)
+}
+
 // pslKids returns the child nodes of n.
 func pslKids(n cst.Node) []cst.Node {
 	var out []cst.Node
