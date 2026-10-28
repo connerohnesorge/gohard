@@ -119,8 +119,10 @@ type Design struct {
 	// native runs the ieee functions with a native body natively
 	// (not Options.InterpretedBodies).
 	native bool
-	// hook observes the statements the processes run (SetStmtHook).
-	hook sema.StmtHook
+	// hook observes the statements the processes run (SetStmtHook);
+	// debug is the same hook when it is a DebugHook (#68).
+	hook  sema.StmtHook
+	debug DebugHook
 }
 
 // SetStmtHook makes every statement the design's processes run from
@@ -132,9 +134,11 @@ type Design struct {
 // reported, and run the kernel with sim.Options.Uncached so the
 // kernel calls every resolution it would make without its cache. The
 // hook observes only: values, the trace and step counts stay the
-// same.
+// same. A DebugHook is told where the interpreter's statements run
+// instead (ProcStmt), and may halt the run.
 func (d *Design) SetStmtHook(h sema.StmtHook) {
 	d.hook = h
+	d.debug, _ = h.(DebugHook)
 	if d.Top != nil {
 		// Every instance's evaluator shares the design state of the
 		// hierarchy's (hier.Instance.Evaluator).

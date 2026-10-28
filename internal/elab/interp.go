@@ -268,6 +268,9 @@ type machine struct {
 	// lastRet is the result of the function frame that just returned.
 	lastRet      eval.Value
 	lastReturned bool
+	// at is the place a DebugHook is told of (debug.go), kept here so
+	// telling it allocates nothing.
+	at At
 	// elab is the design object newShared elaborates, with the
 	// frame count at its start and its instance: a std.env call in its
 	// value is located in its declaration (callSite), and the shared
@@ -462,7 +465,14 @@ func (m *machine) run(base int) (w sim.Wait, susp bool, err error) {
 			return sim.Wait{}, false, err
 		}
 		if h := m.w.d.hook; h != nil {
-			h.Stmt(n.s)
+			if dh := m.w.d.debug; dh != nil {
+				m.at = At{m: m, n: n}
+				if dh.ProcStmt(n.s, &m.at) {
+					return sim.Wait{}, false, ErrHalted
+				}
+			} else {
+				h.Stmt(n.s)
+			}
 		}
 		w, susp, err := m.exec(n)
 		if err != nil {
