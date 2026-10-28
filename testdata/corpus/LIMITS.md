@@ -107,7 +107,9 @@ v1.1, since under v1.0 its units are opaque.
   computes `prev(prev(a))` as `prev(a)` (GoHard: `prev(a, 2)`, by the
   definition of `prev`), and gives 0 for `prev(i, n)` of an INTEGER
   before the n-th sample (GoHard: the default value of the subtype,
-  INTEGER'LEFT; both give 'U' for a STD_ULOGIC).
+  INTEGER'LEFT; both give 'U' for a STD_ULOGIC). GoHard keeps at most
+  2^20 sampled values per call, so `prev` of a large array with a large
+  count is a `sim/runtime-error` at time 0; NVC has no such bound.
 * **Stand-in models.** One design (`standin_model`), one opaque unit, one
   stand-in. Neither GHDL nor NVC marks modeled drivers, so the
   `modeled_drivers_marked` invariant has no tool oracle; the marking in

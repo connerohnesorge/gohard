@@ -220,7 +220,8 @@ func (r *runner) letter(c *sim.Ctx, ev *sema.Evaluator) ([]bool, error) {
 // sample evaluates the directive's built-in calls (inner calls first)
 // and records their arguments' values as the newest samples. It
 // returns ev answering each call with its value, for the booleans of
-// this tick.
+// this tick. A call whose samples would keep more than maxSampled
+// values is a run-time error at its first sample, before it keeps any.
 func (r *runner) sample(c *sim.Ctx, ev *sema.Evaluator) (*sema.Evaluator,
 	error,
 ) {
@@ -237,6 +238,12 @@ func (r *runner) sample(c *sim.Ctx, ev *sema.Evaluator) (*sema.Evaluator,
 		cur, err := r.eval(c, ev, bi.arg)
 		if err != nil {
 			return nil, err
+		}
+		if bi.depth > 0 {
+			limit := maxSampled / bi.depth
+			if sizeAtMost(cur, limit) > limit {
+				return nil, r.tooManySamples(bi)
+			}
 		}
 		v, err := bi.value(cur, &r.hist[i])
 		if err != nil {

@@ -24,8 +24,11 @@
 //     as NVC 1.23 does) and at every tick before the booleans; before
 //     the n-th sample prev(e, n) is the default value of e's subtype
 //     (T'LEFT). The samples are values the design had: ClearPslState
-//     keeps them. A clock argument, ended and a built-in in a clock
-//     expression are unsupported/construct, reported at time 0.
+//     keeps them. The samples of one call keep at most 2^20 values
+//     (its depth times the size of one value of its argument): past
+//     that the call is a run-time error at its first sample (P7). A
+//     clock argument, ended and a built-in in a clock expression are
+//     unsupported/construct, reported at time 0.
 //   - assume, restrict and fairness do nothing in simulation.
 //   - The std.env PSL API (#18) reads the kernel's PSL state
 //     (sim.Ctx.PSL*): an enabled violation sets PslAssertFailed; a
@@ -57,5 +60,6 @@
 // semantics after every tick, also across Kernel.Clone; on random
 // sample sequences every built-in's value agrees with a reference that
 // indexes the whole sequence, also from a cloned state; the #111
-// directives fail at the ticks NVC 1.23.0 gives.
+// directives fail at the ticks NVC 1.23.0 gives; a call over the
+// sample bound fails at time 0 and one just under it runs.
 package psl

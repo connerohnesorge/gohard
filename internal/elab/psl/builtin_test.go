@@ -209,6 +209,77 @@ func TestBuiltinUnsupported(t *testing.T) {
 	}
 }
 
+// TestBuiltinSampleBound (#111, P7): a built-in call whose samples
+// would keep more than maxSampled values (its depth times the size of
+// one value of its argument) is a run-time error at its first sample,
+// time 0, before it keeps any; a call just under the bound runs. One
+// value of mem is 1 + 1024*33 = 33793 values, so the bound allows
+// prev(mem, 31) (1047583 values) and not prev(mem, 32) (1081376).
+func TestBuiltinSampleBound(t *testing.T) {
+	const src = `library ieee; use ieee.std_logic_1164.all;
+entity s is end;
+architecture rtl of s is
+  type mem_t is array (0 to 1023) of std_logic_vector(31 downto 0);
+  signal clk : std_logic := '0';
+  signal mem : mem_t := (others => (others => '0'));
+  default clock is rising_edge(clk);
+begin
+  clk <= not clk after 5 ns;
+  mem(0) <= not mem(0) after 10 ns;
+  x: assert always (prev(mem, DEPTH) /= mem or true);
+  stopper: process begin wait for 100 ns; std.env.finish; end process;
+end;
+`
+	under := strings.ReplaceAll(src, "DEPTH", "31")
+	checkTicks(t, "prev(mem, 31)", under, nil)
+	over := strings.ReplaceAll(src, "DEPTH", "32")
+	evs, ds := simBuiltin(t, "prev(mem, 32)", over)
+	var got []string
+	for _, d := range ds {
+		got = append(got, string(d.Code)+" "+strconv.Itoa(d.Line)+
+			" "+d.Message)
+	}
+	want := []string{"sim/runtime-error 11 prev(mem, 32) in PSL " +
+		"directive x would keep more than 1048576 sampled values in s.x " +
+		"at 0 fs"}
+	if !slices.Equal(got, want) || len(evs) != 0 {
+		t.Fatalf("prev(mem, 32): %q, events %v", got, evs)
+	}
+}
+
+// TestSizeAtMost: sizeAtMost counts a value and its elements, nested
+// ones included, and stops at limit+1.
+func TestSizeAtMost(t *testing.T) {
+	bit := &eval.Type{Kind: eval.KindEnum, Name: "BIT",
+		Literals: []string{"'0'", "'1'"},
+		Range:    eval.Range{Left: 0, Right: 1, Dir: eval.To}}
+	vec := func(n int) eval.Value {
+		return eval.Value{E: make([]eval.Value, n)}
+	}
+	nested := eval.Value{E: []eval.Value{vec(3), vec(3), vec(3)}}
+	cases := []struct {
+		v           eval.Value
+		limit, want int
+	}{
+		{eval.Enum(bit, 1), 0, 1},
+		{eval.Enum(bit, 1), 5, 1},
+		{vec(4), 5, 5},
+		{vec(4), 4, 5},
+		{vec(4), 3, 4},
+		{vec(4), 0, 1},
+		{nested, 13, 13},
+		{nested, 12, 13},
+		{nested, 7, 8},
+		{nested, 1, 2},
+	}
+	for _, c := range cases {
+		if got := sizeAtMost(c.v, c.limit); got != c.want {
+			t.Errorf("sizeAtMost(%d elements, %d) = %d, want %d",
+				len(c.v.E), c.limit, got, c.want)
+		}
+	}
+}
+
 // TestBuiltinClearPslState (#111): ClearPslState drops a directive's
 // obligations but not the samples of its built-in calls, which are
 // values the design had: stable(a) fails at 25 ns (a rose at 20 ns)

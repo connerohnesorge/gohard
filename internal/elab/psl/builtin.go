@@ -138,6 +138,34 @@ func walkExpr(e *sema.Expr, f func(*sema.Expr)) {
 	f(e)
 }
 
+// maxSampled bounds the values the samples of one built-in call keep:
+// its depth times the size of its argument's value (sizeAtMost), so
+// prev(mem, 2000) of a large array fails at its first sample, time 0,
+// instead of growing by a copy of mem at every tick (P7).
+const maxSampled = 1 << 20
+
+// sizeAtMost returns the number of values v is made of (itself and
+// every element, nested ones included), or limit+1 when it is more
+// than limit.
+func sizeAtMost(v eval.Value, limit int) int {
+	n := 1
+	for _, e := range v.E {
+		if n > limit {
+			break
+		}
+		n += sizeAtMost(e, limit-n)
+	}
+	return min(n, limit+1)
+}
+
+// tooManySamples is the run-time error of the call bi, whose samples
+// would keep more than maxSampled values.
+func (r *runner) tooManySamples(bi *builtin) error {
+	return errors.New(strings.TrimSpace(bi.call.Node.Text()) +
+		" in PSL directive " + r.dir.label + " would keep more than " +
+		strconv.Itoa(maxSampled) + " sampled values")
+}
+
 // samples holds the last values of one built-in's argument, at most
 // the call's depth: a ring, oldest first until it is full, then
 // starting at next.
