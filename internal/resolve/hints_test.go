@@ -95,3 +95,52 @@ func TestHints(t *testing.T) {
 		t.Errorf("whole:\n%s\nhalves:\n%s", a, b)
 	}
 }
+
+// TestValueHintsBudget: values that take more than the editor's step
+// limit to build or compute (huge aggregates, a function looping 2**30
+// times, deep recursion) get no hint and cost a bounded amount of
+// work; the generic whose default is a plain static expression still
+// gets its value (#56, P7).
+func TestValueHintsBudget(t *testing.T) {
+	src := `entity e is
+  generic (N : natural := 2 ** 30);
+end entity;
+architecture rtl of e is
+  type big_t is array (0 to 2 ** 30) of integer;
+  constant C1 : bit_vector(0 to 2 ** 30) := (others => '0');
+  constant C2 : big_t := (others => 7);
+  constant C3 : string(1 to 100000000) := (others => 'a');
+  function rep(n : natural) return bit_vector is
+    variable v : bit_vector(0 to n - 1) := (others => '1');
+  begin
+    return v;
+  end function;
+  constant C4 : bit_vector := rep(2 ** 30);
+  function loopy(n : natural) return natural is
+    variable s : natural := 0;
+  begin
+    for i in 0 to n loop
+      s := (s + i) mod 7;
+    end loop;
+    return s;
+  end function;
+  constant C5 : natural := loopy(2 ** 30);
+  function grow(n : natural) return string is
+  begin
+    if n = 0 then
+      return "";
+    end if;
+    return grow(n - 1) & "abcdefgh";
+  end function;
+  constant C6 : string := grow(100000);
+  constant C7 : bit_vector := C1 & C1 & C1 & C1;
+begin
+end architecture;
+`
+	r := analyzeOne(t, src)
+	got := hintText(src, Hints(r, "a.vhd", 0, len(src),
+		HintKinds{Values: true}))
+	if want := "2:34 = 1073741824\n"; got != want {
+		t.Errorf("value hints:\n%s\nwant\n%s", got, want)
+	}
+}
