@@ -394,12 +394,13 @@ var pre2008 = regexp.MustCompile("(?s)`if VHDL_VERSION < \"2008\" " +
 	"then\n.*?`end if\n")
 
 // pocErrors are the PoC files with errors under gohard check, none
-// about the import: arith_Scaler declares a positive constant that is
-// 0 under its default generics, and the two *_OSVVM packages use the
-// library osvvm_axi4 of PoC's lib/OSVVM-AXI4 submodule, which the
-// pinned checkout does not include.
+// about the import: the two *_OSVVM packages use the library
+// osvvm_axi4, which PoC's regression.tcl builds from its nested
+// lib/OSVVM-AXI4 submodule (lib/OsvvmLibraries.pro) before PoC.pro.
+// Only a recursive checkout has that submodule, and its scripts use
+// OSVVM's DirectoryExists and ChangeWorkingDirectory, which gohard
+// import does not evaluate, so the test maps no osvvm_axi4.
 var pocErrors = []string{
-	"src/arith/arith_Scaler.vhdl",
 	"src/bus/axi4/axi4_OSVVM.pkg.vhdl",
 	"src/bus/axi4lite/axi4lite_OSVVM.pkg.vhdl",
 }
@@ -414,8 +415,10 @@ func TestImportPoC(t *testing.T) {
 	poc := pinned(t, "testdata/poc")
 	dir := t.TempDir()
 	copyTree(t, filepath.Join(poc, "src"), filepath.Join(dir, "src"))
-	copyTree(t, filepath.Join(poc, "tb", "common"), filepath.Join(dir,
-		"tb", "common"))
+	// With its testbench under the root, arith_Scaler is not checked
+	// as a top level under default generics that make a positive
+	// constant 0.
+	copyTree(t, filepath.Join(poc, "tb"), filepath.Join(dir, "tb"))
 	projectRoot(t, dir)
 	// What PoC's WriteLocalConfiguration (tools/poc.tcl) writes.
 	if err := os.WriteFile(filepath.Join(dir, "tb", "common",
