@@ -36,7 +36,7 @@ behind. The package expression is kept in
 [packaging/nixpkgs/](../packaging/nixpkgs/README.md). The flake in
 this repository always builds the commit you name:
 `nix run github:connerohnesorge/gohard -- version`, or
-`nix run github:connerohnesorge/gohard/v1.1.1 -- version` for a tag.
+`nix run github:connerohnesorge/gohard/v2.0.0 -- version` for a tag.
 
 The nixpkgs build has no commit to embed, so its `gohard version`
 prints `commit unknown`. The flake and the release archives print the
@@ -58,7 +58,7 @@ file, and is signed with a short-lived Sigstore certificate GitHub
 issues to that workflow run. Verify one with the GitHub CLI:
 
 ```
-gh attestation verify gohard_1.2.0_linux_amd64.tar.gz \
+gh attestation verify gohard_2.0.0_linux_amd64.tar.gz \
   --repo connerohnesorge/gohard \
   --signer-workflow connerohnesorge/gohard/.github/workflows/release.yml
 ```

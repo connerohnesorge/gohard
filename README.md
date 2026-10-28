@@ -35,7 +35,7 @@ Then run `gohard version`. It prints the version, the commit, the
 bundled IEEE library tag and commit, and the Go toolchain:
 
 ```
-version 1.0.0
+version 2.0.0
 commit <40-hex commit>
 ieee 1076-2019 16a012320947d378611cc7457f64ed76cb52bac4
 go go1.27.2
@@ -46,10 +46,19 @@ go go1.27.2
 * `gohard check` checks a project; `gohard fmt` formats it, and
   `gohard fmt -` formats standard input to standard output (exit 1 if it
   does not parse; with `--check`, exit 1 if it would change).
+* `gohard check` also runs the lint rules `lint/unused-signal`,
+  `lint/sensitivity-list` and `lint/latch` as warnings, which fail a
+  run only under `--strict`; `lint/clock-edge-style` is off. The
+  `lint.*` keys in [docs/config.md](docs/config.md) set each rule to
+  `off`, `hint` or `warning`.
+* `gohard check --format junit` writes JUnit XML for CI test reports,
+  next to `text`, `json` and `sarif` ([docs/ci.md](docs/ci.md)).
 * `gohard check --sim` also runs testbenches; failures print a repro
   command. `gohard check --coverage` also writes their statement,
   branch and PSL cover coverage as lcov files under `.gohard/coverage/`
   (`genhtml` reads them); `gohard coverage merge` sums several runs.
+* `gohard trace export --format vcd|fst|ghw TRACE` converts a run's
+  trace from `.gohard/traces/` for a waveform viewer.
 * `gohard lsp` is the language server over stdio.
 * `gohard dap` debugs a testbench over the Debug Adapter Protocol
   (prototype, Neovim through nvim-dap): breakpoints on statements,
@@ -63,7 +72,7 @@ go go1.27.2
 
 | Standard | Analysis | Simulation |
 | --- | --- | --- |
-| VHDL-1993, 2000, 2002, 2008 | yes, with PSL in VHDL | yes |
+| VHDL-1993, 2000, 2002, 2008 | yes, with PSL in VHDL and PSL verification units (`vunit`, `vmode`, `vprop`) | yes |
 | VHDL-2019 (`standard: "2019"`) | yes: conditional analysis, 64-bit `INTEGER`, conditional `return ... when`, inferred constraints, generic maps on subprogram calls, composite `'IMAGE` | yes |
 | VHDL-2019 protected types | generics (on the variable, `is new`, in the header), arrays, records and pointers of protected types, nested protected types, `private` variables, method aliases, protected function parameters, shared-variable ports | yes, with `'PATH_NAME`/`'INSTANCE_NAME` of protected objects |
 | VHDL-2019 `std.env` and `std.reflection` | yes | dates and times from `simulation.env.epoch`, `GETENV` from `simulation.env.vars` or `--env`, `DIR_*`, the VHDL and PSL assert APIs, `std.reflection`; `--real-env` reads the real clock and environment |
