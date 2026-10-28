@@ -61,6 +61,10 @@ const (
 	cProtArray    = "arrays of protected types"
 	cProtRecord   = "records of protected types"
 	cProtParam    = "protected-type and access parameters on functions"
+	// cVunitPath is a PSL verification unit bound to an instance path
+	// (vunit v(tb.u), IEEE 1850 7.2): only a binding to a design
+	// entity, e or e(a), is implemented (#110, #66).
+	cVunitPath = "verification unit bindings to an instance path"
 )
 
 // constructs are the legal constructs GoHard does not implement, by
@@ -68,10 +72,6 @@ const (
 var constructs = []construct{
 	{kind: cst.KindAliasDecl, name: cMethodAlias, v2019: true,
 		match: inProtectedDecl},
-	// PSL verification units bound in a configuration (`use vunit`):
-	// legal VHDL-2008 that neither sema nor the kernel implements.
-	{kind: cst.KindVerificationUnitBinding,
-		name: "verification unit bindings in configurations"},
 }
 
 // legacy lists the VHDL-2019 constructs that an older standard does not
@@ -537,6 +537,16 @@ func (s *session) findings(u *Unit) []finding {
 			continue
 		}
 		declFindings(d, add)
+	}
+	if u.BoundInline() { // psl.go
+		if _, _, ok := vunitBinding(u.Lib, u.Library); !ok {
+			for c := range u.Lib.Nodes() {
+				if c.Kind() == cst.KindPSLHierarchicalName {
+					out = append(out, finding{rg: c.Span(),
+						name: cVunitPath})
+				}
+			}
+		}
 	}
 	return out
 }

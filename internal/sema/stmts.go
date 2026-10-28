@@ -1452,6 +1452,7 @@ func (a *analyzer) blockConfiguration(bc cst.BlockConfiguration,
 			cc := cst.ComponentConfiguration{Node: item.Node}
 			comp := a.componentSpec(cc.Spec())
 			a.bindingIndication(cc.Binding(), comp)
+			a.vunitBindings(cc.Node) // vunitbind.go
 			a.blockConfiguration(cc.Block(), nil)
 		}
 	}
@@ -1541,12 +1542,15 @@ func (a *analyzer) bindingIndication(b cst.BindingIndication,
 	a.assocMap(b.PortMap().List(), region, DeclPort)
 }
 
-// vunit analyzes a PSL verification unit.
+// vunit analyzes a PSL verification unit. Its statements (directives,
+// processes, assignments) are the unit's Body, which elaboration runs
+// in every instance the unit is bound to (#66).
 func (a *analyzer) vunit(lu cst.Node) {
 	d := a.newDecl(DeclVunit, lu.TokenIn(nameTokens, 0), lu)
 	a.u.Decl = d
 	a.declare(d)
 	a.u.Region = a.push(RegionVunit, d, lu)
+	var body []*Stmt
 	for c := range lu.Nodes() {
 		switch {
 		case c.Kind() == cst.KindPSLHierarchicalName:
@@ -1564,10 +1568,13 @@ func (a *analyzer) vunit(lu cst.Node) {
 			if l := c.Child[cst.Label](0); !l.IsZero() {
 				a.declare(a.labelDecl(l, c))
 			}
-			a.concStmt(c)
+			if s := a.concStmt(c); s != nil {
+				body = append(body, s)
+			}
 		default:
 			a.psl(c)
 		}
 	}
+	a.u.Body = body
 	a.pop()
 }

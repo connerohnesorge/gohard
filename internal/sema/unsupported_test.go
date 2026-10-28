@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/token"
 	"go.yaml.in/yaml/v3"
@@ -290,9 +291,15 @@ func TestV11Delivered(t *testing.T) {
 // entity at its first use (two architectures of e: one diagnostic,
 // both opaque); a configuration is its own design entity and gets its
 // own diagnostic; a unit instantiating the opaque configuration is
-// unchecked. The construct is one v1.1 still does not implement, so
-// the message is the please-report variant.
+// unchecked. The construct is the please-report variant. No construct
+// of the table found by node kind is unimplemented since #66 delivered
+// `use vunit`, so the test adds one for that node kind.
 func TestDesignEntityGroups(t *testing.T) {
+	saved := constructs
+	constructs = append(slices.Clone(constructs), construct{
+		kind: cst.KindVerificationUnitBinding,
+		name: "verification unit bindings in configurations"})
+	t.Cleanup(func() { constructs = saved })
 	arch := func(name, vunit string) string {
 		return "architecture " + name + " of e is\n" +
 			"  component leaf is end component;\n" +

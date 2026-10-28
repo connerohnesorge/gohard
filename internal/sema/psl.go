@@ -471,7 +471,9 @@ func vunitBinding(lu cst.Node, own Key) (entity Key, arch cst.Token,
 
 // boundUnits returns the units the PSL verification unit u is bound
 // to, as u sees them (#110): the entity and, when the binding names
-// one, its architecture; nil when not found. The architecture is
+// one, its architecture; nil when not found. A unit without a binding
+// of its own is bound by the first verification unit binding
+// indication that names it (vunitbind.go, #66). The architecture is
 // looked up among the entity's secondary units like a late reference
 // (resolveLate), except that one after u in u's own design file is
 // not analyzed yet when u is (LRM 13.5).
@@ -479,19 +481,25 @@ func (s *session) boundUnits(u *Unit) (entity, arch *Unit) {
 	if u.Kind != UnitVunit {
 		return nil, nil
 	}
+	var ak Key
 	ek, at, ok := vunitBinding(u.Lib, u.Library)
-	if !ok {
+	l, lok := s.library(u, Work)
+	if ok {
+		ak = TokenKey(at)
+	} else if b, found := s.vunitBinders[u]; found && !u.BoundInline() {
+		ek, ak = b.entity, b.arch
+		l, lok = s.libs[b.lib]
+	} else {
 		return nil, nil
 	}
-	l, ok := s.library(u, Work)
-	if !ok {
+	if !lok {
 		return nil, nil
 	}
 	e, ok := l.UnitFrom(ek, u)
 	if !ok || e.Kind != UnitEntity {
 		return nil, nil
 	}
-	if k := TokenKey(at); k != "" {
+	if k := ak; k != "" {
 		for _, sec := range l.Secondary(e.Name) {
 			if sec.Kind == UnitArchitecture && sec.Name == k &&
 				!analyzedLater(sec, u) {
@@ -517,6 +525,22 @@ func (a *analyzer) boundRegion() *Region {
 		}
 	}
 	return nil
+}
+
+// BoundInline reports whether the PSL verification unit u names its
+// binding in its declaration (vunit v(e(a)), IEEE 1850 7.2): it is
+// bound to every instance of that design entity. A unit without one is
+// bound only by a verification unit binding indication (#66).
+func (u *Unit) BoundInline() bool {
+	if u == nil || u.Kind != UnitVunit {
+		return false
+	}
+	for c := range u.Lib.Nodes() {
+		if c.Kind() == cst.KindPSLHierarchicalName {
+			return true
+		}
+	}
+	return false
 }
 
 // Binds reports whether u is a PSL verification unit bound to the

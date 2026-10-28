@@ -106,8 +106,8 @@ func analyzeOne(t *testing.T, src string) *sema.Result {
 		Text: []byte(src)}}, Config: config.Defaults()})
 }
 
-// TestRenameOpaque: a declaration of an opaque unit (a construct
-// GoHard does not implement) is not renamed.
+// TestRenameOpaque: a declaration of an opaque unit (one with an
+// encrypted IEEE 1735 envelope inside it) is not renamed.
 func TestRenameOpaque(t *testing.T) {
 	src := `entity leaf is end;
 architecture rtl of leaf is begin end;
@@ -115,9 +115,10 @@ entity top is end;
 architecture rtl of top is
   signal pair_s : bit;
   component leaf is end component;
-  for u1 : leaf use entity work.leaf;
-    use vunit checks;
-  end for;
+` + "`" + `protect begin_protected
+` + "`" + `protect data_block
+bm90IHJlYWwgY2lwaGVydGV4dCwgb25seSBmaWxsZXI=
+` + "`" + `protect end_protected
 begin
   u1 : component leaf;
   pair_s <= '1';

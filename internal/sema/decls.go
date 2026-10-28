@@ -66,6 +66,7 @@ func (a *analyzer) declItem(n cst.Node) {
 		cs := cst.ConfigurationSpec{Node: n}
 		comp := a.componentSpec(cs.Spec())
 		a.bindingIndication(cs.Binding(), comp)
+		a.vunitBindings(n)          // vunitbind.go
 		a.configSpecRules(cs, comp) // config.go
 	case cst.KindDisconnectionSpec:
 		ds := cst.DisconnectionSpec{Node: n}

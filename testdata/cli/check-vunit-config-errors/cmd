@@ -1,0 +1,4 @@
+# A verification unit binding indication names unbound verification
+# units only (LRM 7.3.4, #66): v_bound is bound in its declaration,
+# dut is an entity and nothere is no unit.
+gohard check

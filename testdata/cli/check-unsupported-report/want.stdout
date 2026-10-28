@@ -1,2 +1,2 @@
-top.vhd:22:7: error[unsupported/construct]: verification unit bindings in configurations is not supported yet, please report
+top.vhd:10:13: error[unsupported/construct]: verification unit bindings to an instance path is not supported yet, please report
 summary: 1 errors, 0 warnings, 0 hints, 1 files

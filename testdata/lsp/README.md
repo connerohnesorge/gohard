@@ -151,13 +151,14 @@ result; positions are zero-based UTF-8.
 | `rename/extended-refused` | an extended identifier keeps its spelling: refused |
 | `rename/reserved-word` | a reserved word is not a valid new name |
 | `rename/to-extended` | renaming to an extended identifier uses it verbatim at every site |
-| `rename/opaque-refused` | a declaration of an opaque unit (a construct GoHard does not implement) is not renamed: its references are not known |
+| `rename/opaque-refused` | a declaration of an opaque unit (one with an encrypted envelope inside it) is not renamed: its references are not known |
 | `rename/conflict-region` | a new name already declared in the same region is refused |
 | `rename/conflict-port` | an architecture signal may not take a port name of its entity (case-insensitive) |
 | `rename/conflict-unit` | an entity may not take the name of another design unit of its library |
 | `hover/opaque-unit` | hover still shows a declaration of an opaque unit (a protected type: its declaration text) |
 | `hover/vunit-bound-port` | a port used inside a PSL vunit bound to `dut(rtl)` in another file (#110): the port of `dut`; own project (`dut.vhd`, `props.vhd`, `tb.vhd`) |
 | `definition/vunit-bound-port` | the same name: the port in `dut.vhd` |
+| `definition/vunit-config-port` | a port used inside an unbound PSL vunit that a component configuration binds to `dut(rtl)` (`use vunit`, #66): the port in `dut.vhd` |
 
 | `run/lens-position` | `gohard lsp run --at PATH:LINE:COL`: the Run testbench code lens (`gohard.runTestbench`) on the entity at the position; the result is `gohard lsp sim`'s JSON, and the run writes its trace and repro file (`want/`) |
 | `run/seed` | `gohard lsp run --at PATH:1:1 1`: re-run with a seed; the `sim/race` warning against seed 0, as `gohard lsp sim --seed 1` |

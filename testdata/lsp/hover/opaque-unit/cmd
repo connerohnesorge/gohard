@@ -1,3 +1,3 @@
-# hover still describes a declaration used in an opaque unit (one using
-# a construct GoHard does not implement).
+# hover still describes a declaration used in an opaque unit (one with
+# an encrypted IEEE 1735 envelope inside it).
 gohard lsp hover --at top.vhd:14:23

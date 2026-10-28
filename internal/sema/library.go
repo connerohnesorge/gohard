@@ -171,6 +171,7 @@ func (s *session) library(from *Unit, k Key) (*Library, bool) {
 
 // linkDeps turns every unit's syntactic references into Deps.
 func (s *session) linkDeps() {
+	s.vunitBinders = s.findVunitBinders() // vunitbind.go
 	for _, u := range s.units {
 		var deps []*Unit
 		add := func(d *Unit) {
@@ -204,10 +205,15 @@ func (s *session) linkDeps() {
 				}
 			}
 		}
-		// A verification unit sees its bound unit's names (psl.go).
+		// A verification unit sees its bound unit's names (psl.go);
+		// a verification unit binding indication names a unit
+		// (vunitbind.go).
 		e, arch := s.boundUnits(u)
 		add(e)
 		add(arch)
+		for _, v := range s.namedVunits(u) {
+			add(v)
+		}
 		slices.SortFunc(deps, func(a, b *Unit) int {
 			return cmp.Compare(a.Index, b.Index)
 		})

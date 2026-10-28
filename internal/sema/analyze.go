@@ -307,6 +307,10 @@ type session struct {
 	pslMu sync.Mutex
 	// toolVersion is Input.ToolVersion (part of incState.key).
 	toolVersion string
+	// vunitBinders binds each unbound PSL verification unit that a
+	// verification unit binding indication names (vunitbind.go). It is
+	// set before the unit jobs run and only read by them.
+	vunitBinders map[*Unit]vunitBinder
 
 	// The per-unit state below is indexed by a unit's position in
 	// units (incr.go). fresh marks the units whose objects this

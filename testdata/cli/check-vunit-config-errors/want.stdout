@@ -1,0 +1,4 @@
+cfg.vhd:2:13: error[sema/error]: work.v_bound is bound in its declaration, and a verification unit binding indication names only unbound verification units (LRM 7.3.4)
+cfg.vhd:2:27: error[sema/error]: dut is an entity, not a verification unit (LRM 7.3.4)
+cfg.vhd:2:32: error[sema/undefined]: nothere is not declared
+summary: 3 errors, 0 warnings, 0 hints, 4 files

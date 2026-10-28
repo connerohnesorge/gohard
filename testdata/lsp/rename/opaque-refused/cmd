@@ -1,2 +1,2 @@
-# a declaration of an opaque unit (a construct GoHard does not implement) is not renamed: its references are not known.
+# a declaration of an opaque unit (one with an encrypted IEEE 1735 envelope inside it) is not renamed: its references are not known.
 gohard lsp rename --dry-run --at top.vhd:12:10 s2

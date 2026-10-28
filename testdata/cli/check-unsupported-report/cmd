@@ -1,3 +1,4 @@
-# Legal VHDL GoHard does not implement and that is not planned for
-# v1.1: unsupported/construct, "please report", exit 2.
+# Legal VHDL GoHard does not implement: a PSL verification unit bound
+# to an instance path (#66 binds them to design entities only) is
+# unsupported/construct, "please report", exit 2.
 gohard check

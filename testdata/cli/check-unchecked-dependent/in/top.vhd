@@ -15,6 +15,11 @@ begin
   u1 : component leaf;
 end architecture rtl;
 
+-- Bound to the instance u1 of top, not to a design entity.
+vunit checks(top.u1) {
+  assert always true;
+}
+
 configuration top_cfg of top is
   for rtl
     for u1 : leaf

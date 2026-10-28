@@ -1,0 +1,7 @@
+# Verification unit binding indications (use vunit, #66): v_top is
+# bound by the configuration to tb(sim), v_comp by a component
+# configuration to u1 and v_spec by a configuration specification to
+# u2. Each unbound vunit sees the names of the design entity it is
+# bound to, so plain check is clean (and no port of dut is
+# lint/unused-signal).
+gohard check

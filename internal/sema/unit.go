@@ -628,6 +628,7 @@ func (a *analyzer) configuration(c cst.ConfigurationDecl, ent *Unit) {
 	a.declare(d)
 	a.u.Region = a.push(RegionConfiguration, d, c.Node)
 	a.declarativePart(c.Decls().Node)
+	a.vunitBindings(c.Node) // vunitbind.go
 	a.blockConfiguration(c.Block(), ent)
 	a.endClause(c.End(), d)
 	a.pop()

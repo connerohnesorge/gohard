@@ -1,3 +1,4 @@
-top.vhd:22:7: error[unsupported/construct]: verification unit bindings in configurations is not supported yet, please report
-user.vhd:4:14: warning[sema/unchecked-unit]: work.user(rtl) was not checked: it depends on opaque unit work.top_cfg
-summary: 1 errors, 1 warnings, 0 hints, 2 files
+top.vhd:19:13: error[unsupported/construct]: verification unit bindings to an instance path is not supported yet, please report
+top.vhd:23:15: warning[sema/unchecked-unit]: work.top_cfg was not checked: it depends on opaque unit work.checks
+user.vhd:4:14: warning[sema/unchecked-unit]: work.user(rtl) was not checked: it depends on opaque unit work.checks
+summary: 1 errors, 2 warnings, 0 hints, 2 files
