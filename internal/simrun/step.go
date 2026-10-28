@@ -89,7 +89,7 @@ func Start(o Options) *Running {
 	if o.Coverage {
 		// Installed after elaboration: coverage counts what the run
 		// executes from the kernel's initialization on.
-		r.cov = coverage.New(o.Result, coverage.Units(o.Result, d.Top))
+		r.cov = coverage.New(o.Result, d)
 		d.SetStmtHook(r.cov)
 	}
 	if o.Orders != nil {

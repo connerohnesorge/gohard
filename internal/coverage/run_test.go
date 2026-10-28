@@ -2,6 +2,7 @@ package coverage_test
 
 import (
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -187,5 +188,56 @@ func TestNestedBodies(t *testing.T) {
 		"end_of_record")
 	if got := string(coverage.Encode(*res.Coverage)); got != want {
 		t.Errorf("coverage\n%s\nwant\n%s", got, want)
+	}
+}
+
+// TestSameLineCovers: two PSL cover directives on one line each count
+// their own cover-hit events, so the line counts the larger of the two
+// (c1 hits at the 4 rising edges where a is high, c2 at the one where
+// b is), not their sum.
+func TestSameLineCovers(t *testing.T) {
+	src := lines(
+		"library ieee;",
+		"use ieee.std_logic_1164.all;",
+		"use std.env.all;",
+		"entity two is",
+		"end entity two;",
+		"architecture sim of two is",
+		"  signal clk : std_logic := '0';",
+		"  signal a, b : std_logic := '0';",
+		"begin",
+		"  clk <= not clk after 5 ns;",
+		"  stim : process",
+		"  begin",
+		"    a <= '1';",
+		"    wait for 40 ns;",
+		"    a <= '0';",
+		"    b <= '1';",
+		"    wait for 10 ns;",
+		"    b <= '0';",
+		"    wait for 20 ns;",
+		"    finish;",
+		"  end process stim;",
+		"  c1 : cover {a = '1'} @ rising_edge(clk); "+
+			"c2 : cover {b = '1'} @ rising_edge(clk);",
+		"end architecture sim;")
+	r := corpus.Run{Design: corpus.Design{Name: "two", Testbench: "two"},
+		Standard: "2008", Paths: []string{"two.vhd"}}
+	res, err := corpus.Execute(r, map[string][]byte{"two.vhd": []byte(src)},
+		corpus.Options{Code: simrun.DefaultCode, Coverage: true})
+	if err != nil || res.Coverage == nil {
+		t.Fatalf("%v %v", err, res.Messages)
+	}
+	var msgs []string
+	for _, m := range res.Messages {
+		msgs = append(msgs, m.Message)
+	}
+	if !slices.Contains(msgs, "cover c1 hit 4 times") ||
+		!slices.Contains(msgs, "cover c2 hit 1 times") {
+		t.Fatalf("messages %v", msgs)
+	}
+	got := string(coverage.Encode(*res.Coverage))
+	if !strings.Contains(got, "\nDA:22,4\n") {
+		t.Errorf("coverage\n%s\nwant DA:22,4", got)
 	}
 }

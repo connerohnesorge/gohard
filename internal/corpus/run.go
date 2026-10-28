@@ -222,7 +222,7 @@ func Execute(r Run, src map[string][]byte, o Options) (*Result, error) {
 		StopLevel: stopLevel(sc.StopLevel), Uncached: o.Coverage}
 	var col *coverage.Collector
 	if o.Coverage {
-		col = coverage.New(res, coverage.Units(res, d.Top))
+		col = coverage.New(res, d)
 		d.SetStmtHook(col)
 	}
 	if o.Seed != 0 {

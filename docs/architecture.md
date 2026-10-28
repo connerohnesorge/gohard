@@ -252,10 +252,11 @@ project-relative, so `genhtml --branch-coverage -o html
   alternative, an if statement's else (written or not) and a
   conditional assignment's "no condition held" included; the branches
   of a decision that never ran are `-`. A PSL `cover` directive is a
-  line whose count is the number of its `cover-hit` trace events: the
-  #18 counters, not a second count. A line's count is the largest
-  count of the statements that start on it; the decisions of one line
-  are numbered in source order.
+  line whose count is the number of `cover-hit` trace events its
+  processes emitted: the #18 counters, not a second count. A line's
+  count is the largest count of the statements and covers that start
+  on it, so two covers on one line do not add up; the decisions of one
+  line are numbered in source order.
 * The hook: `sema.StmtHook`, installed with `elab.Design.SetStmtHook`
   after elaboration, is told each statement the interpreter runs
   (processes, concurrent statements, the subprograms they call) and

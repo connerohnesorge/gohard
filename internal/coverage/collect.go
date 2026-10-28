@@ -18,7 +18,8 @@
 // kernel's initialization on, so evaluations during elaboration
 // (generics, constants) are not counted. PSL covers are not counted a
 // second time: their hits are the cover-hit events of the run's trace,
-// the #18 counters.
+// the #18 counters, each the hit of the directive whose process
+// emitted it.
 //
 // In lcov terms a statement is a line (DA): the line's count is the
 // largest count of the statements and covers that start on it. A
@@ -35,15 +36,9 @@ import (
 	"slices"
 
 	"github.com/connerohnesorge/gohard/internal/cst"
+	"github.com/connerohnesorge/gohard/internal/elab"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/trace"
-)
-
-type kind uint8
-
-const (
-	kindStmt  kind = iota // a statement
-	kindCover             // a PSL cover directive
 )
 
 // point is one coverable statement or cover directive.
@@ -51,7 +46,6 @@ type point struct {
 	file  *sema.File
 	start int // byte offset of the statement in file
 	line  int
-	kind  kind
 	count int64
 	// alts counts the alternatives a decision took (nil for another
 	// statement); taken is their sum.
@@ -64,11 +58,6 @@ type pointKey struct {
 	start int
 }
 
-type coverKey struct {
-	path string
-	line int
-}
-
 // Collector counts the statements and decisions of one run. It
 // implements sema.StmtHook; it is not safe for concurrent use (a run is
 // single-threaded).
@@ -77,12 +66,13 @@ type Collector struct {
 	// The maps are lookup only: index finds a point by its place,
 	// files the project file of a tree root, bundle the roots of the
 	// bundled std/ieee trees, seen the point of a statement run before
-	// (-1: none), covers the cover directives of a place.
+	// (-1: none), covers the cover directive a process runs, by
+	// process path.
 	index  map[pointKey]int32
 	files  map[*cst.Green]*sema.File
 	bundle map[*cst.Green]bool
 	seen   map[*sema.SeqStmt]int32
-	covers map[coverKey][]int32
+	covers map[string]int32
 	// unmatched counts the statements run that are no point although
 	// they are not bundled, the branches outside their decision's
 	// alternatives and the branches beyond one per run of their
@@ -92,14 +82,15 @@ type Collector struct {
 
 var _ sema.StmtHook = (*Collector)(nil)
 
-// New returns a collector of the statements of units (Units), the
-// units of the analysis r.
-func New(r *sema.Result, units []*sema.Unit) *Collector {
+// New returns a collector of the statements of the design d
+// elaborated in the analysis r: those of Units(r, d.Top), with the
+// processes of d that run their PSL cover directives.
+func New(r *sema.Result, d *elab.Design) *Collector {
 	c := &Collector{index: map[pointKey]int32{},
 		files:  map[*cst.Green]*sema.File{},
 		bundle: map[*cst.Green]bool{},
 		seen:   map[*sema.SeqStmt]int32{},
-		covers: map[coverKey][]int32{}}
+		covers: map[string]int32{}}
 	if r != nil {
 		for _, f := range r.Files {
 			if f.Parse != nil {
@@ -114,17 +105,27 @@ func New(r *sema.Result, units []*sema.Unit) *Collector {
 			}
 		}
 	}
-	for _, u := range units {
+	for _, u := range Units(r, d.Top) {
 		f := u.File
 		if f == nil || f.Lines == nil {
 			continue
 		}
 		c.conc(f, u.Body)
-		for _, d := range u.Decls {
-			if d.Kind.IsSubprogram() &&
-				d.Node.Kind() == cst.KindSubprogramBody {
-				c.seq(f, d.Seq)
+		for _, x := range u.Decls {
+			if x.Kind.IsSubprogram() &&
+				x.Node.Kind() == cst.KindSubprogramBody {
+				c.seq(f, x.Seq)
 			}
+		}
+	}
+	for _, p := range d.Procs {
+		if p.File == nil || p.Stmt == nil ||
+			p.Stmt.Node.Kind() != cst.KindPSLCover {
+			continue
+		}
+		key := pointKey{p.File, p.Stmt.Node.Span().Start}
+		if i, ok := c.index[key]; ok {
+			c.covers[p.Path] = i
 		}
 	}
 	return c
@@ -142,13 +143,11 @@ func (c *Collector) conc(f *sema.File, ss []*sema.Stmt) {
 			case cst.KindConcurrentSimpleSignalAssign,
 				cst.KindConcurrentConditionalSignalAssign,
 				cst.KindConcurrentSelectedSignalAssign:
-				c.add(f, s.Node, kindStmt, sema.Alternatives(
+				c.add(f, s.Node, sema.Alternatives(
 					&sema.SeqStmt{Kind: sema.SeqSignal, Node: s.Node}))
 			case cst.KindConcurrentAssertionStmt,
-				cst.KindConcurrentProcedureCallStmt:
-				c.add(f, s.Node, kindStmt, 0)
-			case cst.KindPSLCover:
-				c.add(f, s.Node, kindCover, 0)
+				cst.KindConcurrentProcedureCallStmt, cst.KindPSLCover:
+				c.add(f, s.Node, 0)
 			}
 			continue
 		}
@@ -164,7 +163,7 @@ func (c *Collector) conc(f *sema.File, ss []*sema.Stmt) {
 // them.
 func (c *Collector) seq(f *sema.File, ss []*sema.SeqStmt) {
 	for _, s := range ss {
-		c.add(f, s.Node, kindStmt, sema.Alternatives(s))
+		c.add(f, s.Node, sema.Alternatives(s))
 		for _, br := range s.Branches {
 			c.seq(f, br.Body)
 		}
@@ -176,7 +175,7 @@ func (c *Collector) seq(f *sema.File, ss []*sema.SeqStmt) {
 	}
 }
 
-func (c *Collector) add(f *sema.File, n cst.Node, k kind, alts int) {
+func (c *Collector) add(f *sema.File, n cst.Node, alts int) {
 	if n.IsZero() {
 		return
 	}
@@ -188,15 +187,11 @@ func (c *Collector) add(f *sema.File, n cst.Node, k kind, alts int) {
 	line, _ := f.Lines.LineCol(start)
 	i := int32(len(c.points))
 	c.index[key] = i
-	p := point{file: f, start: start, line: line, kind: k}
+	p := point{file: f, start: start, line: line}
 	if alts > 0 {
 		p.alts = make([]int64, alts)
 	}
 	c.points = append(c.points, p)
-	if k == kindCover {
-		ck := coverKey{f.Path, line}
-		c.covers[ck] = append(c.covers[ck], i)
-	}
 }
 
 // Stmt implements sema.StmtHook.
@@ -266,7 +261,7 @@ func (c *Collector) Unmatched() int { return c.unmatched }
 
 // Report returns the coverage of the run whose trace is t: the
 // statement and branch counts so far, and as the count of each cover
-// directive its cover-hit events in t (nil: none).
+// directive the cover-hit events in t of its processes (t nil: none).
 func (c *Collector) Report(t *trace.Trace) Report {
 	counts := make([]int64, len(c.points))
 	for i, p := range c.points {
@@ -274,10 +269,11 @@ func (c *Collector) Report(t *trace.Trace) Report {
 	}
 	if t != nil {
 		for _, e := range t.Events {
-			if e.Kind != trace.CoverHit {
+			if e.Kind != trace.CoverHit || e.Process < 1 ||
+				e.Process > len(t.Processes) {
 				continue
 			}
-			for _, i := range c.covers[coverKey{e.File, e.Line}] {
+			if i, ok := c.covers[t.Processes[e.Process-1].Path]; ok {
 				counts[i] = add(counts[i], 1)
 			}
 		}
