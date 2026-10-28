@@ -313,8 +313,8 @@ func loadCorpus(t *testing.T) ([]corpusDesign,
 // garbage collection). Every result is independent of the file order.
 func TestCorpus(t *testing.T) {
 	designs, run := loadCorpus(t)
-	if len(designs) != 16 {
-		t.Fatalf("%d corpus designs, want 16", len(designs))
+	if len(designs) != 17 {
+		t.Fatalf("%d corpus designs, want 17", len(designs))
 	}
 	for _, d := range designs {
 		dir := filepath.Join("../../testdata/corpus", d.Name)

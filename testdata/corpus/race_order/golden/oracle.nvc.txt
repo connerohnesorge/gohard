@@ -1,0 +1,23 @@
+gohard-oracle 1
+tool nvc 1.23.0
+sources 22d18301cd612b5e
+testbench race_order_tb
+signal race_order_tb.dut.go logic 1
+signal race_order_tb.dut.order integer 32
+signal race_order_tb.dut.sample logic 1
+signal race_order_tb.go logic 1
+signal race_order_tb.order integer 32
+signal race_order_tb.sample logic 1
+0 race_order_tb.dut.go 0
+0 race_order_tb.dut.order 0
+0 race_order_tb.dut.sample 0
+0 race_order_tb.go 0
+0 race_order_tb.order 0
+0 race_order_tb.sample 0
+10000000 race_order_tb.dut.go 1
+10000000 race_order_tb.go 1
+15000000 race_order_tb.dut.order 12345678
+15000000 race_order_tb.dut.sample 1
+15000000 race_order_tb.order 12345678
+15000000 race_order_tb.sample 1
+digest 12 da27ce08916d0368f2ed376e7cdb5e91ccb47af9c58b69e9126e14a45f6d192f

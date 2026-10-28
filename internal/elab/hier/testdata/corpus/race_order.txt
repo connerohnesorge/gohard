@@ -1,0 +1,10 @@
+race_order_tb entity work.race_order_tb(sim)
+  race_order_tb.dut entity work.race_order(rtl)
+    race_order_tb.dut.writers(1) for-generate
+    race_order_tb.dut.writers(2) for-generate
+    race_order_tb.dut.writers(3) for-generate
+    race_order_tb.dut.writers(4) for-generate
+    race_order_tb.dut.writers(5) for-generate
+    race_order_tb.dut.writers(6) for-generate
+    race_order_tb.dut.writers(7) for-generate
+    race_order_tb.dut.writers(8) for-generate

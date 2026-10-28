@@ -72,6 +72,10 @@ vocabulary:
       semantic: >-
         PSL in `-- psl` comments (psl.comments) with a comment default
         clock (#109, not in the #8 list)
+    - id: race_warning
+      semantic: >-
+        the #29 sim/race warning: a trace that depends on the in-delta
+        process order (#63, not in the #8 list)
     - id: textio_input_file
       semantic: >-
         textio reads of a checked-in input file (#63, not in the #8 list)
@@ -86,6 +90,13 @@ vocabulary:
   invariants:
     - id: seed_independent
       meaning: byte-identical trace at seeds 0-3 (PR) and 64 seeds (nightly)
+    - id: races_by_design
+      meaning: racy on purpose, so it claims it instead of
+        seed_independent (race_order). At every checked seed N >= 1 the
+        run, compared with seed 0 the way gohard check --sim --seed N
+        compares it, reports sim/race, and at least two of the checked
+        seeds give different traces (seeds 0-3 on pull requests, 0-63
+        nightly)
     - id: variant_stable
       meaning: outcome unchanged under layout, case, rename and
         independent-statement reordering variants
@@ -1163,6 +1174,77 @@ designs:
     oracle_sha256: ef9811e748022662bde89003654d0e5fe152ef95b68a8f983f38e98f68c5202d
     format_oracle_sha256: 3991573b856dd572670d95c0f9ef57bdf5fb94b5cfd3452818daf30a90860247
     semerr_sha256: c7a7bb9b018f0a0908a2929afe55ededada06ec2db9e214691643d0aae7b4b96
+  - name: race_order
+    standard: "2008"
+    milestone: v1.1
+    files:
+      - path: race_order.vhd
+        standard: "2008"
+      - path: race_order_tb.vhd
+        standard: "2008"
+    top: race_order
+    testbench: race_order_tb
+    defines: {}
+    models: {}
+    # The same outcome at every seed; only the trace (the value of
+    # order) depends on the seed. `gohard check --sim --seed N` with
+    # N >= 1 adds one sim/race warning naming two of the writers; the
+    # harness checks that through races_by_design, not here.
+    expected:
+      exit: 0
+      status: clean
+      stop_time: 20 ns
+      messages: []
+    features: [race_warning]
+    invariants: [races_by_design, variant_stable, self_stopping]
+    oracle: both
+    hierarchy_oracle: ghdl
+    ghdl:
+      version: 6.0.0
+      command: >-
+        ghdl -a --std=08 race_order.vhd race_order_tb.vhd;
+        ghdl --elab-run --std=08 race_order_tb
+      result: pass
+      exit: 0
+      stop_time: 20 ns
+      messages:
+        - "simulation finished @20ns"
+      notes: >-
+        GHDL runs the eight writers in reverse order: order is 87654321
+        from 15 ns. The check (a permutation of 1 .. 8) passes; finished
+        via std.env.finish at 20 ns.
+    nvc:
+      version: 1.23.0
+      command: >-
+        nvc --std=2008 -a race_order.vhd race_order_tb.vhd -e race_order_tb
+        -r
+      result: pass
+      exit: 0
+      stop_time: 20 ns
+      messages:
+        - "** Note: 20ns+0: FINISH called"
+      notes: >-
+        NVC runs the writers in declaration order: order is 12345678
+        from 15 ns, as in GoHard at seed 0.
+    disagreements:
+      - topic: in-delta order of the eight writers (the race)
+        ghdl: runs writers(8) first, order = 87654321
+        nvc: runs writers(1) first, order = 12345678
+        follows: nvc
+        lrm: 14.7.5.3
+        notes: >-
+          The LRM does not define the order in which the processes of
+          one simulation cycle run, so both values are correct. GoHard
+          runs them in declaration order at seed 0, as NVC does, and in
+          a seed-dependent order at the other seeds (sim/race). The
+          trace section compares order with the NVC recording only.
+        signals:
+          - race_order_tb.dut.order
+          - race_order_tb.order
+    trace_sha256: 8305e18fdb970753b882a5ce9bda21a2ae9d78bb1a112d1e9ed72fe8f78d81fa
+    oracle_sha256: 9772ee9771ff2905cecb0d5ca6842743e44f17c5685fe9b62ac118d10d785a7c
+    format_oracle_sha256: 0f2859b6bc9a6f2b4bdac0cfa8ffeed734cb0dd57d77708d3e7706c53cd56292
+    semerr_sha256: 2eddb632671535e1aff04108a11827047730c426fbb83b31d42b39ce49e37490
   - name: standin_model
     standard: "2008"
     milestone: v1.0

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/parser"
 	"github.com/connerohnesorge/gohard/internal/simrun"
 	"github.com/connerohnesorge/gohard/internal/token"
@@ -62,16 +63,17 @@ func loadManifest(t testing.TB) (*Manifest, ReadFunc) {
 }
 
 // TestManifest checks the design list: the 14 designs of #8, the #27
-// gc_heap design and the #109 psl_comments design, sorted, each with a
-// directory, and every file of every run present (a missing file names
-// git submodule update --init, never a skip).
+// gc_heap design, the #109 psl_comments design and the #63 race_order
+// design, sorted, each with a directory, and every file of every run
+// present (a missing file names git submodule update --init, never a
+// skip).
 func TestManifest(t *testing.T) {
 	m, read := loadManifest(t)
 	want := []string{"assert_fail", "budget_hang", "force_ext",
 		"gc_heap", "hier_generate", "md_resolve", "mode_views",
 		"overload_ops", "postponed_attrs", "prot_cond", "psl_comments",
-		"psl_simple", "standin_model", "textio_env", "vhdl93_only",
-		"wait_forms"}
+		"psl_simple", "race_order", "standin_model", "textio_env",
+		"vhdl93_only", "wait_forms"}
 	var got []string
 	for _, d := range m.Designs {
 		got = append(got, d.Name)
@@ -82,6 +84,10 @@ func TestManifest(t *testing.T) {
 		}
 		if !d.Has("variant_stable") {
 			t.Errorf("%s does not claim variant_stable", d.Name)
+		}
+		if d.Has("seed_independent") == d.Has("races_by_design") {
+			t.Errorf("%s must claim exactly one of seed_independent "+
+				"and races_by_design", d.Name)
 		}
 	}
 	if !slices.Equal(got, want) {
@@ -190,6 +196,7 @@ func runDesign(t *testing.T, r Run, read ReadFunc) {
 	}
 	if res.Simulated {
 		checkSeeds(t, r, src, res)
+		checkRacy(t, r, src, res)
 		if r.Variant == "" {
 			checkGolden(t, r, read, res)
 		}
@@ -241,6 +248,88 @@ func checkSeeds(t *testing.T, r Run, src map[string][]byte, base *Result) {
 				[]uint64{0, uint64(s)}) {
 				t.Errorf("%s: %s: %s", r.Name(), d.Code, d.Message)
 			}
+		}
+	}
+}
+
+// checkRacy: a design claiming races_by_design (#63) is racy on
+// purpose. At every seed N >= 1 it has the expected outcome and,
+// compared with seed 0 the way `gohard check --sim --seed N` compares
+// it, gives one sim/race warning; and at least two of the checked
+// seeds give different traces.
+func checkRacy(t *testing.T, r Run, src map[string][]byte, base *Result) {
+	t.Helper()
+	if !r.Design.Has("races_by_design") {
+		return
+	}
+	for _, p := range racyProblems(t, r, src, base, *seeds) {
+		t.Errorf("%s: %s", r.Name(), p)
+	}
+}
+
+// racyProblems checks races_by_design at seeds 0..n-1 (base is the
+// run at seed 0) and returns one line per failure.
+func racyProblems(t *testing.T, r Run, src map[string][]byte,
+	base *Result, n int,
+) []string {
+	t.Helper()
+	var probs []string
+	traces := map[string]bool{string(base.Text): true}
+	for s := 1; s < n; s++ {
+		res, err := Execute(r, src, Options{Seed: uint64(s),
+			Code: simrun.DefaultCode})
+		if err != nil {
+			t.Fatalf("%s seed %d: %v", r.Name(), s, err)
+		}
+		for _, p := range Check(r.Expected, res, MatchFor(r)) {
+			probs = append(probs, fmt.Sprintf("seed %d: %s", s, p))
+		}
+		traces[string(res.Text)] = true
+		ds := Races(r, src, simrun.DefaultCode, []uint64{0, uint64(s)})
+		if len(ds) != 1 || ds[0].Code != diag.SimRace {
+			probs = append(probs, fmt.Sprintf("seed %d: want one "+
+				"sim/race warning against seed 0, got %v", s, ds))
+		}
+	}
+	if n > 1 && len(traces) < 2 {
+		probs = append(probs, fmt.Sprintf("the same trace at all %d "+
+			"seeds", n))
+	}
+	return probs
+}
+
+// TestRacyDetects: the races_by_design check fails a race_order whose
+// writers no longer race (each waits its own number of picoseconds
+// before it pushes, so every seed gives 12345678), at every seed after
+// 0 and for the traces, and passes race_order itself.
+func TestRacyDetects(t *testing.T) {
+	m, read := loadManifest(t)
+	d, _ := m.Design("race_order")
+	r := d.Runs()[0]
+	src, err := r.Sources(read)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fixed := maps.Clone(src)
+	fixed["race_order.vhd"] = []byte(strings.Replace(
+		string(src["race_order.vhd"]), "log.push(i);",
+		"wait for i * 1 ps;\n      log.push(i);", 1))
+	for _, c := range []struct {
+		name string
+		src  map[string][]byte
+		want int // 3 seeds without sim/race, one trace
+	}{{"fixed", fixed, 4}, {"racy", src, 0}} {
+		base, err := Execute(r, c.src, Options{Code: simrun.DefaultCode})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if p := Check(r.Expected, base, MatchFor(r)); len(p) > 0 {
+			t.Fatalf("%s: %v", c.name, p)
+		}
+		if probs := racyProblems(t, r, c.src, base, 4); len(probs) !=
+			c.want {
+			t.Errorf("%s: want %d problems, got %q", c.name, c.want,
+				probs)
 		}
 	}
 }

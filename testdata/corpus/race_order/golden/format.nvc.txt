@@ -1,0 +1,17 @@
+# GoHard formatter oracle (#32): race_order, nvc.
+# Written by go run ./tools/oracle --update; do not edit.
+# Every file is formatted once with the design's format.* options
+# under the standard it is first listed with (variants reuse that
+# text). The original and the formatted files of each run are analyzed
+# in order, one file per command, in two fresh work directories. Error
+# lines of the formatted text are mapped back to the original lines;
+# "new" lists errors only the formatted text has, "gone" errors only
+# the original has. The check needs "result new=0".
+tool nvc 1.23.0
+options indent=2 keyword_case=lower align_ports=true max_line_length=80
+run main std=2008
+file race_order.vhd std=2008 sha256=ff2a3e728db9da9ea556a7311ac7575e51b417f8752116cbaa71e16b57b4ae78 formatted=e2f436297b5d40470b4d873889a58dd055fe92b06a0d6f49c8023172ee2ddb15 changed
+  exit original=0 formatted=0
+file race_order_tb.vhd std=2008 sha256=f33a5a234f20dc00e438353475f8a40d0608f7c7f2203e6df51358e513be99e9 formatted=e988bf99035fd790ec81b93f9032731a3a58cc5c44f99277ec4135fe17eb4dfd changed
+  exit original=0 formatted=0
+result new=0

@@ -1,0 +1,43 @@
+gohard-trace 1
+testbench race_order_tb
+end 20000000
+type bit enum '0' '1'
+type integer integer 0 2147483647
+scope race_order_tb instance race_order_tb(sim)
+scope race_order_tb.dut instance race_order(rtl)
+scope race_order_tb.dut.writers(1) for-generate
+scope race_order_tb.dut.writers(2) for-generate
+scope race_order_tb.dut.writers(3) for-generate
+scope race_order_tb.dut.writers(4) for-generate
+scope race_order_tb.dut.writers(5) for-generate
+scope race_order_tb.dut.writers(6) for-generate
+scope race_order_tb.dut.writers(7) for-generate
+scope race_order_tb.dut.writers(8) for-generate
+signal race_order_tb.dut.go bit in
+signal race_order_tb.dut.order integer out
+signal race_order_tb.dut.sample bit in
+signal race_order_tb.go bit signal
+signal race_order_tb.order integer signal
+signal race_order_tb.sample bit signal
+process 1 race_order_tb.check
+process 2 race_order_tb.dut.publish
+process 3 race_order_tb.dut.writers(1).w
+process 4 race_order_tb.dut.writers(2).w
+process 5 race_order_tb.dut.writers(3).w
+process 6 race_order_tb.dut.writers(4).w
+process 7 race_order_tb.dut.writers(5).w
+process 8 race_order_tb.dut.writers(6).w
+process 9 race_order_tb.dut.writers(7).w
+process 10 race_order_tb.dut.writers(8).w
+0 0 race_order_tb.dut.go '0' -
+0 0 race_order_tb.dut.order 0 -
+0 0 race_order_tb.dut.sample '0' -
+0 0 race_order_tb.go '0' -
+0 0 race_order_tb.order 0 -
+0 0 race_order_tb.sample '0' -
+10000000 0 race_order_tb.dut.go '1' p1
+10000000 0 race_order_tb.go '1' p1
+15000000 0 race_order_tb.dut.sample '1' p1
+15000000 0 race_order_tb.sample '1' p1
+15000000 1 race_order_tb.dut.order 12345678 p2
+15000000 1 race_order_tb.order 12345678 p2

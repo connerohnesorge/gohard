@@ -1,0 +1,18 @@
+gohard-tree 1
+tool ghdl 6.0.0
+sources 22d18301cd612b5e
+race_order_tb [entity]
+`-sim [arch]
+  `-dut [instance]
+    `-race_order [entity]
+      `-rtl [arch]
+        +-writers(1) [for-generate]
+        +-writers(2) [for-generate]
+        +-writers(3) [for-generate]
+        +-writers(4) [for-generate]
+        +-writers(5) [for-generate]
+        +-writers(6) [for-generate]
+        +-writers(7) [for-generate]
+        `-writers(8) [for-generate]
+std.standard [package]
+std.env [package]
