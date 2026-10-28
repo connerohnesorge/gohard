@@ -3,6 +3,7 @@ package simrun
 import (
 	"strings"
 
+	"github.com/connerohnesorge/gohard/internal/coverage"
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/elab"
 	"github.com/connerohnesorge/gohard/internal/elab/psl"
@@ -21,6 +22,7 @@ type Running struct {
 	k    *sim.Kernel
 	rec  *trace.Recorder
 	ov   *env.Overlay
+	cov  *coverage.Collector
 	real bool
 	done bool
 }
@@ -82,7 +84,14 @@ func Start(o Options) *Running {
 	so := sim.Options{Seed: o.Seed,
 		Order: Order(o.Seed), TimeBudget: sim.Time(o.Sim.TimeBudget),
 		DeltaBudget: o.Sim.DeltaBudget, Budget: b,
-		StopLevel: StopLevel(o.Sim.StopLevel), Writer: r.rec}
+		StopLevel: StopLevel(o.Sim.StopLevel), Writer: r.rec,
+		Uncached: o.Coverage}
+	if o.Coverage {
+		// Installed after elaboration: coverage counts what the run
+		// executes from the kernel's initialization on.
+		r.cov = coverage.New(o.Result, coverage.Units(o.Result, d.Top))
+		d.SetStmtHook(r.cov)
+	}
 	if o.Orders != nil {
 		so.Observe = o.Orders.Observe
 	}
@@ -141,6 +150,10 @@ func (r *Running) end() {
 	if t, err := r.rec.Trace(); err == nil {
 		t.Header.NonReproducible = r.real
 		r.out.Trace = t
+	}
+	if r.cov != nil {
+		rep := r.cov.Report(r.out.Trace)
+		r.out.Coverage, r.out.unmatched = &rep, r.cov.Unmatched()
 	}
 }
 

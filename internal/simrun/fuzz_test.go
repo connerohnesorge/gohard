@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/internal/coverage"
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/gen/vhdlgen"
 	"github.com/connerohnesorge/gohard/internal/sema"
@@ -38,7 +39,10 @@ const maxCycles = 1 << 22
 // race-free design gives the same trace at seeds 0 to 3 (unless a step
 // budget ran out, which stops mid-delta); and for a racy design Races
 // reports sim/race exactly when the traces at seed 0 and another seed
-// differ. Saved inputs live in testdata/fuzz/FuzzSim (local corpus).
+// differ. The second and a third run record coverage (#62): it changes
+// no trace byte, status or diagnostic (step budgets included), every
+// statement run is a coverable one, and both give the same coverage
+// bytes. Saved inputs live in testdata/fuzz/FuzzSim (local corpus).
 func FuzzSim(f *testing.F) {
 	for seed := range uint64(16) {
 		f.Add(seed, seed%4 == 3, []byte(nil))
@@ -75,8 +79,23 @@ func checkSim(t *testing.T, seed uint64, racy bool, data []byte) {
 	if a.Trace == nil {
 		fail("no trace (status %s)", a.Status)
 	}
-	b := runBounded(o, fail)
-	sameRun(a, b, fail, "two runs at seed %d", seed)
+	oc := o
+	oc.Coverage = true
+	b := runBounded(oc, fail)
+	sameRun(a, b, fail, "two runs at seed %d, the second with coverage",
+		seed)
+	c := runBounded(oc, fail)
+	sameRun(a, c, fail, "two runs at seed %d with coverage", seed)
+	switch {
+	case b.Coverage == nil || c.Coverage == nil:
+		fail("no coverage")
+	case b.unmatched != 0:
+		fail("%d statements ran outside the coverable ones", b.unmatched)
+	case !bytes.Equal(coverage.Encode(*b.Coverage),
+		coverage.Encode(*c.Coverage)):
+		fail("coverage differs between two runs:\n%s\n%s",
+			coverage.Encode(*b.Coverage), coverage.Encode(*c.Coverage))
+	}
 	if stepExceeded(a) {
 		return
 	}

@@ -25,6 +25,7 @@ func Races(o Options, seeds []uint64) []diag.Diagnostic {
 		ro := o
 		ro.Seed = seed
 		ro.Orders = &sim.OrderLog{}
+		ro.Coverage = false // the run's own coverage is the main run's
 		out := Run(ro)
 		if out.Trace == nil || out.Model == nil {
 			return sim.RaceRun{}, errNoTrace

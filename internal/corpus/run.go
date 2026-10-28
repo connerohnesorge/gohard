@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/internal/coverage"
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/elab"
 	"github.com/connerohnesorge/gohard/internal/elab/hier"
@@ -46,6 +47,9 @@ type Options struct {
 	// are done, right before the kernel is built and run: the
 	// benchmarks time the simulation alone from there (#59).
 	Simulating func()
+	// Coverage records the run's coverage in Result.Coverage, as
+	// `gohard check --sim --coverage` does (#62).
+	Coverage bool
 }
 
 // Produced is one produced diagnostic with the simulated time of the
@@ -81,6 +85,11 @@ type Result struct {
 	// Steps are the evaluation steps the run used, elaboration
 	// included (simulation.step_budget counts them).
 	Steps int64
+	// Coverage is the run's coverage under Options.Coverage (nil
+	// without a simulation); Unmatched is the collector's count of
+	// statements it could not place (coverage.Collector.Unmatched).
+	Coverage  *coverage.Report
+	Unmatched int
 }
 
 // Config returns the run's project configuration: the design's
@@ -210,7 +219,12 @@ func Execute(r Run, src map[string][]byte, o Options) (*Result, error) {
 	rec := trace.NewRecorder(sc.DumpScope)
 	opts := sim.Options{Seed: o.Seed, TimeBudget: sim.Time(sc.TimeBudget),
 		DeltaBudget: sc.DeltaBudget, Budget: b, Writer: rec,
-		StopLevel: stopLevel(sc.StopLevel)}
+		StopLevel: stopLevel(sc.StopLevel), Uncached: o.Coverage}
+	var col *coverage.Collector
+	if o.Coverage {
+		col = coverage.New(res, coverage.Units(res, d.Top))
+		d.SetStmtHook(col)
+	}
 	if o.Seed != 0 {
 		opts.Order = env.SeedOrder{Seed: o.Seed}
 	}
@@ -236,6 +250,10 @@ func Execute(r Run, src map[string][]byte, o Options) (*Result, error) {
 		return nil, fmt.Errorf("%s: %w", r.Name(), err)
 	}
 	out.Trace, out.Text = t, trace.Encode(t)
+	if col != nil {
+		rep := col.Report(t)
+		out.Coverage, out.Unmatched = &rep, col.Unmatched()
+	}
 	ds = append(ds, timed(k.Diagnostics(), t)...)
 	return out, nil
 }

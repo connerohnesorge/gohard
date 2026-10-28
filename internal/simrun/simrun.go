@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/internal/coverage"
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/elab"
 	"github.com/connerohnesorge/gohard/internal/env"
@@ -77,6 +78,10 @@ type Options struct {
 	// Orders, when set, records the run orders for race detection
 	// (Races).
 	Orders *sim.OrderLog
+	// Coverage records the run's statement, branch and PSL cover
+	// coverage (#62) in Outcome.Coverage. It changes no value, trace,
+	// diagnostic or step count.
+	Coverage bool
 }
 
 // Env is what a run sees of the world besides its options (#18). The
@@ -132,6 +137,11 @@ type Outcome struct {
 	// DIR_*), with env.ListingSHA256 of their entries, sorted: the
 	// repro header records them like Inputs.
 	Listings []env.Input
+	// Coverage is the run's coverage when Options.Coverage is set and
+	// the kernel ran (nil otherwise).
+	Coverage *coverage.Report
+	// unmatched is the collector's Unmatched count (tests).
+	unmatched int
 }
 
 // interpOptions are the interpreter options of a run with its own
