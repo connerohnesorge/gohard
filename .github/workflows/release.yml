@@ -16,6 +16,10 @@ jobs:
   goreleaser:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # "true" once goreleaser built the release's archives and
+    # checksums.txt in this run; the vscode job publishes only then.
+    outputs:
+      released: ${{ steps.released.outputs.released }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -69,6 +73,15 @@ jobs:
           # the secret is not set, .goreleaser.yaml skips both uploads.
           PACKAGES_GITHUB_TOKEN: ${{ secrets.PACKAGES_GITHUB_TOKEN }}
 
+      # goreleaser writes checksums.txt once every archive is built and
+      # before it publishes. A release that already exists for the tag,
+      # such as one created in the GitHub UI, proves nothing about the
+      # archives, so the vscode job (#3) waits for this output instead.
+      - name: Record that goreleaser built the release
+        id: released
+        if: ${{ !cancelled() && hashFiles('dist/checksums.txt') != '' }}
+        run: echo released=true >>"$GITHUB_OUTPUT"
+
       # Signed SLSA build provenance for every archive and checksums.txt,
       # verifiable with `gh attestation verify` (docs/install.md).
       # goreleaser publishes the release before it pushes the cask and
@@ -88,12 +101,13 @@ jobs:
   # editors/vscode, goes onto the release goreleaser published, then to
   # the VS Code Marketplace with the VSCE_PAT secret and to Open VSX with
   # the OVSX_PAT secret; a store whose secret is not set is skipped.
-  # The job also runs when goreleaser failed after publishing the
-  # release (a failed cask push); without a release the upload fails
-  # and nothing is published.
+  # The job runs only when goreleaser built the release's archives and
+  # checksums.txt in this run, also when it failed after that (a failed
+  # cask push). When goreleaser stopped before them, nothing is
+  # published, even if a release for the tag exists.
   vscode:
     needs: goreleaser
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && needs.goreleaser.outputs.released == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:

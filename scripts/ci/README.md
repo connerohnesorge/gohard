@@ -142,16 +142,20 @@ GORELEASER=$(nix build nixpkgs#goreleaser --no-link --print-out-paths)/bin/gorel
   nix develop -c bash scripts/ci/release-repro.sh
 ```
 
-The `vscode` job of `release.yml` (#3) runs after `goreleaser`, also
-when goreleaser failed after publishing the release. It checks that
-`editors/vscode/package.json` carries the tag's version (the
-`goreleaser` job checks it too, next to `flake.nix`), builds the VSIX
-with `vsce package`, attaches `gohard-<version>.vsix` to the release
-with `gh release upload`, then publishes it to the VS Code Marketplace
-with the `VSCE_PAT` secret (an Azure DevOps token of the publisher
-`connerohnesorge`) and to Open VSX with the `OVSX_PAT` secret (a token
-of the namespace `connerohnesorge`). A store whose secret is not set is
-skipped; without a release the upload fails and nothing is published.
+The `vscode` job of `release.yml` (#3) runs after `goreleaser` once
+goreleaser wrote `dist/checksums.txt` (the attest step's condition),
+also when goreleaser failed after that. A release that already exists
+for the tag, such as one created in the GitHub UI, does not count: when
+goreleaser stopped before building the archives, nothing is published.
+The job checks that `editors/vscode/package.json` carries the tag's
+version (the `goreleaser` job checks it too, next to `flake.nix`),
+builds the VSIX with `vsce package`, attaches `gohard-<version>.vsix`
+to the release with `gh release upload`, then publishes it to the VS
+Code Marketplace with the `VSCE_PAT` secret (an Azure DevOps token of
+the publisher `connerohnesorge`) and to Open VSX with the `OVSX_PAT`
+secret (a token of the namespace `connerohnesorge`). A store whose
+secret is not set is skipped. `TestReleaseVSCodeAfterGoreleaser` in
+`internal/cli` pins the job's guard.
 A release bumps the version in `flake.nix`,
 `editors/vscode/package.json` and `editors/vscode/package-lock.json`
 (`npm version --no-git-tag-version X.Y.Z` in `editors/vscode`);

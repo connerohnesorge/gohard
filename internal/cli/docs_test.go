@@ -1,9 +1,13 @@
 package cli_test
 
 import (
+	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
+
+	"go.yaml.in/yaml/v3"
 )
 
 // TestCIExampleSkipsSARIFOnExit2 pins the documented CI example (#20):
@@ -181,5 +185,98 @@ func TestReleaseAttestsAfterPublishError(t *testing.T) {
 		if !strings.Contains(guard, want) {
 			t.Errorf("attest step guard %q lacks %q", guard, want)
 		}
+	}
+}
+
+// TestReleaseVSCodeAfterGoreleaser pins when the release workflow
+// publishes the VS Code extension (#3): only after goreleaser wrote
+// dist/checksums.txt in the same run, which it does once every archive
+// is built and before it publishes; that is the attest step's condition.
+// The job also runs when goreleaser failed after that (a failed cask
+// push). A release that exists for the tag without goreleaser's
+// archives, such as one created in the GitHub UI, must not get the
+// VSIX: a store cannot take the same version again.
+func TestReleaseVSCodeAfterGoreleaser(t *testing.T) {
+	raw, err := os.ReadFile("../../.github/workflows/release.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	type step struct {
+		ID   string         `yaml:"id"`
+		If   string         `yaml:"if"`
+		Uses string         `yaml:"uses"`
+		Run  string         `yaml:"run"`
+		With map[string]any `yaml:"with"`
+	}
+	var wf struct {
+		Jobs map[string]struct {
+			Needs   any               `yaml:"needs"`
+			If      string            `yaml:"if"`
+			Outputs map[string]string `yaml:"outputs"`
+			Steps   []step            `yaml:"steps"`
+		} `yaml:"jobs"`
+	}
+	if err := yaml.Unmarshal(raw, &wf); err != nil {
+		t.Fatal(err)
+	}
+	gr, ok := wf.Jobs["goreleaser"]
+	if !ok {
+		t.Fatal("release.yml: no goreleaser job")
+	}
+	vs, ok := wf.Jobs["vscode"]
+	if !ok {
+		t.Fatal("release.yml: no vscode job")
+	}
+	if fmt.Sprint(vs.Needs) != "goreleaser" {
+		t.Errorf("vscode job needs %v, want goreleaser", vs.Needs)
+	}
+	// Without !cancelled() GitHub adds success(), and a failed cask push
+	// after the release would leave the release without its VSIX.
+	for _, want := range []string{"!cancelled()",
+		"needs.goreleaser.outputs.released == 'true'"} {
+		if !strings.Contains(vs.If, want) {
+			t.Errorf("vscode job guard %q lacks %q", vs.If, want)
+		}
+	}
+
+	out := gr.Outputs["released"]
+	stepOutput := regexp.MustCompile(
+		`^\$\{\{ *steps\.([\w-]+)\.outputs\.released *\}\}$`)
+	m := stepOutput.FindStringSubmatch(out)
+	if m == nil {
+		t.Fatalf("goreleaser job output released is %q, want a step's "+
+			"output released", out)
+	}
+	release, set := -1, -1
+	for i, s := range gr.Steps {
+		if strings.HasPrefix(s.Uses, "goreleaser/goreleaser-action@") &&
+			strings.HasPrefix(fmt.Sprint(s.With["args"]), "release") {
+			release = i
+		}
+		if s.ID == m[1] {
+			set = i
+		}
+	}
+	if release < 0 {
+		t.Fatal("release.yml: no goreleaser release step")
+	}
+	if set < 0 {
+		t.Fatalf("release.yml: no step with id %s", m[1])
+	}
+	if set < release {
+		t.Errorf("step %s sets released before goreleaser release runs",
+			m[1])
+	}
+	s := gr.Steps[set]
+	for _, want := range []string{"!cancelled()",
+		"hashFiles('dist/checksums.txt') != ''"} {
+		if !strings.Contains(s.If, want) {
+			t.Errorf("step %s guard %q lacks %q", m[1], s.If, want)
+		}
+	}
+	if !strings.Contains(s.Run, "released=true") ||
+		!strings.Contains(s.Run, "$GITHUB_OUTPUT") {
+		t.Errorf("step %s does not write released=true to "+
+			"$GITHUB_OUTPUT: %q", m[1], s.Run)
 	}
 }
