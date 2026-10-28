@@ -151,7 +151,10 @@ GORELEASER=$(nix build nixpkgs#goreleaser --no-link --print-out-paths)/bin/gorel
   `genhtml` from it to read the coverage files (#62). GHDL and NVC never simulate or analyze in
   CI; hashes recorded by `tools/oracle` are compared.
 * A missing submodule must fail with a message naming
-  `git submodule update --init`; nothing is skipped.
+  `git submodule update --init`; nothing is skipped. `TestImportPoC`
+  (`internal/cli`) also needs the OSVVM submodules nested in
+  `testdata/poc`: `git submodule update --init --recursive
+  testdata/poc`.
 * Release gate: a green `pr` run on all three OSes and a green `nightly`
   run on the same commit. Making `pr` required for merging is a branch
   protection setting on GitHub, not a file here.

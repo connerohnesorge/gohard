@@ -393,41 +393,67 @@ func TestImportOpenLogic(t *testing.T) {
 var pre2008 = regexp.MustCompile("(?s)`if VHDL_VERSION < \"2008\" " +
 	"then\n.*?`end if\n")
 
-// pocErrors are the PoC files with errors under gohard check, none
-// about the import: the two *_OSVVM packages use the library
-// osvvm_axi4, which PoC's regression.tcl builds from its nested
-// lib/OSVVM-AXI4 submodule (lib/OsvvmLibraries.pro) before PoC.pro.
-// Only a recursive checkout has that submodule, and its scripts use
-// OSVVM's DirectoryExists and ChangeWorkingDirectory, which gohard
-// import does not evaluate, so the test maps no osvvm_axi4.
-var pocErrors = []string{
-	"src/bus/axi4/axi4_OSVVM.pkg.vhdl",
-	"src/bus/axi4lite/axi4lite_OSVVM.pkg.vhdl",
+// pinnedNested returns the absolute path of the submodule sub (a slash
+// path) of the pinned checkout top, failing when it is not checked out:
+// only a recursive checkout has it, and until then it is an empty
+// folder.
+func pinnedNested(t *testing.T, top, sub string) string {
+	t.Helper()
+	abs := filepath.Join(pinned(t, top), filepath.FromSlash(sub))
+	if ents, err := os.ReadDir(abs); err != nil || len(ents) == 0 {
+		t.Fatalf("%s/%s is missing: run git submodule update --init "+
+			"--recursive %s", top, sub, top)
+	}
+	return abs
 }
+
+// pocLibs are the libraries of PoC's lib/OsvvmLibraries.pro that PoC's
+// files use, in its order: the src/bus/axi4*/*_OSVVM packages use
+// osvvm_axi4 (OSVVM-AXI4), which uses osvvm and osvvm_common. Each is
+// a submodule nested in the PoC checkout.
+var pocLibs = []string{"osvvm", "OSVVM-Common", "OSVVM-AXI4"}
+
+// pocRegression is the build order of PoC's regression.tcl as one
+// script: lib/OsvvmLibraries.pro as it runs in a recursive checkout
+// (where [DirectoryExists OSVVM-AXI4] holds), limited to pocLibs, then
+// PoC.pro. The libraries sit outside the project root, as in a project
+// that uses them.
+const pocRegression = `include ../lib/osvvm/osvvm.pro
+include ../lib/OSVVM-Common
+include ../lib/OSVVM-AXI4
+include PoC.pro
+`
 
 // TestImportPoC: gohard import of PoC's src/build.pro (the build.pro
 // PoC.pro includes, which sets library PoC and includes the other 33)
 // under the default profile, after PoC's own setup step of writing
-// tb/common/local_configuration.vhdl, imports every file, and gohard
-// check, with lenient: true for the GHDL -frelaxed and NVC --relaxed
-// PoC's tools/poc.tcl analyzes with, reports errors only in pocErrors.
+// tb/common/local_configuration.vhdl, imports every file. Imported in
+// the build order of PoC's regression.tcl, after the OSVVM libraries
+// PoC's own checkout pins, gohard check passes on PoC's files, with
+// lenient: true for the GHDL -frelaxed and NVC --relaxed PoC's
+// tools/poc.tcl analyzes with.
 func TestImportPoC(t *testing.T) {
 	poc := pinned(t, "testdata/poc")
 	dir := t.TempDir()
-	copyTree(t, filepath.Join(poc, "src"), filepath.Join(dir, "src"))
+	proj := filepath.Join(dir, "proj")
+	for _, l := range pocLibs {
+		copyTree(t, pinnedNested(t, "testdata/poc", "lib/"+l),
+			filepath.Join(dir, "lib", l))
+	}
+	copyTree(t, filepath.Join(poc, "src"), filepath.Join(proj, "src"))
 	// With its testbench under the root, arith_Scaler is not checked
 	// as a top level under default generics that make a positive
 	// constant 0.
-	copyTree(t, filepath.Join(poc, "tb"), filepath.Join(dir, "tb"))
-	projectRoot(t, dir)
+	copyTree(t, filepath.Join(poc, "tb"), filepath.Join(proj, "tb"))
+	projectRoot(t, proj)
 	// What PoC's WriteLocalConfiguration (tools/poc.tcl) writes.
-	if err := os.WriteFile(filepath.Join(dir, "tb", "common",
+	if err := os.WriteFile(filepath.Join(proj, "tb", "common",
 		"local_configuration.vhdl"), []byte("package local_configuration "+
 		"is\n\tconstant LOCAL_PROJECT_DIR : string := \".\";\n"+
 		"end package;\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	code, out := gohard(dir, "import", "src/build.pro")
+	code, out := gohard(proj, "import", "src/build.pro")
 	if code != 0 || !strings.Contains(out, "wrote gohard.yaml: 214 "+
 		"files in 1 library") {
 		t.Fatalf("gohard import: exit %d\n%s", code, out)
@@ -439,18 +465,71 @@ func TestImportPoC(t *testing.T) {
 			t.Errorf("unexpected hint: %s", l)
 		}
 	}
-	appendConfig(t, dir, "lenient: true\n")
-	files := importedFiles(t, dir)
-	code, out = gohard(dir, append([]string{"check"}, files...)...)
-	if code > 1 || !strings.Contains(out, "214 files") {
-		t.Fatalf("gohard check: exit %d\n%s", code, out)
+	pocFiles := importedFiles(t, proj)
+
+	// OSVVM-AXI4's common/build.pro starts with ChangeWorkingDirectory
+	// ./src, which gohard import does not evaluate: the rest of that
+	// script, moved to common/src, analyzes the same files.
+	common := filepath.Join(dir, "lib", "OSVVM-AXI4", "common")
+	b, err := os.ReadFile(filepath.Join(common, "build.pro"))
+	if err != nil {
+		t.Fatal(err)
 	}
+	head, rest, ok := bytes.Cut(b, []byte("ChangeWorkingDirectory ./src\n"))
+	if !ok {
+		t.Fatalf("OSVVM-AXI4/common/build.pro has no "+
+			"ChangeWorkingDirectory ./src:\n%s", b)
+	}
+	if err := os.WriteFile(filepath.Join(common, "src", "build.pro"),
+		append(head, rest...), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(common, "build.pro"),
+		[]byte("include ./src\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	b, err = os.ReadFile(filepath.Join(poc, "PoC.pro"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(proj, "PoC.pro"), b,
+		0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(proj, "regression.pro"),
+		[]byte(pocRegression), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Remove(filepath.Join(proj, "gohard.yaml")); err != nil {
+		t.Fatal(err)
+	}
+	code, out = gohard(proj, "import", "regression.pro")
+	if code != 0 || !strings.Contains(out, "wrote gohard.yaml: 323 "+
+		"files in 4 libraries") {
+		t.Fatalf("gohard import: exit %d\n%s", code, out)
+	}
+	// Hints only for PoC's disabled command and in the libraries.
 	for l := range strings.Lines(out) {
-		if strings.Contains(l, ": error[") && !slices.ContainsFunc(
-			pocErrors, func(f string) bool {
-				return strings.HasPrefix(l, f+":")
-			}) {
-			t.Errorf("error outside pocErrors: %s", l)
+		if strings.Contains(l, "hint[") && !strings.HasPrefix(l, "../lib/") &&
+			!strings.Contains(l, "hint[import/ignored]: disabled ignored") {
+			t.Errorf("unexpected hint: %s", l)
 		}
+	}
+	// The files under the root are PoC's, the same as before.
+	var files []string
+	for _, f := range importedFiles(t, proj) {
+		if !strings.HasPrefix(f, "../") {
+			files = append(files, f)
+		}
+	}
+	if !slices.Equal(files, pocFiles) {
+		t.Errorf("PoC's files: %d imported with the libraries, %d alone",
+			len(files), len(pocFiles))
+	}
+	appendConfig(t, proj, "lenient: true\n")
+	code, out = gohard(proj, append([]string{"check"}, files...)...)
+	if code != 0 || !strings.Contains(out, "summary: 0 errors, ") ||
+		!strings.Contains(out, " 214 files") {
+		t.Errorf("gohard check: exit %d\n%s", code, out)
 	}
 }

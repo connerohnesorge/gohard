@@ -785,6 +785,18 @@ Under this profile `osvvm.pro` imports 47 files, and after
 their `deprecated/*_c.vhd` stand-ins; `gohard check` passes on both
 sets.
 
+PoC's `src/build.pro` imports 214 files into library `PoC`. Two of
+them use `osvvm_axi4`, which PoC's `regression.tcl` builds from
+`lib/OsvvmLibraries.pro` before `PoC.pro`. That script tests each
+library with `[DirectoryExists X]`, and OSVVM-AXI4's
+`common/build.pro` starts with `ChangeWorkingDirectory ./src`; import
+evaluates neither. A `.pro` that includes `lib/osvvm/osvvm.pro`,
+`lib/OSVVM-Common` and `lib/OSVVM-AXI4` and then `PoC.pro`, with that
+`common/build.pro` moved to `common/src` without its
+`ChangeWorkingDirectory` line, imports 323 files in 4 libraries, and
+`gohard check` passes on PoC's 214 with `lenient: true` (PoC analyzes
+with GHDL `-frelaxed` and NVC `--relaxed`).
+
 A command that needs anything else is skipped with an
 `import/ignored` hint at its line: a variable outside the profile
 (`analyze $::poc::myFile`), another `[command]`
