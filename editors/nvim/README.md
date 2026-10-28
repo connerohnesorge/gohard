@@ -8,6 +8,8 @@ summary.
 
 * `lua/gohard/init.lua` - `setup()`, `config()`, `client()`
 * `lua/gohard/commands.lua` - the commands, lens lookup by title
+* `lua/gohard/dap.lua` - the nvim-dap adapter and launch
+  configuration of `gohard dap`, the debugger prototype (#68)
 * `lsp/gohard.lua` - native config for `vim.lsp.enable('gohard')`
 * `plugin/gohard.lua` - defines the commands at startup
 * `test/run.sh`, `test/e2e.lua` - the headless end-to-end test (CI)

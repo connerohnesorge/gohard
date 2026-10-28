@@ -26,6 +26,18 @@ COMMANDS                                                *gohard-commands*
 Lenses: "▶ Run tb_top", "◉ Running…", "▶ Re-run · seed 42" and
 "Copy repro". Run results are `gohard-sim` diagnostics.
 
+DEBUGGING                                               *gohard-dap*
+
+Prototype. With nvim-dap installed, register the `gohard dap` adapter
+and a launch configuration for VHDL buffers:
+
+    require('gohard.dap').setup({ testbench = 'tb_top', seed = 0 })
+
+Options (all optional): `cmd` ({ 'gohard', 'dap' }), `testbench` (asked
+for when nil), `seed` (0), `stopOnEntry` (false). Breakpoints go on
+sequential statements; step back and reverse continue work. Processes
+are threads; each frame shows Locals and Signals.
+
 See docs/editors.md in the GoHard repository for Helix and platform
 notes.
 
