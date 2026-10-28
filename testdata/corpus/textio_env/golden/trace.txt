@@ -1,6 +1,6 @@
 gohard-trace 1
 testbench textio_env_tb
-end 40000000
+end 70000000
 type std_logic_vector array std_ulogic
 type std_ulogic logic
 scope textio_env_tb instance textio_env_tb(sim)
@@ -29,3 +29,15 @@ process 2 textio_env_tb.dut._p0
 30000000 1 textio_env_tb.dut.a 11111111 p1
 30000000 2 textio_env_tb.dut.y 00000000 p2
 30000000 2 textio_env_tb.y 00000000 p2
+40000000 1 textio_env_tb.a 01011010 p1
+40000000 1 textio_env_tb.dut.a 01011010 p1
+40000000 2 textio_env_tb.dut.y 10100101 p2
+40000000 2 textio_env_tb.y 10100101 p2
+50000000 1 textio_env_tb.a 11000011 p1
+50000000 1 textio_env_tb.dut.a 11000011 p1
+50000000 2 textio_env_tb.dut.y 00111100 p2
+50000000 2 textio_env_tb.y 00111100 p2
+60000000 1 textio_env_tb.a 00000001 p1
+60000000 1 textio_env_tb.dut.a 00000001 p1
+60000000 2 textio_env_tb.dut.y 11111110 p2
+60000000 2 textio_env_tb.y 11111110 p2

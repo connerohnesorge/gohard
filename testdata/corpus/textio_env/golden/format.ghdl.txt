@@ -12,6 +12,6 @@ options indent=2 keyword_case=lower align_ports=true max_line_length=80
 run main std=2008
 file textio_env.vhd std=2008 sha256=4d36321f02528c7a0cfc40002216f65f83d608fa878b13ba7f5e904e455a6b3a formatted=e05404d4523701c2702d6b3a43614bb4160a8a328c2066c767ab7941662aa512 changed
   exit original=0 formatted=0
-file textio_env_tb.vhd std=2008 sha256=608b5e3e37166d4a23ff430153b2b5e4ab2865412cd9c7a8997f6bc775cbd2ae formatted=608b5e3e37166d4a23ff430153b2b5e4ab2865412cd9c7a8997f6bc775cbd2ae unchanged
+file textio_env_tb.vhd std=2008 sha256=83f201fa9c79af65bafbebd6375717caa6a64ae95cc51cb765b02de094aa5506 formatted=eddc61a433600a997fa5b4f7d8b27dc678f991e930c98e221600fe2fed708eb0 changed
   exit original=0 formatted=0
 result new=0

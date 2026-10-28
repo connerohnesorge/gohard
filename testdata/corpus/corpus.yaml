@@ -16,10 +16,11 @@
 schema: 1
 
 # Fixed vocabularies. A design's `features` and `invariants` may only use
-# the ids listed here. The feature list is the semantics list in the
-# "Done when" section of #8 plus the ids added later (access_gc by #27,
-# psl_comments by #109); every id must appear in the `features` of at
-# least one design.
+# the ids listed here. The feature list is #8's list (the semantics in
+# its "Done when" section) plus the ids added later: access_gc by #27,
+# psl_comments by #109, and the ids added by #63 for the gaps LIMITS.md
+# listed. Every id must appear in the `features` of at least one design
+# (corpus.ParseManifest checks both rules).
 vocabulary:
   features:
     - id: delta_ordering
@@ -71,6 +72,9 @@ vocabulary:
       semantic: >-
         PSL in `-- psl` comments (psl.comments) with a comment default
         clock (#109, not in the #8 list)
+    - id: textio_input_file
+      semantic: >-
+        textio reads of a checked-in input file (#63, not in the #8 list)
   invariants:
     - id: seed_independent
       meaning: byte-identical trace at seeds 0-3 (PR) and 64 seeds (nightly)
@@ -1199,12 +1203,14 @@ designs:
     testbench: textio_env_tb
     defines: {}
     models: {}
+    # Read by the testbench while it runs (#63).
+    inputs: [textio_env_in.txt]
     expected:
       exit: 0
       status: clean
-      stop_time: 40 ns
+      stop_time: 70 ns
       messages: []
-    features: [std_env, textio]
+    features: [std_env, textio, textio_input_file]
     invariants: [seed_independent, variant_stable, self_stopping]
     oracle: both
     hierarchy_oracle: ghdl
@@ -1215,16 +1221,21 @@ designs:
         ghdl --elab-run --std=08 textio_env_tb
       result: pass
       exit: 0
-      stop_time: 40 ns
+      stop_time: 70 ns
       messages:
         - "textio_env: rows=4"
-        - "simulation finished @40ns"
+        - "simulation finished @70ns"
       notes: >-
-        Finished via std.env.finish at 40 ns. The log file textio_env.log is
+        Finished via std.env.finish at 70 ns. The log file textio_env.log is
         created in the current directory (write_mode), closed, reopened
         (read_mode) and checked field by field (integer, string, hread,
         std_logic_vector read, time). Its contents were
-        "0 vec 00 11111111 10 ns" .. "3 vec FF 00000000 40 ns". The only
+        "0 vec 00 11111111 10 ns" .. "3 vec FF 00000000 40 ns". Then the
+        checked-in textio_env_in.txt is read from the current directory:
+        its comment line is skipped and its three lines drive a (hread)
+        and give the expected y (read), checked at 50, 60 and 70 ns; an
+        expected y changed in the file is reported at its time by GHDL,
+        NVC and GoHard ("y differs from the input file"). The only
         stdout line from the design is the writeline(output) line
         "textio_env: rows=4"; it is textio output, not a diagnostic.
     nvc:
@@ -1234,19 +1245,19 @@ designs:
         -e textio_env_tb -r
       result: pass
       exit: 0
-      stop_time: 40 ns
+      stop_time: 70 ns
       messages:
         - "textio_env: rows=4"
-        - "** Note: 40ns+0: FINISH called"
+        - "** Note: 70ns+0: FINISH called"
       notes: >-
         Same writeline(output) line and byte-identical textio_env.log as
         GHDL. NVC prints a note for FINISH; GHDL prints "simulation
         finished". Neither is a design message.
     disagreements: []
-    trace_sha256: b79e1f6c9d284526fa3297101197ecdd80987f6daf6fcf43a311ff5c7ac1f583
-    oracle_sha256: afaef1be5d71488477320d6182421897f081308f401741528bd7228887a7d7df
-    format_oracle_sha256: 133b47f00a9a9443253709ee7f0f243bb596466257c25e280f2d02266526e34f
-    semerr_sha256: b9ce64adba7b081647a2a76dcae5cd5b0be04561371209035ed85f182d2c8b77
+    trace_sha256: 550f7e09d1eef9c5e02b1d9375a111c972d3182b4014ab2868af305406496785
+    oracle_sha256: 7970f17042f556933048546858ed59f59dfa0c0edcd64c64f07b48ed70660832
+    format_oracle_sha256: bbbf0ef9e3dcc8def7724384d8a0cc39335debf702a18d880aa9ac3783f0264c
+    semerr_sha256: 5232628ce92bc4b0baf53b187d61f6ae0ec32d608c4658c192d5eada63157e7f
   - name: vhdl93_only
     standard: "1993"
     milestone: v1.0

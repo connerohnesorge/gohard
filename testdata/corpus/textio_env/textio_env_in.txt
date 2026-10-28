@@ -1,0 +1,4 @@
+# textio_env stimuli (#63): a in hex, the expected y in binary
+5A 10100101
+C3 00111100
+01 11111110

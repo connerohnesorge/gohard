@@ -15,6 +15,6 @@
 # (semerr_check.go).
 tool ghdl 6.0.0
 tool nvc 1.23.0
-run corpus:textio_env:main dir=testdata/corpus/textio_env std=08 sha=54082dfa7ccd5cc6
+run corpus:textio_env:main dir=testdata/corpus/textio_env std=08 sha=48b8b38eeb981788
  textio_env.vhd ghdl=0 nvc=0
  textio_env_tb.vhd ghdl=0 nvc=0
