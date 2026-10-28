@@ -15,10 +15,13 @@
 # (semerr_check.go).
 tool ghdl 6.0.0
 tool nvc 1.23.0
-run corpus:vhdl93_only:main dir=testdata/corpus/vhdl93_only std=93 sha=60b147a3cd46c3cd
+run corpus:vhdl93_only:main dir=testdata/corpus/vhdl93_only std=93 sha=4d95e6dc693d7bbb
  vhdl93_only.vhd ghdl=0 nvc=0
+ vhdl93_only_count.vhd ghdl=0 nvc=0
  vhdl93_only_tb.vhd ghdl=0 nvc=0
 run corpus:vhdl93_only:std_2002 dir=testdata/corpus/vhdl93_only std=02 sha=53fcd021dc05a1dc
  vhdl93_only.vhd ghdl=1@19,24,25,26,28,29,31,32 nvc=1@19,25,27,31
 run corpus:vhdl93_only:std_2008 dir=testdata/corpus/vhdl93_only std=08 sha=53fcd021dc05a1dc
  vhdl93_only.vhd ghdl=1@12,13,14,19,22,24,26,28,29,31,32 nvc=1@12,18~,19,22,31
+run corpus:vhdl93_only:shared_2002 dir=testdata/corpus/vhdl93_only std=02 sha=bf4fcb0f9c620a88
+ vhdl93_only_count.vhd ghdl=1@17 nvc=1@17

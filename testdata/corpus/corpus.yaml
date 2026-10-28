@@ -75,6 +75,10 @@ vocabulary:
     - id: textio_input_file
       semantic: >-
         textio reads of a checked-in input file (#63, not in the #8 list)
+    - id: vhdl93_shared_variable
+      semantic: >-
+        a VHDL-1993 shared variable of a non-protected type, an error from
+        VHDL-2002 on (#63, not in the #8 list)
   invariants:
     - id: seed_independent
       meaning: byte-identical trace at seeds 0-3 (PR) and 64 seeds (nightly)
@@ -1264,6 +1268,8 @@ designs:
     files:
       - path: vhdl93_only.vhd
         standard: "1993"
+      - path: vhdl93_only_count.vhd
+        standard: "1993"
       - path: vhdl93_only_tb.vhd
         standard: "1993"
     top: vhdl93_only
@@ -1275,7 +1281,7 @@ designs:
       status: clean
       stop_time: 50 ns
       messages: []
-    features: []
+    features: [vhdl93_shared_variable]
     invariants:
       - seed_independent
       - variant_stable
@@ -1286,8 +1292,8 @@ designs:
     ghdl:
       version: 6.0.0
       command: >-
-        ghdl -a --std=93 vhdl93_only.vhd vhdl93_only_tb.vhd;
-        ghdl --elab-run --std=93 vhdl93_only_tb
+        ghdl -a --std=93 vhdl93_only.vhd vhdl93_only_count.vhd
+        vhdl93_only_tb.vhd; ghdl --elab-run --std=93 vhdl93_only_tb
       result: pass
       exit: 0
       stop_time: 50 ns
@@ -1299,11 +1305,17 @@ designs:
         exit 1, first error vhdl93_only.vhd:19:10 "an identifier is expected
         instead of 'protected'"; --std=08 and --std=19 exit 1, first error
         vhdl93_only.vhd:12:5 "interface declaration expected" (port force).
+        vhdl93_only_count counts the rising edges of force in a shared
+        variable of type natural (#63); the testbench checks the count
+        of 2 at 50 ns, and counting by 2 is reported there by GHDL, NVC
+        and GoHard ("shared variable count"). Under --std=02 and 08 GHDL
+        rejects that file at 17:19, "type of a shared variable must be a
+        protected type" (see variant shared_2002).
     nvc:
       version: 1.23.0
       command: >-
-        nvc --std=1993 -a vhdl93_only.vhd vhdl93_only_tb.vhd
-        -e vhdl93_only_tb -r
+        nvc --std=1993 -a vhdl93_only.vhd vhdl93_only_count.vhd
+        vhdl93_only_tb.vhd -e vhdl93_only_tb -r
       result: pass
       exit: 0
       stop_time: 50 ns
@@ -1318,6 +1330,9 @@ designs:
         "unexpected protected while parsing signal declaration" at line 19;
         under --std=2008 and --std=2019 exit 1 with 5 errors, the first
         "unexpected force while parsing interface declaration" at line 12.
+        vhdl93_only_count.vhd is accepted silently under 1993 and
+        rejected under 2002 and later ("shared variable HITS must have
+        protected type", line 17).
     disagreements:
       - topic: later-standard reserved words used as identifiers under 1993
         ghdl: accepts silently
@@ -1389,10 +1404,46 @@ designs:
           expected.messages lists the first error, which must be on line 12
           (port force); parser recovery may add more errors. 2019 behaves
           the same.
-    trace_sha256: 9a27748985d1e257ed1e8f90e11b892a4cb188cc8fc5d1fe5616a8e31212d7d7
-    oracle_sha256: b72ab12235d9ebd527cc3e272a93040093b7d681ec2f6f4f277bf62c72974dd1
-    format_oracle_sha256: 6284d8838abf6dcbb4dda3b2329acbab72718b52cf1ec66a4b1355274d9eac96
-    semerr_sha256: 8a8630a94d04f85053f6532bc3b085bd8f5b6ddca36c64b4621cf5217f06c4ec
+      - name: shared_2002
+        standard: "2002"
+        files:
+          - path: vhdl93_only_count.vhd
+            standard: "2002"
+        expected:
+          exit: 1
+          status: problems
+          stop_time: none
+          messages:
+            - severity: error
+              text: must be a protected type
+              path: vhdl93_only_count.vhd
+              line: 17
+        ghdl:
+          version: 6.0.0
+          command: ghdl -a --std=02 vhdl93_only_count.vhd
+          result: analysis-error
+          exit: 1
+          stop_time: none
+          notes: >-
+            vhdl93_only_count.vhd:17:19 "type of a shared variable must be
+            a protected type"; --std=08 is the same
+        nvc:
+          version: 1.23.0
+          command: nvc --std=2002 -a vhdl93_only_count.vhd
+          result: analysis-error
+          exit: 1
+          stop_time: none
+          notes: >-
+            vhdl93_only_count.vhd:17 "shared variable HITS must have
+            protected type"; --std=2019 is the same
+        notes: >-
+          The file has no reserved-word problem, so the semantic rule of
+          LRM 6.4.2.4 (a shared variable is of a protected type from
+          VHDL-2002 on) is what rejects it.
+    trace_sha256: 35b143c43679d047925347c65864fde3fd5cc30f7f7ac81cfa2c8af6448f3185
+    oracle_sha256: c354519cb77487bc26ee682080b4647438728aede2a43ac10546f5745d0e366e
+    format_oracle_sha256: e67b9449028c71d0eea4c44f9164a5e5cb113e2ce3d800b50cfd62d65488fa86
+    semerr_sha256: 298721e71fa929ee5d78dac1b8d5837d2d32e336e05a4eadc9ad02016ba554cb
   - name: wait_forms
     standard: "2008"
     milestone: v1.0

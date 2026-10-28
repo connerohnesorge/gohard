@@ -1,28 +1,39 @@
 gohard-oracle 1
 tool nvc 1.23.0
-sources a78e0e4650879baa
+sources c782ebcc12609690
 testbench vhdl93_only_tb
+signal vhdl93_only_tb.cnt.count integer 32
+signal vhdl93_only_tb.cnt.tick logic 1
 signal vhdl93_only_tb.context logic 1
+signal vhdl93_only_tb.count integer 32
 signal vhdl93_only_tb.dut.context logic 1
 signal vhdl93_only_tb.dut.force logic 1
 signal vhdl93_only_tb.dut.protected logic 1
 signal vhdl93_only_tb.dut.release logic 1
 signal vhdl93_only_tb.force logic 1
 signal vhdl93_only_tb.release logic 1
+0 vhdl93_only_tb.cnt.count 0
+0 vhdl93_only_tb.cnt.tick 0
 0 vhdl93_only_tb.context 0
+0 vhdl93_only_tb.count 0
 0 vhdl93_only_tb.dut.context 0
 0 vhdl93_only_tb.dut.force 0
 0 vhdl93_only_tb.dut.protected 0
 0 vhdl93_only_tb.dut.release 0
 0 vhdl93_only_tb.force 0
 0 vhdl93_only_tb.release 0
+10000000 vhdl93_only_tb.cnt.tick 1
 10000000 vhdl93_only_tb.context 1
 10000000 vhdl93_only_tb.dut.context 1
 10000000 vhdl93_only_tb.dut.force 1
 10000000 vhdl93_only_tb.dut.protected 1
 10000000 vhdl93_only_tb.force 1
+20000000 vhdl93_only_tb.cnt.count 1
+20000000 vhdl93_only_tb.cnt.tick 0
+20000000 vhdl93_only_tb.count 1
 20000000 vhdl93_only_tb.dut.force 0
 20000000 vhdl93_only_tb.force 0
+30000000 vhdl93_only_tb.cnt.tick 1
 30000000 vhdl93_only_tb.context 0
 30000000 vhdl93_only_tb.dut.context 0
 30000000 vhdl93_only_tb.dut.force 1
@@ -30,8 +41,11 @@ signal vhdl93_only_tb.release logic 1
 30000000 vhdl93_only_tb.dut.release 1
 30000000 vhdl93_only_tb.force 1
 30000000 vhdl93_only_tb.release 1
+40000000 vhdl93_only_tb.cnt.count 2
+40000000 vhdl93_only_tb.cnt.tick 0
+40000000 vhdl93_only_tb.count 2
 40000000 vhdl93_only_tb.dut.force 0
 40000000 vhdl93_only_tb.dut.release 0
 40000000 vhdl93_only_tb.force 0
 40000000 vhdl93_only_tb.release 0
-digest 25 b8a799471a4f0b066143b9c14f1eb66d363ec17f07a83d6cd29b1ab5279fc86b
+digest 36 f87bde9198c20b4d187f461633a83a616ef2bf24c5d8fb2ea48f6db85a6adfde

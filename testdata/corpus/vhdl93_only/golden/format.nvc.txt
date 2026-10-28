@@ -12,7 +12,9 @@ options indent=2 keyword_case=lower align_ports=true max_line_length=80
 run main std=1993
 file vhdl93_only.vhd std=1993 sha256=5c10ef74e4a9a9f32df2527cfce7afc5c2abb9725ad012dc38da2eb9707f603e formatted=56bfb64a364808cee8cf7629eff1d3268249668e46a8e5a1dccdaae7a7ad46cc changed
   exit original=0 formatted=0
-file vhdl93_only_tb.vhd std=1993 sha256=5f951e00e24d21d66415d70f8b75b713035f599255c36a71a88ebd9f33c261cc formatted=43e5b83fe59cfa048decbedd9f2ed0f8f34e3ca3135601b84e1dac14feb68826 changed
+file vhdl93_only_count.vhd std=1993 sha256=9ee2bc22894b04c81e2ba3b1cefe240a14bcc2234ec95dddfce6e0965818c9b8 formatted=b5b42322be615b4979d78d5985b82c121aea0fef577787c060f6bee5982c3a82 changed
+  exit original=0 formatted=0
+file vhdl93_only_tb.vhd std=1993 sha256=7b9d126737c999e2b8ea97d58db8773c6a2cf833a15f155ba3af17d26815a579 formatted=82ccd2652948a8f558c64b85d9df86c759a5279c3bcd40d6f73ab697b574c280 changed
   exit original=0 formatted=0
 run std_2002 std=2002
 file vhdl93_only.vhd std=1993 sha256=5c10ef74e4a9a9f32df2527cfce7afc5c2abb9725ad012dc38da2eb9707f603e formatted=56bfb64a364808cee8cf7629eff1d3268249668e46a8e5a1dccdaae7a7ad46cc changed
@@ -29,4 +31,8 @@ file vhdl93_only.vhd std=1993 sha256=5c10ef74e4a9a9f32df2527cfce7afc5c2abb9725ad
   error 19: unexpected protected while parsing signal declaration, expecting identifier
   error 22: unexpected force while parsing name, expecting one of string or identifier
   error 31: unexpected context while parsing concurrent statement, expecting one of process, postponed, component, entity, configuration, with, assert, block, if, for, case, (, identifier or <<
+run shared_2002 std=2002
+file vhdl93_only_count.vhd std=1993 sha256=9ee2bc22894b04c81e2ba3b1cefe240a14bcc2234ec95dddfce6e0965818c9b8 formatted=b5b42322be615b4979d78d5985b82c121aea0fef577787c060f6bee5982c3a82 changed
+  exit original=1 formatted=1
+  error 17: shared variable HITS must have protected type
 result new=0
