@@ -1,0 +1,2 @@
+# A client without the create resource operation gets no Create testbench, so applying it is a usage error and no file is written (#57).
+gohard lsp codeaction --no-resource-operations --at counter.vhd:6:8 "Create testbench counter_tb.vhd"

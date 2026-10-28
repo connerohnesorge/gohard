@@ -1,0 +1,1 @@
+{"title":"Complete port map","kind":"refactor.rewrite","edit":{"changes":{"file://$WORK/top.vhd":[{"range":{"start":{"line":16,"character":0},"end":{"line":19,"character":6}},"newText":"  u0 : entity work.counter\n    port map (\n      clk   => clk, -- the only clock\n      rst   => rst,\n      en    => open,\n      count => count\n    );"}]}}}

@@ -331,6 +331,11 @@ func notFullyConstrained(t *Type, depth int) bool {
 	return false
 }
 
+// FullyConstrained reports whether t leaves no index range open at
+// any element level (LRM 5.1), so a signal of it may be declared;
+// scalar, unknown and run-time constrained subtypes are.
+func (t *Type) FullyConstrained() bool { return !notFullyConstrained(t, 0) }
+
 // FieldType returns the subtype of record element f in a value of
 // subtype t: the nearest record constraint's, else f's own.
 func (t *Type) FieldType(f *Decl) *Type {

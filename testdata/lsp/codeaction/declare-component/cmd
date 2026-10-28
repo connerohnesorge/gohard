@@ -1,0 +1,2 @@
+# A component instantiation of an entity whose component is not declared gets Declare component: the declaration at the end of the architecture's declarative part (#57).
+gohard lsp codeaction --at top.vhd:20:8

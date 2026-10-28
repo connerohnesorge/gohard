@@ -16,12 +16,15 @@ import (
 
 func init() { provide(server.FeatureCodeActions) }
 
-// CodeActions implements server.Analyzer (Analysis.QuickFixes). No
-// quick fix creates a file.
-func (a *Analyzer) CodeActions(q server.Query, r server.Span, _ bool,
+// CodeActions implements server.Analyzer: the quick fixes
+// (Analysis.QuickFixes), then the generated rewrites and source
+// actions (Analysis.Refactors, #57).
+func (a *Analyzer) CodeActions(q server.Query, r server.Span, create bool,
 ) server.Task[[]server.CodeAction] {
 	return Query(a, q.Snap, func(an *Analysis) []server.CodeAction {
-		return an.QuickFixes(q.URI, r)
+		return slices.Concat(an.QuickFixes(q.URI, r),
+			an.Refactors(q.URI, r, Generate{
+				ToolVersion: a.opts.ToolVersion, Create: create}))
 	})
 }
 

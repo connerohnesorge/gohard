@@ -99,6 +99,13 @@ result; positions are zero-based UTF-8.
 | `codeaction/add-sensitivity-alias` | a read through an alias declared in the process: the fix appends the signal, since the alias is not visible in the list |
 | `codeaction/map-library` | an unmapped library: the `libraries` line written into `gohard.yaml`, with the folder declaring the unit (the search of `gohard libs detect`, #34) |
 | `codeaction/map-library-new-yaml` | without `gohard.yaml` the fix adds a `libraries` block |
+| `codeaction/instantiate-entity` | a bare entity name in a statement part: Instantiate entity (#57) writes the entity instantiation with every formal, the visible port of the formal's name or `open` |
+| `codeaction/instantiate-entity-library` | an entity of another library: the instance names the library and the edit adds `library ip;`; a generic without a default maps to the visible constant of its name |
+| `codeaction/declare-component` | a component instantiation of an undeclared component: Declare component adds the entity's component declaration at the end of the declarative part |
+| `codeaction/complete-port-map` | a port map that names only the clock: Complete port map adds the other formals, each on its own line, the comment staying with its association |
+| `codeaction/create-testbench` | in an entity with a clock port: Create testbench, a `CreateFile` operation and the testbench's text (clock process, stimulus ending in `std.env.finish`) |
+| `codeaction/create-testbench-vhdl93` | under `standard: "1993"`: the stimulus stops the clock through `done` and every process ends with `wait;` |
+| `codeaction/create-testbench-no-resource-operations` | `--no-resource-operations`, a client without the `create` resource operation: no Create testbench |
 | `hover/doc-comment` | a signal: its declaration and doc comment |
 | `hover/cross-library-call` | a call of a function of another library: the chosen overload, its package and doc comment |
 | `hover/bundled-operator` | an operator: the chosen overload from ieee.numeric_std |
@@ -177,6 +184,12 @@ result; positions are zero-based UTF-8.
 | `inlay-hints/kind-off` | `inlay_hints.parameter_names: false` with the other kinds on: the type and value hints, no parameter name |
 | `inlay-hints/all-off` | no `inlay_hints` key: every kind is off, no hint |
 | `inlay-hints/range` | `--at PATH:44:1 47:1`: only the hints in the range (the instance) |
+
+The `testdata/cli/lsp-codeaction-*` fixtures apply the #57 actions
+with `gohard lsp codeaction --at PATH:LINE:COL TITLE`, which writes
+the edits and creates the testbench file (`want/` holds the result);
+`TestCodeActionResults` checks that each result passes `gohard check`
+and `gohard fmt --check` unchanged.
 
 The `waveform/` cases replace the Executor with a simulated one through
 the `viewers [NAME...]` setup directive (see `testdata/cli/README.md`).

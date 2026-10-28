@@ -1,0 +1,2 @@
+# Create testbench applied: counter_tb.vhd with a signal per port, the instance, a clock process and a stimulus ending in std.env.finish (#57).
+gohard lsp codeaction --at counter.vhd:6:8 "Create testbench counter_tb.vhd"

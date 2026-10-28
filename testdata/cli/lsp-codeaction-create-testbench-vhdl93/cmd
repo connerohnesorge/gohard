@@ -1,0 +1,2 @@
+# Create testbench under VHDL-93: no std.env, so the stimulus stops the clock and every process ends with wait (#57).
+gohard lsp codeaction --at counter.vhd:6:8 "Create testbench counter_tb.vhd"

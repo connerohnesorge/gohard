@@ -1,0 +1,2 @@
+# A port map that leaves formals out gets Complete port map: each missing formal on its own line, the comment staying with its association (#57).
+gohard lsp codeaction --at top.vhd:17:3

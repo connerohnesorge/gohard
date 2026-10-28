@@ -1,0 +1,2 @@
+# In an entity with a clock port, Create testbench creates counter_tb.vhd next to it: a CreateFile resource operation and the text (#57).
+gohard lsp codeaction --at counter.vhd:6:8

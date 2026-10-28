@@ -1,0 +1,2 @@
+# Declare component applied: the component declaration from the entity's generics and ports (#57).
+gohard lsp codeaction --at top.vhd:20:8 "Declare component counter"

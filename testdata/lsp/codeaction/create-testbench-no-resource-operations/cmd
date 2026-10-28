@@ -1,0 +1,2 @@
+# A client without the create resource operation gets no Create testbench (#57).
+gohard lsp codeaction --no-resource-operations --at counter.vhd:6:8

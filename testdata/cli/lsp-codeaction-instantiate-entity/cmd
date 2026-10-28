@@ -1,0 +1,2 @@
+# Instantiate entity applied: the bare name becomes the instance; the result passes gohard check and gohard fmt --check (#57).
+gohard lsp codeaction --at top.vhd:17:3 "Instantiate entity work.counter"

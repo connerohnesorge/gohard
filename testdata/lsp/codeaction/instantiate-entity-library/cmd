@@ -1,0 +1,2 @@
+# An entity of another library: the instance names the library and the fix adds its library clause; DEPTH maps to the visible constant of that name (#57).
+gohard lsp codeaction --at top.vhd:17:3

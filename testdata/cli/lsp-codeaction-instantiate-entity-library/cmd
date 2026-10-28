@@ -1,0 +1,2 @@
+# Instantiate entity of another library applied: the library clause and the instance (#57).
+gohard lsp codeaction --at top.vhd:17:3 "Instantiate entity ip.fifo"
