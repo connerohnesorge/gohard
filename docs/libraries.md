@@ -703,6 +703,24 @@ It reads only these parts of each format and never runs anything:
 * GoHard never reads compiled libraries (ModelSim `_info`, `.dat`,
   `.dbs`, Vivado or Quartus databases), only sources.
 
+Import writes nothing and exits 2 when a listed source file or an
+included `.pro` script does not exist or a `vcom` wildcard matches no
+file (`import/missing-file`, at the line that lists it), a project
+file cannot be read (`import/syntax`), lists no VHDL file
+(`import/no-files`) or the project root already has a `gohard.yaml`
+(`import/config-exists`). Diagnostics print in the `--format` chosen
+(text, JSON or SARIF), located in the file they concern: the project
+file, an included script or a `.core` it depends on.
+
+The project root is found as for every command
+([config.md](config.md)): the nearest folder with `gohard.yaml`, else
+with `.git`, else the current folder. Run `gohard import` from a folder
+whose root holds the sources: a listed file outside the root (a `.xpr`
+in a folder of its own run from there, `../src/a.vhd`) resolves names
+but its own problems are not reported, like a library folder outside
+the root. Files under the root that the project file does not list are
+still checked, as `work` files.
+
 ### FuseSoC `.core` dependencies
 
 Each `depend:` entry, `[op]vendor:library:name[:version]`, resolves to
@@ -755,10 +773,11 @@ the VHDL-2019 packages, and PoC's vendor-free build.
 uses when no user settings exist; `[string compare A B]` is Tcl's.
 The PoC values are the defaults of PoC's `tools/poc.tcl`. PoC's
 scripts write `local_configuration.vhdl` (`WriteLocalConfiguration`)
-and import does not run them, so create it before importing PoC. Under this profile `osvvm.pro`
-imports 47 files, and after `SetVHDLVersion 2019` 47 files with the
-VHDL-2019 packages in place of their `deprecated/*_c.vhd` stand-ins;
-`gohard check` passes on both sets.
+and import does not run them, so create it before importing PoC.
+Under this profile `osvvm.pro` imports 47 files, and after
+`SetVHDLVersion 2019` 47 files with the VHDL-2019 packages in place of
+their `deprecated/*_c.vhd` stand-ins; `gohard check` passes on both
+sets.
 
 A command that needs anything else is skipped with an
 `import/ignored` hint at its line: a variable outside the profile
@@ -770,24 +789,6 @@ command other than the ones above (`puts`, `set`, `simulate`,
 the same way. Import reads at most 20,000 commands and 4 MiB of
 script, counting a script included twice twice; past that it stops
 with `import/syntax`.
-
-Import writes nothing and exits 2 when a listed source file or an
-included `.pro` script does not exist or a `vcom` wildcard matches no
-file (`import/missing-file`, at the line that lists it), a project
-file cannot be read (`import/syntax`), lists no VHDL file
-(`import/no-files`) or the project root already has a `gohard.yaml`
-(`import/config-exists`). Diagnostics print in the `--format` chosen
-(text, JSON or SARIF), located in the file they concern: the project
-file, an included script or a `.core` it depends on.
-
-The project root is found as for every command
-([config.md](config.md)): the nearest folder with `gohard.yaml`, else
-with `.git`, else the current folder. Run `gohard import` from a folder
-whose root holds the sources: a listed file outside the root (a `.xpr`
-in a folder of its own run from there, `../src/a.vhd`) resolves names
-but its own problems are not reported, like a library folder outside
-the root. Files under the root that the project file does not list are
-still checked, as `work` files.
 
 ## How CI checks this guide
 
