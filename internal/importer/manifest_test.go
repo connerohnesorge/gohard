@@ -347,6 +347,91 @@ ip/top.core:17:9 warning[import/unresolved-dependency]: dependency acme:ip:missi
 	checkAll(t, ParseCore("ip/top.core", []byte(src), files), want)
 }
 
+// TestParseCoreSolve checks that a .core import picks one version of
+// each vendor:library:name that every depend: entry of the cores
+// picked accepts, going back on a pick that a later entry rejects, as
+// FuseSoC's solver does. Before, the reviewer's case imported d 1.5
+// and d 1.2 into one library, and gohard check failed on the second
+// package d.
+func TestParseCoreSolve(t *testing.T) {
+	core := func(name, file, deps string) string {
+		return "CAPI=2:\nname: " + name + "\nfilesets:\n  rtl:\n" +
+			"    files: [" + file + "]\n" +
+			"    file_type: vhdlSource-2008\n" +
+			"    depend: [" + deps + "]\n"
+	}
+	files := memFiles{files: map[string]string{
+		"../d12/d.core": core("x:y:d:1.2", "d.vhd", `"^x:y:f:1.0"`),
+		"../d15/d.core": core("x:y:d:1.5", "d.vhd", `"^x:y:f:2.0"`),
+		"../e/e.core":   core("x:y:e:1.0", "e.vhd", `"x:y:d:1.2"`),
+		"../f1/f.core":  core("x:y:f:1.1", "f.vhd", ""),
+		"../f2/f.core":  core("x:y:f:2.0", "f.vhd", ""),
+	}}
+	files.cores = slices.Sorted(maps.Keys(files.files))
+	unresolved := " warning[import/unresolved-dependency]: dependency " +
+		"x:y:d:3.0 matches no .core file under the project root or on " +
+		"the command line; gohard import fetches nothing, so its files " +
+		"are not imported\n"
+	d15 := `f2/f.core:5:13 work ../f2/f.vhd "2008"
+d15/d.core:5:13 work ../d15/d.vhd "2008"
+`
+	for _, tc := range []struct{ deps, want string }{
+		// d 1.5 is the newest ^1.0, but e needs d 1.2, and d 1.2 needs
+		// f 1, not the f 2 that d 1.5 needs.
+		{`"^x:y:d:1.0", "x:y:e:1.0"`, `f1/f.core:5:13 work ../f1/f.vhd "2008"
+d12/d.core:5:13 work ../d12/d.vhd "2008"
+e/e.core:5:13 work ../e/e.vhd "2008"
+rtl/top.core:5:13 work top.vhd "2008"
+`},
+		// Nothing satisfies both d 1.5 and e's d 1.2: d 1.5 alone.
+		{`"x:y:d:1.5", "x:y:e:1.0"`, d15 + `e/e.core:5:13 work ../e/e.vhd "2008"
+rtl/top.core:5:13 work top.vhd "2008"
+e/e.core:7:14 warning[import/dependency-conflict]: dependency x:y:d:1.2 does not match x:y:d:1.5, the version another dependency chose; no choice of versions satisfies every depend: entry, so only x:y:d:1.5 is imported
+`},
+		// A dependency no core matches is unresolved, not a conflict,
+		// before or after another dependency picks its name.
+		{`"x:y:d:3.0", "^x:y:d:1.0"`, d15 +
+			"rtl/top.core:5:13 work top.vhd \"2008\"\n" +
+			"rtl/top.core:7:14" + unresolved},
+		{`"^x:y:d:1.0", "x:y:d:3.0"`, d15 +
+			"rtl/top.core:5:13 work top.vhd \"2008\"\n" +
+			"rtl/top.core:7:28" + unresolved},
+	} {
+		checkAll(t, ParseCore("rtl/top.core", []byte(core("x:y:top:1",
+			"top.vhd", tc.deps)), files), tc.want)
+	}
+}
+
+// TestParseCoreSolveBudget checks that the backtracking of the
+// dependency solver ends within coreBudget (P7): 20 names of two
+// versions each and a conflict that no choice of them resolves would
+// take 2^20 tries.
+func TestParseCoreSolveBudget(t *testing.T) {
+	files := memFiles{files: map[string]string{}}
+	var deps []string
+	for i := range 20 {
+		for v := 1; v <= 2; v++ {
+			p := fmt.Sprintf("a%d_%d.core", i, v)
+			files.files[p] = fmt.Sprintf("CAPI=2:\nname: x:y:a%d:%d\n", i, v)
+			files.cores = append(files.cores, p)
+		}
+		deps = append(deps, fmt.Sprintf("x:y:a%d", i))
+	}
+	files.files["c1.core"] = "CAPI=2:\nname: x:y:c:1\n"
+	files.files["c2.core"] = "CAPI=2:\nname: x:y:c:2\n"
+	files.cores = append(files.cores, "c1.core", "c2.core")
+	src := "CAPI=2:\nfilesets:\n  r:\n    files: [a.vhd]\n" +
+		"    file_type: vhdlSource\n    depend: [" +
+		strings.Join(deps, ", ") + ", x:y:c:1, x:y:c:2]\n"
+	p := ParseCore("top.core", []byte(src), files)
+	if len(p.Entries) != 0 || len(p.Diagnostics) == 0 ||
+		!strings.HasSuffix(p.Diagnostics[len(p.Diagnostics)-1].Message,
+			"takes more than "+strconv.Itoa(coreBudget)+" steps, "+
+				"counting each use of a YAML alias") {
+		t.Errorf("%d entries:\n%s", len(p.Entries), showAll(p))
+	}
+}
+
 func TestParseCoreSyntax(t *testing.T) {
 	for _, tc := range []struct{ src, want string }{
 		{"", `c.core:1:1 error[import/syntax]: not a valid FuseSoC .core file: the file is empty

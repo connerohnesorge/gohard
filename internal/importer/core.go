@@ -5,8 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"path"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -63,19 +65,24 @@ const coreMark = 64
 // -2019, in the library of its logical_name (work when absent). Paths
 // are relative to the folder of the .core file. Each depend: entry
 // ([op]vendor:library:name[:version], op one of = >= > <= < ^ ~, no
-// op with a version meaning =) resolves to the newest matching core
-// among this core and files.Cores(), or to the core an earlier
-// dependency on the same vendor:library:name chose when it matches.
-// The files of a core come after the files of the cores it depends on;
-// a dependency nothing matches is import/unresolved-dependency. Files
-// of another type, provider: (nothing is fetched) and entries with a
-// use-flag condition are skipped with an import/ignored hint; targets,
-// generators and every other key are skipped silently. The import
-// takes at most coreBudget steps and parses at most coreByteBudget
-// bytes of .core files; past either it stops with import/syntax.
+// op with a version meaning =) resolves among this core and
+// files.Cores() to one core per vendor:library:name, picked by solve
+// so that every depend: entry matches its pick, as FuseSoC's solver
+// does. The files of a core come after the files of the cores it
+// depends on. A dependency nothing matches is
+// import/unresolved-dependency; when no picks satisfy every
+// dependency, the first dependency on a name picks its newest match
+// and a later one that does not match it is
+// import/dependency-conflict. Files of another type, provider:
+// (nothing is fetched) and entries with a use-flag condition are
+// skipped with an import/ignored hint; targets, generators and every
+// other key are skipped silently. The import takes at most coreBudget
+// steps and parses at most coreByteBudget bytes of .core files; past
+// either it stops with import/syntax.
 func ParseCore(name string, src []byte, files Files) Project {
 	r := &coreRun{files: files, main: name, visited: map[string]bool{},
-		chosen: map[vlnv]*coreFile{}, byName: map[vlnv][]*coreFile{}}
+		chosen: map[vlnv]*coreFile{}, byName: map[vlnv][]*coreFile{},
+		sorted: map[vlnv]bool{}}
 	c := readCore(path.Base(name), name, src, &r.b)
 	switch {
 	case r.b.over:
@@ -90,6 +97,7 @@ func ParseCore(name string, src []byte, files Files) Project {
 		r.add(c)
 		r.chosen[c.vlnv.unversioned()] = c
 	}
+	r.solve(c)
 	r.visit(c)
 	if r.b.over {
 		r.p.Diagnostics = append(r.p.Diagnostics, r.b.stop)
@@ -104,14 +112,22 @@ type coreRun struct {
 	p     Project
 	b     coreSpent
 	// byName holds the cores a depend: may resolve to, by
-	// vendor:library:name (no version), in the order resolve prefers
-	// among equal versions.
+	// vendor:library:name (no version), newest first once sorted; among
+	// equal versions the project file's own core, then files.Cores()
+	// order.
 	byName  map[vlnv][]*coreFile
-	loaded  bool // files.Cores() is read
+	loaded  bool          // files.Cores() is read
+	sorted  map[vlnv]bool // byName[key] is sorted
 	visited map[string]bool
-	// chosen is the core a dependency on vendor:library:name resolved
-	// to first; later dependencies it satisfies reuse it.
+	// chosen is the core each vendor:library:name resolves to: solve's
+	// picks, or else the core the first dependency on it resolved to.
 	chosen map[vlnv]*coreFile
+}
+
+// coreNeed is a depend: entry d of the core from.
+type coreNeed struct {
+	from *coreFile
+	d    coreDep
 }
 
 // coreSpent is what one import has spent of its budgets.
@@ -150,6 +166,15 @@ type coreDep struct {
 // vlnv is a FuseSoC core name, vendor:library:name:version.
 type vlnv struct{ vendor, library, name, version string }
 
+// String returns v as a core name, vendor:library:name:version.
+func (v vlnv) String() string {
+	s := v.vendor + ":" + v.library + ":" + v.name
+	if v.version != "" {
+		s += ":" + v.version
+	}
+	return s
+}
+
 // unversioned returns v without its version.
 func (v vlnv) unversioned() vlnv {
 	v.version = ""
@@ -170,11 +195,17 @@ func (r *coreRun) visit(c *coreFile) {
 	r.visited[c.rel] = true
 	r.p.Diagnostics = append(r.p.Diagnostics, c.diags...)
 	for _, d := range c.deps {
-		dep := r.resolve(c, d)
+		dep, conflict := r.resolve(coreNeed{c, d})
 		if r.b.over {
 			return
 		}
-		if dep == nil {
+		switch {
+		case conflict != nil:
+			r.p.Diagnostics = append(r.p.Diagnostics, c.l.at(diag.New(
+				diag.ImportDependencyConflict, d.text,
+				conflict.vlnv.String()), d.off))
+			continue
+		case dep == nil:
 			r.p.Diagnostics = append(r.p.Diagnostics, c.l.at(diag.New(
 				diag.ImportUnresolvedDependency, d.text), d.off))
 			continue
@@ -186,31 +217,118 @@ func (r *coreRun) visit(c *coreFile) {
 	r.p.Entries = append(r.p.Entries, c.entries...)
 }
 
-// resolve returns the core d, a dependency of from, resolves to: the
-// core an earlier dependency on the same vendor:library:name chose,
-// when d matches it; else the newest core d matches, the first among
-// equal versions (the project file's own core, then files.Cores()
-// order); nil when none does or the budget runs out.
-func (r *coreRun) resolve(from *coreFile, d coreDep) *coreFile {
-	key := d.want.unversioned()
-	// compare charges comparing d with the core c, and c with best when
-	// there is one; the names and versions it compares cost a step per
-	// coreTextStep bytes, so long versions do not multiply the work.
-	compare := func(c, best *coreFile) bool {
-		n := len(d.text) + len(c.vlnv.version)
-		if best != nil {
-			n += len(best.vlnv.version)
-		}
-		return from.charge(1+n/coreTextStep, func() int { return d.off })
-	}
+// resolve returns the core the dependency n resolves to: the core
+// chosen for its vendor:library:name when n matches it, else (no core,
+// conflict) that core, unless no core matches n at all; with none
+// chosen yet, the newest core n matches, which becomes the choice. It
+// returns nils when no core matches or the budget runs out.
+func (r *coreRun) resolve(n coreNeed) (core, conflict *coreFile) {
+	key := n.d.want.unversioned()
 	if c, ok := r.chosen[key]; ok {
-		if !compare(c, nil) {
+		match, more := r.test(n, c)
+		switch {
+		case !more:
+			return nil, nil
+		case match:
+			return c, nil
+		}
+		if r.newest(n) != nil {
+			return nil, c
+		}
+		return nil, nil
+	}
+	c := r.newest(n)
+	if c != nil {
+		r.chosen[key] = c
+	}
+	return c, nil
+}
+
+// newest returns the newest core n matches, or nil when none does or
+// the budget runs out.
+func (r *coreRun) newest(n coreNeed) *coreFile {
+	for _, c := range r.cores(n) {
+		match, more := r.test(n, c)
+		if !more {
 			return nil
 		}
-		if d.matches(c.vlnv) {
+		if match {
 			return c
 		}
 	}
+	return nil
+}
+
+// solve picks the core each vendor:library:name that root depends on,
+// directly or through the cores picked, resolves to, so that every
+// depend: entry of root and of the cores picked matches its pick, as
+// FuseSoC's dependency solver requires. It takes the depend: entries
+// breadth first from root, each core's in file order; for a name not
+// yet picked it tries the cores the entry matches newest first, and
+// when a later entry does not match a pick it goes back to the last
+// pick with a core left to try (backtracking). A depend: entry that no
+// core matches constrains nothing (visit reports it). The first picks
+// found go to r.chosen; when there are none, or the budget runs out,
+// r.chosen keeps root alone. Every core compared costs steps, so the
+// search ends within coreBudget.
+func (r *coreRun) solve(root *coreFile) {
+	var queue []coreNeed
+	push := func(c *coreFile) {
+		for _, d := range c.deps {
+			queue = append(queue, coreNeed{c, d})
+		}
+	}
+	push(root)
+	sel := maps.Clone(r.chosen)
+	var try func(i int) bool
+	try = func(i int) bool {
+		for ; i < len(queue); i++ {
+			n := queue[i]
+			key := n.d.want.unversioned()
+			if c, ok := sel[key]; ok {
+				match, more := r.test(n, c)
+				switch {
+				case !more:
+					return false
+				case !match && r.newest(n) != nil:
+					return false // a conflict
+				}
+				continue
+			}
+			tried := false
+			for _, c := range r.cores(n) {
+				match, more := r.test(n, c)
+				if !more {
+					return false
+				}
+				if !match {
+					continue
+				}
+				tried = true
+				sel[key] = c
+				k := len(queue)
+				push(c)
+				if try(i + 1) {
+					return true
+				}
+				queue = queue[:k]
+			}
+			delete(sel, key)
+			if tried || r.b.over {
+				return false
+			}
+		}
+		return true
+	}
+	if try(0) {
+		r.chosen = sel
+	}
+}
+
+// cores returns the cores of n's vendor:library:name, newest first;
+// the first call reads files.Cores(). It returns nil when the budget
+// runs out.
+func (r *coreRun) cores(n coreNeed) []*coreFile {
 	if !r.loaded {
 		r.loaded = true
 		for _, p := range r.files.Cores() {
@@ -227,21 +345,38 @@ func (r *coreRun) resolve(from *coreFile, d coreDep) *coreFile {
 			}
 		}
 	}
-	var best *coreFile
-	for _, c := range r.byName[key] {
-		if !compare(c, best) {
-			return nil
-		}
-		if d.matches(c.vlnv) && (best == nil ||
-			compareVersions(c.vlnv.version, best.vlnv.version) > 0) {
-			best = c
-		}
+	key := n.d.want.unversioned()
+	cs := r.byName[key]
+	if !r.sorted[key] {
+		r.sorted[key] = true
+		// Sorting compares versions, which costs steps as test does.
+		slices.SortStableFunc(cs, func(a, b *coreFile) int {
+			n.from.charge(1+(len(a.vlnv.version)+len(b.vlnv.version))/
+				coreTextStep, n.at)
+			return compareVersions(b.vlnv.version, a.vlnv.version)
+		})
 	}
-	if _, ok := r.chosen[key]; !ok && best != nil {
-		r.chosen[key] = best
+	if r.b.over {
+		return nil
 	}
-	return best
+	return cs
 }
+
+// test reports whether the core c satisfies the dependency n, and
+// whether the budget lets the import go on: comparing costs a step,
+// plus one per coreTextStep bytes of the name and versions compared,
+// so long versions do not multiply the work.
+func (r *coreRun) test(n coreNeed, c *coreFile) (match, more bool) {
+	if !n.from.charge(1+(len(n.d.text)+len(c.vlnv.version))/
+		coreTextStep, n.at) {
+		return false, false
+	}
+	return n.d.matches(c.vlnv), true
+}
+
+// at returns the byte offset of n in its core, where the import stops
+// when n runs the budget out.
+func (n coreNeed) at() int { return n.d.off }
 
 // matches reports whether the core have satisfies d.
 func (d coreDep) matches(have vlnv) bool {

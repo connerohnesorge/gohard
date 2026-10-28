@@ -731,15 +731,21 @@ project root (folders whose name starts with `.` are not searched).
 Without a version any version matches; with one and no operator only
 that version; `>=`, `>`, `<=`, `<` compare, `^1.2.0` takes `1.2.0` and
 later `1.x`, and `~1.2.0` takes `1.2.0` and later `1.2.x`. Versions
-compare part by part, numbers as numbers. Of the cores that match,
-the newest is imported, and a later dependency on the same
-`vendor:library:name` that it satisfies reuses it. A dependency that
-no core matches is `import/unresolved-dependency` (a warning): import
-fetches nothing, so the files of that core are not in `gohard.yaml`.
+compare part by part, numbers as numbers. Import picks one core for
+each `vendor:library:name`, so that every `depend:` entry of the cores
+it imports matches the pick, as FuseSoC's solver does: it takes the
+entries in the order it meets them, tries the cores an entry matches
+newest first, and goes back on a pick when a later entry does not
+match it. When no picks satisfy every entry, the first entry on a name
+picks the newest core it matches, and a later entry that does not
+match that core is `import/dependency-conflict` (a warning): only the
+first pick is imported. A dependency that no core matches is
+`import/unresolved-dependency` (a warning): import fetches nothing,
+so the files of that core are not in `gohard.yaml`.
 A `.core` file over 10 MB is not read, so it matches nothing. Import
 takes at most 100,000 steps (a key or list item read, or a core
-compared with a `depend:` entry; an item a YAML alias reaches counts
-each time) and reads at most 4 MiB of `.core` files; past that it
+compared with a `depend:` entry, again each time the search goes back;
+an item a YAML alias reaches counts each time) and reads at most 4 MiB of `.core` files; past that it
 stops with `import/syntax`.
 
 ### OSVVM `.pro` scripts
