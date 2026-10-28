@@ -1,6 +1,8 @@
 package resolve
 
 import (
+	"cmp"
+	"slices"
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/cst"
@@ -42,16 +44,16 @@ func SignatureHelp(r *sema.Result, path string, off int,
 	if !ok {
 		return nil, false
 	}
-	call, list, callOK := innermostCall(f, off)
+	c, callOK := innermostCall(f, off)
 	m, mapOK := innermostMap(f, off)
 	switch {
-	case callOK && (!mapOK || within(list.Span(), m.list.Span())):
-		return callSignatures(r, f, call, list, off)
+	case callOK && (!mapOK || within(c.list.Span(), m.list.Span())):
+		return callSignatures(r, c, off)
 	case mapOK:
 		return []Signature{mapSignature(r, m, off)}, true
 	}
 	if op, ok := innermostOperator(f, off); ok {
-		return callSignatures(r, f, op, cst.AssociationList{}, off)
+		return callSignatures(r, op, off)
 	}
 	return nil, false
 }
@@ -61,62 +63,98 @@ func within(a, b cst.Range) bool {
 	return b.Start <= a.Start && a.End <= b.End
 }
 
-// eachExpr calls fn on every typed expression of the file's units,
-// nested ones included: the unit's expressions and the actuals of its
-// generic and port maps.
-func eachExpr(f *sema.File, fn func(e *sema.Expr)) {
-	var walk func(e *sema.Expr, depth int)
-	walk = func(e *sema.Expr, depth int) {
-		if e == nil || depth > 256 || e.Node.IsZero() {
-			return
-		}
-		fn(e)
-		walk(e.Prefix, depth+1)
-		for _, x := range e.Args {
-			walk(x, depth+1)
-		}
-		for _, as := range e.Assocs {
-			for _, c := range as.Choices {
-				walk(c, depth+1)
+// call is a subprogram call written with an association list (f(a, b),
+// p(x), a VHDL-2019 parameter map), or an operator expression (list
+// zero), with the reference sema recorded at its name: the one hover
+// and definition answer from. Calls are found in the syntax tree, so a
+// call anywhere (an initial value, an index constraint, a loop range,
+// an allocator) has one, wherever sema keeps its typed expression.
+type call struct {
+	node cst.Node
+	list cst.AssociationList
+	ref  sema.Ref
+}
+
+// callAt returns the call whose node is n: a name with an association
+// list whose designator (its last token: f in pkg.f) has a call
+// reference, or an operation whose operator has one with an overload
+// result. f(x)(y), an index of the result of a call, is not one.
+func callAt(f *sema.File, n cst.Node) (call, bool) {
+	var name cst.Range
+	var l cst.AssociationList
+	switch n.Kind() {
+	case cst.KindBinaryExpr:
+		name = cst.BinaryExpr{Node: n}.Op().Span()
+	case cst.KindUnaryExpr:
+		name = cst.UnaryExpr{Node: n}.Op().Span()
+	case cst.KindCallOrIndexName:
+		c := cst.CallOrIndexName{Node: n}
+		if l = c.Args(); l.IsZero() {
+			if pm := c.ParameterMap(); !pm.IsZero() {
+				l = pm.List()
 			}
-			walk(as.Value, depth+1)
 		}
-		if rc := e.Range; rc != nil {
-			walk(rc.Left, depth+1)
-			walk(rc.Right, depth+1)
-			walk(rc.Attr, depth+1)
+		if l.IsZero() {
+			return call{}, false
+		}
+		name = c.Prefix().Node.LastToken().Span()
+	default:
+		return call{}, false
+	}
+	ref, ok := callRef(f, name)
+	if !ok || l.IsZero() && ref.Overload == nil {
+		return call{}, false
+	}
+	return call{node: n, list: l, ref: ref}, true
+}
+
+// callRef returns the call reference sema recorded at the name token
+// at (the last one when it recorded several).
+func callRef(f *sema.File, at cst.Range) (sema.Ref, bool) {
+	var out sema.Ref
+	found := false
+	for _, u := range f.Units {
+		rs := u.Refs
+		i, _ := slices.BinarySearchFunc(rs, at.Start,
+			func(r sema.Ref, start int) int {
+				return cmp.Compare(r.Span.Start, start)
+			})
+		for ; i < len(rs) && rs[i].Span.Start == at.Start; i++ {
+			if r := rs[i]; r.File == f && r.Span == at &&
+				r.Kind == sema.RefCall &&
+				(r.Decl != nil || r.Overload != nil) {
+				out, found = r, true
+			}
 		}
 	}
-	for _, u := range f.Units {
-		for _, e := range u.Exprs {
-			walk(e, 0)
+	return out, found
+}
+
+// eachCall calls fn on every call of the file, outer calls before the
+// calls nested in them.
+func eachCall(f *sema.File, fn func(call)) {
+	for n := range f.Root().Descendants() {
+		if c, ok := callAt(f, n); ok {
+			fn(c)
 		}
-		eachMap(u, func(m assocMap) {
-			for _, as := range m.assocs {
-				walk(as.Actual, 0)
-				walk(as.Part, 0)
-			}
-		})
 	}
 }
 
-// callList returns the association list of a call written with one
-// (f(a, b), p(x), a VHDL-2019 parameter map).
-func callList(e *sema.Expr) (cst.AssociationList, bool) {
-	if e.Kind != sema.ExprCall {
-		return cst.AssociationList{}, false
+// callsAt calls fn on every call whose node holds off, outer calls
+// before the calls nested in them.
+func callsAt(f *sema.File, off int, fn func(call)) {
+	var walk func(n cst.Node)
+	walk = func(n cst.Node) {
+		for c := range n.Nodes() {
+			if sp := c.Span(); sp.Start <= off && off <= sp.End {
+				if cl, ok := callAt(f, c); ok {
+					fn(cl)
+				}
+				walk(c)
+			}
+		}
 	}
-	c, ok := cst.As[cst.CallOrIndexName](e.Node)
-	if !ok {
-		return cst.AssociationList{}, false
-	}
-	if l := c.Args(); !l.IsZero() {
-		return l, true
-	}
-	if pm := c.ParameterMap(); !pm.IsZero() && !pm.List().IsZero() {
-		return pm.List(), true
-	}
-	return cst.AssociationList{}, false
+	walk(f.Root())
 }
 
 // inside reports whether off is between the parentheses of l (after
@@ -147,89 +185,41 @@ func inside(l cst.AssociationList, off int) bool {
 
 // innermostCall returns the call whose association list holds off,
 // the innermost one when calls nest.
-func innermostCall(f *sema.File, off int) (*sema.Expr,
-	cst.AssociationList, bool,
-) {
-	var best *sema.Expr
-	var bestList cst.AssociationList
-	eachExpr(f, func(e *sema.Expr) {
-		if e.Overload == nil && e.Decl == nil {
+func innermostCall(f *sema.File, off int) (call, bool) {
+	var best call
+	found := false
+	callsAt(f, off, func(c call) {
+		if c.list.IsZero() || !inside(c.list, off) {
 			return
 		}
-		l, ok := callList(e)
-		if !ok || !inside(l, off) {
-			return
-		}
-		if best == nil || within(l.Span(), bestList.Span()) {
-			best, bestList = e, l
+		if !found || within(c.list.Span(), best.list.Span()) {
+			best, found = c, true
 		}
 	})
-	return best, bestList, best != nil
+	return best, found
 }
 
 // innermostOperator returns the innermost operator expression (a
 // binary or unary operation with an overload result) whose span holds
 // off.
-func innermostOperator(f *sema.File, off int) (*sema.Expr, bool) {
-	var best *sema.Expr
-	eachExpr(f, func(e *sema.Expr) {
-		if e.Kind != sema.ExprCall || e.Overload == nil {
+func innermostOperator(f *sema.File, off int) (call, bool) {
+	var best call
+	found := false
+	callsAt(f, off, func(c call) {
+		if !c.list.IsZero() {
 			return
 		}
-		k := e.Node.Kind()
-		if k != cst.KindBinaryExpr && k != cst.KindUnaryExpr {
-			return
-		}
-		sp := e.Node.Span()
-		if off < sp.Start || off > sp.End {
-			return
-		}
-		if best == nil || within(sp, best.Node.Span()) {
-			best = e
+		if !found || within(c.node.Span(), best.node.Span()) {
+			best, found = c, true
 		}
 	})
-	return best, best != nil
+	return best, found
 }
 
-// callRef returns the reference sema recorded at the name of a call:
-// the designator of the prefix (f, pkg.f, "+") or the operator symbol.
-func callRef(f *sema.File, e *sema.Expr) (sema.Ref, bool) {
-	var at cst.Range
-	switch e.Node.Kind() {
-	case cst.KindBinaryExpr:
-		at = cst.BinaryExpr{Node: e.Node}.Op().Span()
-	case cst.KindUnaryExpr:
-		at = cst.UnaryExpr{Node: e.Node}.Op().Span()
-	default:
-		c, ok := cst.As[cst.CallOrIndexName](e.Node)
-		if !ok {
-			return sema.Ref{}, false
-		}
-		at = c.Prefix().Span()
-	}
-	var out sema.Ref
-	found := false
-	for _, u := range f.Units {
-		for _, ref := range u.Refs {
-			if ref.File == f && ref.Kind == sema.RefCall &&
-				within(ref.Span, at) &&
-				(!found || ref.Span.Start >= out.Span.Start) {
-				out, found = ref, true
-			}
-		}
-	}
-	return out, found
-}
-
-// callSignatures returns the overloads of the call e.
-func callSignatures(r *sema.Result, f *sema.File, e *sema.Expr,
-	l cst.AssociationList, off int,
+// callSignatures returns the overloads of the call c.
+func callSignatures(r *sema.Result, c call, off int,
 ) ([]Signature, bool) {
-	o := e.Overload
-	chosen := e.Decl
-	if ref, ok := callRef(f, e); ok {
-		o, chosen = ref.Overload, ref.Decl
-	}
+	o, chosen := c.ref.Overload, c.ref.Decl
 	type cand struct {
 		d      *sema.Decl
 		reason string
@@ -238,34 +228,34 @@ func callSignatures(r *sema.Result, f *sema.File, e *sema.Expr,
 	if chosen != nil {
 		cands = append(cands, cand{chosen, ""})
 	}
-	for _, c := range o.Sorted() {
-		if c.Decl != chosen {
-			cands = append(cands, cand{c.Decl, c.Reason})
+	for _, x := range o.Sorted() {
+		if x.Decl != chosen {
+			cands = append(cands, cand{x.Decl, x.Reason})
 		}
 	}
 	if len(cands) == 0 {
 		return nil, false
 	}
 	out := make([]Signature, 0, len(cands))
-	for _, c := range cands {
-		s := subprogramSignature(c.d)
-		if l.IsZero() {
-			s.Active = operand(e, off)
+	for _, cd := range cands {
+		s := subprogramSignature(cd.d)
+		if c.list.IsZero() {
+			s.Active = operand(c.node, off)
 		} else {
-			s.Active = activeFormal(l, off, s.Formals)
+			s.Active = activeFormal(c.list, off, s.Formals)
 		}
 		if s.Active >= len(s.Params) {
 			s.Active = -1 // the right operand of a unary candidate
 		}
 		var doc []string
-		if x := c.d.Denotes(); x.Unit != nil {
+		if x := cd.d.Denotes(); x.Unit != nil {
 			doc = append(doc, "from "+string(x.Unit.Library)+"."+
 				string(x.Unit.Name))
 		}
-		if c.reason != "" {
-			doc = append(doc, "does not fit: "+c.reason)
+		if cd.reason != "" {
+			doc = append(doc, "does not fit: "+cd.reason)
 		}
-		if d := DocOf(r, c.d); d != "" {
+		if d := DocOf(r, cd.d); d != "" {
 			doc = append(doc, d)
 		}
 		s.Doc = strings.Join(doc, "\n\n")
@@ -274,10 +264,10 @@ func callSignatures(r *sema.Result, f *sema.File, e *sema.Expr,
 	return out, true
 }
 
-// operand returns the operand of the operator expression e that off
+// operand returns the operand of the operator expression n that off
 // is in: 0 for a unary operator or the left operand, 1 for the right.
-func operand(e *sema.Expr, off int) int {
-	if b, ok := cst.As[cst.BinaryExpr](e.Node); ok &&
+func operand(n cst.Node, off int) int {
+	if b, ok := cst.As[cst.BinaryExpr](n); ok &&
 		off >= b.Op().Span().End {
 		return 1
 	}

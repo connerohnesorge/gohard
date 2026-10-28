@@ -327,12 +327,13 @@ the full or range result for a file (`--at` names the file).
 Signature help (#56) opens on `(` and `,` inside a subprogram call, a
 procedure call, a generic map or a port map, and on an operand of an
 operator. A call shows every overload the resolver kept: the one the
-call resolves to first (the one hover and go to definition give),
-then the others, each with why it does not fit. A map shows the
-generic or port list of the instantiated entity, component or block.
-Each signature carries its parameters with their class, mode, type
-and default as written. The active parameter is the formal a named
-association names, else the position of a positional one.
+call resolves to first (the one hover and go to definition give), then
+the others, each with why it does not fit. This holds for a call
+anywhere, an index constraint or a loop range included. A map shows
+the generic or port list of the instantiated entity, component or
+block. Each signature carries its parameters with their class, mode,
+type and default as written. The active parameter is the formal a
+named association names, else the position of a positional one.
 
 Inlay hints come in kinds, each with its own key in `gohard.yaml` or
 the editor settings, all off by default:

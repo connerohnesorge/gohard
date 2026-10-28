@@ -11,6 +11,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/config"
 	"github.com/connerohnesorge/gohard/internal/cst"
 	"github.com/connerohnesorge/gohard/internal/sema"
+	"github.com/connerohnesorge/gohard/internal/token"
 )
 
 // corpusResult analyzes the files of the oracle corpus design name.
@@ -43,51 +44,47 @@ func corpusResult(t *testing.T, name string) *sema.Result {
 // (#8), at every offset where signature help answers, its first
 // signature is the overload hover and go to definition give at the
 // call's name, and every call written with an association list or as
-// an operator gets signature help somewhere (#56).
+// an operator gets signature help (#56).
 func TestSignatureHelpAgreesWithHover(t *testing.T) {
 	r := corpusResult(t, "overload_ops")
-	paths := []string{"overload_ops.vhd", "overload_ops_pkg.vhd",
-		"overload_ops_tb.vhd"}
+	n := checkSignatureHelp(t, r, "overload_ops.vhd",
+		"overload_ops_pkg.vhd", "overload_ops_tb.vhd")
+	t.Logf("%d positions checked", n)
+}
+
+// checkSignatureHelp checks signature help against hover and
+// definition at every offset of the files at paths, and that every
+// call gets it. The calls expected come from the call references sema
+// recorded and the tokens after them, not from the walk signature help
+// makes, so a call that walk misses fails the check. It returns the
+// number of offsets checked.
+func checkSignatureHelp(t *testing.T, r *sema.Result,
+	paths ...string,
+) int {
+	t.Helper()
 	checked := 0
 	for _, p := range paths {
-		f, ok := r.File(p)
-		if !ok {
-			t.Fatalf("no file %s", p)
+		f := mustFile(t, r, p)
+		calls, ops := expectedCalls(f)
+		if len(calls) == 0 {
+			t.Fatalf("%s: no call", p)
 		}
-		want := map[*sema.Expr]bool{}
-		eachExpr(f, func(e *sema.Expr) {
-			if _, ok := callList(e); ok && e.Overload != nil {
-				want[e] = true
-			}
-			// An operator inside a call's association list gets
-			// the call's signature help, not its own.
-			if _, _, inCall := innermostCall(f,
-				e.Node.Span().Start); !inCall && e.Overload != nil &&
-				e.Kind == sema.ExprCall &&
-				(e.Node.Kind() == cst.KindBinaryExpr ||
-					e.Node.Kind() == cst.KindUnaryExpr) {
-				want[e] = true
-			}
-		})
-		seen := map[*sema.Expr]bool{}
+		seen := map[cst.Range]bool{}
 		for off := 0; off <= len(f.Text); off++ {
 			sigs, ok := SignatureHelp(r, p, off)
 			if !ok {
 				continue
 			}
-			e, _, isCall := innermostCall(f, off)
+			c, isCall := innermostCall(f, off)
 			if m, isMap := innermostMap(f, off); isMap && (!isCall ||
-				!within(innermostList(f, off), m.list.Span())) {
+				!within(c.list.Span(), m.list.Span())) {
 				continue // a map: no overloads
 			}
 			if !isCall {
-				e, _ = innermostOperator(f, off)
+				c, _ = innermostOperator(f, off)
 			}
-			seen[e] = true
-			ref, ok := callRef(f, e)
-			if !ok {
-				t.Fatalf("%s:%d: no reference at the call's name", p, off)
-			}
+			ref := c.ref
+			seen[ref.Span] = true
 			at := fmt.Sprintf("%s:%d (%s)", p, off,
 				f.Text[ref.Span.Start:ref.Span.End])
 			if ref.Decl == nil {
@@ -117,27 +114,107 @@ func TestSignatureHelpAgreesWithHover(t *testing.T) {
 			}
 			checked++
 		}
-		for e := range want {
-			if !seen[e] {
-				sp := e.Node.Span()
-				t.Errorf("%s:%d: the call %q gets no signature help", p,
-					sp.Start, f.Text[sp.Start:sp.End])
+		for name, open := range calls {
+			at := fmt.Sprintf("%s:%d: the call %s", p, name.Start,
+				f.Text[name.Start:name.End])
+			if !seen[name] {
+				t.Errorf("%s gets no signature help", at)
+				continue
+			}
+			// Right after its parenthesis, the call is the innermost.
+			sigs, ok := SignatureHelp(r, p, open)
+			if ref, _ := callRef(f, name); !ok ||
+				sigs[0].Decl != ref.Decl {
+				t.Errorf("%s: no signature help of its own after (", at)
+			}
+		}
+		for name := range ops {
+			if !seen[name] {
+				t.Errorf("%s:%d: the operator %s gets no signature help",
+					p, name.Start, f.Text[name.Start:name.End])
 			}
 		}
 	}
 	if checked == 0 {
 		t.Fatal("no call checked")
 	}
-	t.Logf("%d positions checked", checked)
+	return checked
 }
 
-// innermostList is the association list of the innermost call at off.
-func innermostList(f *sema.File, off int) cst.Range {
-	_, l, ok := innermostCall(f, off)
-	if !ok {
-		return cst.Range{}
+// expectedCalls returns, by the span of their name, the calls of the
+// file f written with an association list (a call reference followed
+// by a parenthesis), with the offset after that parenthesis, and the
+// operator calls outside any call's or map's parentheses (there, the
+// call's or map's signature help answers).
+func expectedCalls(f *sema.File) (calls map[cst.Range]int,
+	ops map[cst.Range]bool,
+) {
+	var toks []cst.Token
+	index := map[int]int{}
+	for tk := range f.Root().DescendantTokens() {
+		if tk.Missing() || tk.Span().Len() == 0 {
+			continue
+		}
+		index[tk.Span().Start] = len(toks)
+		toks = append(toks, tk)
 	}
-	return l.Span()
+	// closing returns the span inside the parentheses opened at i.
+	closing := func(i int) cst.Range {
+		depth := 0
+		for j := i; j < len(toks); j++ {
+			switch toks[j].Kind() {
+			case token.LParen:
+				depth++
+			case token.RParen:
+				if depth--; depth == 0 {
+					return cst.Range{Start: toks[i].Span().End,
+						End: toks[j].Span().Start}
+				}
+			}
+		}
+		return cst.Range{Start: toks[i].Span().End, End: len(f.Text)}
+	}
+	var parens []cst.Range
+	for i, tk := range toks {
+		if tk.Kind() == token.KwMap && i+1 < len(toks) &&
+			toks[i+1].Kind() == token.LParen {
+			parens = append(parens, closing(i+1))
+		}
+	}
+	calls, ops = map[cst.Range]int{}, map[cst.Range]bool{}
+	var opRefs []sema.Ref
+	for _, u := range f.Units {
+		for _, ref := range u.Refs {
+			if ref.File != f || ref.Kind != sema.RefCall ||
+				ref.Decl == nil && ref.Overload == nil {
+				continue
+			}
+			i, ok := index[ref.Span.Start]
+			if !ok || toks[i].Span() != ref.Span {
+				continue
+			}
+			if i+1 < len(toks) && toks[i+1].Kind() == token.LParen {
+				in := closing(i + 1)
+				calls[ref.Span] = in.Start
+				parens = append(parens, in)
+				continue
+			}
+			switch toks[i].Parent().Kind() {
+			case cst.KindBinaryExpr, cst.KindUnaryExpr:
+				if ref.Overload != nil {
+					opRefs = append(opRefs, ref)
+				}
+			}
+		}
+	}
+	for _, ref := range opRefs {
+		if !slices.ContainsFunc(parens, func(in cst.Range) bool {
+			return within(ref.Span, in)
+		}) {
+			ops[ref.Span] = true
+		}
+	}
+	return calls, ops
 }
 
 func TestSignatureHelpActiveParameter(t *testing.T) {
@@ -264,4 +341,80 @@ end architecture;
 				c.want, c.params)
 		}
 	}
+}
+
+// callsEverywhereSrc has calls of f in every place an expression can
+// be outside an initial value or a statement (an index constraint of
+// a port, a subtype, an array type and an allocator; a range
+// constraint; generate and loop ranges; a slice).
+const callsEverywhereSrc = `package fp is
+  function f(x : integer; y : integer) return integer;
+end package;
+package body fp is
+  function f(x : integer; y : integer) return integer is
+  begin
+    return x + y;
+  end function;
+end package body;
+use work.fp.all;
+entity e is
+  port (p : in bit_vector(f(1, 2) downto 0));
+end entity;
+architecture rtl of e is
+  subtype word is bit_vector(f(3, 4) downto 0);
+  type mem is array (0 to f(5, 6)) of word;
+  signal s : integer range 0 to f(7, 8);
+  signal v : bit_vector(15 downto 0);
+  type ptr is access bit_vector;
+begin
+  g : for i in 0 to f(9, 10) generate
+  end generate;
+  process
+    variable q : ptr;
+  begin
+    for j in f(11, 12) downto 0 loop
+    end loop;
+    q := new bit_vector(f(13, 14) downto 0);
+    v(f(15, 16) - 24 downto 0) <= (others => '0');
+    wait;
+  end process;
+end architecture;
+`
+
+// TestSignatureHelpEverywhere: a call in a subtype indication, a range
+// or an allocator gets the signature help a call in an initial value
+// gets (#56).
+func TestSignatureHelpEverywhere(t *testing.T) {
+	src := callsEverywhereSrc
+	r := analyzeOne(t, src)
+	if len(r.Diagnostics) > 0 {
+		t.Fatalf("diagnostics: %v", r.Diagnostics)
+	}
+	const fLabel = "function f(x : integer; y : integer) return INTEGER"
+	for _, c := range []struct {
+		at     string
+		label  string
+		active int
+	}{
+		{"f(1, ", fLabel, 1},
+		{"f(3, ", fLabel, 1},
+		{"f(5, ", fLabel, 1},
+		{"f(7, ", fLabel, 1},
+		{"f(9, ", fLabel, 1},
+		{"f(11, ", fLabel, 1},
+		{"f(13, ", fLabel, 1},
+		{"f(15, ", fLabel, 1},
+	} {
+		off := strings.Index(src, c.at) + len(c.at)
+		sigs, ok := SignatureHelp(r, "a.vhd", off)
+		if !ok {
+			t.Errorf("%q: no signature help", c.at)
+			continue
+		}
+		if sigs[0].Label != c.label || sigs[0].Active != c.active {
+			t.Errorf("%q: %q active %d, want %q active %d", c.at,
+				sigs[0].Label, sigs[0].Active, c.label, c.active)
+		}
+	}
+	checkSignatureHelp(t, r, "a.vhd")
 }

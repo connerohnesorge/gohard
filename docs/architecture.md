@@ -525,22 +525,24 @@ last full or delta result of the document, which the State keeps
 same IDs and edits.
 
 Signature help and inlay hints (#56) are `resolve` queries, like
-navigation.
-`resolve.SignatureHelp` takes the overloads of a call from the
-reference sema recorded at the call's name, the one hover and
-definition answer from, so the three agree; a generic or port map
-gives the formal list of its unit. `resolve.Hints` is a pure function
-of the sema result and the kinds turned on (`inlay_hints.*` in the
-snapshot's configuration): parameter names come from the formals sema
-matched to each positional actual, types from the declarations, and
-values from static evaluation with a fresh evaluator per declaration.
-The values of one request share one budget of 1,000,000 steps (P7),
-spent in source order from the start of the file, so a request costs
-at most one editor evaluation however many constants the file has, and
-a hint does not depend on the range asked for. Each hint sits on a
-token boundary. With every kind off the analyzer answers without
-waiting for the analysis. A change of the `inlay_hints.*` keys sends
-`workspace/inlayHint/refresh` to a client that supports it.
+navigation. Both find calls in the syntax tree, not in sema's typed
+expressions, which do not hold every expression (an index constraint,
+a loop range), and take the overloads of a call from the reference sema recorded at the
+call's name, the one hover and definition answer from, so the three
+agree. A generic or port map gives the formal list of its unit.
+`resolve.Hints` is a pure function of the sema result and the kinds
+turned on (`inlay_hints.*` in the snapshot's configuration): parameter
+names pair each positional actual of a call with the parameter at its
+position and each of a map with the formal sema matched to it, types
+come from the declarations, and values from static evaluation with a
+fresh evaluator per declaration. The values of one request share one
+budget of 1,000,000 steps (P7), spent in source order from the start
+of the file, so a request costs at most one editor evaluation however
+many constants the file has, and a hint does not depend on the range
+asked for. Each hint sits on a token boundary. With every kind off the
+analyzer answers without waiting for the analysis. A change of the
+`inlay_hints.*` keys sends `workspace/inlayHint/refresh` to a client
+that supports it.
 
 ## VHDL-2019 in v1.1 (#18, #27)
 

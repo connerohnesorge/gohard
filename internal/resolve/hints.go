@@ -130,20 +130,20 @@ func parameterHints(f *sema.File, add func(int, string, HintKind)) {
 		}
 		add(act.Span().Start, formal.Text+" =>", HintParameter)
 	}
-	eachExpr(f, func(e *sema.Expr) {
-		if e.Decl == nil {
+	// Positional actuals come first (LRM 6.5.7.1): the i-th one
+	// associates the i-th parameter of the subprogram the call resolves
+	// to.
+	eachCall(f, func(c call) {
+		if c.list.IsZero() || c.ref.Decl == nil {
 			return
 		}
-		l, ok := callList(e)
-		if !ok {
-			return
-		}
+		params := c.ref.Decl.Denotes().Params
 		i := 0
-		for it := range l.Items() {
-			if i < len(e.Args) && i < len(e.Formals) &&
-				within(e.Args[i].Node.Span(), it.Span()) {
-				hint(it, e.Formals[i])
+		for it := range c.list.Items() {
+			if !it.Formal().IsZero() || i >= len(params) {
+				return
 			}
+			hint(it, params[i])
 			i++
 		}
 	})
