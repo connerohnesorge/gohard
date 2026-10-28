@@ -5,8 +5,9 @@ a VHDL language server, checker, formatter and simulator. The
 extension starts `gohard lsp` for VHDL files. Diagnostics, hover,
 go to definition, references, rename, completion, symbols, formatting,
 folding, highlights, semantic tokens, signature help, inlay hints, the
-testbench code lenses and the "Open waveform" code action all come
-from the server.
+testbench code lenses, the "Open waveform" code action and the code
+actions that write instances, component declarations, port maps and
+testbenches all come from the server.
 
 The extension adds the VHDL language (`.vhd`, `.vhdl`) with a
 TextMate grammar for the reserved words, literals, comments and
