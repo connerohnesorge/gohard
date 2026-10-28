@@ -99,7 +99,7 @@ result; positions are zero-based UTF-8.
 | `codeaction/add-sensitivity-alias` | a read through an alias declared in the process: the fix appends the signal, since the alias is not visible in the list |
 | `codeaction/map-library` | an unmapped library: the `libraries` line written into `gohard.yaml`, with the folder declaring the unit (the search of `gohard libs detect`, #34) |
 | `codeaction/map-library-new-yaml` | without `gohard.yaml` the fix adds a `libraries` block |
-| `codeaction/instantiate-entity` | a bare entity name in a statement part: Instantiate entity (#57) writes the entity instantiation with every formal, the visible port of the formal's name or `open` |
+| `codeaction/instantiate-entity` | a bare entity name without its `;` before another statement: Instantiate entity (#57) writes the entity instantiation with every formal, the visible port of the formal's name or `open`, in place of the name only |
 | `codeaction/instantiate-entity-library` | an entity of another library: the instance names the library and the edit adds `library ip;`; a generic without a default maps to the visible constant of its name |
 | `codeaction/declare-component` | a component instantiation of an undeclared component: Declare component adds the entity's component declaration at the end of the declarative part |
 | `codeaction/complete-port-map` | a port map that names only the clock: Complete port map adds the other formals, each on its own line, the comment staying with its association |

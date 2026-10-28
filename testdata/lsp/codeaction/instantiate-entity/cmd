@@ -1,2 +1,2 @@
-# A bare entity name in a statement part gets Instantiate entity: the entity instantiation with every formal, an object of the formal's name where one is visible, else open (#57).
-gohard lsp codeaction --at top.vhd:17:3
+# A bare entity name in a statement part gets Instantiate entity: the entity instantiation with every formal, an object of the formal's name where one is visible, else open; the edit replaces the name only, not the next statement the parser folds into it without a `;` (#57).
+gohard lsp codeaction --at top.vhd:18:3

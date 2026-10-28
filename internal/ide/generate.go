@@ -146,6 +146,10 @@ func (x *gen) instantiate(stmt cst.Node, u *sema.Unit,
 		ref.Decl != nil && ref.Decl.Kind != sema.DeclEntity {
 		return nil // a procedure call or a declared component
 	}
+	end, ok := x.nameEnd(stmt, name)
+	if !ok {
+		return nil
+	}
 	at := stmt.Span().Start
 	var out []server.CodeAction
 	for _, e := range x.entitiesNamed(name, u) {
@@ -160,8 +164,7 @@ func (x *gen) instantiate(stmt cst.Node, u *sema.Unit,
 		gs, ps := formals(e.Region)
 		text := instanceText(l, lib, e.Decl.Text,
 			x.associations(gs, at), x.associations(ps, at))
-		s, end := stmt.Span().Start, stmt.Span().End
-		edits := []server.Edit{x.replace(s, end, text)}
+		edits := []server.Edit{x.replace(at, end, text)}
 		if lk := sema.IdentKey(lib); lib != "work" && lk != "std" &&
 			!names(x.an.Result, u, lk) {
 			edits = append([]server.Edit{insertContext(u, x.text,
@@ -174,6 +177,27 @@ func (x *gen) instantiate(stmt cst.Node, u *sema.Unit,
 		})
 	}
 	return out
+}
+
+// nameEnd returns where the text Instantiate entity replaces ends: the
+// `;` after the name, else the name. Without the `;` the parser folds
+// what follows (the next statement) into stmt as an error; that text
+// is kept, and the action is not offered when it starts on the name's
+// line, where the statement is more than a name.
+func (x *gen) nameEnd(stmt, name cst.Node) (int, bool) {
+	last := lastToken(name)
+	end := last.Span().End
+	next := last.Next()
+	for next.Missing() {
+		next = next.Next()
+	}
+	switch {
+	case next.IsZero() || next.Span().Start >= stmt.Span().End:
+		return end, true
+	case next.Kind() == token.Semicolon && next.Parent().Equal(stmt):
+		return next.Span().End, true
+	}
+	return end, bytes.IndexByte(x.text[end:next.Span().Start], '\n') >= 0
 }
 
 // declareComponent is Declare component on a component instantiation

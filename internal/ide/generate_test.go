@@ -424,3 +424,101 @@ func TestAnalyzed(t *testing.T) {
 		}
 	}
 }
+
+// genAction returns the edited text of the action title at the first
+// occurrence of at in the file rel of p, and whether it is offered.
+func genAction(t *testing.T, p project, rel, at, title string,
+) ([]byte, bool) {
+	t.Helper()
+	off := strings.Index(string(p[rel]), at)
+	if off < 0 {
+		t.Fatalf("%q not in %s", at, rel)
+	}
+	off += len(at) - len(strings.TrimLeft(at, " "))
+	an := analyze(t, snapshotOf(t, p, nil))
+	as := an.Refactors(uri(rel), server.Span{Start: off, End: off},
+		Generate{ToolVersion: "test"})
+	a, ok := actionOf(as, title)
+	if !ok {
+		return nil, false
+	}
+	if len(a.Edits) != 1 || a.Edits[0].URI != uri(rel) {
+		t.Fatalf("%s: edits %+v", title, a.Edits)
+	}
+	return apply(p[rel], a.Edits[0].Edits), true
+}
+
+// cleanResult checks that the file rel of p is formatted and that the
+// project has no error.
+func cleanResult(t *testing.T, p project, rel string) {
+	t.Helper()
+	cfg := Config(snapshotOf(t, p, nil))
+	if !fmtClean(cfg, p[rel]) {
+		t.Fatalf("%s not formatted:\n%s", rel, p[rel])
+	}
+	if an := analyze(t, snapshotOf(t, p, nil)); hasErrors(an) {
+		t.Fatalf("errors %q in\n%s", diagSet(an), p[rel])
+	}
+}
+
+// genCounter is an entity for the rewrites' tests.
+const genCounter = "library ieee;\nuse ieee.std_logic_1164.all;\n\n" +
+	"entity counter is\n  port (\n    clk : in std_logic;\n" +
+	"    q   : out std_logic\n  );\nend entity counter;\n"
+
+// TestInstantiateKeepsNextStatement: without a `;` after the name, the
+// parser folds the next statement into the name's statement as an
+// error; Instantiate entity replaces the label, the name and its `;`
+// only, so it gives what it gives with the `;` and the next statement
+// stays (#57). A statement with more than the name on its line is not
+// rewritten.
+func TestInstantiateKeepsNextStatement(t *testing.T) {
+	top := func(stmts string) []byte {
+		return []byte("library ieee;\nuse ieee.std_logic_1164.all;\n\n" +
+			"entity top is\n  port (\n    clk : in std_logic\n  );\n" +
+			"end entity top;\n\narchitecture rtl of top is\n" +
+			"  signal s : std_logic;\nbegin\n" + stmts +
+			"end architecture rtl;\n")
+	}
+	const title = "Instantiate entity work.counter"
+	for _, c := range []struct{ name, next string }{
+		{"  counter", "  s <= clk;\n"},
+		{"  lbl : counter", "  s <= clk;\n"},
+		{"  work.counter", "  s <= clk;\n"},
+		{"  counter -- here", "  s <= clk;\n"},
+		{"  counter", "  tick : process (clk) is\n  begin\n" +
+			"    s <= clk;\n  end process tick;\n"},
+		{"  counter", "  u2 : entity work.counter\n" +
+			"    port map (\n      clk => clk,\n      q   => s\n    );\n"},
+	} {
+		p := project{"counter.vhd": []byte(genCounter),
+			"top.vhd": top(c.name + "\n" + c.next)}
+		got, ok := genAction(t, p, "top.vhd", c.name, title)
+		if !ok {
+			t.Fatalf("%q: not offered", c.name)
+		}
+		semi, _, _ := strings.Cut(c.name, " --")
+		p["top.vhd"] = top(semi + ";\n" + c.next)
+		want, ok := genAction(t, p, "top.vhd", semi, title)
+		if !ok {
+			t.Fatalf("%q;: not offered", c.name)
+		}
+		if semi != c.name {
+			i := strings.LastIndex(string(want), ");\n") + 2
+			want = slices.Concat(want[:i], []byte(" -- here"), want[i:])
+		}
+		if string(got) != string(want) {
+			t.Fatalf("%q then %q gave\n%s\nwant\n%s", c.name, c.next,
+				got, want)
+		}
+		p["top.vhd"] = got
+		cleanResult(t, p, "top.vhd")
+	}
+	for _, s := range []string{"  counter s <= clk;\n",
+		"  counter foo;\n"} {
+		p := project{"counter.vhd": []byte(genCounter), "top.vhd": top(s)}
+		if got, ok := genAction(t, p, "top.vhd", "counter", title); ok {
+			t.Errorf("%q: offered:\n%s", s, got)
+		}
+	}
+}
