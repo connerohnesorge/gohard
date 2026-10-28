@@ -142,8 +142,13 @@ func TestReleaseAttestsAfterPublishError(t *testing.T) {
 	lines := strings.Split(strings.ReplaceAll(string(raw), "\r\n", "\n"),
 		"\n")
 	// The steps are list items at one indentation; collect the one
-	// that uses actions/attest.
+	// that uses actions/attest. A step ends at the next step or at a
+	// line indented less than the steps, such as the next job (#3).
 	const item = "      - "
+	outer := func(l string) bool {
+		return strings.TrimSpace(l) != "" &&
+			len(l)-len(strings.TrimLeft(l, " ")) < len(item)-2
+	}
 	var step []string
 	for i, l := range lines {
 		if !strings.Contains(l, "uses: actions/attest@") {
@@ -154,7 +159,8 @@ func TestReleaseAttestsAfterPublishError(t *testing.T) {
 			start--
 		}
 		end := i + 1
-		for end < len(lines) && !strings.HasPrefix(lines[end], item) {
+		for end < len(lines) && !strings.HasPrefix(lines[end], item) &&
+			!outer(lines[end]) {
 			end++
 		}
 		step = lines[start:end]
