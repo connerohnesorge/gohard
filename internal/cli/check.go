@@ -24,7 +24,8 @@ func init() { lookup("check").Run = runCheck }
 // the env job runner) and elaborates the instance hierarchy for the
 // per-instance static checks (internal/elab/hier). With --sim, --tb,
 // --seed, --repro or --coverage it then runs the testbenches
-// (simulate.go, #35, #29, #62).
+// (simulate.go, #35, #29, #62); gohard dap takes the analysis instead
+// (Invocation.analyzed, #68).
 func runCheck(inv *Invocation) Result {
 	r := inv.NewReport()
 	fsys := inv.Env.FS
@@ -85,9 +86,13 @@ func runCheck(inv *Invocation) Result {
 	res := analyzeSources(inv, r, cfg, srcs, append(ctx, libs...),
 		l.Root)
 
-	if simRequested(inv) {
-		simulate(inv, r, simInput{root: l.Root, cfg: cfg, res: res,
-			files: srcs, repro: rp})
+	in := simInput{root: l.Root, cfg: cfg, res: res, files: srcs,
+		repro: rp}
+	switch {
+	case inv.analyzed != nil:
+		inv.analyzed(r, in)
+	case simRequested(inv):
+		simulate(inv, r, in)
 	}
 	return Result{Report: r}
 }

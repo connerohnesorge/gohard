@@ -118,6 +118,11 @@ var commands = []Command{
 		},
 	},
 	{
+		Name: "dap",
+		Summary: "debug a testbench over the Debug Adapter " +
+			"Protocol on stdio (prototype)",
+	},
+	{
 		Name: "fmt", Args: "[PATH... | -]",
 		Summary: "format VHDL files in place (- for stdin to " +
 			"stdout), or check formatting",

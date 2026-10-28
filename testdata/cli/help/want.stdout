@@ -7,6 +7,7 @@ Commands:
   check     parse and analyze VHDL; with --sim, run testbenches
   config    check gohard.yaml or print its JSON schema
   coverage  sum lcov coverage files of several runs
+  dap       debug a testbench over the Debug Adapter Protocol on stdio (prototype)
   fmt       format VHDL files in place (- for stdin to stdout), or check formatting
   help      show help for gohard or one command
   import    write gohard.yaml from a ModelSim, Vivado, Quartus, FuseSoC or OSVVM project file

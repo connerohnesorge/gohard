@@ -1,0 +1,59 @@
+Content-Length: 154
+
+{"seq":1,"type":"response","request_seq":1,"success":true,"command":"initialize","body":{"supportsConfigurationDoneRequest":true,"supportsStepBack":true}}Content-Length: 141
+
+{"seq":2,"type":"response","request_seq":2,"success":false,"command":"launch","message":"no testbench named nope; candidates: wait_forms_tb"}Content-Length: 77
+
+{"seq":3,"type":"response","request_seq":3,"success":true,"command":"launch"}Content-Length: 125
+
+{"seq":4,"type":"event","event":"output","body":{"category":"console","output":"gohard: debugging wait_forms_tb (seed 0)\n"}}Content-Length: 46
+
+{"seq":5,"type":"event","event":"initialized"}Content-Length: 364
+
+{"seq":6,"type":"response","request_seq":4,"success":true,"command":"setBreakpoints","body":{"breakpoints":[{"verified":true,"line":125,"source":{"name":"wait_forms_tb.vhd","path":"wait_forms_tb.vhd"}},{"verified":false,"line":1,"source":{"name":"wait_forms_tb.vhd","path":"wait_forms_tb.vhd"},"message":"no statement the debugger stops at starts on this line"}]}}Content-Length: 120
+
+{"seq":7,"type":"response","request_seq":5,"success":true,"command":"setExceptionBreakpoints","body":{"breakpoints":[]}}Content-Length: 88
+
+{"seq":8,"type":"response","request_seq":6,"success":true,"command":"configurationDone"}Content-Length: 152
+
+{"seq":9,"type":"event","event":"stopped","body":{"allThreadsStopped":true,"description":"at 0 fs, delta 0, statement 1","reason":"entry","threadId":1}}Content-Length: 998
+
+{"seq":10,"type":"response","request_seq":7,"success":true,"command":"threads","body":{"threads":[{"id":1,"name":"wait_forms_tb.dut._p0"},{"id":2,"name":"wait_forms_tb.dut._p1"},{"id":3,"name":"wait_forms_tb.dut._p2"},{"id":4,"name":"wait_forms_tb.stim"},{"id":5,"name":"wait_forms_tb.forever"},{"id":6,"name":"wait_forms_tb.on_one"},{"id":7,"name":"wait_forms_tb.on_two"},{"id":8,"name":"wait_forms_tb.until_only"},{"id":9,"name":"wait_forms_tb.on_until"},{"id":10,"name":"wait_forms_tb.on_for"},{"id":11,"name":"wait_forms_tb.until_for"},{"id":12,"name":"wait_forms_tb.on_until_for"},{"id":13,"name":"wait_forms_tb.for_only"},{"id":14,"name":"wait_forms_tb.until_static"},{"id":15,"name":"wait_forms_tb.sens"},{"id":16,"name":"wait_forms_tb.edge"},{"id":17,"name":"wait_forms_tb.mon_inert"},{"id":18,"name":"wait_forms_tb.mon_trans"},{"id":19,"name":"wait_forms_tb.mon_rej"},{"id":20,"name":"wait_forms_tb.mon_ti"},{"id":21,"name":"wait_forms_tb.mon_ii"},{"id":22,"name":"wait_forms_tb.final"}]}}Content-Length: 245
+
+{"seq":11,"type":"response","request_seq":8,"success":true,"command":"scopes","body":{"scopes":[{"expensive":false,"name":"Locals","presentationHint":"locals","variablesReference":1},{"expensive":false,"name":"Signals","variablesReference":2}]}}Content-Length: 396
+
+{"seq":12,"type":"response","request_seq":9,"success":true,"command":"variables","body":{"variables":[{"name":"x","value":"'0'","type":"std_logic","variablesReference":0},{"name":"y_inert","value":"'U'","type":"std_logic","variablesReference":0},{"name":"y_trans","value":"'U'","type":"std_logic","variablesReference":0},{"name":"y_rej","value":"'U'","type":"std_logic","variablesReference":0}]}}Content-Length: 117
+
+{"seq":13,"type":"response","request_seq":10,"success":true,"command":"continue","body":{"allThreadsContinued":true}}Content-Length: 160
+
+{"seq":14,"type":"event","event":"stopped","body":{"allThreadsStopped":true,"description":"at 10 ns, delta 0, statement 62","reason":"breakpoint","threadId":6}}Content-Length: 106
+
+{"seq":15,"type":"response","request_seq":11,"success":true,"command":"variables","body":{"variables":[]}}Content-Length: 77
+
+{"seq":16,"type":"response","request_seq":12,"success":true,"command":"next"}Content-Length: 154
+
+{"seq":17,"type":"event","event":"stopped","body":{"allThreadsStopped":true,"description":"at 10 ns, delta 0, statement 65","reason":"step","threadId":6}}Content-Length: 81
+
+{"seq":18,"type":"response","request_seq":13,"success":true,"command":"stepBack"}Content-Length: 154
+
+{"seq":19,"type":"event","event":"stopped","body":{"allThreadsStopped":true,"description":"at 10 ns, delta 0, statement 62","reason":"step","threadId":6}}Content-Length: 117
+
+{"seq":20,"type":"response","request_seq":14,"success":true,"command":"continue","body":{"allThreadsContinued":true}}Content-Length: 161
+
+{"seq":21,"type":"event","event":"stopped","body":{"allThreadsStopped":true,"description":"at 30 ns, delta 0, statement 112","reason":"breakpoint","threadId":6}}Content-Length: 117
+
+{"seq":22,"type":"response","request_seq":15,"success":true,"command":"continue","body":{"allThreadsContinued":true}}Content-Length: 161
+
+{"seq":23,"type":"event","event":"stopped","body":{"allThreadsStopped":true,"description":"at 60 ns, delta 0, statement 151","reason":"breakpoint","threadId":6}}Content-Length: 117
+
+{"seq":24,"type":"response","request_seq":16,"success":true,"command":"continue","body":{"allThreadsContinued":true}}Content-Length: 145
+
+{"seq":25,"type":"event","event":"output","body":{"category":"console","output":"gohard: simulated wait_forms_tb (seed 0): stopped at 500 ns\n"}}Content-Length: 133
+
+{"seq":26,"type":"event","event":"output","body":{"category":"console","output":"summary: 0 errors, 0 warnings, 0 hints, 2 files\n"}}Content-Length: 64
+
+{"seq":27,"type":"event","event":"exited","body":{"exitCode":0}}Content-Length: 46
+
+{"seq":28,"type":"event","event":"terminated"}Content-Length: 83
+
+{"seq":29,"type":"response","request_seq":17,"success":true,"command":"disconnect"}

@@ -1,0 +1,35 @@
+Content-Length: 168
+
+{"seq":1,"type":"request","command":"initialize","arguments":{"clientID":"neovim","adapterID":"gohard","pathFormat":"path","linesStartAt1":true,"columnsStartAt1":true}}Content-Length: 78
+
+{"seq":2,"type":"request","command":"launch","arguments":{"testbench":"nope"}}Content-Length: 115
+
+{"seq":3,"type":"request","command":"launch","arguments":{"testbench":"wait_forms_tb","seed":0,"stopOnEntry":true}}Content-Length: 172
+
+{"seq":4,"type":"request","command":"setBreakpoints","arguments":{"source":{"name":"wait_forms_tb.vhd","path":"wait_forms_tb.vhd"},"breakpoints":[{"line":125},{"line":1}]}}Content-Length: 89
+
+{"seq":5,"type":"request","command":"setExceptionBreakpoints","arguments":{"filters":[]}}Content-Length: 71
+
+{"seq":6,"type":"request","command":"configurationDone","arguments":{}}Content-Length: 61
+
+{"seq":7,"type":"request","command":"threads","arguments":{}}Content-Length: 71
+
+{"seq":8,"type":"request","command":"scopes","arguments":{"frameId":1}}Content-Length: 85
+
+{"seq":9,"type":"request","command":"variables","arguments":{"variablesReference":2}}Content-Length: 75
+
+{"seq":10,"type":"request","command":"continue","arguments":{"threadId":1}}Content-Length: 86
+
+{"seq":11,"type":"request","command":"variables","arguments":{"variablesReference":1}}Content-Length: 71
+
+{"seq":12,"type":"request","command":"next","arguments":{"threadId":6}}Content-Length: 75
+
+{"seq":13,"type":"request","command":"stepBack","arguments":{"threadId":6}}Content-Length: 75
+
+{"seq":14,"type":"request","command":"continue","arguments":{"threadId":6}}Content-Length: 75
+
+{"seq":15,"type":"request","command":"continue","arguments":{"threadId":6}}Content-Length: 75
+
+{"seq":16,"type":"request","command":"continue","arguments":{"threadId":6}}Content-Length: 89
+
+{"seq":17,"type":"request","command":"disconnect","arguments":{"terminateDebuggee":true}}

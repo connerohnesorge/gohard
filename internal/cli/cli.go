@@ -53,6 +53,9 @@ type Invocation struct {
 	// simRuns, when set, collects the simulation outcomes of a check
 	// run (gohard lsp sim reads them).
 	simRuns *[]simrun.Outcome
+	// analyzed, when set, receives the report and the analysis of a
+	// check run in place of its simulation (gohard dap, #68).
+	analyzed func(*diag.Report, simInput)
 }
 
 // Result is what a command returns. Either Report is set, and the

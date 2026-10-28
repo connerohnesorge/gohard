@@ -123,7 +123,7 @@ func TestParseArgs(t *testing.T) {
 }
 
 func TestCommandTable(t *testing.T) {
-	want := []string{"check", "config", "coverage", "fmt", "help",
+	want := []string{"check", "config", "coverage", "dap", "fmt", "help",
 		"import", "libs", "lsp", "parse", "trace", "version"}
 	var got []string
 	for _, c := range commands {
