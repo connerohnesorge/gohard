@@ -289,7 +289,7 @@ func TestReport(t *testing.T) {
 		Warm: childOut{Samples: []Sample{mk(10, 20), mk(60, 70)},
 			Hover: []float64{1}, Definition: []float64{1},
 			Completion: []float64{1}, Save: []float64{1},
-			Tokens: []float64{1}},
+			Tokens: []float64{1}, Hints: []float64{1}},
 		Sim: childOut{SimKernel: []float64{3}}}
 	sig := mk(500, 600)
 	sig.Kind = KindSignature
@@ -303,6 +303,8 @@ func TestReport(t *testing.T) {
 		"| First diagnostics from cold start, p95 < 2 s | 2.50 s | MISS |",
 		"| Semantic tokens, full file neorv32_cpu_alu_fpu.vhd, warm " +
 			"p95 < 100 ms | 1.0 ms | pass |",
+		"| Inlay hints, full file neorv32_cpu_control.vhd, every kind, " +
+			"warm p95 < 100 ms | 1.0 ms | pass |",
 		"1 gate(s) missed"} {
 		if !bytes.Contains([]byte(out), []byte(want)) {
 			t.Errorf("report lacks %q:\n%s", want, out)

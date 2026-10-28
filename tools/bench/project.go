@@ -23,6 +23,10 @@ type Project struct {
 	// TokensFile, when set, is the document of the semantic tokens
 	// measure (#55): warm full-file requests on it.
 	TokensFile string
+	// Hints turns every inlay hint kind on in gohard.yaml (hintsConfig)
+	// and adds the inlay hints measure (#56): warm full-document
+	// requests on Target.
+	Hints bool
 	// Testbench is run for the first-simulation-progress measure
 	// ("" for none) and TestbenchFile is its file.
 	Testbench, TestbenchFile string
@@ -62,6 +66,7 @@ var Projects = []Project{
 		Config: "libraries:\n  neorv32: [rtl, sim]\n  osvvm: [osvvm]\n" +
 			"simulation:\n  time_budget: \"1 us\"\n",
 		Target: "rtl/core/neorv32_cpu_control.vhd",
+		Hints:  true,
 		// NEORV32's largest file (118,813 bytes at the pinned commit).
 		TokensFile: "rtl/core/neorv32_cpu_alu_fpu.vhd",
 		Testbench:  "neorv32_tb", TestbenchFile: "sim/neorv32_tb.vhd",
@@ -104,6 +109,10 @@ var osvvm2008Skip = []string{
 	"osvvm/deprecated/TbUtilPkg_xilinx.vhd",
 	"osvvm/deprecated/TextUtilPkg_xilinx.vhd",
 }
+
+// hintsConfig turns every inlay hint kind on (#56).
+const hintsConfig = "inlay_hints:\n  parameter_names: true\n" +
+	"  types: true\n  values: true\n"
 
 func projectByName(name string) (Project, bool) {
 	for _, p := range Projects {
@@ -155,9 +164,13 @@ func (p Project) Build(repo, dst string) (int, error) {
 			return 0, err
 		}
 	}
-	if p.Config != "" {
+	config := p.Config
+	if p.Hints {
+		config += hintsConfig
+	}
+	if config != "" {
 		err := os.WriteFile(filepath.Join(dst, "gohard.yaml"),
-			[]byte(p.Config), 0o644)
+			[]byte(config), 0o644)
 		if err != nil {
 			return 0, err
 		}

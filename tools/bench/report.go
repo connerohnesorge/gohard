@@ -45,9 +45,16 @@ var tokensFile = func() string {
 	return path.Base(p.TokensFile)
 }()
 
-// Gates returns the #25 latency gates and the #55 semantic tokens
-// gate measured on the large project result r; sim, when its testbench ran, adds first simulation
-// progress on a testbench that simulates.
+// hintsFile names the document of the inlay hints gate (#56).
+var hintsFile = func() string {
+	p, _ := projectByName("large")
+	return path.Base(p.Target)
+}()
+
+// Gates returns the #25 latency gates, the #55 semantic tokens gate
+// and the #56 inlay hints gate measured on the large project result r;
+// sim, when its testbench ran, adds first simulation progress on a
+// testbench that simulates.
 func Gates(r result, sim *result) []Gate {
 	g := func(name string, limit float64, xs []float64) Gate {
 		return Gate{Name: name, LimitMS: limit, P95MS: p95(xs),
@@ -59,6 +66,8 @@ func Gates(r result, sim *result) []Gate {
 		g("Completion, warm p95 < 100 ms", 100, r.Warm.Completion),
 		g("Semantic tokens, full file "+tokensFile+
 			", warm p95 < 100 ms", 100, r.Warm.Tokens),
+		g("Inlay hints, full file "+hintsFile+", every kind, warm "+
+			"p95 < 100 ms", 100, r.Warm.Hints),
 		g("Diagnostics after save, warm p95 < 2 s", 2000, r.Warm.Save),
 		g("First diagnostics from cold start, p95 < 2 s", 2000, r.First),
 		g("First simulation progress (first simulated-time report "+
@@ -198,6 +207,7 @@ func simTable(b *strings.Builder, r result) {
 		{"Definition (warm)", r.Warm.Definition},
 		{"Completion (warm)", r.Warm.Completion},
 		{"Semantic tokens, full file (warm)", r.Warm.Tokens},
+		{"Inlay hints, full file (warm)", r.Warm.Hints},
 		{"Diagnostics after save (warm)", r.Warm.Save},
 		{"Run command to progress begin", r.Sim.SimBegin},
 		{"Run command to \"elaborated\"", r.Sim.SimElab},

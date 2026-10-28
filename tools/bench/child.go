@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -25,6 +26,9 @@ type childOut struct {
 	// Tokens are warm textDocument/semanticTokens/full requests on
 	// the project's TokensFile (#55).
 	Tokens []float64
+	// Hints are warm full-document textDocument/inlayHint requests
+	// on the target with every kind on (#56).
+	Hints []float64
 	// SimBegin is the time from the run command to the run's
 	// $/progress begin, SimElab to its "elaborated" report (-1: none)
 	// and SimKernel to its first simulated-time report (or the
@@ -158,6 +162,11 @@ func runChild(a childArgs) (childOut, error) {
 	if err := c.tokens(a, &out); err != nil {
 		return out, err
 	}
+	if a.p.Hints {
+		if err := c.hints(uri, cur, a.n, &out); err != nil {
+			return out, err
+		}
+	}
 	// Saves: one stray name stays in the file throughout, so every
 	// save publishes the target's diagnostics (a document without any,
 	// before and after, gets no publish to wait for).
@@ -229,6 +238,34 @@ func (c *client) tokens(a childArgs, out *childOut) error {
 		}
 		if i > 0 {
 			out.Tokens = append(out.Tokens, ms(m.at.Sub(t0)))
+		}
+	}
+	return nil
+}
+
+// hints sends one inlay hint request for the whole document uri
+// (text) to warm up, then measures n more on the unchanged document.
+// Every kind is on (Project.Hints), so an empty result is an error.
+func (c *client) hints(uri string, text []byte, n int,
+	out *childOut,
+) error {
+	params := map[string]any{"textDocument": map[string]string{
+		"uri": uri}, "range": map[string]any{
+		"start": map[string]int{"line": 0, "character": 0},
+		"end": map[string]int{"line": bytes.Count(text, []byte("\n")) + 1,
+			"character": 0}}}
+	for i := range n + 1 {
+		t0 := time.Now()
+		m, err := c.request("textDocument/inlayHint", params)
+		if err != nil {
+			return err
+		}
+		var hs []json.RawMessage
+		if json.Unmarshal(m.m["result"], &hs) != nil || len(hs) == 0 {
+			return fmt.Errorf("inlay hints of %s: none", uri)
+		}
+		if i > 0 {
+			out.Hints = append(out.Hints, ms(m.at.Sub(t0)))
 		}
 	}
 	return nil
