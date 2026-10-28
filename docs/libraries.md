@@ -706,7 +706,8 @@ It reads only these parts of each format and never runs anything:
 Import writes nothing and exits 2 when a listed source file or an
 included `.pro` script does not exist or a `vcom` wildcard matches no
 file (`import/missing-file`, at the line that lists it), a project
-file cannot be read (`import/syntax`), lists no VHDL file
+file cannot be read (`import/syntax`, or `workspace/unreadable` for a
+project file or included script over 10 MB), lists no VHDL file
 (`import/no-files`) or the project root already has a `gohard.yaml`
 (`import/config-exists`). Diagnostics print in the `--format` chosen
 (text, JSON or SARIF), located in the file they concern: the project
@@ -735,6 +736,11 @@ the newest is imported, and a later dependency on the same
 `vendor:library:name` that it satisfies reuses it. A dependency that
 no core matches is `import/unresolved-dependency` (a warning): import
 fetches nothing, so the files of that core are not in `gohard.yaml`.
+A `.core` file over 10 MB is not read, so it matches nothing. Import
+takes at most 100,000 steps (a key or list item read, or a core
+compared with a `depend:` entry; an item a YAML alias reaches counts
+each time) and reads at most 4 MiB of `.core` files; past that it
+stops with `import/syntax`.
 
 ### OSVVM `.pro` scripts
 
