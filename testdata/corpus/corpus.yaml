@@ -79,6 +79,10 @@ vocabulary:
       semantic: >-
         a VHDL-1993 shared variable of a non-protected type, an error from
         VHDL-2002 on (#63, not in the #8 list)
+    - id: cond_analysis_cli_define
+      semantic: >-
+        conditional analysis, user identifier from --define over defines:
+        (in mode_views, #63, not in the #8 list)
   invariants:
     - id: seed_independent
       meaning: byte-identical trace at seeds 0-3 (PR) and 64 seeds (nightly)
@@ -653,6 +657,7 @@ designs:
       - cond_analysis_builtin_id
       - cond_analysis_user_define
       - cond_analysis_inactive_branch
+      - cond_analysis_cli_define
     invariants: [seed_independent, variant_stable, self_stopping]
     oracle: nvc
     # GHDL 6.0.0 cannot elaborate this 2019 design, so there is no
@@ -707,10 +712,57 @@ designs:
           IEEE 1076-2019 conditional analysis tool directives (section
           number not verified against the LRM text). GHDL 6.0.0 lacks the
           feature, so it is not a semantic disagreement about the design.
+    variants:
+      # `gohard check --sim --define MV_PROFILE=narrow` (#63): the
+      # --define overrides the gohard.yaml defines: entry, the `elsif
+      # arm becomes the active branch, and the testbench's check of the
+      # wide key fails at 0 fs.
+      - name: define_narrow
+        standard: "2019"
+        defines:
+          MV_PROFILE: narrow
+        files:
+          - path: mode_views_pkg.vhd
+            standard: "2019"
+          - path: mode_views.vhd
+            standard: "2019"
+          - path: mode_views_tb.vhd
+            standard: "2019"
+        expected:
+          exit: 1
+          status: problems
+          stop_time: 0 fs
+          messages:
+            - severity: error
+              text: MV_PROFILE branch not taken
+              time: 0 fs
+        ghdl:
+          version: 6.0.0
+          command: >-
+            ghdl -a --std=19 mode_views_pkg.vhd mode_views.vhd
+            mode_views_tb.vhd
+          result: unsupported
+          exit: 1
+          stop_time: none
+          notes: no conditional analysis and no -D, as for the design
+        nvc:
+          version: 1.23.0
+          command: >-
+            nvc --std=2019 -a -D MV_PROFILE=narrow mode_views_pkg.vhd
+            mode_views.vhd mode_views_tb.vhd -e mode_views_tb -r
+          result: fail
+          exit: 1
+          stop_time: 0 fs
+          notes: >-
+            "** Failure: 0ms+0: MV_PROFILE branch not taken", from the
+            check process (mode_views_tb.vhd:21)
+        notes: >-
+          The repro header of the gohard run records defines
+          {"MV_PROFILE": "narrow"}, so --repro replays the override.
     trace_sha256: 6b21bbd3a1f3de5e1d5ff7ed787f445cdbb6fadb6ca7e599f37843d2e2b80dce
     oracle_sha256: 901f95aae64fe22e966e78ba21e7bc3a9ab8d4b5ad017afa24671f0bc16a1c62
-    format_oracle_sha256: e634b69fd6b07941074a6155b26020f7aa012363fc00d3b4deb73a2581f608c8
-    semerr_sha256: d1e487de6593b603e4612367a1a5bc15d7181b63a60561abd20b3b4d26e0b6ab
+    format_oracle_sha256: 8cb2d7569e8e05a17cee3ddefeed9b47df9b2a222e96fd21c4a3c2aca9d37f5e
+    semerr_sha256: 89d9b4145705a5b204dec6f22c082dc1d5f69b25a50d4c3db7ad4c4749b2bc43
   - name: overload_ops
     standard: "2008"
     milestone: v1.0

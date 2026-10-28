@@ -1,0 +1,4 @@
+mode_views_tb entity work.mode_views_tb(sim)
+  mode_views_tb.dut entity work.mode_views(rtl)
+    mode_views_tb.dut.u_prod entity work.mv_producer(rtl)
+    mode_views_tb.dut.u_cons entity work.mv_consumer(rtl)

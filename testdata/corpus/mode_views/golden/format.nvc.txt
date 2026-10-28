@@ -16,4 +16,11 @@ file mode_views.vhd std=2019 sha256=635d99b8487e7894d4519bab9c7198603b7d5ef0efc4
   exit original=0 formatted=0
 file mode_views_tb.vhd std=2019 sha256=144a82e97376acb8b11b4bd4074e0fc4cf59266172650bca80cc09d35b9e1606 formatted=b10f5a2499b1539dc413d7e40a3445d6c16b0fdfc1c44bfb1de48cb6a3a3e441 changed
   exit original=0 formatted=0
+run define_narrow std=2019 define=MV_PROFILE=narrow
+file mode_views_pkg.vhd std=2019 sha256=3d8d09087980154284d4f33735d0b4e19e0afedd4a3d9973386dfecc5bee913b formatted=bb107ab36da032826b596107a0460c8d03f9b9f2bfcf9ea248afb4330a5b4a06 changed
+  exit original=0 formatted=0
+file mode_views.vhd std=2019 sha256=635d99b8487e7894d4519bab9c7198603b7d5ef0efc4ea8b9fc8a7c07bf917f5 formatted=4531c7110b56033c8d560f2b507ea6408117383bdc90449acdd5a9b879b6a7ef changed
+  exit original=0 formatted=0
+file mode_views_tb.vhd std=2019 sha256=144a82e97376acb8b11b4bd4074e0fc4cf59266172650bca80cc09d35b9e1606 formatted=b10f5a2499b1539dc413d7e40a3445d6c16b0fdfc1c44bfb1de48cb6a3a3e441 changed
+  exit original=0 formatted=0
 result new=0

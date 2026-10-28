@@ -19,3 +19,7 @@ run corpus:mode_views:main dir=testdata/corpus/mode_views std=19 define=MV_PROFI
  mode_views_pkg.vhd ghdl=1@26,28,30,33,35,37,38,39 nvc=0
  mode_views.vhd ghdl=1@6,11,15~,37,42,48~,72,82~ nvc=0
  mode_views_tb.vhd ghdl=1@5,10~ nvc=0
+run corpus:mode_views:define_narrow dir=testdata/corpus/mode_views std=19 define=MV_PROFILE=narrow sha=34b8dea5e9db344a
+ mode_views_pkg.vhd ghdl=1@26,28,30,33,35,37,38,39 nvc=0
+ mode_views.vhd ghdl=1@6,11,15~,37,42,48~,72,82~ nvc=0
+ mode_views_tb.vhd ghdl=1@5,10~ nvc=0
