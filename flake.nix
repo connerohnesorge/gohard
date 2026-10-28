@@ -61,6 +61,11 @@
           lcov
           neovim
           helix
+          # The VS Code extension (#3): npm, tsc, vsce and its tests.
+          nodejs
+        ] ++ lib.optionals stdenv.hostPlatform.isLinux [
+          # Its end-to-end test runs VS Code on a virtual X display.
+          xvfb-run
         ];
 
         shellHook = ''
