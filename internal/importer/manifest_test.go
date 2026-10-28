@@ -6,6 +6,7 @@ import (
 	"maps"
 	"os"
 	"path"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -316,6 +317,129 @@ func TestParseCoreSyntax(t *testing.T) {
 	} {
 		checkAll(t, ParseCore("c.core", []byte(tc.src), memFiles{}),
 			tc.want)
+	}
+}
+
+// TestParseCoreBudget checks that a small .core file cannot make the
+// import do unbounded work through YAML aliases (P7): every files: or
+// depend: item and every candidate core compared counts each time an
+// alias reaches it, and the import stops with import/syntax at
+// coreBudget steps, or at coreByteBudget bytes of .core files, with no
+// entry. Before the budget, the files case gave 120,000 entries, and a
+// 5,000 by 5,000 variant of it (273 KB) ran gohard import out of 5 GB.
+func TestParseCoreBudget(t *testing.T) {
+	list := func(n int, item string) string {
+		items := make([]string, n)
+		for i := range items {
+			items[i] = fmt.Sprintf(item, i)
+		}
+		return "[" + strings.Join(items, ", ") + "]"
+	}
+	// fanout is a core with the anchor &x on line 3 and sets filesets
+	// that each hold set.
+	fanout := func(anchor string, sets int, set string) string {
+		var b strings.Builder
+		b.WriteString("CAPI=2:\nname: a:b:top:1\nx: &x " + anchor +
+			"\nfilesets:\n")
+		for i := range sets {
+			fmt.Fprintf(&b, "  s%d: {%s}\n", i, set)
+		}
+		return b.String()
+	}
+	// cores is n candidate cores named a:b:c:version, each followed by
+	// pad.
+	cores := func(n int, version, pad string) memFiles {
+		m := memFiles{files: map[string]string{}}
+		for i := range n {
+			p := fmt.Sprintf("c%d.core", i)
+			m.files[p] = "CAPI=2:\nname: a:b:c:" + version + "\n" + pad
+			m.cores = append(m.cores, p)
+		}
+		return m
+	}
+	steps := "error[import/syntax]: not a valid FuseSoC .core file: " +
+		"the import takes more than " + strconv.Itoa(coreBudget) +
+		" steps, counting each use of a YAML alias\n"
+	// on3 is the position of item on line 3.
+	on3 := func(src, item string) string {
+		l := strings.Split(src, "\n")[2]
+		return "big.core:3:" + strconv.Itoa(strings.Index(l, item)+1) +
+			" "
+	}
+	files := fanout(list(400, "f%d.vhd"), 300,
+		"files: *x, file_type: vhdlSource")
+	deps := fanout(list(400, "a:b:c%d"), 300, "depend: *x")
+	// One dependency that none of 1,000 cores satisfies, in each of
+	// 150 filesets: 150,000 comparisons.
+	none := fanout(`[">=a:b:c:2"]`, 150, "depend: *x")
+	// A version of 64 KiB costs 1,025 steps per comparison.
+	long := fanout(`[">=a:b:c:2"]`, 100, "depend: *x")
+	for _, tc := range []struct {
+		name, src string
+		files     memFiles
+		last      string // the last diagnostic
+	}{
+		{"files", files, memFiles{}, on3(files, "f49.vhd,") + steps},
+		{"depend", deps, memFiles{}, on3(deps, "a:b:c298,") + steps},
+		{"candidates", none, cores(1000, "1", ""), on3(none, `">=`) +
+			steps},
+		{
+			"long version", long,
+			cores(1, "1."+strings.Repeat("0", 1<<16), ""),
+			on3(long, `">=`) + steps,
+		},
+		{
+			"bytes", "CAPI=2:\nfilesets: {r: {depend: [a:b:z]}}\n",
+			cores(5, "1", "# "+strings.Repeat("x", 1<<20)+"\n"),
+			"c3.core:1:1 error[import/syntax]: not a valid FuseSoC " +
+				".core file: the .core files hold more than 4 MiB\n",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			p := ParseCore("big.core", []byte(tc.src), tc.files)
+			if len(p.Entries) != 0 || len(p.Diagnostics) == 0 {
+				t.Fatalf("%d entries, %d diagnostics", len(p.Entries),
+					len(p.Diagnostics))
+			}
+			last := p.Diagnostics[len(p.Diagnostics)-1:]
+			if got := showAll(Project{Diagnostics: last}); got != tc.last {
+				t.Errorf("last diagnostic:\n%swant:\n%s", got, tc.last)
+			}
+		})
+	}
+}
+
+// TestCoreBudgetMargin checks that the .core budgets leave room for
+// real projects: reading every .core file of the pinned open-logic
+// takes under 1% of each budget.
+func TestCoreBudgetMargin(t *testing.T) {
+	var b coreSpent
+	n := 0
+	err := filepath.WalkDir("../../testdata/open-logic", func(p string,
+		d fs.DirEntry, err error,
+	) error {
+		if err != nil || d.IsDir() || path.Ext(p) != ".core" {
+			return err
+		}
+		src, err := os.ReadFile(p)
+		if err != nil {
+			return err
+		}
+		if c := readCore(p, p, src, &b); c.fatal || !c.named {
+			t.Errorf("%s does not read as a named core:\n%s", p,
+				showAll(Project{Diagnostics: c.diags}))
+		}
+		n++
+		return nil
+	})
+	if err != nil || n == 0 {
+		t.Fatalf("no .core file under testdata/open-logic (%v): run "+
+			"git submodule update --init testdata/open-logic", err)
+	}
+	if b.over || b.steps*100 > coreBudget ||
+		b.bytes*100 > coreByteBudget {
+		t.Errorf("%d cores take %d steps and %d bytes", n, b.steps,
+			b.bytes)
 	}
 }
 

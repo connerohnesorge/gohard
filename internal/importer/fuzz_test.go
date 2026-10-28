@@ -61,6 +61,11 @@ func FuzzImport(f *testing.F) {
 			"    file_type: vhdlSource-2008\n    depend: [a:b:c, ^a:b:d:1]\n",
 		"CAPI=2:\nfilesets: {r: {files: [&x a.vhd, *x], " +
 			"file_type: vhdlSource}}\nprovider: {}",
+		// Aliases that fan out: each use counts against the budget.
+		"CAPI=2:\nname: a:b:c:1\nx: &x [a.vhd, b.vhd]\n" +
+			"d: &d [a:b:c, \">=a:b:e:1\"]\nfilesets: {r: {files: *x, " +
+			"depend: *d, file_type: vhdlSource}, s: &s {files: *x, " +
+			"depend: *d}, t: *s}\n",
 	} {
 		for i := range Formats {
 			f.Add(uint8(i), []byte(s))

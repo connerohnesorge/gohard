@@ -34,6 +34,29 @@ var coreFlagRE = regexp.MustCompile(`^!?[A-Za-z0-9_-]+\?\s*\(`)
 // coreOps are the version operators of a depend: entry, longest first.
 var coreOps = []string{">=", "<=", ">", "<", "=", "^", "~"}
 
+// coreBudget is the most steps one import of a .core file takes, with
+// the .core files it reads to resolve depend: entries, and
+// coreByteBudget the most .core text it parses (P7). A step is one
+// YAML key or list item read, or one candidate core compared with a
+// depend: entry, plus one per coreTextStep bytes of the text it reads
+// or compares. An item reached through a YAML alias counts each time
+// it is used, so a small file whose aliases fan out to millions of
+// files stops at the budget. Reading all 17 .core files of the pinned
+// open-logic takes 569 steps and 22 kilobytes (TestCoreBudgetMargin).
+// A 4 MiB list of one-letter items, the most YAML the byte budget
+// lets through, parses into about 420 MB of YAML nodes.
+const (
+	coreBudget     = 100000
+	coreByteBudget = 4 << 20
+)
+
+// coreTextStep is the text one step pays for.
+const coreTextStep = 64
+
+// coreMark is how many characters apart off keeps the byte offsets of
+// a line.
+const coreMark = 64
+
 // ParseCore reads a FuseSoC CAPI2 .core file (#64): every file of
 // every fileset whose file_type (the file's own, else the fileset's)
 // is vhdlSource, vhdlSource-87 or -93 (both read as 1993), -2008 or
@@ -44,40 +67,58 @@ var coreOps = []string{">=", "<=", ">", "<", "=", "^", "~"}
 // among this core and files.Cores(), or to the core an earlier
 // dependency on the same vendor:library:name chose when it matches.
 // The files of a core come after the files of the cores it depends on;
-// a dependency nothing matches is import/unresolved-dependency. Files of another type, provider:
-// (nothing is fetched) and entries with a use-flag condition are
-// skipped with an import/ignored hint; targets, generators and every
-// other key are skipped silently.
+// a dependency nothing matches is import/unresolved-dependency. Files
+// of another type, provider: (nothing is fetched) and entries with a
+// use-flag condition are skipped with an import/ignored hint; targets,
+// generators and every other key are skipped silently. The import
+// takes at most coreBudget steps and parses at most coreByteBudget
+// bytes of .core files; past either it stops with import/syntax.
 func ParseCore(name string, src []byte, files Files) Project {
 	r := &coreRun{files: files, main: name, visited: map[string]bool{},
-		chosen: map[vlnv]*coreFile{}}
-	c := readCore(path.Base(name), name, src)
-	if c.fatal {
+		chosen: map[vlnv]*coreFile{}, byName: map[vlnv][]*coreFile{}}
+	c := readCore(path.Base(name), name, src, &r.b)
+	switch {
+	case r.b.over:
+		r.p.Diagnostics = append(c.diags, r.b.stop)
+		return r.p
+	case c.fatal:
 		r.p.Diagnostics = c.diags
 		return r.p
 	}
 	if c.named {
 		// A dependency may lead back to the project file's own core.
-		r.cands = append(r.cands, c)
-		key := c.vlnv
-		key.version = ""
-		r.chosen[key] = c
+		r.add(c)
+		r.chosen[c.vlnv.unversioned()] = c
 	}
 	r.visit(c)
+	if r.b.over {
+		r.p.Diagnostics = append(r.p.Diagnostics, r.b.stop)
+	}
 	return r.p
 }
 
 // coreRun is one import of a .core file and the cores it depends on.
 type coreRun struct {
-	files   Files
-	main    string // the project file, as diagnostics show it
-	p       Project
-	cands   []*coreFile // the cores a depend: may resolve to
-	loaded  bool        // cands is read
+	files Files
+	main  string // the project file, as diagnostics show it
+	p     Project
+	b     coreSpent
+	// byName holds the cores a depend: may resolve to, by
+	// vendor:library:name (no version), in the order resolve prefers
+	// among equal versions.
+	byName  map[vlnv][]*coreFile
+	loaded  bool // files.Cores() is read
 	visited map[string]bool
 	// chosen is the core a dependency on vendor:library:name resolved
 	// to first; later dependencies it satisfies reuse it.
 	chosen map[vlnv]*coreFile
+}
+
+// coreSpent is what one import has spent of its budgets.
+type coreSpent struct {
+	steps, bytes int
+	over         bool            // a budget ran out: the import stops
+	stop         diag.Diagnostic // the import/syntax error that says so
 }
 
 // coreFile is one .core file read: its own entries, hints and
@@ -92,7 +133,10 @@ type coreFile struct {
 	diags   []diag.Diagnostic
 	deps    []coreDep
 	fatal   bool // not a CAPI2 file
-	cur     cursor
+	b       *coreSpent
+	// marks holds, for each line off has converted, the byte offset
+	// of every coreMark-th character.
+	marks map[int][]int
 }
 
 // coreDep is one depend: entry.
@@ -106,17 +150,30 @@ type coreDep struct {
 // vlnv is a FuseSoC core name, vendor:library:name:version.
 type vlnv struct{ vendor, library, name, version string }
 
-// cursor resumes the conversion of YAML positions on one line.
-type cursor struct{ line, col, off int }
+// unversioned returns v without its version.
+func (v vlnv) unversioned() vlnv {
+	v.version = ""
+	return v
+}
 
 var utf8BOM = []byte("\ufeff")
 
-// visit adds c's dependencies, then c's own entries.
+// add makes the core c one a depend: may resolve to.
+func (r *coreRun) add(c *coreFile) {
+	key := c.vlnv.unversioned()
+	r.byName[key] = append(r.byName[key], c)
+}
+
+// visit adds c's dependencies, then c's own entries; it stops when the
+// budget runs out.
 func (r *coreRun) visit(c *coreFile) {
 	r.visited[c.rel] = true
 	r.p.Diagnostics = append(r.p.Diagnostics, c.diags...)
 	for _, d := range c.deps {
-		dep := r.resolve(d)
+		dep := r.resolve(c, d)
+		if r.b.over {
+			return
+		}
 		if dep == nil {
 			r.p.Diagnostics = append(r.p.Diagnostics, c.l.at(diag.New(
 				diag.ImportUnresolvedDependency, d.text), d.off))
@@ -129,16 +186,30 @@ func (r *coreRun) visit(c *coreFile) {
 	r.p.Entries = append(r.p.Entries, c.entries...)
 }
 
-// resolve returns the core d resolves to: the core an earlier
-// dependency on the same vendor:library:name chose, when d matches it;
-// else the newest core d matches, the first among equal versions (the
-// project file's own core, then files.Cores() order); nil when none
-// does.
-func (r *coreRun) resolve(d coreDep) *coreFile {
-	key := d.want
-	key.version = ""
-	if c, ok := r.chosen[key]; ok && d.matches(c.vlnv) {
-		return c
+// resolve returns the core d, a dependency of from, resolves to: the
+// core an earlier dependency on the same vendor:library:name chose,
+// when d matches it; else the newest core d matches, the first among
+// equal versions (the project file's own core, then files.Cores()
+// order); nil when none does or the budget runs out.
+func (r *coreRun) resolve(from *coreFile, d coreDep) *coreFile {
+	key := d.want.unversioned()
+	// compare charges comparing d with the core c, and c with best when
+	// there is one; the names and versions it compares cost a step per
+	// coreTextStep bytes, so long versions do not multiply the work.
+	compare := func(c, best *coreFile) bool {
+		n := len(d.text) + len(c.vlnv.version)
+		if best != nil {
+			n += len(best.vlnv.version)
+		}
+		return from.charge(1+n/coreTextStep, func() int { return d.off })
+	}
+	if c, ok := r.chosen[key]; ok {
+		if !compare(c, nil) {
+			return nil
+		}
+		if d.matches(c.vlnv) {
+			return c
+		}
 	}
 	if !r.loaded {
 		r.loaded = true
@@ -147,14 +218,20 @@ func (r *coreRun) resolve(d coreDep) *coreFile {
 			if err != nil {
 				continue // an unreadable core provides nothing
 			}
-			c := readCore(p, join(path.Dir(r.main), p), src)
+			c := readCore(p, join(path.Dir(r.main), p), src, &r.b)
+			if r.b.over {
+				return nil
+			}
 			if !c.fatal && c.named {
-				r.cands = append(r.cands, c)
+				r.add(c)
 			}
 		}
 	}
 	var best *coreFile
-	for _, c := range r.cands {
+	for _, c := range r.byName[key] {
+		if !compare(c, best) {
+			return nil
+		}
 		if d.matches(c.vlnv) && (best == nil ||
 			compareVersions(c.vlnv.version, best.vlnv.version) > 0) {
 			best = c
@@ -257,9 +334,15 @@ func parseVLNV(s string) (op string, v vlnv, ok bool) {
 }
 
 // readCore reads the .core file src at rel (relative to the project
-// file's folder), shown as shown.
-func readCore(rel, shown string, src []byte) (c *coreFile) {
-	c = &coreFile{rel: rel, l: newLines(shown, src), src: src}
+// file's folder), shown as shown, spending from b.
+func readCore(rel, shown string, src []byte, b *coreSpent) (c *coreFile) {
+	c = &coreFile{rel: rel, l: newLines(shown, src), src: src, b: b,
+		marks: map[int][]int{}}
+	if b.bytes += len(src); b.bytes > coreByteBudget {
+		c.over(0, "the .core files hold more than "+
+			strconv.Itoa(coreByteBudget>>20)+" MiB")
+		return c
+	}
 	defer func() {
 		// The YAML library is third-party code; a panic inside it must
 		// not crash GoHard (P6).
@@ -285,6 +368,9 @@ func readCore(rel, shown string, src []byte) (c *coreFile) {
 	capi := false
 	for i := 0; i+1 < len(root.Content); i += 2 {
 		k, v := root.Content[i], deref(root.Content[i+1])
+		if !c.step(k, v) {
+			return c
+		}
 		switch k.Value {
 		case "CAPI=2":
 			capi = true
@@ -326,6 +412,38 @@ func (c *coreFile) fail(off int, reason string) {
 	c.diags = append(c.diags, c.l.syntax(coreFormat, off, reason))
 }
 
+// over stops the import at off of c: a budget ran out.
+func (c *coreFile) over(off int, reason string) {
+	c.b.over = true
+	c.b.stop = c.l.syntax(coreFormat, off, reason)
+}
+
+// charge spends n steps; at is where the import stops when that runs
+// the budget out. It reports whether the import goes on.
+func (c *coreFile) charge(n int, at func() int) bool {
+	if c.b.over {
+		return false
+	}
+	if c.b.steps += n; c.b.steps > coreBudget {
+		c.over(at(), "the import takes more than "+
+			strconv.Itoa(coreBudget)+" steps, counting each use of "+
+			"a YAML alias")
+		return false
+	}
+	return true
+}
+
+// step charges the item at n and its value v (nil for none): one step,
+// plus one per coreTextStep bytes of their text. It reports whether
+// the import goes on.
+func (c *coreFile) step(n, v *yaml.Node) bool {
+	text := len(deref(n).Value)
+	if v != nil {
+		text += len(deref(v).Value)
+	}
+	return c.charge(1+text/coreTextStep, func() int { return c.off(n) })
+}
+
 // ignored records the import/ignored hint for item at n.
 func (c *coreFile) ignored(n *yaml.Node, item, reason string) {
 	c.diags = append(c.diags, c.l.ignored(c.off(n), item, reason))
@@ -362,9 +480,15 @@ func yamlScalar(n *yaml.Node) (string, bool) {
 // filesets reads the filesets mapping.
 func (c *coreFile) filesets(n *yaml.Node) {
 	for _, set := range pairs(n) {
+		if !c.step(set[0], nil) {
+			return
+		}
 		var files, deps *yaml.Node
 		typ, lib := "", "work"
 		for _, kv := range pairs(set[1]) {
+			if !c.step(kv[0], kv[1]) {
+				return
+			}
 			switch kv[0].Value {
 			case "files":
 				files = kv[1]
@@ -380,11 +504,16 @@ func (c *coreFile) filesets(n *yaml.Node) {
 		}
 		if files != nil && files.Kind == yaml.SequenceNode {
 			for _, it := range files.Content {
-				c.file(it, typ, lib)
+				if !c.step(it, nil) || !c.file(it, typ, lib) {
+					return
+				}
 			}
 		}
 		if deps != nil && deps.Kind == yaml.SequenceNode {
 			for _, it := range deps.Content {
+				if !c.step(it, nil) {
+					return
+				}
 				c.depend(it)
 			}
 		}
@@ -392,20 +521,27 @@ func (c *coreFile) filesets(n *yaml.Node) {
 }
 
 // file reads one files: entry, "path" or "path: {attributes}", with
-// the fileset's file type and library.
-func (c *coreFile) file(it *yaml.Node, typ, lib string) {
+// the fileset's file type and library; the files loop has charged the
+// entry's step. It reports whether the import goes on.
+func (c *coreFile) file(it *yaml.Node, typ, lib string) bool {
 	at := deref(it)
 	p, ok := yamlScalar(at)
 	if !ok {
-		kv := pairs(at)
-		if len(kv) != 1 {
+		m := at
+		if m.Kind != yaml.MappingNode || len(m.Content) != 2 {
 			c.ignored(it, "files entry", "not a file name or a file "+
 				"name with attributes")
-			return
+			return true
 		}
-		at = kv[0][0]
+		at = m.Content[0]
+		if !c.step(at, nil) {
+			return false
+		}
 		p = at.Value
-		for _, a := range pairs(kv[0][1]) {
+		for _, a := range pairs(m.Content[1]) {
+			if !c.step(a[0], a[1]) {
+				return false
+			}
 			v, _ := yamlScalar(a[1])
 			switch a[0].Value {
 			case "file_type":
@@ -416,6 +552,13 @@ func (c *coreFile) file(it *yaml.Node, typ, lib string) {
 				}
 			}
 		}
+	}
+	// Every entry reads its file type and library again (its message
+	// may hold them), so their text counts for each entry.
+	if !c.charge((len(typ)+len(lib))/coreTextStep, func() int {
+		return c.off(at)
+	}) {
+		return false
 	}
 	p = strings.ReplaceAll(p, `\`, "/")
 	std, vhdl := coreStandards[typ]
@@ -430,10 +573,11 @@ func (c *coreFile) file(it *yaml.Node, typ, lib string) {
 		e, d := c.l.file(join(path.Dir(c.rel), p), lib, std, c.off(at))
 		if d != nil {
 			c.diags = append(c.diags, *d)
-			return
+			return true
 		}
 		c.entries = append(c.entries, e)
 	}
+	return true
 }
 
 // depend reads one depend: entry.
@@ -458,27 +602,36 @@ func (c *coreFile) depend(it *yaml.Node) {
 }
 
 // off returns the byte offset of the node n. YAML counts columns in
-// characters and does not count a byte order mark; nodes come mostly
-// in document order, so off resumes from the previous node on the same
-// line and a long single-line file costs linear time.
+// characters and does not count a byte order mark. Aliases send the
+// nodes back and forth along a line, so off keeps the byte offset of
+// every coreMark-th character of each line it converts: a line costs
+// linear time once, then each node at most coreMark characters (P7).
 func (c *coreFile) off(n *yaml.Node) int {
 	idx := c.l.idx
 	line := min(max(1, n.Line), idx.LineCount())
-	col := max(1, n.Column)
-	k := &c.cur
-	if k.line != line || k.col > col {
-		off := idx.LineStart(line - 1)
-		if line == 1 && bytes.HasPrefix(c.src, utf8BOM) {
-			off += len(utf8BOM)
-		}
-		*k = cursor{line: line, col: 1, off: off}
-	}
 	end := idx.LineEnd(line - 1)
-	for k.col < col && k.off < end {
-		_, size := utf8.DecodeRune(c.src[k.off:end])
-		k.off += size
-		k.col++
+	marks, ok := c.marks[line]
+	if !ok {
+		at := idx.LineStart(line - 1)
+		if line == 1 && bytes.HasPrefix(c.src, utf8BOM) {
+			at += len(utf8BOM)
+		}
+		marks = []int{at}
+		for k := 1; at < end; k++ {
+			_, size := utf8.DecodeRune(c.src[at:end])
+			at += size
+			if k%coreMark == 0 {
+				marks = append(marks, at)
+			}
+		}
+		c.marks[line] = marks
 	}
-	k.col = col
-	return k.off
+	k := max(1, n.Column) - 1 // the characters before n
+	i := min(k/coreMark, len(marks)-1)
+	off := marks[i]
+	for k -= i * coreMark; k > 0 && off < end; k-- {
+		_, size := utf8.DecodeRune(c.src[off:end])
+		off += size
+	}
+	return off
 }
