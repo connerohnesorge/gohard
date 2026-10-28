@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "version": "0.0.0-dev",
+  "commit": "unknown",
+  "ieee": "1076-2019 16a012320947d378611cc7457f64ed76cb52bac4",
+  "go": "unknown",
+  "standard": "2008",
+  "testbench": "tb_a",
+  "seed": 0,
+  "defines": {},
+  "budgets": {
+    "time": "1 ms",
+    "delta": 10000,
+    "step": 50000000
+  },
+  "models": {},
+  "config": null,
+  "sources": [
+    {
+      "path": "dut.vhd",
+      "sha256": "ba05c3f1320ea6a3138e2a3f2a9839f658c108bedea1efc616f940aa48538f20"
+    },
+    {
+      "path": "tb_a.vhd",
+      "sha256": "99dbe753dcf8705a0bb089d0755a345980c1e89b058f29aa345c695c393498f0"
+    },
+    {
+      "path": "tb_b.vhd",
+      "sha256": "a2c2a98a76f5aac1c15dc0ccf482e298c62b4f592b62a6c804b50ff7e5ce2454"
+    },
+    {
+      "path": "util.vhd",
+      "sha256": "92c4309664f9a9d651ed64aa1bad48b12f8305fcbaea23fec6367227fa1914f5"
+    }
+  ],
+  "env": {
+    "epoch": "2000-01-01T00:00:00Z",
+    "vars": {},
+    "real": false
+  }
+}

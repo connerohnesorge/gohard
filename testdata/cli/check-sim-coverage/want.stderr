@@ -1,0 +1,3 @@
+gohard: simulated tb_a (seed 0): quiet
+gohard: simulated tb_b (seed 0): quiet
+gohard: coverage: .gohard/coverage/lcov.info: 35 of 36 lines (97.2%), 12 of 13 branches (92.3%)

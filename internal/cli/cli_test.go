@@ -123,8 +123,8 @@ func TestParseArgs(t *testing.T) {
 }
 
 func TestCommandTable(t *testing.T) {
-	want := []string{"check", "config", "fmt", "help", "import", "libs",
-		"lsp", "parse", "trace", "version"}
+	want := []string{"check", "config", "coverage", "fmt", "help",
+		"import", "libs", "lsp", "parse", "trace", "version"}
 	var got []string
 	for _, c := range commands {
 		got = append(got, c.Name)
@@ -155,7 +155,8 @@ func TestExitCodesDefined(t *testing.T) {
 		"libs", "version", "help", "nope", "--strict", "--format",
 		"json", "sarif", "junit", "xml", "-p", "3", "-h", "--help", "--",
 		"a.vhd", "check", "schema", "export", "detect", "--output",
-		"--define", "--sim=maybe", "-"}
+		"--define", "--sim=maybe", "-", "coverage", "merge",
+		"--coverage"}
 	s := uint64(1)
 	for n := range 400 {
 		var args []string

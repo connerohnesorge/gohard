@@ -1,0 +1,10 @@
+gohard-trace 1
+testbench tb
+end 10000000
+type integer integer -2147483648 2147483647
+scope tb instance tb(sim)
+signal tb.n integer signal
+process 1 tb.count
+0 0 tb.n 0 -
+0 1 tb.n 1 p1
+10000000 0 ! assert error tb.vhd:14 p1 "stop at one"

@@ -75,6 +75,11 @@ var commands = []Command{
 				Name: "allow-empty", Kind: Bool,
 				Usage: "exit 0 when no VHDL files are found",
 			},
+			{
+				Name: "coverage", Kind: Bool,
+				Usage: "simulate and write statement, branch and " +
+					"PSL cover coverage to .gohard/coverage (lcov)",
+			},
 			defineFlag,
 			envFlag,
 			checkFormatFlag,
@@ -98,6 +103,19 @@ var commands = []Command{
 		Summary: "check gohard.yaml or print its JSON schema",
 		Subs:    []string{"check", "schema"},
 		Flags:   []Flag{defineFlag, formatFlag, strictFlag},
+	},
+	{
+		Name: "coverage", Args: "merge FILE...",
+		Summary: "sum lcov coverage files of several runs",
+		Subs:    []string{"merge"},
+		Flags: []Flag{
+			{
+				Name: "out", Short: "o", Kind: String,
+				Value: "FILE",
+				Usage: "write the merged file to FILE (a temp file, " +
+					"then rename) instead of standard output",
+			},
+		},
 	},
 	{
 		Name: "fmt", Args: "[PATH... | -]",

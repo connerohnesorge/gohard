@@ -1,0 +1,2 @@
+gohard: error[coverage/invalid]: invalid coverage file bad.info: line 3: malformed DA "3"
+summary: 1 errors, 0 warnings, 0 hints, 0 files

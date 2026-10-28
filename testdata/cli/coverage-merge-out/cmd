@@ -1,0 +1,1 @@
+gohard coverage merge -o all.info tb_a-0.info tb_b-0.info tb_a-0.info

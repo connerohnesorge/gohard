@@ -4,16 +4,17 @@ Usage:
   gohard <command> [flags] [arguments]
 
 Commands:
-  check    parse and analyze VHDL; with --sim, run testbenches
-  config   check gohard.yaml or print its JSON schema
-  fmt      format VHDL files in place (- for stdin to stdout), or check formatting
-  help     show help for gohard or one command
-  import   write gohard.yaml from a ModelSim .do, Vivado .xpr or Quartus .qsf file
-  libs     find vendor libraries and print gohard.yaml lines
-  lsp      run the language server, or one language-server action
-  parse    print the concrete syntax tree of a file
-  trace    export a simulation trace to VCD, FST or GHW
-  version  print the version, commit, IEEE library and Go toolchain
+  check     parse and analyze VHDL; with --sim, run testbenches
+  config    check gohard.yaml or print its JSON schema
+  coverage  sum lcov coverage files of several runs
+  fmt       format VHDL files in place (- for stdin to stdout), or check formatting
+  help      show help for gohard or one command
+  import    write gohard.yaml from a ModelSim .do, Vivado .xpr or Quartus .qsf file
+  libs      find vendor libraries and print gohard.yaml lines
+  lsp       run the language server, or one language-server action
+  parse     print the concrete syntax tree of a file
+  trace     export a simulation trace to VCD, FST or GHW
+  version   print the version, commit, IEEE library and Go toolchain
 
 Global flags:
   -h, --help         show help

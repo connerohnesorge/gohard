@@ -23,8 +23,8 @@ func init() { lookup("check").Run = runCheck }
 // then parses and analyzes them (#31, #34: sema.Analyze, pure jobs on
 // the env job runner) and elaborates the instance hierarchy for the
 // per-instance static checks (internal/elab/hier). With --sim, --tb,
-// --seed or --repro it then runs the testbenches (simulate.go, #35,
-// #29).
+// --seed, --repro or --coverage it then runs the testbenches
+// (simulate.go, #35, #29, #62).
 func runCheck(inv *Invocation) Result {
 	r := inv.NewReport()
 	fsys := inv.Env.FS
@@ -234,7 +234,7 @@ func searched(args []string) string {
 
 func simRequested(inv *Invocation) bool {
 	for _, f := range []string{"sim", "tb", "seed", "repro", "env",
-		"real-env"} {
+		"real-env", "coverage"} {
 		if inv.IsSet(f) {
 			return true
 		}

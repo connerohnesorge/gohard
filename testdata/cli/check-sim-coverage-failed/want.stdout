@@ -1,0 +1,2 @@
+tb.vhd:14:7: error[sim/assert-error]: assertion error: stop at one
+summary: 1 errors, 0 warnings, 0 hints, 1 files

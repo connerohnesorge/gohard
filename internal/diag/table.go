@@ -63,6 +63,9 @@ const (
 	ConfigUnquotedStandard Code = "config/unquoted-standard"
 	ConfigUnreadable       Code = "config/unreadable"
 
+	// coverage: coverage files (#62).
+	CoverageInvalid Code = "coverage/invalid"
+
 	// workspace: file discovery and limits (#20, #31).
 	WorkspaceFileTooLarge Code = "workspace/file-too-large"
 	WorkspaceSymlinkLoop  Code = "workspace/symlink-loop"
@@ -277,6 +280,11 @@ var table = []Info{
 		Owner:   28,
 		Summary: "gohard.yaml exists but cannot be read",
 		Message: "cannot read {path}: {reason}",
+	},
+	{
+		Code: CoverageInvalid, Severity: Error, Class: Tool, Owner: 62,
+		Summary: "a coverage file cannot be read",
+		Message: "invalid coverage file {path}: {reason}",
 	},
 	{
 		Code: FormatNotParsed, Severity: Error, Class: Design,

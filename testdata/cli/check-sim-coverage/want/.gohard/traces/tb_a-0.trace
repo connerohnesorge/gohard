@@ -1,0 +1,53 @@
+gohard-trace 1
+testbench tb_a
+end 20000000
+type bit enum '0' '1'
+type bit_vector array bit
+type integer integer -2147483648 2147483647
+type wired enum '0' '1'
+type wired_vector array wired
+scope tb_a instance tb_a(sim)
+scope tb_a.u instance dut(rtl)
+signal tb_a.flag bit signal
+signal tb_a.mode integer signal
+signal tb_a.u.flag bit out
+signal tb_a.u.kind bit_vector signal 1 downto 0
+signal tb_a.u.mode integer in
+signal tb_a.u.x integer in
+signal tb_a.u.y integer out
+signal tb_a.w wired signal
+signal tb_a.wv wired_vector signal 3 downto 0
+signal tb_a.x integer signal
+signal tb_a.y integer signal
+process 1 tb_a._p0
+process 2 tb_a._p1
+process 3 tb_a.stim
+process 4 tb_a.u._p0
+process 5 tb_a.u._p1
+process 6 tb_a.u.calc
+0 0 tb_a.flag '0' -
+0 0 tb_a.mode 0 -
+0 0 tb_a.u.flag '0' -
+0 0 tb_a.u.kind [ '0' '0' ] -
+0 0 tb_a.u.mode 0 -
+0 0 tb_a.u.x 0 -
+0 0 tb_a.u.y 0 -
+0 0 tb_a.w '0' -
+0 0 tb_a.wv [ '0' '0' '0' '0' ] -
+0 0 tb_a.x 0 -
+0 0 tb_a.y 0 -
+0 1 tb_a.mode 1 p3
+0 1 tb_a.u.mode 1 p3
+0 1 tb_a.u.x 20 p3
+0 1 tb_a.wv [ '1' '0' '1' '0' ] p2
+0 1 tb_a.x 20 p3
+0 2 tb_a.u.y 10 p6
+0 2 tb_a.y 10 p6
+5000000 0 tb_a.w '1' p1
+10000000 1 tb_a.u.x -5 p3
+10000000 1 tb_a.x -5 p3
+10000000 2 tb_a.u.kind [ '0' '1' ] p4
+10000000 2 tb_a.u.y 0 p6
+10000000 2 tb_a.y 0 p6
+10000000 3 tb_a.flag '1' p5
+10000000 3 tb_a.u.flag '1' p5

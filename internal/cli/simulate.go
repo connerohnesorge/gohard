@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/internal/coverage"
 	"github.com/connerohnesorge/gohard/internal/diag"
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/repro"
@@ -223,13 +224,16 @@ func simulate(inv *Invocation, r *diag.Report, in simInput) {
 	world := realEnv(inv, in)
 	world.ToolVersion, world.Root, world.FS = Version, in.root,
 		inv.Env.FS
+	cover := inv.IsSet("coverage") && inv.Bool("coverage")
+	var covs []coverage.Report
 	for _, tb := range tbs {
 		h, herr := header(inv, in, tb, seed, world.Real)
 		w := world
 		w.RunDir = repro.RunDir(h)
 		opts := simrun.Options{Result: in.res,
 			Sim: in.cfg.Simulation, Testbench: tb, Seed: seed, Env: w,
-			Cancelled: func() bool { return inv.Ctx.Err() != nil }}
+			Cancelled: func() bool { return inv.Ctx.Err() != nil },
+			Coverage:  cover}
 		out := simrun.Run(opts)
 		h.Inputs = repro.InputFiles(out.Inputs)
 		h.Listings = repro.InputFiles(out.Listings)
@@ -241,6 +245,9 @@ func simulate(inv *Invocation, r *diag.Report, in simInput) {
 			run.Diagnostics = append(run.Diagnostics, wds...)
 			if len(wds) == 0 {
 				run.Repro = repro.FileName(out.Testbench, out.Seed)
+				if out.Coverage != nil {
+					covs = append(covs, *out.Coverage)
+				}
 			}
 			inv.Logf("simulated %s (%s): %s", out.Testbench,
 				simrun.SeedText(out.Seed), out.Status)
@@ -251,6 +258,27 @@ func simulate(inv *Invocation, r *diag.Report, in simInput) {
 			*inv.simRuns = append(*inv.simRuns, out)
 		}
 	}
+	if len(covs) > 0 {
+		r.Diagnostics = append(r.Diagnostics,
+			writeCoverage(inv, in.root, covs)...)
+	}
+}
+
+// writeCoverage writes the coverage of every testbench of the run,
+// merged, to .gohard/coverage/lcov.info and logs its summary line
+// (#62).
+func writeCoverage(inv *Invocation, root string,
+	covs []coverage.Report,
+) []diag.Diagnostic {
+	m := coverage.Merge(covs...)
+	abs := filepath.Join(root, filepath.FromSlash(coverage.Merged))
+	if err := trace.WriteFile(inv.Env.FS, abs,
+		coverage.Encode(m)); err != nil {
+		return []diag.Diagnostic{diag.New(diag.CLIOutputFailed,
+			coverage.Merged, errReason(err))}
+	}
+	inv.Logf("coverage: %s: %s", coverage.Merged, m.Totals())
+	return nil
 }
 
 // testbenchRun is the report entry of one testbench run (#61): its
@@ -282,8 +310,8 @@ func races(inv *Invocation, o simrun.Options,
 
 // writeRun writes the trace (diffed against the recorded one under a
 // version-mismatched --repro), the files the design wrote (below the
-// run directory runDir, #18) and the repro file h of one run; herr is
-// the error of building h.
+// run directory runDir, #18), the coverage under --coverage (#62) and
+// the repro file h of one run; herr is the error of building h.
 func writeRun(inv *Invocation, in simInput, out simrun.Outcome,
 	runDir string, h repro.Header, herr error,
 ) []diag.Diagnostic {
@@ -307,6 +335,14 @@ func writeRun(inv *Invocation, in simInput, out simrun.Outcome,
 			diffTraces(inv, name, old, data)
 		}
 		if err := trace.WriteFile(fsys, abs, data); err != nil {
+			return failed(name, err)
+		}
+	}
+	if out.Coverage != nil {
+		name := coverage.FileName(out.Testbench, out.Seed)
+		abs := filepath.Join(in.root, filepath.FromSlash(name))
+		if err := trace.WriteFile(fsys, abs,
+			coverage.Encode(*out.Coverage)); err != nil {
 			return failed(name, err)
 		}
 	}
