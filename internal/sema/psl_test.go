@@ -50,6 +50,44 @@ end;
 `}})
 }
 
+// TestPSLBooleanOperands (#111): an HDL expression or a built-in call
+// that is a SERE item or the operand of a property is a PSL Boolean
+// (BOOLEAN, BIT or STD_ULOGIC), as NVC 1.23.0 requires ("expression
+// must be a PSL Boolean"); prev of an INTEGER or a vector is not one.
+// An actual of a sequence or property instance may be a value.
+func TestPSLBooleanOperands(t *testing.T) {
+	checkMarked(t, []markedCase{{name: "psl", std: "2008", src: `
+library ieee; use ieee.std_logic_1164.all;
+entity e is end;
+architecture a of e is
+  signal clk, x : std_logic;
+  signal b : boolean;
+  signal i : integer;
+  signal c : character;
+  signal v : std_logic_vector(3 downto 0);
+  default clock is rising_edge(clk);
+  sequence s2(const n) is {x[*n]};
+  property p2(boolean y) is always y;
+begin
+  a1: assert always prev(i); --E
+  a2: assert always prev(v); --E
+  a3: assert always (prev(i)); --E
+  a4: assert always {x; prev(i)}; --E
+  a5: assert always (i); --E
+  a6: assert always c; --E
+  a7: cover {x; v}; --E
+  a8: assert always x -> prev(v); --E
+  b1: assert always prev(x);
+  b2: assert always (prev(b) -> b);
+  b3: assert always prev(i) = 1 -> x;
+  b4: cover {x; prev(x, 2); b};
+  b5: cover s2(3);
+  b6: assert p2(x);
+  b7: assert always rose(x) -> stable(v);
+end;
+`}})
+}
+
 // TestPSLBuiltinCalls (#111): a PSL built-in call names its function
 // (PSLBuiltin) and keeps its typed actuals for the simulator's PSL
 // runner, inside an HDL expression and as a PSL operand of its own,

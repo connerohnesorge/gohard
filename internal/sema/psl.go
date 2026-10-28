@@ -225,6 +225,7 @@ func (a *analyzer) pslBuiltinCall(n cst.Node) {
 	e := a.pslCall(n, name, nodes)
 	a.inPSL--
 	a.pslRecord(n, e)
+	a.pslOperand(n, n)
 }
 
 // pslForm checks the PSL operator rules on the node n after its
@@ -238,7 +239,8 @@ func (a *analyzer) pslBuiltinCall(n cst.Node) {
 //     never is a Boolean or a sequence (IEEE 1850 4.4.4);
 //   - a range's low bound does not exceed its high bound (IEEE 1850
 //     5.3.1, 6.1.1.2);
-//   - a clock expression is a Boolean (IEEE 1850 6.1.1.1);
+//   - a clock expression is a Boolean (IEEE 1850 6.1.1.1), and so is
+//     an HDL expression that is a PSL operand (pslOperand);
 //   - the operands of union are of one type (IEEE 1850 5.1.3).
 func (a *analyzer) pslForm(n cst.Node) {
 	if a.quiet {
@@ -277,6 +279,10 @@ func (a *analyzer) pslForm(n cst.Node) {
 	case cst.KindPSLClockedProp:
 		if c := childAfter(n, token.At); !c.IsZero() {
 			a.pslClock(c)
+		}
+	case cst.KindPSLBoolean:
+		if op := kid(0); !op.IsZero() {
+			a.pslOperand(n, op)
 		}
 	case cst.KindPSLUnion:
 		u := cst.PSLUnion{Node: n}
@@ -342,20 +348,51 @@ func (a *analyzer) pslCount(n cst.Node) {
 	}
 }
 
-// pslClock reports a clock expression that is not a PSL Boolean
-// (BOOLEAN, BIT or STD_ULOGIC in the VHDL flavor).
+// pslClock reports a clock expression that is not a PSL Boolean.
 func (a *analyzer) pslClock(c cst.Node) {
-	e := a.pslTyped(c)
-	if e == nil || e.illTyped || e.Type.Unknown() {
+	if t := a.pslNotBoolean(c); t != "" {
+		a.semaError(c.Span(), "a clock expression must be a Boolean, "+
+			"not "+t)
+	}
+}
+
+// pslOperand reports the PSL operand n (a PSLBoolean or a built-in
+// function call; x holds its typed expression) when it is no PSL
+// Boolean, as prev(i) of an INTEGER i: a SERE item or the operand of
+// a property is a Boolean, and the simulator's PSL runner reads it as
+// one (#111). The actual of a property or sequence instance may be a
+// value (for a const formal) and is not checked.
+func (a *analyzer) pslOperand(n, x cst.Node) {
+	if a.quiet {
 		return
+	}
+	p := n.Parent()
+	for p.Kind() == cst.KindPSLParenProp {
+		p = p.Parent()
+	}
+	if p.Kind() == cst.KindAssociationList {
+		return
+	}
+	if t := a.pslNotBoolean(x); t != "" {
+		a.semaError(n.Span(), "a PSL Boolean must be BOOLEAN, BIT or "+
+			"STD_ULOGIC, not "+t)
+	}
+}
+
+// pslNotBoolean returns the type name of the typed expression of the
+// PSL node n when it is no PSL Boolean (BOOLEAN, BIT or STD_ULOGIC in
+// the VHDL flavor), "" when it is one or is not typed.
+func (a *analyzer) pslNotBoolean(n cst.Node) string {
+	e := a.pslTyped(n)
+	if e == nil || e.illTyped || e.Type.Unknown() {
+		return ""
 	}
 	b := e.Type.Base()
 	if b == a.stdType("boolean").Base() || a.bitOrULogic(b) ||
 		b.Class == TypeGeneric {
-		return
+		return ""
 	}
-	a.semaError(c.Span(), "a clock expression must be a Boolean, not "+
-		e.Type.Name())
+	return e.Type.Name()
 }
 
 // vunitArch checks the architecture of a verification unit binding

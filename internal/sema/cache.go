@@ -90,7 +90,8 @@ const (
 // and implicit operations of protected composites; 3: the v1.1 Stage 3
 // rules: name-attribute prefixes, protected-type generics and the
 // retired v1.1 unsupported/construct detectors; 4: PSL built-in calls
-// keep their actuals and isunknown is one, #111).
+// keep their actuals, isunknown is one and a PSL operand is a PSL
+// Boolean, #111).
 const cacheFormat = 4
 
 var schemaOnce = sync.OnceValue(func() string {
