@@ -148,29 +148,33 @@ end architecture;
 }
 
 // TestParameterHintsEverywhere: every positional actual of a call in
-// a subtype indication, a range or an allocator gets its formal's name
-// (#56).
+// a subtype indication, a range or an allocator, and of the generic
+// map of a package instance, gets its formal's name (#56).
 func TestParameterHintsEverywhere(t *testing.T) {
 	src := callsEverywhereSrc
 	r := analyzeOne(t, src)
 	got := hintText(src, Hints(r, "a.vhd", 0, len(src),
 		HintKinds{ParameterNames: true}))
-	want := `12:29 x =>
-12:32 y =>
-15:32 x =>
-15:35 y =>
-16:29 x =>
+	want := `16:29 x =>
 16:32 y =>
-17:35 x =>
-17:38 y =>
-21:23 x =>
-21:26 y =>
-26:16 x =>
-26:20 y =>
-28:27 x =>
-28:31 y =>
-29:9 x =>
-29:13 y =>
+19:32 x =>
+19:35 y =>
+20:29 x =>
+20:32 y =>
+21:35 x =>
+21:38 y =>
+24:42 A =>
+25:42 A =>
+27:23 x =>
+27:26 y =>
+32:16 x =>
+32:20 y =>
+34:27 x =>
+34:31 y =>
+35:9 x =>
+35:13 y =>
+39:40 A =>
+39:43 B =>
 `
 	if got != want {
 		t.Errorf("parameter hints:\n%s\nwant\n%s", got, want)

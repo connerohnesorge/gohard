@@ -346,7 +346,9 @@ end architecture;
 // callsEverywhereSrc has calls of f in every place an expression can
 // be outside an initial value or a statement (an index constraint of
 // a port, a subtype, an array type and an allocator; a range
-// constraint; generate and loop ranges; a slice).
+// constraint; generate and loop ranges; a slice), and package
+// instances, declared and design units, whose generic maps are
+// positional and named.
 const callsEverywhereSrc = `package fp is
   function f(x : integer; y : integer) return integer;
 end package;
@@ -356,6 +358,10 @@ package body fp is
     return x + y;
   end function;
 end package body;
+package gp is
+  generic (A : natural := 1; B : natural := 2; C : natural := 3);
+  constant K : natural := A;
+end package;
 use work.fp.all;
 entity e is
   port (p : in bit_vector(f(1, 2) downto 0));
@@ -366,6 +372,8 @@ architecture rtl of e is
   signal s : integer range 0 to f(7, 8);
   signal v : bit_vector(15 downto 0);
   type ptr is access bit_vector;
+  package pi is new work.gp generic map (7);
+  package pj is new work.gp generic map (8, C => 9);
 begin
   g : for i in 0 to f(9, 10) generate
   end generate;
@@ -379,11 +387,13 @@ begin
     wait;
   end process;
 end architecture;
+package pl is new work.gp generic map (5, 6);
 `
 
 // TestSignatureHelpEverywhere: a call in a subtype indication, a range
 // or an allocator gets the signature help a call in an initial value
-// gets (#56).
+// gets, and the generic map of a package instance gets the generic
+// list of the package (#56).
 func TestSignatureHelpEverywhere(t *testing.T) {
 	src := callsEverywhereSrc
 	r := analyzeOne(t, src)
@@ -391,6 +401,8 @@ func TestSignatureHelpEverywhere(t *testing.T) {
 		t.Fatalf("diagnostics: %v", r.Diagnostics)
 	}
 	const fLabel = "function f(x : integer; y : integer) return INTEGER"
+	const gpLabel = "package gp generic (A : natural := 1; " +
+		"B : natural := 2; C : natural := 3)"
 	for _, c := range []struct {
 		at     string
 		label  string
@@ -404,6 +416,9 @@ func TestSignatureHelpEverywhere(t *testing.T) {
 		{"f(11, ", fLabel, 1},
 		{"f(13, ", fLabel, 1},
 		{"f(15, ", fLabel, 1},
+		{"map (", gpLabel, 0},
+		{"map (8, ", gpLabel, 2},
+		{"map (5, ", gpLabel, 1},
 	} {
 		off := strings.Index(src, c.at) + len(c.at)
 		sigs, ok := SignatureHelp(r, "a.vhd", off)

@@ -529,7 +529,9 @@ navigation. Both find calls in the syntax tree, not in sema's typed
 expressions, which do not hold every expression (an index constraint,
 a loop range), and take the overloads of a call from the reference sema recorded at the
 call's name, the one hover and definition answer from, so the three
-agree. A generic or port map gives the formal list of its unit.
+agree. A generic or port map gives the formal list of its unit; for a
+package instance, whose associations sema does not keep, the generic
+list of the uninstantiated package, paired by position.
 `resolve.Hints` is a pure function of the sema result and the kinds
 turned on (`inlay_hints.*` in the snapshot's configuration): parameter
 names pair each positional actual of a call with the parameter at its

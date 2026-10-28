@@ -484,7 +484,14 @@ func eachMap(u *sema.Unit, fn func(assocMap)) {
 	}
 	stmts(u.Body, 0)
 	for _, d := range u.Decls {
-		if len(d.Generics) == 0 || d.Implicit || d.Node.IsZero() {
+		if d.Implicit || d.Node.IsZero() {
+			continue
+		}
+		if d.Kind == sema.DeclPackageInst {
+			packageInstMap(d, fn)
+			continue
+		}
+		if len(d.Generics) == 0 {
 			continue
 		}
 		l, ok := mapList(d.Node, false)
@@ -494,6 +501,37 @@ func eachMap(u *sema.Unit, fn func(assocMap)) {
 		fn(assocMap{list: l, assocs: d.Generics, owner: d,
 			formals: formalsOf(d.Generics)})
 	}
+}
+
+// packageInstMap reports the generic map of the package instance d
+// against the generic list of the uninstantiated package. Sema keeps
+// no associations for a package instance, so the positional actuals,
+// which come first (LRM 6.5.7.1), are paired with the generics in
+// order; a named one gets no formal here.
+func packageInstMap(d *sema.Decl, fn func(assocMap)) {
+	x := d.Target
+	if x == nil || x.Region == nil {
+		return
+	}
+	l, ok := mapList(d.Node, false)
+	if !ok {
+		return
+	}
+	var formals []*sema.Decl
+	for _, g := range x.Region.Decls {
+		if isGeneric(g.Kind) {
+			formals = append(formals, g)
+		}
+	}
+	var as []sema.Association
+	for it := range l.Items() {
+		if !it.Formal().IsZero() || len(as) >= len(formals) {
+			break
+		}
+		as = append(as, sema.Association{Formal: formals[len(as)],
+			Node: it.Node})
+	}
+	fn(assocMap{list: l, assocs: as, owner: x, formals: formals})
 }
 
 // stmtMaps reports the generic and port maps of an instance or block.
@@ -547,8 +585,8 @@ func isGeneric(k sema.DeclKind) bool {
 }
 
 // formalsOf returns the formals of a generic map that sema resolved,
-// in their declaration order (for a package or subprogram instance,
-// whose generic list is not at hand).
+// in their declaration order (for a subprogram instance, whose
+// generic list is not at hand).
 func formalsOf(as []sema.Association) []*sema.Decl {
 	var out []*sema.Decl
 	for _, a := range as {
