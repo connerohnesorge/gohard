@@ -49,6 +49,17 @@ type Recorder struct {
 	started   bool
 	ended     bool
 	err       error
+	// frozen is what was recorded before the last Clone of this
+	// recorder or of the one it was cloned from, in recording order:
+	// clones share these entries and nothing writes them again (#68).
+	// t.Changes and t.Events hold what was recorded since.
+	frozen []segment
+}
+
+// segment is a run of entries recorded before a Clone.
+type segment struct {
+	changes []Change
+	events  []Event
 }
 
 // NewRecorder returns a Recorder for the dump_scope prefixes.
@@ -58,25 +69,60 @@ func NewRecorder(dumpScope []string) *Recorder {
 
 // Clone returns an independent copy of r: the copy holds what r
 // recorded so far, and each goes on recording without the other
-// seeing it, as a forked kernel needs (sim.Kernel.Clone, #68).
+// seeing it, as a forked kernel needs (sim.Kernel.Clone, #68). The
+// two share what r recorded so far instead of copying it, so a chain
+// of clones (the debugger's checkpoints) holds each entry once. Clone
+// is a write to r: do not call it while another goroutine uses r.
 func (r *Recorder) Clone() *Recorder {
+	r.freeze()
 	c := *r
 	c.dumpScope = slices.Clone(r.dumpScope)
 	c.sigMap = slices.Clone(r.sigMap)
 	c.procMap = slices.Clone(r.procMap)
+	// Clipped: an append by either recorder reallocates instead of
+	// writing a slot the other sees.
+	c.frozen = slices.Clip(r.frozen)
 	if r.t != nil {
-		// The declarations never change after Begin; the changes and
-		// events are appended to, and Trace sorts them in place. A
-		// recorded value is never changed once recorded.
+		// The declarations never change after Begin. A recorded value
+		// is never changed once recorded.
 		t := *r.t
 		t.Types, t.Scopes = slices.Clip(t.Types), slices.Clip(t.Scopes)
 		t.Signals = slices.Clip(t.Signals)
 		t.Processes = slices.Clip(t.Processes)
-		t.Changes = slices.Clone(r.t.Changes)
-		t.Events = slices.Clone(r.t.Events)
 		c.t = &t
 	}
 	return &c
+}
+
+// freeze moves what r recorded since its last freeze to the end of
+// r.frozen.
+func (r *Recorder) freeze() {
+	if r.t == nil || len(r.t.Changes) == 0 && len(r.t.Events) == 0 {
+		return
+	}
+	r.frozen = append(r.frozen, segment{changes: slices.Clip(r.t.Changes),
+		events: slices.Clip(r.t.Events)})
+	r.t.Changes, r.t.Events = nil, nil
+}
+
+// thaw gives r.t all of r's changes and events in one new slice each,
+// which Trace may sort in place: the frozen entries stay as they are
+// for the clones that share them.
+func (r *Recorder) thaw() {
+	if len(r.frozen) == 0 {
+		return
+	}
+	t := r.t
+	nc, ne := len(t.Changes), len(t.Events)
+	for _, s := range r.frozen {
+		nc, ne = nc+len(s.changes), ne+len(s.events)
+	}
+	cs, es := make([]Change, 0, nc), make([]Event, 0, ne)
+	for _, s := range r.frozen {
+		cs, es = append(cs, s.changes...), append(es, s.events...)
+	}
+	t.Changes, t.Events = append(cs, t.Changes...), append(es, t.Events...)
+	r.frozen = nil
 }
 
 func (r *Recorder) fail(err error) error {
@@ -288,6 +334,7 @@ func (r *Recorder) Trace() (*Trace, error) {
 	if !r.ended {
 		return nil, errors.New("trace: Trace before End")
 	}
+	r.thaw()
 	t := r.t
 	// The stream is already in (time, delta) order; sorting by signal
 	// path inside each delta is what makes a race-free design give the

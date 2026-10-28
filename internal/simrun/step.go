@@ -198,7 +198,8 @@ func (r *Running) Checkpoint() *Checkpoint {
 }
 
 // Resume returns a run that continues from c: a sim.Kernel.Clone of
-// its kernel writing to a copy of its trace so far.
+// its kernel writing to a trace.Recorder.Clone of its recorder, which
+// shares the trace recorded so far instead of copying it.
 func (c *Checkpoint) Resume() *Running {
 	r := *c.r
 	r.k = c.r.k.Clone()
