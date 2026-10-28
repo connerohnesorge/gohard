@@ -5,14 +5,17 @@ import (
 	"slices"
 	"strings"
 	"testing"
+
+	"github.com/connerohnesorge/gohard/internal/config"
+	"github.com/connerohnesorge/gohard/internal/cst"
 )
 
 // TestPSLNamesAndBuiltins: a named sequence or property is a PSL
 // operand by its name (IEEE 1850 6.1.1.1, 6.2.4), not a value error;
-// prev, rose, fell, stable, onehot and onehot0 are built-in functions
-// inside PSL code, typed by their argument (IEEE 1850 5.2.3): onehot
-// of a scalar, or rose of an integer, is an error, and outside PSL the
-// names are ordinary identifiers.
+// prev, rose, fell, stable, onehot, onehot0 and isunknown are built-in
+// functions inside PSL code, typed by their argument (IEEE 1850
+// 5.2.3): onehot or isunknown of a scalar, or rose of an integer, is
+// an error, and outside PSL the names are ordinary identifiers.
 func TestPSLNamesAndBuiltins(t *testing.T) {
 	checkMarked(t, []markedCase{{name: "psl", std: "2008", src: `
 entity e is end;
@@ -35,6 +38,8 @@ begin
   a7: assert always rose(i) -> y; --E
   a8: assert always onehot(i); --E
   a9: assert always prev(nope) = x; --E
+  a10: assert always isunknown(v) -> y;
+  a11: assert always isunknown(x) -> y; --E
   b1: process
     variable prev : integer := 0; -- an identifier outside PSL
   begin
@@ -43,6 +48,64 @@ begin
   end process;
 end;
 `}})
+}
+
+// TestPSLBuiltinCalls (#111): a PSL built-in call names its function
+// (PSLBuiltin) and keeps its typed actuals for the simulator's PSL
+// runner, inside an HDL expression and as a PSL operand of its own,
+// whose typed call is recorded like a Boolean's.
+func TestPSLBuiltinCalls(t *testing.T) {
+	src := `library ieee; use ieee.std_logic_1164.all;
+entity e is end;
+architecture a of e is
+  signal clk, x, y : std_logic;
+  default clock is rising_edge(clk);
+begin
+  a1: assert always (prev(x, 2) = '1' -> y);
+  a2: assert always rose(x) -> stable(y);
+end;
+`
+	r := analyze(t, map[string]string{"e.vhd": src},
+		func(c *config.Config) { c.Standard = "2008" })
+	if len(r.Diagnostics) > 0 {
+		t.Fatal(diagText(r))
+	}
+	var got []string
+	for _, f := range r.Files {
+		for n := range f.Root().Descendants() {
+			if n.Kind() != cst.KindPSLBoolean &&
+				n.Kind() != cst.KindPSLBuiltinCall {
+				continue
+			}
+			e := f.PSLExpr(n)
+			var walk func(e *Expr)
+			walk = func(e *Expr) {
+				if e == nil {
+					return
+				}
+				if name := PSLBuiltin(e); name != "" {
+					var args []string
+					for _, a := range e.Args {
+						args = append(args, a.Node.Text()+":"+a.Type.Name())
+					}
+					got = append(got, n.Kind().String()+" "+name+"("+
+						strings.Join(args, ", ")+") "+e.Type.Name())
+				}
+				for _, a := range e.Args {
+					walk(a)
+				}
+			}
+			walk(e)
+		}
+	}
+	want := []string{
+		"PSLBoolean prev(x:STD_LOGIC, 2:universal_integer) STD_LOGIC",
+		"PSLBuiltinCall rose(x:STD_LOGIC) BOOLEAN",
+		"PSLBuiltinCall stable(y:STD_LOGIC) BOOLEAN",
+	}
+	if !slices.Equal(got, want) {
+		t.Fatalf("built-in calls:\n%s", strings.Join(got, "\n"))
+	}
 }
 
 // TestPSLSequenceContext: cover and restrict take a sequence, and a

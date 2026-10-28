@@ -19,18 +19,24 @@ func (a *analyzer) pslExpr(n cst.Node) *Expr {
 	a.inPSL++
 	e := a.expr(n, nil)
 	a.inPSL--
+	a.pslRecord(n, e)
+	return e
+}
+
+// pslRecord records e as the typed expression of the PSL node n.
+func (a *analyzer) pslRecord(n cst.Node, e *Expr) {
 	a.s.pslMu.Lock()
 	defer a.s.pslMu.Unlock()
 	if a.f.PSL == nil {
 		a.f.PSL = map[cst.Range]*Expr{}
 	}
 	a.f.PSL[n.Span()] = e
-	return e
 }
 
 // PSLExpr returns the typed expression of the VHDL expression node n
 // of the file's PSL code (the operand of a PSL boolean, a clock
-// expression), or nil when n is not one.
+// expression, a built-in function call that is a PSL operand), or nil
+// when n is not one.
 func (f *File) PSLExpr(n cst.Node) *Expr {
 	if f == nil || n.IsZero() {
 		return nil
@@ -113,11 +119,23 @@ func (a *analyzer) sequenceBody(decl, body cst.Node) {
 // pslBuiltins are the PSL built-in functions sema types (IEEE 1850
 // 5.2.3, LRM 2008 PSL flavor): prev(e [, n [, clk]]) is of e's type;
 // rose and fell take a BIT, STD_ULOGIC or BOOLEAN; stable any value;
-// onehot and onehot0 a one-dimensional array of BIT or STD_ULOGIC;
-// ended a sequence. All but prev return BOOLEAN.
+// onehot, onehot0 and isunknown a one-dimensional array of BIT or
+// STD_ULOGIC; ended a sequence. All but prev return BOOLEAN.
 var pslBuiltins = map[string]bool{"prev": true, "rose": true,
 	"fell": true, "stable": true, "onehot": true, "onehot0": true,
-	"ended": true}
+	"isunknown": true, "ended": true}
+
+// PSLBuiltin returns the name of the PSL built-in function the call e
+// makes (prev, rose, ... in lower case), or "" when e is no such call.
+// The call is an ExprUnknown of the function's result type whose Args
+// are its typed actuals, in order (a sequence actual of ended is left
+// out): the PSL runner evaluates it (#111), static evaluation cannot.
+func PSLBuiltin(e *Expr) string {
+	if e == nil || e.Kind != ExprUnknown {
+		return ""
+	}
+	return string(e.Attr)
+}
 
 // pslBuiltin types n, prefix(args) inside PSL code, as a call of a PSL
 // built-in function when prefix is one and no declaration of that name
@@ -156,7 +174,8 @@ func (a *analyzer) pslCall(n cst.Node, name string, nodes []cst.Node,
 		}
 		args = append(args, a.expr(v, nil))
 	}
-	e := &Expr{Kind: ExprUnknown, Node: n, Type: a.stdType("boolean")}
+	e := &Expr{Kind: ExprUnknown, Node: n, Type: a.stdType("boolean"),
+		Attr: Key(name), Args: args}
 	if len(args) == 0 {
 		if name != "ended" {
 			a.semaError(n.Span(), name+" needs an argument")
@@ -176,7 +195,7 @@ func (a *analyzer) pslCall(n cst.Node, name string, nodes []cst.Node,
 			a.semaError(x.Node.Span(), "the argument of "+name+
 				" must be BIT, STD_ULOGIC or BOOLEAN, not "+x.Type.Name())
 		}
-	case "onehot", "onehot0":
+	case "onehot", "onehot0", "isunknown":
 		if b.Class != TypeArray || len(b.Index) != 1 ||
 			!a.bitOrULogic(b.Elem.Base()) {
 			a.semaError(x.Node.Span(), "the argument of "+name+
@@ -188,7 +207,7 @@ func (a *analyzer) pslCall(n cst.Node, name string, nodes []cst.Node,
 }
 
 // pslBuiltinCall types a PSL built-in function call that is a PSL
-// operand on its own.
+// operand on its own, and records it for the PSL runner.
 func (a *analyzer) pslBuiltinCall(n cst.Node) {
 	c := cst.PSLBuiltinCall{Node: n}
 	name := strings.ToLower(c.Function().Text())
@@ -203,8 +222,9 @@ func (a *analyzer) pslBuiltinCall(n cst.Node) {
 		nodes = append(nodes, x.Node)
 	}
 	a.inPSL++
-	a.pslCall(n, name, nodes)
+	e := a.pslCall(n, name, nodes)
 	a.inPSL--
+	a.pslRecord(n, e)
 }
 
 // pslForm checks the PSL operator rules on the node n after its

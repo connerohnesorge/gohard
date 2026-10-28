@@ -56,7 +56,8 @@ type Expr struct {
 	Formals []*Decl
 	Assocs  []Assoc
 	Range   *RangeCons
-	// Attr is the attribute designator of ExprAttr.
+	// Attr is the attribute designator of ExprAttr, and the name of
+	// the PSL built-in function an ExprUnknown calls (PSLBuiltin).
 	Attr Key
 	// Lit is the literal token.
 	Lit cst.Token
