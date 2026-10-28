@@ -9,10 +9,10 @@ formatting, folding, highlights, the simulation code lens and the
 "Open waveform" code action. v2 adds semantic tokens (#55, see
 [Semantic tokens](#semantic-tokens)) and signature help and inlay hints
 (#56, see [Signature help and inlay hints](#signature-help-and-inlay-hints)).
-Neovim is the editor CI checks end to end (#38). Helix works with no
-extension. Zed has an extension in `editors/zed` (#65). VS Code support
-is planned for v2 (#3). The configs proposed to nvim-lspconfig, Helix
-and Zed's extension registry are listed under
+CI checks Neovim (#38) and VS Code (#3) end to end. Helix works with
+no extension. Zed and VS Code have extensions, in `editors/zed` (#65)
+and `editors/vscode` (#3). The configs proposed to nvim-lspconfig,
+Helix and Zed's extension registry are listed under
 [Upstream configs](#upstream-configs).
 
 Install `gohard` on your `PATH` first. Use any of these:
@@ -319,6 +319,99 @@ initialization options, and an empty `workspace/didChangeConfiguration`
 The diagnostics of the opened file must equal `gohard check`, as in
 `TestHelixStdio`.
 
+## VS Code
+
+The extension in `editors/vscode` (#3) starts `gohard lsp` for VHDL
+files. It adds the VHDL language: the file types `.vhd` and `.vhdl`,
+comment and bracket rules, and a TextMate grammar for the reserved
+words, literals, comments, operators and attributes. Everything else
+comes from the server: diagnostics, navigation, formatting, semantic
+tokens (they colour the names), signature help, inlay hints, the
+testbench lenses and the "Open waveform" code action. It needs VS Code
+1.91 or later; forks such as VSCodium install it from Open VSX.
+
+Install "GoHard" (ID `connerohnesorge.gohard`) from the VS Code
+Marketplace or Open VSX. Each GitHub release also carries its
+`gohard-VERSION.vsix`, which
+`code --install-extension gohard-VERSION.vsix` installs. The
+extension's version is the release it comes from; use a `gohard` of
+the same release.
+
+| Setting | Default | Does |
+| --- | --- | --- |
+| `gohard.path` | `gohard` | the `gohard` binary to start as `gohard lsp`: a command on `PATH` or an absolute path; a change restarts the server |
+| `gohard.trace.server` | `off` | `messages` or `verbose` logs the LSP messages to the GoHard output |
+| `gohard.inlay_hints.parameter_names`, `.types`, `.values` | `false` | the inlay hint kinds of [Signature help and inlay hints](#signature-help-and-inlay-hints) |
+
+The extension sends the `gohard.inlay_hints.*` settings as the
+`inlay_hints` keys of the editor settings, in `initializationOptions`
+and, when one changes, in `workspace/didChangeConfiguration`. It sends
+only the keys set in a settings file, so a key left at its default
+does not override anything and `gohard.yaml` decides it; a key both
+set keeps the `gohard.yaml` value, as in every editor. In a workspace
+you have not trusted, VS Code takes `gohard.path` only from the user
+settings.
+
+VS Code sends the opened folders as workspace folders. The server
+takes the first one as the project folder and looks for `gohard.yaml`
+from there upward, so in a multi-root workspace only the first
+folder's project is checked. A file opened with no folder gets the
+folder of the first file opened (#48).
+
+Two commands: "GoHard: Restart Server" and "GoHard: Show Output" (the
+server's log, and the LSP messages when `gohard.trace.server` is on).
+The lenses run through the server's commands. The one thing the
+extension does with a command's result is "Copy repro": it copies the
+command the server returns to the clipboard.
+
+The extension declares the token types `signal`, based on `variable`,
+and `port`, based on `parameter`, and the modifier `inactive`. A theme
+without rules for them colours signals as variables and ports as
+parameters; set your own with
+`"editor.semanticTokenColorCustomizations": {"rules": {"signal": "#4fc1ff"}}`.
+
+### End-to-end test
+
+`editors/vscode/test/run.sh` compiles the extension, builds `gohard`
+and starts VS Code twice through `@vscode/test-electron`, each time
+on a copy of a `testdata/lsp` fixture with `gohard.path` pointing at
+that build:
+
+1. In `diagnostics/cross-file` it opens `top.vhd` and waits until VS
+   Code's diagnostics of the file equal `gohard lsp diagnostics` on
+   the same folder. The file's semantic tokens must equal
+   `gohard lsp semantic-tokens`, and VS Code must decode the token at
+   the signal `s` as a `signal` with the `declaration` modifier.
+2. In `inlay-hints/all-off`, which has no `gohard.yaml`, the file has
+   no hint. With `gohard.inlay_hints.parameter_names` turned on in the
+   user settings, its hints must equal those of the
+   `inlay-hints/parameter-names` fixture (sent with
+   `didChangeConfiguration`), and again after "GoHard: Restart
+   Server" (sent with `initializationOptions`). "GoHard: Show Output"
+   runs, and the `gohard.copyRepro` command leaves its result on the
+   clipboard.
+
+A run that exits without reaching the end of its checks fails.
+`npm test` runs the unit tests under Node: the settings the extension
+sends, the manifest, and the grammar with VS Code's TextMate engine
+(`vscode-textmate`). Every reserved word of `internal/token/keywords.yaml`
+must be a keyword in any letter case and the PSL-only words must not.
+`TestVSCodeManifest` in `cmd/gohard` (plain `go test`) checks the
+manifest against the server: the token types and modifiers it
+declares are those of the legend that LSP lacks, each
+`gohard.inlay_hints.*` setting has the key table's type, default and
+text, and the version equals the flake's.
+
+CI runs `scripts/ci/vscode.sh` (npm ci, the unit tests, `vsce package`
+and the end-to-end test) on Linux on VS Code 1.91.1 and the current
+release. Locally, run `nix develop -c bash scripts/ci/vscode.sh`.
+`VSCODE_VERSION` picks the VS Code it downloads. Where the download
+cannot start, as on NixOS, set `VSCODE_PATH` to the Electron binary of
+an installed VS Code (for nixpkgs' `vscode`, `lib/vscode/code`, not
+the `bin/code` launcher, which returns at once). VS Code and the
+`gohard` it starts run under the dev shell's memory cap
+(`GOHARD_MEMCAP`).
+
 ## Upstream configs
 
 These are proposed to the editors' own repositories (#65). Each
@@ -398,7 +491,9 @@ settings = { gohard = { inlay_hints = { parameter_names = true } } },
 ```
 
 In Helix, set `display-inlay-hints = true` under `[editor.lsp]` and
-the kinds in `config`.
+the kinds in `config`. In VS Code, which shows inlay hints by default,
+set `gohard.inlay_hints.parameter_names` and the other kinds
+([VS Code](#vs-code)).
 
 `gohard lsp signature-help --at PATH:LINE:COL` prints the signature
 help at a position, and `gohard lsp inlay-hints --at PATH:LINE:COL
@@ -415,8 +510,8 @@ of the file without one).
   `gohard`, set `cmd = { '/full/path/to/gohard', 'lsp' }`. The same
   applies to finding `surfer`. Homebrew's `gtkwave` cask is also
   found, as long as `gtkwave` is on `PATH`.
-* **Windows:** the binary is `gohard.exe`. Neovim, Helix and Zed find
-  it on `PATH` without the extension. Paths in diagnostics and
+* **Windows:** the binary is `gohard.exe`. Neovim, Helix, Zed and VS
+  Code find it on `PATH` without the extension. Paths in diagnostics and
   locations are `file:///C:/...` URIs. To use `Copy repro`, Neovim needs a
   clipboard provider for the `+` register (`win32yank` or the
   built-in one in recent releases). The unnamed register always gets

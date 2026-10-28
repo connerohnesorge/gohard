@@ -37,6 +37,7 @@ Triggers: `pull_request`, pushes to `main` and `v1`, manual dispatch.
 | Helix stdio connection test | `go test` (`TestHelixStdio` in `cmd/gohard`, real pipes) | wired (#38); command line from the upstream entry `editors/upstream/helix/gohard.diff` (#65) |
 | Debug adapter stdio test and the debugger's corpus properties | `go test` (`TestDAPStdio` in `cmd/gohard`, real pipes; `TestReplayTrace` and `TestReverseStep` in `internal/simdbg`) | wired (#68): nvim-dap's requests on `wait_forms` and `assert_fail`; Neovim itself is not run |
 | Zed stdio connection test | `go test` (`TestZedStdio` in `cmd/gohard`, real pipes; Zed itself is not run) | wired (#65): command line from `editors/zed/src/lib.rs` |
+| VS Code extension: unit tests (settings, manifest, TextMate grammar), `vsce package`, end-to-end test in VS Code under `xvfb-run` on VS Code 1.91.1 and the current release (Linux) | `vscode.sh` (job `vscode`, `nix develop` provides Node and `xvfb-run`; `@vscode/test-electron` downloads VS Code); the VSIX is kept as the `gohard-vsix` artifact | wired (#3): `editors/vscode/test/run.sh`; `TestVSCodeManifest` in `cmd/gohard` checks the manifest against the server under plain `go test` |
 | GHW exports read back by GHDL's `ghwdump` (Linux) | `ghwdump.sh` (job `ghwdump`, `nix develop` provides GHDL); plain `go test` skips the ghwdump part of `TestGhwdump` when `ghwdump` is not on PATH | wired (#60): every corpus golden, the sample, the shapes trace and random traces |
 | Coverage files read by lcov's `genhtml` (Linux) | `genhtml.sh` (job `genhtml`, `nix develop` provides lcov); plain `go test` skips `TestGenhtml` when `genhtml` is not on PATH | wired (#62): every corpus coverage golden, the `check-sim-coverage` fixture and a test design, with branches, no warning allowed |
 | `docs/libraries.md` examples | new step | later: #1 |
@@ -141,12 +142,30 @@ GORELEASER=$(nix build nixpkgs#goreleaser --no-link --print-out-paths)/bin/gorel
   nix develop -c bash scripts/ci/release-repro.sh
 ```
 
+The `vscode` job of `release.yml` (#3) runs after `goreleaser`, also
+when goreleaser failed after publishing the release. It checks that
+`editors/vscode/package.json` carries the tag's version (the
+`goreleaser` job checks it too, next to `flake.nix`), builds the VSIX
+with `vsce package`, attaches `gohard-<version>.vsix` to the release
+with `gh release upload`, then publishes it to the VS Code Marketplace
+with the `VSCE_PAT` secret (an Azure DevOps token of the publisher
+`connerohnesorge`) and to Open VSX with the `OVSX_PAT` secret (a token
+of the namespace `connerohnesorge`). A store whose secret is not set is
+skipped; without a release the upload fails and nothing is published.
+A release bumps the version in `flake.nix`,
+`editors/vscode/package.json` and `editors/vscode/package-lock.json`
+(`npm version --no-git-tag-version X.Y.Z` in `editors/vscode`);
+`TestVSCodeManifest` fails while the three differ.
+
 ## Rules (#30)
 
 * CI downloads nothing beyond checking out submodules and the Go module
   cache (the pinned golines comes from the module proxy).
   The exceptions are the `editors` job, which installs Nix and
-  takes Neovim from the flake's dev shell (#38), the `ghwdump`
+  takes Neovim from the flake's dev shell (#38), the `vscode` job,
+  which takes Node and `xvfb-run` from it, installs the npm packages
+  pinned by `editors/vscode/package-lock.json` and downloads VS Code
+  (#3), the `ghwdump`
   job, which takes GHDL's `ghwdump` from the same dev shell to read
   the GHW exports (#60), and the `genhtml` job, which takes lcov's
   `genhtml` from it to read the coverage files (#62). GHDL and NVC never simulate or analyze in
