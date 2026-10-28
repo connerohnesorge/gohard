@@ -44,8 +44,17 @@ func designs(t *testing.T) []corpus.Design {
 	return m.Designs
 }
 
-// options returns the run options of design d's main run at seed, and
-// false when its analysis has errors (the run does not simulate).
+// maxTime bounds the simulated time of every run in these tests. Every
+// corpus design but budget_hang ends before 3 us; budget_hang only ends
+// at the 1 ms default time budget, and its two traces of 200,000 clock
+// edges (the plain run's and the session's) took the test binary to
+// 900 MB. At 10 us it still ends at the time budget, and
+// TestReplayTrace still reaches maxStops before it does.
+const maxTime = 10 * config.Microsecond
+
+// options returns the run options of design d's main run at seed, with
+// at most maxTime of simulated time, and false when its analysis has
+// errors (the run does not simulate).
 func options(t *testing.T, d corpus.Design, seed uint64) (simrun.Options,
 	bool,
 ) {
@@ -74,7 +83,9 @@ func options(t *testing.T, d corpus.Design, seed uint64) (simrun.Options,
 		files[p] = b
 	}
 	fs := simenv.New(simenv.Options{Dir: root, Files: files}).FS
-	return simrun.Options{Result: res, Sim: cfg.Simulation,
+	sc := cfg.Simulation
+	sc.TimeBudget = min(sc.TimeBudget, maxTime)
+	return simrun.Options{Result: res, Sim: sc,
 		Testbench: d.Testbench, Seed: seed,
 		Env: simrun.Env{Root: root, FS: fs}}, true
 }

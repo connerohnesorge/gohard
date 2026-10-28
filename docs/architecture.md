@@ -375,7 +375,9 @@ folder.
   the step came from with the same state, and every move back to
   land on the state the walk, or a new session moving straight to
   that count, recorded there; a failure prints its walk seed
-  (`-simdbg.walk=N`).
+  (`-simdbg.walk=N`). Both tests stop every run at 10 us of
+  simulated time, which only shortens `budget_hang` (1 ms
+  otherwise): at 1 ms its traces took the test binary to 900 MB.
 * Limits: no pause, no watch expressions or `evaluate`, no setting of
   values; composite values are one line of text; columns are UTF-8
   byte columns. A move that reaches the end of the run ends the
