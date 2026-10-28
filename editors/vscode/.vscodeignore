@@ -1,0 +1,11 @@
+# The VSIX holds package.json, README.md, LICENSE, the language files,
+# the compiled extension and the production node_modules (vsce leaves
+# out the devDependencies).
+**
+!package.json
+!README.md
+!LICENSE
+!language-configuration.json
+!syntaxes/vhdl.tmLanguage.json
+!out/src/*.js
+!node_modules/**

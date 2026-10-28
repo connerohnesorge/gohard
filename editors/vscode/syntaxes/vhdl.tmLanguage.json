@@ -1,0 +1,211 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "VHDL",
+  "scopeName": "source.vhdl",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#directives"
+    },
+    {
+      "include": "#extended-identifiers"
+    },
+    {
+      "include": "#bit-strings"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#attributes"
+    },
+    {
+      "include": "#characters"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#punctuation"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-dash.vhdl",
+          "match": "(--).*$",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.comment.vhdl"
+            }
+          }
+        },
+        {
+          "name": "comment.block.vhdl",
+          "begin": "/\\*",
+          "end": "\\*/",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.begin.vhdl"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.end.vhdl"
+            }
+          }
+        }
+      ]
+    },
+    "directives": {
+      "patterns": [
+        {
+          "name": "keyword.control.directive.vhdl",
+          "match": "(`)[A-Za-z][A-Za-z0-9_]*",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.directive.vhdl"
+            }
+          }
+        }
+      ]
+    },
+    "extended-identifiers": {
+      "patterns": [
+        {
+          "name": "meta.identifier.extended.vhdl",
+          "match": "\\\\(?:[^\\\\\\n]|\\\\\\\\)*\\\\"
+        }
+      ]
+    },
+    "bit-strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.bit-string.vhdl",
+          "match": "\\b[0-9]*(?i:[us]?[box]|d)\"[^\"\\n]*\""
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.vhdl",
+          "begin": "\"",
+          "end": "(\")(?!\")|$",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.vhdl"
+            }
+          },
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.string.end.vhdl"
+            }
+          },
+          "patterns": [
+            {
+              "name": "constant.character.escape.vhdl",
+              "match": "\"\""
+            }
+          ]
+        }
+      ]
+    },
+    "attributes": {
+      "patterns": [
+        {
+          "match": "(?<=[A-Za-z0-9_)\\]\\\\])(')([A-Za-z][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "punctuation.separator.attribute.vhdl"
+            },
+            "2": {
+              "name": "entity.other.attribute-name.vhdl"
+            }
+          }
+        },
+        {
+          "name": "punctuation.separator.qualified-expression.vhdl",
+          "match": "(?<=[A-Za-z0-9_\\\\])'(?=\\s*\\()"
+        }
+      ]
+    },
+    "characters": {
+      "patterns": [
+        {
+          "name": "string.quoted.single.vhdl",
+          "match": "'[^\\n]'"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.based.vhdl",
+          "match": "\\b\\d(?:_?\\d)*#[0-9A-Fa-f](?:_?[0-9A-Fa-f])*(?:\\.[0-9A-Fa-f](?:_?[0-9A-Fa-f])*)?#(?:[Ee][+-]?\\d(?:_?\\d)*)?"
+        },
+        {
+          "name": "constant.numeric.decimal.vhdl",
+          "match": "\\b\\d(?:_?\\d)*(?:\\.\\d(?:_?\\d)*)?(?:[Ee][+-]?\\d(?:_?\\d)*)?\\b"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.vhdl",
+          "match": "\\b(?i:assert|case|else|elsif|exit|for|generate|if|loop|next|report|return|select|severity|then|until|wait|when|while)\\b"
+        },
+        {
+          "name": "keyword.operator.word.vhdl",
+          "match": "\\b(?i:abs|and|mod|nand|nor|not|or|rem|rol|ror|sla|sll|sra|srl|xnor|xor)\\b"
+        },
+        {
+          "name": "keyword.other.vhdl",
+          "match": "\\b(?i:access|after|alias|all|architecture|array|attribute|begin|block|body|buffer|bus|component|configuration|constant|context|cover|default|disconnect|downto|end|entity|file|force|function|generic|group|guarded|impure|in|inertial|inout|is|label|library|linkage|literal|map|new|null|of|on|open|others|out|package|parameter|port|postponed|private|procedure|process|protected|pure|range|record|register|reject|release|shared|signal|subtype|to|transport|type|unaffected|units|use|variable|view|with)\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "punctuation.definition.external-name.vhdl",
+          "match": "<<|>>"
+        },
+        {
+          "name": "keyword.operator.vhdl",
+          "match": "\\?\\?|\\?/=|\\?<=|\\?>=|\\?=|\\?<|\\?>|:=|<=|>=|=>|/=|\\*\\*|<>|[-+*/&=<>|]"
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.terminator.statement.vhdl",
+          "match": ";"
+        },
+        {
+          "name": "punctuation.separator.comma.vhdl",
+          "match": ","
+        },
+        {
+          "name": "punctuation.separator.colon.vhdl",
+          "match": ":"
+        },
+        {
+          "name": "punctuation.accessor.dot.vhdl",
+          "match": "\\."
+        }
+      ]
+    }
+  }
+}
