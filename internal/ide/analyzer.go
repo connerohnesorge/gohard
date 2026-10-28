@@ -100,6 +100,9 @@ func (a *Analyzer) Features() server.Features {
 	if f.Has(server.FeatureSemanticTokens) {
 		f.TokenTypes, f.TokenModifiers = TokenTypes, TokenModifiers
 	}
+	if f.Has(server.FeatureSignatureHelp) {
+		f.SignatureTriggers = SignatureTriggers
+	}
 	return f
 }
 

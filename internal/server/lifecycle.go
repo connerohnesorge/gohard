@@ -32,6 +32,9 @@ type initializeParams struct {
 			CodeLens struct {
 				RefreshSupport bool `json:"refreshSupport"`
 			} `json:"codeLens"`
+			InlayHint struct {
+				RefreshSupport bool `json:"refreshSupport"`
+			} `json:"inlayHint"`
 			DidChangeWatchedFiles struct {
 				DynamicRegistration bool `json:"dynamicRegistration"`
 			} `json:"didChangeWatchedFiles"`
@@ -108,6 +111,7 @@ func (s *State) initialize(o *out, m call) {
 	s.enc = Negotiate(p.Capabilities.General.PositionEncodings)
 	s.progressOK = p.Capabilities.Window.WorkDoneProgress
 	s.lensRefresh = p.Capabilities.Workspace.CodeLens.RefreshSupport
+	s.hintRefresh = p.Capabilities.Workspace.InlayHint.RefreshSupport
 	s.watchReg = p.Capabilities.Workspace.DidChangeWatchedFiles.
 		DynamicRegistration
 	s.folder, _ = p.Folder()
@@ -243,6 +247,12 @@ func (s *State) merge(o *out) {
 	if s.file == nil {
 		return
 	}
+	hints := s.cfg.InlayHints
+	defer func() {
+		if s.cfg.InlayHints != hints {
+			s.refreshHints(o)
+		}
+	}()
 	s.cfg = s.file.Config
 	if s.editor == nil {
 		return
@@ -252,6 +262,19 @@ func (s *State) merge(o *out) {
 	for _, k := range over {
 		s.log(o, LogInfo, config.OverrideMessage(k))
 	}
+}
+
+// refreshHints asks a client that supports it to request its inlay
+// hints again: the inlay_hints.* settings changed (#56). A client
+// asks for hints on its own after an edit, not after a setting.
+func (s *State) refreshHints(o *out) {
+	if !s.hintRefresh || !s.loaded || s.phase != phaseRunning ||
+		!s.features().Has(FeatureInlayHints) {
+		return
+	}
+	s.nextOut++
+	o.send(&jsonrpc2.Request{ID: jsonrpc2.IntID(s.nextOut),
+		Method: "workspace/inlayHint/refresh"})
 }
 
 func (s *State) didChangeConfiguration(o *out, params json.RawMessage) {
@@ -329,6 +352,14 @@ func (s *State) capabilities() map[string]any {
 		map[string]any{"codeActionKinds": []string{"quickfix"}})
 	set(FeatureSemanticTokens, "semanticTokensProvider",
 		tokensCapability(f))
+	sigTriggers := slices.Clone(f.SignatureTriggers)
+	if sigTriggers == nil {
+		sigTriggers = []string{}
+	}
+	set(FeatureSignatureHelp, "signatureHelpProvider",
+		map[string]any{"triggerCharacters": sigTriggers})
+	set(FeatureInlayHints, "inlayHintProvider",
+		map[string]any{"resolveProvider": false})
 	cmds := slices.Clone(f.Commands)
 	if cmds == nil {
 		cmds = []string{}

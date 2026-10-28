@@ -62,6 +62,13 @@ type Analyzer interface {
 	// them in the negotiated position encoding and answers range and
 	// delta requests from them.
 	SemanticTokens(snap *Snapshot, uri string) Task[[]SemToken]
+	// SignatureHelp returns the signatures of the call, generic map
+	// or port map around q, or nil (#56).
+	SignatureHelp(q Query) Task[*SignatureHelp]
+	// InlayHints returns the inlay hints of the document uri whose
+	// position lies in r, of the kinds the snapshot's configuration
+	// turns on (snap.Config.InlayHints, #56), sorted by position.
+	InlayHints(snap *Snapshot, uri string, r Span) Task[[]InlayHint]
 }
 
 // Feature is one optional language feature.
@@ -85,6 +92,8 @@ const (
 	FeatureCommands
 	FeatureCodeActions
 	FeatureSemanticTokens
+	FeatureSignatureHelp
+	FeatureInlayHints
 )
 
 // Features is what an Analyzer provides.
@@ -98,6 +107,9 @@ type Features struct {
 	// (FeatureSemanticTokens): SemToken.Type indexes TokenTypes and bit
 	// i of SemToken.Mods stands for TokenModifiers[i].
 	TokenTypes, TokenModifiers []string
+	// SignatureTriggers are the signature help trigger characters
+	// (FeatureSignatureHelp).
+	SignatureTriggers []string
 }
 
 // Has reports whether f includes every feature in want.
@@ -221,6 +233,43 @@ type SemToken struct {
 	Mods uint32
 }
 
+// SignatureHelp is the signature help of a position: every signature
+// that may apply, the active one first.
+type SignatureHelp struct {
+	Signatures []Signature
+}
+
+// Signature is one signature: a subprogram overload, or the generic or
+// port list of an instantiated unit.
+type Signature struct {
+	Label string
+	// Doc is markdown documentation ("" for none).
+	Doc string
+	// Params are the parameters as byte ranges [Start, End) of Label;
+	// the server converts them to the client's position encoding.
+	Params []Span
+	// Active is the index into Params of the active parameter, or -1.
+	Active int
+}
+
+// InlayHintKind is the LSP InlayHintKind; 0 sends none (a value).
+type InlayHintKind int
+
+// Inlay hint kinds.
+const (
+	HintType      InlayHintKind = 1
+	HintParameter InlayHintKind = 2
+)
+
+// InlayHint is a label shown at a byte offset of a document.
+type InlayHint struct {
+	Offset   int
+	Label    string
+	Kind     InlayHintKind
+	PadLeft  bool
+	PadRight bool
+}
+
 // Nop is the Analyzer of a server without analysis: it provides no
 // features and every task finishes at once with an empty result.
 type Nop struct{}
@@ -306,4 +355,14 @@ func (Nop) CodeActions(Query, Span) Task[[]CodeAction] {
 // SemanticTokens implements Analyzer.
 func (Nop) SemanticTokens(*Snapshot, string) Task[[]SemToken] {
 	return Done[[]SemToken](nil)
+}
+
+// SignatureHelp implements Analyzer.
+func (Nop) SignatureHelp(Query) Task[*SignatureHelp] {
+	return Done[*SignatureHelp](nil)
+}
+
+// InlayHints implements Analyzer.
+func (Nop) InlayHints(*Snapshot, string, Span) Task[[]InlayHint] {
+	return Done[[]InlayHint](nil)
 }

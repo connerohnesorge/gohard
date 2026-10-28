@@ -50,6 +50,8 @@ var methods = map[string]Feature{
 	methodTokensFull:                 FeatureSemanticTokens,
 	methodTokensDelta:                FeatureSemanticTokens,
 	methodTokensRange:                FeatureSemanticTokens,
+	"textDocument/signatureHelp":     FeatureSignatureHelp,
+	"textDocument/inlayHint":         FeatureInlayHints,
 }
 
 // Methods returns the feature request methods, sorted.
@@ -157,7 +159,8 @@ func takesPosition(method string) bool {
 	case "textDocument/documentSymbol", "textDocument/formatting",
 		"textDocument/rangeFormatting", "textDocument/foldingRange",
 		"textDocument/codeLens", "textDocument/codeAction",
-		methodTokensFull, methodTokensDelta, methodTokensRange:
+		methodTokensFull, methodTokensDelta, methodTokensRange,
+		"textDocument/inlayHint":
 		return false
 	}
 	return true
@@ -236,6 +239,18 @@ func (s *State) runner(method string, q Query, p docParams,
 		) any {
 			return c.tokens(uri, ts, r, method, p.PreviousResultID)
 		})
+	case "textDocument/signatureHelp":
+		return runTask(an.SignatureHelp(q), c.signatureHelp)
+	case "textDocument/inlayHint":
+		var r Span
+		if d, ok := snap.Document(uri); ok {
+			r.End = len(d.Text())
+			if p.Range != nil {
+				r = toSpan(d.index, *p.Range, s.enc)
+			}
+		}
+		return runTask(an.InlayHints(snap, uri, r),
+			func(hs []InlayHint) any { return c.inlayHints(uri, hs) })
 	default: // workspace/executeCommand
 		return runTask(an.Command(snap, p.Command, p.Arguments),
 			func(r json.RawMessage) any { return r })

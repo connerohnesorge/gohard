@@ -102,6 +102,8 @@ type State struct {
 	anDiags     []FileDiagnostics
 	saves       uint64
 	lensRefresh bool
+	// hintRefresh: the client takes workspace/inlayHint/refresh (#56).
+	hintRefresh bool
 
 	// tokens is the last full or delta semantic tokens result of each
 	// document (by docKey; copy on write), the base of the next delta
