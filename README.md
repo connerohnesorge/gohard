@@ -47,7 +47,9 @@ go go1.27.2
   `gohard fmt -` formats standard input to standard output (exit 1 if it
   does not parse; with `--check`, exit 1 if it would change).
 * `gohard check --sim` also runs testbenches; failures print a repro
-  command.
+  command. `gohard check --coverage` also writes their statement,
+  branch and PSL cover coverage as lcov files under `.gohard/coverage/`
+  (`genhtml` reads them); `gohard coverage merge` sums several runs.
 * `gohard lsp` is the language server over stdio.
 * `gohard import FILE` writes `gohard.yaml` from a ModelSim `.do`,
   Vivado `.xpr` or Quartus `.qsf` file

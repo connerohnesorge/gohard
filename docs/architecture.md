@@ -74,6 +74,7 @@ Env, maps SIGINT/SIGTERM to 130/143, and calls `cli.Run`.
 | 6 | `internal/elab` | lowers a resolved design to a compact model; instance paths like `tb.dut.u0` | #35 |
 | 6 | `internal/sim` | single-threaded discrete-event kernel ordered by (time, delta, process sequence) | #35 |
 | 6 | `internal/trace` | lossless native trace, `Writer`/`Recorder` fed by the kernel, canonical text form (grammar in `doc.go`), value lookup; exports in `trace/vcd`, `trace/fst` and `trace/ghw` (pure Go, fixed bytes); `trace/waveform` is "Open waveform" | #36, #60 |
+| 6 | `internal/coverage` | the coverage of a simulation run: the coverable statements of the design's units, the collector the run installs as its `sema.StmtHook`, lcov encode, parse and merge | #62 |
 | 6 | `internal/repro` | repro files and session headers (`"schema":1`) | #29 |
 | 7 | `internal/ide` | LSP features as pure functions of a snapshot | #25 |
 | 7 | `internal/jsonrpc2` | hand-rolled JSON-RPC 2.0 framing; the only goroutines (stdio reader and writer) | #25 |
@@ -132,6 +133,7 @@ wording is locked when v1.0 ships. Codes are `area/kebab-name`:
 | `format/` | #32 | `format/would-change` |
 | `sim/` | #35, #29 | `sim/budget-exceeded`, `sim/assert-error`, `sim/race` |
 | `import/` | #2 | `import/ignored`, `import/missing-file`, `import/standard` |
+| `coverage/` | #62 | `coverage/invalid` |
 | `repro/`, `trace/`, `lsp/`, `libs/`, `internal/` | #29, #36, #26, #1, #20 | `repro/source-changed`, `internal/crash` |
 
 A `Diagnostic` has a project-relative `/` path, one-based line and
@@ -175,13 +177,14 @@ wipes existing GitHub alerts.
 
 | Command | Purpose | Owner |
 | --- | --- | --- |
-| `gohard check [PATH...]` | parse and analyze; `--sim`, `--tb`, `--seed N\|random`, `--repro FILE`, `--strict`, `--define`, `--allow-empty`, `--env NAME=VALUE`, `--real-env` | #20, #34, #35, #29, #18 |
+| `gohard check [PATH...]` | parse and analyze; `--sim`, `--tb`, `--seed N\|random`, `--repro FILE`, `--strict`, `--define`, `--allow-empty`, `--env NAME=VALUE`, `--real-env`, `--coverage` | #20, #34, #35, #29, #18, #62 |
 | `gohard fmt [--check] [PATH...]` | format in place (temp file + rename) or check; `gohard fmt [--check] -` formats stdin to stdout with the `gohard.yaml` of the current directory's project | #32, #42 |
 | `gohard parse --dump FILE` | stable tree dump | #31 |
 | `gohard config check\|schema` | config diagnostics; JSON schema | #28 |
 | `gohard lsp` | stdio LSP 3.17 server; `--record DIR` | #25 |
 | `gohard lsp <action> --at PATH:LINE:COL` | one LSP action on the server's code path; `lsp sim` (with `--env`, `--real-env`), `lsp replay FILE` | #26, #18 |
 | `gohard trace export --format vcd\|fst\|ghw` | export a native trace; see [Trace exports](#trace-exports) | #36, #60 |
+| `gohard coverage merge FILE... [-o OUT]` | sum lcov coverage files; see [Coverage](#coverage) | #62 |
 | `gohard import FILE` | write `gohard.yaml` from a ModelSim `.do`, Vivado `.xpr` or Quartus `.qsf` file (`--dir`, `--format`) | #2 |
 | `gohard libs detect [--write]` | find vendor library sources | #1 |
 | `gohard version` | prints `version`, `commit`, `ieee` (bundled IEEE tag and commit) and `go` lines; `unknown` when not known | #20, #39 |
@@ -219,6 +222,77 @@ index is not an integer is a block. Names with a byte in 0-31 or
 128-159, enumerations of more than 256 literals and array bounds beyond
 32 bits cannot be written. The package documentation of `trace/ghw`
 has the full mapping. "Open waveform" stays FST; GHW is CLI-only.
+
+## Coverage
+
+`gohard check --coverage` (it implies `--sim`) records the coverage
+of every testbench it runs (#62) and writes it in lcov's tracefile
+format: `.gohard/coverage/<tb>-<seed>.info` per run and
+`.gohard/coverage/lcov.info`, the sum of the run's testbenches, with
+one log line such as `gohard: coverage: .gohard/coverage/lcov.info: 35
+of 36 lines (97.2%), 12 of 13 branches (92.3%)`. A run that stops on
+a design error (an assertion, a budget) still writes the coverage of
+what it ran; a run with a tool error writes neither its trace nor its
+coverage. `gohard coverage merge FILE... [-o OUT]` sums lcov files of
+several runs (seeds, testbench subsets) in sorted name order and
+prints the same summary; it only
+adds, so any order of the same files gives the same bytes. An
+unreadable or invalid file is `coverage/invalid`. `SF` paths are
+project-relative, so `genhtml --branch-coverage -o html
+.gohard/coverage/lcov.info` runs from the project root.
+
+* Coverable: the units of the elaborated design (the entity and
+  architecture of every instance, the units they depend on and the
+  bodies of those packages), without the bundled std/ieee and opaque
+  units. In them every sequential statement of a process or
+  subprogram, and every concurrent assignment, assertion and
+  procedure call, is a line (`DA`). If and case statements and
+  conditional and selected assignments (variable and signal,
+  sequential and concurrent) are decisions (`BRDA`): one branch per
+  alternative, an if statement's else (written or not) and a
+  conditional assignment's "no condition held" included; the branches
+  of a decision that never ran are `-`. A PSL `cover` directive is a
+  line whose count is the number of its `cover-hit` trace events: the
+  #18 counters, not a second count. A line's count is the largest
+  count of the statements that start on it; the decisions of one line
+  are numbered in source order.
+* The hook: `sema.StmtHook`, installed with `elab.Design.SetStmtHook`
+  after elaboration, is told each statement the interpreter runs
+  (processes, concurrent statements, the subprograms they call) and
+  each statement of the pure functions the evaluator interprets for
+  them, plus the alternative every decision takes. It only observes;
+  #68 builds on it. While a hook is installed, sema's memo of pure
+  calls is off and the kernel calls every initial resolution
+  (`sim.Options.Uncached`), so repeated calls and resolution functions
+  count every call; both caches charge the steps of the calls they
+  replace, so values, traces, diagnostics and step counts are the
+  same with coverage on and off. `TestCorpus` checks that on every
+  corpus run and `FuzzSim` on generated designs. With coverage off the
+  interpreter and the evaluator test one nil hook per statement:
+  `BenchmarkSim` stayed within noise (interleaved runs before and after
+  the hook on `budget_hang`, `gc_heap` and `wait_forms`, medians -1.0%
+  to +0.5%).
+* Not counted: evaluation during elaboration (generic values,
+  constants, the warm-up call of each resolution function), so a
+  function only elaboration calls shows as not run; the native ieee
+  bodies. The statements of an if or case generate alternative that
+  was not chosen are coverable and show as not run. A PSL `assert`
+  directive is not a line. The language server does not show
+  coverage yet (the "Show coverage" command of #62's proposal).
+* Determinism: counts are a function of the run (P1), so the files are
+  byte-identical across reruns and at `-p 1` and `-p 16`
+  (`testdata/cli/check-sim-coverage` and its neighbours,
+  `TestCoverageReruns`); `gohard coverage merge` of the per-testbench
+  files gives the bytes of `lcov.info`. Each seed's run has its own
+  file, since a seed that changes the in-delta order of a racy design
+  may change its counts.
+* Answer key: every simulating corpus design has `golden/coverage.info`
+  (seed 0, hash `coverage_sha256`, `tools/oracle` section `coverage`);
+  those of `wait_forms`, `hier_generate` and `psl_simple` were checked
+  by hand against the sources. `TestFormsCoverage` pins every statement
+  form against hand-worked counts, and `TestGenhtml` (CI job `genhtml`)
+  has lcov 2's `genhtml --branch-coverage` read the goldens without a
+  warning.
 
 ## Files GoHard writes
 
@@ -260,6 +334,9 @@ has the full mapping. "Open waveform" stays FST; GHW is CLI-only.
   `NAME_ERROR` at `FILE_OPEN` in every mode. Editor runs read the same
   project view (each file once per run) and drop their writes; `lsp
   replay` runs read no project file.
+* `.gohard/coverage/<tb>-<seed>.info` (named like the trace) and
+  `.gohard/coverage/lcov.info`, the sum of the run's testbenches, under
+  `gohard check --coverage` (#62); the folder is not configurable.
 * `.gohard/crash/<hash>.txt` on an internal crash (#20).
 * `.gohard/cache/` under the project root: the on-disk analysis cache
   (#37, see below), written by `gohard check` and the language server

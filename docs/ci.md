@@ -128,3 +128,33 @@ jobs:
 
 The `gohard check` step fails the job on exit 1 or 2; the report and
 the repro files are still published.
+
+## Coverage
+
+`gohard check --coverage` runs the testbenches like `--sim` and writes
+their statement, branch and PSL cover coverage as lcov tracefiles
+(#62): `.gohard/coverage/<testbench>-<seed>.info` per run and
+`.gohard/coverage/lcov.info` for all of them. Paths in the files are
+relative to the project root, so tools that read lcov (genhtml,
+coverage services) run from there. Runs at several seeds, or on
+several machines, combine with `gohard coverage merge`, which only adds
+counts: the order of its files does not change the result.
+
+```yaml
+gohard-coverage:
+  image: golang:1.27
+  script:
+    - go install github.com/connerohnesorge/gohard/cmd/gohard@latest
+    - gohard check --coverage --seed 1
+    - gohard check --coverage --seed 2
+    - gohard coverage merge -o lcov.info .gohard/coverage/*-1.info .gohard/coverage/*-2.info
+    - genhtml --branch-coverage -o coverage-html lcov.info
+  artifacts:
+    when: always
+    paths:
+      - lcov.info
+      - coverage-html/
+```
+
+`genhtml` comes with lcov, which the job's image must provide (on
+Debian, `apt-get install lcov`).
