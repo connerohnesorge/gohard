@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/config"
@@ -28,8 +29,11 @@ func init() { lookup("import").Run = runImport }
 // the project root). A .do script is read as vsim runs it: paths are
 // relative to the folder it runs from (--dir, default the current
 // folder), and vcom wildcards are expanded. gohard.yaml gets the paths
-// relative to the root. Diagnostics go to stdout in the --format
-// chosen, located in the project file or the file they concern.
+// relative to the root. A project file or script of more than 10 MB
+// (workspace.MaxFileSize) is workspace/unreadable, and another .core
+// file that large provides no core. Diagnostics go to stdout in the
+// --format chosen, located in the project file or the file they
+// concern.
 // Nothing is written when a source file is missing
 // (import/missing-file), a file cannot be read (import/syntax), it
 // lists no VHDL file (import/no-files) or the root already has a
@@ -64,7 +68,7 @@ func runImport(inv *Invocation) Result {
 	root, found := config.FindRoot(fsys, cwd)
 	abs := env.Abs(cwd, filepath.FromSlash(arg))
 	name := relSlash(root, abs)
-	src, err := fsys.ReadFile(abs)
+	src, err := readCapped(fsys, abs)
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
 		return inv.Fail(diag.New(diag.CLIMissingPath, name))
@@ -213,7 +217,29 @@ func (f *importFiles) abs(p string) string {
 	return env.Abs(f.dir, filepath.FromSlash(p))
 }
 
-// Read reads the regular file at p.
+// errTooLarge is why gohard import does not read a file of more than
+// workspace.MaxFileSize bytes, the largest file GoHard parses (P7): it
+// reads the project file, and the scripts and .core files it names,
+// whole.
+var errTooLarge = errors.New("it is larger than " +
+	strconv.Itoa(workspace.MaxFileSize) + " bytes")
+
+// readCapped reads the file a, or fails with errTooLarge.
+func readCapped(fsys env.FS, a string) ([]byte, error) {
+	if fi, err := fsys.Stat(a); err == nil &&
+		fi.Size() > workspace.MaxFileSize {
+		return nil, errTooLarge
+	}
+	b, err := fsys.ReadFile(a)
+	if err == nil && len(b) > workspace.MaxFileSize {
+		return nil, errTooLarge // it grew after Stat
+	}
+	return b, err
+}
+
+// Read reads the regular file at p, up to workspace.MaxFileSize bytes:
+// a larger .core file provides no core, and including a larger script
+// is workspace/unreadable.
 func (f *importFiles) Read(p string) ([]byte, error) {
 	a := f.abs(p)
 	fi, err := f.fsys.Stat(a)
@@ -223,7 +249,7 @@ func (f *importFiles) Read(p string) ([]byte, error) {
 	if !fi.Mode().IsRegular() {
 		return nil, fs.ErrNotExist
 	}
-	b, err := f.fsys.ReadFile(a)
+	b, err := readCapped(f.fsys, a)
 	if err == nil {
 		f.read[relSlash(f.root, a)] = b
 	}
