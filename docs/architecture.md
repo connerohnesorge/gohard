@@ -652,7 +652,11 @@ find their statement in the syntax tree and their entity in sema's
 libraries. Every text they write is laid out by the formatter: an
 edit is the replaced range of the edited document after
 `format.Range` over it, a new file `format.Format` of its text, both
-with the snapshot's `format.*` keys. Create testbench is a
+with the snapshot's `format.*` keys. Declare component looks up each
+name the entity's generic and port declarations use (the entity's
+sema refs, and the characters of their string literals) at the place
+of the new declaration, and adds the `use` or `library` clause that
+makes it denote the same declaration there. Create testbench is a
 `CreateFile` resource operation (`server.FileEdit.Create`, sent as
 `documentChanges`), offered only when the client's initialize names
 `create` in `workspace.workspaceEdit.resourceOperations`; the server

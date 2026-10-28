@@ -1,0 +1,2 @@
+# Declare component applied for an entity whose port type only its own use clause makes visible: the edit adds that use clause too, so the result passes gohard check (#57).
+gohard lsp codeaction --at top.vhd:15:8 "Declare component counter"

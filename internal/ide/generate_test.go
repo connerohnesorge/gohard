@@ -585,3 +585,80 @@ func TestGeneratedKeepsLineComments(t *testing.T) {
 	p["top.vhd"] = got
 	cleanResult(t, p, "top.vhd")
 }
+
+// TestDeclareComponentContext: the generic and port declarations a
+// component declaration copies keep naming what they name in the
+// entity: the clauses that only the entity's context has are added,
+// and the action is not offered where no clause can do it (#57).
+func TestDeclareComponentContext(t *testing.T) {
+	types := "package types is\n" +
+		"  subtype word_t is bit_vector(7 downto 0);\n" +
+		"  constant ZERO : word_t := (others => '0');\n" +
+		"end package types;\n"
+	ent := func(ctx, ports string) []byte {
+		return []byte(ctx + "entity counter is\n  port (\n" + ports +
+			"\n  );\nend entity counter;\n")
+	}
+	top := func(ctx, decls string) []byte {
+		return []byte(ctx + "entity top is\nend entity top;\n\n" +
+			"architecture rtl of top is\n" + decls + "begin\n" +
+			"  u0 : counter;\nend architecture rtl;\n")
+	}
+	const comp = "Declare component counter"
+	const ieee = "library ieee;\nuse ieee.std_logic_1164.all;\n\n"
+	for _, c := range []struct {
+		name      string
+		ctx       string // of counter.vhd
+		ports     string
+		topCtx    string
+		decls     string
+		want      string // the context the action adds, "-" for none
+		notOffers bool
+	}{
+		{name: "use all", ctx: "use work.types.all;\n\n",
+			ports: "    count : out word_t := ZERO",
+			want:  "use work.types.all;\n\narchitecture"},
+		{name: "use package", ctx: "use work.types;\n\n",
+			ports: "    count : out types.word_t",
+			want:  "use work.types;\n\narchitecture"},
+		{name: "expanded", ports: "    count : out work.types.word_t",
+			want: "-"},
+		{name: "library", ctx: "library ieee;\n\n",
+			ports: "    q : out ieee.std_logic_1164.std_logic",
+			want:  "library ieee;\n\narchitecture"},
+		{name: "literal", ctx: ieee,
+			ports: "    clk : in ieee.std_logic_1164.std_logic := '1'",
+			want: "library ieee;\nuse ieee.std_logic_1164.all;\n\n" +
+				"architecture"},
+		{name: "string", ctx: ieee,
+			ports: "    d : in ieee.std_logic_1164.std_logic_vector(" +
+				"1 downto 0) := \"1Z\"",
+			want: "library ieee;\nuse ieee.std_logic_1164.all;\n\n" +
+				"architecture"},
+		{name: "already used", ctx: "use work.types.all;\n\n",
+			ports:  "    count : out word_t",
+			topCtx: "use work.types.all;\n\n", want: "-"},
+		{name: "hidden", ctx: "use work.types.all;\n\n",
+			ports:     "    count : out word_t",
+			decls:     "  subtype word_t is bit_vector(3 downto 0);\n",
+			notOffers: true},
+	} {
+		p := project{"types.vhd": []byte(types),
+			"counter.vhd": ent(c.ctx, c.ports),
+			"top.vhd":     top(c.topCtx, c.decls)}
+		got, ok := genAction(t, p, "top.vhd", "u0 :", comp)
+		if ok == c.notOffers {
+			t.Fatalf("%s: offered %v:\n%s", c.name, ok, got)
+		}
+		if !ok {
+			continue
+		}
+		before, _, _ := strings.Cut(string(got), "entity top is")
+		if c.want == "-" && before != c.topCtx ||
+			c.want != "-" && !strings.Contains(string(got), c.want) {
+			t.Fatalf("%s: context %q in\n%s", c.name, c.want, got)
+		}
+		p["top.vhd"] = got
+		cleanResult(t, p, "top.vhd")
+	}
+}

@@ -229,18 +229,161 @@ func (x *gen) declareComponent(stmt cst.Node, u *sema.Unit,
 	}
 	var out []server.CodeAction
 	for _, e := range x.entitiesNamed(name, u) {
+		ctx, ok := x.componentContext(e, u, at.off)
+		if !ok {
+			continue
+		}
 		ins := "\n\n" + componentText(e)
 		if at.empty {
 			ins = "\n" + componentText(e)
 		}
+		var edits []server.Edit
+		if len(ctx) > 0 {
+			edits = append(edits, insertContext(u, x.text,
+				strings.Join(ctx, "\n"), false, ""))
+		}
 		out = append(out, server.CodeAction{
 			Title: "Declare component " + e.Decl.Text,
 			Kind:  server.ActionRewrite,
-			Edits: []server.FileEdit{{URI: x.uri, Edits: []server.Edit{
-				x.replace(at.off, at.off, ins)}}},
+			Edits: []server.FileEdit{{URI: x.uri, Edits: append(edits,
+				x.replace(at.off, at.off, ins))}},
 		})
 	}
 	return out
+}
+
+// componentContext returns the library and use clauses unit u needs
+// so that each name the generic and port declarations of entity e use,
+// and each character of their string literals (LRM 9.3.2), denotes at
+// off, where the component declaration goes, what it denotes in e. A
+// name that only e's context clause makes visible needs `use
+// LIB.PKG.all;` (`use LIB.PKG;` for a package named alone) or `library
+// LIB;`. ok is false when a clause cannot do it: another declaration
+// of the name is visible at off.
+func (x *gen) componentContext(e, u *sema.Unit, off int,
+) (clauses []string, ok bool) {
+	var needs []need
+	gs, ps := formals(e.Region)
+	var spans []cst.Range
+	for _, d := range slices.Concat(gs, ps) {
+		spans = append(spans, d.Node.Span())
+		needs = stringChars(needs, d.Value)
+	}
+	for _, ref := range e.Refs {
+		if !slices.ContainsFunc(spans, func(s cst.Range) bool {
+			return s.Start <= ref.Span.Start && ref.Span.End <= s.End
+		}) {
+			continue
+		}
+		d := ref.Decl
+		if d == nil && ref.Overload != nil {
+			d = ref.Overload.Chosen
+		}
+		tok := e.File.Root().TokenAt(ref.Span.Start)
+		if d == nil || tok.Prev().Kind() == token.Dot {
+			continue // a selected name's suffix
+		}
+		k := d.Name
+		if d.Kind == sema.DeclLibrary {
+			k = sema.TokenKey(tok) // work denotes the unit's library
+		}
+		needs = append(needs, need{d, k})
+	}
+	add := func(c string) {
+		if !slices.Contains(clauses, c) {
+			clauses = append(clauses, c)
+		}
+	}
+	for _, n := range needs {
+		d, k := n.d, n.k
+		if d.Unit == e {
+			continue // a formal: the component declares it too
+		}
+		vis := x.an.Result.LookupAt(x.path, off, k)
+		switch {
+		case slices.Contains(vis, d):
+			continue
+		case len(vis) > 0 && !d.Overloadable():
+			return nil, false
+		case d.Kind == sema.DeclLibrary:
+			add("library " + string(d.Name) + ";")
+			continue
+		}
+		p := d.Unit
+		if p == nil || p.Region == nil || p.Decl == nil ||
+			p.Decl.Kind == sema.DeclGenericPackage ||
+			p.Kind != sema.UnitPackage && p.Kind != sema.UnitPackageInst {
+			return nil, false
+		}
+		l, ok := x.an.Result.Library(p.Library)
+		if !ok {
+			return nil, false
+		}
+		lib := string(p.Library)
+		if p.Library == u.Library && !l.Bundled {
+			lib = "work"
+		}
+		use := "use " + lib + "." + p.Decl.Text
+		switch {
+		case d == p.Decl:
+			use += ";"
+		case d.Parent == p.Region:
+			use += ".all;"
+		default:
+			return nil, false // in a nested region of the package
+		}
+		if l.Bundled {
+			use = strings.ToLower(use)
+		}
+		if lib != "work" && lib != "std" &&
+			!names(x.an.Result, u, p.Library) {
+			add("library " + lib + ";")
+		}
+		add(use)
+	}
+	return clauses, true
+}
+
+// need is a declaration a copied text names, with the name as written.
+type need struct {
+	d *sema.Decl
+	k sema.Key
+}
+
+// stringChars appends to ns, for each string literal in the expression
+// e of an array type of an enumeration type, the enumeration literal of
+// each of its characters.
+func stringChars(ns []need, e *sema.Expr) []need {
+	if e == nil {
+		return ns
+	}
+	if e.Kind == sema.ExprLiteral && e.Lit.Kind() == token.StringLiteral &&
+		e.Type != nil && e.Type.Base().Elem != nil {
+		lits := e.Type.Base().Elem.Base().Literals
+		body := e.Lit.Text()
+		if len(body) >= 2 {
+			body = body[1 : len(body)-1]
+		}
+		for i := range len(body) {
+			k := sema.Key([]byte{'\'', body[i], '\''})
+			for _, d := range lits {
+				if d.Name == k && !slices.Contains(ns, need{d, k}) {
+					ns = append(ns, need{d, k})
+				}
+			}
+		}
+	}
+	ns = stringChars(ns, e.Prefix)
+	for _, a := range e.Args {
+		ns = stringChars(ns, a)
+	}
+	for _, a := range e.Assocs {
+		for _, c := range a.Choices {
+			ns = stringChars(ns, c)
+		}
+		ns = stringChars(ns, a.Value)
+	}
+	return ns
 }
 
 // completePortMap is Complete port map on an instance whose port map
