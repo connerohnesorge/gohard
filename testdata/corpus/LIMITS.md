@@ -95,6 +95,19 @@ v1.1, since under v1.0 its units are opaque.
   GHDL and NVC continue a `-- psl` directive across a blank or non-comment
   line up to its `;`; GoHard ends it at the first line that does not
   start with `--`, so a design that relies on that fails in GoHard.
+  No design uses the PSL built-in functions (`prev`, `stable`, `rose`,
+  `fell`, `onehot`, `onehot0`, `isunknown`, #111). GHDL 6.0.0 crashes
+  on the first six ("cannot handle IIR_KIND_PSL_PREV") and does not
+  know `isunknown` ("no declaration"), so NVC 1.23.0 is their only
+  oracle, and only in the `internal/elab/psl` tests
+  (`TestBuiltinsNVC`), which hold the failure ticks NVC gives.
+  NVC crashes on `rose` and `fell` of a STD_ULOGIC ("argument to not is
+  not boolean"; those rows use the ticks NVC gives for BIT), ignores a
+  clock argument (GoHard reports it as `unsupported/construct`),
+  computes `prev(prev(a))` as `prev(a)` (GoHard: `prev(a, 2)`, by the
+  definition of `prev`), and gives 0 for `prev(i, n)` of an INTEGER
+  before the n-th sample (GoHard: the default value of the subtype,
+  INTEGER'LEFT; both give 'U' for a STD_ULOGIC).
 * **Stand-in models.** One design (`standin_model`), one opaque unit, one
   stand-in. Neither GHDL nor NVC marks modeled drivers, so the
   `modeled_drivers_marked` invariant has no tool oracle; the marking in
