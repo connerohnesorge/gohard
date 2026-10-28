@@ -1,0 +1,1 @@
+{"signatures":[{"label":"entity adder port (a : in unsigned(WIDTH - 1 downto 0); b : in unsigned(WIDTH - 1 downto 0); sum : out unsigned(WIDTH - 1 downto 0))","documentation":{"kind":"markdown","value":"from work.adder"},"parameters":[{"label":[19,54]},{"label":[56,91]},{"label":[93,131]}],"activeParameter":2}],"activeSignature":0,"activeParameter":2}

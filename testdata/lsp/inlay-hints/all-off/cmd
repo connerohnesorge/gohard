@@ -1,0 +1,2 @@
+# without inlay_hints keys every kind is off: no hint (#56).
+gohard lsp inlay-hints --at top.vhd:1:1

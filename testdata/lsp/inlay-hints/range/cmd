@@ -1,0 +1,2 @@
+# gohard lsp inlay-hints --at PATH:LINE:COL END_LINE:END_COL: only the hints in the range, here the instance (#56).
+gohard lsp inlay-hints --at top.vhd:44:1 47:1

@@ -1,0 +1,2 @@
+# inlay_hints.parameter_names turned off, the other kinds on: the types and values of inlay-hints/types and inlay-hints/values, no parameter name (#56).
+gohard lsp inlay-hints --at top.vhd:1:1

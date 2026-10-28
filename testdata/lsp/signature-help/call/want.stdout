@@ -1,0 +1,1 @@
+{"signatures":[{"label":"function clip(value : integer; limit : integer) return INTEGER","documentation":{"kind":"markdown","value":"from work.sim\n\nLimits value to at most limit."},"parameters":[{"label":[14,29]},{"label":[31,46]}],"activeParameter":1}],"activeSignature":0,"activeParameter":1}

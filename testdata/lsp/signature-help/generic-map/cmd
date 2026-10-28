@@ -1,0 +1,2 @@
+# signature-help in a generic map: the generic list of the entity, the first generic active (#56).
+gohard lsp signature-help --at top.vhd:45:18

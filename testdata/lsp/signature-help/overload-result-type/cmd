@@ -1,0 +1,2 @@
+# signature-help on the operand of -a in the overload_ops corpus design (#8): the overload chosen by the target type (return integer) comes first, as hover and definition show it (#56).
+gohard lsp signature-help --at overload_ops.vhd:28:13

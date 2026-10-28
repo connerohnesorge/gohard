@@ -1,0 +1,4 @@
+inlay_hints:
+  parameter_names: true
+  types: true
+  values: true

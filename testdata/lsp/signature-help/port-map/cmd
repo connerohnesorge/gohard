@@ -1,0 +1,2 @@
+# signature-help on a named association of a port map: the port list of the entity, the named formal active (#56).
+gohard lsp signature-help --at top.vhd:46:21

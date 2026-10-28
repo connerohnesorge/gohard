@@ -1,0 +1,2 @@
+# signature-help on the second positional actual of a call: the function with its doc comment, parameter 1 active (#56).
+gohard lsp signature-help --at top.vhd:38:45

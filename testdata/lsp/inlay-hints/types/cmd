@@ -1,0 +1,2 @@
+# inlay_hints.types: the type of an alias without a subtype indication (low_nibble, not carry) and of a loop parameter (#56).
+gohard lsp inlay-hints --at top.vhd:1:1

@@ -165,6 +165,18 @@ result; positions are zero-based UTF-8.
 | `semantic-tokens/inactive-branch` | `full`: each line of the inactive `` `elsif `` and `` `else `` branches is one comment token with the inactive modifier |
 | `semantic-tokens/non-ascii` | Latin-1 identifiers, an extended identifier, comments and a string with emoji; `TestSemanticTokensEncodings` checks the same tokens under utf-16 and utf-32 |
 | `semantic-tokens/bad-range` | a range that is not `LINE:COL-LINE:COL` is a usage error (exit 2) |
+| `signature-help/call` | `gohard lsp signature-help` (#56) on the second positional actual of a call: the function with its doc comment, parameter 1 active |
+| `signature-help/bundled-overloads` | a call of a bundled overloaded function: the overload the call resolves to first, then every other candidate with why it does not fit |
+| `signature-help/overload-result-type` | the operand of `-a` in the `overload_ops` corpus design: the overload the target type picks (return integer) first, as hover and definition give it |
+| `signature-help/generic-map` | a generic map: the entity's generic list, the first generic active |
+| `signature-help/port-map` | a named association of a port map: the entity's port list, the named formal active |
+| `signature-help/outside` | outside any call or map: `null` |
+| `inlay-hints/parameter-names` | `gohard lsp inlay-hints --at PATH:1:1` (#56) with `inlay_hints.parameter_names`: the formal before each positional actual of a call, generic map and port map; none for an actual named like its formal or a named association |
+| `inlay-hints/types` | `inlay_hints.types`: the type of an alias without a subtype indication and of a loop parameter |
+| `inlay-hints/values` | `inlay_hints.values`: the static value of constants and generic defaults, a user function call included; none for a literal or a value that is not static |
+| `inlay-hints/kind-off` | `inlay_hints.parameter_names: false` with the other kinds on: the type and value hints, no parameter name |
+| `inlay-hints/all-off` | no `inlay_hints` key: every kind is off, no hint |
+| `inlay-hints/range` | `--at PATH:44:1 47:1`: only the hints in the range (the instance) |
 
 The `waveform/` cases replace the Executor with a simulated one through
 the `viewers [NAME...]` setup directive (see `testdata/cli/README.md`).
@@ -211,7 +223,10 @@ the result it names gives the full result.
 
 `gohard lsp range-format --at PATH:LINE:COL END_LINE:END_COL` formats
 the half-open range from `--at` to the end position (both one-based,
-columns in bytes).
+columns in bytes). `gohard lsp inlay-hints --at PATH:LINE:COL
+[END_LINE:END_COL]` asks for the hints from `--at` to the end position
+(the end of the file without one), of the kinds the `inlay_hints.*`
+keys of `gohard.yaml` turn on.
 
 ```sh
 nix develop -c go test ./internal/cli -run TestLSPActionFixtures -update

@@ -1,0 +1,2 @@
+# signature-help outside any call or map: null (#56).
+gohard lsp signature-help --at top.vhd:27:3

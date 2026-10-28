@@ -1,0 +1,2 @@
+# inlay_hints.parameter_names: the formal before each positional actual of a call, generic map and port map; none for an actual named like its formal (limit) or a named association (#56).
+gohard lsp inlay-hints --at top.vhd:1:1

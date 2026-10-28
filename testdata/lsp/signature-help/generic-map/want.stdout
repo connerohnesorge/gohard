@@ -1,0 +1,1 @@
+{"signatures":[{"label":"entity adder generic (WIDTH : natural := 8; DEPTH : natural := 2 ** 4)","documentation":{"kind":"markdown","value":"from work.adder"},"parameters":[{"label":[22,42]},{"label":[44,69]}],"activeParameter":0}],"activeSignature":0,"activeParameter":0}
