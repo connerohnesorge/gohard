@@ -210,6 +210,9 @@ start with `:DapContinue`:
   reverse continue (`require('dap').step_back()`,
   `require('dap').reverse_continue()`); the stop's description shows
   the simulated time, the delta and the statement count
+* a procedure of the bundled std/ieee libraries that you step into
+  (`ieee.math_real`'s `uniform`, say) opens in a buffer of the bundled
+  text, which nvim-dap reads from the adapter
 * at the end of the run the console shows the report `gohard check
   --sim` gives, and the session ends with its exit code
 

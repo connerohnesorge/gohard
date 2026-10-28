@@ -355,7 +355,11 @@ folder.
   constants, variables and parameters) and Signals (the signals of
   its process's design entity instance and the blocks and generates
   around it), values written as messages write them and cut at 4096
-  bytes. The stopped event's description gives the time, delta and
+  bytes. A frame in a bundled std/ieee file (`ieee.math_real`'s
+  `UNIFORM`, say) has no path, which would name a project file, but a
+  `sourceReference` (its place in `stdlib.Files` plus one) that the
+  `source` request answers with the bundled text; the interpreter
+  names such statements by their bundle path (`elab.At.Src`). The stopped event's description gives the time, delta and
   statement count. At the end of the run the adapter sends the
   report `gohard check --sim` gives for the run as output, then
   `exited` with its exit code and `terminated`.

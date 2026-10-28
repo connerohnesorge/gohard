@@ -21,6 +21,9 @@ import (
 type node struct {
 	s   *sema.SeqStmt
 	src sim.SrcRef
+	// bundled marks a statement of a bundled std/ieee file, whose
+	// src.Path is its bundle path (debugSrc).
+	bundled bool
 	// Children, shaped like s's: if branches, else, case alternatives,
 	// loop and block bodies.
 	branches [][]*node
@@ -190,7 +193,8 @@ func (pc *progCache) node(f *sema.File, s *sema.SeqStmt) (*node, error) {
 	if n, ok := pc.nodes[s]; ok {
 		return n, nil
 	}
-	n := &node{s: s, src: srcOf(f, s.Node.Span())}
+	n := &node{s: s, src: srcOf(f, s.Node.Span()),
+		bundled: f != nil && f.Bundled}
 	pc.nodes[s] = n
 	var err error
 	for _, br := range s.Branches {

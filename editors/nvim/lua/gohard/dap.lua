@@ -41,7 +41,12 @@ function M.setup(opts)
       type = 'executable',
       command = o.cmd[1],
       args = vim.list_slice(o.cmd, 2),
-      options = { cwd = config.cwd or vim.fn.getcwd() },
+      options = {
+        cwd = config.cwd or vim.fn.getcwd(),
+        -- A frame in a bundled std/ieee file has no path; nvim-dap
+        -- reads its text from the adapter (a source request).
+        source_filetype = 'vhdl',
+      },
     })
   end
   local testbench = o.testbench

@@ -54,8 +54,19 @@ func (a *At) Process() int { return a.m.idx }
 // process's own statements, one more per subprogram call.
 func (a *At) Depth() int { return len(a.m.frames) }
 
-// Src is the place of the statement.
-func (a *At) Src() sim.SrcRef { return a.n.src }
+// Src is the place of the statement. A statement of a bundled
+// std/ieee file has an empty Path and its bundle path in Bundled
+// (sim.SrcRef), never a project path.
+func (a *At) Src() sim.SrcRef { return a.n.debugSrc() }
+
+// debugSrc is the place of n as a DebugHook is told of it (At.Src).
+func (n *node) debugSrc() sim.SrcRef {
+	s := n.src
+	if n.bundled {
+		s.Path, s.Bundled = "", s.Path
+	}
+	return s
+}
 
 // Now is the simulated time of the statement.
 func (a *At) Now() sim.Time {
@@ -82,7 +93,8 @@ type Frame struct {
 	// Src is the statement the frame is at: the statement starting in
 	// the innermost frame of the running process, the call in a
 	// caller, the wait statement of a suspended process. A process
-	// waiting on its sensitivity list is at its process statement.
+	// waiting on its sensitivity list is at its process statement. A
+	// statement of a bundled std/ieee file is named as At.Src names it.
 	Src sim.SrcRef
 	// Vars are the frame's objects (constants, variables, parameters,
 	// loop parameters) in declaration order.
@@ -125,7 +137,7 @@ func (a *At) Frames(p int) (frames []Frame, ok bool) {
 		}
 		if n := len(f.conts); n > 0 {
 			if c := f.conts[n-1]; c.i > 0 && c.i <= len(c.ss) {
-				fr.Src = c.ss[c.i-1].src
+				fr.Src = c.ss[c.i-1].debugSrc()
 			}
 		}
 		fr.Vars = a.vars(f)

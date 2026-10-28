@@ -16,6 +16,7 @@
 // setBreakpoints, setExceptionBreakpoints (no filters),
 // configurationDone, threads (one per process the interpreter runs),
 // stackTrace, scopes (Locals and Signals of each frame), variables,
+// source (the text of a bundled std/ieee file a frame is in),
 // continue, next, stepIn, stepOut, stepBack, reverseContinue and
 // disconnect. Any other request fails with "not supported".
 package dap
@@ -33,6 +34,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/elab"
 	"github.com/connerohnesorge/gohard/internal/env"
 	"github.com/connerohnesorge/gohard/internal/simdbg"
+	"github.com/connerohnesorge/gohard/internal/stdlib"
 	"github.com/connerohnesorge/gohard/internal/trace"
 )
 
@@ -188,6 +190,8 @@ func (s *Server) Handle(body []byte) [][]byte {
 		s.scopes(o, req)
 	case "variables":
 		s.variables(o, req)
+	case "source":
+		s.source(o, req)
 	case "continue":
 		s.move(o, req, simdbg.Continue,
 			map[string]any{"allThreadsContinued": true})
@@ -263,6 +267,8 @@ func (o *out) output(text string) {
 type source struct {
 	Name string `json:"name,omitempty"`
 	Path string `json:"path,omitempty"`
+	// SourceReference names a bundled std/ieee file (bundledSource).
+	SourceReference int `json:"sourceReference,omitempty"`
 }
 
 type breakpoint struct {
@@ -514,15 +520,56 @@ func (s *Server) stackTrace(o *out, req request) {
 		}
 		sf := stackFrame{ID: s.base[i] + k + 1, Name: f.Name,
 			Line: s.lineOut(f.Src.Line), Column: s.colOut(f.Src.Col)}
-		if f.Src.Path != "" {
+		switch {
+		case f.Src.Path != "":
 			sf.Source = &source{Name: path.Base(f.Src.Path),
 				Path: filepath.Join(s.l.Root,
 					filepath.FromSlash(f.Src.Path))}
+		case f.Src.Bundled != "":
+			sf.Source = bundledSource(f.Src.Bundled)
 		}
 		fs = append(fs, sf)
 	}
 	o.reply(req, map[string]any{"stackFrames": fs,
 		"totalFrames": len(th.Frames)})
+}
+
+// bundledSource is the source of the bundled std/ieee file at bundle
+// path p (nil when there is none). The file is not on disk, so the
+// source has no path, only a sourceReference, the file's place in
+// stdlib.Files plus one, whose text the client reads with a source
+// request.
+func bundledSource(p string) *source {
+	i := slices.IndexFunc(stdlib.Files(), func(f stdlib.File) bool {
+		return f.Path == p
+	})
+	if i < 0 {
+		return nil
+	}
+	return &source{Name: path.Base(p), SourceReference: i + 1}
+}
+
+// source answers with the text of the bundled file a sourceReference
+// names (bundledSource).
+func (s *Server) source(o *out, req request) {
+	var a struct {
+		Source *struct {
+			SourceReference int `json:"sourceReference"`
+		} `json:"source"`
+		SourceReference int `json:"sourceReference"`
+	}
+	_ = json.Unmarshal(req.Arguments, &a)
+	ref := a.SourceReference
+	if a.Source != nil && a.Source.SourceReference != 0 {
+		ref = a.Source.SourceReference
+	}
+	if fs := stdlib.Files(); ref >= 1 && ref <= len(fs) {
+		if b, ok := stdlib.Source(fs[ref-1].Path); ok {
+			o.reply(req, map[string]any{"content": string(b)})
+			return
+		}
+	}
+	o.fail(req, "no source "+strconv.Itoa(ref))
 }
 
 // Each frame f has two scopes: its locals, variables reference 2f-1,
