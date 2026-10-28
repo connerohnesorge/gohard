@@ -13,9 +13,10 @@ import (
 
 // Units returns the coverable units of the design elaborated from top
 // (elab.Design.Top) in the analysis r, in unit order: the entity and
-// architecture of every entity instance, every unit those depend on
-// (Unit.Deps, transitively) and the body of every package among them,
-// except the bundled std/ieee units, opaque units and duplicates.
+// architecture of every entity instance and the PSL verification units
+// bound to it (#66), every unit those depend on (Unit.Deps,
+// transitively) and the body of every package among them, except the
+// bundled std/ieee units, opaque units and duplicates.
 func Units(r *sema.Result, top *hier.Instance) []*sema.Unit {
 	seen := map[*sema.Unit]bool{} // lookup only
 	var out, stack []*sema.Unit
@@ -37,6 +38,9 @@ func Units(r *sema.Result, top *hier.Instance) []*sema.Unit {
 				push(in.Entity.Unit)
 			}
 			push(in.Arch)
+			for _, v := range in.Vunits {
+				push(v)
+			}
 		}
 		insts = append(insts, in.Children...)
 	}

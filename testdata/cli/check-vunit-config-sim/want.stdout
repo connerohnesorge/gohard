@@ -1,0 +1,4 @@
+props.vhd:5:3: error[sim/assert-error]: assertion error: comp: a without b
+props.vhd:10:3: hint[sim/cover-hit]: cover spec_pulse (spec: a pulse) hit 1 times
+props.vhd:15:3: hint[sim/cover-hit]: cover top_ab (top: a then b) hit 1 times
+summary: 1 errors, 0 warnings, 2 hints, 4 files

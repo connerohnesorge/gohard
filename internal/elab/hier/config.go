@@ -8,6 +8,8 @@ package hier
 // unit's expressions.
 
 import (
+	"cmp"
+	"slices"
 	"strings"
 
 	"github.com/connerohnesorge/gohard/internal/cst"
@@ -36,6 +38,9 @@ type binding struct {
 	ports bool
 	// aspect is set when the binding indication has an entity aspect.
 	aspect bool
+	// vunits are the PSL verification units the binding's verification
+	// unit binding indications name (#66).
+	vunits []*sema.Unit
 }
 
 // bindAssoc is one association of a binding's generic map.
@@ -86,7 +91,69 @@ func (b *builder) configuration(u *sema.Unit) *binding {
 		bc.arch = sema.TokenKey(sp.FirstToken())
 	}
 	return &binding{entity: u.Decl.Spec, arch: bc.arch, block: bc,
-		config: u}
+		config: u, vunits: b.vunitsOf(u, cd.Node)}
+}
+
+// vunitsOf returns the PSL verification units that the verification
+// unit binding indications (`use vunit v, w;`, LRM 7.3.4) among the
+// children of n, written in unit u, name, as sema resolved them.
+func (b *builder) vunitsOf(u *sema.Unit, n cst.Node) []*sema.Unit {
+	if u == nil || u.File == nil {
+		return nil
+	}
+	var out []*sema.Unit
+	for vb := range n.Children[cst.VerificationUnitBinding]() {
+		for name := range vb.Names() {
+			ref, ok := b.r.RefAt(u.File.Path,
+				name.Node.LastToken().Span().Start)
+			if !ok || ref.Decl == nil {
+				continue
+			}
+			v := ref.Decl.Denotes().Unit
+			if ref.Decl.Denotes().Kind == sema.DeclVunit && v != nil &&
+				!slices.Contains(out, v) {
+				out = append(out, v)
+			}
+		}
+	}
+	return out
+}
+
+// inlineVunits returns the PSL verification units of r bound in their
+// own declaration (vunit v(e(a))), in canonical order.
+func inlineVunits(r *sema.Result) []*sema.Unit {
+	var out []*sema.Unit
+	for _, u := range r.Units {
+		if u.Kind == sema.UnitVunit && u.Decl != nil && !u.Duplicate &&
+			!u.Opaque && u.BoundInline() {
+			out = append(out, u)
+		}
+	}
+	return out
+}
+
+// vunits returns the verification units bound to the entity instance
+// in, whose binding is bd (#66): the units bound inline to its design
+// entity (sema.Unit.Binds) and those bd's verification unit binding
+// indications name, in canonical order, each once.
+func (b *builder) vunits(in *Instance, bd *binding) []*sema.Unit {
+	var out []*sema.Unit
+	for _, u := range b.inline {
+		if u.Binds(in.Entity.Unit, in.Arch) {
+			out = append(out, u)
+		}
+	}
+	if bd != nil {
+		for _, u := range bd.vunits {
+			if !slices.Contains(out, u) && !u.Opaque && !u.Duplicate {
+				out = append(out, u)
+			}
+		}
+	}
+	slices.SortFunc(out, func(x, y *sema.Unit) int {
+		return cmp.Compare(x.Index, y.Index)
+	})
+	return out
 }
 
 // nested returns the block configuration inside bc for the block or
@@ -234,6 +301,8 @@ func (b *builder) componentBinding(s *sema.Stmt, sc scope,
 				continue
 			}
 			bd := b.bindingOf(bc.unit, cc.Binding())
+			bd.vunits = append(bd.vunits, b.vunitsOf(bc.unit,
+				cc.Node)...)
 			if blk := cc.Block(); !blk.IsZero() {
 				bd.block = &blockConfig{unit: bc.unit, node: blk}
 				if sp := blk.Spec(); !sp.IsZero() &&
@@ -262,6 +331,7 @@ func (b *builder) componentBinding(s *sema.Stmt, sc scope,
 		if inc.arch != "" && bd.arch == "" {
 			bd.arch = inc.arch
 		}
+		bd.vunits = append(bd.vunits, inc.vunits...)
 	}
 	return bd
 }
@@ -293,6 +363,8 @@ func (b *builder) specBinding(s *sema.Stmt, sc scope) *binding {
 			if bd.entity == nil && cf.Binding().Entity().IsZero() {
 				bd.entity = b.defaultEntity(s)
 			}
+			bd.vunits = append(bd.vunits, b.vunitsOf(sc.unit,
+				cf.Node)...)
 			return bd
 		}
 	}

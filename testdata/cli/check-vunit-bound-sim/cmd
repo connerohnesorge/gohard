@@ -1,5 +1,7 @@
-# The bound vunit of check-vunit-bound under --sim (#110): GoHard does
-# not simulate verification units yet (#66), so elaborating dut(rtl)
-# stops with one unsupported/construct at the vunit (exit 2) instead of
-# a pass without its assertion.
+# The bound vunit of check-vunit-bound under --sim (#66): its assertion
+# runs in tb.u, the instance of dut(rtl), and fails at the 25 ns rising
+# edge (a = '1', b = '0'), which halts the run at the default
+# stop_level. GHDL 6.0.0 runs no vunit item (--psl-report lists no
+# assertion) and NVC 1.23.0 cannot parse vunits, so the time is
+# hand-checked.
 gohard check --sim --seed 0 --tb tb

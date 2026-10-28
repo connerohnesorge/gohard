@@ -1,0 +1,4 @@
+simulation:
+  testbenches: [cfg]
+  # Run on past the assert error at 25 ns, so the covers show too.
+  stop_level: failure

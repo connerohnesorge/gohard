@@ -89,6 +89,13 @@ type Instance struct {
 	Configuration *sema.Unit
 	Generics      []Generic
 	Children      []*Instance
+	// Vunits are the PSL verification units bound to a KindEntity
+	// instance (#66): the units bound in their declaration to its
+	// entity, or to its entity and architecture (vunit v(e(a))), and
+	// the units the verification unit binding indications (use vunit)
+	// of the configuration items that bound it name, in canonical
+	// order, each once.
+	Vunits []*sema.Unit
 	// Stmt is the statement that creates the instance (nil for tops);
 	// Alt the chosen alternative of an if or case generate, Param the
 	// value of a for generate's parameter.
@@ -170,7 +177,7 @@ func Build(r *sema.Result, o Options) *Result {
 		}
 	}
 	base.SetNativeBodies(o.NativeBodies)
-	b := &builder{r: r, o: o, out: &Result{},
+	b := &builder{r: r, o: o, out: &Result{}, inline: inlineVunits(r),
 		base:    base,
 		exprs:   map[*sema.Unit]map[[2]int]*sema.Expr{},
 		indep:   map[*sema.Decl]bool{},
@@ -217,6 +224,9 @@ type builder struct {
 	asgDone map[*sema.Assign]bool
 	spent   int64
 	capped  bool
+	// inline are the verification units bound in their declaration
+	// (config.go).
+	inline []*sema.Unit
 }
 
 type top struct {
@@ -408,6 +418,7 @@ func (b *builder) entity(in *Instance, s *sema.Stmt, bd *binding,
 		arch = bc.arch
 	}
 	in.Arch = b.architecture(eu, arch)
+	in.Vunits = b.vunits(in, bd)
 	if depth >= b.o.MaxDepth {
 		// Not the step limit: the design nests deeper than any real
 		// hierarchy, so its instantiation recurses without end.

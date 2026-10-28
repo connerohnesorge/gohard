@@ -1,0 +1,84 @@
+gohard-trace 1
+testbench tb
+end 60000000
+type std_logic logic
+scope tb instance tb(sim)
+scope tb.u1 instance dut(rtl)
+scope tb.u1.v_comp block
+scope tb.u2 instance dut(rtl)
+scope tb.u2.v_spec block
+scope tb.v_top block
+signal tb.a std_logic signal
+signal tb.b std_logic signal
+signal tb.clk std_logic signal
+signal tb.u1.a std_logic in
+signal tb.u1.b std_logic in
+signal tb.u1.clk std_logic in
+signal tb.u2.a std_logic in
+signal tb.u2.b std_logic in
+signal tb.u2.clk std_logic in
+process 1 tb._p0
+process 2 tb._p1
+process 3 tb.u1.v_comp.comp_ab
+process 4 tb.u2.v_spec.spec_pulse
+process 5 tb.v_top.top_ab
+0 0 tb.a 0 -
+0 0 tb.b 0 -
+0 0 tb.clk 0 -
+0 0 tb.u1.a 0 -
+0 0 tb.u1.b 0 -
+0 0 tb.u1.clk 0 -
+0 0 tb.u2.a 0 -
+0 0 tb.u2.b 0 -
+0 0 tb.u2.clk 0 -
+5000000 0 tb.clk 1 p1
+5000000 0 tb.u1.clk 1 p1
+5000000 0 tb.u2.clk 1 p1
+10000000 0 tb.clk 0 p1
+10000000 0 tb.u1.clk 0 p1
+10000000 0 tb.u2.clk 0 p1
+15000000 0 tb.clk 1 p1
+15000000 0 tb.u1.clk 1 p1
+15000000 0 tb.u2.clk 1 p1
+20000000 0 tb.clk 0 p1
+20000000 0 tb.u1.clk 0 p1
+20000000 0 tb.u2.clk 0 p1
+22000000 1 tb.a 1 p2
+22000000 1 tb.u1.a 1 p2
+22000000 1 tb.u2.b 1 p2
+25000000 0 tb.clk 1 p1
+25000000 0 tb.u1.clk 1 p1
+25000000 0 tb.u2.clk 1 p1
+25000000 0 ! assert error props.vhd:5 p3 "comp: a without b"
+30000000 0 tb.clk 0 p1
+30000000 0 tb.u1.clk 0 p1
+30000000 0 tb.u2.clk 0 p1
+32000000 1 tb.a 0 p2
+32000000 1 tb.b 1 p2
+32000000 1 tb.u1.a 0 p2
+32000000 1 tb.u1.b 1 p2
+32000000 1 tb.u2.a 1 p2
+32000000 1 tb.u2.b 0 p2
+35000000 0 tb.clk 1 p1
+35000000 0 tb.u1.clk 1 p1
+35000000 0 tb.u2.clk 1 p1
+35000000 0 ! cover-hit - props.vhd:15 p5 "top: a then b"
+40000000 0 tb.clk 0 p1
+40000000 0 tb.u1.clk 0 p1
+40000000 0 tb.u2.clk 0 p1
+42000000 1 tb.b 0 p2
+42000000 1 tb.u1.b 0 p2
+42000000 1 tb.u2.a 0 p2
+45000000 0 tb.clk 1 p1
+45000000 0 tb.u1.clk 1 p1
+45000000 0 tb.u2.clk 1 p1
+45000000 0 ! cover-hit - props.vhd:10 p4 "spec: a pulse"
+50000000 0 tb.clk 0 p1
+50000000 0 tb.u1.clk 0 p1
+50000000 0 tb.u2.clk 0 p1
+55000000 0 tb.clk 1 p1
+55000000 0 tb.u1.clk 1 p1
+55000000 0 tb.u2.clk 1 p1
+60000000 0 tb.clk 0 p1
+60000000 0 tb.u1.clk 0 p1
+60000000 0 tb.u2.clk 0 p1

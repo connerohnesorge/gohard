@@ -1,2 +1,2 @@
-props.vhd:1:7: error[unsupported/construct]: simulating PSL verification units is not supported yet, please report
+props.vhd:3:3: error[sim/assert-error]: assertion error: assertion _p0 failed
 summary: 1 errors, 0 warnings, 0 hints, 3 files

@@ -1,0 +1,35 @@
+gohard-trace 1
+testbench tb
+end 25000000
+type std_logic logic
+scope tb instance tb(sim)
+scope tb.u instance dut(rtl)
+scope tb.u.v_dut block
+signal tb.a std_logic signal
+signal tb.b std_logic signal
+signal tb.clk std_logic signal
+signal tb.u.a std_logic in
+signal tb.u.b std_logic in
+signal tb.u.clk std_logic in
+process 1 tb._p0
+process 2 tb._p1
+process 3 tb.u.v_dut._p0
+0 0 tb.a 0 -
+0 0 tb.b 0 -
+0 0 tb.clk 0 -
+0 0 tb.u.a 0 -
+0 0 tb.u.b 0 -
+0 0 tb.u.clk 0 -
+5000000 0 tb.clk 1 p1
+5000000 0 tb.u.clk 1 p1
+10000000 0 tb.clk 0 p1
+10000000 0 tb.u.clk 0 p1
+15000000 0 tb.clk 1 p1
+15000000 0 tb.u.clk 1 p1
+20000000 0 tb.clk 0 p1
+20000000 0 tb.u.clk 0 p1
+22000000 1 tb.a 1 p2
+22000000 1 tb.u.a 1 p2
+25000000 0 tb.clk 1 p1
+25000000 0 tb.u.clk 1 p1
+25000000 0 ! assert error props.vhd:3 p3 "assertion _p0 failed"

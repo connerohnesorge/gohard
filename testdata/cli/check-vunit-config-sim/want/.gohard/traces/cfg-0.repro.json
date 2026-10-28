@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "version": "0.0.0-dev",
+  "commit": "unknown",
+  "ieee": "1076-2019 16a012320947d378611cc7457f64ed76cb52bac4",
+  "go": "unknown",
+  "standard": "2008",
+  "testbench": "cfg",
+  "seed": 0,
+  "defines": {},
+  "budgets": {
+    "time": "1 ms",
+    "delta": 10000,
+    "step": 50000000
+  },
+  "models": {},
+  "config": {
+    "path": "gohard.yaml",
+    "sha256": "3de0414874d9f9abfbce0c88f51231ac859c98706a2157015623c08a80ca3903"
+  },
+  "sources": [
+    {
+      "path": "cfg.vhd",
+      "sha256": "f34de383da1d401829a634b511b4107717b3ee9a208a8c228df666b643be456a"
+    },
+    {
+      "path": "dut.vhd",
+      "sha256": "e5b68e52bdc1b37ca5e6c1f208e020afcd84d9c1f75d76588007c81265571a15"
+    },
+    {
+      "path": "props.vhd",
+      "sha256": "b9af2a0430806ff93f0d0a337afcf0d8a2b986a1c125740913ecdea65910aabe"
+    },
+    {
+      "path": "tb.vhd",
+      "sha256": "02fef41823edb9952b5765d3156f5c1587db139b3d85b4556071e0a6d50967ed"
+    }
+  ],
+  "env": {
+    "epoch": "2000-01-01T00:00:00Z",
+    "vars": {},
+    "real": false
+  }
+}

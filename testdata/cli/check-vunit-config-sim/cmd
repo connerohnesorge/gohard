@@ -1,0 +1,6 @@
+# check-vunit-config under --sim with the configuration cfg as the
+# testbench (#66): v_comp runs in tb.u1 and fails at 25 ns (a = '1',
+# b = '0'), v_spec in tb.u2 is hit at 45 ns (u2.a is tb.b: '1' at
+# 35 ns, '0' at 45 ns) and v_top in tb at 35 ns. GHDL 6.0.0 and NVC
+# 1.23.0 cannot parse `use vunit`, so the times are hand-checked.
+gohard check --sim --tb cfg

@@ -114,8 +114,6 @@ type Design struct {
 	// order.
 	varPorts map[sigKey]sharedKey
 	ownPorts []sharedKey
-	// vunits are the design's PSL verification units (boundVunit).
-	vunits []*sema.Unit
 	// native runs the ieee functions with a native body natively
 	// (not Options.InterpretedBodies).
 	native bool
@@ -195,11 +193,6 @@ func Elaborate(r *sema.Result, o Options) (*Design, []diag.Diagnostic) {
 		d.runtime(d.declSrc(g), top.Path, errors.New("the generic "+
 			g.Text+" of the testbench "+top.Path+" has no default"))
 		return d, d.diags
-	}
-	for _, u := range r.Units {
-		if u.Kind == sema.UnitVunit {
-			d.vunits = append(d.vunits, u)
-		}
 	}
 	d.instance(top)
 	if d.stopped {
@@ -362,9 +355,6 @@ func (d *Design) instance(in *hier.Instance) {
 	d.standIn(in)
 	switch in.Kind {
 	case hier.KindEntity:
-		if d.boundVunit(in) {
-			return
-		}
 		unit := in.Entity.Text
 		if in.Arch != nil {
 			unit += "(" + string(in.Arch.Name) + ")"
@@ -374,17 +364,20 @@ func (d *Design) instance(in *hier.Instance) {
 			Unit: strings.ToLower(unit)})
 		eu := in.Entity.Unit
 		d.ports(in)
-		d.declarations(in, in.Entity.Region)
-		d.body(in, eu.Body, eu.File)
+		d.declarations(in, in.Entity.Region, in.Path)
+		d.body(in, eu.Body, eu.File, in.Path)
 		if in.Arch != nil {
-			d.declarations(in, in.Arch.Region)
-			d.body(in, in.Arch.Body, in.Arch.File)
+			d.declarations(in, in.Arch.Region, in.Path)
+			d.body(in, in.Arch.Body, in.Arch.File, in.Path)
+		}
+		for _, v := range in.Vunits {
+			d.vunit(in, v)
 		}
 	case hier.KindBlock:
 		d.Model.Scopes = append(d.Model.Scopes, trace.Scope{
 			Path: in.Path, Kind: trace.Block})
-		d.declarations(in, in.Stmt.Region)
-		d.body(in, in.Stmt.Body, d.fileOf(in))
+		d.declarations(in, in.Stmt.Region, in.Path)
+		d.body(in, in.Stmt.Body, d.fileOf(in), in.Path)
 	case hier.KindGenerate:
 		kind := trace.ForGenerate
 		switch in.Stmt.Kind {
@@ -396,34 +389,62 @@ func (d *Design) instance(in *hier.Instance) {
 		d.Model.Scopes = append(d.Model.Scopes, trace.Scope{
 			Path: in.Path, Kind: kind})
 		if in.Alt != nil {
-			d.declarations(in, in.Alt.Region)
-			d.body(in, in.Alt.Body, d.fileOf(in))
+			d.declarations(in, in.Alt.Region, in.Path)
+			d.body(in, in.Alt.Body, d.fileOf(in), in.Path)
 		} else {
-			d.declarations(in, in.Stmt.Region)
-			d.body(in, in.Stmt.Body, d.fileOf(in))
+			d.declarations(in, in.Stmt.Region, in.Path)
+			d.body(in, in.Stmt.Body, d.fileOf(in), in.Path)
 		}
 	}
 }
 
-// boundVunit stops elaboration at a PSL verification unit bound to the
-// design entity of in (#110): GoHard does not simulate verification
-// units yet (#66), so the run ends with one unsupported/construct at
-// the vunit rather than passing without its directives.
-func (d *Design) boundVunit(in *hier.Instance) bool {
-	for _, u := range d.vunits {
-		if u.Decl == nil || !u.Binds(in.Entity.Unit, in.Arch) {
-			continue
-		}
-		d.unsupported(d.declSrc(u.Decl), cVunitSim)
+// vunit elaborates the PSL verification unit v bound to the entity
+// instance in (#66): its items belong to in's design entity (IEEE 1850
+// 7.2, LRM 7.3.4), so its directives and processes run in in and read
+// in's signals. They are named under in.Path + "." + v's name (a block
+// scope in the trace): tb.dut.v.a1, unlabeled ones _p0, _p1 within v.
+// A unit sema analyzed against another design entity (one unbound unit
+// bound to two), a structural statement in v and an inherit of other
+// units stop the run with unsupported/construct.
+func (d *Design) vunit(in *hier.Instance, v *sema.Unit) {
+	if d.stopped || v.Decl == nil {
+		return
+	}
+	stop := func(n cst.Node, what string) {
+		d.unsupported(srcOf(v.File, n.Span()), what)
 		d.stopped = true
-		return true
 	}
-	return false
+	if !v.Binds(in.Entity.Unit, in.Arch) {
+		stop(v.Decl.Node, cVunitTwice)
+		return
+	}
+	for c := range v.Lib.Nodes() {
+		if c.Kind() == cst.KindPSLInheritSpec {
+			stop(c, cVunitInherit)
+			return
+		}
+	}
+	for _, s := range v.Body {
+		if s.Kind != sema.StmtOther && s.Kind != sema.StmtProcess {
+			stop(s.Node, cVunitStructure)
+			return
+		}
+	}
+	path := in.Path + "." + string(v.Name)
+	d.Model.Scopes = append(d.Model.Scopes, trace.Scope{Path: path,
+		Kind: trace.Block})
+	d.declarations(in, v.Region, path)
+	d.body(in, v.Body, v.File, path)
 }
 
-// cVunitSim names the PSL verification units the simulator does not
-// run yet.
-const cVunitSim = "simulating PSL verification units"
+// The PSL verification unit constructs the simulator does not run.
+const (
+	cVunitTwice = "a PSL verification unit bound to more than one " +
+		"design entity"
+	cVunitInherit   = "inherit in a PSL verification unit"
+	cVunitStructure = "instances, blocks and generate statements in a " +
+		"PSL verification unit"
+)
 
 // fileOf returns the source file of a block or generate instance.
 func (d *Design) fileOf(in *hier.Instance) *sema.File {
@@ -439,8 +460,11 @@ func (d *Design) fileOf(in *hier.Instance) *sema.File {
 }
 
 // body elaborates the concurrent statements ss of in: processes in
-// order, and the child instances each structural statement created.
-func (d *Design) body(in *hier.Instance, ss []*sema.Stmt, f *sema.File) {
+// order, named under prefix, and the child instances each structural
+// statement created.
+func (d *Design) body(in *hier.Instance, ss []*sema.Stmt, f *sema.File,
+	prefix string,
+) {
 	unlabeled := 0
 	for _, s := range ss {
 		if d.stopped {
@@ -461,7 +485,7 @@ func (d *Design) body(in *hier.Instance, ss []*sema.Stmt, f *sema.File) {
 				name = "_p" + strconv.Itoa(unlabeled)
 				unlabeled++
 			}
-			d.process(in, s, f, in.Path+"."+name)
+			d.process(in, s, f, prefix+"."+name)
 		default:
 			if s.Label == nil {
 				unlabeled++
@@ -534,8 +558,11 @@ func seqTargets(ss []*sema.SeqStmt) []*sema.Expr {
 	return out
 }
 
-// declarations declares the signals of region r in instance in.
-func (d *Design) declarations(in *hier.Instance, r *sema.Region) {
+// declarations declares the signals of region r in instance in, named
+// under prefix.
+func (d *Design) declarations(in *hier.Instance, r *sema.Region,
+	prefix string,
+) {
 	if r == nil {
 		return
 	}
@@ -550,7 +577,7 @@ func (d *Design) declarations(in *hier.Instance, r *sema.Region) {
 		if !ok {
 			continue
 		}
-		sig := sim.Signal{Path: in.Path + "." + string(x.Name), Type: t,
+		sig := sim.Signal{Path: prefix + "." + string(x.Name), Type: t,
 			Init: init, Dir: trace.Internal, Src: d.declSrc(x)}
 		d.resolution(&sig, x.Type)
 		d.add(in, x, sig)
