@@ -3,6 +3,7 @@ package hier
 import (
 	"flag"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -65,6 +66,15 @@ func analyzeDesign(t *testing.T, dir string, d corpusDesign,
 		c, _ = config.Parse(d.Config, cb)
 	}
 	c.Standard = d.Standard
+	if len(d.Defines) > 0 {
+		// The design's defines mirror its config; a variant's are
+		// --define arguments over it.
+		var args []string
+		for _, k := range slices.Sorted(maps.Keys(d.Defines)) {
+			args = append(args, k+"="+d.Defines[k])
+		}
+		c, _, _ = config.ApplyDefines(c, args)
+	}
 	var srcs []sema.Source
 	for _, i := range order {
 		f := d.Files[i]

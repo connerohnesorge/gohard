@@ -111,4 +111,23 @@ func newWorkDir(files map[string][]byte, order []string) (*workDir,
 	return w, nil
 }
 
+// addInputs copies the input files of d into the work directory, at
+// their design-relative paths, as the design reads them while it runs.
+func (w *workDir) addInputs(x *ctx, d design) error {
+	files, err := inputFiles(x, d)
+	if err != nil {
+		return err
+	}
+	for _, rel := range d.Inputs {
+		name := filepath.Join(w.dir, filepath.FromSlash(rel))
+		if err := os.MkdirAll(filepath.Dir(name), 0o755); err != nil {
+			return err
+		}
+		if err := os.WriteFile(name, files[rel], 0o644); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (w *workDir) close() { os.RemoveAll(w.dir) }

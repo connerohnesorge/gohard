@@ -16,5 +16,5 @@ func Races(r Run, src map[string][]byte, code simrun.CodeFunc,
 		return nil
 	}
 	return simrun.Races(simrun.Options{Result: res, Sim: cfg.Simulation,
-		Testbench: r.Design.Testbench, Code: code}, seeds)
+		Testbench: r.Design.Testbench, Code: r.Code(src, code)}, seeds)
 }

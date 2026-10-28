@@ -13,6 +13,8 @@ import (
 	"strings"
 
 	"go.yaml.in/yaml/v3"
+
+	"github.com/connerohnesorge/gohard/internal/config"
 )
 
 // manifestPath is corpus.yaml, relative to the repository root.
@@ -25,6 +27,8 @@ type manifest struct {
 	Regression []regEntry `yaml:"regression"`
 }
 
+// design is a corpus design; Inputs are the checked-in data files it
+// reads while it runs, which every tool work directory holds.
 type design struct {
 	Name     string            `yaml:"name"`
 	Standard string            `yaml:"standard"`
@@ -32,6 +36,7 @@ type design struct {
 	Defines  map[string]string `yaml:"defines"`
 	Models   map[string]string `yaml:"models"`
 	Config   string            `yaml:"config"`
+	Inputs   []string          `yaml:"inputs"`
 	Variants []variant         `yaml:"variants"`
 	GHDL     toolEntry         `yaml:"ghdl"`
 	NVC      toolEntry         `yaml:"nvc"`
@@ -63,10 +68,31 @@ type fileEntry struct {
 	Standard string `yaml:"standard"`
 }
 
+// variant is a variant run; Defines are its --define arguments over
+// the design config's defines: (NVC -D).
 type variant struct {
-	Name     string      `yaml:"name"`
-	Standard string      `yaml:"standard"`
-	Files    []fileEntry `yaml:"files"`
+	Name     string            `yaml:"name"`
+	Standard string            `yaml:"standard"`
+	Defines  map[string]string `yaml:"defines"`
+	Files    []fileEntry       `yaml:"files"`
+}
+
+// runDefines are the defines of a run: the config's, overridden by the
+// variant's --define arguments as the command line overrides them.
+func runDefines(cfg config.Config, over map[string]string) (
+	[]config.Define, error) {
+	if len(over) == 0 {
+		return cfg.Defines, nil
+	}
+	var args []string
+	for _, k := range sortedKeys(over) {
+		args = append(args, k+"="+over[k])
+	}
+	c, _, ds := config.ApplyDefines(cfg, args)
+	if len(ds) > 0 {
+		return nil, fmt.Errorf("--define: %s", ds[0].Message)
+	}
+	return c.Defines, nil
 }
 
 type toolEntry struct {

@@ -27,8 +27,10 @@
 //
 //   - format (#32): every corpus file is formatted with the design's
 //     format.* options; GHDL and NVC analyze the original and the
-//     formatted files, and golden/format.{ghdl,nvc}.txt record that the
-//     formatted text adds no errors. Hash: format_oracle_sha256.
+//     formatted files (NVC with the run's defines: the config's, or a
+//     variant's `defines` over them), and golden/format.{ghdl,nvc}.txt
+//     record that the formatted text adds no errors. Hash:
+//     format_oracle_sha256.
 //
 //   - semerr (#34, R12): the semantic-error oracle. GHDL and NVC
 //     analyze every PR-set file (the corpus designs, GHDL's testsuite
@@ -49,10 +51,11 @@
 //   - trace (#36, #8): GHDL (--vcd) and NVC (--wave --format=vcd
 //     --dump-arrays) run the main run of each design with a trace
 //     oracle (the design's `oracle` field), the opaque IEEE 1735
-//     files left out (the stand-in replaces them), with the design's
-//     stop_level as --assert-level/--exit-severity, -fpsl/--psl when
-//     it sets psl.comments, and the expected stop_time as --stop-time
-//     for a "bounded" tool result. The dumps
+//     files left out (the stand-in replaces them), the design's
+//     `inputs` in the work directory (hashed into the sources line),
+//     with the design's stop_level as --assert-level/--exit-severity,
+//     -fpsl/--psl when it sets psl.comments, and the expected
+//     stop_time as --stop-time for a "bounded" tool result. The dumps
 //     become golden/oracle.{ghdl,nvc}.txt (corpus.Oracle: settled
 //     values per time under GoHard's hierarchical paths, the first
 //     corpus.OracleLines changes plus a digest of all). The check

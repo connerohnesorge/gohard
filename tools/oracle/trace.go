@@ -84,7 +84,23 @@ func runSources(x *ctx, d design) ([]string, map[string][]byte, error) {
 	return order, files, nil
 }
 
-// sourcesHash identifies the analysed sources and config of a run.
+// inputFiles reads the input files of d (design-relative path to
+// bytes).
+func inputFiles(x *ctx, d design) (map[string][]byte, error) {
+	out := map[string][]byte{}
+	for _, p := range d.Inputs {
+		rel := path.Join(d.dir(), p)
+		b, err := readRepo(x.root, rel)
+		if err != nil {
+			return nil, corpus.Missing(rel, err)
+		}
+		out[p] = b
+	}
+	return out, nil
+}
+
+// sourcesHash identifies the analysed sources, the input files and the
+// config of a run.
 func sourcesHash(x *ctx, d design) (string, error) {
 	order, files, err := runSources(x, d)
 	if err != nil {
@@ -94,6 +110,13 @@ func sourcesHash(x *ctx, d design) (string, error) {
 	for i, p := range order {
 		gs = append(gs, goldenFile{Name: fmt.Sprintf("%03d %s", i, p),
 			Data: files[p]})
+	}
+	inputs, err := inputFiles(x, d)
+	if err != nil {
+		return "", err
+	}
+	for _, p := range d.Inputs {
+		gs = append(gs, goldenFile{Name: "input " + p, Data: inputs[p]})
 	}
 	if d.Config != "" {
 		b, err := readRepo(x.root, path.Join(d.dir(), d.Config))
@@ -170,6 +193,9 @@ func simulate(x *ctx, tl *toolset, d design, tool string) ([]byte,
 		return nil, "", err
 	}
 	defer w.close()
+	if err := w.addInputs(x, d); err != nil {
+		return nil, "", err
+	}
 	stop := toolStop(d, tool)
 	var steps [][]string
 	switch tool {

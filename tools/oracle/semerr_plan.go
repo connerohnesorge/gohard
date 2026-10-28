@@ -757,14 +757,19 @@ func planDesign(x *ctx, d design) (*semPlan, error) {
 		cfg = c
 	}
 	p := &semPlan{}
-	add := func(name, std string, files []fileEntry) error {
+	add := func(name, std string, over map[string]string,
+		files []fileEntry) error {
 		s, ok := token.ParseStandard(std)
 		if !ok {
 			return fmt.Errorf("%s: run %s: standard %q", d.Name, name, std)
 		}
+		defs, err := runDefines(cfg, over)
+		if err != nil {
+			return fmt.Errorf("%s: run %s: %w", d.Name, name, err)
+		}
 		r := &semRun{ID: "corpus:" + d.Name + ":" + name,
 			Golden: semGoldenOf(d.Name), Dir: d.dir(), Std: s,
-			GHDLStd: toGHDLStd(s), Defines: cfg.Defines}
+			GHDLStd: toGHDLStd(s), Defines: defs}
 		for _, e := range files {
 			r.Files = append(r.Files, semFile{Arg: e.Path,
 				Path: path.Join(d.dir(), e.Path), Lib: work,
@@ -777,11 +782,12 @@ func planDesign(x *ctx, d design) (*semPlan, error) {
 	for _, m := range d.modelPaths() {
 		main = append(main, fileEntry{Path: m, Standard: d.Standard})
 	}
-	if err := add("main", d.Standard, append(main, d.Files...)); err != nil {
+	if err := add("main", d.Standard, nil,
+		append(main, d.Files...)); err != nil {
 		return nil, err
 	}
 	for _, v := range d.Variants {
-		if err := add(v.Name, v.Standard, v.Files); err != nil {
+		if err := add(v.Name, v.Standard, v.Defines, v.Files); err != nil {
 			return nil, err
 		}
 	}

@@ -23,11 +23,21 @@ const Dir = "testdata/corpus"
 // Manifest is the part of corpus.yaml the harness reads.
 type Manifest struct {
 	Schema     int          `yaml:"schema"`
+	Vocabulary Vocabulary   `yaml:"vocabulary"`
 	Designs    []Design     `yaml:"designs"`
 	Regression []Regression `yaml:"regression"`
 }
 
-// Design is one corpus design entry.
+// Vocabulary holds the fixed feature and invariant ids a design may
+// name.
+type Vocabulary struct {
+	Features   []struct{ ID string } `yaml:"features"`
+	Invariants []struct{ ID string } `yaml:"invariants"`
+}
+
+// Design is one corpus design entry. Inputs are the checked-in data
+// files the design reads while it runs (textio), design-relative: the
+// project files of the run.
 type Design struct {
 	Name            string            `yaml:"name"`
 	Standard        string            `yaml:"standard"`
@@ -38,7 +48,9 @@ type Design struct {
 	Defines         map[string]string `yaml:"defines"`
 	Models          map[string]string `yaml:"models"`
 	Config          string            `yaml:"config"`
+	Inputs          []string          `yaml:"inputs"`
 	Expected        Expected          `yaml:"expected"`
+	Features        []string          `yaml:"features"`
 	Invariants      []string          `yaml:"invariants"`
 	Oracle          string            `yaml:"oracle"`
 	HierarchyOracle string            `yaml:"hierarchy_oracle"`
@@ -79,13 +91,16 @@ type Message struct {
 }
 
 // Variant is an extra run of a design with other files or standard.
+// Defines are the run's --define NAME=VALUE arguments: they override
+// the design config's defines: as on the command line.
 type Variant struct {
-	Name     string   `yaml:"name"`
-	Standard string   `yaml:"standard"`
-	Files    []File   `yaml:"files"`
-	Expected Expected `yaml:"expected"`
-	GHDL     Tool     `yaml:"ghdl"`
-	NVC      Tool     `yaml:"nvc"`
+	Name     string            `yaml:"name"`
+	Standard string            `yaml:"standard"`
+	Defines  map[string]string `yaml:"defines"`
+	Files    []File            `yaml:"files"`
+	Expected Expected          `yaml:"expected"`
+	GHDL     Tool              `yaml:"ghdl"`
+	NVC      Tool              `yaml:"nvc"`
 }
 
 // Tool is what GHDL or NVC did on a design.
@@ -132,7 +147,47 @@ func ParseManifest(src []byte) (*Manifest, error) {
 				"expected", ManifestPath, d.Name, Release)
 		}
 	}
+	if err := m.checkVocabulary(); err != nil {
+		return nil, fmt.Errorf("%s: %w", ManifestPath, err)
+	}
 	return &m, nil
+}
+
+// checkVocabulary requires every feature and invariant a design names
+// to be in the vocabulary, and every vocabulary feature to be named by
+// at least one design.
+func (m *Manifest) checkVocabulary() error {
+	ids := func(xs []struct{ ID string }) map[string]bool {
+		out := map[string]bool{}
+		for _, x := range xs {
+			out[x.ID] = true
+		}
+		return out
+	}
+	features, invariants := ids(m.Vocabulary.Features),
+		ids(m.Vocabulary.Invariants)
+	used := map[string]bool{}
+	for _, d := range m.Designs {
+		for _, f := range d.Features {
+			if !features[f] {
+				return fmt.Errorf("%s: feature %q is not in "+
+					"vocabulary.features", d.Name, f)
+			}
+			used[f] = true
+		}
+		for _, i := range d.Invariants {
+			if !invariants[i] {
+				return fmt.Errorf("%s: invariant %q is not in "+
+					"vocabulary.invariants", d.Name, i)
+			}
+		}
+	}
+	for _, f := range m.Vocabulary.Features {
+		if !used[f.ID] {
+			return fmt.Errorf("feature %q is named by no design", f.ID)
+		}
+	}
+	return nil
 }
 
 // Design returns the design named name.
@@ -174,6 +229,8 @@ type Run struct {
 	Design   Design
 	Variant  string // "" for the main run
 	Standard string
+	// Defines are the run's --define arguments (variants only).
+	Defines map[string]string
 	// Paths are the analysis files, design-relative: stand-in models
 	// first (main run only), then the files in order.
 	Paths    []string
@@ -200,7 +257,7 @@ func (d Design) Runs() []Run {
 	out := []Run{main}
 	for _, v := range d.Variants {
 		r := Run{Design: d, Variant: v.Name, Standard: v.Standard,
-			Expected: v.Expected}
+			Defines: v.Defines, Expected: v.Expected}
 		for _, f := range v.Files {
 			r.Paths = append(r.Paths, f.Path)
 		}
@@ -244,12 +301,23 @@ func (r Run) Sources(read ReadFunc) (map[string][]byte, error) {
 		}
 		out[configKey] = b
 	}
+	for _, p := range r.Design.Inputs {
+		rel := path.Join(r.Design.DirOf(), p)
+		b, err := read(rel)
+		if err != nil {
+			return nil, Missing(rel, err)
+		}
+		out[inputKey+p] = b
+	}
 	return out, nil
 }
 
-// configKey holds the design config among the sources; no VHDL path
-// can start with a NUL byte.
-const configKey = "\x00config"
+// configKey holds the design config among the sources, and inputKey
+// prefixes each input file; no VHDL path can start with a NUL byte.
+const (
+	configKey = "\x00config"
+	inputKey  = "\x00input/"
+)
 
 // isVHDL reports whether a sources key is a VHDL file.
 func isVHDL(p string) bool { return !strings.HasPrefix(p, "\x00") }

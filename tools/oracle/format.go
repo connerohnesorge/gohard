@@ -111,17 +111,17 @@ func (f *fmtFile) state() string {
 // fmtRun is one analysis run: files analyzed in order under one
 // standard, as the design (main) or one of its variants.
 type fmtRun struct {
-	name  string
-	std   token.Standard
-	files []*fmtFile
+	name    string
+	std     token.Standard
+	defines []config.Define // the config's, or a variant's --define
+	files   []*fmtFile
 }
 
 // fmtPlan is the pure part of the format section for one design.
 type fmtPlan struct {
-	opts    format.Options
-	defines []config.Define
-	psl     bool // psl.comments
-	runs    []fmtRun
+	opts format.Options
+	psl  bool // psl.comments
+	runs []fmtRun
 }
 
 // planFormat formats the files of design name. The main run analyzes
@@ -150,8 +150,7 @@ func planFormat(x *ctx, name string) (*fmtPlan, error) {
 		}
 		cfg = c
 	}
-	p := &fmtPlan{opts: format.FromConfig(cfg), defines: cfg.Defines,
-		psl: cfg.PSL.Comments}
+	p := &fmtPlan{opts: format.FromConfig(cfg), psl: cfg.PSL.Comments}
 	cache := map[string]*fmtFile{}
 	file := func(e fileEntry) (*fmtFile, error) {
 		std, ok := token.ParseStandard(e.Standard)
@@ -178,12 +177,17 @@ func planFormat(x *ctx, name string) (*fmtPlan, error) {
 		cache[e.Path] = f
 		return f, nil
 	}
-	addRun := func(rn, rs string, entries []fileEntry) error {
+	addRun := func(rn, rs string, over map[string]string,
+		entries []fileEntry) error {
 		std, ok := token.ParseStandard(rs)
 		if !ok {
 			return fmt.Errorf("%s: run %s: standard %q", name, rn, rs)
 		}
-		r := fmtRun{name: rn, std: std}
+		defs, err := runDefines(cfg, over)
+		if err != nil {
+			return fmt.Errorf("%s: run %s: %w", name, rn, err)
+		}
+		r := fmtRun{name: rn, std: std, defines: defs}
 		for _, e := range entries {
 			f, err := file(e)
 			if err != nil {
@@ -199,11 +203,12 @@ func planFormat(x *ctx, name string) (*fmtPlan, error) {
 		main = append(main, fileEntry{Path: m, Standard: d.Standard})
 	}
 	main = append(main, d.Files...)
-	if err := addRun("main", d.Standard, main); err != nil {
+	if err := addRun("main", d.Standard, nil, main); err != nil {
 		return nil, err
 	}
 	for _, v := range d.Variants {
-		if err := addRun(v.Name, v.Standard, v.Files); err != nil {
+		if err := addRun(v.Name, v.Standard, v.Defines,
+			v.Files); err != nil {
 			return nil, err
 		}
 	}
@@ -234,7 +239,7 @@ func (p *fmtPlan) planLines() []string {
 
 func (p *fmtPlan) runLine(r fmtRun) string {
 	s := "run " + r.name + " std=" + r.std.String()
-	for _, d := range p.defines {
+	for _, d := range r.defines {
 		s += " define=" + d.Name + "=" + d.Value
 	}
 	if p.psl {
@@ -409,7 +414,7 @@ func (p *fmtPlan) analyzeAll(a analyzer, tt *tool, r fmtRun,
 	defer w.close()
 	var out []fileResult
 	for _, f := range r.files {
-		text, code, err := tt.run(w.dir, a.args(r.std, p.defines, p.psl,
+		text, code, err := tt.run(w.dir, a.args(r.std, r.defines, p.psl,
 			f.path)...)
 		if err != nil {
 			return nil, err

@@ -2,6 +2,8 @@ package corpus
 
 import (
 	"fmt"
+	"maps"
+	"path/filepath"
 	"slices"
 	"strings"
 
@@ -11,6 +13,7 @@ import (
 	"github.com/connerohnesorge/gohard/internal/elab/hier"
 	"github.com/connerohnesorge/gohard/internal/elab/psl"
 	"github.com/connerohnesorge/gohard/internal/env"
+	"github.com/connerohnesorge/gohard/internal/env/simenv"
 	"github.com/connerohnesorge/gohard/internal/eval"
 	"github.com/connerohnesorge/gohard/internal/sema"
 	"github.com/connerohnesorge/gohard/internal/sim"
@@ -95,7 +98,49 @@ func (r Run) Config(src map[string][]byte) (config.Config, error) {
 		cfg = c
 	}
 	cfg.Standard = r.Standard
+	if len(r.Defines) > 0 {
+		// A variant's defines are --define arguments: the same
+		// override of defines: the command line applies.
+		var args []string
+		for _, k := range slices.Sorted(maps.Keys(r.Defines)) {
+			args = append(args, k+"="+r.Defines[k])
+		}
+		c, _, ds := config.ApplyDefines(cfg, args)
+		if len(ds) > 0 {
+			return cfg, fmt.Errorf("%s: --define: %s", r.Name(),
+				ds[0].Message)
+		}
+		cfg = c
+	}
 	return cfg, nil
+}
+
+// Code returns the interpreter of a run of r with code: code itself,
+// or, when the design has input files, code's interpreter with those
+// files as the project (elab.Interpreter over an env.Overlay, a fresh
+// one for each elaborated design), as `gohard check --sim` run in the
+// design directory gives them. code nil stays nil.
+func (r Run) Code(src map[string][]byte, code CodeFunc) CodeFunc {
+	if code == nil || len(r.Design.Inputs) == 0 {
+		return code
+	}
+	root := filepath.FromSlash(simenv.DefaultDir)
+	files := map[string][]byte{}
+	for _, p := range r.Design.Inputs {
+		files[p] = src[inputKey+p]
+	}
+	worlds := map[*elab.Design]CodeFunc{}
+	return func(d *elab.Design, p *elab.Proc) (sim.Code, error) {
+		c, ok := worlds[d]
+		if !ok {
+			base := simenv.New(simenv.Options{Dir: root,
+				Files: files}).FS
+			c = elab.Interpreter(elab.InterpOptions{
+				FS: env.NewOverlay(base, root)})
+			worlds[d] = c
+		}
+		return c(d, p)
+	}
 }
 
 // Analyze runs analysis on the sources of r.
@@ -145,7 +190,7 @@ func Execute(r Run, src map[string][]byte, o Options) (*Result, error) {
 	}
 	// PSL directives run in the PSL runner, the rest in o.Code.
 	d, eds := elab.Elaborate(res, elab.Options{Top: r.Design.Testbench,
-		Budget: b, Code: psl.Wrap(o.Code),
+		Budget: b, Code: psl.Wrap(r.Code(src, o.Code)),
 		InterpretedBodies: o.InterpretedBodies})
 	add(eds)
 	out.Design = d

@@ -86,6 +86,9 @@ func recordTree(x *ctx, tl *toolset, t target) ([]goldenFile, error) {
 		return nil, err
 	}
 	defer w.close()
+	if err := w.addInputs(x, d); err != nil {
+		return nil, err
+	}
 	a := append([]string{"-a", "--std=" + ghdlStd(std)}, psl...)
 	a = append(a, order...)
 	if out, code, err := tt.run(w.dir, a...); err != nil || code != 0 {

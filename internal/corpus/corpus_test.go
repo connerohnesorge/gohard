@@ -95,6 +95,29 @@ func TestManifest(t *testing.T) {
 	}
 }
 
+// TestVocabulary: ParseManifest rejects a feature or invariant id
+// outside the vocabulary and a vocabulary feature no design names.
+func TestVocabulary(t *testing.T) {
+	const head = "schema: 1\nvocabulary:\n  features:\n" +
+		"    - id: f1\n  invariants:\n    - id: i1\ndesigns:\n" +
+		"  - name: d\n    milestone: v1.0\n    testbench: tb\n" +
+		"    files: [{path: a.vhd, standard: \"2008\"}]\n"
+	for _, c := range []struct{ body, want string }{
+		{"    features: [f1]\n    invariants: [i1]\n", ""},
+		{"    features: [f2]\n", `feature "f2" is not in`},
+		{"    features: [f1]\n    invariants: [i2]\n",
+			`invariant "i2" is not in`},
+		{"    features: []\n", `feature "f1" is named by no design`},
+	} {
+		_, err := ParseManifest([]byte(head + c.body))
+		if c.want == "" && err != nil ||
+			c.want != "" && (err == nil ||
+				!strings.Contains(err.Error(), c.want)) {
+			t.Errorf("%q: err = %v, want %q", c.body, err, c.want)
+		}
+	}
+}
+
 // TestMissingFile: a missing corpus or submodule file is a failure
 // whose message names git submodule update --init.
 func TestMissingFile(t *testing.T) {
