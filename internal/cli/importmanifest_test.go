@@ -441,10 +441,15 @@ func TestImportPoC(t *testing.T) {
 			filepath.Join(dir, "lib", l))
 	}
 	copyTree(t, filepath.Join(poc, "src"), filepath.Join(proj, "src"))
-	// With its testbench under the root, arith_Scaler is not checked
-	// as a top level under default generics that make a positive
-	// constant 0.
-	copyTree(t, filepath.Join(poc, "tb"), filepath.Join(proj, "tb"))
+	// PoC's tb/common, where local_configuration.vhdl goes, and the
+	// testbench of arith_Scaler: without an instance gohard check takes
+	// it as a top level under default generics that make a positive
+	// constant 0. The other 167 testbench files are left out: with
+	// them this test peaks at 2.0 GB, not 0.7 GB.
+	for _, d := range []string{"common", "arith/Scaler"} {
+		copyTree(t, filepath.Join(poc, "tb", filepath.FromSlash(d)),
+			filepath.Join(proj, "tb", filepath.FromSlash(d)))
+	}
 	projectRoot(t, proj)
 	// What PoC's WriteLocalConfiguration (tools/poc.tcl) writes.
 	if err := os.WriteFile(filepath.Join(proj, "tb", "common",
