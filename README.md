@@ -6,6 +6,36 @@ GoHard is a VHDL language server, checker, formatter and simulator in
 one pure-Go binary. Runs are deterministic: the same inputs and seed
 give the same bytes on every OS.
 
+## Demo
+
+Neovim running this build of `gohard lsp` on the files in
+[docs/demo](docs/demo). Regenerate the pictures with
+`nix run .#demo-screenshots`.
+
+![Hover on the signal added](docs/images/hover.png)
+
+Hover on `added` shows the signal and the comment above its declaration.
+
+![Completion of the prefix pic](docs/images/completion.png)
+
+Completing `pic` offers the function `pick` and its signature.
+
+![Go to definition of work.adder](docs/images/definition.png)
+
+Go to definition on `work.adder` opens entity `adder`.
+
+![References of the signal added](docs/images/references.png)
+
+References for `added` lists the declaration and both uses.
+
+![Signature help for the call pick](docs/images/signature.png)
+
+Signature help in `pick(` names the parameters and highlights the active one.
+
+![Lint warnings and an undeclared-name error](docs/images/diagnostics.png)
+
+Lint warnings and an undeclared name, with signs and virtual text.
+
 ## Install
 
 Pick one:

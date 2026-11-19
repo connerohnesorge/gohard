@@ -1,0 +1,5 @@
+# Marks this directory as its own project so the language server does
+# not treat the GoHard repository as the workspace. indent is set
+# because a key left at its default is reported as redundant.
+format:
+  indent: 4

@@ -40,12 +40,42 @@
           mainProgram = "gohard";
         };
       };
+      # Fonts for the README screenshots (docs/demo). makeFontsConf
+      # points fontconfig at JetBrains Mono, which the vhs tape names.
+      demoFonts = pkgs.makeFontsConf {
+        fontDirectories = [ pkgs.jetbrains-mono ];
+      };
+      demoScreenshots = pkgs.writeShellScript "gohard-demo-screenshots" ''
+        set -eu
+        export PATH="${pkgs.lib.makeBinPath [
+          pkgs.bash
+          pkgs.coreutils
+          pkgs.git
+          pkgs.neovim
+          pkgs.vhs
+          pkgs.python3
+        ]}:$PATH"
+        export FONTCONFIG_FILE="${demoFonts}"
+        export GOHARD_BIN="${gohard}/bin/gohard"
+        dir=$PWD
+        while [ "$dir" != / ] && [ ! -x "$dir/docs/demo/render.sh" ]; do
+          dir=$(dirname "$dir")
+        done
+        cd "$dir"
+        exec ./docs/demo/render.sh
+      '';
     in {
       packages.default = gohard;
       packages.gohard = gohard;
       apps.default = {
         type = "app";
         program = "${gohard}/bin/gohard";
+      };
+      # Regenerates docs/images from the current gohard build.
+      # From a checkout: nix run .#demo-screenshots
+      apps.demo-screenshots = {
+        type = "app";
+        program = "${demoScreenshots}";
       };
       devShells.default = pkgs.mkShell {
         packages = with pkgs; [

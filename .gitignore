@@ -4,3 +4,4 @@ result
 .gohard/
 *.test
 dist
+docs/demo/.cache/
