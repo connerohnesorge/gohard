@@ -17,3 +17,4 @@ does not accept MPL-2.0 (#65).
 ## Contributors
 
 - Conner Ohnesorge
+- Cursor Agent
