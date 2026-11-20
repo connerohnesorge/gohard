@@ -708,8 +708,12 @@ func Complete(r *sema.Result, path string, off int) []Item {
 
 // Symbol is a document or workspace symbol.
 type Symbol struct {
-	Name     string
-	Kind     sema.DeclKind
+	Name string
+	Kind sema.DeclKind
+	// Stmt is the CST kind of a statement label's statement, and zero
+	// for every other declaration. The outline uses it to tell a
+	// process, an instance and a generate apart.
+	Stmt     cst.Kind
 	Detail   string
 	Location Location
 	// Full is the whole declaration's span.
@@ -740,8 +744,12 @@ func DocumentSymbols(r *sema.Result, path string) []Symbol {
 
 func symbol(d *sema.Decl) Symbol {
 	l, _ := LocationOf(d)
-	return Symbol{Name: d.Text, Kind: d.Kind, Detail: Describe(d),
+	s := Symbol{Name: d.Text, Kind: d.Kind, Detail: Describe(d),
 		Location: l, Full: d.Full}
+	if d.Kind == sema.DeclLabel {
+		s.Stmt = d.Node.Kind()
+	}
+	return s
 }
 
 func regionSymbols(reg *sema.Region, f *sema.File) []Symbol {

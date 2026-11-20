@@ -101,3 +101,18 @@ Show
 Sleep 600ms
 Screenshot docs/images/diagnostics.png
 Sleep 400ms
+
+Hide
+Escape
+Escape
+Type ":qa!"
+Enter
+Wait+Screen@15s /\$ /
+
+Type "./docs/demo/scene.sh symbols"
+Enter
+Wait+Screen@30s /Method/
+Show
+Sleep 600ms
+Screenshot docs/images/symbols.png
+Sleep 400ms

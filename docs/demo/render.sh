@@ -51,6 +51,7 @@ names = [
     "references.png",
     "signature.png",
     "diagnostics.png",
+    "symbols.png",
 ]
 bad = False
 for name in names:

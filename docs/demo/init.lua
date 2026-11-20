@@ -1,7 +1,8 @@
 -- Neovim config for the README screenshots. Loaded with
 -- `nvim -n --noplugin -i NONE -u docs/demo/init.lua`. It starts the
 -- GoHard plugin in this repository against $GOHARD_BIN and, when
--- $GOHARD_SCENE is set, leaves the editor on that scene.
+-- $GOHARD_SCENE is set, leaves the editor on that scene. The symbols
+-- scene lists each declaration with its LSP SymbolKind.
 
 local demo = vim.fs.dirname(debug.getinfo(1, 'S').source:sub(2))
 local repo = vim.fs.dirname(vim.fs.dirname(demo))

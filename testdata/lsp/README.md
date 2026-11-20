@@ -89,6 +89,7 @@ result; positions are zero-based UTF-8.
 | `completion/keywords-and-names` | visible names and the keywords of the selected standard, filtered by the word before the cursor |
 | `completion/overload-candidates` | inside an undecided call the candidates come first, each with the reason hover shows (#34) |
 | `symbols/document` | `gohard lsp symbols`: the declarations of the file as a tree |
+| `symbols/kinds` | the SymbolKind of each declaration in a file with an entity, ports, signals, a process, a component instance and a generate (#116) |
 | `workspace-symbols/all` | `gohard lsp workspace-symbols --at PATH:1:1 [QUERY]`: every unit and package declaration of the project |
 | `workspace-symbols/query` | only the names containing the query, case insensitive |
 | `folding/blocks` | the context clause (`imports`), the architecture, the process (each to the line before its `end`) and a comment run |

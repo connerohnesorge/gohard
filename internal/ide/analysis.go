@@ -230,7 +230,8 @@ func (an *Analysis) symbols(ss []resolve.Symbol,
 		if full.End <= full.Start {
 			full = l.Span
 		}
-		sym := server.Symbol{Name: s.Name, Kind: SymbolKind(s.Kind),
+		sym := server.Symbol{Name: s.Name,
+			Kind:   SymbolKind(s.Kind, s.Stmt),
 			Detail: s.Detail, URI: l.URI, Span: full, Selection: l.Span}
 		if nested {
 			sym.Children = an.symbols(s.Children, true)
@@ -238,64 +239,4 @@ func (an *Analysis) symbols(ss []resolve.Symbol,
 		out = append(out, sym)
 	}
 	return out
-}
-
-// LSP SymbolKind values.
-const (
-	symFile          = 1
-	symModule        = 2
-	symNamespace     = 3
-	symPackage       = 4
-	symClass         = 5
-	symProperty      = 7
-	symField         = 8
-	symInterface     = 11
-	symFunction      = 12
-	symVariable      = 13
-	symConstant      = 14
-	symKey           = 20
-	symEnumMember    = 22
-	symStruct        = 23
-	symEvent         = 24
-	symTypeParameter = 26
-)
-
-// SymbolKind maps a declaration kind to the LSP SymbolKind.
-func SymbolKind(k sema.DeclKind) int {
-	switch k {
-	case sema.DeclEntity, sema.DeclComponent:
-		return symClass
-	case sema.DeclArchitecture, sema.DeclConfiguration,
-		sema.DeclVunit:
-		return symModule
-	case sema.DeclPackage, sema.DeclPackageBody, sema.DeclPackageInst,
-		sema.DeclGenericPackage, sema.DeclLibrary:
-		return symPackage
-	case sema.DeclContext:
-		return symNamespace
-	case sema.DeclType, sema.DeclSubtype, sema.DeclGroupTemplate:
-		return symStruct
-	case sema.DeclGenericType:
-		return symTypeParameter
-	case sema.DeclConstant, sema.DeclGeneric:
-		return symConstant
-	case sema.DeclSignal, sema.DeclPort:
-		return symEvent
-	case sema.DeclFunction, sema.DeclProcedure,
-		sema.DeclGenericSubprogram:
-		return symFunction
-	case sema.DeclEnumLiteral, sema.DeclUnit:
-		return symEnumMember
-	case sema.DeclElement:
-		return symField
-	case sema.DeclAttribute, sema.DeclAlias:
-		return symProperty
-	case sema.DeclModeView, sema.DeclPSL:
-		return symInterface
-	case sema.DeclLabel, sema.DeclGroup:
-		return symKey
-	case sema.DeclFile:
-		return symFile
-	}
-	return symVariable
 }

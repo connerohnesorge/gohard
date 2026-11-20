@@ -29,4 +29,12 @@ begin
     port map (a => x, b => y, sum => added);
 
   res <= pick(op, added, x);
+
+  -- Watch the opcode.
+  tick : process (op) is
+  begin
+    if op = '1' then
+      null;
+    end if;
+  end process tick;
 end architecture rtl;
