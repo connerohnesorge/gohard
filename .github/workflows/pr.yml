@@ -251,6 +251,12 @@ jobs:
           export GOPATH="$RUNNER_TEMP/gopath"
           export GOMODCACHE="$GOPATH/pkg/mod"
           cd "$RUNNER_TEMP"
+          # Git 2.54 on ubuntu-latest runs geometric maintenance during
+          # fetch. That rewrites the shallow file while
+          # `git fetch --unshallow` (go install, GOPROXY=direct) is
+          # reading it: "shallow file has changed since we read it".
+          # gc.auto=0 no longer suppresses it.
+          git config --global maintenance.auto false
           go install \
             "github.com/connerohnesorge/gohard/v2/cmd/gohard@$SHA"
           "$GOPATH/bin/gohard" version | tee version.txt
