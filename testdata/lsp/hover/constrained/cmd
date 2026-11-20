@@ -1,0 +1,3 @@
+# a signal declared with an index constraint (#117): the client sees
+# the type mark and the range.
+gohard lsp hover --at top.vhd:16:10

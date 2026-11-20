@@ -21,7 +21,7 @@ Enter
 
 Type "./docs/demo/scene.sh hover"
 Enter
-Wait+Screen@30s /UNSIGNED/
+Wait+Screen@30s /UNSIGNED\(7 downto 0\)/
 Show
 Sleep 600ms
 Screenshot docs/images/hover.png

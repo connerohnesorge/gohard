@@ -391,6 +391,7 @@ local function probe(demo)
   local hover = request('textDocument/hover', position_params())
   local hover_text = text_of(hover and hover.contents)
   check(hover_text:find('added', 1, true) ~= nil
+    and hover_text:find('UNSIGNED(7 downto 0)', 1, true) ~= nil
     and hover_text:lower():find('sum of the two operands', 1, true) ~= nil,
     'hover on added', hover_text)
 
