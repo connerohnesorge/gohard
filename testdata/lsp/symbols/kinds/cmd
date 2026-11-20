@@ -1,0 +1,2 @@
+# The SymbolKind a client sees for each declaration (#116).
+gohard lsp symbols --at kinds.vhd:1:1
