@@ -32,6 +32,12 @@ References for `added` lists the declaration and both uses.
 
 Signature help in `pick(` names the parameters and highlights the active one.
 
+![Document symbols of entity alu](docs/images/symbols.png)
+
+The outline lists entity `alu` as Interface, its ports and signal
+`added` as Variable, process `tick` as Method and instance `u_add` as
+Object.
+
 ![Lint warnings and an undeclared-name error](docs/images/diagnostics.png)
 
 Lint warnings and an undeclared name, with signs and virtual text.

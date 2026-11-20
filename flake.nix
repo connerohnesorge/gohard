@@ -47,12 +47,16 @@
       };
       demoScreenshots = pkgs.writeShellScript "gohard-demo-screenshots" ''
         set -eu
+        # render.sh checks for ttyd and ffmpeg itself. vhs uses them
+        # but does not put their binaries on PATH.
         export PATH="${pkgs.lib.makeBinPath [
           pkgs.bash
           pkgs.coreutils
           pkgs.git
           pkgs.neovim
           pkgs.vhs
+          pkgs.ttyd
+          pkgs.ffmpeg
           pkgs.python3
         ]}:$PATH"
         export FONTCONFIG_FILE="${demoFonts}"

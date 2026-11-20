@@ -3,6 +3,8 @@
 --
 -- Scenes: hover, completion, definition, references, signature,
 -- symbols, diagnostics. Scene "probe" checks all of them and exits.
+-- The symbols scene fills a quickfix list whose lines are the LSP
+-- SymbolKind and the declaration name.
 
 local M = {}
 
@@ -173,17 +175,132 @@ local function open_signature()
   vim.cmd.redraw()
 end
 
+-- LSP SymbolKind names, in protocol order. The outline prints these
+-- rather than Neovim's own quickfix text, which leads with the path.
+local symbol_kinds = {
+  [1] = 'File',
+  [2] = 'Module',
+  [3] = 'Namespace',
+  [4] = 'Package',
+  [5] = 'Class',
+  [6] = 'Method',
+  [7] = 'Property',
+  [8] = 'Field',
+  [9] = 'Constructor',
+  [10] = 'Enum',
+  [11] = 'Interface',
+  [12] = 'Function',
+  [13] = 'Variable',
+  [14] = 'Constant',
+  [15] = 'String',
+  [16] = 'Number',
+  [17] = 'Boolean',
+  [18] = 'Array',
+  [19] = 'Object',
+  [20] = 'Key',
+  [21] = 'Null',
+  [22] = 'EnumMember',
+  [23] = 'Struct',
+  [24] = 'Event',
+  [25] = 'Operator',
+  [26] = 'TypeParameter',
+}
+
+local function each_symbol(symbols, fn)
+  if type(symbols) ~= 'table' then
+    return
+  end
+  for _, s in ipairs(symbols) do
+    if type(s) == 'table' and s.name ~= nil then
+      fn(s)
+      each_symbol(s.children, fn)
+    end
+  end
+end
+
+local function symbol_line(symbol, depth)
+  local kind = symbol_kinds[symbol.kind] or ('Kind' .. tostring(symbol.kind))
+  return string.format('%s%-12s %s', string.rep('  ', depth), kind, symbol.name)
+end
+
+local function symbol_items(symbols, depth, items)
+  for _, s in ipairs(symbols) do
+    local range = s.selectionRange
+    local filename = vim.api.nvim_buf_get_name(0)
+    if range == nil and type(s.location) == 'table' then
+      range = s.location.range
+      if s.location.uri ~= nil then
+        filename = vim.uri_to_fname(s.location.uri)
+      end
+    end
+    if type(range) == 'table' and type(range.start) == 'table' then
+      items[#items + 1] = {
+        filename = filename,
+        lnum = range.start.line + 1,
+        col = range.start.character + 1,
+        text = symbol_line(s, depth),
+      }
+    end
+    if type(s.children) == 'table' then
+      symbol_items(s.children, depth + 1, items)
+    end
+  end
+end
+
+-- The quickfix window draws whatever this returns, so the screenshot
+-- shows the kind and the name and not the file path.
+function _G.gohard_symbol_text(info)
+  local query = { id = info.id, items = 1 }
+  local list
+  if info.quickfix == 1 then
+    list = vim.fn.getqflist(query)
+  else
+    list = vim.fn.getloclist(info.winid, query)
+  end
+  local lines = {}
+  for i = info.start_idx, info.end_idx do
+    local item = list.items[i]
+    lines[#lines + 1] = (item and item.text) or ''
+  end
+  return lines
+end
+
 local function open_symbols()
-  vim.lsp.buf.document_symbol({
-    on_list = function(opts)
-      opts.title = 'Document symbols'
-      vim.fn.setqflist({}, ' ', opts)
-      vim.cmd('botright copen 14')
-    end,
+  local result = request('textDocument/documentSymbol', {
+    textDocument = { uri = vim.uri_from_bufnr(0) },
   })
-  wait_until(8000, function()
-    return vim.fn.getqflist({ size = 1 }).size > 2
-  end, 'document symbols')
+  if type(result) ~= 'table' or result[1] == nil then
+    fail('document symbols empty')
+  end
+  local items = {}
+  symbol_items(result, 0, items)
+  local shown = {}
+  for _, item in ipairs(items) do
+    shown[item.text] = true
+  end
+  -- These are the kinds the screenshot is for. A wrong mapping fails
+  -- here, before the tape records. The line is built the same way as
+  -- the quickfix text, so the padding cannot drift.
+  local function expect(depth, kind, name)
+    local line = symbol_line({ kind = kind, name = name }, depth)
+    if shown[line] == nil then
+      fail('outline missing "' .. line .. '"\n' .. vim.inspect(items))
+    end
+  end
+  expect(0, 11, 'alu')
+  expect(1, 13, 'op')
+  expect(1, 13, 'added')
+  expect(0, 2, 'rtl')
+  expect(1, 12, 'pick')
+  expect(1, 19, 'u_add')
+  expect(1, 6, 'tick')
+  vim.cmd('normal! gg')
+  vim.o.quickfixtextfunc = 'v:lua.gohard_symbol_text'
+  vim.fn.setqflist({}, ' ', {
+    title = 'Document symbols',
+    items = items,
+  })
+  vim.cmd('botright copen ' .. tostring(#items))
   vim.cmd.redraw()
 end
 
@@ -298,10 +415,22 @@ local function probe(demo)
   local sym = request('textDocument/documentSymbol', {
     textDocument = { uri = vim.uri_from_bufnr(0) },
   })
-  local sym_text = text_of(sym)
-  check(sym_text:find('alu', 1, true) ~= nil
-    and sym_text:find('added', 1, true) ~= nil,
-    'document symbols', nil)
+  local kinds = {}
+  each_symbol(sym, function(s)
+    kinds[s.name] = s.kind
+  end)
+  local function kind_is(name, kind, label)
+    check(kinds[name] == kind,
+      label .. ' is ' .. (symbol_kinds[kind] or '?'),
+      name .. '=' .. tostring(kinds[name]))
+  end
+  kind_is('alu', 11, 'entity alu')
+  kind_is('op', 13, 'port op')
+  kind_is('added', 13, 'signal added')
+  kind_is('rtl', 2, 'architecture rtl')
+  kind_is('pick', 12, 'function pick')
+  kind_is('u_add', 19, 'instance u_add')
+  kind_is('tick', 6, 'process tick')
 
   local row = place('res <= pick', 1)
   vim.api.nvim_buf_set_lines(0, row - 1, row, false, { '  res <= pic' })
