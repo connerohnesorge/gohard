@@ -30,7 +30,8 @@ References for `added` lists the declaration and both uses.
 
 ![Signature help for the call pick](docs/images/signature.png)
 
-Signature help in `pick(` names the parameters and highlights the active one.
+Signature help in `pick(` names the parameters, highlights the active
+one, and says `pick` is declared in `architecture rtl of alu`.
 
 ![Document symbols of entity alu](docs/images/symbols.png)
 

@@ -25,7 +25,8 @@ type Signature struct {
 	Formals []*sema.Decl
 	// Active is the index of the active parameter, -1 for none.
 	Active int
-	// Doc is markdown: where the subprogram comes from, why a
+	// Doc is markdown: where the subprogram is declared
+	// (declaredAt, the same place hover and completion name), why a
 	// candidate does not fit, and the doc comment.
 	Doc string
 }
@@ -248,9 +249,8 @@ func callSignatures(r *sema.Result, c call, off int,
 			s.Active = -1 // the right operand of a unary candidate
 		}
 		var doc []string
-		if x := cd.d.Denotes(); x.Unit != nil {
-			doc = append(doc, "from "+string(x.Unit.Library)+"."+
-				string(x.Unit.Name))
+		if place := declaredAt(cd.d); place != "" {
+			doc = append(doc, "from "+place)
 		}
 		if cd.reason != "" {
 			doc = append(doc, "does not fit: "+cd.reason)
@@ -343,7 +343,11 @@ func activeFormal(l cst.AssociationList, off int,
 }
 
 // subprogramSignature is the label of a subprogram:
-// `function NAME(formal : mode type; ...) return TYPE`.
+// `function NAME(formal : mode type; ...) return TYPE`. The return
+// type is Type.Name, the spelling at the type's own declaration, the
+// same mark hover's profile uses: the bundled sources write INTEGER
+// and UNSIGNED in upper case, and a user type keeps its declared
+// case. That is not a separate uppercasing of the return type (#118).
 func subprogramSignature(d *sema.Decl) Signature {
 	x := d.Denotes()
 	s := Signature{Decl: d, Formals: x.Params}
@@ -375,10 +379,13 @@ func subprogramSignature(d *sema.Decl) Signature {
 	return s
 }
 
-// formalText is one formal of a signature: its declaration as written
-// (`signal clk : in std_logic := '0'`), whitespace and comments
-// folded to single spaces, or for a predefined operation
-// `l : in INTEGER`.
+// formalText is one formal of a signature. Class, name, mode and
+// default are as written (`signal clk : in ... := '0'`), whitespace
+// and comments folded to single spaces. The type mark is the spelling
+// hover uses (subtypeText): the type's own declaration, so a formal
+// written `unsigned` is UNSIGNED, and a user type keeps its declared
+// case. A resolution or constraint written on the formal is kept. A
+// predefined operation has no source text (`l : in INTEGER`).
 func formalText(d *sema.Decl) string {
 	if d.File != nil && !d.Implicit {
 		switch d.Node.Kind() {
@@ -391,8 +398,13 @@ func formalText(d *sema.Decl) string {
 			if m := io.Mode(); !m.IsZero() && m.Span().End > m.Span().Start {
 				s += " " + tokensText(m.Node)
 			}
+			// A mode view writes its subtype on the mode (`view v of
+			// rec(...)`), which the mode text already includes. A
+			// separate subtype indication is the type mark.
 			if st := io.Subtype(); !st.IsZero() {
-				s += " " + tokensText(st.Node)
+				if mark := formalType(d, io); mark != "" {
+					s += " " + mark
+				}
 			}
 			if as := io.Node.Token(token.VarAssign, 0); !as.IsZero() {
 				for c := range io.Node.Nodes() {
@@ -429,6 +441,23 @@ func formalText(d *sema.Decl) string {
 		mode = "linkage "
 	}
 	return d.Text + " : " + mode + t
+}
+
+// formalType is the type mark of an interface object. A resolved type
+// uses the hover spelling; an unresolved one keeps the indication as
+// written, so a name that did not resolve is not replaced with
+// "unknown type".
+func formalType(d *sema.Decl, io cst.InterfaceObjectDecl) string {
+	if d.Type != nil && !d.Type.Unknown() {
+		return subtypeText(d, d)
+	}
+	if st := io.Subtype(); !st.IsZero() {
+		return tokensText(st.Node)
+	}
+	if d.Type != nil {
+		return d.Type.Name()
+	}
+	return ""
 }
 
 // tokensText is the text of n's tokens, one space wherever the source
@@ -670,8 +699,9 @@ func mapSignature(r *sema.Result, m assocMap, off int) Signature {
 	if m.owner != nil {
 		var doc []string
 		if u := m.owner.Unit; u != nil && u.Decl == m.owner {
-			doc = append(doc, "from "+string(u.Library)+"."+
-				string(u.Name))
+			if place := unitPlace(u); place != "" {
+				doc = append(doc, "from "+place)
+			}
 		}
 		if d := DocOf(r, m.owner); d != "" {
 			doc = append(doc, d)

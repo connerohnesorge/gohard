@@ -1,0 +1,1 @@
+{"signatures":[{"label":"function pick(sel : STD_LOGIC; a : UNSIGNED; b : UNSIGNED) return UNSIGNED","documentation":{"kind":"markdown","value":"from architecture rtl of alu"},"parameters":[{"label":[14,29]},{"label":[31,43]},{"label":[45,57]}],"activeParameter":0}],"activeSignature":0,"activeParameter":0}
