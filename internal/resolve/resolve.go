@@ -393,10 +393,12 @@ func docText(trs []cst.Trivia) string {
 }
 
 // Describe is a one-line description of d: its kind, name, type or
-// profile, and for subprograms and literals the unit it comes from
+// profile, and for subprograms and literals where it is declared
 // ("function "+" [UNSIGNED, UNSIGNED return UNSIGNED] from
-// ieee.numeric_std"). An object's type is the subtype indication
-// written on its declaration (#117).
+// ieee.numeric_std", "function pick [...] from architecture rtl of
+// alu"). An object's type is the subtype indication written on its
+// declaration (#117). Hover, completion and signature help share
+// declaredAt for that place (#118).
 func Describe(d *sema.Decl) string {
 	x := d.Denotes()
 	s := d.Kind.String() + " " + d.Text
@@ -412,9 +414,133 @@ func Describe(d *sema.Decl) string {
 	if u := x.Unit; u != nil && (x.Kind.IsSubprogram() ||
 		x.Kind == sema.DeclEnumLiteral || x.Implicit ||
 		u.File.Bundled) {
-		s += " from " + string(u.Library) + "." + string(u.Name)
+		if place := declaredAt(x); place != "" {
+			s += " from " + place
+		}
 	}
 	return s
+}
+
+// declaredAt names where d is declared, for signature help, hover and
+// completion (#118). A subprogram of a primary unit (a package, an
+// entity, a configuration) is "library.name" (work.pkg,
+// ieee.numeric_std): primary unit names are unique in a library, and
+// the name is the unit's key, the form messages already use. A
+// subprogram declared in a package body and not in the package is
+// "package body library.name". One declared in an architecture is
+// "architecture rtl of alu", the architecture and entity as declared,
+// because an architecture name alone (work.rtl) is not the design
+// unit. One declared in a nested region names that region and then
+// the design unit: "process tick in architecture rtl of alu",
+// "function outer in package body work.pkg", "protected counter_t in
+// work.pkg". "" when the place is not known.
+func declaredAt(d *sema.Decl) string {
+	x := d.Denotes()
+	if x == nil {
+		return ""
+	}
+	var nested []string
+	for reg := x.Parent; reg != nil; reg = reg.Parent {
+		if reg.Unit != nil && reg.Owner == reg.Unit.Decl {
+			return nestPlace(nested, unitPlace(reg.Unit))
+		}
+		if s := regionPlace(reg); s != "" {
+			nested = append(nested, s)
+		}
+	}
+	if x.Unit != nil {
+		return nestPlace(nested, unitPlace(x.Unit))
+	}
+	return nestPlace(nested, "")
+}
+
+// nestPlace joins the inner regions in front of the design unit.
+func nestPlace(nested []string, unit string) string {
+	if len(nested) == 0 {
+		return unit
+	}
+	s := strings.Join(nested, " in ")
+	if unit == "" {
+		return s
+	}
+	return s + " in " + unit
+}
+
+// unitPlace is the design unit u as declaredAt shows it.
+func unitPlace(u *sema.Unit) string {
+	if u == nil {
+		return ""
+	}
+	lib, name := string(u.Library), string(u.Name)
+	switch u.Kind {
+	case sema.UnitArchitecture:
+		arch := name
+		if u.Decl != nil && u.Decl.Text != "" {
+			arch = u.Decl.Text
+		}
+		ent := string(u.Of)
+		if u.Decl != nil && u.Decl.Spec != nil &&
+			u.Decl.Spec.Text != "" {
+			ent = u.Decl.Spec.Text
+		}
+		if ent == "" {
+			return "architecture " + arch
+		}
+		return "architecture " + arch + " of " + ent
+	case sema.UnitPackageBody:
+		return "package body " + lib + "." + name
+	}
+	if lib == "" {
+		return name
+	}
+	return lib + "." + name
+}
+
+// regionPlace is a nested declarative region as declaredAt shows it,
+// or "" for a region that is not a place a subprogram is declared
+// (a context clause, a record). An unlabelled process is "process".
+func regionPlace(reg *sema.Region) string {
+	if reg == nil {
+		return ""
+	}
+	name := ""
+	if reg.Owner != nil {
+		name = reg.Owner.Text
+	}
+	word := ""
+	switch reg.Kind {
+	case sema.RegionProcess:
+		word = "process"
+	case sema.RegionBlock, sema.RegionSeqBlock:
+		word = "block"
+	case sema.RegionGenerate:
+		word = "generate"
+	case sema.RegionLoop:
+		word = "loop"
+	case sema.RegionSubprogram:
+		word = "function"
+		if reg.Owner != nil && (reg.Owner.Kind == sema.DeclProcedure ||
+			reg.Owner.Kind == sema.DeclGenericSubprogram &&
+				!reg.Owner.IsFunction()) {
+			word = "procedure"
+		}
+	case sema.RegionProtected:
+		word = "protected"
+	case sema.RegionProtectedBody:
+		word = "protected body"
+	case sema.RegionPackage:
+		word = "package"
+	case sema.RegionPackageBody:
+		word = "package body"
+	case sema.RegionComponent:
+		word = "component"
+	default:
+		return ""
+	}
+	if name == "" {
+		return word
+	}
+	return word + " " + name
 }
 
 // subtypeText is the subtype indication hover shows. The type mark is

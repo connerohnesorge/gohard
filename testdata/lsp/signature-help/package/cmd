@@ -1,0 +1,2 @@
+# A package function (#118): type marks as declared, origin work.maths, the second parameter active.
+gohard lsp signature-help --at top.vhd:18:37

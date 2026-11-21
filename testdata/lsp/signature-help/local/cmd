@@ -1,0 +1,2 @@
+# A function declared in an architecture (#118): origin architecture rtl of alu, the first parameter active.
+gohard lsp signature-help --at top.vhd:16:16

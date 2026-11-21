@@ -476,8 +476,31 @@ the others, each with why it does not fit. This holds for a call
 anywhere, an index constraint or a loop range included. A map shows
 the generic or port list of the instantiated entity, component, block
 or package. Each signature carries its parameters with their class,
-mode, type and default as written. The active parameter is the formal
-a named association names, else the position of a positional one.
+mode and default as written. The type mark of a parameter, and the
+return type, are spelled the way hover spells a type mark: the
+spelling at the type's own declaration. The bundled std/ieee sources
+write `UNSIGNED` and `STD_LOGIC` in upper case, and a user type keeps
+the case it was declared with (`Word`, `nibble`). A resolution or a
+constraint written on a parameter is kept (`UNSIGNED(7 downto 0)`,
+`INTEGER range 0 to 9`). The return type is that mark alone. This is
+the same name hover and diagnostics already use, not a separate
+uppercasing of the return type (#118).
+
+The documentation names where the subprogram is declared, and hover
+and completion use that same text. A subprogram of a package, an
+entity or another primary unit is `library.name` (`work.pkg`,
+`ieee.numeric_std`, `work.alu`): a primary unit's name is unique in
+its library. One that is declared in a package body and not in the
+package is `package body work.pkg`. One declared in an architecture
+is `architecture rtl of alu`, the architecture and the entity as
+they are declared, so the label is not the architecture's unit name
+`work.rtl`. One declared in a nested region names that region and
+then the design unit: `process tick in architecture rtl of alu`,
+`function outer in package body work.pkg`, `protected counter_t in
+work.pkg`. An unlabelled process is `process`.
+
+The active parameter is the formal a named association names, else
+the position of a positional one.
 
 Inlay hints come in kinds, each with its own key in `gohard.yaml` or
 the editor settings, all off by default:

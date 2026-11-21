@@ -175,7 +175,9 @@ result; positions are zero-based UTF-8.
 | `semantic-tokens/inactive-branch` | `full`: each line of the inactive `` `elsif `` and `` `else `` branches is one comment token with the inactive modifier |
 | `semantic-tokens/non-ascii` | Latin-1 identifiers, an extended identifier, comments and a string with emoji; `TestSemanticTokensEncodings` checks the same tokens under utf-16 and utf-32 |
 | `semantic-tokens/bad-range` | a range that is not `LINE:COL-LINE:COL` is a usage error (exit 2) |
-| `signature-help/call` | `gohard lsp signature-help` (#56) on the second positional actual of a call: the function with its doc comment, parameter 1 active |
+| `signature-help/call` | `gohard lsp signature-help` (#56) on the second positional actual of a call: the function with its doc comment, parameter 1 active, declared in `architecture sim of top` (#118) |
+| `signature-help/package` | a package function: type marks as declared (`INTEGER`, not the lower case written at the formal), origin `work.maths`, the second parameter active |
+| `signature-help/local` | a function declared in an architecture: origin `architecture rtl of alu`, the first parameter active |
 | `signature-help/bundled-overloads` | a call of a bundled overloaded function: the overload the call resolves to first, then every other candidate with why it does not fit |
 | `signature-help/overload-result-type` | the operand of `-a` in the `overload_ops` corpus design: the overload the target type picks (return integer) first, as hover and definition give it |
 | `signature-help/generic-map` | a generic map: the entity's generic list, the first generic active |

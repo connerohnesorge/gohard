@@ -81,7 +81,7 @@ Wait+Screen@15s /\$ /
 
 Type "./docs/demo/scene.sh signature"
 Enter
-Wait+Screen@30s /from work.rtl/
+Wait+Screen@30s /from architecture rtl of alu/
 Show
 Sleep 600ms
 Screenshot docs/images/signature.png

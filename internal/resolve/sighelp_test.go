@@ -317,15 +317,15 @@ end architecture;
 		at, want string
 		params   []string
 	}{
-		{"(4)", "entity e generic (W : natural := 8)",
-			[]string{"W : natural := 8"}},
-		{"(a =>", "entity e port (a : in bit; signal b : out " +
-			"bit_vector(W - 1 downto 0))",
-			[]string{"a : in bit", "signal b : out bit_vector(W - 1 " +
+		{"(4)", "entity e generic (W : NATURAL := 8)",
+			[]string{"W : NATURAL := 8"}},
+		{"(a =>", "entity e port (a : in BIT; signal b : out " +
+			"BIT_VECTOR(W - 1 downto 0))",
+			[]string{"a : in BIT", "signal b : out BIT_VECTOR(W - 1 " +
 				"downto 0)"}},
-		{"(1, v)", "procedure p(constant x : in integer; variable y " +
-			": inout integer)", []string{"constant x : in integer",
-			"variable y : inout integer"}},
+		{"(1, v)", "procedure p(constant x : in INTEGER; variable y " +
+			": inout INTEGER)", []string{"constant x : in INTEGER",
+			"variable y : inout INTEGER"}},
 	} {
 		sigs, ok := SignatureHelp(r, "a.vhd", strings.Index(src, c.at)+1)
 		if !ok {
@@ -400,9 +400,9 @@ func TestSignatureHelpEverywhere(t *testing.T) {
 	if len(r.Diagnostics) > 0 {
 		t.Fatalf("diagnostics: %v", r.Diagnostics)
 	}
-	const fLabel = "function f(x : integer; y : integer) return INTEGER"
-	const gpLabel = "package gp generic (A : natural := 1; " +
-		"B : natural := 2; C : natural := 3)"
+	const fLabel = "function f(x : INTEGER; y : INTEGER) return INTEGER"
+	const gpLabel = "package gp generic (A : NATURAL := 1; " +
+		"B : NATURAL := 2; C : NATURAL := 3)"
 	for _, c := range []struct {
 		at     string
 		label  string
@@ -432,4 +432,243 @@ func TestSignatureHelpEverywhere(t *testing.T) {
 		}
 	}
 	checkSignatureHelp(t, r, "a.vhd")
+}
+
+// declaredSrc has a package function, a package-body function, an
+// entity function and functions nested in an architecture, a process,
+// a block and a generate. Type marks are written in a different case
+// from the type's declaration so the signature can be checked against
+// hover's spelling (#118).
+const declaredSrc = `package Maths is
+  type Word is array (0 to 3) of bit;
+  type nibble is array (0 to 3) of bit;
+  function clip(value : integer; limit : integer) return integer;
+  function width(x : Word) return Word;
+  function lo(x : NIBBLE) return nibble;
+  function lim(x : integer range 0 to 9) return integer;
+  type counter_t is protected
+    impure function get return integer;
+  end protected counter_t;
+end package;
+
+package body Maths is
+  function clip(value : integer; limit : integer) return integer is
+  begin
+    return value;
+  end function;
+  function width(x : Word) return Word is
+  begin
+    return x;
+  end function;
+  function lo(x : NIBBLE) return nibble is
+  begin
+    return x;
+  end function;
+  function lim(x : integer range 0 to 9) return integer is
+  begin
+    return x;
+  end function;
+  function hidden(x : integer) return integer is
+    function inner(y : integer) return integer is
+    begin
+      return y;
+    end function;
+  begin
+    return inner(x);
+  end function;
+  constant hid : integer := hidden(1);
+  type counter_t is protected body
+    variable n : integer := 0;
+    impure function get return integer is
+    begin
+      return n;
+    end function;
+  end protected body counter_t;
+end package body;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use work.Maths.all;
+
+entity ALU is
+  function ident(x : integer) return integer is
+  begin
+    return x;
+  end function;
+end entity;
+
+architecture RTL of ALU is
+  function pick(sel : std_logic; a, b : unsigned) return unsigned is
+  begin
+    return a;
+  end function;
+  function wide(x : unsigned(7 downto 0)) return unsigned is
+  begin
+    return x;
+  end function;
+  signal res : unsigned(7 downto 0);
+  constant clipped : integer := clip(300, 255);
+  constant shaped : Word := width((others => '0'));
+  constant low : nibble := lo((others => '0'));
+  constant limited : integer := lim(3);
+  constant same : integer := ident(1);
+begin
+  res <= pick('1', res, res);
+  res <= wide(res);
+  tick : process is
+    function local(x : integer) return integer is
+    begin
+      return x;
+    end function;
+    variable v : integer := local(1);
+  begin
+    wait;
+  end process;
+  process is
+    function bare(x : integer) return integer is
+    begin
+      return x;
+    end function;
+    variable v : integer := bare(2);
+  begin
+    wait;
+  end process;
+  b : block is
+    function inside(x : integer) return integer is
+    begin
+      return x;
+    end function;
+    constant bk : integer := inside(1);
+  begin
+  end block;
+  g : if true generate
+    function gfun(x : integer) return integer is
+    begin
+      return x;
+    end function;
+    constant gk : integer := gfun(1);
+  begin
+  end generate;
+end architecture;
+`
+
+// TestSignatureHelpDeclaredAt is the signature help a client renders
+// (#118): the label, each parameter, the active parameter and the
+// origin. The origin is the same text hover and completion use.
+// Package functions are "work.maths" (the unit key, not the declared
+// spelling Maths). A function written only in the package body is
+// "package body work.maths". A local function is "architecture RTL of
+// ALU". Type marks use the type's declaration, so integer is INTEGER
+// and NIBBLE is nibble.
+func TestSignatureHelpDeclaredAt(t *testing.T) {
+	src := declaredSrc
+	r := analyzeOne(t, src)
+	if len(r.Diagnostics) > 0 {
+		t.Fatalf("diagnostics: %v", r.Diagnostics)
+	}
+	for _, c := range []struct {
+		at, label, origin string
+		params            []string
+		active            int
+	}{
+		{"clip(300, ", "function clip(value : INTEGER; limit : " +
+			"INTEGER) return INTEGER", "work.maths",
+			[]string{"value : INTEGER", "limit : INTEGER"}, 1},
+		{"width((others", "function width(x : Word) return Word",
+			"work.maths", []string{"x : Word"}, 0},
+		{"lo((others", "function lo(x : nibble) return nibble",
+			"work.maths", []string{"x : nibble"}, 0},
+		{"lim(3", "function lim(x : INTEGER range 0 to 9) return " +
+			"INTEGER", "work.maths",
+			[]string{"x : INTEGER range 0 to 9"}, 0},
+		{"hidden(1", "function hidden(x : INTEGER) return INTEGER",
+			"package body work.maths", []string{"x : INTEGER"}, 0},
+		{"inner(x", "function inner(y : INTEGER) return INTEGER",
+			"function hidden in package body work.maths",
+			[]string{"y : INTEGER"}, 0},
+		{"ident(1", "function ident(x : INTEGER) return INTEGER",
+			"work.alu", []string{"x : INTEGER"}, 0},
+		{"pick('1'", "function pick(sel : STD_LOGIC; a : UNSIGNED; " +
+			"b : UNSIGNED) return UNSIGNED",
+			"architecture RTL of ALU",
+			[]string{"sel : STD_LOGIC", "a : UNSIGNED",
+				"b : UNSIGNED"}, 0},
+		{"wide(res", "function wide(x : UNSIGNED(7 downto 0)) " +
+			"return UNSIGNED", "architecture RTL of ALU",
+			[]string{"x : UNSIGNED(7 downto 0)"}, 0},
+		{"local(1", "function local(x : INTEGER) return INTEGER",
+			"process tick in architecture RTL of ALU",
+			[]string{"x : INTEGER"}, 0},
+		{"bare(2", "function bare(x : INTEGER) return INTEGER",
+			"process in architecture RTL of ALU",
+			[]string{"x : INTEGER"}, 0},
+		{"inside(1", "function inside(x : INTEGER) return INTEGER",
+			"block b in architecture RTL of ALU",
+			[]string{"x : INTEGER"}, 0},
+		{"gfun(1", "function gfun(x : INTEGER) return INTEGER",
+			"generate g in architecture RTL of ALU",
+			[]string{"x : INTEGER"}, 0},
+	} {
+		off := strings.Index(src, c.at)
+		if off < 0 {
+			t.Fatalf("no %q", c.at)
+		}
+		off += len(c.at)
+		sigs, ok := SignatureHelp(r, "a.vhd", off)
+		if !ok || len(sigs) != 1 {
+			t.Errorf("%s: %d signatures", c.at, len(sigs))
+			continue
+		}
+		s := sigs[0]
+		var params []string
+		for _, p := range s.Params {
+			if p.Start < 0 || p.End > len(s.Label) || p.Start >= p.End {
+				t.Errorf("%s: parameter %v in %q", c.at, p, s.Label)
+				continue
+			}
+			params = append(params, s.Label[p.Start:p.End])
+		}
+		if s.Label != c.label || s.Active != c.active ||
+			!slices.Equal(params, c.params) ||
+			s.Doc != "from "+c.origin {
+			t.Errorf("%s:\n got %q active %d %q\n doc %q\nwant %q "+
+				"active %d %q\n doc %q", c.at, s.Label, s.Active,
+				params, s.Doc, c.label, c.active, c.params,
+				"from "+c.origin)
+		}
+		name := s.Decl.Text
+		h, hok := HoverAt(r, "a.vhd", strings.Index(src, c.at))
+		if !hok || !strings.Contains(h.Markdown, "from "+c.origin) {
+			t.Errorf("%s: hover %q, want from %s", c.at, h.Markdown,
+				c.origin)
+		}
+		found := false
+		for _, it := range Complete(r, "a.vhd", strings.Index(src, c.at)) {
+			if it.Label == name &&
+				strings.Contains(it.Detail, "from "+c.origin) {
+				found = true
+			}
+		}
+		if !found {
+			t.Errorf("%s: completion has no %s from %s", c.at, name,
+				c.origin)
+		}
+	}
+	got := map[sema.UnitKind]string{}
+	for _, u := range r.Units {
+		if u.File == nil || u.File.Bundled {
+			continue
+		}
+		for _, d := range u.Decls {
+			if d.Text == "get" && d.Kind == sema.DeclFunction {
+				got[u.Kind] = declaredAt(d)
+			}
+		}
+	}
+	if got[sema.UnitPackage] != "protected counter_t in work.maths" ||
+		got[sema.UnitPackageBody] != "protected body counter_t in "+
+			"package body work.maths" {
+		t.Errorf("protected method: %v", got)
+	}
 }
