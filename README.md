@@ -39,9 +39,9 @@ The outline lists entity `alu` as Interface, its ports and signal
 `added` as Variable, process `tick` as Method and instance `u_add` as
 Object.
 
-![Lint warnings and an undeclared-name error](docs/images/diagnostics.png)
+![Lint warnings and an undeclared name in one file](docs/images/diagnostics.png)
 
-Lint warnings and an undeclared name, with signs and virtual text.
+Lint warnings and an undeclared name in the same file, with signs and virtual text.
 
 ## Install
 

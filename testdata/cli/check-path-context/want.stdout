@@ -1,2 +1,4 @@
+rtl/top.vhd:4:9: warning[lint/unused-signal]: port d is never read
+rtl/top.vhd:8:10: warning[lint/unused-signal]: signal s is never used
 rtl/top.vhd:8:21: error[sema/undefined]: nope is not declared
-summary: 1 errors, 0 warnings, 0 hints, 1 files
+summary: 1 errors, 2 warnings, 0 hints, 1 files

@@ -83,6 +83,7 @@ result; positions are zero-based UTF-8.
 | `range-format/bad-end` | a range end that is not LINE:COL is a usage error (exit 2) |
 | `diagnostics/cross-file` | `gohard lsp diagnostics --at PATH:1:1`: the syntax and semantic diagnostics published for a file using a package in another file |
 | `diagnostics/unsupported-construct` | a construct GoHard does not implement gives the same `unsupported/construct` ("please report") diagnostic as `gohard check` (#25) |
+| `diagnostics/error-and-lint` | a file with an undeclared name still publishes its lint warnings (unused port, unused signal, sensitivity list, latch) beside the error (#119) |
 | `completion/record-field` | after `p.` the fields of the record signal `p` |
 | `completion/library-units` | after `work.` the primary units of the library and `all` |
 | `completion/library-name` | library names (`ieee`) |

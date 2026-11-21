@@ -3,4 +3,5 @@ p.vhd:6:8: error[syntax/standard]: arrays of protected types requires VHDL-2019 
 p.vhd:8:18: error[syntax/standard]: protected-type and access parameters on functions requires VHDL-2019 or later (standard is 2008)
 top.vhd:4:18: error[syntax/standard]: shared-variable ports of protected type requires VHDL-2019 or later (standard is 2008)
 top.vhd:8:10: error[syntax/standard]: inferred constraints requires VHDL-2019 or later (standard is 2008)
-summary: 5 errors, 0 warnings, 0 hints, 2 files
+top.vhd:8:10: warning[lint/unused-signal]: signal s is never used
+summary: 5 errors, 1 warnings, 0 hints, 2 files

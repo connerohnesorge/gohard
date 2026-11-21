@@ -571,3 +571,174 @@ end;
 		},
 	}})
 }
+
+// analyzeAny is analyze without failing on analysis diagnostics: the
+// lint findings of a file that also has errors.
+func analyzeAny(t *testing.T, src string) *sema.Result {
+	t.Helper()
+	return sema.Analyze(sema.Input{
+		Files:  []sema.Source{{Path: "a.vhd", Text: []byte(src)}},
+		Config: config.Defaults(),
+	})
+}
+
+func hasDiag(ds []diag.Diagnostic, code diag.Code, text string) bool {
+	for _, d := range ds {
+		if d.Code == code && strings.Contains(d.Message, text) {
+			return true
+		}
+	}
+	return false
+}
+
+// beside is one file that has errors and the lint findings that must
+// still be published for it.
+type beside struct {
+	name string
+	src  string
+	// code, when set, must be among the analysis diagnostics. The
+	// text must occur in that diagnostic's message.
+	code diag.Code
+	text string
+	want []string
+}
+
+func runBeside(t *testing.T, c beside) {
+	t.Helper()
+	r := analyzeAny(t, c.src)
+	if c.code != "" && !hasDiag(r.Diagnostics, c.code, c.text) {
+		t.Fatalf("no %s diagnostic mentioning %q:\n%s", c.code, c.text,
+			strings.Join(shows(r.Diagnostics), "\n"))
+	}
+	got := shows(Check(r, allOn))
+	want := slices.Clone(c.want)
+	slices.Sort(want)
+	if !slices.Equal(got, want) {
+		t.Errorf("got\n\t%s\nwant\n\t%s",
+			strings.Join(got, "\n\t"), strings.Join(want, "\n\t"))
+	}
+}
+
+// TestLintBesideErrors: a semantic error does not hide lint findings
+// that do not depend on the broken name (#119). A syntax error
+// withholds only a finding whose signal is named inside the error
+// node, where the reference that would silence it may have been
+// swallowed. A syntax error that names some other signal leaves the
+// finding in place.
+func TestLintBesideErrors(t *testing.T) {
+	latch := "a.vhd:10:7: lint/latch: y is not assigned on every path " +
+		"through the process, so it infers a latch"
+	sens := "a.vhd:9:8: lint/sensitivity-list: en is read in the " +
+		"process but is not in its sensitivity list"
+	unused := []string{
+		"a.vhd:3:16: lint/unused-signal: port b is never read",
+		"a.vhd:6:10: lint/unused-signal: signal spare is never used",
+	}
+	kept := append(append([]string{}, unused...), sens, latch)
+	for _, c := range []beside{
+		{
+			name: "undeclared name",
+			src: header + `entity e is
+  port (a, en, b : in std_logic; y : out std_logic);
+end;
+architecture a of e is
+  signal spare : std_logic;
+begin
+  p : process (a) begin
+    if en = '1' then
+      y <= a;
+    end if;
+  end process;
+  assert missing = '1';
+end;
+`,
+			code: diag.SemaUndefined, text: "missing", want: kept,
+		}, {
+			// `<= other` is a syntax error. It names neither port,
+			// spare, en nor y, so every finding stays.
+			name: "syntax keeps unrelated",
+			src: header + `entity e is
+  port (a, en, b : in std_logic; y : out std_logic);
+end;
+architecture a of e is
+  signal spare : std_logic;
+begin
+  p : process (a) begin
+    if en = '1' then
+      y <= a;
+    end if;
+  end process;
+  <= other;
+end;
+`,
+			code: diag.SyntaxError, text: "<=", want: kept,
+		}, {
+			// The only use of spare is inside the error node, so
+			// spare is not reported unused. dead is never named
+			// there and still is.
+			name: "syntax swallows a use",
+			src: header + `entity e is
+  port (a : in std_logic; y : out std_logic);
+end;
+architecture a of e is
+  signal spare, dead : std_logic;
+begin
+  y <= a;
+  <= spare;
+end;
+`,
+			code: diag.SyntaxError, text: "<=",
+			want: []string{
+				"a.vhd:6:17: lint/unused-signal: signal dead is never used",
+			},
+		}, {
+			// The else branch's broken assignment names y, so y's
+			// latch is withheld. z is not named there and still is.
+			name: "syntax swallows one assignment",
+			src: header + `entity e is
+  port (en, a : in std_logic; y, z : out std_logic);
+end;
+architecture a of e is
+begin
+  p : process (en, a) begin
+    if en = '1' then
+      y <= a;
+      z <= a;
+    else
+      <= y;
+    end if;
+  end process;
+end;
+`,
+			code: diag.SyntaxError, text: "<=",
+			want: []string{
+				"a.vhd:10:7: lint/latch: z is not assigned on every " +
+					"path through the process, so it infers a latch",
+			},
+		}, {
+			// The `<=` ends the sensitivity list before b. b and c
+			// are read and are not names inside that error, so both
+			// sensitivity findings stay.
+			name: "syntax in the sensitivity list",
+			src: header + `entity e is
+  port (a, b, c : in std_logic; y : out std_logic);
+end;
+architecture a of e is
+begin
+  p : process (a, <= b) begin
+    y <= a and b and c;
+  end process;
+end;
+`,
+			code: diag.SyntaxError, text: "<=",
+			want: []string{
+				"a.vhd:8:16: lint/sensitivity-list: b is read in the " +
+					"process but is not in its sensitivity list",
+				"a.vhd:8:22: lint/sensitivity-list: c is read in the " +
+					"process but is not in its sensitivity list",
+			},
+		},
+	} {
+		t.Run(c.name, func(t *testing.T) { runBeside(t, c) })
+	}
+}
