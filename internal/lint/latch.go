@@ -18,17 +18,17 @@ import (
 // signal, variable or file (a generic, a constant, a pure function of
 // them) picks the same path every time the process runs, so it counts
 // as assigning what any of its paths assigns.
-func latches(res *sema.Result, m *meter, sev diag.Severity) []finding {
-	bad := errorFiles(res)
+func latches(res *sema.Result, m *meter, sev diag.Severity, h holes,
+) []finding {
 	var out []finding
 	for _, u := range res.Units {
-		if !trusted(u, bad) {
+		if !analyzable(u) {
 			continue
 		}
 		l := latch{u: u, m: m, root: u.File.Root()}
 		for _, st := range processes(u.Body) {
 			p := cst.ProcessStmt{Node: st.Node}
-			if p.Sensitivity().IsZero() || clocked(m, u, p) ||
+			if p.Sensitivity().IsZero() || clocked(m, u, p, h) ||
 				waits(st.Seq) {
 				continue
 			}
@@ -37,8 +37,14 @@ func latches(res *sema.Result, m *meter, sev diag.Severity) []finding {
 			if m.over(u) {
 				break
 			}
+			body := p.Stmts().Span()
 			for _, d := range l.order {
 				if all[d] {
+					continue
+				}
+				// An assignment of d may sit in a syntax error here.
+				if h.overlaps(u.File, body) &&
+					h.mentions(u.File, body, useKeys(d, u)) {
 					continue
 				}
 				f := diag.New(diag.LintLatch, d.Text)

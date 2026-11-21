@@ -19,11 +19,11 @@ import (
 // reads of every element or field of that signal, so listing r.x and
 // reading r.w gives no finding.
 func sensitivity(res *sema.Result, m *meter, sev diag.Severity,
+	h holes,
 ) []finding {
-	bad := errorFiles(res)
 	var out []finding
 	for _, u := range res.Units {
-		if !trusted(u, bad) {
+		if !analyzable(u) {
 			continue
 		}
 		root := u.File.Root()
@@ -36,7 +36,8 @@ func sensitivity(res *sema.Result, m *meter, sev diag.Severity,
 			}
 			p := cst.ProcessStmt{Node: n}
 			sl := p.Sensitivity()
-			if sl.IsZero() || !sl.All().IsZero() || clocked(m, u, p) {
+			if sl.IsZero() || !sl.All().IsZero() ||
+				clocked(m, u, p, h) {
 				continue
 			}
 			listed := map[*sema.Decl]bool{}
@@ -53,6 +54,11 @@ func sensitivity(res *sema.Result, m *meter, sev diag.Severity,
 					continue
 				}
 				listed[d] = true // one finding per signal, at its first read
+				// The list may have named d inside a syntax error.
+				if h.overlaps(u.File, sl.Span()) &&
+					h.mentions(u.File, sl.Span(), useKeys(d, u)) {
+					continue
+				}
 				f := diag.New(diag.LintSensitivityList,
 					ListName(u.File, n, r.Decl))
 				f.Severity = sev
@@ -81,11 +87,16 @@ func ListName(f *sema.File, proc cst.Node, d *sema.Decl) string {
 
 // clocked reports whether process p tests a clock edge: it calls
 // rising_edge or falling_edge, or reads 'event or 'stable.
-func clocked(m *meter, u *sema.Unit, p cst.ProcessStmt) bool {
+func clocked(m *meter, u *sema.Unit, p cst.ProcessStmt, h holes) bool {
 	tick := false
 	for t := range p.DescendantTokens() {
 		if !m.spend(u, 1) {
 			return true // u is over its budget: its findings are dropped
+		}
+		// A token the parser swallowed is not a clock edge.
+		if h.overlaps(u.File, t.Span()) {
+			tick = false
+			continue
 		}
 		s := strings.ToLower(t.Text())
 		switch {

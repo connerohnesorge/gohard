@@ -14,6 +14,7 @@ import (
 	"github.com/connerohnesorge/gohard/v2/internal/diag"
 	"github.com/connerohnesorge/gohard/v2/internal/eval"
 	"github.com/connerohnesorge/gohard/v2/internal/sema"
+	"github.com/connerohnesorge/gohard/v2/internal/token"
 )
 
 // Check returns the lint findings of res under cfg. Each design unit's
@@ -32,18 +33,19 @@ func check(res *sema.Result, cfg config.Lint, m *meter,
 	if res == nil {
 		return nil
 	}
+	h := newHoles(res)
 	var fs []finding
 	if sev, on := severity(cfg.UnusedSignal); on {
-		fs = append(fs, unusedSignals(res, m, sev)...)
+		fs = append(fs, unusedSignals(res, m, sev, h)...)
 	}
 	if sev, on := severity(cfg.ClockEdgeStyle); on {
-		fs = append(fs, edgeStyle(res, m, sev)...)
+		fs = append(fs, edgeStyle(res, m, sev, h)...)
 	}
 	if sev, on := severity(cfg.Latch); on {
-		fs = append(fs, latches(res, m, sev)...)
+		fs = append(fs, latches(res, m, sev, h)...)
 	}
 	if sev, on := severity(cfg.SensitivityList); on {
-		fs = append(fs, sensitivity(res, m, sev)...)
+		fs = append(fs, sensitivity(res, m, sev, h)...)
 	}
 	var ds []diag.Diagnostic
 	for _, f := range fs {
@@ -111,22 +113,171 @@ func severity(v string) (sev diag.Severity, on bool) {
 	return 0, false
 }
 
-// trusted reports whether u's references are complete: a unit GoHard
-// could not fully analyze, or whose file has errors, may miss the
-// references that would silence a finding.
-func trusted(u *sema.Unit, bad map[string]bool) bool {
-	return !u.Opaque && !u.Unchecked && !bad[u.File.Path]
+// analyzable reports whether u's references are complete. An opaque
+// unit, or a unit that depends on one, was not fully analyzed, so a
+// missing reference could be anywhere in it and no lint rule runs on
+// it. A semantic error leaves every other name resolved. A syntax
+// error swallows names only inside its error nodes (holes); each
+// rule then skips only a finding those names could silence.
+func analyzable(u *sema.Unit) bool {
+	return u != nil && !u.Opaque && !u.Unchecked
 }
 
-// errorFiles returns the paths of the files with errors.
-func errorFiles(res *sema.Result) map[string]bool {
-	bad := map[string]bool{}
+// nameAt is an identifier token inside a syntax-error node.
+type nameAt struct {
+	key sema.Key
+	at  cst.Range
+}
+
+// gap is one error node the parser swallowed.
+type gap struct {
+	span  cst.Range
+	names []nameAt
+}
+
+// holes are the syntax errors of a result, by file. A file with only
+// semantic errors has none.
+type holes struct {
+	byFile map[*sema.File][]gap
+}
+
+// newHoles collects the error nodes of files that have a syntax/error.
+// Other files are not walked: a semantic error leaves the tree intact.
+func newHoles(res *sema.Result) holes {
+	h := holes{}
+	if res == nil {
+		return h
+	}
+	broken := map[string]bool{}
 	for _, d := range res.Diagnostics {
-		if d.Severity == diag.Error {
-			bad[d.Path] = true
+		if d.Code == diag.SyntaxError {
+			broken[d.Path] = true
 		}
 	}
-	return bad
+	if len(broken) == 0 {
+		return h
+	}
+	h.byFile = map[*sema.File][]gap{}
+	for _, f := range res.Files {
+		if f == nil || f.Parse == nil || !broken[f.Path] {
+			continue
+		}
+		var gs []gap
+		for n := range f.Root().Descendants() {
+			if n.Kind() != cst.KindErrorNode || n.Inactive() {
+				continue
+			}
+			sp := n.Span()
+			if len(gs) > 0 {
+				p := gs[len(gs)-1].span
+				if p.Start <= sp.Start && sp.End <= p.End {
+					continue // a node inside the one just recorded
+				}
+			}
+			g := gap{span: sp}
+			for t := range n.DescendantTokens() {
+				knd := t.Kind()
+				if knd != token.Identifier &&
+					knd != token.ExtendedIdentifier {
+					continue
+				}
+				if k := sema.TokenKey(t); k != "" {
+					g.names = append(g.names, nameAt{k, t.Span()})
+				}
+			}
+			gs = append(gs, g)
+		}
+		if len(gs) > 0 {
+			h.byFile[f] = gs
+		}
+	}
+	return h
+}
+
+// overlaps reports whether an error node in f overlaps rg.
+func (h holes) overlaps(f *sema.File, rg cst.Range) bool {
+	for _, g := range h.byFile[f] {
+		if g.span.Start < rg.End && rg.Start < g.span.End {
+			return true
+		}
+	}
+	return false
+}
+
+// mentions reports whether an error node overlapping rg contains one
+// of keys inside rg. A reference of that name may have been swallowed
+// there, and only there.
+func (h holes) mentions(f *sema.File, rg cst.Range, keys []sema.Key,
+) bool {
+	if f == nil || len(keys) == 0 {
+		return false
+	}
+	want := map[sema.Key]bool{}
+	for _, k := range keys {
+		if k != "" {
+			want[k] = true
+		}
+	}
+	if len(want) == 0 {
+		return false
+	}
+	for _, g := range h.byFile[f] {
+		if g.span.End <= rg.Start || g.span.Start >= rg.End {
+			continue
+		}
+		for _, n := range g.names {
+			if n.at.End <= rg.Start || n.at.Start >= rg.End {
+				continue
+			}
+			if want[n.key] {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// useKeys returns d's name and the names of aliases of d declared in
+// units. A swallowed use may name the alias rather than d.
+func useKeys(d *sema.Decl, units ...*sema.Unit) []sema.Key {
+	if d == nil || d.Name == "" {
+		return nil
+	}
+	ks := []sema.Key{d.Name}
+	seen := map[sema.Key]bool{d.Name: true}
+	for _, u := range units {
+		if u == nil {
+			continue
+		}
+		for _, a := range u.Decls {
+			if a.Kind != sema.DeclAlias || object(a) != d ||
+				a.Name == "" || seen[a.Name] {
+				continue
+			}
+			seen[a.Name] = true
+			ks = append(ks, a.Name)
+		}
+	}
+	return ks
+}
+
+// hidesUse reports whether a syntax error in one of units swallowed a
+// token of d's name or of an alias of d. The use that would silence
+// an unused-signal finding may be that token.
+func (h holes) hidesUse(d *sema.Decl, units ...*sema.Unit) bool {
+	if len(h.byFile) == 0 {
+		return false
+	}
+	keys := useKeys(d, units...)
+	for _, u := range units {
+		if u == nil || u.Node.IsZero() {
+			continue
+		}
+		if h.mentions(u.File, u.Node.Span(), keys) {
+			return true
+		}
+	}
+	return false
 }
 
 func at(f *sema.File, rg cst.Range, d diag.Diagnostic) diag.Diagnostic {

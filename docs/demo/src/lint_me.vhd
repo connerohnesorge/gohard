@@ -28,4 +28,6 @@ begin
       q <= a;
     end if;
   end process;
+
+  assert missing = '1';
 end architecture rtl;

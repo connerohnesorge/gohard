@@ -314,31 +314,23 @@ local function wait_diags(buf, pred, what)
 end
 
 local function open_diagnostics(demo)
-  -- Lint findings are not published for a file that already has an
-  -- error, so the warning and the error live in two buffers.
+  -- One file carries the lint warnings and an undeclared name.
   edit_vhdl(demo .. '/src/lint_me.vhd')
-  local lint = vim.api.nvim_get_current_buf()
-  wait_client(lint)
-  wait_diags(lint, function(ds)
+  local buf = vim.api.nvim_get_current_buf()
+  wait_client(buf)
+  wait_diags(buf, function(ds)
+    local warn, err = false, false
     for _, d in ipairs(ds) do
       if d.severity == vim.diagnostic.severity.WARN then
-        return true
+        warn = true
+      end
+      if d.severity == vim.diagnostic.severity.ERROR
+        and d.message:find('not declared', 1, true) then
+        err = true
       end
     end
-  end, 'lint warnings')
-  vim.cmd('botright 11split ' .. vim.fn.fnameescape(demo .. '/src/undeclared.vhd'))
-  if vim.bo.filetype ~= 'vhdl' then
-    vim.bo.filetype = 'vhdl'
-  end
-  local err = vim.api.nvim_get_current_buf()
-  wait_client(err)
-  wait_diags(err, function(ds)
-    for _, d in ipairs(ds) do
-      if d.severity == vim.diagnostic.severity.ERROR then
-        return true
-      end
-    end
-  end, 'error diagnostic')
+    return warn and err
+  end, 'lint warnings beside an error')
   place('missing', 1)
   vim.cmd.redraw()
 end
@@ -454,30 +446,25 @@ local function probe(demo)
 
   edit_vhdl(demo .. '/src/lint_me.vhd')
   wait_client(0)
-  local warns = wait_diags(0, function(ds)
+  local diags = wait_diags(0, function(ds)
+    local warn, err = false, false
     for _, d in ipairs(ds) do
       if d.severity == vim.diagnostic.severity.WARN then
-        return true
+        warn = true
       end
-    end
-  end, 'lint warnings')
-  local warn_text = summarize_diags(warns)
-  check(warn_text:find('lint/latch', 1, true) ~= nil
-    and warn_text:find('lint/sensitivity-list', 1, true) ~= nil
-    and warn_text:find('lint/unused-signal', 1, true) ~= nil,
-    'lint warnings', warn_text)
-
-  edit_vhdl(demo .. '/src/undeclared.vhd')
-  wait_client(0)
-  local errs = wait_diags(0, function(ds)
-    for _, d in ipairs(ds) do
       if d.severity == vim.diagnostic.severity.ERROR
         and d.message:find('not declared', 1, true) then
-        return true
+        err = true
       end
     end
-  end, 'error diagnostic')
-  check(true, 'error diagnostic', summarize_diags(errs))
+    return warn and err
+  end, 'lint warnings beside an error')
+  local diag_text = summarize_diags(diags)
+  check(diag_text:find('lint/latch', 1, true) ~= nil
+    and diag_text:find('lint/sensitivity-list', 1, true) ~= nil
+    and diag_text:find('lint/unused-signal', 1, true) ~= nil
+    and diag_text:find('not declared', 1, true) ~= nil,
+    'lint warnings beside an error', diag_text)
 
   if #failures > 0 then
     os.exit(1)

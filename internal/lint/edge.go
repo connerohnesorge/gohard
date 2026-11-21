@@ -21,6 +21,7 @@ import (
 // edge test gets one sema/eval-limit warning for this rule in place
 // of its findings.
 func edgeStyle(res *sema.Result, m *meter, sev diag.Severity,
+	h holes,
 ) []finding {
 	type tick struct {
 		u  *sema.Unit
@@ -37,6 +38,11 @@ func edgeStyle(res *sema.Result, m *meter, sev diag.Severity,
 			if !m.spend(u, 1) {
 				cut = true
 				break
+			}
+			// A token the parser swallowed is not an edge test.
+			if h.overlaps(u.File, t.Span()) {
+				after = false
+				continue
 			}
 			s := strings.ToLower(t.Text())
 			switch {

@@ -1,0 +1,2 @@
+# An undeclared name does not hide the file's lint warnings (#119).
+gohard lsp diagnostics --at both.vhd:1:1

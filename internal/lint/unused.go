@@ -23,8 +23,8 @@ type use struct{ read, written bool }
 // shortcut: package signals are not checked, add them once the whole
 // design's readers are known to be in the analysis.
 func unusedSignals(res *sema.Result, m *meter, sev diag.Severity,
+	h holes,
 ) []finding {
-	bad := errorFiles(res)
 	uses := map[*sema.Decl]*use{}
 	type name struct{ lib, entity sema.Key }
 	archs := map[name][]*sema.Unit{}
@@ -84,7 +84,7 @@ func unusedSignals(res *sema.Result, m *meter, sev diag.Severity,
 		out = append(out, finding{u, at(d.File, d.Span, f)})
 	}
 	for _, u = range res.Units {
-		if !trusted(u, bad) || m.over(u) {
+		if !analyzable(u) || m.over(u) {
 			continue
 		}
 		for _, d := range u.Decls {
@@ -98,6 +98,10 @@ func unusedSignals(res *sema.Result, m *meter, sev diag.Severity,
 			switch {
 			case d.Kind == sema.DeclSignal &&
 				u.Kind == sema.UnitArchitecture:
+				// A use of d may sit in a syntax error in this unit.
+				if h.hidesUse(d, u) {
+					continue
+				}
 				switch {
 				case !x.read && !x.written:
 					report(d, "signal", "used")
@@ -114,9 +118,14 @@ func unusedSignals(res *sema.Result, m *meter, sev diag.Severity,
 				}
 				ok := true
 				for _, a := range as {
-					ok = ok && trusted(a, bad) && !m.over(a)
+					ok = ok && analyzable(a) && !m.over(a)
 				}
 				if !ok {
+					continue
+				}
+				// A use may sit in a syntax error in the entity or
+				// in one of its architectures.
+				if h.hidesUse(d, append([]*sema.Unit{u}, as...)...) {
 					continue
 				}
 				switch d.Mode {
