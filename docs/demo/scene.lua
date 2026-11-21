@@ -332,6 +332,11 @@ local function open_diagnostics(demo)
     return warn and err
   end, 'lint warnings beside an error')
   place('missing', 1)
+  -- The file fits the window. zz centered the error and scrolled the
+  -- unused-port warning off the top; keep the whole file in view.
+  if vim.api.nvim_buf_line_count(0) <= vim.api.nvim_win_get_height(0) then
+    vim.fn.winrestview({ topline = 1 })
+  end
   vim.cmd.redraw()
 end
 
