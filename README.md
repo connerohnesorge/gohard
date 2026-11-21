@@ -14,7 +14,7 @@ Neovim running this build of `gohard lsp` on the files in
 
 ![Hover on the signal added](docs/images/hover.png)
 
-Hover on `added` shows the signal and the comment above its declaration.
+Hover on `added` shows the signal, its range, and the comment above its declaration.
 
 ![Completion of the prefix pic](docs/images/completion.png)
 

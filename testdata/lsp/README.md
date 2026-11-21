@@ -108,9 +108,10 @@ result; positions are zero-based UTF-8.
 | `codeaction/create-testbench-vhdl93` | under `standard: "1993"`: the stimulus stops the clock through `done` and every process ends with `wait;` |
 | `codeaction/create-testbench-no-resource-operations` | `--no-resource-operations`, a client without the `create` resource operation: no Create testbench |
 | `hover/doc-comment` | a signal: its declaration and doc comment |
+| `hover/constrained` | a signal declared `unsigned(7 downto 0)` (#117): the type mark and the index constraint, plus its doc comment |
 | `hover/cross-library-call` | a call of a function of another library: the chosen overload, its package and doc comment |
 | `hover/bundled-operator` | an operator: the chosen overload from ieee.numeric_std |
-| `hover/record-field` | a record field with its doc comment |
+| `hover/record-field` | a record field with its index constraint and doc comment |
 | `hover/record-type` | a record type: its declaration with the element list, `from lib.pkg` and its doc comment |
 | `hover/enum-type` | an enumeration type: its declaration with the literals, `from lib.pkg` and its doc comment |
 | `hover/entity-doc` | a design unit: the doc comment above the entity, after the context clause |

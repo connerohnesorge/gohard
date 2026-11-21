@@ -395,7 +395,8 @@ func docText(trs []cst.Trivia) string {
 // Describe is a one-line description of d: its kind, name, type or
 // profile, and for subprograms and literals the unit it comes from
 // ("function "+" [UNSIGNED, UNSIGNED return UNSIGNED] from
-// ieee.numeric_std").
+// ieee.numeric_std"). An object's type is the subtype indication
+// written on its declaration (#117).
 func Describe(d *sema.Decl) string {
 	x := d.Denotes()
 	s := d.Kind.String() + " " + d.Text
@@ -405,7 +406,7 @@ func Describe(d *sema.Decl) string {
 	case x.Kind.IsObject() || x.Kind == sema.DeclElement ||
 		x.Kind == sema.DeclAlias || x.Kind == sema.DeclAttribute:
 		if x.Type != nil {
-			s += " : " + x.Type.Name()
+			s += " : " + subtypeText(d, x)
 		}
 	}
 	if u := x.Unit; u != nil && (x.Kind.IsSubprogram() ||
@@ -414,6 +415,158 @@ func Describe(d *sema.Decl) string {
 		s += " from " + string(u.Library) + "." + string(u.Name)
 	}
 	return s
+}
+
+// subtypeText is the subtype indication hover shows. The type mark is
+// Type.Name, the spelling at the type's own declaration: the bundled
+// std/ieee sources write UNSIGNED and STD_LOGIC in upper case, and a
+// user type keeps the case it was declared with. That is the same
+// name diagnostics already use, not a case change made for hover. A
+// resolution or constraint written on the declaration is kept, so the
+// width is visible ("signal added : UNSIGNED(7 downto 0)",
+// "INTEGER range 0 to 7", "rec(data(7 downto 0))").
+func subtypeText(d, denoted *sema.Decl) string {
+	if s, ok := writtenIndication(d); ok {
+		return s
+	}
+	if denoted != d {
+		if s, ok := writtenIndication(denoted); ok {
+			return s
+		}
+	}
+	return denoted.Type.Name()
+}
+
+// writtenIndication is the subtype indication of d when it writes a
+// resolution or a constraint, and ok is false when it does not (a bare
+// type mark, or a declaration that has no subtype indication).
+func writtenIndication(d *sema.Decl) (string, bool) {
+	if d == nil || d.Type == nil {
+		return "", false
+	}
+	si, ok := declIndication(d)
+	if !ok {
+		return "", false
+	}
+	res, cons := si.Resolution(), si.Constraint()
+	if res.IsZero() && cons.IsZero() {
+		return "", false
+	}
+	var b strings.Builder
+	if !res.IsZero() {
+		if s := tokenLine(res.Node); s != "" {
+			b.WriteString(s)
+			b.WriteByte(' ')
+		}
+	}
+	b.WriteString(d.Type.Name())
+	if !cons.IsZero() {
+		if s := tokenLine(cons.Node); s != "" {
+			if !strings.HasPrefix(s, "(") {
+				b.WriteByte(' ')
+			}
+			b.WriteString(s)
+		}
+	}
+	if b.Len() == 0 {
+		return "", false
+	}
+	return b.String(), true
+}
+
+// declIndication returns the subtype indication of an object, element
+// or alias declaration. A VHDL-2019 mode view keeps it on the mode
+// ("view v of rec(data(7 downto 0))"), not beside the names.
+func declIndication(d *sema.Decl) (cst.SubtypeIndication, bool) {
+	if d == nil || d.Node.IsZero() {
+		return cst.SubtypeIndication{}, false
+	}
+	var si cst.SubtypeIndication
+	switch n := d.Node; n.Kind() {
+	case cst.KindConstantDecl:
+		si = cst.ConstantDecl{Node: n}.Subtype()
+	case cst.KindSignalDecl:
+		si = cst.SignalDecl{Node: n}.Subtype()
+	case cst.KindVariableDecl:
+		si = cst.VariableDecl{Node: n}.Subtype()
+	case cst.KindFileDecl:
+		si = cst.FileDecl{Node: n}.Subtype()
+	case cst.KindElementDecl:
+		si = cst.ElementDecl{Node: n}.Subtype()
+	case cst.KindAliasDecl:
+		si = cst.AliasDecl{Node: n}.Subtype()
+	case cst.KindInterfaceObjectDecl:
+		io := cst.InterfaceObjectDecl{Node: n}
+		si = io.Subtype()
+		if si.IsZero() {
+			si = modeViewIndication(io.Mode().Node)
+		}
+	}
+	return si, !si.IsZero()
+}
+
+// modeViewIndication is the subtype of a mode view indication, or zero.
+func modeViewIndication(n cst.Node) cst.SubtypeIndication {
+	switch n.Kind() {
+	case cst.KindModeViewIndication:
+		return cst.ModeViewIndication{Node: n}.Subtype()
+	case cst.KindArrayModeViewIndication:
+		return cst.ArrayModeViewIndication{Node: n}.Subtype()
+	}
+	return cst.SubtypeIndication{}
+}
+
+// tokenLine joins the tokens under n into one line. Parentheses, dots
+// and attribute ticks stay tight, a sign keeps its operand against it
+// ("range -1"), and every other pair takes one space, so a character
+// literal keeps the space it spells ("range ' ' to '~'").
+func tokenLine(n cst.Node) string {
+	var b strings.Builder
+	var prev, before token.Kind
+	started := false
+	for t := range n.DescendantTokens() {
+		if t.Missing() || t.Inactive() || t.Text() == "" {
+			continue
+		}
+		k := t.Kind()
+		if started && tokenSpace(before, prev, k) {
+			b.WriteByte(' ')
+		}
+		b.WriteString(t.Text())
+		before, prev = prev, k
+		started = true
+	}
+	return b.String()
+}
+
+// tokenSpace reports whether a space belongs between prev and next.
+// before is the token that precedes prev.
+func tokenSpace(before, prev, next token.Kind) bool {
+	switch prev {
+	case token.LParen, token.Dot, token.Tick:
+		return false
+	case token.Plus, token.Minus:
+		if !tokenOperand(before) {
+			return false
+		}
+	}
+	switch next {
+	case token.LParen, token.RParen, token.Comma, token.Dot, token.Tick:
+		return false
+	}
+	return true
+}
+
+// tokenOperand reports a token a binary + or - can follow.
+func tokenOperand(k token.Kind) bool {
+	switch k {
+	case token.Identifier, token.ExtendedIdentifier,
+		token.IntegerLiteral, token.RealLiteral,
+		token.CharacterLiteral, token.StringLiteral,
+		token.BitStringLiteral, token.RParen:
+		return true
+	}
+	return false
 }
 
 // Edit replaces Span in the file at Path with NewText.
