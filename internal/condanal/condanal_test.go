@@ -195,3 +195,36 @@ func TestRegionsDisjoint(t *testing.T) {
 		}
 	}
 }
+
+// TestDeepNesting: deeply nested not and parentheses in a condition give
+// a syntax error instead of overflowing the stack (#124).
+func TestDeepNesting(t *testing.T) {
+	const n = 2_000_000
+	for _, src := range []string{
+		"`if " + strings.Repeat("not ", n) + "A = \"1\" then\n`end if",
+		"`if " + strings.Repeat("(", n) + "A = \"1\"" +
+			strings.Repeat(")", n) + " then\n`end if",
+		// An inactive branch is bounded too.
+		"`if A = \"1\" then\n`elsif " + strings.Repeat("not ", n) +
+			"A = \"1\" then\n`end if",
+	} {
+		res := analyze(src, token.Std2019, Define{"A", "1"})
+		for _, p := range res.Problems {
+			if p.Code != diag.SyntaxError {
+				t.Errorf("unexpected problem %v", p.Code)
+			}
+		}
+	}
+	res := analyze("`if "+strings.Repeat("not ", n)+"A = \"1\" then\n`end if",
+		token.Std2019, Define{"A", "1"})
+	if got := codes(res); !slices.Equal(got, []string{"syntax/error"}) {
+		t.Errorf("got %v, want one syntax/error", got)
+	}
+	// Moderate nesting still works.
+	res = analyze("`if "+strings.Repeat("not ", 100)+"A = \"1\" then\nx\n`end if",
+		token.Std2019, Define{"A", "1"})
+	if len(res.Problems) != 0 || !slices.Contains(active("`if "+
+		strings.Repeat("not ", 100)+"A = \"1\" then\nx\n`end if", res), "x") {
+		t.Errorf("100 nots: problems %v", codes(res))
+	}
+}
