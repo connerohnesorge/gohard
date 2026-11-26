@@ -14,6 +14,7 @@ package condanal
 import (
 	"bytes"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/connerohnesorge/gohard/v2/internal/diag"
@@ -311,7 +312,13 @@ type condParser struct {
 	sc     *scanner
 	report bool
 	failed bool
+	depth  int
 }
+
+// maxCondDepth bounds the nesting of not and parentheses in a condition,
+// so a hostile file cannot overflow the stack (#124). The main parser
+// uses the same limit.
+const maxCondDepth = 1000
 
 func (p *condParser) fail(t tok, msg string) {
 	if p.report && !p.failed {
@@ -349,6 +356,13 @@ func (p *condParser) expr() bool {
 // relation := not primary | ( expr ) | identifier relop string
 func (p *condParser) relation() bool {
 	t := p.sc.next()
+	if p.depth >= maxCondDepth {
+		p.fail(t, "condition is nested too deeply (more than "+
+			strconv.Itoa(maxCondDepth)+" levels)")
+		return false
+	}
+	p.depth++
+	defer func() { p.depth-- }()
 	switch {
 	case t.kind == tWord && strings.EqualFold(t.text, "not"):
 		return !p.relation()
